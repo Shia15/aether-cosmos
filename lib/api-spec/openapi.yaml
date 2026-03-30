@@ -1,15 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AETHER Knowledge Graph & Coherence System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: documents
+    description: Document ingestion and management
+  - name: graph
+    description: Knowledge graph operations
+  - name: concepts
+    description: Concept operations
+  - name: search
+    description: Semantic search
+  - name: equations
+    description: Equation lab operations
+  - name: coherence
+    description: Coherence metrics
 paths:
   /healthz:
     get:
@@ -24,6 +35,180 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [documents]
+      summary: List all ingested documents
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+    post:
+      operationId: ingestDocument
+      tags: [documents]
+      summary: Upload and ingest a document
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IngestDocumentRequest"
+      responses:
+        "200":
+          description: Document ingested
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+
+  /documents/{id}:
+    delete:
+      operationId: deleteDocument
+      tags: [documents]
+      summary: Delete a document and its concepts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /graph:
+    get:
+      operationId: getGraph
+      tags: [graph]
+      summary: Get full knowledge graph (nodes + edges)
+      responses:
+        "200":
+          description: Graph data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphData"
+
+  /concepts:
+    get:
+      operationId: listConcepts
+      tags: [concepts]
+      summary: List all concepts with coherence scores
+      responses:
+        "200":
+          description: List of concepts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Concept"
+
+  /concepts/{id}:
+    get:
+      operationId: getConcept
+      tags: [concepts]
+      summary: Get a single concept with its relations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Concept details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConceptDetail"
+
+  /search:
+    get:
+      operationId: searchConcepts
+      tags: [search]
+      summary: Search concepts by keyword or phrase
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [semantic, concept, coherence]
+            default: semantic
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchResult"
+
+  /equations:
+    get:
+      operationId: listEquations
+      tags: [equations]
+      summary: List equation candidates
+      responses:
+        "200":
+          description: Equation candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Equation"
+    post:
+      operationId: generateEquations
+      tags: [equations]
+      summary: Generate equation candidates from selected concepts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateEquationsRequest"
+      responses:
+        "200":
+          description: Generated equations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Equation"
+
+  /coherence/summary:
+    get:
+      operationId: getCoherenceSummary
+      tags: [coherence]
+      summary: Get global coherence metrics and cluster summary
+      responses:
+        "200":
+          description: Coherence summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoherenceSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +219,291 @@ components:
       required:
         - status
 
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        conceptCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - content
+        - conceptCount
+        - createdAt
+
+    IngestDocumentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+      required:
+        - title
+        - content
+
+    GraphNode:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+          enum: [concept, paper, equation, claim]
+        coherence:
+          type: number
+        documentId:
+          type: string
+        size:
+          type: number
+      required:
+        - id
+        - label
+        - type
+        - coherence
+
+    GraphEdge:
+      type: object
+      properties:
+        source:
+          type: string
+        target:
+          type: string
+        weight:
+          type: number
+        type:
+          type: string
+      required:
+        - source
+        - target
+        - weight
+        - type
+
+    GraphData:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphEdge"
+        globalCoherence:
+          type: number
+        nodeCount:
+          type: integer
+        edgeCount:
+          type: integer
+      required:
+        - nodes
+        - edges
+        - globalCoherence
+        - nodeCount
+        - edgeCount
+
+    Concept:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        coherence:
+          type: number
+        supportCount:
+          type: integer
+        contradictCount:
+          type: integer
+        documentIds:
+          type: array
+          items:
+            type: string
+        relatedConcepts:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - coherence
+        - supportCount
+        - contradictCount
+        - documentIds
+        - relatedConcepts
+
+    ConceptDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        coherence:
+          type: number
+        supportCount:
+          type: integer
+        contradictCount:
+          type: integer
+        documentIds:
+          type: array
+          items:
+            type: string
+        relatedConcepts:
+          type: array
+          items:
+            type: string
+        equations:
+          type: array
+          items:
+            type: string
+        claims:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - coherence
+        - supportCount
+        - contradictCount
+        - documentIds
+        - relatedConcepts
+        - equations
+        - claims
+
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        coherence:
+          type: number
+        relevance:
+          type: number
+        snippet:
+          type: string
+      required:
+        - id
+        - name
+        - type
+        - coherence
+        - relevance
+
+    Equation:
+      type: object
+      properties:
+        id:
+          type: string
+        latex:
+          type: string
+        description:
+          type: string
+        score:
+          type: number
+        conceptIds:
+          type: array
+          items:
+            type: string
+        domain:
+          type: string
+      required:
+        - id
+        - latex
+        - description
+        - score
+        - conceptIds
+
+    GenerateEquationsRequest:
+      type: object
+      properties:
+        conceptIds:
+          type: array
+          items:
+            type: string
+        domain:
+          type: string
+      required:
+        - conceptIds
+
+    ClusterSummary:
+      type: object
+      properties:
+        name:
+          type: string
+        coherence:
+          type: number
+        conceptCount:
+          type: integer
+        concepts:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - coherence
+        - conceptCount
+        - concepts
+
+    CoherenceSummary:
+      type: object
+      properties:
+        globalCoherence:
+          type: number
+        nodeCount:
+          type: integer
+        edgeCount:
+          type: integer
+        topCluster:
+          $ref: "#/components/schemas/ClusterSummary"
+        weakestLink:
+          type: object
+          properties:
+            from:
+              type: string
+            to:
+              type: string
+            weight:
+              type: number
+          required:
+            - from
+            - to
+            - weight
+        clusters:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClusterSummary"
+        documentCount:
+          type: integer
+      required:
+        - globalCoherence
+        - nodeCount
+        - edgeCount
+        - clusters
+        - documentCount
