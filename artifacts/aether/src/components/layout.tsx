@@ -9,12 +9,14 @@ import {
   Cpu,
   Layers,
   Workflow,
-  Waves
+  Waves,
+  Brain
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "Graph Map", icon: Network },
+  { href: "/ecosystem", label: "Ecosystem", icon: Brain },
   { href: "/architecture", label: "Architecture", icon: Layers },
   { href: "/pipeline", label: "Pipeline", icon: Workflow },
   { href: "/lattice", label: "CGLE Lattice", icon: Waves },
