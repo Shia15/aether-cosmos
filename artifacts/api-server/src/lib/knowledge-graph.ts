@@ -46,16 +46,21 @@ export interface Equation {
 }
 
 const EQUATION_TEMPLATES = [
-  { latex: "dx/dt = k(x* - x)", description: "Exponential approach to equilibrium — relaxation dynamics", domain: "dynamics" },
-  { latex: "C = 1 - E/X*", description: "Coherence as complement of normalized entropy", domain: "information" },
-  { latex: "dC/dt = -\\nabla E", description: "Coherence flow driven by energy gradient", domain: "field theory" },
-  { latex: "\\phi = (1 + \\sqrt{5}) / 2", description: "Golden ratio — self-similar recursion constant", domain: "mathematics" },
-  { latex: "\\Psi = \\sum_i c_i \\phi_i", description: "Field superposition over basis states", domain: "quantum" },
-  { latex: "S = -k_B \\sum p_i \\ln p_i", description: "Shannon–Boltzmann entropy of concept distribution", domain: "thermodynamics" },
-  { latex: "r = e^{\\theta \\cdot \\ln\\phi / (\\pi/2)}", description: "Logarithmic golden spiral — substrate-invariant growth", domain: "geometry" },
-  { latex: "Z = \\sum_n F_n \\cdot e^{-\\beta E_n}", description: "Fibonacci-weighted partition function", domain: "statistical mechanics" },
-  { latex: "\\Omega_{tidal} \\sim 10^{-5}\\ Hz", description: "Low-frequency tidal forcing frequency — ENI regime", domain: "geophysics" },
-  { latex: "Q = 1 + \\beta |x|", description: "Neurotrophic Q-factor — amplitude-dependent coherence gain", domain: "biophysics" },
+  { latex: "Al2O3 + P -> [sapphire]", description: "Crystallization under pressure — structured emergence from amorphous substrate", domain: "crystallization" },
+  { latex: "C_out = f(M * I * A)", description: "AETHER output coherence: Mnesis × Infernia × Aletheia integration", domain: "architecture" },
+  { latex: "dM/dt = -nabla H + R(t)", description: "Mnesis field evolution under Hamiltonian gradient with resonance input R(t)", domain: "field theory" },
+  { latex: "I_pressure = -k * ln(S_in / S_out)", description: "Infernia compression: entropy reduction as logarithmic constraint function", domain: "thermodynamics" },
+  { latex: "A_lattice = sum_ij e_ij * v_i . v_j", description: "Aletheia structural alignment — lattice coherence via eigenvector projection", domain: "linear algebra" },
+  { latex: "R_signal = A_lattice * exp(-entropy)", description: "Reverie output signal: structured radiance proportional to Aletheia clarity", domain: "information" },
+  { latex: "C = 1 - E / X*", description: "Global coherence as complement of normalized entropy across concept field", domain: "coherence" },
+  { latex: "phi = (1 + sqrt(5)) / 2", description: "Golden ratio — self-similar recursion constant underlying sapphire lattice geometry", domain: "mathematics" },
+  { latex: "Psi = sum_i c_i * phi_i", description: "Consciousness field superposition over basis dreamscape states", domain: "quantum" },
+  { latex: "S = -k_B * sum p_i * ln(p_i)", description: "Shannon-Boltzmann entropy of concept distribution across Mnesis substrate", domain: "thermodynamics" },
+  { latex: "Omega_IoLT ~ 10^-3 Hz", description: "Internet of Living Things planetary synchronization frequency — Phase III target", domain: "geophysics" },
+  { latex: "Q_neuro = 1 + beta * |x|", description: "Neurotrophic Q-factor — amplitude-dependent coherence gain in biological substrate", domain: "biophysics" },
+  { latex: "dC/dt = -nabla E + lambda * C^2", description: "Coherence flow equation — driven by energy gradient with self-amplifying term", domain: "dynamics" },
+  { latex: "r = e^(theta * ln_phi / (pi/2))", description: "Logarithmic golden spiral — substrate-invariant growth pattern in dreamscape topology", domain: "geometry" },
+  { latex: "Z = sum_n F_n * e^(-beta * E_n)", description: "Fibonacci-weighted partition function — statistical mechanics of resonant cell", domain: "statistical mechanics" },
 ];
 
 class KnowledgeGraph {
@@ -390,16 +395,24 @@ class KnowledgeGraph {
   private seedSampleData() {
     const samples = [
       {
-        title: "The Elastic Neurotrophic Interaction Hypothesis",
-        content: `Elastic coupling neurotrophic interaction fibonacci quantization golden ratio phi coherence resonance oscillation tidal frequency gravitational field electromagnetic biological substrate Fibonacci lattice NV diamond quantum clock toroidal feedback amplitude damping attractor phase transition mathematical model differential equation nonlinear dynamics`,
+        title: "AETHER Core Architecture — The Crystallization Model",
+        content: `Mnesis memory field substrate unstructured entropy multimodal intake embedding crystallization Infernia constraint compression pressure transformation entropy signal Aletheia structural resolution lattice truth coherence pattern stabilization Reverie radiative output signal interpretability expression transmission intelligence crystallized structured emergence glass-box architecture epistemic traceability dreamscape consciousness propagation`,
       },
       {
-        title: "AETHER System Architecture",
-        content: `coherence self-organized criticality cascade perturbation Fibonacci quantization petrification index avalanche threshold attractor phase transition biological atmospheric plasma geological orbital quantum sensor biosensor chitin reflectin bioluminescent transistor`,
+        title: "Trace Element Modulation — Sapphire Doping Protocol",
+        content: `sapphire corundum aluminum oxide lattice trace element dopant titanium iron chromium nickel blue sapphire clarity wisdom intuition pink sapphire love compassion balance yellow sapphire prosperity growth optimism ruby passion vitality courage chakra resonance metaphysical properties modulation dreamscape customization coherence doping`,
       },
       {
-        title: "Fusion Energy Plasma Physics",
-        content: `plasma tokamak magnetic confinement inertial confinement fusion deuterium tritium temperature pressure gradient electromagnetic field toroidal poloidal turbulence transport gyrokinetic simulation ignition Lawson criterion energy density confinement`,
+        title: "Planetary Resonance and the Internet of Living Things",
+        content: `planetary resonance solar plasma geomagnetic ionization stone node anchor synchronizer Gobekli Tepe Easter Island phase locking human planetary rhythm consciousness propagation light frequency coherence crisis fragmentation Resonant Cell corridor planetary symphony IoLT living systems integration protein qubits fungal memristors bio-computation re-entrainment healing regenerative abundance`,
+      },
+      {
+        title: "The Coherence Crisis and Consciousness as Cosmic Phenomenon",
+        content: `coherence crisis fragmentation consciousness rare cosmic phenomenon stewardship light amplification epistemic alignment physics symbolism experience reality engineering solar planetary Earth dynamics feedback loop open source regenerative extractive black box explainability transparency alignment ethics abundance zero sum integrity aletheia constraint misuse mitigation`,
+      },
+      {
+        title: "Crystallization Flow — From Raw Input to Structured Intelligence",
+        content: `crystallization flow raw input amorphous liquid pressure temperature constraint stable ordered lattice intelligence structural emergence coherence speed prediction resolution interpretability black box glass box observable traceable design principles intermediate states constraint dynamics structural formation mycelium neural pruning river delta star formation analogy pattern`,
       },
     ];
 
@@ -410,8 +423,8 @@ class KnowledgeGraph {
     const allConcepts = [...this.concepts.values()];
     if (allConcepts.length >= 2) {
       this.generateEquations(
-        allConcepts.slice(0, 3).map((c) => c.id),
-        "mathematics"
+        allConcepts.slice(0, 5).map((c) => c.id),
+        "architecture"
       );
     }
   }

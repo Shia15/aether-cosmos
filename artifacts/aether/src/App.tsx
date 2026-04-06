@@ -9,6 +9,7 @@ import UploadView from "@/pages/upload";
 import CoherenceView from "@/pages/coherence";
 import SearchView from "@/pages/search";
 import EquationsView from "@/pages/equations";
+import ArchitectureView from "@/pages/architecture";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={GraphView} />
+        <Route path="/architecture" component={ArchitectureView} />
         <Route path="/upload" component={UploadView} />
         <Route path="/coherence" component={CoherenceView} />
         <Route path="/search" component={SearchView} />
