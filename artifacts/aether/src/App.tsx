@@ -11,6 +11,7 @@ import SearchView from "@/pages/search";
 import EquationsView from "@/pages/equations";
 import ArchitectureView from "@/pages/architecture";
 import PipelineView from "@/pages/pipeline";
+import LatticeView from "@/pages/lattice";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ function Router() {
         <Route path="/search" component={SearchView} />
         <Route path="/equations" component={EquationsView} />
         <Route path="/pipeline" component={PipelineView} />
+        <Route path="/lattice" component={LatticeView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

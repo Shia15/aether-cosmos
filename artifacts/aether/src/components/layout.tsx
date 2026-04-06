@@ -8,7 +8,8 @@ import {
   FunctionSquare,
   Cpu,
   Layers,
-  Workflow
+  Workflow,
+  Waves
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Graph Map", icon: Network },
   { href: "/architecture", label: "Architecture", icon: Layers },
   { href: "/pipeline", label: "Pipeline", icon: Workflow },
+  { href: "/lattice", label: "CGLE Lattice", icon: Waves },
   { href: "/upload", label: "Ingest", icon: UploadCloud },
   { href: "/coherence", label: "Coherence", icon: Activity },
   { href: "/search", label: "Query", icon: Search },
