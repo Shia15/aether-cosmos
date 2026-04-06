@@ -14,14 +14,26 @@ router.get("/documents", async (_req, res): Promise<void> => {
 });
 
 router.post("/documents", async (req, res): Promise<void> => {
-  const { title, content } = req.body as { title?: string; content?: string };
+  const { title, content, layer, docType, source, tags } = req.body as {
+    title?: string;
+    content?: string;
+    layer?: string;
+    docType?: string;
+    source?: string;
+    tags?: string[];
+  };
 
   if (!title || content == null) {
     res.status(400).json({ error: "title and content are required" });
     return;
   }
 
-  const doc = knowledgeGraph.ingestDocument(title, content);
+  const doc = knowledgeGraph.ingestDocument(title, content, {
+    layer: layer as any,
+    docType: docType as any,
+    source: source ?? "",
+    tags: tags ?? [],
+  });
   res.json({
     ...doc,
     createdAt: doc.createdAt.toISOString(),

@@ -1,11 +1,19 @@
 import { v4 as uuidv4 } from "uuid";
 
+export type AetherLayer = "mnesis" | "infernia" | "aletheia" | "reverie" | "auto";
+export type DocType = "research" | "whitepaper" | "philosophical" | "technical" | "empirical" | "personal" | "other";
+
 export interface Document {
   id: string;
   title: string;
   content: string;
   conceptCount: number;
   createdAt: Date;
+  layer: AetherLayer;
+  docType: DocType;
+  source: string;
+  tags: string[];
+  charCount: number;
 }
 
 export interface Concept {
@@ -122,7 +130,11 @@ class KnowledgeGraph {
     return intersection.size / union.size;
   }
 
-  ingestDocument(title: string, content: string): Document {
+  ingestDocument(
+    title: string,
+    content: string,
+    meta?: { layer?: AetherLayer; docType?: DocType; source?: string; tags?: string[] }
+  ): Document {
     const id = uuidv4();
     const extractedNames = this.extractConcepts(content);
 
@@ -183,6 +195,11 @@ class KnowledgeGraph {
       content,
       conceptCount: conceptIds.length,
       createdAt: new Date(),
+      layer: meta?.layer ?? "auto",
+      docType: meta?.docType ?? "other",
+      source: meta?.source ?? "",
+      tags: meta?.tags ?? [],
+      charCount: content.length,
     };
     this.documents.set(id, doc);
     return doc;
