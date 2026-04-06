@@ -10,7 +10,8 @@ import {
   Layers,
   Workflow,
   Waves,
-  Brain
+  Brain,
+  FlaskConical
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const NAV_ITEMS = [
   { href: "/architecture", label: "Architecture", icon: Layers },
   { href: "/pipeline", label: "Pipeline", icon: Workflow },
   { href: "/lattice", label: "CGLE Lattice", icon: Waves },
+  { href: "/core", label: "Core Engine", icon: FlaskConical },
   { href: "/upload", label: "Ingest", icon: UploadCloud },
   { href: "/coherence", label: "Coherence", icon: Activity },
   { href: "/search", label: "Query", icon: Search },

@@ -7,6 +7,7 @@ import searchRouter from "./search";
 import equationsRouter from "./equations";
 import coherenceRouter from "./coherence";
 import pipelineRouter from "./pipeline";
+import coreRouter from "./core";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(searchRouter);
 router.use(equationsRouter);
 router.use(coherenceRouter);
 router.use(pipelineRouter);
+router.use(coreRouter);
 
 export default router;
