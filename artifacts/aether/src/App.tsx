@@ -10,6 +10,7 @@ import CoherenceView from "@/pages/coherence";
 import SearchView from "@/pages/search";
 import EquationsView from "@/pages/equations";
 import ArchitectureView from "@/pages/architecture";
+import PipelineView from "@/pages/pipeline";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ function Router() {
         <Route path="/coherence" component={CoherenceView} />
         <Route path="/search" component={SearchView} />
         <Route path="/equations" component={EquationsView} />
+        <Route path="/pipeline" component={PipelineView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

@@ -7,13 +7,15 @@ import {
   Search, 
   FunctionSquare,
   Cpu,
-  Layers
+  Layers,
+  Workflow
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "Graph Map", icon: Network },
   { href: "/architecture", label: "Architecture", icon: Layers },
+  { href: "/pipeline", label: "Pipeline", icon: Workflow },
   { href: "/upload", label: "Ingest", icon: UploadCloud },
   { href: "/coherence", label: "Coherence", icon: Activity },
   { href: "/search", label: "Query", icon: Search },
@@ -70,7 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         <div className="p-4 border-t border-border">
           <div className="text-xs font-mono text-muted-foreground/50 text-center">
-            AETHER OS v1.1.0
+            AETHER OS v1.2.0
           </div>
         </div>
       </aside>
