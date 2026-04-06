@@ -33,6 +33,8 @@ export interface GraphNode {
   label: string;
   type: "concept" | "paper" | "equation" | "claim";
   coherence: number;
+  layer: AetherLayer;
+  bridgeScore: number;
   documentId?: string;
   size?: number;
 }
@@ -227,10 +229,30 @@ class KnowledgeGraph {
     );
   }
 
+  private conceptLayer(concept: Concept): AetherLayer {
+    // Resolve layer from the majority vote of source documents
+    const layerCounts: Record<string, number> = {};
+    for (const docId of concept.documentIds) {
+      const doc = this.documents.get(docId);
+      if (!doc || doc.layer === "auto") continue;
+      layerCounts[doc.layer] = (layerCounts[doc.layer] ?? 0) + 1;
+    }
+    const entries = Object.entries(layerCounts);
+    if (entries.length === 0) return "mnesis";
+    return entries.sort((a, b) => b[1] - a[1])[0][0] as AetherLayer;
+  }
+
   getGraph(): { nodes: GraphNode[]; edges: GraphEdge[]; globalCoherence: number } {
     const nodes: GraphNode[] = [];
     const edges: GraphEdge[] = [];
     const seen = new Set<string>();
+
+    // Degree map for bridge score
+    const degree: Map<string, number> = new Map();
+    for (const c of this.concepts.values()) {
+      degree.set(c.id, c.relatedConcepts.length);
+    }
+    const maxDegree = Math.max(...degree.values(), 1);
 
     for (const c of this.concepts.values()) {
       nodes.push({
@@ -238,6 +260,8 @@ class KnowledgeGraph {
         label: c.name,
         type: "concept",
         coherence: c.coherence,
+        layer: this.conceptLayer(c),
+        bridgeScore: (degree.get(c.id) ?? 0) / maxDegree,
         size: 3 + c.relatedConcepts.length * 0.5,
       });
     }
