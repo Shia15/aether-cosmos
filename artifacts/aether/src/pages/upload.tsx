@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, Trash2, FolderOpen, X, Plus,
-  Tag, ChevronDown, CheckCircle2, Loader2, AlertCircle,
+  Tag, ChevronDown, CheckCircle2, Loader2, AlertCircle, Sparkles,
 } from "lucide-react";
 
 type AetherLayer = "auto" | "mnesis" | "infernia" | "aletheia" | "reverie";
@@ -41,6 +41,105 @@ interface QueuedFile {
   docType: DocType;
   source: string;
   tags: string[];
+  autoFilled?: boolean;
+}
+
+// ─── Content analyser ───────────────────────────────────────────────────────
+// Reads a document's text and infers layer, docType, source, and tags
+// so the queue card fields are pre-populated when a file is added.
+
+const STOPWORDS = new Set([
+  "the","and","for","are","but","not","you","all","any","can","had","her",
+  "was","one","our","out","day","get","has","him","his","how","man","new",
+  "now","old","see","two","way","who","its","did","let","put","say","she",
+  "too","use","this","that","with","have","from","they","will","been","when",
+  "more","than","into","some","what","there","their","which","about","would",
+  "could","other","after","first","these","those","where","should","through",
+]);
+
+const LAYER_KEYWORDS: Record<Exclude<AetherLayer,"auto">, string[]> = {
+  mnesis:   ["memory","substrate","raw","input","intake","embed","store","recall","signal","noise","entropy","multimodal","unstructured","field","mnesis"],
+  infernia: ["compress","constraint","pressure","transform","pattern","infer","extract","encode","weight","parameter","gradient","loss","optimization","infernia"],
+  aletheia: ["truth","coherence","resolve","lattice","stable","verify","validate","knowledge","graph","structure","crystallis","align","aletheia","logic","reason"],
+  reverie:  ["output","express","emit","radiat","interpret","transmit","generat","synthesize","dream","render","reverie","response","answer","produce"],
+};
+
+const DOCTYPE_KEYWORDS: Record<Exclude<DocType,"other">, string[]> = {
+  research:      ["abstract","introduction","methodology","results","conclusion","doi","arxiv","citation","references","hypothesis","experiment","findings"],
+  whitepaper:    ["executive summary","whitepaper","white paper","proposal","architecture","overview","solution","framework","strategy","roadmap"],
+  philosophical: ["consciousness","phenomenology","epistemic","ontolog","metaphys","being","mind","qualia","perception","intentionality","meaning","awareness"],
+  technical:     ["function","class","module","api","algorithm","implementation","interface","library","code","runtime","database","system","protocol"],
+  empirical:     ["dataset","measurement","observation","trial","sample","control","variable","statistic","correlation","regression","survey","quantitative"],
+  personal:      ["i believe","i think","my experience","i feel","personal","journal","diary","note","reflection","memoir","autobiography"],
+};
+
+function analyzeContent(
+  content: string,
+  filename: string,
+): { layer: AetherLayer; docType: DocType; source: string; tags: string[] } {
+  const lower = content.toLowerCase();
+
+  // ── Layer detection ──────────────────────────────────────────────────────
+  const layerScores: Record<Exclude<AetherLayer,"auto">, number> = {
+    mnesis: 0, infernia: 0, aletheia: 0, reverie: 0,
+  };
+  for (const [layer, words] of Object.entries(LAYER_KEYWORDS) as [Exclude<AetherLayer,"auto">, string[]][]) {
+    for (const w of words) layerScores[layer] += (lower.match(new RegExp(w, "g")) ?? []).length;
+  }
+  const topLayer = (Object.entries(layerScores) as [Exclude<AetherLayer,"auto">, number][])
+    .sort((a, b) => b[1] - a[1])[0];
+  const layer: AetherLayer = topLayer[1] > 0 ? topLayer[0] : "auto";
+
+  // ── DocType detection ────────────────────────────────────────────────────
+  const typeScores: Record<Exclude<DocType,"other">, number> = {
+    research: 0, whitepaper: 0, philosophical: 0, technical: 0, empirical: 0, personal: 0,
+  };
+  for (const [type, words] of Object.entries(DOCTYPE_KEYWORDS) as [Exclude<DocType,"other">, string[]][]) {
+    for (const w of words) typeScores[type] += (lower.match(new RegExp(w, "g")) ?? []).length;
+  }
+  const topType = (Object.entries(typeScores) as [Exclude<DocType,"other">, number][])
+    .sort((a, b) => b[1] - a[1])[0];
+  const docType: DocType = topType[1] > 0 ? topType[0] : "other";
+
+  // ── Source / author detection ────────────────────────────────────────────
+  let source = "";
+  const authorPatterns = [
+    /^author[s]?\s*[:–-]\s*(.+)/im,
+    /^by\s+([A-Z][a-z]+ [A-Z][a-z]+.*)/m,
+    /^written by\s+(.+)/im,
+    /^([A-Z][a-z]+ [A-Z][a-z]+)\s*\n/m,  // "Firstname Lastname" on its own line
+  ];
+  for (const pat of authorPatterns) {
+    const m = content.match(pat);
+    if (m?.[1]) { source = m[1].trim().slice(0, 80); break; }
+  }
+  // fallback: check for URL in first 500 chars
+  if (!source) {
+    const urlMatch = content.slice(0, 500).match(/https?:\/\/[^\s]+/);
+    if (urlMatch) source = urlMatch[0].slice(0, 80);
+  }
+
+  // ── Tag extraction ───────────────────────────────────────────────────────
+  // Tokenise, filter stopwords + short words, count frequency, take top 6
+  const words = lower
+    .replace(/[^a-z\s-]/g, " ")
+    .split(/\s+/)
+    .filter(w => w.length > 4 && !STOPWORDS.has(w));
+
+  const freq: Record<string, number> = {};
+  for (const w of words) freq[w] = (freq[w] ?? 0) + 1;
+
+  const tags = Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([w]) => w.replace(/-+/g, "-").slice(0, 24))
+    .filter(w => w.length > 3);
+
+  // Also include filename-derived tags
+  const fileTag = filename.replace(/\.[^/.]+$/, "").toLowerCase().replace(/[\s_]+/g, "-");
+  if (fileTag && !tags.includes(fileTag) && fileTag.length > 2) tags.unshift(fileTag);
+  
+  return { layer, docType, source, tags: tags.slice(0, 6) };
 }
 
 export default function UploadPage() {
@@ -80,17 +179,19 @@ export default function UploadPage() {
     );
     for (const file of arr) {
       const content = await readFile(file);
+      const { layer, docType, source, tags } = analyzeContent(content, file.name);
       const qf: QueuedFile = {
         id: `${Date.now()}-${Math.random()}`,
         name: file.name,
         content,
         size: file.size,
         status: "pending",
-        title: file.name.replace(/\.[^/.]+$/, ""),
-        layer: "auto",
-        docType: "other",
-        source: "",
-        tags: [],
+        title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]+/g, " "),
+        layer,
+        docType,
+        source,
+        tags,
+        autoFilled: true,
       };
       setQueue(q => [...q, qf]);
       setExpandedId(qf.id);
@@ -409,7 +510,7 @@ function QueueCard({ file, isExpanded, onToggle, onUpdate, onRemove, onAddTag, o
   const layerMeta = LAYER_META[file.layer];
 
   return (
-    <div className="rounded-lg border border-border/40 overflow-hidden">
+    <div className={`rounded-lg border overflow-hidden transition-all ${file.autoFilled ? "border-primary/20" : "border-border/40"}`}>
       <div
         className="flex items-center gap-3 p-3 cursor-pointer hover:bg-white/2 transition-all"
         onClick={onToggle}
@@ -417,8 +518,15 @@ function QueueCard({ file, isExpanded, onToggle, onUpdate, onRemove, onAddTag, o
         {statusIcon}
         <div className="flex-1 min-w-0">
           <div className="font-mono text-xs text-foreground/80 truncate">{file.name}</div>
-          <div className="font-mono text-[9px] text-muted-foreground/40">
-            {(file.size / 1024).toFixed(1)} KB · {file.content.split(/\s+/).length} words
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="font-mono text-[9px] text-muted-foreground/40">
+              {(file.size / 1024).toFixed(1)} KB · {file.content.split(/\s+/).length} words
+            </span>
+            {file.autoFilled && (
+              <span className="flex items-center gap-0.5 font-mono text-[9px] text-primary/50">
+                <Sparkles className="w-2.5 h-2.5" /> auto-filled
+              </span>
+            )}
           </div>
         </div>
         <div className="font-mono text-[10px] shrink-0" style={{ color: layerMeta.color }}>
@@ -441,17 +549,23 @@ function QueueCard({ file, isExpanded, onToggle, onUpdate, onRemove, onAddTag, o
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 space-y-3 border-t border-border/30 pt-3">
+              {file.autoFilled && (
+                <div className="flex items-center gap-1.5 font-mono text-[9px] text-primary/40 bg-primary/5 border border-primary/10 rounded px-2 py-1">
+                  <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                  Fields detected from content — review and adjust as needed
+                </div>
+              )}
               <div>
                 <label className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-1 block">Title</label>
                 <input
                   value={file.title}
-                  onChange={e => onUpdate({ title: e.target.value })}
+                  onChange={e => onUpdate({ title: e.target.value, autoFilled: false })}
                   className="w-full bg-background/50 border border-border/40 rounded px-3 py-1.5 font-mono text-xs text-foreground focus:outline-none focus:border-primary/50 transition-all"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <LayerSelect value={file.layer} onChange={layer => onUpdate({ layer })} compact />
-                <TypeSelect value={file.docType} onChange={docType => onUpdate({ docType })} compact />
+                <LayerSelect value={file.layer} onChange={layer => onUpdate({ layer, autoFilled: false })} compact />
+                <TypeSelect value={file.docType} onChange={docType => onUpdate({ docType, autoFilled: false })} compact />
               </div>
               <div>
                 <label className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-1 block">Source</label>
