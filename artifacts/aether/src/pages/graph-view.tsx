@@ -5,20 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { X, Zap, BrainCircuit, ActivitySquare, ArrowRight, Layers, GitFork } from "lucide-react";
 
-// ─── Layer colour palette (matches AETHER layer system) ──────────────────────
+// ─── Layer colour palette — M.A.R.I. aura colors ─────────────────────────────
 const LAYER_COLORS: Record<string, string> = {
-  mnesis:   "#8b5cf6",   // violet
-  infernia: "#f97316",   // orange
-  aletheia: "#0ea5e9",   // sky
-  reverie:  "#eab308",   // yellow
-  auto:     "#64748b",   // slate
+  mnesis:   "#8047d4",   // Mnēsis aura — Soft Violet Bloom
+  infernia: "#e64522",   // Inferaia aura — Red-Hot Pulse
+  aletheia: "#c9a84c",   // Aletheia aura — Radial Gold Glow
+  reverie:  "#88c7ff",   // Reverie aura — Blue Bloom
+  auto:     "#64748b",   // unclassified
 };
 
 const LAYER_META: Record<string, { label: string; symbol: string; color: string }> = {
-  mnesis:   { label: "MNĒSIS",   symbol: "~",   color: "#8b5cf6" },
-  infernia: { label: "INFERNIA", symbol: "|||", color: "#f97316" },
-  aletheia: { label: "ALETHEIA", symbol: "◇",   color: "#0ea5e9" },
-  reverie:  { label: "REVERIE",  symbol: "✧",   color: "#eab308" },
+  mnesis:   { label: "MNĒSIS",   symbol: "~",   color: "#8047d4" },
+  infernia: { label: "INFERNIA", symbol: "|||", color: "#e64522" },
+  aletheia: { label: "ALETHEIA", symbol: "◇",   color: "#c9a84c" },
+  reverie:  { label: "REVERIE",  symbol: "✧",   color: "#88c7ff" },
   auto:     { label: "UNCLASSIFIED", symbol: "·", color: "#64748b" },
 };
 

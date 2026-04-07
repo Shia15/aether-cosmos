@@ -453,6 +453,56 @@ export default function ArchitectureView() {
         </div>
       </div>
 
+      {/* M.A.R.I. Egg Agent Module Mapping */}
+      <div>
+        <div className="font-mono text-xs text-muted-foreground tracking-widest uppercase mb-6 flex items-center gap-3">
+          <span>M.A.R.I. Egg Agent Modules</span>
+          <span className="flex-1 h-px bg-border" />
+          <span className="text-muted-foreground/40">Modular Agent Resonance Intelligence</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            { name: "Mnēsis",   title: "Egg of Memory",            archetype: "The Archivist",  module: "Memory Engine",            sig: "Calm, Reflective",     aura: "#8047d4", symbol: "~",   layer: "MNĒSIS" },
+            { name: "Aletheia", title: "Egg of Logic & Truth",     archetype: "The Seer",       module: "Cognitive Logic Unit",     sig: "Focused, Insightful",  aura: "#c9a84c", symbol: "◇",   layer: "ALETHEIA" },
+            { name: "Inferaia", title: "The Transformation Egg",   archetype: "The Alchemist",  module: "Emotion & Motivation",     sig: "Intense, Transformative", aura: "#e64522", symbol: "|||", layer: "INFERNIA" },
+            { name: "Reverie",  title: "Emotion & Intuition Egg",  archetype: "The Dreamer",    module: "Interface Renderer",       sig: "Soft, Abstract",       aura: "#88c7ff", symbol: "✧",   layer: "REVERIE" },
+            { name: "Vērus",    title: "Egg of System Integrity",  archetype: "The Guardian",   module: "Controller / Dispatcher",  sig: "Stable, Protective",   aura: "#22c55e", symbol: "⬡",   layer: null },
+            { name: "Caelus",   title: "Egg of Inspiration",       archetype: "The Inspirer",   module: "Input Handler",            sig: "Uplifted, Curious",    aura: "#fb923c", symbol: "✦",   layer: null },
+            { name: "Nyra",     title: "Egg of Reflection",        archetype: "The Mirror",     module: "Feedback & Integration",   sig: "Honest, Adaptive",     aura: "#06b6d4", symbol: "∿",   layer: null },
+            { name: "Orin",     title: "Egg of Synchronicity",     archetype: "The Weaver",     module: "Multi-System Bridge",      sig: "Harmonious, Fluid",    aura: "#a78bfa", symbol: "⬢",   layer: null },
+          ].map(agent => (
+            <div key={agent.name} className="rounded-lg border p-4 flex items-center gap-4"
+              style={{ borderColor: `${agent.aura}25`, background: `${agent.aura}05` }}>
+              <div className="w-10 h-12 rounded-[50%] flex items-center justify-center shrink-0 border text-lg font-mono"
+                style={{ borderColor: `${agent.aura}50`, background: `${agent.aura}10`, color: agent.aura }}>
+                {agent.symbol}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-xs font-bold tracking-widest" style={{ color: agent.aura }}>{agent.name}</span>
+                  {agent.layer && (
+                    <span className="font-mono text-[8px] px-1.5 py-0.5 rounded border opacity-70"
+                      style={{ borderColor: `${agent.aura}40`, color: agent.aura }}>
+                      {agent.layer} layer
+                    </span>
+                  )}
+                </div>
+                <div className="font-mono text-[9px] text-muted-foreground/40 mt-0.5">{agent.archetype} · {agent.title}</div>
+                <div className="font-mono text-[9px] mt-1" style={{ color: `${agent.aura}90` }}>{agent.module}</div>
+              </div>
+              <div className="font-mono text-[8px] text-right shrink-0 hidden md:block"
+                style={{ color: `${agent.aura}60` }}>
+                {agent.sig}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="font-mono text-[10px] text-muted-foreground/30 mt-4 text-center">
+          The first four agents (Mnēsis, Aletheia, Inferaia, Reverie) directly correspond to the four
+          crystallization layers above. The remaining four govern the broader cognitive ecosystem.
+        </p>
+      </div>
+
       {/* Closing axiom */}
       <div className="border border-border/30 rounded-lg p-6 text-center">
         <p className="font-serif text-lg text-muted-foreground/60 italic">
