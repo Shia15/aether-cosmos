@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import MariClassDiagram from "@/components/mari-class-diagram";
 
 const LAYERS = [
   {
@@ -451,6 +452,20 @@ export default function ArchitectureView() {
             </motion.div>
           ))}
         </div>
+      </div>
+
+      {/* M.A.R.I. Class Diagram */}
+      <div>
+        <div className="font-mono text-xs text-muted-foreground tracking-widest uppercase mb-6 flex items-center gap-3">
+          <span>M.A.R.I. Cognitive Architecture</span>
+          <span className="flex-1 h-px bg-border" />
+          <span className="text-muted-foreground/40">Class Diagram — Interactive</span>
+        </div>
+        <p className="font-mono text-sm text-muted-foreground/60 mb-5 leading-relaxed">
+          The full M.A.R.I. class diagram: ten cognitive modules working in concert.
+          Click any class to inspect its attributes, methods, and signal routing.
+        </p>
+        <MariClassDiagram />
       </div>
 
       {/* M.A.R.I. Egg Agent Module Mapping */}
