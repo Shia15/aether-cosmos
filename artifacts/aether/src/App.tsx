@@ -14,6 +14,7 @@ import PipelineView from "@/pages/pipeline";
 import LatticeView from "@/pages/lattice";
 import EcosystemView from "@/pages/ecosystem";
 import CoreEngineView from "@/pages/core-engine";
+import CulturalView from "@/pages/cultural";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function Router() {
         <Route path="/lattice" component={LatticeView} />
         <Route path="/ecosystem" component={EcosystemView} />
         <Route path="/core" component={CoreEngineView} />
+        <Route path="/cultural" component={CulturalView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

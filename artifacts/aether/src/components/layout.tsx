@@ -11,7 +11,8 @@ import {
   Workflow,
   Waves,
   Brain,
-  FlaskConical
+  FlaskConical,
+  Palette
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/coherence", label: "Coherence", icon: Activity },
   { href: "/search", label: "Query", icon: Search },
   { href: "/equations", label: "Lab", icon: FunctionSquare },
+  { href: "/cultural", label: "Cultural", icon: Palette },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
