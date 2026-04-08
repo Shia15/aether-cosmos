@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Japanese color vocabulary ────────────────────────────────────────────────
@@ -114,6 +114,36 @@ export default function CulturalPage() {
   const [purpleAge, setPurpleAge] = useState(0);
   const [autoAge, setAutoAge] = useState(false);
   const ageRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Beni extraction state
+  const [beniPhase, setBeniPhase] = useState(0); // 0=raw, 1=yellow, 2=wash, 3=living reaction, 4=beni
+  const [beniHeat, setBeniHeat] = useState(0);   // 0-1 continuous heat progress
+  const beniRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [beniHeating, setBeniHeating] = useState(false);
+
+  const startHeat = useCallback(() => {
+    if (beniPhase < 4) setBeniHeating(true);
+  }, [beniPhase]);
+  const stopHeat = useCallback(() => setBeniHeating(false), []);
+
+  useEffect(() => {
+    if (beniHeating && beniPhase < 4) {
+      beniRef.current = setInterval(() => {
+        setBeniHeat(h => {
+          const next = Math.min(1, h + 0.02);
+          if (next >= 1) {
+            setBeniPhase(p => Math.min(4, p + 1));
+            setBeniHeating(false);
+            return 0;
+          }
+          return next;
+        });
+      }, 60);
+    } else {
+      if (beniRef.current) clearInterval(beniRef.current);
+    }
+    return () => { if (beniRef.current) clearInterval(beniRef.current); };
+  }, [beniHeating, beniPhase]);
 
   // Purple live decay
   useEffect(() => {
@@ -653,6 +683,240 @@ export default function CulturalPage() {
         </div>
       </div>
 
+      {/* ── Beni — The Living Reaction ──────────────────────────────────── */}
+      <div>
+        <div className="font-mono text-xs text-muted-foreground tracking-widest uppercase mb-2 flex items-center gap-3">
+          <span>Beni — Living Color</span>
+          <span className="flex-1 h-px bg-border" />
+          <span className="text-muted-foreground/40">紅花 — Safflower Extraction × Human Body Heat</span>
+        </div>
+        <p className="font-mono text-xs text-muted-foreground/40 mb-5 leading-relaxed">
+          We now possess over 16 million digital colors — perfect, uniform, instantly reproducible. But Beni, the deep red
+          extracted from safflower, reveals something no RGB value can contain: a living reaction completed only by human hands.
+          The yellow must be removed first. Hidden beneath it, a deep red waits — activated by the warmth and pH of the human body.
+        </p>
+
+        <div className="rounded-xl border border-border/20 p-6 bg-white/2 space-y-8">
+
+          {/* Digital vs Living comparison */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="rounded-lg border border-green-500/15 bg-green-500/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="font-mono text-[9px] text-green-400/60 uppercase tracking-widest">Digital RGB</div>
+                <span className="font-mono text-[8px] px-2 py-0.5 rounded border border-green-500/30 text-green-400/50">Perfect</span>
+              </div>
+              <div className="flex gap-1 flex-wrap">
+                {Array.from({length:30}).map((_,i) => (
+                  <div key={i} className="w-5 h-5 rounded-sm"
+                    style={{ background:`hsl(${Math.random()*360|0},${60+Math.random()*30|0}%,${40+Math.random()*30|0}%)` }} />
+                ))}
+              </div>
+              <div className="font-mono text-[9px] text-muted-foreground/40">
+                16,777,216 colors &nbsp;·&nbsp; Instant &nbsp;·&nbsp; Identical &nbsp;·&nbsp; Eternal
+              </div>
+              <div className="font-mono text-[9px] text-green-400/30 italic">
+                "Uniform. Reproducible. Complete."
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-red-500/15 bg-red-500/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="font-mono text-[9px] text-red-400/60 uppercase tracking-widest">Beni / 紅花</div>
+                <span className="font-mono text-[8px] px-2 py-0.5 rounded border border-red-500/30 text-red-400/50">Living</span>
+              </div>
+              <div className="flex gap-1 flex-wrap">
+                {Array.from({length:30}).map((_,i) => {
+                  const variation = (Math.random()-0.5)*20;
+                  return (
+                    <div key={i} className="w-5 h-5 rounded-sm"
+                      style={{ background:`hsl(${355+variation},${65+variation}%,${35+variation}%)` }} />
+                  );
+                })}
+              </div>
+              <div className="font-mono text-[9px] text-muted-foreground/40">
+                1 color &nbsp;·&nbsp; Seasons &nbsp;·&nbsp; Unique batch &nbsp;·&nbsp; Mortal
+              </div>
+              <div className="font-mono text-[9px] text-red-400/30 italic">
+                "Singular. Irreproducible. Alive."
+              </div>
+            </div>
+          </div>
+
+          {/* Extraction simulator */}
+          <div className="space-y-4">
+            <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest">
+              Extraction Process — Hold to Apply Human Heat
+            </div>
+
+            {/* Phase track */}
+            <div className="flex items-center gap-0 mb-2">
+              {[
+                { label:"Raw Flower", color:"#d4a843" },
+                { label:"Yellow Wash", color:"#e8c34a" },
+                { label:"Remove Yellow", color:"#b8964a" },
+                { label:"Living Reaction", color:"#c04a3a" },
+                { label:"Beni", color:"#8b1a2a" },
+              ].map((phase, i) => (
+                <div key={phase.label} className="flex items-center gap-0 flex-1">
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className={`w-3 h-3 rounded-full border-2 transition-all duration-500 ${i <= beniPhase ? "border-transparent" : "border-muted-foreground/20 bg-transparent"}`}
+                      style={i <= beniPhase ? { background: phase.color, boxShadow:`0 0 8px ${phase.color}` } : {}} />
+                    <div className="font-mono text-[7px] text-center text-muted-foreground/30 leading-tight w-14">
+                      {phase.label}
+                    </div>
+                  </div>
+                  {i < 4 && <div className="h-px w-4 bg-border/30 mb-3 shrink-0" />}
+                </div>
+              ))}
+            </div>
+
+            {/* Main extraction visual */}
+            <div className="flex gap-6 items-center">
+              {/* Vessel */}
+              <div className="relative w-32 h-40 shrink-0">
+                {/* Outer container shape */}
+                <div className="absolute inset-0 rounded-b-3xl rounded-t-lg border-2 border-border/30 overflow-hidden"
+                  style={{
+                    background: beniPhase === 0 ? "#8a6a30" :
+                                beniPhase === 1 ? `hsl(45,80%,${45+beniHeat*15}%)` :
+                                beniPhase === 2 ? lerpColor("#d4a843","#6b4520", beniHeat) :
+                                beniPhase === 3 ? lerpColor("#6b4520","#8b1a2a", beniHeat) :
+                                "#8b1a2a",
+                    boxShadow: beniPhase >= 3 ? `0 0 ${20+beniHeat*20}px #8b1a2a60` : undefined,
+                    transition:"background 0.3s, box-shadow 0.3s",
+                  }}>
+
+                  {/* Liquid surface shimmer */}
+                  {beniHeating && (
+                    <div className="absolute top-2 left-0 right-0 flex justify-around">
+                      {Array.from({length:5}).map((_,i) => (
+                        <motion.div key={i}
+                          animate={{ y:[-2,2,-2], opacity:[0.3,0.7,0.3] }}
+                          transition={{ duration:0.8+i*0.2, repeat:Infinity }}
+                          className="w-1 h-1 rounded-full bg-white/30" />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Phase label inside vessel */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
+                    <div className="font-serif text-xs text-white/60">
+                      {beniPhase === 0 && "紅花"}
+                      {beniPhase === 1 && "黄"}
+                      {beniPhase === 2 && "除黄"}
+                      {beniPhase === 3 && "反応"}
+                      {beniPhase === 4 && "紅"}
+                    </div>
+                    {beniPhase < 4 && (
+                      <div className="font-mono text-[8px] text-white/30">
+                        {beniHeating ? `${Math.round(beniHeat*100)}%` : "apply heat"}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Heat indicator */}
+                {beniHeating && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full"
+                    style={{ background:"linear-gradient(90deg,transparent,#ef444460,transparent)", filter:"blur(2px)" }} />
+                )}
+              </div>
+
+              {/* Instructions & button */}
+              <div className="flex-1 space-y-4">
+                <div className="space-y-2">
+                  {[
+                    { phase:0, text:"Dried safflower petals are soaked in water. The visible yellow pigment dissolves first." },
+                    { phase:1, text:"Yellow wash flooded. The bath turns golden — but this is not the color you seek." },
+                    { phase:2, text:"The yellow is removed by rinsing with alkali. What remains is hidden, insoluble, waiting." },
+                    { phase:3, text:"Human hands enter the bath. Body temperature and skin pH trigger the living reaction — the red awakens." },
+                    { phase:4, text:"Beni — deep crimson revealed. Every batch unique to the hands that completed it. No two the same." },
+                  ].map(step => (
+                    <motion.div key={step.phase}
+                      animate={{ opacity: step.phase === beniPhase ? 1 : 0.2 }}
+                      className="flex gap-3 items-start">
+                      <div className="w-4 h-4 rounded-full border shrink-0 mt-0.5 flex items-center justify-center font-mono text-[8px]"
+                        style={{
+                          borderColor: step.phase <= beniPhase ? "#c04a3a50" : "#334155",
+                          color: step.phase <= beniPhase ? "#c04a3a" : "#475569",
+                          background: step.phase === beniPhase ? "#c04a3a10" : "transparent",
+                        }}>
+                        {step.phase + 1}
+                      </div>
+                      <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">{step.text}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {beniPhase < 4 ? (
+                  <div className="space-y-2">
+                    {/* Progress bar */}
+                    {beniHeating && (
+                      <div className="h-0.5 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div className="h-full rounded-full"
+                          style={{ width:`${beniHeat*100}%`,
+                            background:"linear-gradient(90deg,#d4a843,#c04a3a)" }} />
+                      </div>
+                    )}
+                    <button
+                      onMouseDown={startHeat} onMouseUp={stopHeat}
+                      onTouchStart={startHeat} onTouchEnd={stopHeat}
+                      onMouseLeave={stopHeat}
+                      className="font-mono text-[9px] px-4 py-2 rounded border transition-all select-none"
+                      style={{
+                        borderColor: beniHeating ? "#c04a3a60" : "#334155",
+                        color: beniHeating ? "#c04a3a" : "#64748b",
+                        background: beniHeating ? "#c04a3a10" : "transparent",
+                      }}>
+                      {beniHeating ? "🌡 Applying body heat…" : "☞ Hold to apply human heat"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="font-mono text-[9px] px-4 py-2 rounded border border-red-500/30 bg-red-500/5 text-red-400/70">
+                      ✓ Beni complete — crimson revealed by living hands
+                    </div>
+                    <button onClick={() => { setBeniPhase(0); setBeniHeat(0); }}
+                      className="font-mono text-[9px] px-3 py-1 rounded border border-border/20 text-muted-foreground/30 hover:text-muted-foreground/50 transition-all">
+                      RESET EXTRACTION
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Result swatch */}
+              <div className="shrink-0 w-16 flex flex-col items-center gap-2">
+                <div className="w-14 h-20 rounded-xl border transition-all duration-500"
+                  style={{
+                    background: beniPhase < 4 ? "#2c2826" : "#8b1a2a",
+                    borderColor: beniPhase < 4 ? "#334155" : "#8b1a2a60",
+                    boxShadow: beniPhase >= 4 ? "0 0 24px #8b1a2a50" : undefined,
+                  }} />
+                <div className="font-mono text-[8px] text-center"
+                  style={{ color: beniPhase >= 4 ? "#8b1a2a" : "#334155" }}>
+                  {beniPhase >= 4 ? "紅\nBeni" : "—"}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Philosophical contrast */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-border/15">
+            {[
+              { icon:"⬛", title:"Digital", body:"A color is a number. #8B1A2A is the same everywhere, everywhen, for everyone. Perfect. Featureless." },
+              { icon:"🌿", title:"Living Material", body:"A color is a process. Beni requires seasons, a craftsperson's patience, and the heat of a human body to complete." },
+              { icon:"⏳", title:"Unnamed Colors", body:"True beauty may lie in colors that resist naming — the shade of fading memory, the tones of light outside your window right now." },
+            ].map(({ icon, title, body }) => (
+              <div key={title} className="rounded-lg border border-border/15 p-4 space-y-2">
+                <div className="text-lg">{icon}</div>
+                <div className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest">{title}</div>
+                <p className="font-serif text-xs text-foreground/50 italic leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Perception Stack ─────────────────────────────────────────────── */}
       <div>
         <div className="font-mono text-xs text-muted-foreground tracking-widest uppercase mb-6 flex items-center gap-3">
@@ -701,11 +965,10 @@ export default function CulturalPage() {
           BEYOND PERFECT COLOR
         </div>
         <p className="font-serif text-base text-foreground/50 italic max-w-2xl mx-auto leading-relaxed">
-          "The most meaningful colors may be those that resist classification —
-          the color of fading memory, the shifting tones of light outside a window,
-          the subtle difference between two moments in the same landscape."
+          "True beauty lies not in perfect, digital shades, but in those that are unnamed:
+          the color of fading memory, or the fleeting colors outside your window right now."
         </p>
-        <p className="font-serif text-sm text-foreground/30 italic">
+        <p className="font-serif text-sm text-foreground/30 italic mt-2">
           "These colors exist not in wavelengths, but in the relationship between perception, time, and experience."
         </p>
         <div className="font-mono text-[9px] text-muted-foreground/15 mt-4">
