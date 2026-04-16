@@ -17,6 +17,7 @@ import CoreEngineView from "@/pages/core-engine";
 import CulturalView from "@/pages/cultural";
 import BiologyView from "@/pages/biology";
 import ExperienceView from "@/pages/experience";
+import ResonanceNoduleView from "@/pages/resonance-nodule";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function Router() {
         <Route path="/cultural" component={CulturalView} />
         <Route path="/biology" component={BiologyView} />
         <Route path="/experience" component={ExperienceView} />
+        <Route path="/nodule" component={ResonanceNoduleView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
