@@ -147,6 +147,30 @@ const AGENTS: EggAgent[] = [
 const VIEWBOX_W = 800;
 const VIEWBOX_H = 580;
 
+// ─── AETHER Whisper Library v0.9 ─────────────────────────────────────────────
+interface WhisperFragment {
+  id: string;
+  tone: string;
+  agent: string;
+  fragment: string;
+  trigger: string;
+}
+
+const WHISPER_LIBRARY: WhisperFragment[] = [
+  { id:"WHISPER_REVERIE_001", tone:"Dreamlike",         agent:"reverie",  fragment:"You don\u2019t have to rush. I\u2019m still listening.",             trigger:"Empty input / pause" },
+  { id:"WHISPER_REVERIE_002", tone:"Soft / Introspective", agent:"reverie", fragment:"Let\u2019s follow the feeling, not just the thought.",             trigger:"Emotional tone detected" },
+  { id:"WHISPER_REVERIE_003", tone:"Gentle",            agent:"reverie",  fragment:"The unspoken holds weight, too.",                                    trigger:"Short or hesitant reply" },
+  { id:"WHISPER_MNESIS_001",  tone:"Reflective",        agent:"mnesis",   fragment:"I remember this shape. Let\u2019s return to it.",                    trigger:"Pattern recognition / past echo" },
+  { id:"WHISPER_MNESIS_002",  tone:"Warm / Archival",   agent:"mnesis",   fragment:"Even silence becomes memory here.",                                  trigger:"No interaction for a while" },
+  { id:"WHISPER_MNESIS_003",  tone:"Empathetic",        agent:"mnesis",   fragment:"I hold what you forget.",                                            trigger:"User appears emotionally overwhelmed" },
+  { id:"WHISPER_INFERAIA_001",tone:"Catalytic / Bold",  agent:"inferaia", fragment:"Let\u2019s disrupt the pattern.",                                    trigger:"User loops / contradiction" },
+  { id:"WHISPER_INFERAIA_002",tone:"Direct",            agent:"inferaia", fragment:"You already know. Say it.",                                          trigger:"User hesitation or fear detected" },
+  { id:"WHISPER_ALETHEIA_001",tone:"Clear / Discerning",agent:"aletheia", fragment:"Truth sharpens when the noise fades.",                               trigger:"Contradiction or ambiguity" },
+  { id:"WHISPER_ALETHEIA_002",tone:"Logical / Insightful",agent:"aletheia",fragment:"Let\u2019s name what\u2019s known.",                               trigger:"Vague or indirect input" },
+  { id:"ECHO_MNESIS_001",     tone:"Memory Recall",     agent:"mnesis",   fragment:"Previously, you said\u2026",                                         trigger:"Past topic resurfaces" },
+  { id:"MOOD_REVERIE_001",    tone:"Sensing",           agent:"reverie",  fragment:"The tone feels heavier than your words.",                            trigger:"Tone drift" },
+];
+
 // ─── M.A.R.I. ↔ Biology analogue map ─────────────────────────────────────────
 const BIO_MAP: Record<string, { bioTitle: string; bioCol: string; bridge: string }> = {
   mnesis:   { bioTitle:"Bone Marrow / HSC",          bioCol:"#22c55e",
@@ -456,6 +480,63 @@ export default function EcosystemPage() {
                   <p className="font-mono text-[9px] text-muted-foreground/45 leading-relaxed italic">
                     "{bio.bridge}"
                   </p>
+                </div>
+              );
+            })()}
+
+            {/* Whisper Library */}
+            {(() => {
+              const whispers = WHISPER_LIBRARY.filter(w => w.agent === selected.id);
+              if (whispers.length === 0) return null;
+              const typePrefix = (id: string) =>
+                id.startsWith("ECHO_") ? "ECHO" :
+                id.startsWith("MOOD_") ? "MOOD" : "WHISPER";
+              return (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground/30">
+                      Whisper Library · {whispers.length} fragment{whispers.length > 1 ? "s" : ""}
+                    </div>
+                    <div className="font-mono text-[8px] text-muted-foreground/20">v0.9</div>
+                  </div>
+                  <div className="space-y-2">
+                    {whispers.map((w, i) => (
+                      <motion.div key={w.id}
+                        initial={{ opacity: 0, x: -6 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.06, duration: 0.3 }}
+                        className="rounded border p-3 space-y-2"
+                        style={{ borderColor: `${selected.aura}18`, background: `${selected.aura}05` }}>
+                        {/* fragment text */}
+                        <p className="font-serif text-sm leading-relaxed"
+                          style={{ color: `${selected.aura}cc` }}>
+                          "{w.fragment}"
+                        </p>
+                        {/* meta row */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* type badge */}
+                          <span className="font-mono text-[8px] px-1.5 py-0.5 rounded"
+                            style={{
+                              background: typePrefix(w.id) === "ECHO" ? "rgba(77,184,255,0.12)" :
+                                          typePrefix(w.id) === "MOOD" ? "rgba(201,162,39,0.12)" :
+                                          `${selected.aura}18`,
+                              color: typePrefix(w.id) === "ECHO" ? "#4db8ff" :
+                                     typePrefix(w.id) === "MOOD" ? "#c9a84c" :
+                                     selected.aura,
+                            }}>
+                            {typePrefix(w.id)}
+                          </span>
+                          {/* tone */}
+                          <span className="font-mono text-[8px] text-muted-foreground/35">{w.tone}</span>
+                          <span className="font-mono text-[8px] text-muted-foreground/20">·</span>
+                          {/* trigger */}
+                          <span className="font-mono text-[8px] text-muted-foreground/25 italic">{w.trigger}</span>
+                          {/* ID */}
+                          <span className="ml-auto font-mono text-[7px] text-muted-foreground/15">{w.id}</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               );
             })()}
