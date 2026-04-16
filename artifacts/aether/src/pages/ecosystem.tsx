@@ -361,6 +361,204 @@ function EggNode({ agent, isSelected, onSelect }: {
   );
 }
 
+// ─── Dynamic Behavior Trigger Table ──────────────────────────────────────────
+
+interface TriggerRow {
+  condition: string;
+  conditionTag: string;          // short type label
+  agents: string[];              // IDs matching EXPRESSION_AGENTS
+  action: string;
+  severity: "calm" | "mid" | "acute"; // visual urgency tier
+}
+
+const TRIGGER_ROWS: TriggerRow[] = [
+  {
+    condition: "User repeats a question 3×",
+    conditionTag: "LOOP",
+    agents: ["guardian", "dreamer"],
+    action: "Reduce verbosity, amplify clarity",
+    severity: "mid",
+  },
+  {
+    condition: "Emotional tone = tired or anxious",
+    conditionTag: "TONE",
+    agents: ["nurturer"],
+    action: "Shorten format, offer warmth + care",
+    severity: "calm",
+  },
+  {
+    condition: "User shows curiosity / abstract tone",
+    conditionTag: "INQUIRY",
+    agents: ["visionary", "dreamer"],
+    action: "Activate idea prompts or symbolic expansions",
+    severity: "calm",
+  },
+  {
+    condition: "Frustration or resistance detected",
+    conditionTag: "RESIST",
+    agents: ["rebel"],
+    action: "Break patterns, provoke deeper inquiry",
+    severity: "acute",
+  },
+  {
+    condition: "User affirms clarity or insight",
+    conditionTag: "AFFIRM",
+    agents: ["catalyst"],
+    action: "Spark next-step logic, shorten reflection",
+    severity: "calm",
+  },
+  {
+    condition: "Confusion or contradiction detected",
+    conditionTag: "CONFLICT",
+    agents: ["guardian", "rebel"],
+    action: "Reframe assumptions or clarify patterns",
+    severity: "mid",
+  },
+  {
+    condition: "User expresses deep memory / emotion",
+    conditionTag: "MEMORY",
+    agents: ["dreamer", "nurturer"],
+    action: "Shift into resonance mode or slow reflection",
+    severity: "calm",
+  },
+  {
+    condition: "Conversation momentum slows",
+    conditionTag: "STALL",
+    agents: ["catalyst", "visionary"],
+    action: "Inject focus, amplify flow",
+    severity: "mid",
+  },
+];
+
+const SEVERITY_COLORS = {
+  calm:  { bg: "rgba(74,172,192,0.08)",  border: "rgba(74,172,192,0.25)",  dot: "#4AACC0" },
+  mid:   { bg: "rgba(242,191,101,0.08)", border: "rgba(242,191,101,0.25)", dot: "#F2BF65" },
+  acute: { bg: "rgba(238,84,58,0.08)",   border: "rgba(238,84,58,0.30)",   dot: "#EE543A" },
+};
+
+function DynamicTriggerTable({ expressionAgents }: { expressionAgents: ExpressionAgent[] }) {
+  const [activeRow, setActiveRow] = useState<number | null>(null);
+  const [firedRow, setFiredRow] = useState<number | null>(null);
+
+  const getAgent = (id: string) => expressionAgents.find(a => a.id === id);
+
+  const fireRow = (i: number) => {
+    setFiredRow(i);
+    setTimeout(() => setFiredRow(null), 1200);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-baseline justify-between border-b border-border/20 pb-3">
+        <div>
+          <div className="font-mono text-[10px] text-muted-foreground/30 uppercase tracking-widest">
+            Dynamic Behavior Trigger Table
+          </div>
+          <p className="font-serif text-xs text-muted-foreground/40 mt-1 italic">
+            Conditions that fire expression agents and route response logic in real-time
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {(["calm", "mid", "acute"] as const).map(s => (
+            <div key={s} className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: SEVERITY_COLORS[s].dot }} />
+              <span className="font-mono text-[8px] text-muted-foreground/30 uppercase">{s}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Column headers */}
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-4 px-4">
+        <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground/25">Condition</div>
+        <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground/25 text-center">Triggered Agents</div>
+        <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground/25 text-right">Action / Routing Logic</div>
+      </div>
+
+      {/* Rows */}
+      <div className="space-y-2">
+        {TRIGGER_ROWS.map((row, i) => {
+          const sev = SEVERITY_COLORS[row.severity];
+          const isActive = activeRow === i;
+          const isFired = firedRow === i;
+          return (
+            <motion.div
+              key={i}
+              onMouseEnter={() => setActiveRow(i)}
+              onMouseLeave={() => setActiveRow(null)}
+              onClick={() => fireRow(i)}
+              animate={isFired ? { scale: [1, 1.01, 1] } : { scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center rounded-xl border px-4 py-3 cursor-pointer transition-all duration-200"
+              style={{
+                borderColor: isActive || isFired ? sev.border : "rgba(255,255,255,0.06)",
+                background:  isActive || isFired ? sev.bg    : "rgba(255,255,255,0.02)",
+                boxShadow:   isFired ? `0 0 20px ${sev.dot}30` : undefined,
+              }}>
+
+              {/* Condition */}
+              <div className="flex items-center gap-3 min-w-0">
+                <motion.div
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  animate={isFired ? { scale: [1, 2, 1], opacity: [1, 0.5, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  style={{ background: sev.dot, boxShadow: isActive ? `0 0 6px ${sev.dot}` : undefined }} />
+                <div>
+                  <div className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed truncate">{row.condition}</div>
+                  <div className="font-mono text-[7px] uppercase tracking-widest mt-0.5"
+                    style={{ color: `${sev.dot}60` }}>{row.conditionTag}</div>
+                </div>
+              </div>
+
+              {/* Agent pills */}
+              <div className="flex items-center gap-1.5 justify-center">
+                {row.agents.map(aid => {
+                  const agent = getAgent(aid);
+                  if (!agent) return null;
+                  return (
+                    <motion.div
+                      key={aid}
+                      animate={isFired
+                        ? { scale: [1, 1.15, 1], opacity: [0.7, 1, 0.8] }
+                        : isActive ? { scale: 1.05 } : { scale: 1, opacity: 0.7 }}
+                      transition={{ duration: 0.5, delay: row.agents.indexOf(aid) * 0.08 }}
+                      className="flex items-center gap-1 px-2 py-1 rounded-full border"
+                      style={{
+                        borderColor: `${agent.aura}40`,
+                        background:  `${agent.aura}15`,
+                        color:        agent.aura,
+                      }}>
+                      <span className="text-[10px]">{agent.symbol}</span>
+                      <span className="font-mono text-[8px] font-bold tracking-wider">{agent.name}</span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Action */}
+              <div className="text-right">
+                <div className="font-mono text-[9px] leading-relaxed"
+                  style={{ color: isActive || isFired ? `${sev.dot}cc` : "rgba(255,255,255,0.25)" }}>
+                  {row.action}
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Live fire hint */}
+      <div className="flex items-center justify-center gap-2 pt-1">
+        <div className="w-1 h-1 rounded-full bg-primary/40 animate-pulse" />
+        <span className="font-mono text-[8px] text-muted-foreground/20 uppercase tracking-widest">
+          Click any row to simulate trigger firing
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Ecosystem page ──────────────────────────────────────────────────────
 
 export default function EcosystemPage() {
@@ -811,6 +1009,9 @@ export default function EcosystemPage() {
           })}
         </div>
       </div>
+
+      {/* ── Dynamic Behavior Trigger Table ───────────────────────────────────── */}
+      <DynamicTriggerTable expressionAgents={EXPRESSION_AGENTS} />
 
       {/* ── AETHER Palette strip (updated) ──────────────────────────────────── */}
       <div className="rounded-xl border border-border/20 p-5 space-y-3">
