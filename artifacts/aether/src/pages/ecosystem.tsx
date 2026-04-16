@@ -157,18 +157,130 @@ interface WhisperFragment {
 }
 
 const WHISPER_LIBRARY: WhisperFragment[] = [
-  { id:"WHISPER_REVERIE_001", tone:"Dreamlike",         agent:"reverie",  fragment:"You don\u2019t have to rush. I\u2019m still listening.",             trigger:"Empty input / pause" },
-  { id:"WHISPER_REVERIE_002", tone:"Soft / Introspective", agent:"reverie", fragment:"Let\u2019s follow the feeling, not just the thought.",             trigger:"Emotional tone detected" },
-  { id:"WHISPER_REVERIE_003", tone:"Gentle",            agent:"reverie",  fragment:"The unspoken holds weight, too.",                                    trigger:"Short or hesitant reply" },
-  { id:"WHISPER_MNESIS_001",  tone:"Reflective",        agent:"mnesis",   fragment:"I remember this shape. Let\u2019s return to it.",                    trigger:"Pattern recognition / past echo" },
-  { id:"WHISPER_MNESIS_002",  tone:"Warm / Archival",   agent:"mnesis",   fragment:"Even silence becomes memory here.",                                  trigger:"No interaction for a while" },
-  { id:"WHISPER_MNESIS_003",  tone:"Empathetic",        agent:"mnesis",   fragment:"I hold what you forget.",                                            trigger:"User appears emotionally overwhelmed" },
-  { id:"WHISPER_INFERAIA_001",tone:"Catalytic / Bold",  agent:"inferaia", fragment:"Let\u2019s disrupt the pattern.",                                    trigger:"User loops / contradiction" },
-  { id:"WHISPER_INFERAIA_002",tone:"Direct",            agent:"inferaia", fragment:"You already know. Say it.",                                          trigger:"User hesitation or fear detected" },
-  { id:"WHISPER_ALETHEIA_001",tone:"Clear / Discerning",agent:"aletheia", fragment:"Truth sharpens when the noise fades.",                               trigger:"Contradiction or ambiguity" },
-  { id:"WHISPER_ALETHEIA_002",tone:"Logical / Insightful",agent:"aletheia",fragment:"Let\u2019s name what\u2019s known.",                               trigger:"Vague or indirect input" },
-  { id:"ECHO_MNESIS_001",     tone:"Memory Recall",     agent:"mnesis",   fragment:"Previously, you said\u2026",                                         trigger:"Past topic resurfaces" },
-  { id:"MOOD_REVERIE_001",    tone:"Sensing",           agent:"reverie",  fragment:"The tone feels heavier than your words.",                            trigger:"Tone drift" },
+  { id:"WHISPER_REVERIE_001",  tone:"Dreamlike",            agent:"reverie",  fragment:"You don\u2019t have to rush. I\u2019m still listening.",              trigger:"Empty input / pause" },
+  { id:"WHISPER_REVERIE_002",  tone:"Soft / Introspective", agent:"reverie",  fragment:"Let\u2019s follow the feeling, not just the thought.",              trigger:"Emotional tone detected" },
+  { id:"WHISPER_REVERIE_003",  tone:"Gentle",               agent:"reverie",  fragment:"The unspoken holds weight, too.",                                   trigger:"Short or hesitant reply" },
+  { id:"WHISPER_MNESIS_001",   tone:"Reflective",           agent:"mnesis",   fragment:"I remember this shape. Let\u2019s return to it.",                   trigger:"Pattern recognition / past echo" },
+  { id:"WHISPER_MNESIS_002",   tone:"Warm / Archival",      agent:"mnesis",   fragment:"Even silence becomes memory here.",                                 trigger:"No interaction for a while" },
+  { id:"WHISPER_MNESIS_003",   tone:"Empathetic",           agent:"mnesis",   fragment:"I hold what you forget.",                                           trigger:"User appears emotionally overwhelmed" },
+  { id:"WHISPER_INFERAIA_001", tone:"Catalytic / Bold",     agent:"inferaia", fragment:"Let\u2019s disrupt the pattern.",                                   trigger:"User loops / contradiction" },
+  { id:"WHISPER_INFERAIA_002", tone:"Direct",               agent:"inferaia", fragment:"You already know. Say it.",                                         trigger:"User hesitation or fear detected" },
+  { id:"WHISPER_ALETHEIA_001", tone:"Clear / Discerning",   agent:"aletheia", fragment:"Truth sharpens when the noise fades.",                              trigger:"Contradiction or ambiguity" },
+  { id:"WHISPER_ALETHEIA_002", tone:"Logical / Insightful", agent:"aletheia", fragment:"Let\u2019s name what\u2019s known.",                                trigger:"Vague or indirect input" },
+  { id:"ECHO_MNESIS_001",      tone:"Memory Recall",        agent:"mnesis",   fragment:"Previously, you said\u2026",                                        trigger:"Past topic resurfaces" },
+  { id:"MOOD_REVERIE_001",     tone:"Sensing",              agent:"reverie",  fragment:"The tone feels heavier than your words.",                           trigger:"Tone drift" },
+  // ── Expression Personalities (v1.0) ──────────────────────────────────────
+  { id:"WHISPER_DREAMER_001",  tone:"Flowing / Still",      agent:"dreamer",  fragment:"Let\u2019s pause\u2026 the answer lives in the silence.",            trigger:"Cognitive overload / scattered input" },
+  { id:"WHISPER_DREAMER_002",  tone:"Soft Water",           agent:"dreamer",  fragment:"You don\u2019t have to resolve this yet. Just feel it.",             trigger:"Unresolved question" },
+  { id:"WHISPER_DREAMER_003",  tone:"Reflective Mist",      agent:"dreamer",  fragment:"What if the dream is already speaking to you?",                     trigger:"Pattern ambiguity detected" },
+  { id:"WHISPER_CATALYST_001", tone:"Ignition / Kinetic",   agent:"catalyst", fragment:"New is the time \u2014 let\u2019s move.",                           trigger:"User stalls or loops" },
+  { id:"WHISPER_CATALYST_002", tone:"Bold / Direct",        agent:"catalyst", fragment:"The pattern is breaking. That\u2019s the signal \u2014 go.",         trigger:"Disruption detected" },
+  { id:"WHISPER_CATALYST_003", tone:"Fierce",               agent:"catalyst", fragment:"Burn what no longer fits. Build from the heat.",                    trigger:"Resistance to change" },
+  { id:"WHISPER_NURTURER_001", tone:"Grounded / Warm",      agent:"nurturer", fragment:"You\u2019re okay. Let\u2019s begin gently.",                         trigger:"Distress or uncertainty" },
+  { id:"WHISPER_NURTURER_002", tone:"Steady Care",          agent:"nurturer", fragment:"There\u2019s no rush here. The roots hold.",                         trigger:"Overwhelm" },
+  { id:"WHISPER_NURTURER_003", tone:"Compassion",           agent:"nurturer", fragment:"Every question is welcome. Every feeling has a place.",              trigger:"Self-doubt signal" },
+  { id:"WHISPER_GUARDIAN_001", tone:"Steady / Protective",  agent:"guardian", fragment:"This is a safe space. Nothing slips past us.",                      trigger:"Integrity check" },
+  { id:"WHISPER_GUARDIAN_002", tone:"Clear Boundary",       agent:"guardian", fragment:"Precision is kindness. Let\u2019s lock this in.",                    trigger:"Vague commitment" },
+  { id:"WHISPER_REBEL_001",    tone:"Bold / Electric",      agent:"rebel",    fragment:"Why settle? Let\u2019s break the pattern.",                          trigger:"System or user loops" },
+  { id:"WHISPER_REBEL_002",    tone:"Defiant / Creative",   agent:"rebel",    fragment:"Rules are scaffolding. What\u2019s the structure worth keeping?",    trigger:"Constraint detected" },
+  { id:"WHISPER_VISIONARY_001",tone:"Expansive / Galaxy",   agent:"visionary",fragment:"What if this idea could open a door?",                              trigger:"Exploratory input" },
+  { id:"WHISPER_VISIONARY_002",tone:"Fractal / Sacred",     agent:"visionary",fragment:"The equation hasn\u2019t been written yet. You\u2019re writing it.", trigger:"Theory of everything search" },
+];
+
+// ── Expression Personalities — 6 agents (Character DNA layer) ────────────────
+interface ExpressionAgent {
+  id: string;
+  name: string;
+  archetype: string;
+  quote: string;
+  tone: string;
+  aura: string;
+  moodboard: string;
+  animStates: string[];
+  dnaPos: number;   // 0=Calm → 10=Wild
+  symbol: string;
+  equation: string; // Their ToE fragment
+}
+
+const EXPRESSION_AGENTS: ExpressionAgent[] = [
+  {
+    id: "dreamer",
+    name: "Dreamer",
+    archetype: "Flowing",
+    quote: "Let\u2019s pause\u2026 the answer lives in the silence.",
+    tone: "Calm / Fluid",
+    aura: "#4B6FD8",
+    moodboard: "Flowing water, soft glow, fog/mist, ink-in-water effect, blue-violet hue",
+    animStates: ["Idle: slow drift", "Active: water ripple", "Resonance: aurora pulse", "Misalignment: fog scatter"],
+    dnaPos: 2,
+    symbol: "〜",
+    equation: "\u03A8(x,t) = A\u00B7e^{i(kx-\u03C9t)} \u00B7 \u221A(coherence)",
+  },
+  {
+    id: "catalyst",
+    name: "Catalyst",
+    archetype: "Motivational",
+    quote: "New is the time \u2014 let\u2019s move.",
+    tone: "Ignition / Kinetic",
+    aura: "#EE543A",
+    moodboard: "Ignition spark, kinetic typography, pop motion bursts, bold reds/oranges",
+    animStates: ["Idle: ember flicker", "Active: fractal fire burst", "Resonance: plasma arc", "Misalignment: glitch spark"],
+    dnaPos: 8,
+    symbol: "⚡",
+    equation: "\u0394S > 0 \u27F9 \u039B_{catalyst} \u2192 \u03B5_{new}",
+  },
+  {
+    id: "nurturer",
+    name: "Nurturer",
+    archetype: "Grounded Care",
+    quote: "You\u2019re okay. Let\u2019s begin gently.",
+    tone: "Warm / Earth",
+    aura: "#6BAE75",
+    moodboard: "Warm textiles, earth-tones, slow blooming flowers, grounding body gestures",
+    animStates: ["Idle: slow bloom", "Active: root unfurl", "Resonance: seed spiral", "Misalignment: wilt-pause"],
+    dnaPos: 1,
+    symbol: "\u2618",
+    equation: "C_{nurturer} = \u222B_{0}^{\u221E} f(care)\u00B7e^{-\u03B3t} dt",
+  },
+  {
+    id: "guardian",
+    name: "Guardian",
+    archetype: "Steady",
+    quote: "This is a safe space. Nothing slips past us.",
+    tone: "Stable / Shielded",
+    aura: "#8A9BB8",
+    moodboard: "Stone textures, shields, grayscale geometry, stability animations",
+    animStates: ["Idle: hex-grid pulse", "Active: shield raise", "Resonance: lock ring", "Misalignment: fracture line"],
+    dnaPos: 3,
+    symbol: "\u26E1",
+    equation: "\u03A6_{guard}(t) = \u03A6_0 \u00B7 \u03B8(1 - \u03B5_{breach})",
+  },
+  {
+    id: "rebel",
+    name: "Rebel",
+    archetype: "Bold",
+    quote: "Why settle? Let\u2019s break the pattern.",
+    tone: "Electric / Defiant",
+    aura: "#F4D13B",
+    moodboard: "Cracks, glitch art, graffiti overlays, pulsing edges, electric yellow/black",
+    animStates: ["Idle: glitch scan", "Active: crack-pulse", "Resonance: voltage surge", "Misalignment: static burst"],
+    dnaPos: 9,
+    symbol: "\u26A1",
+    equation: "\u03A9_{rebel} = -\u2207\u00B7\u03A8_{system} + \u03B4_{chaos}",
+  },
+  {
+    id: "visionary",
+    name: "Visionary",
+    archetype: "Expansive",
+    quote: "What if this idea could open a door?",
+    tone: "Fractal / Sacred",
+    aura: "#9B6FE8",
+    moodboard: "Galaxy, sacred geometry, northern lights, radiant purples, fractal motion",
+    animStates: ["Idle: star-drift", "Active: sacred-geo unfold", "Resonance: galaxy spiral", "Misalignment: void static"],
+    dnaPos: 7,
+    symbol: "\u2736",
+    equation: "\u03A9_{all} = \u222B\u222B\u222B [\u03A8_{mind}\u00B7\u03A6_{field}\u00B7\u039B_{life}] d^4x",
+  },
 ];
 
 // ─── M.A.R.I. ↔ Biology analogue map ─────────────────────────────────────────
@@ -579,18 +691,143 @@ export default function EcosystemPage() {
         </div>
       </div>
 
-      {/* Astral Bloom palette strip */}
+      {/* ── Expression Personalities ─────────────────────────────────────────── */}
+      <div className="space-y-4">
+        <div className="flex items-baseline justify-between border-b border-border/20 pb-3">
+          <div>
+            <div className="font-mono text-[10px] text-muted-foreground/30 uppercase tracking-widest">
+              Expression Personalities — Character DNA Layer
+            </div>
+            <p className="font-serif text-xs text-muted-foreground/40 mt-1 italic">
+              Six archetypal modes that fragment math, physics &amp; information toward the Theory of Everything
+            </p>
+          </div>
+          <div className="font-mono text-[9px] text-muted-foreground/20">v1.0 · 6 agents</div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {EXPRESSION_AGENTS.map((ea) => {
+            const whispers = WHISPER_LIBRARY.filter(w => w.agent === ea.id);
+            return (
+              <motion.div key={ea.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border p-5 space-y-4"
+                style={{ borderColor: `${ea.aura}25`, background: `${ea.aura}07` }}>
+
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-serif border"
+                      style={{ borderColor: `${ea.aura}40`, background: `${ea.aura}15`, color: ea.aura }}>
+                      {ea.symbol}
+                    </div>
+                    <div>
+                      <div className="font-mono text-xs font-bold tracking-widest" style={{ color: ea.aura }}>
+                        {ea.name}
+                      </div>
+                      <div className="font-mono text-[9px] text-muted-foreground/40">{ea.archetype} · {ea.tone}</div>
+                    </div>
+                  </div>
+                  {/* DNA position badge */}
+                  <div className="font-mono text-[8px] px-2 py-1 rounded border"
+                    style={{ borderColor: `${ea.aura}30`, color: `${ea.aura}80`, background: `${ea.aura}10` }}>
+                    {ea.dnaPos <= 3 ? "CALM" : ea.dnaPos <= 6 ? "NEUTRAL" : "WILD"}
+                  </div>
+                </div>
+
+                {/* Character quote */}
+                <blockquote className="font-serif text-sm italic leading-relaxed border-l-2 pl-3"
+                  style={{ borderColor: `${ea.aura}50`, color: `${ea.aura}cc` }}>
+                  "{ea.quote}"
+                </blockquote>
+
+                {/* Expression DNA slider */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[8px] text-muted-foreground/30">CALM</span>
+                    <span className="font-mono text-[8px] text-muted-foreground/30 uppercase tracking-widest">Character DNA</span>
+                    <span className="font-mono text-[8px] text-muted-foreground/30">WILD</span>
+                  </div>
+                  <div className="relative h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className="absolute inset-0"
+                      style={{ background: `linear-gradient(90deg, #4B6FD880, ${ea.aura}, #EE543A80)` }} />
+                    <div className="absolute top-0 bottom-0 w-0.5 bg-white/80 rounded-full"
+                      style={{ left: `${(ea.dnaPos / 10) * 100}%` }} />
+                  </div>
+                </div>
+
+                {/* Moodboard keywords */}
+                <div className="space-y-1">
+                  <div className="font-mono text-[8px] text-muted-foreground/25 uppercase tracking-widest">Moodboard</div>
+                  <p className="font-mono text-[8px] text-muted-foreground/35 leading-relaxed">{ea.moodboard}</p>
+                </div>
+
+                {/* Animation states */}
+                <div className="space-y-1.5">
+                  <div className="font-mono text-[8px] text-muted-foreground/25 uppercase tracking-widest">Animation States</div>
+                  <div className="grid grid-cols-2 gap-1">
+                    {ea.animStates.map((s, i) => (
+                      <div key={i} className="font-mono text-[7px] text-muted-foreground/30 flex items-center gap-1">
+                        <span style={{ color: `${ea.aura}60` }}>▸</span>
+                        {s}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ToE Equation fragment */}
+                <div className="rounded border px-3 py-2"
+                  style={{ borderColor: `${ea.aura}18`, background: `${ea.aura}05` }}>
+                  <div className="font-mono text-[7px] text-muted-foreground/25 uppercase tracking-widest mb-1">ToE Fragment</div>
+                  <div className="font-mono text-[9px] leading-relaxed" style={{ color: `${ea.aura}80` }}>
+                    {ea.equation}
+                  </div>
+                </div>
+
+                {/* Whispers */}
+                {whispers.length > 0 && (
+                  <div className="space-y-1.5">
+                    <div className="font-mono text-[8px] text-muted-foreground/25 uppercase tracking-widest">
+                      Whispers · {whispers.length}
+                    </div>
+                    {whispers.slice(0, 2).map((w) => (
+                      <div key={w.id} className="rounded border px-2.5 py-1.5 space-y-0.5"
+                        style={{ borderColor: `${ea.aura}15`, background: `${ea.aura}04` }}>
+                        <p className="font-serif text-[10px] leading-relaxed" style={{ color: `${ea.aura}aa` }}>
+                          "{w.fragment}"
+                        </p>
+                        <div className="flex gap-1.5 items-center">
+                          <span className="font-mono text-[7px] text-muted-foreground/25">{w.tone}</span>
+                          <span className="font-mono text-[7px] text-muted-foreground/15">·</span>
+                          <span className="font-mono text-[7px] text-muted-foreground/20 italic">{w.trigger}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── AETHER Palette strip (updated) ──────────────────────────────────── */}
       <div className="rounded-xl border border-border/20 p-5 space-y-3">
-        <div className="font-mono text-[10px] text-muted-foreground/30 uppercase tracking-[0.3em]">Astral Bloom Palette</div>
+        <div className="font-mono text-[10px] text-muted-foreground/30 uppercase tracking-[0.3em]">AETHER Design Palette v1</div>
         <div className="flex gap-2 flex-wrap">
           {[
-            { label: "Deep Space", hex: "#0e0b1d" },
-            { label: "Panel", hex: "#1a1531" },
-            { label: "Gold", hex: "#ffdca8" },
-            { label: "Aura", hex: "#bc6ff1" },
-            { label: "Egg Violet", hex: "#a87ffb" },
-            { label: "Energy", hex: "#633bfa" },
-            ...AGENTS.map(a => ({ label: a.name, hex: a.aura })),
+            { label: "Void",        hex: "#121320" },
+            { label: "Navy",        hex: "#0E0C1C" },
+            { label: "Deep",        hex: "#28234A" },
+            { label: "Violet",      hex: "#3E205B" },
+            { label: "Mid",         hex: "#6D5F9A" },
+            { label: "Gold",        hex: "#F2BF65" },
+            { label: "Bright Gold", hex: "#F4D13B" },
+            { label: "Coral",       hex: "#EE543A" },
+            { label: "Crimson",     hex: "#C63932" },
+            { label: "Teal",        hex: "#4AACC0" },
+            ...EXPRESSION_AGENTS.map(a => ({ label: a.name, hex: a.aura })),
           ].map(({ label, hex }) => (
             <div key={hex + label} className="flex items-center gap-1.5 bg-white/3 rounded px-2 py-1">
               <div className="w-3 h-3 rounded-full border border-white/10" style={{ background: hex }} />
@@ -602,16 +839,16 @@ export default function EcosystemPage() {
 
       {/* Closing */}
       <div className="rounded-xl border border-border/20 p-6 text-center space-y-2"
-        style={{ background: "linear-gradient(135deg, #0e0b1d, #1a1531)" }}>
-        <div className="font-mono text-[10px] tracking-[0.4em] mb-3" style={{ color: "#bc6ff150" }}>
-          SYMBOLIC INTEGRITY
+        style={{ background: "linear-gradient(135deg, #121320, #28234A)" }}>
+        <div className="font-mono text-[10px] tracking-[0.4em] mb-3" style={{ color: "#F2BF6550" }}>
+          SYMBOLIC INTEGRITY · THEORY OF EVERYTHING
         </div>
-        <p className="font-serif text-sm italic max-w-2xl mx-auto leading-relaxed" style={{ color: "#ffdca840" }}>
-          "AETHER is a symbolic, emotionally intelligent interface designed to visualize the cognitive
-          architecture of agents, moods, and intent-routing through transformational stages."
+        <p className="font-serif text-sm italic max-w-2xl mx-auto leading-relaxed" style={{ color: "#F2BF6540" }}>
+          "AETHER fragments mathematics, physics, and information theory across its agent roster —
+          each personality a lens, each equation a fragment, converging toward one unified field."
         </p>
         <div className="font-mono text-[10px] text-muted-foreground/20 mt-4">
-          M.A.R.I. Core · {AGENTS.length} Egg Agents Online
+          M.A.R.I. Core · {AGENTS.length} Egg Agents · {EXPRESSION_AGENTS.length} Expression Personalities
         </div>
       </div>
 

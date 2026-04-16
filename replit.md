@@ -1,3 +1,23 @@
+# AETHER Knowledge System
+
+## Project Summary
+
+AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, Express backend) implementing the Crystallization Model of Intelligence. Features: force-directed knowledge graph, 4-layer architecture, M.A.R.I. 8-agent ecosystem, CGLE lattice with body-systems mapping, live crystallization pipeline, cultural perception geometry, biological systems layer, semantic search, equation generation, Smart Animate experience flow, and 6 Expression Personality agents with Theory of Everything fragments.
+
+### AETHER Color Palette (v1 — applied to CSS tokens)
+- Void: `#121320`  Navy: `#0E0C1C`  Deep: `#28234A`  Violet: `#3E205B`
+- Mid: `#6D5F9A`   Gold: `#F2BF65`  Bright Gold: `#F4D13B`
+- Coral: `#EE543A`  Crimson: `#C63932`  Teal: `#4AACC0`
+
+### Agent Roster
+**M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
+**Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
+
+### Routes
+`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience`
+
+---
+
 # Workspace
 
 ## Overview

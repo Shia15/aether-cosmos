@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono:wght@400&family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -43,133 +43,145 @@
   --font-sans: var(--app-font-sans);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
-  
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ── AETHER Color Palette (raw hex tokens) ──────────────────────────────────
+   Source: AETHER Design System v1 — Group_10 palette
+   Row 1: #28234A  #6D5F9A  #F2BF65  #EE543A
+   Row 2: #3E205B  #F4D13B  #C63932  #4AACC0  #121320
+   Row 3: violet   blue     cyan     amber    coral
+   Row 4: obsidian dark-teal bronze  maroon
+*/
 :root {
-  --app-font-sans: 'Inter', sans-serif;
+  --aether-void:        #121320;   /* deepest background */
+  --aether-navy:        #0E0C1C;   /* background */
+  --aether-deep:        #28234A;   /* border / surface edge */
+  --aether-violet:      #3E205B;   /* deep violet accent */
+  --aether-mid:         #6D5F9A;   /* mid purple / muted fg */
+  --aether-gold:        #F2BF65;   /* warm gold — accent */
+  --aether-bright-gold: #F4D13B;   /* catalytic gold */
+  --aether-coral:       #EE543A;   /* coral red — alert / heat */
+  --aether-crimson:     #C63932;   /* deep crimson */
+  --aether-teal:        #4AACC0;   /* teal — signal / flow */
+  --aether-dream-blue:  #4B6FD8;   /* dreamer blue */
+  --aether-electric:    #F4D13B;   /* rebel electric yellow */
+  --aether-glyph:       #9B6FE8;   /* visionary galaxy purple */
+
+  --app-font-sans:  'Inter', sans-serif;
   --app-font-serif: 'Cormorant Garamond', serif;
-  --app-font-mono: 'Share Tech Mono', monospace;
+  --app-font-mono:  'Share Tech Mono', monospace;
   --radius: 0.5rem;
-  
-  --background: 220 15% 4%;
-  --foreground: 210 40% 88%;
-  
-  --border: 220 15% 15%;
-  --input: 220 15% 15%;
-  --ring: 175 80% 45%;
 
-  --card: 220 20% 8%;
-  --card-foreground: 210 40% 88%;
-  --card-border: 220 15% 15%;
+  /* ── Background: deep navy-purple ─────────────────────────────────────── */
+  --background: 248 34% 8%;           /* #0E0C1C */
+  --foreground: 252 30% 90%;          /* soft lavender-white */
 
-  --popover: 220 20% 8%;
-  --popover-foreground: 210 40% 88%;
-  --popover-border: 220 15% 15%;
+  /* ── Borders & surfaces ────────────────────────────────────────────────── */
+  --border: 250 36% 22%;              /* #28234A */
+  --input:  250 36% 22%;
+  --ring:   191 44% 52%;              /* #4AACC0 teal */
 
-  --primary: 175 80% 45%;
-  --primary-foreground: 220 15% 4%;
-  --primary-border: 175 80% 35%;
+  --card:             250 38% 13%;    /* #1A1530 */
+  --card-foreground:  252 30% 88%;
+  --card-border:      250 36% 22%;
 
-  --secondary: 220 15% 15%;
-  --secondary-foreground: 210 40% 88%;
-  --secondary-border: 220 15% 20%;
+  --popover:            250 38% 11%;
+  --popover-foreground: 252 30% 88%;
+  --popover-border:     250 36% 22%;
 
-  --muted: 220 15% 15%;
-  --muted-foreground: 210 20% 60%;
-  --muted-border: 220 15% 20%;
+  /* ── Primary: AETHER teal (#4AACC0) ───────────────────────────────────── */
+  --primary:            191 44% 52%;
+  --primary-foreground: 248 34% 8%;
+  --primary-border:     191 44% 38%;
 
-  --accent: 43 90% 55%;
-  --accent-foreground: 220 15% 4%;
-  --accent-border: 43 90% 45%;
+  /* ── Secondary ─────────────────────────────────────────────────────────── */
+  --secondary:            250 32% 18%;
+  --secondary-foreground: 252 30% 80%;
+  --secondary-border:     250 36% 25%;
 
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 88%;
-  --destructive-border: 0 84% 50%;
+  /* ── Muted: purple-gray (#6D5F9A family) ──────────────────────────────── */
+  --muted:            250 30% 18%;
+  --muted-foreground: 252 22% 52%;    /* #6D5F9A */
+  --muted-border:     250 32% 24%;
 
-  --sidebar: 220 20% 6%;
-  --sidebar-foreground: 210 40% 88%;
-  --sidebar-border: 220 15% 15%;
-  --sidebar-primary: 175 80% 45%;
-  --sidebar-primary-foreground: 220 15% 4%;
-  --sidebar-accent: 220 15% 15%;
-  --sidebar-accent-foreground: 210 40% 88%;
-  --sidebar-ring: 175 80% 45%;
+  /* ── Accent: warm gold (#F2BF65) ───────────────────────────────────────── */
+  --accent:            39 84% 67%;
+  --accent-foreground: 248 34% 8%;
+  --accent-border:     39 84% 52%;
 
-  --chart-1: 175 80% 45%;
-  --chart-2: 43 90% 55%;
-  --chart-3: 210 40% 88%;
-  --chart-4: 220 15% 40%;
-  --chart-5: 220 20% 20%;
+  /* ── Destructive: coral (#EE543A) ──────────────────────────────────────── */
+  --destructive:            9 83% 59%;
+  --destructive-foreground: 252 30% 96%;
+  --destructive-border:     9 83% 45%;
+
+  /* ── Sidebar: deeper void (#16122A) ────────────────────────────────────── */
+  --sidebar:                    250 42% 10%;
+  --sidebar-foreground:         252 28% 80%;
+  --sidebar-border:             250 36% 18%;
+  --sidebar-primary:            191 44% 52%;
+  --sidebar-primary-foreground: 248 34% 8%;
+  --sidebar-accent:             250 32% 16%;
+  --sidebar-accent-foreground:  252 28% 80%;
+  --sidebar-ring:               191 44% 52%;
+
+  /* ── Charts ─────────────────────────────────────────────────────────────── */
+  --chart-1: 191 44% 52%;   /* teal */
+  --chart-2: 39  84% 67%;   /* gold */
+  --chart-3: 252 22% 52%;   /* mid purple */
+  --chart-4: 9   83% 59%;   /* coral */
+  --chart-5: 276 48% 24%;   /* deep violet */
 }
 
 .dark {
-  --background: 220 15% 4%;
-  --foreground: 210 40% 88%;
-  
-  --border: 220 15% 15%;
-  --input: 220 15% 15%;
-  --ring: 175 80% 45%;
-
-  --card: 220 20% 8%;
-  --card-foreground: 210 40% 88%;
-  --card-border: 220 15% 15%;
-
-  --popover: 220 20% 8%;
-  --popover-foreground: 210 40% 88%;
-  --popover-border: 220 15% 15%;
-
-  --primary: 175 80% 45%;
-  --primary-foreground: 220 15% 4%;
-  --primary-border: 175 80% 35%;
-
-  --secondary: 220 15% 15%;
-  --secondary-foreground: 210 40% 88%;
-  --secondary-border: 220 15% 20%;
-
-  --muted: 220 15% 15%;
-  --muted-foreground: 210 20% 60%;
-  --muted-border: 220 15% 20%;
-
-  --accent: 43 90% 55%;
-  --accent-foreground: 220 15% 4%;
-  --accent-border: 43 90% 45%;
-
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 88%;
-  --destructive-border: 0 84% 50%;
-
-  --sidebar: 220 20% 6%;
-  --sidebar-foreground: 210 40% 88%;
-  --sidebar-border: 220 15% 15%;
-  --sidebar-primary: 175 80% 45%;
-  --sidebar-primary-foreground: 220 15% 4%;
-  --sidebar-accent: 220 15% 15%;
-  --sidebar-accent-foreground: 210 40% 88%;
-  --sidebar-ring: 175 80% 45%;
-
-  --chart-1: 175 80% 45%;
-  --chart-2: 43 90% 55%;
-  --chart-3: 210 40% 88%;
-  --chart-4: 220 15% 40%;
-  --chart-5: 220 20% 20%;
+  --background: 248 34% 8%;
+  --foreground: 252 30% 90%;
+  --border: 250 36% 22%;
+  --input:  250 36% 22%;
+  --ring:   191 44% 52%;
+  --card:             250 38% 13%;
+  --card-foreground:  252 30% 88%;
+  --card-border:      250 36% 22%;
+  --popover:            250 38% 11%;
+  --popover-foreground: 252 30% 88%;
+  --popover-border:     250 36% 22%;
+  --primary:            191 44% 52%;
+  --primary-foreground: 248 34% 8%;
+  --primary-border:     191 44% 38%;
+  --secondary:            250 32% 18%;
+  --secondary-foreground: 252 30% 80%;
+  --secondary-border:     250 36% 25%;
+  --muted:            250 30% 18%;
+  --muted-foreground: 252 22% 52%;
+  --muted-border:     250 32% 24%;
+  --accent:            39 84% 67%;
+  --accent-foreground: 248 34% 8%;
+  --accent-border:     39 84% 52%;
+  --destructive:            9 83% 59%;
+  --destructive-foreground: 252 30% 96%;
+  --destructive-border:     9 83% 45%;
+  --sidebar:                    250 42% 10%;
+  --sidebar-foreground:         252 28% 80%;
+  --sidebar-border:             250 36% 18%;
+  --sidebar-primary:            191 44% 52%;
+  --sidebar-primary-foreground: 248 34% 8%;
+  --sidebar-accent:             250 32% 16%;
+  --sidebar-accent-foreground:  252 28% 80%;
+  --sidebar-ring:               191 44% 52%;
+  --chart-1: 191 44% 52%;
+  --chart-2: 39  84% 67%;
+  --chart-3: 252 22% 52%;
+  --chart-4: 9   83% 59%;
+  --chart-5: 276 48% 24%;
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-serif tracking-tight;
-  }
-  code, pre, .font-mono {
-    @apply font-mono;
-  }
+  * { @apply border-border; }
+  body { @apply font-sans antialiased bg-background text-foreground; }
+  h1, h2, h3, h4, h5, h6 { @apply font-serif tracking-tight; }
+  code, pre, .font-mono { @apply font-mono; }
 }
