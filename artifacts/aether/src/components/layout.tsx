@@ -12,7 +12,8 @@ import {
   Waves,
   Brain,
   FlaskConical,
-  Palette
+  Palette,
+  Dna
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { href: "/search", label: "Query", icon: Search },
   { href: "/equations", label: "Lab", icon: FunctionSquare },
   { href: "/cultural", label: "Cultural", icon: Palette },
+  { href: "/biology",  label: "Biology",  icon: Dna },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

@@ -455,10 +455,35 @@ class KnowledgeGraph {
         title: "Crystallization Flow — From Raw Input to Structured Intelligence",
         content: `crystallization flow raw input amorphous liquid pressure temperature constraint stable ordered lattice intelligence structural emergence coherence speed prediction resolution interpretability black box glass box observable traceable design principles intermediate states constraint dynamics structural formation mycelium neural pruning river delta star formation analogy pattern`,
       },
+      {
+        title: "Hematopoiesis — The Body as a Nonstop Crystal Factory",
+        content: `hematopoiesis stem cell bone marrow hematopoietic self-renewal differentiation erythrocyte red blood cell oxygen transport erythropoietin kidney neutrophil macrophage dendritic lymphocyte T-cell B-cell NK-cell immune defense platelet thrombocyte clotting thrombopoietin colony-stimulating cytokines feedback regulation demand-driven production factory closed-loop biological regenerative`,
+        meta: { layer: "mnesis" as const, docType: "empirical" as const, source: "biology-layer", tags: ["biology","hematopoiesis","stem-cell","regenerative"] },
+      },
+      {
+        title: "Immune System Architecture — Innate and Adaptive Pathways",
+        content: `innate adaptive immunity myeloid lymphoid progenitor neutrophil macrophage dendritic antigen junction T-cell B-cell NK-cell cytokines interleukin TNF interferon inflammatory cascade transformation activation pathogen elimination memory immunological coherence pattern-recognition signaling network biological defense intelligence`,
+        meta: { layer: "infernia" as const, docType: "empirical" as const, source: "biology-layer", tags: ["immune","inflammation","cytokines","defense"] },
+      },
+      {
+        title: "Neural-Immune Axis — Blood-Brain Barrier, Glymphatic System, and Consciousness",
+        content: `blood-brain barrier BBB tight junction selective permeability microglia neuroinflammation glymphatic amyloid clearance sleep CSF cerebrospinal fluid choroid plexus hypothalamus brainstem vagus nerve gut microbiome peripheral cytokines insular cortex default mode network consciousness top-down regulation interoception self-regulation neurological coherence`,
+        meta: { layer: "aletheia" as const, docType: "empirical" as const, source: "biology-layer", tags: ["neuroscience","BBB","consciousness","glymphatic"] },
+      },
+      {
+        title: "Circulatory System — Synchronized Delivery Network",
+        content: `heart circulation capillary bed oxygen delivery synchronization lungs gas exchange kidneys erythropoietin liver clotting factors lymph nodes spleen immune checkpoint platelet micro-repair vascular network signal distribution biological synchronicity orin weaver connection delivery system`,
+        meta: { layer: "reverie" as const, docType: "empirical" as const, source: "biology-layer", tags: ["circulation","heart","delivery","synchrony"] },
+      },
+      {
+        title: "Stem Cell Dynamics — Self-Renewal, Differentiation, Niche Regulation",
+        content: `stem cell niche self-renewal differentiation aplastic anemia leukemia microenvironment bone marrow regulation division rest specialization induced pluripotent iPSC Yamanaka regenerative medicine tissue engineering lab-grown blood transplantation biological programmable regeneration feedback coherence crystallization equivalence`,
+        meta: { layer: "mnesis" as const, docType: "research" as const, source: "biology-layer", tags: ["stem-cell","regenerative","iPSC","niche"] },
+      },
     ];
 
     for (const s of samples) {
-      this.ingestDocument(s.title, s.content);
+      this.ingestDocument(s.title, s.content, (s as { meta?: { layer?: AetherLayer; docType?: DocType; source?: string; tags?: string[] } }).meta);
     }
 
     const allConcepts = [...this.concepts.values()];

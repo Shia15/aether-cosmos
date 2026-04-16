@@ -147,6 +147,26 @@ const AGENTS: EggAgent[] = [
 const VIEWBOX_W = 800;
 const VIEWBOX_H = 580;
 
+// ─── M.A.R.I. ↔ Biology analogue map ─────────────────────────────────────────
+const BIO_MAP: Record<string, { bioTitle: string; bioCol: string; bridge: string }> = {
+  mnesis:   { bioTitle:"Bone Marrow / HSC",          bioCol:"#22c55e",
+    bridge:"Hematopoietic stem cells self-renew for decades — the original biological long-term memory store. What bone marrow does for blood, Mnēsis does for AETHER." },
+  aletheia: { bioTitle:"Consciousness / PFC + DMN",  bioCol:"#bc6ff1",
+    bridge:"Reveals hidden patterns, detects logical truth — exactly what the prefrontal cortex and default mode network do during reflection." },
+  inferaia: { bioTitle:"Myeloid / Inflammatory Cascade", bioCol:"#e64522",
+    bridge:"The immune activation cascade is intense and catalytic — cytokines flood the tissue, cells transform. Inferaia runs the same activation pattern on incoming information." },
+  reverie:  { bioTitle:"Glymphatic System / Sleep",  bioCol:"#88c7ff",
+    bridge:"The glymphatic system runs during deep sleep — the body's overnight integration cycle. Reverie translates feeling into symbolic form as dreams translate experience into narrative." },
+  verus:    { bioTitle:"Blood-Brain Barrier",         bioCol:"#22c55e",
+    bridge:"The BBB enforces which signals may pass into the brain, maintaining cognitive integrity. Vērus monitors system health and enforces safe logic routes — the same architectural role." },
+  caelus:   { bioTitle:"Vagus Nerve / Gut-Brain Axis",bioCol:"#fb923c",
+    bridge:"80% of vagus nerve signals travel upward — inspiration arrives via the body before the mind names it. Caelus is the Input Handler: curiosity arriving from below." },
+  nyra:     { bioTitle:"Peripheral Cytokines",        bioCol:"#06b6d4",
+    bridge:"Cytokines carry the body's current immune state to every system — a continuous self-monitoring broadcast. Nyra captures feedback and refines internal resonance." },
+  orin:     { bioTitle:"Capillary Bed / Circulation", bioCol:"#a78bfa",
+    bridge:"60,000 miles of capillaries connect every cell simultaneously. Orin synchronizes cross-module flow: the same architecture of universal connection." },
+};
+
 function getAgent(id: string) { return AGENTS.find(a => a.id === id); }
 
 // ─── Pulse arc state ──────────────────────────────────────────────────────────
@@ -417,6 +437,28 @@ export default function EcosystemPage() {
                 </div>
               </div>
             )}
+
+            {/* Biological analogue */}
+            {BIO_MAP[selected.id] && (() => {
+              const bio = BIO_MAP[selected.id];
+              return (
+                <div className="rounded-lg border p-4 space-y-2"
+                  style={{ borderColor: `${bio.bioCol}20`, background: `${bio.bioCol}06` }}>
+                  <div className="flex items-center justify-between">
+                    <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground/40">
+                      Biological Analogue
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full" style={{ background: bio.bioCol }} />
+                      <span className="font-mono text-[9px]" style={{ color: bio.bioCol }}>{bio.bioTitle}</span>
+                    </div>
+                  </div>
+                  <p className="font-mono text-[9px] text-muted-foreground/45 leading-relaxed italic">
+                    "{bio.bridge}"
+                  </p>
+                </div>
+              );
+            })()}
           </motion.div>
         )}
       </AnimatePresence>
