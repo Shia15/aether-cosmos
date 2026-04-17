@@ -13,8 +13,14 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 **M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
 **Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
 
-### Routes
-`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience`
+### Routes (25 pages)
+`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer`
+
+### Simulator Pages
+- **PDE Simulator** (`/pde-simulator`) — CGLE + Swift-Hohenberg + Multi-Scale PDEs, 22-step tour, canvas perturbation
+- **φ-AETHER Coherent Criticality Engine** (`/phi-aether`) — 500-agent BA-network, FQP quantization, 3 view modes (FIELD/WAVE/TORUS), power-law α, Hurst H, permutation entropy, 6-layer accordion, AETHER loop, phase portrait, system log. Cinzel/Raleway cosmic aesthetic
+- **Multi-Scale Integration** (`/multiscale`) — 3×3 canvas grid (31×31 waveguide substrate + 8 bio/climate/econ levels), coupled NLS evolution, scenario perturbations (cancer, climate shock, market crash, coupled crisis)
+- **Morphogenetic Computer** (`/morpho-computer`) — 6-panel photonic reservoir (30×30 NLS) + 5 Bloch-sphere qubits + FQP 500-dim feature histogram + input signal + φ-spiral network topology + prediction vs target (MSE)
 
 ---
 

@@ -26,6 +26,9 @@ import NeuralEmergenceView from "@/pages/neural-emergence";
 import SpaceRocksView from "@/pages/space-rocks";
 import AsAboveView from "@/pages/as-above";
 import PDESimulatorView from "@/pages/pde-simulator";
+import PhiAetherView from "@/pages/phi-aether";
+import MultiScaleView from "@/pages/multiscale";
+import MorphoComputerView from "@/pages/morpho-computer";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +58,9 @@ function Router() {
         <Route path="/space-rocks" component={SpaceRocksView} />
         <Route path="/as-above" component={AsAboveView} />
         <Route path="/pde-simulator" component={PDESimulatorView} />
+        <Route path="/phi-aether" component={PhiAetherView} />
+        <Route path="/multiscale" component={MultiScaleView} />
+        <Route path="/morpho-computer" component={MorphoComputerView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

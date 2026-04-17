@@ -24,6 +24,9 @@ import {
   Flame,
   Satellite,
   Gauge,
+  AudioWaveform,
+  Boxes,
+  Microscope,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +53,9 @@ const NAV_ITEMS = [
   { href: "/space-rocks",     label: "Space Rocks", icon: Flame },
   { href: "/as-above",        label: "As Above",    icon: Satellite },
   { href: "/pde-simulator",   label: "PDE Sim",     icon: Gauge },
+  { href: "/phi-aether",     label: "φ-AETHER",    icon: AudioWaveform },
+  { href: "/multiscale",     label: "Multi-Scale",  icon: Boxes },
+  { href: "/morpho-computer", label: "Morpho Comp", icon: Microscope },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
