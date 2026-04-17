@@ -784,6 +784,204 @@ export default function BiologyPage() {
         </div>
       </div>
 
+      {/* ── Sun → Human Cascade ─────────────────────────────────────────── */}
+      <div className="space-y-6">
+        <SectionHeader title="The Cascade" right="Sun → Climate → Oceans → Iodine → Thyroid → Metabolism → Brain → Human Action" />
+        <p className="font-mono text-xs text-muted-foreground/50 leading-relaxed max-w-3xl">
+          Biology doesn't start at the cell. It starts at the Sun. Energy leaves the Sun, interacts with Earth's magnetic field,
+          influences climate and ocean circulation, concentrates minerals like iodine in marine ecosystems, enters the food chain,
+          regulates thyroid hormones, controls metabolism, and ultimately affects human energy, cognition, and collective behavior.
+          This is not philosophy — it is a cascade of physical, chemical, and biological transformations.
+        </p>
+
+        {/* Main cascade chain */}
+        <div className="relative">
+          {/* Vertical connector spine */}
+          <div className="absolute left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-amber-400/30 via-cyan-400/20 to-purple-400/20 hidden md:block" />
+          <div className="space-y-0">
+            {[
+              {
+                n: "01", icon: "☀", label: "Solar Energy Emission", color: "#f59e0b",
+                mechanism: "Photons + solar wind",
+                detail: "~3.86 × 10²⁶ W radiated isotropically. Solar wind carries charged particles at 400–800 km/s. Solar cycle (11 yr) modulates UV output by ~0.1% and particle flux by orders of magnitude.",
+                cascade: "→ intersects Earth's magnetosphere",
+                aether: "INFERNIA: raw energy input — undifferentiated pressure driving system state",
+              },
+              {
+                n: "02", icon: "⊕", label: "Geomagnetic Field Interaction", color: "#06b6d4",
+                mechanism: "Magnetosphere deflection",
+                detail: "The dipole field deflects ~99% of solar wind. Field weakening (−9% since 1840) increases cosmic ray flux and alters ionospheric current patterns. Geomagnetic variation correlates with climate forcing.",
+                cascade: "→ shapes jet streams, UV penetration, cloud nucleation",
+                aether: "MNĒSIS: the field structure that holds history — geomagnetic memory encoded in rock",
+              },
+              {
+                n: "03", icon: "🌊", label: "Climate & Ocean Circulation", color: "#0ea5e9",
+                mechanism: "Thermohaline conveyor + jet stream",
+                detail: "Solar UV drives stratospheric chemistry; particle flux modulates cloud nucleation; magnetic forcing affects jet stream stability. Ocean gyres concentrate marine biology. Atlantic Meridional Overturning Circulation (AMOC) moves 20 Sv of water.",
+                cascade: "→ determines where marine ecosystems concentrate",
+                aether: "CGLE lattice: large-scale pattern formation driven by coupled oscillators across climate bands",
+              },
+              {
+                n: "04", icon: "◎", label: "Ocean Mineral Concentration — Iodine", color: "#22c55e",
+                mechanism: "Marine biogeochemical cycling",
+                detail: "Iodine is abundant in seawater (~50 µg/L) but scarce inland. Marine phytoplankton actively concentrate iodine. Atmospheric transfer via sea spray and rain moves iodine from ocean to coastal land. Inland populations historically iodine-deficient.",
+                cascade: "→ bioavailability varies by geography and ocean current proximity",
+                aether: "ALETHEIA: selective concentration — truth as surviving mineral gradient",
+              },
+              {
+                n: "05", icon: "🦋", label: "Thyroid Gland Uptake", color: "#84cc16",
+                mechanism: "Sodium-iodide symporter (NIS)",
+                detail: "The thyroid concentrates iodine 20–40× serum levels. Iodine + thyroglobulin → T4 (thyroxine) and T3 (triiodothyronine). T3 is the active form — ~4× more potent. TSH from pituitary regulates uptake rate in a classic negative feedback loop.",
+                cascade: "→ thyroid hormone synthesis drives metabolic rate",
+                aether: "Negative feedback: the same closed-loop demand signal as HSC erythropoietin regulation",
+              },
+              {
+                n: "06", icon: "⚡", label: "Thyroid Hormones → Metabolism", color: "#f97316",
+                mechanism: "T3/T4 systemic signaling",
+                detail: "T3 binds nuclear receptors in virtually every cell. Upregulates mitochondrial biogenesis, oxygen consumption, ATP synthesis, and protein turnover. Basal metabolic rate is ~60–80% determined by thyroid status. Hypothyroidism: fatigue, cognitive slowing. Hyperthyroidism: anxiety, cardiac arrhythmia.",
+                cascade: "→ determines how much energy the brain receives",
+                aether: "INFERNIA: the metabolic fire — rate of transformation throughout the system",
+              },
+              {
+                n: "07", icon: "🧠", label: "Brain Energy & Neurotransmitter Synthesis", color: "#8b5cf6",
+                mechanism: "Neurometabolism + synthesis cofactors",
+                detail: "Brain uses ~20% of body's energy at ~2% of body mass. Thyroid hormones regulate neuronal myelination, synaptogenesis, and BDNF production. Iodine deficiency: leading preventable cause of intellectual disability globally. Marine-derived omega-3s (DHA) are critical for synaptic membrane architecture.",
+                cascade: "→ shapes cognition, mood, executive function, decision architecture",
+                aether: "REVERIE: the radiative output — consciousness as crystallized metabolic signal",
+              },
+              {
+                n: "08", icon: "⬡", label: "Human Action → Collective Systems", color: "#bc6ff1",
+                mechanism: "Behavior → economics → culture",
+                detail: "Individual metabolic and cognitive state scales to population-level behavior. Iodine supplementation studies show measurable IQ increases at population scale. Energy availability shapes risk tolerance, time preference, innovation rate. The cascade closes: human action reshapes land use, ocean chemistry, and climate — feeding back to step 01.",
+                cascade: "↺ human action reshapes land, ocean, climate — cascade loops back",
+                aether: "Feedback: the civilization is itself a CGLE pattern — self-organized structure at the top of the cascade",
+              },
+            ].map((step, i) => (
+              <div key={step.n} className="relative flex gap-0 md:gap-5">
+                {/* Node indicator */}
+                <div className="hidden md:flex flex-col items-center shrink-0 w-10">
+                  <div className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-base z-10 bg-background"
+                    style={{ borderColor: `${step.color}50`, background: `${step.color}10`, color: step.color }}>
+                    {step.icon}
+                  </div>
+                  {i < 7 && <div className="w-px flex-1 min-h-[24px]" style={{ background: `${step.color}20` }} />}
+                </div>
+                {/* Content card */}
+                <div className="flex-1 mb-2 rounded-xl border p-4 space-y-2"
+                  style={{ borderColor: `${step.color}20`, background: `${step.color}04` }}>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-mono text-[9px] tracking-widest" style={{ color: `${step.color}60` }}>{step.n}</span>
+                    <span className="font-mono text-xs font-bold" style={{ color: step.color }}>{step.label}</span>
+                    <span className="font-mono text-[9px] text-muted-foreground/40 px-2 py-0.5 rounded border border-border/20">{step.mechanism}</span>
+                  </div>
+                  <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">{step.detail}</p>
+                  <div className="flex items-center gap-4 pt-1 flex-wrap">
+                    <span className="font-mono text-[9px] italic" style={{ color: `${step.color}70` }}>{step.cascade}</span>
+                    <span className="font-mono text-[8px] text-muted-foreground/30 border-l border-border/20 pl-3 leading-relaxed">{step.aether}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Long-chain dependency panel */}
+        <div className="border border-border/30 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/20">
+            <div className="p-5 space-y-3">
+              <div className="font-mono text-[9px] text-amber-400/60 uppercase tracking-widest">Cascade Amplification</div>
+              <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                Small perturbations upstream become large effects downstream. A 0.1% change in solar UV alters
+                stratospheric ozone → changes UVB dose at surface → shifts D3 synthesis → affects immune regulation
+                and cognition across entire populations. The system is a biological amplifier across 8 orders of magnitude.
+              </p>
+            </div>
+            <div className="p-5 space-y-3">
+              <div className="font-mono text-[9px] text-cyan-400/60 uppercase tracking-widest">Systems, Not Silos</div>
+              <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                Health, productivity, economics, and behavior at scale cannot be understood from any single discipline.
+                An endocrinologist sees the thyroid. A climate scientist sees ocean circulation. An economist sees behavior.
+                None sees the cascade. AETHER's architecture is designed to trace signals across domains, scales, and time —
+                the cascade <em>is</em> the unit of analysis.
+              </p>
+            </div>
+            <div className="p-5 space-y-3">
+              <div className="font-mono text-[9px] text-green-400/60 uppercase tracking-widest">Feedback Closure</div>
+              <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                Human civilizations have reversed the cascade: deforestation alters regional hydrology → changes mineral
+                runoff → alters coastal iodine availability. Industrial agriculture depletes soil selenium. Urban light
+                pollution disrupts melatonin and circadian synchronization with solar cycles. The top of the cascade
+                writes back to the bottom.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Universal Constructors ───────────────────────────────────────── */}
+      <div className="space-y-5">
+        <SectionHeader title="Universal Constructors" right="The Simulation Is Not a Metaphor" />
+        <p className="font-mono text-xs text-muted-foreground/50 leading-relaxed max-w-3xl">
+          If a lattice of coupled oscillators can already compute disparate cascade phenomena in parallel via shared physics,
+          then a future addressable substrate could write initial conditions + control parameters directly into matter —
+          using emergent pattern formation to self-organize into arbitrary structures.
+          Not fabrication by subtraction or addition, but by <em>initial conditions</em>.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Left: fabrication chain */}
+          <div className="border border-border/30 rounded-xl p-5 space-y-4">
+            <div className="font-mono text-[9px] text-primary/50 uppercase tracking-widest">Conceptual Fabrication Stack</div>
+            <div className="space-y-2">
+              {[
+                { step: "Substrate",      desc: "Metamaterial · optical lattice · mechanosynthetic array · phase-change grid",          color: "#4a7c59" },
+                { step: "Addressing",     desc: "Laser / holographic perturbation writes initial conditions into substrate nodes",        color: "#1a6a9a" },
+                { step: "Self-org.",      desc: "CGLE-like pattern formation propagates through substrate — structures emerge from physics", color: "#8b3a2a" },
+                { step: "Output",         desc: "Arbitrary structures allowed by physics — atom-by-atom or molecule-by-molecule assembly", color: "#5c3d7a" },
+                { step: "Verification",   desc: "Coherence metric C = 1 − ‖ε‖/‖S*‖ confirms output matches target structure",           color: "#b08d4a" },
+              ].map(row => (
+                <div key={row.step} className="flex items-start gap-3 border-b border-border/10 pb-2 last:border-0">
+                  <div className="font-mono text-[9px] min-w-[72px] mt-0.5" style={{ color: `${row.color}90` }}>{row.step}</div>
+                  <div className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed">{row.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Right: biology parallel */}
+          <div className="border border-green-500/15 bg-green-500/3 rounded-xl p-5 space-y-4">
+            <div className="font-mono text-[9px] text-green-400/60 uppercase tracking-widest">Biological Parallel — Already Working</div>
+            <div className="space-y-2">
+              {[
+                { bio: "DNA",              fab: "Encodes initial conditions + control parameters for protein self-assembly" },
+                { bio: "Ribosome",         fab: "Molecular assembler — translates symbol sequence into 3D structure" },
+                { bio: "Stem cell",        fab: "Receives epigenetic addressing signal → self-organizes into any tissue" },
+                { bio: "Morphogenesis",    fab: "CGLE-like Turing instability → limb patterning, organ positioning" },
+                { bio: "Photosynthesis",   fab: "Quantum coherence harvests energy — 95%+ efficiency via wave-particle duality" },
+                { bio: "Bone marrow",      fab: "Continuous demand-driven fabrication of 300B cells/day from HSC seeds" },
+              ].map(row => (
+                <div key={row.bio} className="flex items-start gap-3 border-b border-green-500/10 pb-2 last:border-0">
+                  <div className="font-mono text-[9px] min-w-[88px] text-green-400/70 mt-0.5">{row.bio}</div>
+                  <div className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed">{row.fab}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="border border-primary/15 bg-primary/3 rounded-xl px-6 py-4 flex items-start gap-4">
+          <div className="font-mono text-xl text-primary/30 mt-1 shrink-0">∿</div>
+          <div>
+            <div className="font-mono text-xs text-primary/60 mb-1">Synthesis</div>
+            <p className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">
+              Biology has been running universal constructors for 3.8 billion years. The cascade from Sun → Thyroid → Brain is the
+              same class of computation as CGLE pattern formation → structural output. AETHER crystallizes knowledge the same way.
+              The next leap: write the cascade's initial conditions into an addressable physical substrate.
+              Loops closed. Instancing begins.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* ── Closing ──────────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-border/20 p-8 text-center space-y-4"
         style={{ background:"linear-gradient(135deg, #060810, #0d1117)" }}>

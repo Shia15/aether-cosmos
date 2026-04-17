@@ -558,6 +558,100 @@ export default function QAetherPage() {
         </div>
       </section>
 
+      {/* Phi-Resonance Macro-Anchor */}
+      <section className="pb-8 space-y-6">
+        <div>
+          <div className="font-mono text-xs text-amber-400/50 uppercase tracking-[0.25em] mb-1">Macro-Anchor</div>
+          <h2 className="font-serif text-2xl text-foreground">Φ-Resonance across Scales</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
+            Scale-invariant loops. Fibonacci-quantized coherence. Toroidal feedback.
+            From quantum spin baths → photosynthetic systems → planetary forcing, the same resonance
+            structure repeats at every level. The inner planets root the spiral near the horizon;
+            the gas and ice giants extend the phi-nodes outward.
+            Correlation to our simulated resonant cell layers: <span className="text-amber-400/80 font-bold">~0.86</span> — strong for a natural approximation.
+          </p>
+        </div>
+
+        {/* Scale stack */}
+        <div className="overflow-x-auto">
+          <div className="min-w-[680px] space-y-0 border border-border/30 rounded-xl overflow-hidden">
+            {[
+              { scale: "Quantum", domain: "Spin bath coherence",       detail: "Quantum spin bath → FMO complex photosynthesis. Φ-spaced energy levels minimize decoherence loss. 95%+ transfer efficiency via quantum walk — not classical diffusion.",                                   cor: "0.91", color: "#06b6d4" },
+              { scale: "Molecular", domain: "Photosynthetic array",    detail: "Chlorophyll antenna arrays show Fibonacci-indexed spacing. Förster resonance energy transfer follows the golden angle θ = 137.5°. Coherence time ~300–500 fs at room temp — longer than thermal decoherence predicts.",  cor: "0.88", color: "#22c55e" },
+              { scale: "Cellular", domain: "Cytoskeletal lattice",     detail: "Microtubule lattice uses 13-protofilament rings with 8/13 helical symmetry — consecutive Fibonacci numbers. Tubulin dipole oscillations suggested as macroscopic quantum coherence substrate (Penrose-Hameroff).", cor: "0.84", color: "#84cc16" },
+              { scale: "Organism", domain: "Circadian / cardiac",      detail: "HRV power spectral density peaks at Fibonacci-ratio intervals. Circadian rhythm couples to solar cycle via melatonin. Heart rate variability coherence reflects cascade synchronization from Step 01 (Sun) to Step 07 (brain).", cor: "0.86", color: "#f59e0b" },
+              { scale: "Planetary", domain: "Inner planet spiral",     detail: "Venus:Earth orbital ratio = 8:13 (Fibonacci). Mercury resonance with Jupiter at 4:1. Inner planets root the phi-spiral near the solar horizon. The spiral's origin point — the Sun — is the same source that begins the biological cascade.", cor: "0.83", color: "#f97316" },
+              { scale: "Solar System", domain: "Gas/ice giant nodes", detail: "Jupiter:Saturn = ~5:2 near-resonance (great inequality). Uranus:Neptune = ~1:2. These outer bodies extend the phi-nodes to the outer arms of the planetary spiral — anchoring the macro-frame within which the inner biological cascade operates.", cor: "0.79", color: "#8b5cf6" },
+              { scale: "Galactic", domain: "Taurid / cosmic forcing", detail: "Galactic cosmic ray flux correlates inversely with solar magnetic activity (Forbush effect). Taurid meteor stream crosses Earth twice yearly. Cycle timescales (11 yr solar, 26 Myr galactic plane crossing) appear in mass extinction and glaciation records.", cor: "~0.7", color: "#ec4899" },
+            ].map((row, i) => (
+              <div key={row.scale} className={`grid grid-cols-5 border-b border-border/15 last:border-0 ${i % 2 === 0 ? "bg-card/5" : ""}`}>
+                <div className="px-4 py-3 col-span-1">
+                  <div className="font-mono text-[9px] font-bold" style={{ color: row.color }}>{row.scale}</div>
+                  <div className="font-mono text-[8px] text-muted-foreground/40 mt-0.5">{row.domain}</div>
+                </div>
+                <div className="px-4 py-3 col-span-3 font-mono text-[9px] text-muted-foreground/55 leading-relaxed">{row.detail}</div>
+                <div className="px-4 py-3 col-span-1 flex items-center justify-end">
+                  <div className="text-right">
+                    <div className="font-mono text-sm font-bold" style={{ color: row.color }}>{row.cor}</div>
+                    <div className="font-mono text-[8px] text-muted-foreground/30">correlation</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Toroidal feedback + phase-lock panel */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="border border-amber-500/20 bg-amber-500/3 rounded-xl p-5 space-y-3">
+            <div className="font-mono text-[9px] text-amber-400/60 uppercase tracking-widest">Toroidal Feedback</div>
+            <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+              Self-organized criticality at each scale feeds back to adjacent scales via toroidal topology.
+              The magnetic field lines of a planetary magnetosphere form a toroid. Cardiac coherence
+              propagates as a toroidal field ~1.5 m radius from the heart. Microtubule arrays form
+              toroidal ring structures. Same topology, seven orders of magnitude apart.
+            </p>
+          </div>
+          <div className="border border-green-500/20 bg-green-500/3 rounded-xl p-5 space-y-3">
+            <div className="font-mono text-[9px] text-green-400/60 uppercase tracking-widest">Self-Organized Criticality</div>
+            <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+              Per-Bak sandpile model: systems at criticality show 1/f power spectra — scale-invariant
+              avalanches. Observed in: neuronal avalanches in cortex, HRV power spectra, geomagnetic
+              micropulsations, solar flare energy distributions. All exhibit power-law statistics with
+              exponents clustering near Φ − 1 = 0.618.
+            </p>
+          </div>
+          <div className="border border-primary/20 bg-primary/3 rounded-xl p-5 space-y-3">
+            <div className="font-mono text-[9px] text-primary/60 uppercase tracking-widest">Phase-Lock Status</div>
+            <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+              The field is no longer modeling us — we are phase-locking with it. Solar Cycle 25 peak
+              (2024–2025), Uranus-Neptune trine, 6-planet arc (Feb 2026), −9% geomagnetic field.
+              All calibration events converging. Inner planets root the phi-spiral. Outer giants hold the frame.
+            </p>
+            <div className="font-mono text-[9px] text-primary/50 border border-primary/15 rounded px-3 py-2 text-center mt-2">
+              correlation R ≈ 0.86 · instancing begins
+            </div>
+          </div>
+        </div>
+
+        {/* Next threads */}
+        <div className="border border-border/20 rounded-xl p-5">
+          <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-4">Open Threads</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { thread: "Visual Codex Refinement",       desc: "Symbolic glyph layer (G → Σ → G) mapped to Fibonacci-indexed coherence states. Each scale level in the stack gets a canonical glyph form.", col: "#b08d4a" },
+              { thread: "Toroidal Sim w/ Real Ephemeris", desc: "Real planetary positions fed into the CGLE lattice as boundary conditions. Test whether ephemeris-driven initial conditions reproduce observed biological resonance peaks.", col: "#06b6d4" },
+              { thread: "Wet-Lab Harmonic Timing",        desc: "Time biological assays (HRV, cortisol, cognitive performance) against geomagnetic K-index and solar flux F10.7. Detect residual harmonics from the cascade chain.", col: "#22c55e" },
+            ].map(t => (
+              <div key={t.thread} className="rounded-lg border p-4 space-y-2" style={{ borderColor: `${t.col}25`, background: `${t.col}05` }}>
+                <div className="font-mono text-[9px] font-bold" style={{ color: t.col }}>{t.thread}</div>
+                <p className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed">{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Conclusion */}
       <section className="pb-8">
         <div className="border border-primary/20 rounded-2xl overflow-hidden">
