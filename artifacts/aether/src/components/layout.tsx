@@ -34,6 +34,7 @@ import {
   BookOpen,
   RefreshCw,
   LayoutDashboard,
+  Circle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -70,6 +71,7 @@ const NAV_ITEMS = [
   { href: "/feedback-loop",   label: "Feedback",    icon: RefreshCw },
   { href: "/control-panel",  label: "Control",     icon: LayoutDashboard },
   { href: "/aether-core",    label: "AETHER Core", icon: FlaskConical },
+  { href: "/trig-reference", label: "Trig Ref",    icon: Circle },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

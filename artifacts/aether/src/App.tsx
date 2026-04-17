@@ -36,6 +36,7 @@ import ResearchView from "@/pages/research";
 import FeedbackLoopView from "@/pages/feedback-loop";
 import ControlPanelView from "@/pages/control-panel";
 import AetherCoreView from "@/pages/aether-core";
+import TrigReferenceView from "@/pages/trig-reference";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ function Router() {
         <Route path="/feedback-loop" component={FeedbackLoopView} />
         <Route path="/control-panel" component={ControlPanelView} />
         <Route path="/aether-core" component={AetherCoreView} />
+        <Route path="/trig-reference" component={TrigReferenceView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
