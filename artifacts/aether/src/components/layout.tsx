@@ -35,6 +35,8 @@ import {
   RefreshCw,
   LayoutDashboard,
   Circle,
+  HeartPulse,
+  Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -71,7 +73,9 @@ const NAV_ITEMS = [
   { href: "/feedback-loop",   label: "Feedback",    icon: RefreshCw },
   { href: "/control-panel",  label: "Control",     icon: LayoutDashboard },
   { href: "/aether-core",    label: "AETHER Core", icon: FlaskConical },
-  { href: "/trig-reference", label: "Trig Ref",    icon: Circle },
+  { href: "/trig-reference",    label: "Trig Ref",    icon: Circle },
+  { href: "/neuroplasticity",   label: "Neuro Health",icon: HeartPulse },
+  { href: "/aether-components", label: "Components",  icon: Package },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

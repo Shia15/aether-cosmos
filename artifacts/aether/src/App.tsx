@@ -37,6 +37,8 @@ import FeedbackLoopView from "@/pages/feedback-loop";
 import ControlPanelView from "@/pages/control-panel";
 import AetherCoreView from "@/pages/aether-core";
 import TrigReferenceView from "@/pages/trig-reference";
+import NeuroplasticityView from "@/pages/neuroplasticity";
+import AetherComponentsView from "@/pages/aether-components";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +79,8 @@ function Router() {
         <Route path="/control-panel" component={ControlPanelView} />
         <Route path="/aether-core" component={AetherCoreView} />
         <Route path="/trig-reference" component={TrigReferenceView} />
+        <Route path="/neuroplasticity" component={NeuroplasticityView} />
+        <Route path="/aether-components" component={AetherComponentsView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
