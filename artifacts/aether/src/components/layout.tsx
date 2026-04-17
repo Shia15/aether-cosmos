@@ -33,6 +33,7 @@ import {
   Hammer,
   BookOpen,
   RefreshCw,
+  LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -67,6 +68,7 @@ const NAV_ITEMS = [
   { href: "/fabrication",     label: "Fabrication", icon: Hammer },
   { href: "/research",        label: "Research",    icon: BookOpen },
   { href: "/feedback-loop",   label: "Feedback",    icon: RefreshCw },
+  { href: "/control-panel",  label: "Control",     icon: LayoutDashboard },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
