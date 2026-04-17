@@ -154,7 +154,7 @@ function EventCard({ ev, idx }: { ev: typeof EVENTS[0]; idx: number }) {
 export default function SpaceRocksPage() {
   let currentEra = -1;
   return (
-    <div className="p-6 space-y-8 max-w-5xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6 space-y-8 max-w-5xl mx-auto">
       <div className="space-y-2">
         <div className="font-mono text-xs text-amber-400/50 uppercase tracking-[0.25em]">AETHER · Coherent Catastrophism</div>
         <h1 className="font-serif text-4xl text-foreground">Rocks from Space Have Been<br />Reshaping <span className="text-amber-400 italic">Everything</span></h1>

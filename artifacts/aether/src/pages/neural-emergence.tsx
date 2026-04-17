@@ -387,7 +387,7 @@ export default function NeuralEmergencePage() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6 space-y-8 max-w-7xl mx-auto">
       <div className="space-y-2">
         <div className="font-mono text-xs text-cyan-400/50 uppercase tracking-[0.25em]">AETHER · Neural Emergence Layer</div>
         <h1 className="font-serif text-4xl text-foreground">Emergent Movement</h1>

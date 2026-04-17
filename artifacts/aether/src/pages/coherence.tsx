@@ -101,7 +101,7 @@ export default function CoherenceView() {
   const globalScore = (summary.globalCoherence * 100).toFixed(1);
 
   return (
-    <div className="p-8 max-w-6xl mx-auto w-full space-y-12">
+    <div className="flex-1 overflow-y-auto p-8 max-w-6xl mx-auto w-full space-y-12">
       <header className="space-y-2">
         <div className="font-mono text-xs text-primary tracking-[0.3em] uppercase mb-3">
           System Coherence Analysis

@@ -111,7 +111,7 @@ export default function AsAbovePage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="flex-1 overflow-y-auto p-6 space-y-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="space-y-2">
         <div className="font-mono text-xs text-amber-400/50 uppercase tracking-[0.25em]">AETHER · Coherent Catastrophism</div>
