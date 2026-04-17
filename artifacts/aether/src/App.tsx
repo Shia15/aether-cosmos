@@ -33,6 +33,7 @@ import AetherOSView from "@/pages/aether-os";
 import CGLELiveView from "@/pages/cgle-live";
 import FabricationView from "@/pages/fabrication";
 import ResearchView from "@/pages/research";
+import FeedbackLoopView from "@/pages/feedback-loop";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ function Router() {
         <Route path="/cgle-live" component={CGLELiveView} />
         <Route path="/fabrication" component={FabricationView} />
         <Route path="/research" component={ResearchView} />
+        <Route path="/feedback-loop" component={FeedbackLoopView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

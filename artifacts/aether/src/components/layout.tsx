@@ -32,6 +32,7 @@ import {
   Signal,
   Hammer,
   BookOpen,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +66,7 @@ const NAV_ITEMS = [
   { href: "/cgle-live",       label: "CGLE Live",   icon: Signal },
   { href: "/fabrication",     label: "Fabrication", icon: Hammer },
   { href: "/research",        label: "Research",    icon: BookOpen },
+  { href: "/feedback-loop",   label: "Feedback",    icon: RefreshCw },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
