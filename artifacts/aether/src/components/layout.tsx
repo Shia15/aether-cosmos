@@ -15,7 +15,8 @@ import {
   Palette,
   Dna,
   Sparkles,
-  Radio
+  Radio,
+  Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/pipeline", label: "Pipeline", icon: Workflow },
   { href: "/lattice", label: "CGLE Lattice", icon: Waves },
   { href: "/core", label: "Core Engine", icon: FlaskConical },
+  { href: "/sources", label: "Sources", icon: Link2 },
   { href: "/upload", label: "Ingest", icon: UploadCloud },
   { href: "/coherence", label: "Coherence", icon: Activity },
   { href: "/search", label: "Query", icon: Search },
