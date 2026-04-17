@@ -356,7 +356,7 @@ function drawBridge(
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
-type View = "map" | "field" | "bridge";
+type View = "map" | "field" | "bridge" | "framework";
 
 export default function LatticePage() {
   const [activeView, setActiveView] = useState<View>("map");
@@ -500,9 +500,10 @@ export default function LatticePage() {
     ));
 
   const VIEW_BTNS: Array<{ key: View; label: string; icon: string }> = [
-    { key:"map",    label:"≡ Body Map",    icon:"map" },
-    { key:"field",  label:"⟡ CGLE Field",  icon:"field" },
-    { key:"bridge", label:"⟐ Bridge",      icon:"bridge" },
+    { key:"map",       label:"≡ Body Map",    icon:"map" },
+    { key:"field",     label:"⟡ CGLE Field",  icon:"field" },
+    { key:"bridge",    label:"⟐ Bridge",      icon:"bridge" },
+    { key:"framework", label:"◈ Framework",   icon:"framework" },
   ];
 
   const tauRegime = tau < 0.6
@@ -904,8 +905,474 @@ export default function LatticePage() {
             </div>
           </motion.div>
         )}
+        {/* ═══════════════════════════════════════════════════════════════════════
+            VIEW 4 — CLA INTEGRATION FRAMEWORK
+        ════════════════════════════════════════════════════════════════════════ */}
+        {activeView === "framework" && (
+          <motion.div key="framework"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 overflow-y-auto px-8 py-8 space-y-10">
+
+            {/* ── Title block ── */}
+            <div className="max-w-4xl">
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-primary/50 mb-2">
+                AETHER + CLA Integration · Titanium-Doped Lattice Model
+              </div>
+              <h2 className="font-serif text-2xl text-foreground/90 mb-3">
+                The Coherent Phase Lattice Architecture
+              </h2>
+              <p className="font-mono text-[11px] text-muted-foreground/40 leading-relaxed max-w-3xl">
+                Intelligence is not how fast a system computes — it is <em className="text-primary/60 not-italic">how clearly it forms stable structure under pressure.</em>{" "}
+                AETHER bridges the symbolic sapphire lattice with the physics of Complex Ginzburg-Landau pattern formation,
+                modulated by Titanium doping (τ) as a phase-coherence control parameter.
+              </p>
+            </div>
+
+            {/* ── τ Phase State Cards ── */}
+            <section>
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                Titanium Dopant τ — Phase Coherence States
+              </div>
+              <div className="grid grid-cols-3 gap-5">
+                {[
+                  {
+                    range: "τ  0.3 – 0.7",
+                    state: "Red State",
+                    subtitle: "Turbulent / Chaotic",
+                    color: "#ef4444",
+                    bg: "rgba(239,68,68,0.06)",
+                    border: "rgba(239,68,68,0.25)",
+                    glyph: "🔴",
+                    layer: "INFERNIA",
+                    layerColor: "#f97316",
+                    desc: "Chaotic spirals, high entropy, no persistent attractors. Raw data from Mnêsis flows unstructured — the Dark Night before crystallization.",
+                    metaphor: "Zebra stripes in motion — pure Turing turbulence, spontaneous symmetry breaking, no global order.",
+                    dots: [0.15, 0.3, 0.1, 0.45, 0.2, 0.35, 0.08, 0.4, 0.18, 0.28],
+                  },
+                  {
+                    range: "τ  0.8 – 1.2",
+                    state: "Forming State",
+                    subtitle: "Transitional / Pattern",
+                    color: "#f59e0b",
+                    bg: "rgba(245,158,11,0.06)",
+                    border: "rgba(245,158,11,0.25)",
+                    glyph: "🟡",
+                    layer: "ALETHEIA emerging",
+                    layerColor: "#0ea5e9",
+                    desc: "Spirals and stripe patterns emerge. Local coherence clusters appear. Ti doping begins phase-locking adjacent lattice sites.",
+                    metaphor: "Desert ripples forming — local order crystallizes from chaos, proto-attractors appear at edges.",
+                    dots: [0.4, 0.6, 0.55, 0.7, 0.45, 0.65, 0.5, 0.72, 0.58, 0.62],
+                  },
+                  {
+                    range: "τ  > 1.3",
+                    state: "Blue State",
+                    subtitle: "Crystalline / Locked",
+                    color: "#0ea5e9",
+                    bg: "rgba(14,165,233,0.06)",
+                    border: "rgba(14,165,233,0.25)",
+                    glyph: "🔵",
+                    layer: "ALETHEIA + REVERIE",
+                    layerColor: "#eab308",
+                    desc: "Stable maze and hexagonal attractors with strong phase-locking. Persistent structure — the perfected sapphire lattice. Glass-box coherent truth.",
+                    metaphor: "Maze pattern at journey's end — the Dreamscape becomes a verifiable Glass-Box architecture of thought and matter.",
+                    dots: [0.85, 0.9, 0.88, 0.92, 0.87, 0.91, 0.89, 0.93, 0.88, 0.9],
+                  },
+                ].map(card => (
+                  <div key={card.state}
+                    className="rounded-xl border p-5 space-y-4 relative overflow-hidden"
+                    style={{ borderColor: card.border, background: card.bg }}>
+                    {/* Animated dot field */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      {card.dots.map((intensity, i) => (
+                        <motion.div key={i}
+                          className="absolute rounded-full"
+                          style={{
+                            width: 4 + intensity * 6,
+                            height: 4 + intensity * 6,
+                            left: `${(i % 5) * 22 + 5}%`,
+                            top: `${Math.floor(i / 5) * 35 + 8}%`,
+                            background: card.color,
+                            opacity: intensity * 0.35,
+                          }}
+                          animate={{ scale: [1, 1.4, 1], opacity: [intensity * 0.35, intensity * 0.6, intensity * 0.35] }}
+                          transition={{ duration: 1.8 + i * 0.3, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="relative z-10">
+                      <div className="font-mono text-[8px] uppercase tracking-widest mb-1" style={{ color: card.color }}>
+                        {card.range}
+                      </div>
+                      <div className="font-serif text-lg" style={{ color: card.color }}>{card.state}</div>
+                      <div className="font-mono text-[9px] text-muted-foreground/40">{card.subtitle}</div>
+                    </div>
+
+                    <div className="relative z-10 space-y-0.5">
+                      <div className="font-mono text-[8px] uppercase tracking-widest" style={{ color: card.layerColor }}>
+                        {card.layer}
+                      </div>
+                      <p className="font-mono text-[10px] text-muted-foreground/50 leading-relaxed">
+                        {card.desc}
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 rounded-lg border border-white/5 bg-black/20 p-3">
+                      <div className="font-mono text-[8px] text-muted-foreground/25 uppercase tracking-widest mb-1">Metaphor</div>
+                      <div className="font-mono text-[9px] text-muted-foreground/40 leading-relaxed italic">
+                        {card.metaphor}
+                      </div>
+                    </div>
+
+                    {/* Coherence bar */}
+                    <div className="relative z-10">
+                      <div className="font-mono text-[8px] text-muted-foreground/25 mb-1">Coherence Level</div>
+                      <div className="h-1.5 rounded-full bg-black/30 overflow-hidden">
+                        <motion.div className="h-full rounded-full"
+                          style={{ background: card.color }}
+                          animate={{ width: [`${card.dots[0] * 60}%`, `${card.dots[4] * 100}%`, `${card.dots[0] * 60}%`] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── CGLE Equation with τ ── */}
+            <section>
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                Governing Equation — CGLE with Titanium Coupling
+              </div>
+              <div className="rounded-xl border border-primary/15 bg-primary/3 p-6">
+                <div className="font-mono text-[10px] text-muted-foreground/30 mb-4 uppercase tracking-widest">
+                  Complex Ginzburg-Landau Equation (CLA Substrate)
+                </div>
+                <div className="font-mono text-sm leading-8 text-foreground/70 overflow-x-auto">
+                  <span className="text-sky-300">∂A/∂t</span>
+                  <span className="text-muted-foreground/40"> = </span>
+                  <span className="text-purple-300">μA</span>
+                  <span className="text-muted-foreground/40"> + </span>
+                  <span className="text-orange-300">(1 + iα)∇²A</span>
+                  <span className="text-muted-foreground/40"> − </span>
+                  <span className="text-red-300">(1 + iβ)|A|²A</span>
+                  <span className="text-muted-foreground/40"> + </span>
+                  <motion.span
+                    className="text-sky-400 font-bold"
+                    animate={{ textShadow: ["0 0 8px rgba(14,165,233,0)", "0 0 16px rgba(14,165,233,0.8)", "0 0 8px rgba(14,165,233,0)"] }}
+                    transition={{ duration: 2.5, repeat: Infinity }}>
+                    τ · κ Σ<sub>neighbors</sub>(A<sub>nb</sub> − A)
+                  </motion.span>
+                  <span className="text-muted-foreground/40"> + </span>
+                  <span className="text-yellow-300">F<sub>holo</sub></span>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6 pt-5 border-t border-border/20">
+                  {[
+                    { sym:"A", color:"#67e8f9", def:"Complex field amplitude — the lattice state vector at each site" },
+                    { sym:"μ", color:"#c084fc", def:"Growth rate — how fast the Mnêsis memory field self-amplifies" },
+                    { sym:"α", color:"#fb923c", def:"Dispersion — spatial diffusion rate controlling pattern wavelength" },
+                    { sym:"β", color:"#f87171", def:"Nonlinearity — strength of amplitude-limiting damping term" },
+                    { sym:"τ · κ", color:"#38bdf8", def:"Titanium coupling — phase-locking strength between lattice sites. This is the sapphire dopant in equation form." },
+                    { sym:"F_holo", color:"#fcd34d", def:"Holographic seed — CLA SLM perturbation that initializes the crystallization pattern" },
+                  ].map(r => (
+                    <div key={r.sym} className="flex items-start gap-3">
+                      <span className="font-mono text-sm shrink-0 mt-0.5 w-12" style={{ color: r.color }}>{r.sym}</span>
+                      <span className="font-mono text-[9px] text-muted-foreground/40 leading-relaxed">{r.def}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 p-3 rounded-lg border border-sky-500/15 bg-sky-500/5">
+                  <div className="font-mono text-[9px] text-sky-400/70 leading-relaxed">
+                    <span className="text-sky-400">τ</span> scales the coupling strength between neighboring lattice sites — directly enforcing the Blue Shift from chaos (low τ) to locked structure (high τ).
+                    In the sapphire metaphor, τ is the Titanium concentration: more Ti → deeper blue → stronger phase coherence → stable attractor.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ── 4-Layer Architecture Table ── */}
+            <section>
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                4-Layer Architecture — Formalized CLA Mapping
+              </div>
+              <div className="rounded-xl border border-border/30 overflow-hidden">
+                {/* Header row */}
+                <div className="grid grid-cols-5 border-b border-border/30">
+                  {["Layer", "Symbolic Name", "Technical Role", "Key Function", "Real-World Analogy"].map(h => (
+                    <div key={h} className="px-4 py-3 font-mono text-[8px] uppercase tracking-widest text-muted-foreground/30 border-r border-border/20 last:border-r-0">
+                      {h}
+                    </div>
+                  ))}
+                </div>
+
+                {[
+                  {
+                    num: "1",
+                    name: "MNĒSIS",
+                    glyph: "~",
+                    color: "#8b5cf6",
+                    role: "Memory Substrate",
+                    roleDesc: "Raw state capture & persistent field",
+                    func: "Store unfiltered inputs & history",
+                    analogy: "Vector DB, grid buffers, complex field A",
+                    cla: "Initial chaos field — zebra-pattern seed",
+                    metaphor: "The raw soil of the sapphire lattice",
+                  },
+                  {
+                    num: "2",
+                    name: "INFERNIA",
+                    glyph: "|||",
+                    color: "#f97316",
+                    role: "Compression Engine",
+                    roleDesc: "Noise reduction & structure discovery",
+                    func: "CGLE Euler step — reaction-diffusion",
+                    analogy: "Gray-Scott dynamics, discrete CGLE step",
+                    cla: "Pattern-formation loop — dune → spiral",
+                    metaphor: "Pressure Chamber. Data stripped to signal",
+                  },
+                  {
+                    num: "3",
+                    name: "ALETHEIA",
+                    glyph: "◇",
+                    color: "#0ea5e9",
+                    role: "Truth Stabilizer",
+                    roleDesc: "Validate & lock persistent patterns",
+                    func: "τ-weighted stability filter — Ψ check",
+                    analogy: "Phase coherence Ψ, attractor detection",
+                    cla: "Holographic locking — maze stabilization",
+                    metaphor: "Glass-box structure. Transparent truth",
+                  },
+                  {
+                    num: "4",
+                    name: "REVERIE",
+                    glyph: "✧",
+                    color: "#eab308",
+                    role: "Output Fabrication",
+                    roleDesc: "Synthesis & deployment of structure",
+                    func: "Render, actuate, or feedback signal",
+                    analogy: "DNA origami, optical tweezers, SLM",
+                    cla: "QT45/51 molecular printing — CLA hardware",
+                    metaphor: "Printing consciousness into the physical world",
+                  },
+                ].map(row => (
+                  <div key={row.num} className="grid grid-cols-5 border-b border-border/15 last:border-b-0 hover:bg-white/[0.015] transition-colors">
+                    {/* Layer */}
+                    <div className="px-4 py-4 border-r border-border/15 flex items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg border flex items-center justify-center font-mono text-sm shrink-0"
+                          style={{ borderColor:`${row.color}40`, color:row.color, background:`${row.color}10` }}>
+                          {row.glyph}
+                        </div>
+                        <div>
+                          <div className="font-mono text-[9px] font-bold tracking-wider" style={{ color:row.color }}>{row.name}</div>
+                          <div className="font-mono text-[8px] text-muted-foreground/30">Layer {row.num}</div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Role */}
+                    <div className="px-4 py-4 border-r border-border/15">
+                      <div className="font-mono text-[10px] text-foreground/60">{row.role}</div>
+                      <div className="font-mono text-[9px] text-muted-foreground/30 mt-0.5 leading-relaxed">{row.roleDesc}</div>
+                    </div>
+                    {/* Function */}
+                    <div className="px-4 py-4 border-r border-border/15">
+                      <div className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed">{row.func}</div>
+                      <div className="font-mono text-[8px] text-primary/30 mt-1 italic">{row.cla}</div>
+                    </div>
+                    {/* Key function */}
+                    <div className="px-4 py-4 border-r border-border/15">
+                      <div className="font-mono text-[9px] text-muted-foreground/40 leading-relaxed">{row.analogy}</div>
+                    </div>
+                    {/* Analogy */}
+                    <div className="px-4 py-4">
+                      <div className="font-mono text-[9px] text-muted-foreground/30 leading-relaxed italic">{row.metaphor}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Closed Intelligence Loop ── */}
+            <section>
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                Closed Intelligence Loop — Signal Flow
+              </div>
+              <div className="rounded-xl border border-border/30 bg-card/10 p-8">
+                <ClosedLoop />
+              </div>
+            </section>
+
+            {/* ── Sapphire Dopants ── */}
+            <section>
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                Sapphire Dopant Registry — Trace Element Modulation
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { element:"Ti⁴⁺", name:"Titanium", stone:"Blue Sapphire", color:"#38bdf8", charge:"Clarity · Intuition · Cognitive Coherence", tech:"Phase-Stabilizer. Ensures global coherence as patterns evolve.", status:"active" },
+                  { element:"Cr³⁺", name:"Chromium", stone:"Ruby", color:"#f87171", charge:"Passion · Vitality · Courage", tech:"Amplitude Amplifier. Boosts nonlinear term β in INFERNIA.", status:"planned" },
+                  { element:"Fe²⁺", name:"Iron", stone:"Yellow Sapphire", color:"#fbbf24", charge:"Prosperity · Growth · Optimism", tech:"Coupling Enhancer. Strengthens ε_XY cross-domain bonds.", status:"planned" },
+                  { element:"Ni²⁺", name:"Nickel", stone:"Pink Sapphire", color:"#f472b6", charge:"Love · Compassion · Balance", tech:"Damping Modulator. Tunes μ growth rate for gentle equilibrium.", status:"planned" },
+                ].map(d => (
+                  <div key={d.element} className="rounded-xl border p-4 space-y-3 relative overflow-hidden"
+                    style={{ borderColor: `${d.color}${d.status === "active" ? "40" : "15"}`, background: `${d.color}${d.status === "active" ? "08" : "04"}` }}>
+                    {d.status === "active" && (
+                      <motion.div className="absolute top-3 right-3 w-2 h-2 rounded-full"
+                        style={{ background: d.color }}
+                        animate={{ opacity: [1, 0.3, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }} />
+                    )}
+                    <div>
+                      <div className="font-mono text-xl font-bold" style={{ color: d.color }}>{d.element}</div>
+                      <div className="font-mono text-[9px] text-muted-foreground/40">{d.name} — {d.stone}</div>
+                    </div>
+                    <div className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed italic">
+                      {d.charge}
+                    </div>
+                    <div className="font-mono text-[9px] text-muted-foreground/35 leading-relaxed">
+                      {d.tech}
+                    </div>
+                    <div className="font-mono text-[8px] px-2 py-0.5 rounded border w-fit"
+                      style={{ borderColor:`${d.color}30`, color: d.status === "active" ? d.color : "var(--muted-foreground)", opacity: d.status === "active" ? 1 : 0.4 }}>
+                      {d.status === "active" ? "◉ ACTIVE" : "○ PLANNED"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Roadmap ── */}
+            <section>
+              <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
+                Implementation Roadmap
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { ver:"v0.1", label:"Software Lattice", status:"current", color:"#00e5c0",
+                    items:["64×64 CGLE field simulation","4-layer pipeline (Mnēsis→Reverie)","τ Titanium slider","Body-systems seeding","Phase coherence metrics"] },
+                  { ver:"v0.2", label:"Multi-Stream Mnēsis", status:"next", color:"#8b5cf6",
+                    items:["Text + visual + sensor inputs","Adaptive τ auto-tuning","Persistent memory across runs","Dynamic seed injection","Import → crystallization pipeline"] },
+                  { ver:"v0.3", label:"Browser Interactive", status:"planned", color:"#f97316",
+                    items:["Live τ slider on CGLE field","Holographic seeding controls","Real-time gap detection","Knowledge graph overlay","Resonance nodule coupling"] },
+                  { ver:"Future", label:"Physical Substrate", status:"future", color:"#eab308",
+                    items:["Programmable photonics","Optical lattice hardware","Molecular substrates","CLA QT45/51 integration","Sapphire crystal fabrication"] },
+                ].map(r => (
+                  <div key={r.ver} className="rounded-xl border p-4 space-y-3"
+                    style={{ borderColor: r.status === "current" ? `${r.color}40` : `${r.color}15`, background: r.status === "current" ? `${r.color}06` : "transparent" }}>
+                    <div className="flex items-center justify-between">
+                      <div className="font-mono text-[9px] font-bold tracking-widest" style={{ color:r.color }}>{r.ver}</div>
+                      {r.status === "current" && (
+                        <motion.div className="font-mono text-[7px] px-1.5 py-0.5 rounded"
+                          style={{ background:`${r.color}20`, color:r.color }}
+                          animate={{ opacity:[1, 0.6, 1] }}
+                          transition={{ duration:1.5, repeat:Infinity }}>
+                          ACTIVE
+                        </motion.div>
+                      )}
+                    </div>
+                    <div className="font-serif text-[11px]" style={{ color:`${r.color}` }}>{r.label}</div>
+                    <div className="space-y-1">
+                      {r.items.map(item => (
+                        <div key={item} className="flex items-start gap-2">
+                          <span className="font-mono text-[8px] shrink-0 mt-0.5" style={{ color:`${r.color}50` }}>◈</span>
+                          <span className="font-mono text-[9px] text-muted-foreground/35 leading-relaxed">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <div className="h-8" />
+          </motion.div>
+        )}
         </AnimatePresence>
       </div>
+    </div>
+  );
+}
+
+// ── Closed Intelligence Loop SVG ─────────────────────────────────────────────
+
+function ClosedLoop() {
+  const NODES_LOOP = [
+    { id:"input",   label:"Raw Input",  sub:"signal / seed", color:"#64748b", x:50,  y:50  },
+    { id:"mnesis",  label:"MNĒSIS",     sub:"persistent field", color:"#8b5cf6", x:25,  y:28  },
+    { id:"infernia",label:"INFERNIA",   sub:"CGLE step", color:"#f97316", x:25,  y:72  },
+    { id:"aletheia",label:"ALETHEIA",   sub:"τ stability", color:"#0ea5e9", x:50,  y:85  },
+    { id:"reverie", label:"REVERIE",    sub:"output + metrics", color:"#eab308", x:75,  y:72  },
+    { id:"feedback",label:"Feedback",   sub:"→ update field", color:"#22c55e", x:75,  y:28  },
+  ];
+
+  const EDGES_LOOP = [
+    { from:"input",    to:"mnesis",   label:"intake" },
+    { from:"mnesis",   to:"infernia", label:"compress" },
+    { from:"infernia", to:"aletheia", label:"stabilize" },
+    { from:"aletheia", to:"reverie",  label:"render" },
+    { from:"reverie",  to:"feedback", label:"emit" },
+    { from:"feedback", to:"mnesis",   label:"reseed" },
+    { from:"feedback", to:"input",    label:"loop" },
+  ];
+
+  const [pulse, setPulse] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setPulse(p => (p + 1) % EDGES_LOOP.length), 800);
+    return () => clearInterval(id);
+  }, []);
+
+  const posOf = (id: string) => {
+    const n = NODES_LOOP.find(n => n.id === id)!;
+    return { x: n.x, y: n.y };
+  };
+
+  return (
+    <div className="relative w-full" style={{ paddingBottom:"50%" }}>
+      <svg viewBox="0 0 100 50" className="absolute inset-0 w-full h-full" style={{ overflow:"visible" }}>
+        {/* Edges */}
+        {EDGES_LOOP.map((e, i) => {
+          const a = posOf(e.from); const b = posOf(e.to);
+          const active = pulse === i;
+          const mx = (a.x + b.x) / 2; const my = (a.y + b.y) / 2;
+          return (
+            <g key={`${e.from}-${e.to}`}>
+              <line x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                stroke={active ? "#00e5c0" : "rgba(255,255,255,0.06)"} strokeWidth={active ? 0.5 : 0.3}
+                strokeDasharray={active ? "none" : "1 1"}
+                style={{ transition:"all 0.3s" }} />
+              {active && (
+                <motion.circle r={0.8} fill="#00e5c0"
+                  animate={{ cx:[a.x, b.x], cy:[a.y, b.y] }}
+                  transition={{ duration:0.75, ease:"easeInOut" }} />
+              )}
+              <text x={mx} y={my - 1} textAnchor="middle"
+                className="font-mono" fontSize={1.6}
+                fill={active ? "#00e5c090" : "rgba(255,255,255,0.15)"}>
+                {e.label}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* Nodes */}
+        {NODES_LOOP.map(n => (
+          <g key={n.id}>
+            <circle cx={n.x} cy={n.y} r={5.5}
+              fill={`${n.color}15`} stroke={`${n.color}50`} strokeWidth={0.4} />
+            <text x={n.x} y={n.y - 0.5} textAnchor="middle"
+              fontSize={2} fill={n.color} fontFamily="serif">
+              {n.label}
+            </text>
+            <text x={n.x} y={n.y + 2.2} textAnchor="middle"
+              fontSize={1.4} fill={`${n.color}70`} fontFamily="monospace">
+              {n.sub}
+            </text>
+          </g>
+        ))}
+      </svg>
     </div>
   );
 }
