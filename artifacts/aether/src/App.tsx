@@ -35,6 +35,7 @@ import FabricationView from "@/pages/fabrication";
 import ResearchView from "@/pages/research";
 import FeedbackLoopView from "@/pages/feedback-loop";
 import ControlPanelView from "@/pages/control-panel";
+import AetherCoreView from "@/pages/aether-core";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ function Router() {
         <Route path="/research" component={ResearchView} />
         <Route path="/feedback-loop" component={FeedbackLoopView} />
         <Route path="/control-panel" component={ControlPanelView} />
+        <Route path="/aether-core" component={AetherCoreView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

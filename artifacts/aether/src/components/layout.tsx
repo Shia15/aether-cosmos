@@ -69,6 +69,7 @@ const NAV_ITEMS = [
   { href: "/research",        label: "Research",    icon: BookOpen },
   { href: "/feedback-loop",   label: "Feedback",    icon: RefreshCw },
   { href: "/control-panel",  label: "Control",     icon: LayoutDashboard },
+  { href: "/aether-core",    label: "AETHER Core", icon: FlaskConical },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
