@@ -93,6 +93,106 @@ function detectDocType(text: string, url: string): DocType {
   return "other";
 }
 
+// ── Protected domain detection ────────────────────────────────────────────────
+
+const PROTECTED_DOMAINS = [
+  "claude.ai",
+  "chat.openai.com",
+  "chatgpt.com",
+  "gemini.google.com",
+  "bard.google.com",
+  "twitter.com",
+  "x.com",
+  "linkedin.com",
+  "facebook.com",
+  "instagram.com",
+  "notion.so",
+  "figma.com",
+];
+
+function isProtectedUrl(url: string): { protected: boolean; reason: string } {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+    const match = PROTECTED_DOMAINS.find(d => host === d || host.endsWith(`.${d}`));
+    if (match) {
+      const isClaudeArtifact = host === "claude.ai" && parsed.pathname.includes("artifact");
+      return {
+        protected: true,
+        reason: isClaudeArtifact
+          ? "Claude artifacts require authentication. Paste the content directly instead."
+          : `${match} requires login — paste the content directly instead.`,
+      };
+    }
+  } catch { /* ignore */ }
+  return { protected: false, reason: "" };
+}
+
+// ── POST /api/import/text ─────────────────────────────────────────────────────
+// Import content pasted directly (no server-side fetch needed)
+
+router.post("/import/text", (req, res) => {
+  const { url = "", title = "Pasted Content", content, layer, docType, tags = [] } = req.body as {
+    url?: string;
+    title?: string;
+    content: string;
+    layer?: AetherLayer;
+    docType?: DocType;
+    tags?: string[];
+  };
+
+  if (!content || typeof content !== "string" || content.trim().length < 20) {
+    return res.status(400).json({ error: "content must be at least 20 characters" });
+  }
+
+  // Dedup by URL if provided
+  if (url) {
+    const duplicate = knowledgeGraph.findImportByUrl(url);
+    if (duplicate) {
+      return res.status(409).json({
+        status: "duplicate",
+        message: "This URL has already been imported.",
+        record: { id: duplicate.id, url: duplicate.url, title: duplicate.title, importedAt: duplicate.importedAt, version: duplicate.version },
+      });
+    }
+  }
+
+  const keywords = extractKeywords(content);
+  const resolvedLayer: AetherLayer = layer && layer !== "auto" ? layer : detectLayer(content, keywords);
+  const resolvedDocType: DocType = docType ?? detectDocType(content, url);
+
+  const allTags = [...new Set([
+    ...tags,
+    ...keywords.slice(0, 8),
+    ...(url ? [new URL(url.startsWith("http") ? url : `https://${url}`).hostname.replace(/^www\./, "")] : []),
+  ])];
+
+  const finalTitle = title.trim() || "Pasted Content";
+  const fullContent = url ? `Source: ${url}\n---\n${content.slice(0, 60000)}` : content.slice(0, 60000);
+
+  const doc = knowledgeGraph.ingestDocument(finalTitle, fullContent, {
+    layer: resolvedLayer,
+    docType: resolvedDocType,
+    source: url || "manual-paste",
+    tags: allTags,
+  });
+
+  const sourceKey = url || `paste-${Date.now()}`;
+  const record = knowledgeGraph.recordImport(sourceKey, doc);
+  const gaps = knowledgeGraph.detectGaps(keywords.slice(0, 30));
+
+  return res.json({
+    status: "ok",
+    record: { id: record.id, version: record.version, importedAt: record.importedAt },
+    document: {
+      id: doc.id, title: doc.title, layer: doc.layer, docType: doc.docType,
+      charCount: doc.charCount, conceptCount: doc.conceptCount, tags: doc.tags,
+    },
+    extraction: { headings: [], keywords: keywords.slice(0, 20) },
+    gaps: { missing: gaps.missing.slice(0, 15), weak: gaps.weak.slice(0, 8), coverageScore: gaps.coverageScore },
+  });
+});
+
 // ── POST /api/import/url ──────────────────────────────────────────────────────
 
 router.post("/import/url", async (req, res) => {
@@ -114,6 +214,16 @@ router.post("/import/url", async (req, res) => {
 
   if (!["http:", "https:"].includes(parsedUrl.protocol)) {
     return res.status(400).json({ error: "Only http/https URLs are supported" });
+  }
+
+  // Early-exit for protected domains — no point trying to fetch them
+  const protection = isProtectedUrl(url);
+  if (protection.protected) {
+    return res.status(403).json({
+      error: protection.reason,
+      requiresPaste: true,
+      url,
+    });
   }
 
   // Fetch with 12s timeout

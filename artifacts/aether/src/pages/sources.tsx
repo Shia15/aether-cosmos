@@ -4,7 +4,7 @@ import {
   Link2, Plus, Loader2, CheckCircle2, AlertCircle, Trash2,
   Zap, ChevronDown, ChevronUp, ExternalLink, Tag, Globe,
   Cpu, Sparkles, History, RefreshCw, AlertTriangle, ShieldCheck,
-  TrendingUp, TrendingDown, Copy, BarChart3,
+  TrendingUp, TrendingDown, Copy, BarChart3, ClipboardPaste, X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -89,6 +89,17 @@ export default function SourcesPage() {
   const [gapLoading, setGapLoading] = useState(false);
   const [gapResult, setGapResult] = useState<GapResult | null>(null);
 
+  // Paste modal state — shown when a URL is protected (Claude, Twitter, etc.)
+  const [pasteModal, setPasteModal] = useState<{
+    open: boolean;
+    url: string;
+    reason: string;
+    entryId: string | null;
+    title: string;
+    content: string;
+    submitting: boolean;
+  }>({ open: false, url: "", reason: "", entryId: null, title: "", content: "", submitting: false });
+
   const base = () => import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
 
   // ── Load history when tab opens ──
@@ -139,10 +150,24 @@ export default function SourcesPage() {
       const data = await res.json();
 
       if (res.status === 409) {
-        // Duplicate URL
         updateLink(entry.id, {
           status: "duplicate",
           error: `Already imported on ${new Date(data.record.importedAt).toLocaleDateString()} — v${data.record.version}`,
+        });
+        return;
+      }
+
+      // Protected URL — open paste modal so user can paste content manually
+      if (res.status === 403 && data.requiresPaste) {
+        updateLink(entry.id, { status: "error", error: data.error });
+        setPasteModal({
+          open: true,
+          url: entry.url,
+          reason: data.error,
+          entryId: entry.id,
+          title: "",
+          content: "",
+          submitting: false,
         });
         return;
       }
@@ -169,6 +194,81 @@ export default function SourcesPage() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       updateLink(entry.id, { status: "error", error: msg });
+    }
+  };
+
+  // Submit pasted content to /api/import/text
+  const handlePasteSubmit = async () => {
+    if (!pasteModal.content.trim() || pasteModal.submitting) return;
+    setPasteModal(p => ({ ...p, submitting: true }));
+    try {
+      const res = await fetch(`${base()}/api/import/text`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: pasteModal.url,
+          title: pasteModal.title || undefined,
+          content: pasteModal.content,
+          layer: layer !== "auto" ? layer : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.status === 409) {
+        toast({ title: "Already imported", description: data.message, className: "font-mono" });
+        setPasteModal(p => ({ ...p, open: false, submitting: false }));
+        return;
+      }
+      if (!res.ok) throw new Error(data.error ?? "Import failed");
+
+      // Update the queue entry if one exists
+      if (pasteModal.entryId) {
+        updateLink(pasteModal.entryId, {
+          status: "done",
+          result: {
+            title: data.document.title,
+            layer: data.document.layer,
+            docType: data.document.docType,
+            charCount: data.document.charCount,
+            conceptCount: data.document.conceptCount,
+            headings: [],
+            keywords: data.extraction.keywords,
+            tags: data.document.tags,
+            docId: data.document.id,
+            recordId: data.record?.id ?? "",
+            gaps: data.gaps,
+          },
+        });
+        setExpandedId(pasteModal.entryId);
+      } else {
+        // Standalone paste (no URL queue entry) — add a synthetic done entry
+        const synth: ImportedLink = {
+          id: `paste-${Date.now()}`,
+          url: pasteModal.url || "manual-paste",
+          status: "done",
+          addedAt: new Date(),
+          result: {
+            title: data.document.title,
+            layer: data.document.layer,
+            docType: data.document.docType,
+            charCount: data.document.charCount,
+            conceptCount: data.document.conceptCount,
+            headings: [],
+            keywords: data.extraction.keywords,
+            tags: data.document.tags,
+            docId: data.document.id,
+            recordId: data.record?.id ?? "",
+            gaps: data.gaps,
+          },
+        };
+        setLinks(prev => [synth, ...prev]);
+        setExpandedId(synth.id);
+      }
+      setPasteModal({ open: false, url: "", reason: "", entryId: null, title: "", content: "", submitting: false });
+      toast({ title: "Crystallized from paste", description: data.document.title, className: "font-mono" });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      toast({ title: "Paste import failed", description: msg, variant: "destructive" });
+      setPasteModal(p => ({ ...p, submitting: false }));
     }
   };
 
@@ -735,6 +835,118 @@ export default function SourcesPage() {
 
         </AnimatePresence>
       </div>
+
+      {/* ── Paste Content Modal ─────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {pasteModal.open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(2,6,23,0.85)", backdropFilter: "blur(8px)" }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
+              className="w-full max-w-2xl rounded-2xl border border-primary/20 bg-card shadow-2xl overflow-hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border/30 bg-primary/5">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <ClipboardPaste className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="font-mono text-xs text-primary/60 uppercase tracking-widest">Protected Source</div>
+                    <div className="font-serif text-sm text-foreground font-semibold">Paste Content Manually</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setPasteModal(p => ({ ...p, open: false }))}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-white/5 transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 space-y-4">
+                {/* Reason badge */}
+                <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-mono text-xs text-amber-400/80">{pasteModal.reason}</div>
+                    {pasteModal.url && (
+                      <div className="font-mono text-[10px] text-muted-foreground/40 mt-1 truncate">{pasteModal.url}</div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="font-mono text-xs text-muted-foreground/60 leading-relaxed">
+                  Open the artifact in your browser, select all the text, copy it, and paste it below.
+                  AETHER will crystallize the content into the knowledge graph without needing server access.
+                </div>
+
+                {/* Title field */}
+                <div className="space-y-1.5">
+                  <label className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest">Title (optional)</label>
+                  <input
+                    type="text"
+                    value={pasteModal.title}
+                    onChange={e => setPasteModal(p => ({ ...p, title: e.target.value }))}
+                    placeholder="e.g. CGLE Pattern Formation Study"
+                    className="w-full bg-background/60 border border-border/40 rounded-lg px-4 py-2.5 font-mono text-xs text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                </div>
+
+                {/* Content textarea */}
+                <div className="space-y-1.5">
+                  <label className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest">
+                    Paste Content <span className="text-primary/60">*</span>
+                  </label>
+                  <textarea
+                    value={pasteModal.content}
+                    onChange={e => setPasteModal(p => ({ ...p, content: e.target.value }))}
+                    placeholder="Paste the full text content from the Claude artifact or protected page here…"
+                    rows={10}
+                    className="w-full bg-background/60 border border-border/40 rounded-lg px-4 py-3 font-mono text-xs text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 transition-colors resize-none leading-relaxed"
+                  />
+                  <div className="font-mono text-[9px] text-muted-foreground/30 text-right">
+                    {pasteModal.content.length.toLocaleString()} chars
+                    {pasteModal.content.length < 20 && pasteModal.content.length > 0 && (
+                      <span className="text-red-400 ml-2">— need at least 20 characters</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    onClick={() => setPasteModal(p => ({ ...p, open: false }))}
+                    className="font-mono text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors px-4 py-2"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handlePasteSubmit}
+                    disabled={pasteModal.content.trim().length < 20 || pasteModal.submitting}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-mono text-xs font-semibold hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {pasteModal.submitting ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Zap className="w-3.5 h-3.5" />
+                    )}
+                    {pasteModal.submitting ? "Crystallizing…" : "Crystallize"}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
