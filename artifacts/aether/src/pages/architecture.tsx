@@ -721,6 +721,156 @@ export default function ArchitectureView() {
         </p>
       </div>
 
+      {/* CUCA-AETHER Physical Interface */}
+      <div className="space-y-6">
+        <div>
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.25em] uppercase mb-1">Physical Implementation Layer</div>
+          <h2 className="font-serif text-2xl text-foreground">CUCA–AETHER: Closed-Loop Coherence Interface</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
+            The CUCA–AETHER system extends the 4-layer cognitive architecture into the physical domain.
+            Multi-modal biosignals are acquired, encoded into a unified state vector, rendered through phyllotactic
+            geometry, and emitted as a structured field — with a continuous feedback arc that enforces coherence correction.
+          </p>
+        </div>
+
+        {/* 5-layer pipeline */}
+        <div className="overflow-x-auto">
+          <div className="flex items-stretch gap-0 min-w-[760px] border border-border/30 rounded-xl overflow-hidden">
+            {[
+              { n: "01", label: "SIGNAL\nACQUISITION",     color: "#4a7c59", short: "VOC · HRV · T/P/RH",      eq: "S = concat[v · h · e] ∈ ℝⁿ",     desc: "Biochemical volatiles, physiological rhythm (HRV, respiration, conductance), and environmental parameters sampled in parallel." },
+              { n: "02", label: "STATE &\nCOHERENCE",      color: "#1a6a9a", short: "C = 1 − ‖ε‖ / ‖S*‖",     eq: "ε(t) = S*(t) − S(t)",             desc: "The state vector S evolves toward target S*. Coherence C ∈ [0, 1] measures normalized error minimization. Phase-frequency portrait ω·φ(t) tracks oscillatory dynamics." },
+              { n: "03", label: "GEOMETRY\nENGINE",        color: "#8b3a2a", short: "θₙ = nΦ · 2π",            eq: "rₙ = a√n · C(t)",                 desc: "Phyllotactic spiral parameterized by golden ratio Φ. Coherence C modulates radial spread — high coherence yields tight, ordered patterns; low coherence produces dispersed fields." },
+              { n: "04", label: "EMISSION\nFIELD",         color: "#5c3d7a", short: "∇²E · diffusion",         eq: "E(x,t) · VOC · coupling κ",       desc: "The spatial geometry G drives a physical emission field. VOC concentrations are modulated by the field geometry, propagating coherence information into the local environment." },
+              { n: "05", label: "GLYPH\nTRANSLATION",     color: "#b08d4a", short: "G → Σ → G",               eq: "symbolic ↔ geometric",            desc: "Coherence patterns are translated to symbolic glyphs and back. G → Σ encodes geometry as symbol; Σ → G reads symbolic input back into field coordinates for closed-loop operation." },
+            ].map((layer, i) => (
+              <div key={i} className="flex-1 border-r border-border/20 last:border-0 flex flex-col">
+                <div className="px-4 py-3 border-b border-border/20" style={{ background: `${layer.color}10` }}>
+                  <div className="font-mono text-[9px] tracking-widest" style={{ color: `${layer.color}80` }}>LAYER {layer.n}</div>
+                  <div className="font-mono text-[10px] font-bold mt-1 leading-tight whitespace-pre-line" style={{ color: layer.color }}>{layer.label}</div>
+                </div>
+                <div className="px-4 py-3 flex flex-col gap-2 flex-1">
+                  <div className="font-mono text-[9px] px-2 py-1 rounded border" style={{ borderColor: `${layer.color}30`, color: `${layer.color}90`, background: `${layer.color}08` }}>{layer.short}</div>
+                  <div className="font-mono text-[9px] text-cyan-400/70">{layer.eq}</div>
+                  <div className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed flex-1">{layer.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Feedback arc label */}
+          <div className="mt-2 flex items-center justify-center gap-3">
+            <div className="h-px flex-1 border-t border-dashed border-amber-500/20" />
+            <span className="font-mono text-[9px] text-amber-500/50 tracking-widest uppercase">↺ Feedback Loop — Layer 5 → Layer 1 — Continuous Coherence Correction</span>
+            <div className="h-px flex-1 border-t border-dashed border-amber-500/20" />
+          </div>
+        </div>
+
+        {/* Signal modalities + coherence equations grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Biochemical */}
+          <div className="border border-[#4a7c59]/20 bg-[#4a7c59]/5 rounded-xl p-5 space-y-3">
+            <div className="font-mono text-[9px] text-[#4a7c59]/60 uppercase tracking-widest">Fig. 2a — Biochemical</div>
+            <div className="font-serif text-sm text-foreground/90">VOC Signal Acquisition</div>
+            <div className="space-y-1.5">
+              {[
+                { k: "concentration", v: "cᵢ(t)" },
+                { k: "species identity", v: "ψᵢ" },
+                { k: "temporal gradient", v: "Δc/Δt" },
+              ].map(row => (
+                <div key={row.k} className="flex items-center justify-between border-b border-[#4a7c59]/10 pb-1">
+                  <span className="font-mono text-[9px] text-muted-foreground/50">{row.k}</span>
+                  <span className="font-mono text-[10px] text-[#4a7c59]/80">{row.v}</span>
+                </div>
+              ))}
+            </div>
+            <div className="font-mono text-[9px] px-2 py-1.5 rounded border border-[#4a7c59]/30 text-[#4a7c59]/80 bg-[#4a7c59]/5">v = [c₁, ψ₁, c₂, ψ₂ … ]</div>
+          </div>
+
+          {/* Physiological */}
+          <div className="border border-[#1a6a9a]/20 bg-[#1a6a9a]/5 rounded-xl p-5 space-y-3">
+            <div className="font-mono text-[9px] text-[#1a6a9a]/60 uppercase tracking-widest">Fig. 2b — Physiological</div>
+            <div className="font-serif text-sm text-foreground/90">Human State Signals</div>
+            <div className="space-y-1.5">
+              {[
+                { k: "heart rate variability", v: "HRV · HBR(t)" },
+                { k: "respiratory rate",       v: "ρ(t)" },
+                { k: "skin conductance",       v: "σ(t)" },
+              ].map(row => (
+                <div key={row.k} className="flex items-center justify-between border-b border-[#1a6a9a]/10 pb-1">
+                  <span className="font-mono text-[9px] text-muted-foreground/50">{row.k}</span>
+                  <span className="font-mono text-[10px] text-[#1a6a9a]/80">{row.v}</span>
+                </div>
+              ))}
+            </div>
+            <div className="font-mono text-[9px] px-2 py-1.5 rounded border border-[#1a6a9a]/30 text-[#1a6a9a]/80 bg-[#1a6a9a]/5">h = [HRV, ρ, σ, … ]</div>
+          </div>
+
+          {/* Environmental */}
+          <div className="border border-[#b08d4a]/20 bg-[#b08d4a]/5 rounded-xl p-5 space-y-3">
+            <div className="font-mono text-[9px] text-[#b08d4a]/60 uppercase tracking-widest">Fig. 2c — Environmental</div>
+            <div className="font-serif text-sm text-foreground/90">Context Signals</div>
+            <div className="space-y-1.5">
+              {[
+                { k: "temperature · pressure", v: "T · P" },
+                { k: "humidity · luminance",   v: "RH · lux" },
+                { k: "acoustic field",         v: "ν(t)" },
+              ].map(row => (
+                <div key={row.k} className="flex items-center justify-between border-b border-[#b08d4a]/10 pb-1">
+                  <span className="font-mono text-[9px] text-muted-foreground/50">{row.k}</span>
+                  <span className="font-mono text-[10px] text-[#b08d4a]/80">{row.v}</span>
+                </div>
+              ))}
+            </div>
+            <div className="font-mono text-[9px] px-2 py-1.5 rounded border border-[#b08d4a]/30 text-[#b08d4a]/80 bg-[#b08d4a]/5">e = [T, P, RH, lux, ν]</div>
+          </div>
+        </div>
+
+        {/* Unified state + coherence equations */}
+        <div className="border border-border/30 rounded-xl overflow-hidden">
+          <div className="bg-card/40 border-b border-border/30 px-6 py-3 flex items-center gap-3">
+            <div className="font-mono text-[9px] text-muted-foreground/50 uppercase tracking-widest">Fig. 3 — State & Coherence Space</div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-border/20">
+            <div className="p-6 space-y-4">
+              <div className="font-serif text-sm text-foreground/80">Unified State Vector</div>
+              <div className="space-y-2">
+                {[
+                  { eq: "S = concat[v · h · e] ∈ ℝⁿ",  desc: "All modalities concatenated into one vector" },
+                  { eq: "S*(t)",                          desc: "Target relational state the system aims for" },
+                  { eq: "ε(t) = S*(t) − S(t)",           desc: "Error vector — deviation from target" },
+                  { eq: "Ċ = −λε + noise",               desc: "Coherence dynamics — dissipative correction" },
+                ].map(row => (
+                  <div key={row.eq} className="flex flex-col gap-0.5">
+                    <div className="font-mono text-xs text-cyan-400/80">{row.eq}</div>
+                    <div className="font-mono text-[9px] text-muted-foreground/40">{row.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="font-serif text-sm text-foreground/80">Coherence Metric + Geometry</div>
+              <div className="space-y-2">
+                {[
+                  { eq: "C(t) = 1 − ‖ε(t)‖ / ‖S*(t)‖",  desc: "C ∈ [0, 1] — normalized error minimization" },
+                  { eq: "C = 1 ↔ perfect coherence",       desc: "State vector aligns exactly with target" },
+                  { eq: "θₙ = nΦ · 2π  (Φ = golden ratio)", desc: "Phyllotactic angle — pattern rotation per step" },
+                  { eq: "rₙ = a√n · C(t)",                  desc: "Radial position modulated by live coherence" },
+                ].map(row => (
+                  <div key={row.eq} className="flex flex-col gap-0.5">
+                    <div className="font-mono text-xs text-amber-400/80">{row.eq}</div>
+                    <div className="font-mono text-[9px] text-muted-foreground/40">{row.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-border/20 bg-card/20 px-6 py-3 text-center">
+            <span className="font-mono text-[9px] text-muted-foreground/40">
+              CUCA–AETHER · Figures 1–6 · Closed-Loop Architecture — Signal Acquisition → State Encoding → Geometry → Emission → Glyph → ↺
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Closing axiom */}
       <div className="border border-border/30 rounded-lg p-6 text-center">
         <p className="font-serif text-lg text-muted-foreground/60 italic">

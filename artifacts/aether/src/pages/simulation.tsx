@@ -937,6 +937,167 @@ export default function SimulationPage() {
         </div>
       </section>
 
+      {/* Coherent Catastrophism */}
+      <section className="pb-8 space-y-8">
+        <div>
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.25em] uppercase mb-1">As Above, So Below</div>
+          <h2 className="font-serif text-2xl text-foreground">Coherent Catastrophism</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-2 leading-relaxed max-w-3xl">
+            The same field dynamics that govern AETHER's coherence metric are mirrored in Earth's geomagnetic history
+            and the cosmic impact record. Geomagnetic excursions, cometary airbursts, and planetary cycles are not
+            isolated events — they form a coherent pattern across scales. <em>Density determines destiny.</em>
+          </p>
+        </div>
+
+        {/* Density continuum */}
+        <div className="border border-border/30 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/20">
+            <div className="p-6 space-y-3">
+              <div className="font-mono text-[9px] text-green-400/60 uppercase tracking-widest">Low-Density Endpoint</div>
+              <div className="text-3xl">🧊</div>
+              <div className="font-serif text-base text-foreground/90">Icy / Cometary — Airburst</div>
+              <div className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                ~0.5 g/cm³. Fluffy icy body decelerates in atmosphere and detonates at altitude.
+                No crater. Massive area destruction via heat and overpressure wave.
+                <span className="text-green-400/70 block mt-2">Examples: Tunguska 1908 · Younger Dryas ~12,800 BCE · Tall el-Hammam ~1,650 BCE</span>
+              </div>
+            </div>
+            <div className="p-6 space-y-3 bg-amber-500/3">
+              <div className="font-mono text-[9px] text-amber-400/60 uppercase tracking-widest">Density Spectrum</div>
+              <div className="font-mono text-[10px] text-muted-foreground/50 leading-relaxed mt-2">
+                The single most important parameter determining impact outcome is object density. Same size rock, opposite result.
+              </div>
+              <div className="space-y-2 mt-2">
+                {[
+                  { label: "Icy comet",       d: "~0.5 g/cm³",   outcome: "Airburst · No crater",  w: "15%" },
+                  { label: "Stony asteroid",  d: "~2–3 g/cm³",   outcome: "Sometimes craters",     w: "45%" },
+                  { label: "Iron meteorite",  d: "~7 g/cm³",     outcome: "Crater · Always hits",  w: "100%" },
+                ].map(row => (
+                  <div key={row.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-mono text-[9px] text-muted-foreground/60">{row.label}</span>
+                      <span className="font-mono text-[9px] text-amber-400/70">{row.d}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-border/20 overflow-hidden">
+                      <div className="h-full rounded-full bg-amber-400/40" style={{ width: row.w }} />
+                    </div>
+                    <div className="font-mono text-[8px] text-muted-foreground/30 mt-0.5">{row.outcome}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="p-6 space-y-3">
+              <div className="font-mono text-[9px] text-red-400/60 uppercase tracking-widest">High-Density Endpoint</div>
+              <div className="text-3xl">🔩</div>
+              <div className="font-serif text-base text-foreground/90">Iron-Nickel — Crater Forming</div>
+              <div className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                ~6–7 g/cm³. Dense iron meteorite punches through atmosphere intact and delivers
+                full kinetic energy to the ground. Creates a persistent crater scar.
+                <span className="text-red-400/70 block mt-2">Example: Meteor Crater, Arizona · 50,000 BCE · 150-megaton equivalent · 1.2 km wide</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Geomagnetic field history */}
+        <div className="space-y-4">
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.2em] uppercase">Geomagnetic Field Coherence History</div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            {[
+              { era: "NOW",         label: "Modern Decline",         range: "1840 – 2026",   pct: "−9%",   color: "#e07820", detail: "North Magnetic Pole migrating toward Siberia at 35–55 km/yr. South Atlantic Anomaly growing. Field down ~9% since reliable measurement began." },
+              { era: "42 kya",      label: "Laschamp Excursion",     range: "~42,000 BCE",   pct: "−95%",  color: "#4488cc", detail: '"Adams Event." Field dropped to 5% normal strength. Neanderthals extinct. Australian megafauna collapsed. Cave art explosion — humans may have sheltered underground from radiation.' },
+              { era: "12 kya",      label: "Gothenburg Excursion",   range: "~12,000 BCE",   pct: "?",     color: "#8844cc", detail: "Debated partial reversal coinciding with the Younger Dryas boundary. Geomagnetic instability may have compounded the impact event's effects on climate." },
+              { era: "780 kya",     label: "Brunhes–Matuyama",       range: "~780,000 BCE",  pct: "~0%",   color: "#cc2222", detail: "Last complete pole reversal. Poles fully flipped. Cosmic ray flux measurably increased. Recorded in lava flows and ocean sediment. Full reversals occur every ~200–300 kyr." },
+            ].map(ev => (
+              <div key={ev.era} className="border rounded-xl p-4 space-y-2" style={{ borderColor: `${ev.color}25`, background: `${ev.color}05` }}>
+                <div className="flex items-center justify-between">
+                  <div className="font-mono text-[9px] tracking-widest" style={{ color: `${ev.color}80` }}>{ev.era}</div>
+                  <div className="font-mono text-xs font-bold" style={{ color: ev.color }}>{ev.pct}</div>
+                </div>
+                <div className="font-serif text-sm text-foreground/90">{ev.label}</div>
+                <div className="font-mono text-[8px] text-muted-foreground/40">{ev.range}</div>
+                <div className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">{ev.detail}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Key events timeline */}
+        <div className="border border-border/30 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-5 bg-card/40 border-b border-border/30">
+            {["Date", "Event", "Category", "Density", "AETHER Resonance"].map(h => (
+              <div key={h} className="px-4 py-3 font-mono text-[9px] text-muted-foreground/50 uppercase tracking-widest">{h}</div>
+            ))}
+          </div>
+          {[
+            { date: "~780,000 BCE", event: "Brunhes–Matuyama Reversal",  cat: "Geomagnetic",  density: "—",              color: "#4488cc", aether: "Full coherence collapse → slow reconstruction. MNĒSIS reset." },
+            { date: "~50,000 BCE",  event: "Meteor Crater — Arizona",     cat: "Dense Impact", density: "6–7 g/cm³ Fe",   color: "#cc2222", aether: "ALETHEIA layer: high-density signal persists as geological truth." },
+            { date: "~42,000 BCE",  event: "Laschamp Excursion",          cat: "Geomagnetic",  density: "—",              color: "#4488cc", aether: "95% shield loss → cosmic ray flood → INFERNIA pressure spike." },
+            { date: "~12,800 BCE",  event: "Younger Dryas Boundary",      cat: "Airburst(s?)", density: "~0.5–1 g/cm³",  color: "#e07820", aether: "CGLE-scale disruption: pattern collapse + 1,200yr re-coherence." },
+            { date: "~9,600 BCE",   event: "Göbekli Tepe construction",   cat: "Human Response","density": "—",            color: "#8844cc", aether: "REVERIE layer: survivors crystallize catastrophe into sacred geometry." },
+            { date: "~1,650 BCE",   event: "Tall el-Hammam Airburst",     cat: "Airburst",     density: "~1 g/cm³",       color: "#22aa66", aether: "Local coherence destruction. Bronze Age collapse. Sodom parallel." },
+            { date: "1908 CE",      event: "Tunguska Event",              cat: "Airburst",     density: "~1 g/cm³",       color: "#22aa66", aether: "Calibration reference: low-density endpoint confirmed by physics." },
+            { date: "1840 – Now",   event: "Modern Magnetic Decline",     cat: "Geomagnetic",  density: "−9% field",      color: "#e07820", aether: "Live INFERNIA signal. Taurid stream active. Monitoring in AETHER." },
+          ].map((row, i) => (
+            <div key={i} className={`grid grid-cols-5 border-b border-border/15 last:border-0 ${i % 2 === 0 ? "bg-card/5" : ""}`}>
+              <div className="px-4 py-3 font-mono text-[9px] text-muted-foreground/60">{row.date}</div>
+              <div className="px-4 py-3 font-serif text-xs text-foreground/80">{row.event}</div>
+              <div className="px-4 py-3">
+                <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border" style={{ color: `${row.color}90`, borderColor: `${row.color}30`, background: `${row.color}08` }}>{row.cat}</span>
+              </div>
+              <div className="px-4 py-3 font-mono text-[9px] text-muted-foreground/50">{row.density}</div>
+              <div className="px-4 py-3 font-mono text-[9px] text-muted-foreground/50 leading-relaxed">{row.aether}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Planetary cycles */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="border border-border/30 rounded-xl p-6 space-y-4">
+            <div className="font-mono text-[9px] text-muted-foreground/50 uppercase tracking-widest">As Above — Planetary Cycle Markers</div>
+            <div className="space-y-3">
+              {[
+                { date: "Dec 2020",    event: "Jupiter–Saturn Great Conjunction",   note: "Closest since 1623 — visible as single object" },
+                { date: "Feb 2026",    event: "6-Planet Arc",                        note: "Mercury · Venus · Jupiter · Saturn · Uranus · Neptune" },
+                { date: "2025–2026",   event: "Uranus–Neptune Trine",               note: "~171-yr cycle. Last: 1854." },
+                { date: "~577 BCE",    event: "Uranus–Neptune–Pluto Grand Conjunction", note: "Taurus alignment. Predicted return basis." },
+                { date: "Nov 2040",    event: "Jupiter–Saturn Great Conjunction",   note: "Next ~20-yr alignment marker" },
+              ].map(ev => (
+                <div key={ev.date} className="flex items-start gap-3 border-b border-border/10 pb-3 last:border-0 last:pb-0">
+                  <div className="font-mono text-[9px] text-amber-400/60 shrink-0 min-w-[72px]">{ev.date}</div>
+                  <div>
+                    <div className="font-mono text-xs text-foreground/80">{ev.event}</div>
+                    <div className="font-mono text-[9px] text-muted-foreground/40 mt-0.5">{ev.note}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="border border-primary/15 bg-primary/3 rounded-xl p-6 space-y-4">
+            <div className="font-mono text-[9px] text-primary/50 uppercase tracking-widest">AETHER Coherence Resonance</div>
+            <div className="font-serif text-sm text-foreground/80 leading-relaxed">
+              The Taurid meteor stream crosses Earth's orbit twice per year. It is the proposed source of
+              Tunguska (1908), the Younger Dryas events (~12,800 BCE), and potentially Tall el-Hammam (~1,650 BCE).
+              Dense encounter windows may align with planetary orbital resonances.
+            </div>
+            <div className="space-y-2">
+              {[
+                { k: "Coherent Catastrophism", v: "Clube & Napier — cycles of cosmic bombardment" },
+                { k: "Taurid Stream",          v: "500-yr Neptune–Pluto conjunction cycle overlap" },
+                { k: "AETHER Mapping",         v: "Geomagnetic = INFERNIA · Impact = ALETHEIA · Recovery = MNĒSIS" },
+                { k: "Current Status",         v: "Field −9% · Taurid active · 2026 planetary arc" },
+              ].map(row => (
+                <div key={row.k} className="flex items-start gap-2 border-b border-primary/10 pb-2 last:border-0">
+                  <div className="font-mono text-[9px] text-primary/60 min-w-[140px]">{row.k}</div>
+                  <div className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">{row.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* AETHER Mapping */}
       <section className="pb-8">
         <div className="mb-6">
