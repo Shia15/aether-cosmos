@@ -21,6 +21,7 @@ import ResonanceNoduleView from "@/pages/resonance-nodule";
 import SourcesView from "@/pages/sources";
 import DreamscapeView from "@/pages/dreamscape";
 import SimulationView from "@/pages/simulation";
+import QAetherView from "@/pages/q-aether";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ function Router() {
         <Route path="/sources" component={SourcesView} />
         <Route path="/dreamscape" component={DreamscapeView} />
         <Route path="/simulation" component={SimulationView} />
+        <Route path="/q-aether" component={QAetherView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
