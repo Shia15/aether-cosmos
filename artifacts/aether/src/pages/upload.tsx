@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, Trash2, FolderOpen, X, Plus,
   Tag, ChevronDown, CheckCircle2, Loader2, AlertCircle, Sparkles,
+  Link2, Globe, Zap,
 } from "lucide-react";
 
 type AetherLayer = "auto" | "mnesis" | "infernia" | "aletheia" | "reverie";
@@ -161,6 +162,19 @@ export default function UploadPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isIngesting, setIsIngesting] = useState(false);
 
+  // URL import
+  const [urlInput, setUrlInput] = useState("");
+  const [urlLayer, setUrlLayer] = useState<AetherLayer>("auto");
+  const [urlDocType, setUrlDocType] = useState<DocType>("other");
+  const [urlTagInput, setUrlTagInput] = useState("");
+  const [urlTags, setUrlTags] = useState<string[]>([]);
+  const [urlLoading, setUrlLoading] = useState(false);
+  const [urlResult, setUrlResult] = useState<{
+    title: string; layer: string; docType: string; charCount: number;
+    conceptCount: number; headings: string[]; keywords: string[];
+  } | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
+
   // File queue
   const [queue, setQueue] = useState<QueuedFile[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -256,6 +270,57 @@ export default function UploadPage() {
     } finally {
       setIsIngesting(false);
     }
+  };
+
+  const handleUrlImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = urlInput.trim();
+    if (!url) return;
+    setUrlLoading(true);
+    setUrlResult(null);
+    setUrlError(null);
+    try {
+      const base = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+      const res = await fetch(`${base}/api/import/url`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url,
+          layer: urlLayer !== "auto" ? urlLayer : undefined,
+          docType: urlDocType !== "other" ? urlDocType : undefined,
+          tags: urlTags,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Import failed");
+      setUrlResult({
+        title: data.document.title,
+        layer: data.document.layer,
+        docType: data.document.docType,
+        charCount: data.document.charCount,
+        conceptCount: data.document.conceptCount,
+        headings: data.extraction.headings,
+        keywords: data.extraction.keywords,
+      });
+      queryClient.invalidateQueries({ queryKey: getListDocumentsQueryKey() });
+      toast({ title: "URL Ingested", description: `"${data.document.title}" crystallized — ${data.document.conceptCount} concepts extracted.`, className: "font-mono" });
+      setUrlInput("");
+      setUrlTags([]);
+      setUrlLayer("auto");
+      setUrlDocType("other");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setUrlError(msg);
+      toast({ title: "Import Failed", description: msg, variant: "destructive" });
+    } finally {
+      setUrlLoading(false);
+    }
+  };
+
+  const addUrlTag = () => {
+    const t = urlTagInput.trim().toLowerCase().replace(/\s+/g, "-");
+    if (t && !urlTags.includes(t)) setUrlTags(prev => [...prev, t]);
+    setUrlTagInput("");
   };
 
   const ingestQueue = async () => {
@@ -374,6 +439,156 @@ export default function UploadPage() {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* ── URL / Link Import ── */}
+          <div className="rounded-xl border border-border/30 p-6 space-y-5">
+            <div className="flex items-center gap-2">
+              <Globe className="w-3.5 h-3.5 text-primary/60" />
+              <div className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest flex-1">
+                Link Import
+              </div>
+              <span className="font-mono text-[9px] px-2 py-0.5 rounded-full border border-primary/20 text-primary/50 bg-primary/5">
+                URL → Graph
+              </span>
+            </div>
+
+            <form onSubmit={handleUrlImport} className="space-y-4">
+              {/* URL input */}
+              <div>
+                <label className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest mb-1.5 block">
+                  URL
+                </label>
+                <div className="relative">
+                  <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/30" />
+                  <input
+                    value={urlInput}
+                    onChange={e => { setUrlInput(e.target.value); setUrlError(null); setUrlResult(null); }}
+                    placeholder="https://claude.ai/public/artifacts/... or any URL"
+                    className="w-full bg-background/50 border border-border rounded-lg pl-9 pr-4 py-2.5 font-mono text-xs text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 transition-all"
+                    disabled={urlLoading}
+                  />
+                </div>
+              </div>
+
+              {/* Layer + Type */}
+              <div className="grid grid-cols-2 gap-3">
+                <LayerSelect value={urlLayer} onChange={setUrlLayer} />
+                <TypeSelect value={urlDocType} onChange={setUrlDocType} />
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest mb-1.5 block">
+                  Tags <span className="text-muted-foreground/30">(optional)</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    value={urlTagInput}
+                    onChange={e => setUrlTagInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addUrlTag(); } }}
+                    placeholder="add tag..."
+                    className="flex-1 bg-background/50 border border-border rounded-lg px-3 py-2 font-mono text-xs text-foreground placeholder:text-muted-foreground/30 focus:outline-none focus:border-primary/50 transition-all"
+                    disabled={urlLoading}
+                  />
+                  <button type="button" onClick={addUrlTag}
+                    className="px-3 py-2 rounded-lg border border-border/40 text-muted-foreground hover:text-foreground transition-all">
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                {urlTags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {urlTags.map(t => (
+                      <span key={t} className="font-mono text-[9px] px-2 py-0.5 rounded-full bg-primary/8 border border-primary/20 text-primary/60 flex items-center gap-1">
+                        <Tag className="w-2 h-2" />{t}
+                        <button type="button" onClick={() => setUrlTags(prev => prev.filter(x => x !== t))}
+                          className="text-muted-foreground/40 hover:text-destructive transition-colors ml-0.5">
+                          <X className="w-2.5 h-2.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Error */}
+              <AnimatePresence>
+                {urlError && (
+                  <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="flex items-start gap-2 p-3 rounded-lg border border-red-500/20 bg-red-500/5">
+                    <AlertCircle className="w-3.5 h-3.5 text-red-400 shrink-0 mt-0.5" />
+                    <span className="font-mono text-xs text-red-400">{urlError}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={urlLoading || !urlInput.trim()}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary text-primary-foreground font-mono text-xs hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                {urlLoading
+                  ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Fetching & Crystallizing…</>
+                  : <><Zap className="w-3.5 h-3.5" /> Import URL</>}
+              </button>
+            </form>
+
+            {/* Result */}
+            <AnimatePresence>
+              {urlResult && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                  className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <span className="font-mono text-xs text-green-400">Crystallized</span>
+                  </div>
+                  <div className="font-serif text-sm text-foreground/80 line-clamp-2">{urlResult.title}</div>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { label: LAYER_META[urlResult.layer as AetherLayer]?.label ?? urlResult.layer, color: LAYER_META[urlResult.layer as AetherLayer]?.color ?? "#64748b" },
+                    ].map(b => (
+                      <span key={b.label} className="font-mono text-[9px] px-2 py-0.5 rounded border"
+                        style={{ borderColor: `${b.color}40`, color: b.color }}>
+                        {b.label}
+                      </span>
+                    ))}
+                    <span className="font-mono text-[9px] px-2 py-0.5 rounded border border-border/30 text-muted-foreground/50">
+                      {urlResult.conceptCount} concepts
+                    </span>
+                    <span className="font-mono text-[9px] px-2 py-0.5 rounded border border-border/30 text-muted-foreground/50">
+                      {(urlResult.charCount / 1000).toFixed(1)}k chars
+                    </span>
+                  </div>
+                  {urlResult.headings.length > 0 && (
+                    <div>
+                      <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-1.5">Sections Detected</div>
+                      <div className="flex flex-wrap gap-1">
+                        {urlResult.headings.slice(0, 8).map(h => (
+                          <span key={h} className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-background/60 border border-border/30 text-muted-foreground/50 line-clamp-1 max-w-[180px]">
+                            {h}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {urlResult.keywords.length > 0 && (
+                    <div>
+                      <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-1.5">Keywords Extracted</div>
+                      <div className="flex flex-wrap gap-1">
+                        {urlResult.keywords.slice(0, 12).map(k => (
+                          <span key={k} className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-primary/5 border border-primary/15 text-primary/50">
+                            {k}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Manual text entry */}
           <div className="rounded-xl border border-border/30 p-6 space-y-5">
