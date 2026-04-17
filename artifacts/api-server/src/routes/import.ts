@@ -171,6 +171,22 @@ router.post("/import/url", async (req, res) => {
     `\n---\n${rawText.slice(0, 60000)}`,
   ].join("\n");
 
+  // Deduplication: reject if URL already imported
+  const duplicate = knowledgeGraph.findImportByUrl(url);
+  if (duplicate) {
+    return res.status(409).json({
+      status: "duplicate",
+      message: "This URL has already been imported.",
+      record: {
+        id: duplicate.id,
+        url: duplicate.url,
+        title: duplicate.title,
+        importedAt: duplicate.importedAt,
+        version: duplicate.version,
+      },
+    });
+  }
+
   // Ingest into knowledge graph using the existing API
   const doc = knowledgeGraph.ingestDocument(title, content, {
     layer: resolvedLayer,
@@ -179,8 +195,19 @@ router.post("/import/url", async (req, res) => {
     tags: allTags,
   });
 
+  // Record in import history
+  const record = knowledgeGraph.recordImport(url, doc);
+
+  // Run gap detection on the newly ingested keywords
+  const gaps = knowledgeGraph.detectGaps(keywords.slice(0, 30));
+
   return res.json({
     status: "ok",
+    record: {
+      id: record.id,
+      version: record.version,
+      importedAt: record.importedAt,
+    },
     document: {
       id: doc.id,
       title: doc.title,
@@ -193,6 +220,122 @@ router.post("/import/url", async (req, res) => {
     extraction: {
       headings: headings.slice(0, 20),
       keywords: keywords.slice(0, 20),
+    },
+    gaps: {
+      missing: gaps.missing.slice(0, 15),
+      weak: gaps.weak.slice(0, 8),
+      coverageScore: gaps.coverageScore,
+    },
+  });
+});
+
+// ── GET /import/history ───────────────────────────────────────────────────────
+
+router.get("/import/history", (_req, res) => {
+  const history = knowledgeGraph.getImportHistory();
+  return res.json({ history });
+});
+
+// ── POST /import/gaps ─────────────────────────────────────────────────────────
+// Given a list of keywords, return which are missing or weak in the graph
+
+router.post("/import/gaps", (req, res) => {
+  const { keywords } = req.body as { keywords?: string[] };
+  if (!Array.isArray(keywords) || keywords.length === 0) {
+    return res.status(400).json({ error: "keywords array is required" });
+  }
+  const result = knowledgeGraph.detectGaps(keywords.slice(0, 50));
+  return res.json(result);
+});
+
+// ── POST /import/resync ───────────────────────────────────────────────────────
+// Re-fetch a previously imported URL and merge updates into the graph
+
+router.post("/import/resync", async (req, res) => {
+  const { recordId } = req.body as { recordId: string };
+  if (!recordId) {
+    return res.status(400).json({ error: "recordId is required" });
+  }
+
+  const history = knowledgeGraph.getImportHistory();
+  const record = history.find(r => r.id === recordId);
+  if (!record) {
+    return res.status(404).json({ error: "Import record not found" });
+  }
+
+  // Re-fetch
+  let html = "";
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 12000);
+    const response = await fetch(record.url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; AETHER-Ingester/1.0)",
+        "Accept": "text/html,application/xhtml+xml,application/json,*/*;q=0.8",
+      },
+    });
+    clearTimeout(timer);
+    if (!response.ok) {
+      return res.status(502).json({ error: `Remote returned ${response.status}` });
+    }
+    html = await response.text();
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Fetch failed";
+    return res.status(502).json({ error: `Could not re-fetch: ${msg}` });
+  }
+
+  const title = extractTitle(html, record.url);
+  const headings = extractHeadings(html);
+  const rawText = stripHtml(html);
+  const keywords = extractKeywords(rawText);
+  const parsedUrl = new URL(record.url);
+
+  const allTags = [...new Set([
+    ...record.tags.slice(0, 5),
+    ...keywords.slice(0, 6),
+    parsedUrl.hostname.replace(/^www\./, ""),
+  ])];
+
+  const content = [
+    `Source: ${record.url}`,
+    headings.length ? `\nKey Sections:\n${headings.slice(0, 15).join("\n")}` : "",
+    `\n---\n${rawText.slice(0, 60000)}`,
+  ].join("\n");
+
+  const newDoc = knowledgeGraph.ingestDocument(title, content, {
+    layer: record.layer,
+    docType: record.docType,
+    source: record.url,
+    tags: allTags,
+  });
+
+  const syncResult = knowledgeGraph.resyncImport(recordId, newDoc);
+  if (!syncResult) {
+    return res.status(500).json({ error: "Resync failed" });
+  }
+
+  const gaps = knowledgeGraph.detectGaps(keywords.slice(0, 30));
+
+  return res.json({
+    status: "resynced",
+    conceptDelta: syncResult.conceptDelta,
+    charDelta: syncResult.charDelta,
+    record: {
+      id: syncResult.record.id,
+      version: syncResult.record.version,
+      lastSyncedAt: syncResult.record.lastSyncedAt,
+    },
+    document: {
+      id: newDoc.id,
+      title: newDoc.title,
+      conceptCount: newDoc.conceptCount,
+      charCount: newDoc.charCount,
+    },
+    gaps: {
+      missing: gaps.missing.slice(0, 15),
+      weak: gaps.weak.slice(0, 8),
+      coverageScore: gaps.coverageScore,
     },
   });
 });

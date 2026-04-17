@@ -3,6 +3,22 @@ import { v4 as uuidv4 } from "uuid";
 export type AetherLayer = "mnesis" | "infernia" | "aletheia" | "reverie" | "auto";
 export type DocType = "research" | "whitepaper" | "philosophical" | "technical" | "empirical" | "personal" | "other";
 
+export interface ImportRecord {
+  id: string;
+  url: string;
+  docId: string;
+  title: string;
+  layer: AetherLayer;
+  docType: DocType;
+  charCount: number;
+  conceptCount: number;
+  tags: string[];
+  importedAt: Date;
+  lastSyncedAt: Date;
+  version: number;
+  syncHistory: { syncedAt: Date; conceptDelta: number; charDelta: number }[];
+}
+
 export interface Document {
   id: string;
   title: string;
@@ -77,9 +93,120 @@ class KnowledgeGraph {
   private documents: Map<string, Document> = new Map();
   private concepts: Map<string, Concept> = new Map();
   private equations: Map<string, Equation> = new Map();
+  private importRecords: Map<string, ImportRecord> = new Map();
 
   constructor() {
     this.seedSampleData();
+  }
+
+  // ── Import History ────────────────────────────────────────────────────────
+
+  recordImport(url: string, doc: Document): ImportRecord {
+    // Deduplicate by URL
+    const existing = this.findImportByUrl(url);
+    if (existing) {
+      return existing;
+    }
+    const record: ImportRecord = {
+      id: uuidv4(),
+      url,
+      docId: doc.id,
+      title: doc.title,
+      layer: doc.layer,
+      docType: doc.docType,
+      charCount: doc.charCount,
+      conceptCount: doc.conceptCount,
+      tags: doc.tags,
+      importedAt: new Date(),
+      lastSyncedAt: new Date(),
+      version: 1,
+      syncHistory: [],
+    };
+    this.importRecords.set(record.id, record);
+    return record;
+  }
+
+  findImportByUrl(url: string): ImportRecord | undefined {
+    return [...this.importRecords.values()].find(r => r.url === url);
+  }
+
+  getImportHistory(): ImportRecord[] {
+    return [...this.importRecords.values()].sort(
+      (a, b) => b.importedAt.getTime() - a.importedAt.getTime()
+    );
+  }
+
+  resyncImport(
+    recordId: string,
+    newDoc: Document
+  ): { record: ImportRecord; conceptDelta: number; charDelta: number } | null {
+    const record = this.importRecords.get(recordId);
+    if (!record) return null;
+
+    const conceptDelta = newDoc.conceptCount - record.conceptCount;
+    const charDelta = newDoc.charCount - record.charCount;
+
+    record.syncHistory.push({ syncedAt: new Date(), conceptDelta, charDelta });
+    record.docId = newDoc.id;
+    record.title = newDoc.title;
+    record.layer = newDoc.layer;
+    record.charCount = newDoc.charCount;
+    record.conceptCount = newDoc.conceptCount;
+    record.tags = newDoc.tags;
+    record.lastSyncedAt = new Date();
+    record.version += 1;
+
+    return { record, conceptDelta, charDelta };
+  }
+
+  // ── Gap Detection ─────────────────────────────────────────────────────────
+
+  detectGaps(keywords: string[]): {
+    missing: string[];
+    weak: { name: string; coherence: number }[];
+    present: string[];
+    coverageScore: number;
+  } {
+    const allConceptNames = new Set(
+      [...this.concepts.values()].map(c => c.name.toLowerCase())
+    );
+
+    const missing: string[] = [];
+    const present: string[] = [];
+    const weak: { name: string; coherence: number }[] = [];
+
+    for (const kw of keywords) {
+      const kwLower = kw.toLowerCase();
+      // Exact match
+      const exactMatch = [...this.concepts.values()].find(
+        c => c.name.toLowerCase() === kwLower
+      );
+      if (exactMatch) {
+        present.push(kw);
+        if (exactMatch.coherence < 0.4) {
+          weak.push({ name: exactMatch.name, coherence: exactMatch.coherence });
+        }
+        continue;
+      }
+      // Partial match (substring)
+      const partialMatch = [...this.concepts.values()].find(
+        c => c.name.toLowerCase().includes(kwLower) || kwLower.includes(c.name.toLowerCase())
+      );
+      if (partialMatch) {
+        present.push(kw);
+        if (partialMatch.coherence < 0.5) {
+          weak.push({ name: partialMatch.name, coherence: partialMatch.coherence });
+        }
+      } else {
+        missing.push(kw);
+      }
+    }
+
+    const coverageScore = keywords.length > 0
+      ? present.length / keywords.length
+      : 0;
+
+    return { missing, weak, present, coverageScore };
   }
 
   private extractConcepts(text: string): string[] {
