@@ -209,6 +209,106 @@ export default function SpaceRocksPage() {
         </div>
       </div>
 
+      {/* Element 115 / Bismuth callout */}
+      <div className="border border-border/20 rounded-2xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-border/15" style={{ background: "linear-gradient(135deg, rgba(138,90,220,0.08), rgba(72,199,230,0.06))" }}>
+          <div className="font-mono text-[8px] text-purple-400/60 uppercase tracking-[0.3em] mb-1">Heavy Element Spotlight</div>
+          <h3 className="font-serif text-xl text-foreground">The Two End Points of Heavy Matter</h3>
+          <p className="font-mono text-[9px] text-muted-foreground/50 mt-1 leading-relaxed max-w-2xl">
+            Iron sits at the top of the density spectrum we use for space rocks. But nature goes further. Bismuth is heavier than iron, forms crystalline geometry that looks designed, and levitates over magnets. Element 115 — now officially named Moscovium — was described decades before its synthesis by someone claiming to have reverse-engineered alien propulsion.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-border/15">
+
+          {/* Bismuth card */}
+          <div className="p-6 space-y-4">
+            <div className="flex items-start gap-4">
+              {/* Periodic table cell */}
+              <div className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-purple-400/30 flex flex-col items-center justify-center text-center" style={{ background: "rgba(138,90,220,0.1)" }}>
+                <div className="font-mono text-[9px] text-purple-400/60">83</div>
+                <div className="font-serif text-3xl text-purple-300 font-bold leading-none">Bi</div>
+                <div className="font-mono text-[8px] text-purple-400/70 mt-0.5">209.0</div>
+                <div className="font-mono text-[7px] text-muted-foreground/40">Bismuth</div>
+              </div>
+              <div className="space-y-1.5">
+                <div className="font-serif text-lg text-foreground">Bismuth</div>
+                <div className="font-mono text-[8px] text-purple-300/70 uppercase tracking-widest">Element 83 — Post-Transition Metal</div>
+                <div className="font-mono text-[8px] text-muted-foreground/50 leading-relaxed">
+                  The heaviest element that is <span className="text-purple-300">practically non-radioactive</span> — its half-life is 1.9 × 10¹⁹ years, a trillion times the age of the universe.
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "Density",          val: "9.78 g/cm³", note: "Denser than iron (7.87). Dense enough to hit ground." },
+                { label: "Crystal structure", val: "Stepped pyramids", note: "Forms iridescent hopper crystals — fractal staircases of pure metal." },
+                { label: "Diamagnetic",      val: "Strongest metal", note: "The only metal dense enough to levitate freely above a strong rare-earth magnet." },
+                { label: "Quantum behavior", val: "Topological insulator", note: "Conducts electricity only on its surface edges — a quantum boundary effect." },
+              ].map(f => (
+                <div key={f.label} className="rounded-lg p-2.5 space-y-0.5" style={{ background: "rgba(138,90,220,0.07)", border: "1px solid rgba(138,90,220,0.12)" }}>
+                  <div className="font-mono text-[7.5px] text-purple-400/50 uppercase tracking-widest">{f.label}</div>
+                  <div className="font-mono text-[9px] text-purple-200">{f.val}</div>
+                  <div className="font-mono text-[7px] text-muted-foreground/40 leading-tight">{f.note}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-xl px-4 py-3 font-mono text-[8px] text-muted-foreground/55 leading-relaxed" style={{ background: "rgba(138,90,220,0.06)", border: "1px solid rgba(138,90,220,0.1)" }}>
+              <span className="text-purple-300">Why it matters here:</span> Bismuth appears in some iron meteorites as a trace element — it concentrates in the heavy metallic phase. Its crystalline geometry (stepped hopper growth) resembles the self-organizing patterns in the CGLE simulator. It is the closest natural element to the "island of stability" — the predicted region of nuclear physics where super-heavy elements might be long-lived enough to be useful.
+            </div>
+          </div>
+
+          {/* Element 115 card */}
+          <div className="p-6 space-y-4">
+            <div className="flex items-start gap-4">
+              {/* Periodic table cell */}
+              <div className="flex-shrink-0 w-20 h-20 rounded-xl border-2 border-cyan-400/30 flex flex-col items-center justify-center text-center" style={{ background: "rgba(72,199,230,0.08)" }}>
+                <div className="font-mono text-[9px] text-cyan-400/60">115</div>
+                <div className="font-serif text-3xl text-cyan-300 font-bold leading-none">Mc</div>
+                <div className="font-mono text-[8px] text-cyan-400/70 mt-0.5">289.0</div>
+                <div className="font-mono text-[7px] text-muted-foreground/40">Moscovium</div>
+              </div>
+              <div className="space-y-1.5">
+                <div className="font-serif text-lg text-foreground">Element 115 — Moscovium</div>
+                <div className="font-mono text-[8px] text-cyan-300/70 uppercase tracking-widest">Mc · Synthetic Super-Heavy · Island of Stability</div>
+                <div className="font-mono text-[8px] text-muted-foreground/50 leading-relaxed">
+                  First synthesized 2003 at JINR, Dubna. Officially named 2016. <span className="text-cyan-300">Half-life: ~220 milliseconds.</span> Only a handful of atoms have ever existed on Earth.
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "Proton number", val: "Z = 115", note: "Sits at the predicted 'island of stability' edge — nuclear physics predicts longer-lived isotopes nearby." },
+                { label: "Decay chain",   val: "Mc→Nh→Rg→…", note: "Decays through Nihonium (113) → Roentgenium (111) → via alpha emission." },
+                { label: "Lazar claim",   val: "1989 — 14 yr early", note: "Bob Lazar described element 115 as alien propulsion fuel in 1989, before the element was synthesized in 2003." },
+                { label: "Mechanism",     val: "Proton → gravity wave", note: "Lazar claimed: bombard stable Mc-115 with protons → annihilate with anti-protons → amplified gravity wave used for propulsion." },
+              ].map(f => (
+                <div key={f.label} className="rounded-lg p-2.5 space-y-0.5" style={{ background: "rgba(72,199,230,0.07)", border: "1px solid rgba(72,199,230,0.12)" }}>
+                  <div className="font-mono text-[7.5px] text-cyan-400/50 uppercase tracking-widest">{f.label}</div>
+                  <div className="font-mono text-[9px] text-cyan-200">{f.val}</div>
+                  <div className="font-mono text-[7px] text-muted-foreground/40 leading-tight">{f.note}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-xl px-4 py-3 font-mono text-[8px] text-muted-foreground/55 leading-relaxed" style={{ background: "rgba(72,199,230,0.06)", border: "1px solid rgba(72,199,230,0.1)" }}>
+              <span className="text-cyan-300">The Lazar Anomaly:</span> In 1989, Robert Lazar publicly described working at a classified facility (S-4, near Area 51) where he claims to have examined alien craft using a then-nonexistent element — proton number 115 — as its power source. Element 115 was officially synthesized 14 years later. Whether or not the claim is true, the nuclear physics detail was accurate: element 115 does exist, sits at the edge of the "island of stability," and Moscovium-290 is predicted to be more stable than what we've synthesized so far.
+            </div>
+          </div>
+        </div>
+
+        {/* Connecting strip */}
+        <div className="px-6 py-3 border-t border-border/15 flex items-center gap-3" style={{ background: "rgba(100,100,150,0.04)" }}>
+          <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(138,90,220,0.3), rgba(72,199,230,0.3))" }} />
+          <div className="font-mono text-[8px] text-muted-foreground/35 text-center px-4 leading-relaxed">
+            Bi (83) → gap → Mc (115) · 32 protons apart · Both live at the heavy end of nature's density spectrum · Bismuth stable, Moscovium not — yet
+          </div>
+          <div className="flex-1 h-px" style={{ background: "linear-gradient(90deg, rgba(72,199,230,0.3), rgba(138,90,220,0.3))" }} />
+        </div>
+      </div>
+
       {/* Timeline */}
       <div className="relative space-y-1">
         <div className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2" style={{ background: "linear-gradient(180deg, transparent, rgba(232,184,75,0.25) 5%, rgba(232,184,75,0.25) 95%, transparent)" }} />
