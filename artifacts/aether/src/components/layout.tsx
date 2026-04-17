@@ -18,6 +18,7 @@ import {
   Radio,
   Link2,
   Orbit,
+  Telescope,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +39,7 @@ const NAV_ITEMS = [
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/nodule",     label: "Resonance",   icon: Radio },
+  { href: "/simulation", label: "Simulation",  icon: Telescope },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
