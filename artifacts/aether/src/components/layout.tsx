@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useHealthCheck } from "@workspace/api-client-react";
+import { CoherenceHUD } from "@/components/coherence-hud";
 import { 
   Network, 
   UploadCloud, 
@@ -124,6 +125,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 relative flex flex-col min-w-0 overflow-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background">
         {children}
+        <CoherenceHUD />
       </main>
     </div>
   );

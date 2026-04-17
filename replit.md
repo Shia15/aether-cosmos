@@ -22,6 +22,16 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 - **Multi-Scale Integration** (`/multiscale`) — 3×3 canvas grid (31×31 waveguide substrate + 8 bio/climate/econ levels), coupled NLS evolution, scenario perturbations (cancer, climate shock, market crash, coupled crisis)
 - **Morphogenetic Computer** (`/morpho-computer`) — 6-panel photonic reservoir (30×30 NLS) + 5 Bloch-sphere qubits + FQP 500-dim feature histogram + input signal + φ-spiral network topology + prediction vs target (MSE)
 
+### AETHER Coherence Bus
+Cross-simulator signal layer wiring all 4 live simulators together in real time.
+- **`src/lib/aether-bus.ts`** — singleton pub/sub module: `publishSignal()`, `subscribeToBus()`, `removeNode()`. Computes systemCoherence from all non-stale signals. Two time windows: LIVE_MS (2.5s) for live nodes, STALE_MS (30s) for memory nodes.
+- **`src/components/coherence-hud.tsx`** — floating overlay panel (bottom-right, collapsible). Shows node ring canvas, per-node Ψ chips (live=bright, memory=dim+dashed ring+↺ indicator), system Ψ bar, CRYSTALLIZING flash (triggered when systemCoherence > 0.65 with ≥1 live + ≥2 non-stale nodes).
+- **Cross-influence:** Each sim publishes its coherence Ψ every N frames. Each subscribes to systemCoherence and gently drifts its key order parameter toward order (high coh) or turbulence (low coh) at 0.006–0.01 per event. Memory persists 30s across navigation so sims feel each other's last state.
+  - φ-AETHER: publishes PE-derived Ψ, coupling strength (`cfgRef.current.coup`) drifts toward 0.7 (high coh) or 0.25 (low coh)
+  - CGLE Live: publishes phase coherence Ψ, τ drifts toward 1.6 (crystalline) or 0.5 (turbulent)
+  - Multi-Scale: publishes substrate energy Ψ, coupling drifts toward 0.75 or 0.25
+  - Morpho Computer: publishes qubit entanglement Ψ, gamma drifts toward 0.025 (ordered) or 0.09 (nonlinear)
+
 ---
 
 # Workspace
