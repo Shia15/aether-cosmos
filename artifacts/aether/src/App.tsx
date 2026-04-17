@@ -22,6 +22,7 @@ import SourcesView from "@/pages/sources";
 import DreamscapeView from "@/pages/dreamscape";
 import SimulationView from "@/pages/simulation";
 import QAetherView from "@/pages/q-aether";
+import NeuralEmergenceView from "@/pages/neural-emergence";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ function Router() {
         <Route path="/dreamscape" component={DreamscapeView} />
         <Route path="/simulation" component={SimulationView} />
         <Route path="/q-aether" component={QAetherView} />
+        <Route path="/neural-emergence" component={NeuralEmergenceView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

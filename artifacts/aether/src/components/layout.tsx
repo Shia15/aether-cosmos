@@ -20,6 +20,7 @@ import {
   Orbit,
   Telescope,
   Atom,
+  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,7 @@ const NAV_ITEMS = [
   { href: "/nodule",     label: "Resonance",   icon: Radio },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
   { href: "/q-aether",   label: "Q~AETHER",    icon: Atom },
+  { href: "/neural-emergence", label: "Neural",  icon: Zap },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
