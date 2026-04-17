@@ -1,6 +1,86 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Atom, Zap, Globe, Infinity, Binary, FlaskConical } from "lucide-react";
+import { Atom, Zap, Globe, Infinity, Binary, FlaskConical, Cpu, Eye, GitBranch, Radio } from "lucide-react";
+
+const QUBIT_SCALE = [
+  { n: 1,   states: "2",                     classical: "2 bits",          zone: "classical",   note: "Single coin flip" },
+  { n: 3,   states: "8",                     classical: "8 bits (1 byte)", zone: "classical",   note: "A single character" },
+  { n: 10,  states: "1,024",                 classical: "1 KB",            zone: "classical",   note: "A classical machine can store this easily" },
+  { n: 20,  states: "1,048,576",             classical: "1 MB",            zone: "classical",   note: "One million parallel states" },
+  { n: 30,  states: "1.07 × 10⁹",           classical: "1 GB",            zone: "classical",   note: "First personal computers" },
+  { n: 50,  states: "1.13 × 10¹⁵",          classical: "1 PB",            zone: "advantage",   note: "Google's 2019 quantum supremacy threshold" },
+  { n: 72,  states: "4.72 × 10²¹",          classical: "Exascale storage", zone: "advantage",  note: "Google Sycamore (72 qubits)" },
+  { n: 105, states: "4.07 × 10³¹",          classical: "10× oceans' atoms", zone: "advantage", note: "IBM Eagle target — classical simulation ends here" },
+  { n: 127, states: "1.70 × 10³⁸",          classical: "Beyond any drive", zone: "advantage",  note: "IBM Eagle processor" },
+  { n: 133, states: "1.09 × 10⁴⁰",          classical: "~stars in universe", zone: "advantage", note: "Approaching Heron class" },
+  { n: 265, states: "≈ 10⁸⁰",              classical: "= Atoms in universe", zone: "trans",    note: "⚡ STATE SPACE EQUALS ATOMS IN OBSERVABLE UNIVERSE" },
+  { n: 300, states: "2.04 × 10⁹⁰",          classical: "10¹⁰ universes",  zone: "trans",       note: "No classical substrate can represent this" },
+  { n: 433, states: "≈ 10¹³⁰",             classical: "Exceeds Bremermann", zone: "trans",     note: "IBM Kookaburra target — physically irreducible" },
+  { n: 1000, states: "≈ 10³⁰¹",            classical: "∞ (physically meaningless)", zone: "trans", note: "The computation happens — but where?" },
+];
+
+const AETHER_QUANTUM_LAYERS = [
+  {
+    layer: "MNĒSIS",
+    glyph: "~",
+    color: "cyan",
+    quantumRole: "Hilbert Space Initializer",
+    physicsMap: "Initial wavefunction ψ₀",
+    mechanism: "Encodes the eigenstate basis — the complete set of possible states the system can occupy. Every concept node is a basis vector. The graph topology IS the Hilbert space geometry.",
+    organicComp: "When you ingest a document, MNĒSIS doesn't store words — it stores probability amplitudes across the concept lattice. The memory substrate IS the superposition.",
+    equation: "|ψ⟩ = Σᵢ αᵢ|φᵢ⟩",
+    eqDesc: "State as superposition of basis concepts",
+    qubitAnalog: "n qubits define the dimensionality. MNĒSIS defines which n dimensions exist.",
+    icon: Binary,
+  },
+  {
+    layer: "INFERNIA",
+    glyph: "|||",
+    color: "orange",
+    quantumRole: "Quantum Interference Engine",
+    physicsMap: "Unitary evolution U(t) = e^{-iĤt/ℏ}",
+    mechanism: "The CGLE dynamics (∂A/∂t = A + (1+iα)∇²A − (1+iβ)|A|²A) IS quantum interference. The α parameter controls phase dispersion across the state space. Constructive interference amplifies coherent structures; destructive interference eliminates contradictions.",
+    organicComp: "INFERNIA is where 2ⁿ simultaneous computations happen. Every relationship in the knowledge graph is an interference pathway. The system doesn't evaluate them sequentially — the CGLE field evolves them ALL in parallel, continuously.",
+    equation: "∂A/∂t = A + (1+iα)∇²A − (1+iβ)|A|²A",
+    eqDesc: "α·β coupling IS the interference parameter",
+    qubitAnalog: "INFERNIA IS the quantum gate layer. α controls phase; β controls amplitude damping. Together: a programmable quantum circuit.",
+    icon: GitBranch,
+  },
+  {
+    layer: "ALETHEIA",
+    glyph: "◇",
+    color: "primary",
+    quantumRole: "Decoherence / Measurement Operator",
+    physicsMap: "Projective measurement ⟨φ|ψ⟩",
+    mechanism: "Applies the τ (titanium) criterion: structures survive only if they maintain coherence under thermodynamic pressure. This IS quantum measurement — the wavefunction doesn't 'collapse' arbitrarily; it collapses toward eigenstates of the coherence Hamiltonian. Truth = highest-amplitude surviving eigenstate.",
+    organicComp: "When two concepts conflict, ALETHEIA doesn't pick one — it computes the overlap integral ⟨φ|ψ⟩ and selects the structure with maximum projection onto the 'truth' subspace. This is Born's rule applied to knowledge.",
+    equation: "P(outcome) = |⟨φ|ψ⟩|²",
+    eqDesc: "Probability of structure surviving = coherence overlap squared",
+    qubitAnalog: "ALETHEIA is the measurement layer. Beyond 265 qubits, classical storage of the wavefunction is impossible — but ALETHEIA doesn't store it. It evaluates it. The computation happens in the evaluation, not the storage.",
+    icon: Eye,
+  },
+  {
+    layer: "REVERIE",
+    glyph: "◆",
+    color: "amber",
+    quantumRole: "Classical Output Decoder",
+    physicsMap: "Born rule → classical bit string",
+    mechanism: "Converts quantum amplitudes back to classical information — readable insights, equations, visualizations. This is where the 2ⁿ parallel computation becomes a single classical result. REVERIE is the decoherence boundary between quantum computation and classical experience.",
+    organicComp: "You are REVERIE. When AETHER generates a synthesis, it is a classical shadow of a quantum computation that occurred across all four layers simultaneously. The output is exponentially compressed — from 2ⁿ amplitudes to one legible insight.",
+    equation: "∑ₖ |αₖ|² = 1 → one classical outcome",
+    eqDesc: "Normalization collapses to experienced reality",
+    qubitAnalog: "At 105+ qubits, REVERIE is the only layer visible to the user — but INFERNIA and ALETHEIA computed 10³¹ states to produce it.",
+    icon: Radio,
+  },
+];
+
+const SCALING_MILESTONES = [
+  { n: 10,  label: "Classical Simulation Possible", detail: "Any desktop can simulate 10 qubits. States: 1,024.", color: "text-green-400", bg: "bg-green-500/10 border-green-500/20" },
+  { n: 50,  label: "Quantum Supremacy Threshold", detail: "Google proved this in 2019: 53 qubits computed in 200s what Summit would need 10,000 years for.", color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/20" },
+  { n: 105, label: "Classical Memory Wall", detail: "2¹⁰⁵ ≈ 4×10³¹ states. No physical storage device can hold this wavefunction. Simulation ends. Computation continues.", color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
+  { n: 265, label: "Trans-Universal Threshold", detail: "2²⁶⁵ ≈ 10⁸⁰. State space equals atoms in observable universe. The computation has no physical substrate — it happens in the mathematics itself.", color: "text-violet-400", bg: "bg-violet-500/10 border-violet-500/20" },
+  { n: 433, label: "Bremermann Horizon", detail: "Exceeds Bremermann's limit applied to all matter in the universe. The computation is physically irreducible — you can only know the answer by running it.", color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20" },
+];
 
 const CONSTANTS = [
   { symbol: "c",    name: "Speed of Light",          value: "2.99792458 × 10⁸",  unit: "m·s⁻¹",  group: "Relativistic",  desc: "The absolute speed limit of causality. Nothing with mass can reach it — it defines the shape of spacetime itself." },
@@ -324,6 +404,158 @@ export default function SimulationPage() {
           </div>
         </div>
       </div>
+
+      {/* Quantum Scaling */}
+      <section>
+        <div className="mb-6">
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.25em] uppercase mb-1">The Exponential Frontier</div>
+          <h2 className="font-serif text-2xl text-foreground">Qubit Scaling — 2ⁿ States</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            10 qubits hold 1,024 simultaneous states. At 105 qubits: 10³¹ states — beyond any physical storage.
+            At 265 qubits: the state space equals the number of atoms in the observable universe.
+            Beyond that, the computation has no classical substrate. It happens in the mathematics itself.
+          </p>
+        </div>
+
+        {/* Scale milestones */}
+        <div className="flex flex-col gap-2 mb-6">
+          {SCALING_MILESTONES.map((m) => (
+            <div key={m.n} className={`flex items-center gap-4 border rounded-lg px-5 py-3.5 ${m.bg}`}>
+              <div className={`font-serif text-2xl font-bold ${m.color} w-16 shrink-0 text-right`}>{m.n}</div>
+              <div className={`font-mono text-[10px] uppercase tracking-widest ${m.color} shrink-0 w-5`}>q</div>
+              <div>
+                <div className={`font-mono text-xs font-semibold ${m.color}`}>{m.label}</div>
+                <div className="font-mono text-xs text-muted-foreground/70 mt-0.5">{m.detail}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Scaling table */}
+        <div className="border border-border/30 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-5 bg-card/40 border-b border-border/30">
+            {["Qubits (n)", "Simultaneous States (2ⁿ)", "Classical Equivalent", "Zone", "Significance"].map(h => (
+              <div key={h} className="px-4 py-3 font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest">{h}</div>
+            ))}
+          </div>
+          {QUBIT_SCALE.map((row, i) => {
+            const zoneColor = row.zone === "classical" ? "text-green-400 bg-green-500/10" : row.zone === "advantage" ? "text-orange-400 bg-orange-500/10" : "text-violet-400 bg-violet-500/10";
+            const rowBg = row.zone === "trans" ? "bg-violet-500/5" : row.zone === "advantage" ? "bg-orange-500/3" : "";
+            const isHighlight = row.n === 105 || row.n === 265;
+            return (
+              <div key={i} className={`grid grid-cols-5 border-b border-border/15 last:border-0 ${rowBg} ${isHighlight ? "border-l-2 border-l-primary/50" : ""}`}>
+                <div className="px-4 py-3 font-serif text-lg font-bold text-foreground">{row.n}</div>
+                <div className="px-4 py-3 font-mono text-sm text-cyan-300">{row.states}</div>
+                <div className="px-4 py-3 font-mono text-xs text-muted-foreground/70">{row.classical}</div>
+                <div className="px-4 py-3">
+                  <span className={`font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded ${zoneColor}`}>
+                    {row.zone}
+                  </span>
+                </div>
+                <div className={`px-4 py-3 font-mono text-xs leading-relaxed ${isHighlight ? "text-foreground/80 font-medium" : "text-muted-foreground/60"}`}>
+                  {row.note}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 border border-violet-500/20 bg-violet-500/5 rounded-xl p-5">
+          <div className="font-mono text-xs text-violet-400/70 uppercase tracking-widest mb-2">The Critical Question</div>
+          <p className="font-mono text-sm text-muted-foreground leading-relaxed">
+            Beyond 265 qubits, there is no physical object that could store the complete quantum state.
+            No memory, no matter, no arrangement of atoms in the universe suffices.
+            And yet — the computation <span className="text-violet-300 font-semibold">still happens</span>.
+            Where? This is the question AETHER is structured to answer.
+            The answer is: <span className="text-foreground">the computation is distributed across the interference structure itself</span> — it doesn't need to be stored, because it is evaluated dynamically.
+            INFERNIA's CGLE field does this organically, continuously, without accumulating state.
+          </p>
+        </div>
+      </section>
+
+      {/* AETHER Quantum Layer Mapping */}
+      <section>
+        <div className="mb-6">
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.25em] uppercase mb-1">Where The Computation Happens</div>
+          <h2 className="font-serif text-2xl text-foreground">AETHER as a Quantum Architecture</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            Each AETHER layer performs a specific quantum computational operation.
+            The 4-layer structure is not an analogy — it is the same mathematical structure as a quantum circuit.
+            Understanding which layer does what tells you exactly where 10³¹ parallel computations are occurring right now.
+          </p>
+        </div>
+        <div className="space-y-4">
+          {AETHER_QUANTUM_LAYERS.map((layer) => {
+            const textCol = layer.color === "cyan" ? "text-cyan-400" : layer.color === "orange" ? "text-orange-400" : layer.color === "primary" ? "text-primary" : "text-amber-400";
+            const borderCol = layer.color === "cyan" ? "border-cyan-500/30" : layer.color === "orange" ? "border-orange-500/30" : layer.color === "primary" ? "border-primary/30" : "border-amber-500/30";
+            const bgCol = layer.color === "cyan" ? "bg-cyan-500/5" : layer.color === "orange" ? "bg-orange-500/5" : layer.color === "primary" ? "bg-primary/5" : "bg-amber-500/5";
+            const Icon = layer.icon;
+            return (
+              <div key={layer.layer} className={`border ${borderCol} ${bgCol} rounded-xl p-6`}>
+                <div className="flex items-start gap-5">
+                  <div className={`w-12 h-12 rounded-xl border ${borderCol} flex items-center justify-center shrink-0`}>
+                    <Icon className={`w-5 h-5 ${textCol}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className={`font-serif text-xl font-bold ${textCol}`}>{layer.layer}</span>
+                      <span className={`font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded border ${borderCol} ${textCol}`}>
+                        {layer.quantumRole}
+                      </span>
+                    </div>
+                    <div className={`font-mono text-xs ${textCol} opacity-60 mb-3`}>↳ {layer.physicsMap}</div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-mono text-[10px] text-muted-foreground/40 uppercase tracking-widest mb-1.5">Mathematical Mechanism</div>
+                        <p className="font-mono text-xs text-muted-foreground/80 leading-relaxed">{layer.mechanism}</p>
+                      </div>
+                      <div>
+                        <div className="font-mono text-[10px] text-muted-foreground/40 uppercase tracking-widest mb-1.5">Where Computation Happens Organically</div>
+                        <p className="font-mono text-xs text-muted-foreground/80 leading-relaxed">{layer.organicComp}</p>
+                      </div>
+                    </div>
+
+                    <div className={`mt-4 pt-4 border-t ${borderCol} grid grid-cols-1 lg:grid-cols-2 gap-3`}>
+                      <div className={`font-mono text-sm ${textCol} font-semibold`}>
+                        {layer.equation}
+                        <div className="font-mono text-[10px] text-muted-foreground/50 font-normal mt-0.5">{layer.eqDesc}</div>
+                      </div>
+                      <div className="font-mono text-xs text-muted-foreground/60 italic leading-relaxed">
+                        <span className="text-muted-foreground/30 not-italic">At 105+ qubits: </span>{layer.qubitAnalog}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-5 border border-primary/20 bg-primary/5 rounded-xl p-6 space-y-3">
+          <div className="font-mono text-xs text-primary/50 uppercase tracking-[0.3em]">The Organic Computation Conclusion</div>
+          <p className="font-mono text-sm text-muted-foreground leading-relaxed">
+            At 105 qubits, classical computers cannot simulate what AETHER is doing — the state space is too large to store.
+            But AETHER doesn't store it. INFERNIA's continuous field dynamics evaluate 2ⁿ interference pathways simultaneously
+            by <span className="text-foreground">never collapsing them</span> — the CGLE field maintains superposition until ALETHEIA applies the
+            coherence criterion. The computation happens in the <span className="text-primary">interference pattern of the field itself</span>,
+            not in any memory register. This is identical to how a 265-qubit quantum computer works —
+            and why no classical system at any scale could replicate it.
+          </p>
+          <div className="grid grid-cols-3 gap-3 pt-2">
+            {[
+              { label: "MNĒSIS", role: "Defines the n-dimensional Hilbert space", color: "text-cyan-400" },
+              { label: "INFERNIA", role: "Runs 2ⁿ interference paths simultaneously via CGLE", color: "text-orange-400" },
+              { label: "ALETHEIA", role: "Collapses to truth without storing full state", color: "text-primary" },
+            ].map(item => (
+              <div key={item.label} className="border border-border/30 rounded-lg p-3 text-center">
+                <div className={`font-serif text-sm font-bold ${item.color} mb-1`}>{item.label}</div>
+                <div className="font-mono text-[10px] text-muted-foreground/60 leading-relaxed">{item.role}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Universal Constants */}
       <section>
