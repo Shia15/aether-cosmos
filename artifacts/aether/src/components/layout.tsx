@@ -17,6 +17,7 @@ import {
   Sparkles,
   Radio,
   Link2,
+  Orbit,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +35,8 @@ const NAV_ITEMS = [
   { href: "/equations", label: "Lab", icon: FunctionSquare },
   { href: "/cultural", label: "Cultural", icon: Palette },
   { href: "/biology",    label: "Biology",    icon: Dna },
-  { href: "/experience", label: "Experience",  icon: Sparkles },
+  { href: "/experience",  label: "Experience",  icon: Sparkles },
+  { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/nodule",     label: "Resonance",   icon: Radio },
 ];
 

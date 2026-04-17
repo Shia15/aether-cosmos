@@ -19,6 +19,7 @@ import BiologyView from "@/pages/biology";
 import ExperienceView from "@/pages/experience";
 import ResonanceNoduleView from "@/pages/resonance-nodule";
 import SourcesView from "@/pages/sources";
+import DreamscapeView from "@/pages/dreamscape";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ function Router() {
         <Route path="/experience" component={ExperienceView} />
         <Route path="/nodule" component={ResonanceNoduleView} />
         <Route path="/sources" component={SourcesView} />
+        <Route path="/dreamscape" component={DreamscapeView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
