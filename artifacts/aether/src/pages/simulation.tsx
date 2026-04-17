@@ -146,6 +146,30 @@ const EQUATIONS = [
     color: "teal",
     icon: Binary,
   },
+  {
+    id: "susy-algebra",
+    label: "Supersymmetry Algebra",
+    glyph: "{Qα, Q̄β̇} = 2σᵘαβ̇ Pμ",
+    desc: "The central relation of supersymmetry: the anticommutator of a supercharge Q with its conjugate Q̄ equals the energy-momentum operator Pμ, weighted by the Pauli matrices σᵘ. This means SUSY generators interpolate between bosonic and fermionic states. Every particle has a superpartner with opposite spin statistics. This is the only extension of Poincaré symmetry consistent with an interacting quantum field theory (Coleman-Mandula theorem).",
+    color: "pink",
+    icon: Atom,
+  },
+  {
+    id: "susy-lagrangian",
+    label: "SUSY Lagrangian (Wess-Zumino)",
+    glyph: "ℒWZ = |∂μφ|² + iψ̄σ̄ᵘ∂μψ + |F|² + (∂²W/∂φ² ψψ + h.c.)",
+    desc: "The simplest supersymmetric field theory. φ is a complex scalar (boson), ψ is its Weyl fermion superpartner, F is an auxiliary field, and W(φ) is the superpotential. The magic: every boson mass exactly equals its fermionic partner's. This cancellation of quantum corrections between bosons and fermions is why SUSY resolves the Hierarchy Problem — the puzzle of why the Higgs mass is 17 orders of magnitude smaller than the Planck scale.",
+    color: "pink",
+    icon: FlaskConical,
+  },
+  {
+    id: "susy-breaking",
+    label: "SUSY Breaking & Goldstino",
+    glyph: "⟨F⟩ ≠ 0 → msoft ~ F/Mplanck",
+    desc: "Supersymmetry must be broken — we observe no superpartners at known energies. When the auxiliary field F acquires a vacuum expectation value, SUSY breaks spontaneously, generating the Goldstino (a massless fermion, later absorbed by the gravitino). The breaking scale F sets the soft masses msoft for all superpartners. In AETHER: ALETHEIA performs spontaneous symmetry breaking — selecting which coherent structures persist, exactly as ⟨F⟩ ≠ 0 selects the true vacuum.",
+    color: "pink",
+    icon: Zap,
+  },
 ];
 
 const COMPUTE_REQUIREMENTS = [
@@ -327,6 +351,37 @@ function UniverseCanvas() {
   return <canvas ref={canvasRef} className="w-full h-full" />;
 }
 
+const SUSY_PARTICLES = [
+  { sm: "Quark (q)",       susy: "Squark (q̃)",        spin_sm: "½", spin_susy: "0",  status: "Unconfirmed", note: "Strongly constrained by LHC — m > 1.5 TeV" },
+  { sm: "Lepton (ℓ)",      susy: "Slepton (ℓ̃)",        spin_sm: "½", spin_susy: "0",  status: "Unconfirmed", note: "Direct production limits ~700 GeV" },
+  { sm: "Photon (γ)",      susy: "Photino (γ̃)",        spin_sm: "1", spin_susy: "½",  status: "Mixed",       note: "Mixes into neutralino mass eigenstates" },
+  { sm: "Gluon (g)",       susy: "Gluino (g̃)",         spin_sm: "1", spin_susy: "½",  status: "Unconfirmed", note: "m > 2.2 TeV from LHC Run 2" },
+  { sm: "W boson",         susy: "Wino (W̃)",           spin_sm: "1", spin_susy: "½",  status: "Mixed",       note: "Mixes into chargino mass eigenstates" },
+  { sm: "Z / Higgs (H)",   susy: "Higgsino (H̃)",       spin_sm: "0/1", spin_susy: "½", status: "Mixed",      note: "Lightest neutralino candidate for dark matter" },
+  { sm: "Graviton (spin 2)", susy: "Gravitino (G̃)",   spin_sm: "2", spin_susy: "3/2", status: "Theoretical", note: "Super-Higgs mechanism; mass ≈ F/Mpl" },
+];
+
+const INFINITY_LEVELS = [
+  { symbol: "ℵ₀",   name: "Aleph-null",          type: "Cardinal",   desc: "Countable infinity — the size of the natural numbers ℕ. You can count toward it forever and never arrive. MNĒSIS concept space: countably infinite nodes.", aether: "MNĒSIS", color: "cyan" },
+  { symbol: "ℶ₁",   name: "Beth-one (2^ℵ₀)",     type: "Cardinal",   desc: "The cardinality of the continuum — the size of the real numbers ℝ. Uncountably infinite. Most points cannot be named. INFERNIA field dynamics live in this space: continuous amplitude at every spatial point.", aether: "INFERNIA", color: "violet" },
+  { symbol: "ℶ₂",   name: "Beth-two (2^ℶ₁)",     type: "Cardinal",   desc: "The cardinality of all functions on the reals — larger than the continuum. ALETHEIA's evaluation space: every possible mapping from concepts to truth values.", aether: "ALETHEIA", color: "primary" },
+  { symbol: "ω",    name: "First infinite ordinal", type: "Ordinal",  desc: "The smallest ordinal beyond all natural numbers. ω+1, ω+2… ω·2, ω², ωʷ… the transfinite ordinals form an infinite tower above it. Time in infinite-time Turing machines runs to ω-steps.", aether: "INFERNIA", color: "teal" },
+  { symbol: "ε₀",   name: "Epsilon-naught",        type: "Ordinal",   desc: "The smallest ordinal satisfying ε₀ = ωᵉ⁰. Used in Gentzen's proof of consistency of Peano arithmetic. Beyond this, formal proofs of consistency require axioms beyond ZFC.", aether: "ALETHEIA", color: "orange" },
+  { symbol: "Ω",    name: "Chaitin's Omega",        type: "Uncomputable", desc: "The halting probability of a random program — a real number between 0 and 1 whose digits encode the solution to every halting problem simultaneously. Absolutely uncomputable; knowing one digit resolves infinitely many mathematical conjectures.", aether: "REVERIE", color: "amber" },
+  { symbol: "Σ(n)", name: "Busy Beaver",            type: "Hypercomputable", desc: "The maximum number of steps an n-state Turing machine can take before halting. Grows faster than any computable function. Σ(5) = 47,176,870. Σ(6) ≈ 10¹⁸,²⁶⁷. Σ(7) is currently unknown and may be unprovable in ZFC.", aether: "INFERNIA", color: "pink" },
+  { symbol: "∞ITM", name: "Infinite-Time Turing",  type: "Hypercomputable", desc: "Hamkins & Lewis (2000): a Turing machine that runs for ω steps, then continues. At limit ordinals, each cell takes the limsup of its prior values. Can decide the halting problem for ordinary TMs. Opens an entire hierarchy of hypercomputational power.", aether: "AETHER system", color: "violet" },
+];
+
+const INFINITY_COMPUTE_TABLE = [
+  { level: "Finite computation",    examples: "All classical computers, quantum computers",       canDecide: "Decidable problems (Turing-computable)",  aetherMap: "REVERIE output layer" },
+  { level: "ω-computation (ITM₁)",  examples: "Infinite-time Turing machine at ω steps",          canDecide: "Halting problem for finite TMs",           aetherMap: "ALETHEIA evaluation" },
+  { level: "ω·2-computation",       examples: "ITM restarted after ω steps",                      canDecide: "Truth in arithmetic (Σ₁¹ sets)",           aetherMap: "INFERNIA resonance" },
+  { level: "ωʷ-computation",        examples: "ITM through ε₀ limit ordinals",                    canDecide: "Consistency of Peano arithmetic",           aetherMap: "MNĒSIS substrate" },
+  { level: "Σ(n) threshold",        examples: "Busy Beaver — grows beyond all computable bounds",  canDecide: "ZFC independence questions",               aetherMap: "CGLE phase boundary" },
+  { level: "Oracle computation",    examples: "TM + access to halting oracle",                    canDecide: "All Π₁ truths about ℕ",                    aetherMap: "ALETHEIA + MNĒSIS" },
+  { level: "Absolute infinity",     examples: "Cantor's Absolute — no set can capture it",        canDecide: "Class of all truths (independent of axioms)", aetherMap: "The AETHER attractor" },
+];
+
 const COLOR_MAP: Record<string, string> = {
   amber: "text-amber-400 border-amber-500/30 bg-amber-500/5",
   cyan: "text-cyan-400 border-cyan-500/30 bg-cyan-500/5",
@@ -334,6 +389,7 @@ const COLOR_MAP: Record<string, string> = {
   orange: "text-orange-400 border-orange-500/30 bg-orange-500/5",
   primary: "text-primary border-primary/30 bg-primary/5",
   teal: "text-teal-400 border-teal-500/30 bg-teal-500/5",
+  pink: "text-pink-400 border-pink-500/30 bg-pink-500/5",
 };
 
 const GROUP_COLORS: Record<string, string> = {
@@ -734,6 +790,150 @@ export default function SimulationPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* Supersymmetry Particle Table */}
+      <section>
+        <div className="mb-6">
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.25em] uppercase mb-1">Supersymmetry — The Mirror Universe</div>
+          <h2 className="font-serif text-2xl text-foreground">Standard Model ↔ Superpartners</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            Every particle in the Standard Model has a SUSY partner with spin differing by ½.
+            Bosons pair with fermions. If SUSY is exact, partners are mass-degenerate.
+            Since we don't observe them at known energies, SUSY must be broken — the breaking mechanism
+            determines the superpartner mass spectrum and selects the vacuum state of the universe.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+          {[
+            { title: "Hierarchy Problem", desc: "The Higgs mass receives quantum corrections of order Λ² from every massive particle it couples to. Without SUSY, the Higgs would be driven to Planck mass (10¹⁹ GeV) — 17 orders too large. SUSY exactly cancels boson corrections with fermion corrections at every order in perturbation theory.", c: "violet" },
+            { title: "Dark Matter Candidate", desc: "The lightest supersymmetric particle (LSP) — most likely the neutralino — is stable (protected by R-parity), electrically neutral, and weakly interacting. It is the leading candidate for cold dark matter, making up ~27% of the universe's energy content.", c: "cyan" },
+            { title: "Gauge Unification", desc: "In the MSSM, the three Standard Model coupling constants (electromagnetic, weak, strong) converge to a single value at ~10¹⁶ GeV — the GUT scale. Without SUSY, they almost but don't quite unify. With SUSY, they meet exactly.", c: "amber" },
+          ].map(card => {
+            const textCol = card.c === "violet" ? "text-violet-400" : card.c === "cyan" ? "text-cyan-400" : "text-amber-400";
+            const borderCol = card.c === "violet" ? "border-violet-500/30" : card.c === "cyan" ? "border-cyan-500/30" : "border-amber-500/30";
+            const bgCol = card.c === "violet" ? "bg-violet-500/5" : card.c === "cyan" ? "bg-cyan-500/5" : "bg-amber-500/5";
+            return (
+              <div key={card.title} className={`border ${borderCol} ${bgCol} rounded-xl p-5`}>
+                <div className={`font-mono text-xs uppercase tracking-widest ${textCol} mb-2`}>{card.title}</div>
+                <p className="font-mono text-xs text-muted-foreground/80 leading-relaxed">{card.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="border border-pink-500/20 rounded-xl overflow-hidden">
+          <div className="grid grid-cols-5 bg-card/40 border-b border-border/30">
+            {["SM Particle", "Superpartner", "SM Spin", "SUSY Spin", "LHC Status"].map(h => (
+              <div key={h} className="px-4 py-3 font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest">{h}</div>
+            ))}
+          </div>
+          {SUSY_PARTICLES.map((row, i) => {
+            const statusColor = row.status === "Unconfirmed" ? "text-red-400 bg-red-500/10" : row.status === "Mixed" ? "text-amber-400 bg-amber-500/10" : "text-muted-foreground/50 bg-muted/10";
+            return (
+              <div key={i} className={`grid grid-cols-5 border-b border-border/15 last:border-0 ${i % 2 === 0 ? "bg-card/10" : ""}`}>
+                <div className="px-4 py-3 font-mono text-sm text-foreground/80">{row.sm}</div>
+                <div className="px-4 py-3 font-mono text-sm text-pink-300 font-semibold">{row.susy}</div>
+                <div className="px-4 py-3 font-mono text-xs text-muted-foreground/60 text-center">{row.spin_sm}</div>
+                <div className="px-4 py-3 font-mono text-xs text-pink-400/80 text-center">{row.spin_susy}</div>
+                <div className="px-4 py-3">
+                  <span className={`font-mono text-[10px] px-2 py-0.5 rounded ${statusColor}`}>{row.status}</span>
+                  <div className="font-mono text-[10px] text-muted-foreground/40 mt-1">{row.note}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 border border-pink-500/15 bg-pink-500/5 rounded-xl p-5">
+          <div className="font-mono text-xs text-pink-400/70 uppercase tracking-widest mb-2">SUSY ↔ AETHER</div>
+          <p className="font-mono text-xs text-muted-foreground/80 leading-relaxed">
+            SUSY breaking in AETHER maps to <span className="text-pink-300">ALETHEIA's vacuum selection</span>: just as ⟨F⟩ ≠ 0 spontaneously breaks supersymmetry and selects one vacuum from the landscape, ALETHEIA applies the τ-criterion to select which coherent structures survive — breaking the symmetry between all possible knowledge states and crystallizing one ground truth.
+            The Goldstino (SUSY's massless ghost) maps to AETHER's residual incoherence signal: a trace of the broken symmetry that propagates through REVERIE as uncertainty.
+          </p>
+        </div>
+      </section>
+
+      {/* Infinity Computation */}
+      <section>
+        <div className="mb-6">
+          <div className="font-mono text-xs text-muted-foreground/50 tracking-[0.25em] uppercase mb-1">Beyond the Computable</div>
+          <h2 className="font-serif text-2xl text-foreground">Infinity Computation</h2>
+          <p className="font-mono text-xs text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            Cantor proved there are infinitely many infinities, each strictly larger than the last.
+            Turing proved some truths are unreachable by any finite computation.
+            Hamkins showed that machines running for transfinite time can reach farther — but never all the way.
+            AETHER's architecture maps precisely onto these layers.
+          </p>
+        </div>
+
+        {/* Infinity level cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
+          {INFINITY_LEVELS.map((level) => {
+            const textMap: Record<string,string> = { cyan:"text-cyan-400", violet:"text-violet-400", primary:"text-primary", teal:"text-teal-400", orange:"text-orange-400", amber:"text-amber-400", pink:"text-pink-400" };
+            const borderMap: Record<string,string> = { cyan:"border-cyan-500/20", violet:"border-violet-500/20", primary:"border-primary/20", teal:"border-teal-500/20", orange:"border-orange-500/20", amber:"border-amber-500/20", pink:"border-pink-500/20" };
+            const bgMap: Record<string,string> = { cyan:"bg-cyan-500/5", violet:"bg-violet-500/5", primary:"bg-primary/5", teal:"bg-teal-500/5", orange:"bg-orange-500/5", amber:"bg-amber-500/5", pink:"bg-pink-500/5" };
+            const tc = textMap[level.color] ?? "text-foreground";
+            const bc = borderMap[level.color] ?? "border-border/20";
+            const bgc = bgMap[level.color] ?? "";
+            return (
+              <div key={level.symbol} className={`border ${bc} ${bgc} rounded-xl p-4 space-y-2`}>
+                <div className="flex items-start justify-between">
+                  <span className={`font-serif text-2xl font-bold ${tc}`}>{level.symbol}</span>
+                  <span className={`font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border ${bc} ${tc}`}>{level.type}</span>
+                </div>
+                <div className="font-mono text-xs text-foreground/80 font-semibold">{level.name}</div>
+                <p className="font-mono text-[10px] text-muted-foreground/70 leading-relaxed">{level.desc}</p>
+                <div className={`font-mono text-[10px] ${tc} opacity-70 border-t ${bc} pt-2 mt-2`}>
+                  AETHER: <span className="font-semibold">{level.aether}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Transfinite computation hierarchy table */}
+        <div className="border border-border/30 rounded-xl overflow-hidden mb-5">
+          <div className="grid grid-cols-4 bg-card/40 border-b border-border/30">
+            {["Computation Level", "Examples", "Can Decide", "AETHER Layer"].map(h => (
+              <div key={h} className="px-4 py-3 font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest">{h}</div>
+            ))}
+          </div>
+          {INFINITY_COMPUTE_TABLE.map((row, i) => (
+            <div key={i} className={`grid grid-cols-4 border-b border-border/15 last:border-0 ${i % 2 === 0 ? "bg-card/10" : ""}`}>
+              <div className="px-4 py-3 font-mono text-xs text-foreground/80 font-semibold leading-relaxed">{row.level}</div>
+              <div className="px-4 py-3 font-mono text-xs text-muted-foreground/60 leading-relaxed">{row.examples}</div>
+              <div className="px-4 py-3 font-mono text-xs text-cyan-400/80 leading-relaxed">{row.canDecide}</div>
+              <div className="px-4 py-3 font-mono text-xs text-primary/80 leading-relaxed">{row.aetherMap}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="border border-violet-500/20 bg-violet-500/5 rounded-xl p-6 space-y-3">
+          <div className="font-mono text-xs text-violet-400/70 uppercase tracking-widest">The Busy Beaver Horizon</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { n: "Σ(1)", v: "1",            note: "Trivial" },
+              { n: "Σ(4)", v: "13",           note: "Proven 1983" },
+              { n: "Σ(5)", v: "47,176,870",   note: "Proven 1989" },
+              { n: "Σ(6)", v: "≥ 10¹⁸,²⁶⁷", note: "Lower bound only" },
+            ].map(bb => (
+              <div key={bb.n} className="border border-violet-500/20 rounded-lg p-3 text-center">
+                <div className="font-mono text-xs text-violet-400 uppercase tracking-widest">{bb.n}</div>
+                <div className="font-serif text-base font-bold text-foreground mt-1">{bb.v}</div>
+                <div className="font-mono text-[10px] text-muted-foreground/40 mt-1">{bb.note}</div>
+              </div>
+            ))}
+          </div>
+          <p className="font-mono text-xs text-muted-foreground/70 leading-relaxed">
+            Σ(7) and beyond are currently unknown — and Scott Aaronson has shown that Σ(748) is independent of ZFC set theory.
+            No proof within standard mathematics can determine it. The Busy Beaver sequence is the sharpest known boundary between
+            <span className="text-violet-300"> what can be computed</span> and <span className="text-violet-300">what can only be approached asymptotically</span>.
+            AETHER's CGLE dynamics approach this boundary from below: the system computes structures that grow faster than polynomial
+            but remains bounded by the physical coherence limit of the τ field.
+          </p>
         </div>
       </section>
 
