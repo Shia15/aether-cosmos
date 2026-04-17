@@ -1140,6 +1140,39 @@ export default function SimulationPage() {
           <div className="font-mono text-xs text-muted-foreground/40">— AETHER Crystallization Model, after Tegmark (2014) & Wolfram (2020)</div>
         </div>
       </section>
+
+      {/* Cross-links to related pages */}
+      <section className="px-8 pb-10 space-y-4">
+        <div className="font-mono text-[9px] text-muted-foreground/30 uppercase tracking-[0.3em]">Deepen the Model</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a href="/space-rocks" className="group block border border-border/25 rounded-xl p-5 hover:border-amber-500/35 hover:bg-amber-500/[0.03] transition-all duration-200">
+            <div className="flex items-start gap-4">
+              <div className="text-2xl">🌊</div>
+              <div className="space-y-1.5">
+                <div className="font-mono text-[8px] text-amber-400/50 uppercase tracking-widest">Coherent Catastrophism</div>
+                <div className="font-serif text-base text-foreground/80 group-hover:text-foreground transition-colors">Space Rocks &amp; Earth Shifts</div>
+                <p className="font-mono text-[8px] text-muted-foreground/45 leading-relaxed">
+                  780,000 years of cosmic impact, magnetic reversal, and civilizational collapse — the physical substrate of the Crystallization Model's reset events. Brunhes-Matuyama → Laschamp → Younger Dryas → Göbekli Tepe → Tall el-Hammam → Tunguska.
+                </p>
+                <div className="font-mono text-[7.5px] text-amber-400/40 group-hover:text-amber-400/60 transition-colors">→ Open timeline</div>
+              </div>
+            </div>
+          </a>
+          <a href="/as-above" className="group block border border-border/25 rounded-xl p-5 hover:border-blue-500/35 hover:bg-blue-500/[0.03] transition-all duration-200">
+            <div className="flex items-start gap-4">
+              <div className="text-2xl">🛰</div>
+              <div className="space-y-1.5">
+                <div className="font-mono text-[8px] text-blue-400/50 uppercase tracking-widest">As Above, So Below</div>
+                <div className="font-serif text-base text-foreground/80 group-hover:text-foreground transition-colors">Historical Timeline Synthesis</div>
+                <p className="font-mono text-[8px] text-muted-foreground/45 leading-relaxed">
+                  Multi-column synthesis grid mapping geomagnetic intensity, historical cataclysm, outer-planet conjunctions, and multi-planet alignments onto a single shared timeline. Click any synthesis event for full research context.
+                </p>
+                <div className="font-mono text-[7.5px] text-blue-400/40 group-hover:text-blue-400/60 transition-colors">→ Open synthesis grid</div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
