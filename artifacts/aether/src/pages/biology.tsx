@@ -982,6 +982,264 @@ export default function BiologyPage() {
         </div>
       </div>
 
+      {/* ── The Resonant Cell ───────────────────────────────────────────── */}
+      <section className="space-y-6">
+        <SectionHeader title="The Resonant Cell" right="10-Acre Field Platform · Measuring Coupled Energy Systems" />
+
+        <p className="font-mono text-xs text-muted-foreground/60 max-w-3xl leading-relaxed">
+          Energy is measured in isolation — but interactions across domains are invisible to conventional instruments.
+          The Resonant Cell is a multi-scale physical field platform designed to measure coupled energy systems
+          as they actually flow: ground, air, water, connected. Where standard sensors give you one signal,
+          the Resonant Cell gives you a coherence field.
+        </p>
+
+        {/* Three-column problem statement */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { head: "Energy measured in isolation", sub: "interactions across domains are invisible", color: "#e64522", icon: "⊕" },
+            { head: "Energy as a coupled field", sub: "propagation is nonlinear and branched", color: "#06b6d4", icon: "≈" },
+            { head: "The Resonant Cell platform", sub: "measures what conventional instruments miss", color: "#22c55e", icon: "◈" },
+          ].map(p => (
+            <div key={p.head} className="rounded-xl border p-5 space-y-2" style={{ borderColor:`${p.color}25`, background:`${p.color}06` }}>
+              <div className="font-mono text-sm font-bold" style={{ color: p.color }}>{p.icon}</div>
+              <div className="font-serif text-sm text-foreground/80 font-medium leading-snug">{p.head}</div>
+              <div className="font-mono text-[9px] text-muted-foreground/50">{p.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Platform image + data streams */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          <div className="rounded-xl overflow-hidden border border-border/20">
+            <img src="/resonant-cell.jpeg" alt="The Resonant Cell — 10-Acre Field Platform" className="w-full object-cover" />
+          </div>
+          <div className="space-y-4">
+            <div>
+              <div className="font-mono text-[9px] text-green-400/60 uppercase tracking-widest mb-3">Data Streams</div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { label: "Ground Potential",    color: "#22c55e" },
+                  { label: "Atmosphere E-Field",  color: "#06b6d4" },
+                  { label: "EM Spectrum",         color: "#8b5cf6" },
+                  { label: "Solar DC Output",     color: "#f59e0b" },
+                  { label: "Soil Conductivity",   color: "#84cc16" },
+                  { label: "Thermal Gradient",    color: "#f97316" },
+                ].map(d => (
+                  <div key={d.label} className="flex items-center gap-2 rounded border px-3 py-2" style={{ borderColor:`${d.color}25`, background:`${d.color}08` }}>
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: d.color }} />
+                    <span className="font-mono text-[9px]" style={{ color: d.color }}>{d.label}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="font-mono text-[8px] text-muted-foreground/30 mt-2 text-right">Time Series → Cross-Correlation → Field Coherence</div>
+            </div>
+
+            <div>
+              <div className="font-mono text-[9px] text-amber-400/60 uppercase tracking-widest mb-3">Integrated Sensor Network</div>
+              {["Multi-layer sensor array", "High-frequency sampling", "Edge processing & data flow", "Calibration & validation"].map(f => (
+                <div key={f} className="flex items-center gap-2 mb-1.5">
+                  <div className="w-1 h-1 rounded-full bg-amber-400/40 flex-shrink-0" />
+                  <span className="font-mono text-[9px] text-muted-foreground/55">{f}</span>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <div className="font-mono text-[9px] text-cyan-400/60 uppercase tracking-widest mb-3">Early Results</div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { r: "Coherent Signals Across Domains", c: "#06b6d4" },
+                  { r: "Branched Energy Propagation",    c: "#22c55e" },
+                  { r: "Anomalies Detected",             c: "#f59e0b" },
+                ].map(r => (
+                  <div key={r.r} className="rounded border p-2 text-center" style={{ borderColor:`${r.c}25`, background:`${r.c}08` }}>
+                    <div className="font-mono text-[8px] leading-tight" style={{ color: r.c }}>{r.r}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Phase roadmap */}
+        <div className="border border-border/20 rounded-xl p-5">
+          <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-4">Impact & Deployment Roadmap</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 overflow-hidden rounded-lg border border-border/15">
+            {[
+              { phase: "PHASE 1", label: "Deploy & Validate",       detail: "Single-site 10-acre platform. Sensor calibration. Cross-domain coherence baseline established.", funding: "$200K–$350K", c: "#22c55e" },
+              { phase: "PHASE 2", label: "Multi-Site Expansion",    detail: "Scale to 3–5 geographically distributed sites. Cross-site field coherence comparison. Open data integration.", funding: "TBD",          c: "#06b6d4" },
+              { phase: "PHASE 3", label: "Global Energy Network",   detail: "Planetary-scale sensor mesh. Real-time field coherence map. Feeds AETHER's CGLE lattice with live telemetry.", funding: "TBD",          c: "#8b5cf6" },
+            ].map((ph, i) => (
+              <div key={ph.phase} className={`p-5 ${i < 2 ? "border-r border-border/15" : ""}`} style={{ background:`${ph.c}05` }}>
+                <div className="font-mono text-[9px] font-bold uppercase tracking-widest mb-1" style={{ color: ph.c }}>{ph.phase}</div>
+                <div className="font-serif text-sm text-foreground/70 font-medium mb-2">{ph.label}</div>
+                <p className="font-mono text-[8px] text-muted-foreground/50 leading-relaxed mb-3">{ph.detail}</p>
+                {ph.funding !== "TBD" && (
+                  <div className="font-mono text-[8px] px-2 py-1 rounded border text-center" style={{ color: ph.c, borderColor:`${ph.c}30`, background:`${ph.c}08` }}>
+                    Phase 1 Funding: {ph.funding}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-4">
+            {[
+              { app: "Renewable Energy Efficiency", icon: "⚡" },
+              { app: "Grid Stability Modeling",     icon: "◎" },
+              { app: "Open Data for Research",      icon: "⊛" },
+            ].map(a => (
+              <div key={a.app} className="text-center">
+                <div className="font-mono text-base text-muted-foreground/30">{a.icon}</div>
+                <div className="font-mono text-[8px] text-muted-foreground/40 mt-1">{a.app}</div>
+              </div>
+            ))}
+          </div>
+          <div className="font-serif text-sm text-muted-foreground/40 italic text-center mt-6 border-t border-border/10 pt-5">
+            "The Resonant Cell measures energy as it actually flows. Ground. Air. Water. Connected."
+          </div>
+        </div>
+      </section>
+
+      {/* ── Iodine: From the Sea to the Science of Life ─────────────────── */}
+      <section className="space-y-6">
+        <SectionHeader title="Iodine" right="ιοειδής · The Heaviest Essential Element · From the Sea to the Science of Life" />
+
+        <p className="font-mono text-xs text-muted-foreground/60 max-w-3xl leading-relaxed">
+          The cascade's pivotal choke-point: iodine availability determines thyroid output, which determines
+          metabolic rate, which determines brain energy, which determines cognitive capacity at population scale.
+          Step 04 of The Cascade is not metaphorical — it is a specific chemical element whose concentration
+          in the food supply is determined by ocean circulation, solar activity, and geomagnetic field strength.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          {/* Iodine infographic */}
+          <div className="rounded-xl overflow-hidden border border-purple-500/20">
+            <img src="/iodine-infographic.jpeg" alt="Iodine — From the Ocean to the Science of Life" className="w-full object-cover" />
+          </div>
+
+          {/* Deep dive text */}
+          <div className="space-y-4">
+            <div className="border border-purple-500/15 bg-purple-500/3 rounded-xl p-5 space-y-3">
+              <div className="font-mono text-[9px] text-purple-400/60 uppercase tracking-widest">Discovery</div>
+              <p className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                Iodine (ιοειδής — "violet-colored") was discovered in 1811 by Bernard Courtois
+                while processing seaweed ash with sulfuric acid. The purple vapor that condensed
+                into crystals was later identified as the heaviest element essential to human life.
+                Discovery pathway: seaweed → ash → H₂SO₄ → purple vapor → I₂ crystals.
+              </p>
+            </div>
+
+            <div className="border border-border/15 rounded-xl overflow-hidden">
+              {[
+                { role: "Thyroid Hormone Synthesis", detail: "NIS symporter concentrates I⁻ 20–40× in follicular cells. Thyroid peroxidase oxidizes iodide to iodine for organification. T3 (triiodothyronine) and T4 (thyroxine) are the output — the only iodine-containing hormones in humans.", color: "#06b6d4" },
+                { role: "Metabolism & Energy Production", detail: "T3/T4 set basal metabolic rate — responsible for 60–80% of BMR. They regulate mitochondrial biogenesis, oxygen consumption, and thermogenesis. Hypothyroidism → fatigue, weight gain, cognitive slowing. Hyperthyroidism → heat, anxiety, cardiac arrhythmia.", color: "#f59e0b" },
+                { role: "Brain Development & Function", detail: "Iodine deficiency is the world's leading preventable cause of intellectual disability. Fetal brain development requires T3 from gestational week 10–12 before the fetal thyroid is active. Maternal iodine status sets the child's neurological ceiling. IQ gap: ~13.5 points between iodine-sufficient and iodine-deficient populations.", color: "#8b5cf6" },
+                { role: "Growth & Reproductive Health", detail: "T3/T4 regulate growth hormone sensitivity and skeletal maturation. Severe deficiency → cretinism (stunted growth, intellectual disability). Moderate deficiency → subclinical thyroid disorders, reproductive issues, metabolic syndrome at population scale.", color: "#22c55e" },
+              ].map((r, i) => (
+                <div key={r.role} className={`px-5 py-4 ${i < 3 ? "border-b border-border/10" : ""}`} style={{ background:`${r.color}04` }}>
+                  <div className="font-mono text-[9px] font-bold mb-1" style={{ color: r.color }}>{r.role}</div>
+                  <p className="font-mono text-[8px] text-muted-foreground/50 leading-relaxed">{r.detail}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="border border-amber-500/20 bg-amber-500/3 rounded-xl p-4">
+              <div className="font-mono text-[9px] text-amber-400/60 uppercase tracking-widest mb-2">Cascade Choke-Point</div>
+              <div className="font-mono text-[9px] text-muted-foreground/60 leading-relaxed">
+                Inland & mountain populations have systematically lower iodine intake than coastal populations.
+                Ocean iodine → marine biota → food chain → population iodine intake.
+                Solar activity modulates ocean evaporation → atmospheric iodine transport → inland deposition.
+                The cascade from sunspot cycle to brain function passes through one element, atomic number 53.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── AETHER Causal Pathway Hypothesis ────────────────────────────── */}
+      <section className="space-y-6">
+        <SectionHeader title="Causal Pathway Hypothesis" right="Sunspots → Iodine → Health Impacts · Granger Causality Framework" />
+
+        <p className="font-mono text-xs text-muted-foreground/60 max-w-3xl leading-relaxed">
+          A testable, falsifiable causal chain. Granger Causality Analysis identifies whether
+          past values of one time series (sunspot cycles) significantly predict future values of
+          another (marine iodine, thyroid disorder rates, cognitive outcomes) after controlling
+          for other predictors. If sunspot data Granger-causes iodine concentration which
+          Granger-causes health metrics, the cascade has empirical standing.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+          {/* Causal pathway diagram */}
+          <div className="rounded-xl overflow-hidden border border-blue-500/20">
+            <img src="/causal-pathway.jpeg" alt="AETHER Causal Pathway Hypothesis" className="w-full object-cover" />
+          </div>
+
+          {/* Granger flowchart + analysis */}
+          <div className="space-y-4">
+            <div className="rounded-xl overflow-hidden border border-border/20">
+              <img src="/granger-flowchart.jpeg" alt="Granger Causality Pathway Analysis Flowchart" className="w-full object-cover" />
+            </div>
+
+            <div className="border border-border/15 rounded-xl p-5 space-y-3">
+              <div className="font-mono text-[9px] text-cyan-400/60 uppercase tracking-widest">Pathway Analysis Steps</div>
+              {[
+                { step: "01", label: "Data Collection",             detail: "Sunspot cycle data (SIDC, 1700–present), iodine concentration data (USGS, WHO nutritional surveys), population health records (IQ, thyroid disorder rates, obesity/fatigue correlates)." },
+                { step: "02", label: "Time Series Analysis",         detail: "Decompose each series: trend + seasonal + residual. Apply spectral analysis to identify dominant frequencies. Map 11-yr solar cycle signal in downstream variables." },
+                { step: "03", label: "Iodine Concentration Data",    detail: "Align marine iodine proxy records with sunspot cycle peaks/troughs. Lag structure: solar → ocean circulation has estimated 2–5 year lag." },
+                { step: "04", label: "Cross-Correlation Analysis",   detail: "Compute cross-correlation function at all lags between sunspot index, iodine proxy, and health metrics. Identify peak correlation lag — confirms directionality hypothesis." },
+                { step: "05", label: "Granger Causality Test",       detail: "VAR model: test whether lagged sunspot values improve iodine prediction beyond iodine's own lag. Then test iodine → health metrics. Both must pass at p < 0.05 for the chain to hold." },
+                { step: "06", label: "Causal Inference",             detail: "If Granger tests pass at both links: sunspots → iodine and iodine → health outcomes, the causal chain is statistically supported. Output: IQ & Development, Thyroid Disorders, Fatigue & Obesity, Economic Impact." },
+              ].map(s => (
+                <div key={s.step} className="flex gap-3">
+                  <div className="font-mono text-[9px] text-cyan-400/50 font-bold flex-shrink-0 w-5 mt-0.5">{s.step}</div>
+                  <div>
+                    <div className="font-mono text-[9px] text-foreground/60 font-bold">{s.label}</div>
+                    <p className="font-mono text-[8px] text-muted-foreground/45 leading-relaxed mt-0.5">{s.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Expected outcomes */}
+            <div className="border border-border/15 rounded-xl p-4">
+              <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-3">Granger Causality Outputs</div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { outcome: "IQ & Development",   color: "#8b5cf6" },
+                  { outcome: "Thyroid Disorders",  color: "#06b6d4" },
+                  { outcome: "Fatigue & Obesity",  color: "#f59e0b" },
+                  { outcome: "Economic Impact",    color: "#22c55e" },
+                ].map(o => (
+                  <div key={o.outcome} className="flex items-center gap-2 rounded border px-3 py-2" style={{ borderColor:`${o.color}20`, background:`${o.color}06` }}>
+                    <div className="font-mono text-[8px]" style={{ color: o.color }}>→</div>
+                    <span className="font-mono text-[8px] text-muted-foreground/60">{o.outcome}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Aether mapping */}
+        <div className="border border-border/15 rounded-xl p-5">
+          <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-4">AETHER Layer Mapping — Causal Chain</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { layer: "MNĒSIS",   role: "Data Ingestion",         detail: "Sunspot time series, iodine concentration databases, health records. All ingested as knowledge nodes.", color: "#06b6d4" },
+              { layer: "INFERNIA", role: "Cross-Correlation Engine", detail: "Runs lag-structured cross-correlation and VAR model across the full cascade chain. Detects Granger signals.", color: "#8b5cf6" },
+              { layer: "ALETHEIA",role: "Causal Inference Layer",  detail: "Validates causal chain: does sunspot data Granger-cause iodine? Does iodine Granger-cause health metrics?", color: "#f59e0b" },
+              { layer: "REVERIE", role: "Scenario Projection",     detail: "Given confirmed causal chain: project future iodine availability under solar cycle 26 conditions. Output health forecast.", color: "#22c55e" },
+            ].map(l => (
+              <div key={l.layer} className="rounded-lg border p-4 space-y-2" style={{ borderColor:`${l.color}20`, background:`${l.color}04` }}>
+                <div className="font-mono text-[9px] font-bold uppercase tracking-widest" style={{ color: l.color }}>{l.layer}</div>
+                <div className="font-mono text-[8px] text-foreground/50 font-bold">{l.role}</div>
+                <p className="font-mono text-[8px] text-muted-foreground/40 leading-relaxed">{l.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Closing ──────────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-border/20 p-8 text-center space-y-4"
         style={{ background:"linear-gradient(135deg, #060810, #0d1117)" }}>
