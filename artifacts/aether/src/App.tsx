@@ -29,6 +29,10 @@ import PDESimulatorView from "@/pages/pde-simulator";
 import PhiAetherView from "@/pages/phi-aether";
 import MultiScaleView from "@/pages/multiscale";
 import MorphoComputerView from "@/pages/morpho-computer";
+import AetherOSView from "@/pages/aether-os";
+import CGLELiveView from "@/pages/cgle-live";
+import FabricationView from "@/pages/fabrication";
+import ResearchView from "@/pages/research";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +65,10 @@ function Router() {
         <Route path="/phi-aether" component={PhiAetherView} />
         <Route path="/multiscale" component={MultiScaleView} />
         <Route path="/morpho-computer" component={MorphoComputerView} />
+        <Route path="/aether-os" component={AetherOSView} />
+        <Route path="/cgle-live" component={CGLELiveView} />
+        <Route path="/fabrication" component={FabricationView} />
+        <Route path="/research" component={ResearchView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

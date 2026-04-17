@@ -27,6 +27,10 @@ import {
   AudioWaveform,
   Boxes,
   Microscope,
+  Globe,
+  Signal,
+  Hammer,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +60,10 @@ const NAV_ITEMS = [
   { href: "/phi-aether",     label: "φ-AETHER",    icon: AudioWaveform },
   { href: "/multiscale",     label: "Multi-Scale",  icon: Boxes },
   { href: "/morpho-computer", label: "Morpho Comp", icon: Microscope },
+  { href: "/aether-os",       label: "AETHER OS",   icon: Globe },
+  { href: "/cgle-live",       label: "CGLE Live",   icon: Signal },
+  { href: "/fabrication",     label: "Fabrication", icon: Hammer },
+  { href: "/research",        label: "Research",    icon: BookOpen },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
