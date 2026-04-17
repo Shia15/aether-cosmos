@@ -23,6 +23,7 @@ import {
   Zap,
   Flame,
   Satellite,
+  Gauge,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +49,7 @@ const NAV_ITEMS = [
   { href: "/neural-emergence", label: "Neural",  icon: Zap },
   { href: "/space-rocks",     label: "Space Rocks", icon: Flame },
   { href: "/as-above",        label: "As Above",    icon: Satellite },
+  { href: "/pde-simulator",   label: "PDE Sim",     icon: Gauge },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

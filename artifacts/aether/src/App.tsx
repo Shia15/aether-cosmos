@@ -25,6 +25,7 @@ import QAetherView from "@/pages/q-aether";
 import NeuralEmergenceView from "@/pages/neural-emergence";
 import SpaceRocksView from "@/pages/space-rocks";
 import AsAboveView from "@/pages/as-above";
+import PDESimulatorView from "@/pages/pde-simulator";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ function Router() {
         <Route path="/neural-emergence" component={NeuralEmergenceView} />
         <Route path="/space-rocks" component={SpaceRocksView} />
         <Route path="/as-above" component={AsAboveView} />
+        <Route path="/pde-simulator" component={PDESimulatorView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
