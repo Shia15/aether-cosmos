@@ -93,6 +93,7 @@ const NAV_ITEMS = [
   { href: "/fibonacci-calendar",    label: "Fibonacci Calendar",     icon: Sigma },
   { href: "/unified-timeline",      label: "Unified Timeline",       icon: GitFork },
   { href: "/cerebral-organoids",   label: "Cerebral Organoids",    icon: Brain },
+  { href: "/cosmic-convergence",  label: "Cosmic Convergence",    icon: Orbit },
   { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
 ];
 

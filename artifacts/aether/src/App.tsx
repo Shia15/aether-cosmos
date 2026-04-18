@@ -49,6 +49,7 @@ import EcologicalIntelligenceView from "@/pages/ecological-intelligence";
 import FibonacciCalendarView from "@/pages/fibonacci-calendar";
 import UnifiedTimelineView from "@/pages/unified-timeline";
 import CerebralOrganoidView from "@/pages/cerebral-organoids";
+import CosmicConvergenceView from "@/pages/cosmic-convergence";
 import GobekliTepeView from "@/pages/gobekli-tepe";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,7 @@ function Router() {
         <Route path="/fibonacci-calendar" component={FibonacciCalendarView} />
         <Route path="/unified-timeline" component={UnifiedTimelineView} />
         <Route path="/cerebral-organoids" component={CerebralOrganoidView} />
+        <Route path="/cosmic-convergence" component={CosmicConvergenceView} />
         <Route path="/gobekli-tepe" component={GobekliTepeView} />
         <Route component={NotFound} />
       </Switch>
