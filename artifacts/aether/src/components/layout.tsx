@@ -87,7 +87,8 @@ const NAV_ITEMS = [
   { href: "/phi-framework",     label: "φ-Framework",      icon: Sigma },
   { href: "/aquarium-chip",    label: "Aquarium Chip",    icon: Fish },
   { href: "/quaternions",      label: "Quaternions",      icon: Rotate3d },
-  { href: "/biomimetic-symphony", label: "Biomimetic Symphony", icon: Leaf },
+  { href: "/biomimetic-symphony",    label: "Biomimetic Symphony",    icon: Leaf },
+  { href: "/ecological-intelligence", label: "Ecological Intelligence", icon: Leaf },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

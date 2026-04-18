@@ -45,6 +45,7 @@ import PhiFrameworkView from "@/pages/phi-framework";
 import AquariumChipView from "@/pages/aquarium-chip";
 import QuaternionsView from "@/pages/quaternions";
 import BiomimeticSymphonyView from "@/pages/biomimetic-symphony";
+import EcologicalIntelligenceView from "@/pages/ecological-intelligence";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,7 @@ function Router() {
         <Route path="/aquarium-chip" component={AquariumChipView} />
         <Route path="/quaternions" component={QuaternionsView} />
         <Route path="/biomimetic-symphony" component={BiomimeticSymphonyView} />
+        <Route path="/ecological-intelligence" component={EcologicalIntelligenceView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
