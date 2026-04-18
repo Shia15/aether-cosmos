@@ -43,6 +43,7 @@ import EvenOddFunctionsView from "@/pages/even-odd-functions";
 import AnalogReservoirView from "@/pages/analog-reservoir";
 import PhiFrameworkView from "@/pages/phi-framework";
 import AquariumChipView from "@/pages/aquarium-chip";
+import QuaternionsView from "@/pages/quaternions";
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ function Router() {
         <Route path="/analog-reservoir" component={AnalogReservoirView} />
         <Route path="/phi-framework" component={PhiFrameworkView} />
         <Route path="/aquarium-chip" component={AquariumChipView} />
+        <Route path="/quaternions" component={QuaternionsView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

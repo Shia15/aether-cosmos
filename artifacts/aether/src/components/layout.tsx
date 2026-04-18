@@ -41,6 +41,7 @@ import {
   CircuitBoard,
   Sigma,
   Fish,
+  Rotate3d,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -84,6 +85,7 @@ const NAV_ITEMS = [
   { href: "/analog-reservoir",  label: "Analog Reservoir", icon: CircuitBoard },
   { href: "/phi-framework",     label: "φ-Framework",      icon: Sigma },
   { href: "/aquarium-chip",    label: "Aquarium Chip",    icon: Fish },
+  { href: "/quaternions",      label: "Quaternions",      icon: Rotate3d },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
