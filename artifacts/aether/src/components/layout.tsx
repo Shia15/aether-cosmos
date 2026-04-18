@@ -89,6 +89,8 @@ const NAV_ITEMS = [
   { href: "/quaternions",      label: "Quaternions",      icon: Rotate3d },
   { href: "/biomimetic-symphony",    label: "Biomimetic Symphony",    icon: Leaf },
   { href: "/ecological-intelligence", label: "Ecological Intelligence", icon: Leaf },
+  { href: "/fibonacci-calendar",    label: "Fibonacci Calendar",     icon: Sigma },
+  { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
