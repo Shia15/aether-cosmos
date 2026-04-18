@@ -47,6 +47,7 @@ import QuaternionsView from "@/pages/quaternions";
 import BiomimeticSymphonyView from "@/pages/biomimetic-symphony";
 import EcologicalIntelligenceView from "@/pages/ecological-intelligence";
 import FibonacciCalendarView from "@/pages/fibonacci-calendar";
+import UnifiedTimelineView from "@/pages/unified-timeline";
 import GobekliTepeView from "@/pages/gobekli-tepe";
 
 const queryClient = new QueryClient();
@@ -98,6 +99,7 @@ function Router() {
         <Route path="/biomimetic-symphony" component={BiomimeticSymphonyView} />
         <Route path="/ecological-intelligence" component={EcologicalIntelligenceView} />
         <Route path="/fibonacci-calendar" component={FibonacciCalendarView} />
+        <Route path="/unified-timeline" component={UnifiedTimelineView} />
         <Route path="/gobekli-tepe" component={GobekliTepeView} />
         <Route component={NotFound} />
       </Switch>

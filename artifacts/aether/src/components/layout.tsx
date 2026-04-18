@@ -43,6 +43,7 @@ import {
   Fish,
   Rotate3d,
   Leaf,
+  GitFork,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -90,6 +91,7 @@ const NAV_ITEMS = [
   { href: "/biomimetic-symphony",    label: "Biomimetic Symphony",    icon: Leaf },
   { href: "/ecological-intelligence", label: "Ecological Intelligence", icon: Leaf },
   { href: "/fibonacci-calendar",    label: "Fibonacci Calendar",     icon: Sigma },
+  { href: "/unified-timeline",      label: "Unified Timeline",       icon: GitFork },
   { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
 ];
 
