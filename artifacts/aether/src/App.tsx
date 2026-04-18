@@ -41,6 +41,7 @@ import NeuroplasticityView from "@/pages/neuroplasticity";
 import AetherComponentsView from "@/pages/aether-components";
 import EvenOddFunctionsView from "@/pages/even-odd-functions";
 import AnalogReservoirView from "@/pages/analog-reservoir";
+import PhiFrameworkView from "@/pages/phi-framework";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ function Router() {
         <Route path="/aether-components" component={AetherComponentsView} />
         <Route path="/even-odd" component={EvenOddFunctionsView} />
         <Route path="/analog-reservoir" component={AnalogReservoirView} />
+        <Route path="/phi-framework" component={PhiFrameworkView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

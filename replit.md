@@ -13,8 +13,8 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 **M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
 **Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
 
-### Routes (37 pages)
-`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir`
+### Routes (38 pages)
+`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir` · `/phi-framework`
 
 ### Simulator Pages
 - **PDE Simulator** (`/pde-simulator`) — CGLE + Swift-Hohenberg + Multi-Scale PDEs, 22-step tour, canvas perturbation

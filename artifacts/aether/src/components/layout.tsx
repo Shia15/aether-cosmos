@@ -39,6 +39,7 @@ import {
   Package,
   FlipHorizontal,
   CircuitBoard,
+  Sigma,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -80,6 +81,7 @@ const NAV_ITEMS = [
   { href: "/aether-components", label: "Components",  icon: Package },
   { href: "/even-odd",          label: "Even & Odd",      icon: FlipHorizontal },
   { href: "/analog-reservoir",  label: "Analog Reservoir", icon: CircuitBoard },
+  { href: "/phi-framework",     label: "φ-Framework",      icon: Sigma },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
