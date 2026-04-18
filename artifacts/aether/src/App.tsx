@@ -42,6 +42,7 @@ import AetherComponentsView from "@/pages/aether-components";
 import EvenOddFunctionsView from "@/pages/even-odd-functions";
 import AnalogReservoirView from "@/pages/analog-reservoir";
 import PhiFrameworkView from "@/pages/phi-framework";
+import AquariumChipView from "@/pages/aquarium-chip";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +88,7 @@ function Router() {
         <Route path="/even-odd" component={EvenOddFunctionsView} />
         <Route path="/analog-reservoir" component={AnalogReservoirView} />
         <Route path="/phi-framework" component={PhiFrameworkView} />
+        <Route path="/aquarium-chip" component={AquariumChipView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

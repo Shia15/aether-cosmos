@@ -40,6 +40,7 @@ import {
   FlipHorizontal,
   CircuitBoard,
   Sigma,
+  Fish,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -82,6 +83,7 @@ const NAV_ITEMS = [
   { href: "/even-odd",          label: "Even & Odd",      icon: FlipHorizontal },
   { href: "/analog-reservoir",  label: "Analog Reservoir", icon: CircuitBoard },
   { href: "/phi-framework",     label: "φ-Framework",      icon: Sigma },
+  { href: "/aquarium-chip",    label: "Aquarium Chip",    icon: Fish },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
