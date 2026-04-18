@@ -607,6 +607,36 @@ class KnowledgeGraph {
         content: `stem cell niche self-renewal differentiation aplastic anemia leukemia microenvironment bone marrow regulation division rest specialization induced pluripotent iPSC Yamanaka regenerative medicine tissue engineering lab-grown blood transplantation biological programmable regeneration feedback coherence crystallization equivalence`,
         meta: { layer: "mnesis" as const, docType: "research" as const, source: "biology-layer", tags: ["stem-cell","regenerative","iPSC","niche"] },
       },
+      {
+        title: "Aquarium Chip — Memory Architecture in Living Substrate",
+        content: `aquarium chip memory architecture coral nodes STM alpha PTRN beta LTM gamma WORK delta ARCH epsilon fish agents seek deposit transform bioluminescence thermal vents kelp swaying short-term memory pattern recognition long-term memory working memory archival memory distributed intelligence living substrate analog computation emergent behavior ecosystem simulation coherence crystallization signal routing`,
+        meta: { layer: "mnesis" as const, docType: "technical" as const, source: "lab-layer", tags: ["memory","analog","ecosystem","bioluminescence"] },
+      },
+      {
+        title: "Quaternion Algebra — 4-Dimensional Rotation and Gimbal Lock",
+        content: `quaternion Hamilton algebra four-dimensional rotation gimbal lock SLERP spherical interpolation imaginary axes complex number real number Frobenius theorem division algebra double cover rotation group SO3 unit quaternion angle axis encoding orientation representation composition smooth interpolation Broome Bridge Dublin 1843 mathematical necessity geometric algebra`,
+        meta: { layer: "infernia" as const, docType: "technical" as const, source: "mathematics-layer", tags: ["quaternions","rotation","algebra","4D"] },
+      },
+      {
+        title: "Biomimetic Symphony — Nature as Operating System",
+        content: `biomimicry humpback whale tubercle fins wind turbine efficiency drag reduction shark skin dermal denticles riblets lotus leaf superhydrophobicity contact angle self-cleaning quantum coherence FMO complex exciton transport photosynthesis proton tunneling enzyme catalysis firefly bioluminescence unity photon yield symphonic protocol infrastructure neural tissue circulatory dividends healthcare environmental tuning governance regenerative networks geomagnetic resilience 2026 quantum computing fault tolerant error correction hybrid classical quantum`,
+        meta: { layer: "aletheia" as const, docType: "research" as const, source: "biomimicry-layer", tags: ["biomimicry","quantum-biology","symphonic-protocol","efficiency"] },
+      },
+      {
+        title: "Ecological Intelligence — Plant Networks, Mycorrhizal Web, Marine Cognition",
+        content: `mycorrhizal network wood wide web plant intelligence electrical signaling action potential slow wave potential volatile organic compounds VOC defense herbivore warning salt stress calcium spikes ROS bursts SOS pathway GI protein archaea phyllotaxis golden angle golden ratio Fibonacci spiral dolphin cognition signature whistle echolocation mirror self-recognition consciousness spectrum non-binary slime mold maze cytoplasmic flow FUNGI routing layer chip execution substrate system maintenance resonant alignment free energy efficiency captured waste oncology systems level networked care mental emotional psychosocial evidence bound`,
+        meta: { layer: "reverie" as const, docType: "research" as const, source: "ecology-layer", tags: ["ecology","plant-intelligence","mycorrhizal","dolphin","oncology"] },
+      },
+      {
+        title: "φ-Framework — Golden Ratio Criticality and SOC Architecture",
+        content: `golden ratio phi Landau Ginzburg field theory self organized criticality SOC sandpile neural economic isomorphism Fibonacci quantization phase transition order parameter symmetry breaking universality class power law scaling fractal architecture coherence resonance critical threshold Hopf bifurcation attractor basin dynamical systems ergodic phi measurement AETHER integration`,
+        meta: { layer: "aletheia" as const, docType: "philosophical" as const, source: "phi-layer", tags: ["golden-ratio","criticality","SOC","phase-transition"] },
+      },
+      {
+        title: "Analog Reservoir Computing — Echo State Networks and Physical Substrates",
+        content: `analog reservoir computing echo state network physical substrate recurrent dynamics fading memory separation property liquid state machine high dimensional projection nonlinear transformation readout layer training spectral radius input scaling reservoir topology time series prediction chaotic attractor Lorenz NARMA benchmark biological analog neural computation`,
+        meta: { layer: "infernia" as const, docType: "technical" as const, source: "computing-layer", tags: ["reservoir-computing","analog","echo-state","recurrent"] },
+      },
     ];
 
     for (const s of samples) {
