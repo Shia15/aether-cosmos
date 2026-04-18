@@ -40,6 +40,7 @@ import TrigReferenceView from "@/pages/trig-reference";
 import NeuroplasticityView from "@/pages/neuroplasticity";
 import AetherComponentsView from "@/pages/aether-components";
 import EvenOddFunctionsView from "@/pages/even-odd-functions";
+import AnalogReservoirView from "@/pages/analog-reservoir";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ function Router() {
         <Route path="/neuroplasticity" component={NeuroplasticityView} />
         <Route path="/aether-components" component={AetherComponentsView} />
         <Route path="/even-odd" component={EvenOddFunctionsView} />
+        <Route path="/analog-reservoir" component={AnalogReservoirView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

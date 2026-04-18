@@ -38,6 +38,7 @@ import {
   HeartPulse,
   Package,
   FlipHorizontal,
+  CircuitBoard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -77,7 +78,8 @@ const NAV_ITEMS = [
   { href: "/trig-reference",    label: "Trig Ref",    icon: Circle },
   { href: "/neuroplasticity",   label: "Neuro Health",icon: HeartPulse },
   { href: "/aether-components", label: "Components",  icon: Package },
-  { href: "/even-odd",          label: "Even & Odd",  icon: FlipHorizontal },
+  { href: "/even-odd",          label: "Even & Odd",      icon: FlipHorizontal },
+  { href: "/analog-reservoir",  label: "Analog Reservoir", icon: CircuitBoard },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
