@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { publishSignal, removeNode, subscribeToBus } from "@/lib/aether-bus";
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 const N = 31; // 31x31 = 961 nodes ≈ 1000
@@ -199,7 +198,6 @@ export default function MultiScaleView() {
       agents:      `Activity: ${agtI.toFixed(3)}`,
       markets:     `Volatility: ${(mktI * 100).toFixed(1)}%`,
     });
-    publishSignal({ id: "multiscale", label: "Multi-Scale", color: "#60a5fa", psi: Math.min(1, subI * 8), energy: Math.min(1, (genI + celI) / 2), regime: couplingRef.current > 0.6 ? "coupled" : couplingRef.current > 0.3 ? "transitional" : "decoupled", timestamp: Date.now() });
   }
 
   const step = useCallback(() => {
@@ -224,20 +222,6 @@ export default function MultiScaleView() {
     });
     window.addEventListener("resize", resizeCanvases);
     return () => { cancelAnimationFrame(raf1); clearTimeout(timer); runningRef.current = false; cancelAnimationFrame(animRef.current); window.removeEventListener("resize", resizeCanvases); };
-  }, []);
-
-  // ── AETHER Bus cross-influence ─────────────────────────────────────────────
-  useEffect(() => {
-    const unsub = subscribeToBus(state => {
-      if (state.activeCount < 2) return;
-      const coh = state.systemCoherence;
-      // High system coherence → stronger coupling; low → weaker
-      const target = coh > 0.6 ? 0.75 : coh < 0.4 ? 0.25 : null;
-      if (target !== null) {
-        couplingRef.current = Math.max(0.05, Math.min(0.95, couplingRef.current + (target - couplingRef.current) * 0.006));
-      }
-    });
-    return () => { unsub(); }; // signal persists in bus memory for 30s
   }, []);
 
   const handlePlay  = () => { if (!runningRef.current) { runningRef.current = true; animRef.current = requestAnimationFrame(step); } };

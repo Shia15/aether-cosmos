@@ -1,6 +1,5 @@
 import { Link, useLocation } from "wouter";
 import { useHealthCheck } from "@workspace/api-client-react";
-import { CoherenceHUD } from "@/components/coherence-hud";
 import { 
   Network, 
   UploadCloud, 
@@ -46,6 +45,12 @@ import {
   GitFork,
   Inbox,
   Triangle,
+  FileText,
+  Sun,
+  Sprout,
+  Spline,
+  Music,
+  ScanLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -101,6 +106,12 @@ const NAV_ITEMS = [
   { href: "/aether-intake",         label: "OS · Batch Intake",      icon: Inbox },
   { href: "/nine-shells",           label: "9 Shells · Triangle Lab", icon: Triangle },
   { href: "/shells-mind-map",       label: "9 Shells · Mind Map",     icon: Workflow },
+  { href: "/aether-whitepaper",     label: "AETHER Whitepaper v1",    icon: FileText },
+  { href: "/six-planet-alignment",  label: "Six-Planet Alignment",    icon: Sun },
+  { href: "/discovery-loop",        label: "Closed Discovery Loop",   icon: Sprout },
+  { href: "/fibonacci-quantization", label: "FQP · Fibonacci Quant",  icon: Spline },
+  { href: "/symphonic-os",          label: "Symphonic OS v2",         icon: Music },
+  { href: "/symphonic-protocol",    label: "Symphonic Protocol v1",   icon: ScanLine },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -161,7 +172,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background">
         {children}
-        <CoherenceHUD />
       </main>
     </div>
   );

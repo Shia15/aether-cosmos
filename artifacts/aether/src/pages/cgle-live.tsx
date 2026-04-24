@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { publishSignal, removeNode, subscribeToBus } from "@/lib/aether-bus";
 
 const N = 48;
 const SZ = N * N;
@@ -193,7 +192,6 @@ export default function CGLELive() {
       for (let i = 0; i < SZ; i++) ampSum += Math.sqrt(reRef.current[i] ** 2 + imRef.current[i] ** 2);
       const stable = 1 + p.alpha * p.beta > 0;
       setStats({ step: stepRef.current, psi, amp: ampSum / SZ, stable, tau: p.tau, alpha: p.alpha, beta: p.beta });
-      publishSignal({ id: "cgle", label: "CGLE", color: "#00ff88", psi, energy: Math.min(1, ampSum / SZ), regime: !stable ? "turbulent" : psi > 0.7 ? "crystalline" : "ordered", timestamp: Date.now() });
     }
 
     animRef.current = requestAnimationFrame(step);
@@ -212,21 +210,6 @@ export default function CGLELive() {
     });
     window.addEventListener("resize", resizeCanvases);
     return () => { cancelAnimationFrame(raf); clearTimeout(startTimer); runningRef.current = false; cancelAnimationFrame(animRef.current); window.removeEventListener("resize", resizeCanvases); };
-  }, []);
-
-  // ── AETHER Bus cross-influence ─────────────────────────────────────────────
-  useEffect(() => {
-    const unsub = subscribeToBus(state => {
-      if (state.activeCount < 2) return;
-      const coh = state.systemCoherence;
-      // High system coherence → drift τ toward crystalline (1.6); low → turbulent (0.5)
-      const target = coh > 0.6 ? 1.6 : coh < 0.4 ? 0.5 : null;
-      if (target !== null) {
-        const current = paramsRef.current.tau;
-        paramsRef.current.tau = Math.max(0.3, Math.min(2.0, current + (target - current) * 0.008));
-      }
-    });
-    return () => { unsub(); }; // signal persists in bus memory for 30s
   }, []);
 
   const handleTauChange = (v: number) => {

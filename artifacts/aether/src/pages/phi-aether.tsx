@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { publishSignal, removeNode, subscribeToBus } from "@/lib/aether-bus";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const PHI = 1.6180339887;
@@ -200,7 +199,6 @@ export default function PhiAetherView() {
 
     if(tick%30===0) {
       pushLog("info",`Ψ=${tick}: α=${alpha.toFixed(3)} H=${hurst.toFixed(2)} PE=${pe.toFixed(3)}`);
-      publishSignal({ id:"phi", label:"φ-AETHER", color:"#c084fc", psi: Math.max(0, Math.min(1, 1 - pe + 0.1)), energy: Math.min(1, alpha / 3), regime: crit > 0.6 ? "critical" : pe < 0.5 ? "ordered" : "turbulent", timestamp: Date.now() });
     }
     if(tick%50===0&&fidelity<0.9) pushLog("warn",`Anyon coherence dimming: ${(fidelity*100).toFixed(1)}%`);
 
@@ -396,20 +394,6 @@ export default function PhiAetherView() {
     resizeSim();
     window.addEventListener("resize",()=>{drawBg();resizeSim();});
     return ()=>{runningRef.current=false;cancelAnimationFrame(animRef.current);};
-  }, []);
-
-  // ── AETHER Bus cross-influence ─────────────────────────────────────────────
-  useEffect(() => {
-    const unsub = subscribeToBus(state => {
-      if (state.activeCount < 2) return;
-      const coh = state.systemCoherence;
-      // High system coherence → stronger coupling (more crystalline); low → less
-      const target = coh > 0.6 ? 0.7 : coh < 0.4 ? 0.25 : null;
-      if (target !== null) {
-        cfgRef.current.coup = Math.max(0.05, Math.min(0.95, cfgRef.current.coup + (target - cfgRef.current.coup) * 0.007));
-      }
-    });
-    return () => { unsub(); }; // signal persists in bus memory for 30s
   }, []);
 
   const handleToggle = () => {

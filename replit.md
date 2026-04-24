@@ -13,7 +13,7 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 **M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
 **Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
 
-### Routes (52 pages)
+### Routes (58 pages)
 - `/aether-intake` — AETHER OS Batch Intake v5: drop up to 20 docs, AI auto-titles & section analysis (Anthropic via Replit AI proxy), 9-shell coherence mapping, 26-dimensional freedom signatures, live mind map (radial/tree/cluster), archive filter. Backend route: `/api/aether-intake/{title,analyze}`.
 `/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir` · `/phi-framework` · `/aquarium-chip` · `/quaternions` · `/biomimetic-symphony` · `/ecological-intelligence` · `/fibonacci-calendar` · `/gobekli-tepe` · `/unified-timeline` · `/cerebral-organoids` · `/cosmic-convergence` · `/atlantis-alignment`
 
@@ -26,10 +26,15 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 - **`/atlantis-alignment`** — 11,600-year timeline canvas (8 epochs anchored on MWP 1B → present), Antikythera mechanism live gear simulation, Plato/geology convergence proof
 - **`/nine-shells`** — Triangle Lab. ABC sliders → 9 concentric shells on canvas (DM, GM, AM, HM, QM, LBM, LGM, DQM, DHM) with 3-4-5 triangle overlay. Tabs: Interactive · 25 Dimensions · AETHER Archive
 - **`/shells-mind-map`** — Companion to /nine-shells. SVG mind map of all 9 shells (root → 5 group nodes → 9 shell nodes + dof25), pan/scroll/click, group filters (spatial/time/energy/mind/deep), Degrees-of-Freedom matrix (6 axes × 9 shells), per-shell DOF summary
+- **`/aether-whitepaper`** — Full AETHER Concept Whitepaper v1.0 (Feb 2026). 9-section TOC sidebar, scroll-anchored sections (Abstract, Central Claim, Four Domains, Scale Invariance, Entropy & Coherence, Unified Architecture, Applications, Open Questions, Conclusion). Cinzel/EB Garamond palette, gold accents
+- **`/six-planet-alignment`** — March 2026 evening arc (Mercury/Venus/Jupiter/Saturn/Uranus/Neptune) with live sky canvas (gradient horizon, twinkling stars, planet glow, toroidal coupling field), coupled wave dynamics canvas (quantum/biological/planetary frequencies), Fibonacci spiral, ∇²Ψ=k²φⁿΨ equation, per-planet coherence meters (73-92%)
+- **`/discovery-loop`** — Mycelium × Ferrofluid × Metabolite microscope simulation. 4-phase loop (sense/deliver/activate/feedback) advancing every 220 frames, mycelium network, rogue cells with kill bursts, ferrofluid spike-bodies seeking targets, INJECT button, event log, 59% / 70-80% empirical signal cards
+- **`/fibonacci-quantization`** — FQP. Live Zeckendorf encoder (input integer → unique Fibonacci sum), three canvas modes (golden-angle SPIRAL, recursive φ-TREE, superposed Fibonacci-frequency WAVE), density slider, gold/cream Playfair palette, φ = 1.6180339887
+- **`/symphonic-os`** — Symphonic Protocol OS v2 (7 layers: Mnesis/Aletheia/Infernia/Reverie/AETHER/Pythagoras/Russell). Three live canvases: rotating tetrahedron (Pythagoras), toroidal field lines (Russell), THz photon field (AETHER). Harmonic ratio selector (1:1, 2:1, 3:2, 4:3) modulates rotation speed. Emotion AI panel cycles 6 states (Equilibrium/Resonance/Wonder/Reverie/Entropic/Crystallizing)
+- **`/symphonic-protocol`** — Glass-Box Aquarium v1 (4 layers: Mnesis/Aletheia/Infernia/Reverie). Single full-canvas aquarium with layer-banded backgrounds, mycelium curves (top), dashed logic currents (Aletheia), ferrofluid spike-bodies that seek injected signals (Infernia), bioluminescent particle clouds (Reverie). Click-to-inject signal at any depth
 
 ### Layout & UX notes
 - **Main scroll**: `<main>` in `layout.tsx` uses `overflow-y-auto overflow-x-hidden` (NOT `overflow-hidden` — that breaks page scrolling on every long page)
-- **CoherenceHUD**: Fixed bottom-right overlay (z-9999, w-200px). Click header to collapse. Persists across pages and shows live system Ψ from all simulators
 
 ### Simulator Pages
 - **PDE Simulator** (`/pde-simulator`) — CGLE + Swift-Hohenberg + Multi-Scale PDEs, 22-step tour, canvas perturbation
@@ -37,15 +42,8 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 - **Multi-Scale Integration** (`/multiscale`) — 3×3 canvas grid (31×31 waveguide substrate + 8 bio/climate/econ levels), coupled NLS evolution, scenario perturbations (cancer, climate shock, market crash, coupled crisis)
 - **Morphogenetic Computer** (`/morpho-computer`) — 6-panel photonic reservoir (30×30 NLS) + 5 Bloch-sphere qubits + FQP 500-dim feature histogram + input signal + φ-spiral network topology + prediction vs target (MSE)
 
-### AETHER Coherence Bus
-Cross-simulator signal layer wiring all 4 live simulators together in real time.
-- **`src/lib/aether-bus.ts`** — singleton pub/sub module: `publishSignal()`, `subscribeToBus()`, `removeNode()`. Computes systemCoherence from all non-stale signals. Two time windows: LIVE_MS (2.5s) for live nodes, STALE_MS (30s) for memory nodes.
-- **`src/components/coherence-hud.tsx`** — floating overlay panel (bottom-right, collapsible). Shows node ring canvas, per-node Ψ chips (live=bright, memory=dim+dashed ring+↺ indicator), system Ψ bar, CRYSTALLIZING flash (triggered when systemCoherence > 0.65 with ≥1 live + ≥2 non-stale nodes).
-- **Cross-influence:** Each sim publishes its coherence Ψ every N frames. Each subscribes to systemCoherence and gently drifts its key order parameter toward order (high coh) or turbulence (low coh) at 0.006–0.01 per event. Memory persists 30s across navigation so sims feel each other's last state.
-  - φ-AETHER: publishes PE-derived Ψ, coupling strength (`cfgRef.current.coup`) drifts toward 0.7 (high coh) or 0.25 (low coh)
-  - CGLE Live: publishes phase coherence Ψ, τ drifts toward 1.6 (crystalline) or 0.5 (turbulent)
-  - Multi-Scale: publishes substrate energy Ψ, coupling drifts toward 0.75 or 0.25
-  - Morpho Computer: publishes qubit entanglement Ψ, gamma drifts toward 0.025 (ordered) or 0.09 (nonlinear)
+### Coherence Bus — REMOVED
+The cross-simulator pub/sub layer (`src/lib/aether-bus.ts`) and its floating HUD overlay (`src/components/coherence-hud.tsx`) were removed entirely along with all `publishSignal` / `subscribeToBus` calls in φ-AETHER, CGLE Live, Multi-Scale, and Morpho Computer. Each simulator now operates fully independently.
 
 ---
 

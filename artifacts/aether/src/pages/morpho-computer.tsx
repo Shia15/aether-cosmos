@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { publishSignal, removeNode, subscribeToBus } from "@/lib/aether-bus";
 
 const PHI = (1 + Math.sqrt(5)) / 2;
 const N = 30;
@@ -266,7 +265,6 @@ export default function MorphoComputerView() {
       for (let i = 0; i < tHist.length; i++) mse += (tHist[i] - pHist[i]) ** 2;
       mse /= tHist.length;
       setStats({ reservoir: avgI.toFixed(4), qubits: ent.toFixed(4), output: mse.toFixed(4), input: input.toFixed(3) });
-      publishSignal({ id: "morpho", label: "Morpho", color: "#2dd4bf", psi: Math.min(1, ent), energy: Math.min(1, avgI * 10), regime: mse < 0.05 ? "computing" : mse < 0.15 ? "training" : "initializing", timestamp: Date.now() });
     }
     animRef.current = requestAnimationFrame(step);
   }, []);
@@ -293,20 +291,6 @@ export default function MorphoComputerView() {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", onResize);
     };
-  }, []);
-
-  // ── AETHER Bus cross-influence ─────────────────────────────────────────────
-  useEffect(() => {
-    const unsub = subscribeToBus(state => {
-      if (state.activeCount < 2) return;
-      const coh = state.systemCoherence;
-      // High system coherence → lower gamma (more linear, ordered); low → higher gamma (nonlinear)
-      const target = coh > 0.6 ? 0.025 : coh < 0.4 ? 0.09 : null;
-      if (target !== null) {
-        gammaRef.current = Math.max(0.005, Math.min(0.2, gammaRef.current + (target - gammaRef.current) * 0.01));
-      }
-    });
-    return () => { unsub(); }; // signal persists in bus memory for 30s
   }, []);
 
   const handleRun = () => { if (!runningRef.current) { runningRef.current = true; animRef.current = requestAnimationFrame(step); } };

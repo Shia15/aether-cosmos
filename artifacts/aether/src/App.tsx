@@ -55,6 +55,12 @@ import GobekliTepeView from "@/pages/gobekli-tepe";
 import AetherIntakeView from "@/pages/aether-intake";
 import NineShellsView from "@/pages/nine-shells";
 import ShellsMindMapView from "@/pages/shells-mind-map";
+import AetherWhitepaperView from "@/pages/aether-whitepaper";
+import SixPlanetAlignmentView from "@/pages/six-planet-alignment";
+import DiscoveryLoopView from "@/pages/discovery-loop";
+import FibonacciQuantizationView from "@/pages/fibonacci-quantization";
+import SymphonicOSView from "@/pages/symphonic-os";
+import SymphonicProtocolView from "@/pages/symphonic-protocol";
 
 const queryClient = new QueryClient();
 
@@ -113,6 +119,12 @@ function Router() {
         <Route path="/aether-intake" component={AetherIntakeView} />
         <Route path="/nine-shells" component={NineShellsView} />
         <Route path="/shells-mind-map" component={ShellsMindMapView} />
+        <Route path="/aether-whitepaper" component={AetherWhitepaperView} />
+        <Route path="/six-planet-alignment" component={SixPlanetAlignmentView} />
+        <Route path="/discovery-loop" component={DiscoveryLoopView} />
+        <Route path="/fibonacci-quantization" component={FibonacciQuantizationView} />
+        <Route path="/symphonic-os" component={SymphonicOSView} />
+        <Route path="/symphonic-protocol" component={SymphonicProtocolView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
