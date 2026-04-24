@@ -94,6 +94,7 @@ const NAV_ITEMS = [
   { href: "/unified-timeline",      label: "Unified Timeline",       icon: GitFork },
   { href: "/cerebral-organoids",   label: "Cerebral Organoids",    icon: Brain },
   { href: "/cosmic-convergence",  label: "Cosmic Convergence",    icon: Orbit },
+  { href: "/atlantis-alignment",  label: "Atlantis Alignment",    icon: Waves },
   { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
 ];
 
@@ -153,7 +154,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 relative flex flex-col min-w-0 overflow-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background">
+      <main className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background">
         {children}
         <CoherenceHUD />
       </main>

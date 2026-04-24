@@ -50,6 +50,7 @@ import FibonacciCalendarView from "@/pages/fibonacci-calendar";
 import UnifiedTimelineView from "@/pages/unified-timeline";
 import CerebralOrganoidView from "@/pages/cerebral-organoids";
 import CosmicConvergenceView from "@/pages/cosmic-convergence";
+import AtlantisAlignmentView from "@/pages/atlantis-alignment";
 import GobekliTepeView from "@/pages/gobekli-tepe";
 
 const queryClient = new QueryClient();
@@ -104,6 +105,7 @@ function Router() {
         <Route path="/unified-timeline" component={UnifiedTimelineView} />
         <Route path="/cerebral-organoids" component={CerebralOrganoidView} />
         <Route path="/cosmic-convergence" component={CosmicConvergenceView} />
+        <Route path="/atlantis-alignment" component={AtlantisAlignmentView} />
         <Route path="/gobekli-tepe" component={GobekliTepeView} />
         <Route component={NotFound} />
       </Switch>

@@ -13,8 +13,20 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 **M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
 **Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
 
-### Routes (42 pages)
-`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir` · `/phi-framework` · `/aquarium-chip` · `/quaternions` · `/biomimetic-symphony` · `/ecological-intelligence`
+### Routes (49 pages)
+`/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir` · `/phi-framework` · `/aquarium-chip` · `/quaternions` · `/biomimetic-symphony` · `/ecological-intelligence` · `/fibonacci-calendar` · `/gobekli-tepe` · `/unified-timeline` · `/cerebral-organoids` · `/cosmic-convergence` · `/atlantis-alignment`
+
+### Recently added pages
+- **`/fibonacci-calendar`** — 13-month International Fixed Calendar, Mathematics/History/AETHER Time tabs
+- **`/gobekli-tepe`** — Live T-pillar canvas, Physics Clarity, Digital Substrate (binary/hex/logic-gates/Big-O)
+- **`/unified-timeline`** — 4-track live canvas (Creative/Science/Symbolic/Ethics), 7-year arc bracket from Aug 2025
+- **`/cerebral-organoids`** — 54-neuron live simulation (pyramidal/interneuron/stellate), APPLY COMPOUND/WASHOUT controls, BDNF/TrkB markers, psychedelic research
+- **`/cosmic-convergence`** — Sun-Earth-Jupiter opposition canvas (Jan 2026), CME particles, SAA, aurora poles, Schumann rings; heliobiology cascade with gender sensitivity notes; nature messengers; 4-layer Atlas Tracker
+- **`/atlantis-alignment`** — 11,600-year timeline canvas (8 epochs anchored on MWP 1B → present), Antikythera mechanism live gear simulation, Plato/geology convergence proof
+
+### Layout & UX notes
+- **Main scroll**: `<main>` in `layout.tsx` uses `overflow-y-auto overflow-x-hidden` (NOT `overflow-hidden` — that breaks page scrolling on every long page)
+- **CoherenceHUD**: Fixed bottom-right overlay (z-9999, w-200px). Click header to collapse. Persists across pages and shows live system Ψ from all simulators
 
 ### Simulator Pages
 - **PDE Simulator** (`/pde-simulator`) — CGLE + Swift-Hohenberg + Multi-Scale PDEs, 22-step tour, canvas perturbation
