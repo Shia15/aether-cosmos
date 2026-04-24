@@ -63,6 +63,7 @@ import SymphonicOSView from "@/pages/symphonic-os";
 import SymphonicProtocolView from "@/pages/symphonic-protocol";
 import UFOAscentView from "@/pages/ufo-ascent";
 import BrainMetabolismView from "@/pages/brain-metabolism";
+import HypercomputationView from "@/pages/hypercomputation";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +130,7 @@ function Router() {
         <Route path="/symphonic-protocol" component={SymphonicProtocolView} />
         <Route path="/ufo-ascent" component={UFOAscentView} />
         <Route path="/brain-metabolism" component={BrainMetabolismView} />
+        <Route path="/hypercomputation" component={HypercomputationView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

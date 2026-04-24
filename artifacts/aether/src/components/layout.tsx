@@ -53,6 +53,7 @@ import {
   ScanLine,
   Rocket,
   HeartHandshake,
+  Binary,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -116,6 +117,7 @@ const NAV_ITEMS = [
   { href: "/symphonic-protocol",    label: "Symphonic Protocol v1",   icon: ScanLine },
   { href: "/ufo-ascent",            label: "UFO Ascent · Trajectory", icon: Rocket },
   { href: "/brain-metabolism",      label: "Brain-First Metabolism",  icon: HeartHandshake },
+  { href: "/hypercomputation",      label: "Hypercomputation Lang",   icon: Binary },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

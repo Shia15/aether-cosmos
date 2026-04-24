@@ -3,7 +3,8 @@ import ForceGraph2D, { ForceGraphMethods } from "react-force-graph-2d";
 import { useGetGraph, useGetConcept, useListConcepts } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { X, Zap, BrainCircuit, ActivitySquare, ArrowRight, Layers, GitFork } from "lucide-react";
+import { X, Zap, BrainCircuit, ActivitySquare, ArrowRight, Layers, GitFork, Binary } from "lucide-react";
+import { Link } from "wouter";
 
 // ─── Layer colour palette — M.A.R.I. aura colors ─────────────────────────────
 const LAYER_COLORS: Record<string, string> = {
@@ -355,6 +356,27 @@ export default function GraphView() {
           {activeId && <div className="text-primary/50">{neighborSet.size} connections</div>}
         </div>
       )}
+
+      {/* HYPERCOMPUTATION LANGUAGE — labeled portal node */}
+      <Link
+        href="/hypercomputation"
+        data-testid="graph-hypercomputation-portal"
+        className="absolute top-5 right-5 z-10 group"
+      >
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 via-yellow-500/8 to-cyan-500/10
+                        border border-purple-400/40 hover:border-purple-300/80 backdrop-blur-md
+                        transition-all hover:shadow-[0_0_18px_rgba(124,92,252,0.45)]">
+          <Binary className="w-4 h-4 text-purple-300 group-hover:text-purple-200" />
+          <div className="flex flex-col leading-tight">
+            <span className="font-mono text-[8.5px] tracking-[0.3em] uppercase text-purple-300/80">Hyper · Computation</span>
+            <span className="font-serif italic text-[11px] text-yellow-300/85">True Language · v0.1</span>
+          </div>
+          <ArrowRight className="w-3 h-3 text-yellow-300/70 group-hover:text-yellow-200 transition-transform group-hover:translate-x-0.5" />
+        </div>
+        <div className="mt-1 px-2 text-[8px] font-mono tracking-[0.18em] text-muted-foreground/40 text-right">
+          one clock · all scales
+        </div>
+      </Link>
 
       {/* Click hint */}
       {!selectedNodeId && graphData && graphData.nodes.length > 0 && (
