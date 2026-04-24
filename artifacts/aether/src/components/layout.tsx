@@ -51,6 +51,8 @@ import {
   Spline,
   Music,
   ScanLine,
+  Rocket,
+  HeartHandshake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -112,6 +114,8 @@ const NAV_ITEMS = [
   { href: "/fibonacci-quantization", label: "FQP · Fibonacci Quant",  icon: Spline },
   { href: "/symphonic-os",          label: "Symphonic OS v2",         icon: Music },
   { href: "/symphonic-protocol",    label: "Symphonic Protocol v1",   icon: ScanLine },
+  { href: "/ufo-ascent",            label: "UFO Ascent · Trajectory", icon: Rocket },
+  { href: "/brain-metabolism",      label: "Brain-First Metabolism",  icon: HeartHandshake },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

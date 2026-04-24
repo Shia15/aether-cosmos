@@ -408,6 +408,89 @@ export default function DiscoveryLoopView() {
           </div>
         </aside>
       </div>
+
+      {/* ── BIOLUMINESCENT MYCELIUM · AETHER SYMBOLIC LAYER ── */}
+      <div data-testid="biolum-section" style={{ marginTop: "2.5rem", padding: "1.5rem 1.4rem 2rem", borderTop: `1px solid ${COLORS.border}`, background: "linear-gradient(180deg, rgba(93,186,110,0.04), rgba(0,0,0,0.0))" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
+          <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.65rem", letterSpacing: "0.3em", textTransform: "uppercase" }}>
+            Living Resonance Layer · v1.0
+          </div>
+          <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.18em" }}>
+            Panellus stipticus · Mycena · Armillaria
+          </div>
+        </div>
+        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.8rem", color: COLORS.cream, fontWeight: 600, letterSpacing: "-0.01em", marginBottom: 8 }}>
+          Bioluminescent Mycelium <span style={{ color: COLORS.mycelium, fontStyle: "italic", fontWeight: 300 }}>— the visible coherence layer</span>
+        </h2>
+        <p style={{ color: COLORS.text, fontSize: "0.95rem", lineHeight: 1.7, maxWidth: 820, marginBottom: 22 }}>
+          Bioluminescent mycelium harnesses the natural glow of fungi (luciferin–luciferase reactions) to create soft, oxygen-dependent light without electricity.
+          Within the AETHER framework this becomes a <em style={{ color: COLORS.cream }}>visible resonance layer</em> — emergent coherence (Φ) made readable as living light, woven directly into the discovery loop.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: "0.85rem", marginBottom: "1.6rem" }}>
+          {[
+            { tag: "Eco Lighting", body: "Hybrid wood/substrate composites infused with bioluminescent fungi for ambient glow (hours to days with moisture/oxygen). Room-temperature phosphorescent (RTP) variants tune afterglow blue→red." },
+            { tag: "MycelioTronics", body: "Mycelium 'skins' as flexible, self-healing substrates for circuits, sensors, and batteries (~3.8 mAh/cm²). Compostable hybrid devices that integrate with silicon while reducing e-waste." },
+            { tag: "Bio-Indicator", body: "Glow intensity acts as a living signal for soil health, toxins, and humidity. Mycelial networks remediate pollutants while pulsing visible activity." },
+            { tag: "Living Architecture", body: "Grown composites for insulation, packaging, and acoustics. Speculative glowing underground networks form the substrate for an Internet of Living Things." },
+          ].map((card) => (
+            <div key={card.tag} data-testid={`biolum-card-${card.tag.toLowerCase().replace(/\s+/g, "-")}`} style={{ border: `1px solid ${COLORS.border}`, padding: "0.9rem 1rem", background: "rgba(0,0,0,0.25)", position: "relative" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, width: 24, height: 2, background: COLORS.mycelium, opacity: 0.7 }} />
+              <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6 }}>{card.tag}</div>
+              <div style={{ color: COLORS.text, fontSize: "0.82rem", lineHeight: 1.55 }}>{card.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: "1rem", marginBottom: "1.4rem" }}>
+          <div style={{ border: `1px solid ${COLORS.border}`, padding: "1rem 1.1rem", background: "rgba(93,186,110,0.04)" }}>
+            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: 10 }}>Extended Symbolic Mappings</div>
+            {[
+              { sym: "מΦ", name: "Mem + Phi", desc: "Fluid resonant field — mycelial flow with harmonic glow/coherence." },
+              { sym: "נΨ", name: "Nun + Psi", desc: "Emergent information field — seed-like growth of glowing networks." },
+              { sym: "ΛΦ", name: "Lattice Coherence", desc: "Ordered mycelial structures with phase-locked light." },
+              { sym: "Φ_glow", name: "State Transition", desc: "Bioluminescent coherence in living infrastructure." },
+            ].map((m) => (
+              <div key={m.sym} style={{ display: "grid", gridTemplateColumns: "70px 1fr", gap: 12, padding: "0.55rem 0", borderTop: `1px dashed ${COLORS.border}` }}>
+                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.4rem", color: COLORS.mycelium, lineHeight: 1.1 }}>{m.sym}</div>
+                <div>
+                  <div style={{ color: COLORS.cream, fontFamily: "monospace", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>{m.name}</div>
+                  <div style={{ color: COLORS.text, fontSize: "0.8rem", marginTop: 2 }}>{m.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ border: `1px solid ${COLORS.border}`, padding: "1rem 1.1rem", background: "rgba(0,0,0,0.3)" }}>
+            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: 10 }}>Progression Extension</div>
+            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.05rem", lineHeight: 1.9, color: COLORS.cream, fontStyle: "italic", marginBottom: 14 }}>
+              ψ <span style={{ color: COLORS.dim }}>→</span> Φ <span style={{ color: COLORS.dim }}>→</span> σ <span style={{ color: COLORS.dim }}>→</span> Λ <span style={{ color: COLORS.dim }}>→</span> Ω
+            </div>
+            <div style={{ color: COLORS.text, fontSize: "0.82rem", lineHeight: 1.6 }}>
+              Chaotic substrate → mycelial oscillation/glow → structural tension in network → self-healing lattice → stabilized living system.
+            </div>
+            <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${COLORS.border}` }}>
+              <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>Composite Example</div>
+              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", color: COLORS.cream, fontStyle: "italic" }}>
+                אמΦ — glowing origin fluid resonance in mycelial grids powering FerroDrive roads or Resonant Medicine sensors.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ border: `1px solid ${COLORS.border}`, padding: "0.95rem 1.1rem", background: "rgba(93,186,110,0.05)" }}>
+          <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: 8 }}>Tie to the Symphonic Protocol</div>
+          <ul style={{ paddingLeft: "1.1rem", color: COLORS.text, fontSize: "0.85rem", lineHeight: 1.7, margin: 0 }}>
+            <li><strong style={{ color: COLORS.cream }}>Living Infrastructure</strong> — underground mycelial grids as decentralized servers/sensors with visible bioluminescent pulses; an Internet of Living Things that reclaims the friction tax via zero-cooling, self-healing pathways.</li>
+            <li><strong style={{ color: COLORS.cream }}>Circulatory Mobility</strong> — glowing mycelial road substrates interacting with ferrofluid (∇ flow under B fields) for inductive resonant charging.</li>
+            <li><strong style={{ color: COLORS.cream }}>Resonant Medicine</strong> — bioluminescent signals for non-invasive frequency alignment and biosensing.</li>
+            <li><strong style={{ color: COLORS.cream }}>Sovereignty Dividend</strong> — regenerative, low-impact lighting and materials that turn waste into vitality credits.</li>
+          </ul>
+          <div style={{ marginTop: 12, color: COLORS.dim, fontSize: "0.75rem", fontStyle: "italic", lineHeight: 1.5 }}>
+            Field dominance — electromagnetic and biological — over randomness. Mirroring condensed plasmoid order in living matter.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

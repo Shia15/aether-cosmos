@@ -61,6 +61,8 @@ import DiscoveryLoopView from "@/pages/discovery-loop";
 import FibonacciQuantizationView from "@/pages/fibonacci-quantization";
 import SymphonicOSView from "@/pages/symphonic-os";
 import SymphonicProtocolView from "@/pages/symphonic-protocol";
+import UFOAscentView from "@/pages/ufo-ascent";
+import BrainMetabolismView from "@/pages/brain-metabolism";
 
 const queryClient = new QueryClient();
 
@@ -125,6 +127,8 @@ function Router() {
         <Route path="/fibonacci-quantization" component={FibonacciQuantizationView} />
         <Route path="/symphonic-os" component={SymphonicOSView} />
         <Route path="/symphonic-protocol" component={SymphonicProtocolView} />
+        <Route path="/ufo-ascent" component={UFOAscentView} />
+        <Route path="/brain-metabolism" component={BrainMetabolismView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
