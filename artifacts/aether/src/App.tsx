@@ -52,6 +52,7 @@ import CerebralOrganoidView from "@/pages/cerebral-organoids";
 import CosmicConvergenceView from "@/pages/cosmic-convergence";
 import AtlantisAlignmentView from "@/pages/atlantis-alignment";
 import GobekliTepeView from "@/pages/gobekli-tepe";
+import AetherIntakeView from "@/pages/aether-intake";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ function Router() {
         <Route path="/cosmic-convergence" component={CosmicConvergenceView} />
         <Route path="/atlantis-alignment" component={AtlantisAlignmentView} />
         <Route path="/gobekli-tepe" component={GobekliTepeView} />
+        <Route path="/aether-intake" component={AetherIntakeView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

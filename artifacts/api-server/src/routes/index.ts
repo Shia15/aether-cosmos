@@ -9,6 +9,7 @@ import coherenceRouter from "./coherence";
 import pipelineRouter from "./pipeline";
 import coreRouter from "./core";
 import importRouter from "./import";
+import aetherIntakeRouter from "./aether-intake";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(coherenceRouter);
 router.use(pipelineRouter);
 router.use(coreRouter);
 router.use(importRouter);
+router.use(aetherIntakeRouter);
 
 export default router;

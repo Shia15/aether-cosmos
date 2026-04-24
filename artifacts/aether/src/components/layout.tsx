@@ -44,6 +44,7 @@ import {
   Rotate3d,
   Leaf,
   GitFork,
+  Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -96,6 +97,7 @@ const NAV_ITEMS = [
   { href: "/cosmic-convergence",  label: "Cosmic Convergence",    icon: Orbit },
   { href: "/atlantis-alignment",  label: "Atlantis Alignment",    icon: Waves },
   { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
+  { href: "/aether-intake",         label: "OS · Batch Intake",      icon: Inbox },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
