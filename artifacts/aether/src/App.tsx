@@ -73,6 +73,7 @@ import PhiHOTView from "@/pages/phi-hot";
 import PhiHOTZipperView from "@/pages/phi-hot-zipper";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
+import MathEnginePage from "@/pages/math-engine";
 
 const queryClient = new QueryClient();
 
@@ -149,6 +150,7 @@ function Router() {
         <Route path="/phi-hot-zipper" component={PhiHOTZipperView} />
         <Route path="/thermal-hierarchy" component={ThermalHierarchyView} />
         <Route path="/geometry-of-permission" component={GeometryOfPermissionView} />
+        <Route path="/math-engine" component={MathEnginePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

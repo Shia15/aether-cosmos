@@ -63,6 +63,7 @@ import {
   GitMerge,
   Thermometer,
   KeySquare,
+  Calculator,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -136,6 +137,7 @@ const NAV_ITEMS = [
   { href: "/phi-hot-zipper",        label: "φ-HOT · Zipper",           icon: GitMerge },
   { href: "/thermal-hierarchy",     label: "Thermal Hierarchy",        icon: Thermometer },
   { href: "/geometry-of-permission",label: "Geometry of Permission",   icon: KeySquare },
+  { href: "/math-engine",           label: "Math Engine · Workbench",  icon: Calculator },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
