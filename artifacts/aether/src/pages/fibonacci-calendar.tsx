@@ -1,10 +1,146 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
   teal: "#2dd4bf", gold: "#f2bf65", purple: "#c084fc",
   green: "#4ade80", blue: "#60a5fa", bg: "#030514", panel: "#07021a",
+  red: "#f87171", orange: "#fb923c", cyan: "#22d3ee", rose: "#fb7185",
+  text: "#9ca3af",
 };
+
+// ── World Clock data ─────────────────────────────────────────────
+// Coverage is intentionally global and neutral — major civilizational, scientific,
+// and historically-watched centers across all populated continents.
+type Region =
+  | "East Asia" | "South Asia" | "Middle East" | "Eurasia"
+  | "Europe" | "Africa" | "Americas" | "Oceania" | "Polar/Other";
+
+interface CityRow {
+  city: string;
+  flag: string;
+  ctry: string;
+  region: Region;
+  tz: string;     // IANA timezone
+  lat: number;    // for solar calc
+  lng: number;
+  note?: string;  // historical / coherence note
+}
+
+const CITIES: CityRow[] = [
+  // East Asia
+  { city: "Tokyo",        flag: "🇯🇵", ctry: "Japan",         region: "East Asia",   tz: "Asia/Tokyo",        lat: 35.68,  lng: 139.69, note: "Pacific dawn line · seismic coherence node" },
+  { city: "Beijing",      flag: "🇨🇳", ctry: "China",         region: "East Asia",   tz: "Asia/Shanghai",     lat: 39.90,  lng: 116.40, note: "Continental hub · 5,000-yr calendric tradition" },
+  { city: "Seoul",        flag: "🇰🇷", ctry: "South Korea",   region: "East Asia",   tz: "Asia/Seoul",        lat: 37.57,  lng: 126.98, note: "Demilitarised-zone phase boundary" },
+  { city: "Pyongyang",    flag: "🇰🇵", ctry: "North Korea",   region: "East Asia",   tz: "Asia/Pyongyang",    lat: 39.02,  lng: 125.74, note: "Closed-loop information field" },
+  { city: "Taipei",       flag: "🇹🇼", ctry: "Taiwan",        region: "East Asia",   tz: "Asia/Taipei",       lat: 25.03,  lng: 121.57, note: "Strait coupling node" },
+
+  // South Asia
+  { city: "New Delhi",    flag: "🇮🇳", ctry: "India",         region: "South Asia",  tz: "Asia/Kolkata",      lat: 28.61,  lng: 77.21,  note: "Subcontinental harmonic centre" },
+  { city: "Islamabad",    flag: "🇵🇰", ctry: "Pakistan",      region: "South Asia",  tz: "Asia/Karachi",      lat: 33.68,  lng: 73.04,  note: "Indus boundary node" },
+
+  // Middle East
+  { city: "Jerusalem",    flag: "🇮🇱", ctry: "Israel",        region: "Middle East", tz: "Asia/Jerusalem",    lat: 31.78,  lng: 35.21,  note: "Triple-faith coherence anchor" },
+  { city: "Tehran",       flag: "🇮🇷", ctry: "Iran",          region: "Middle East", tz: "Asia/Tehran",       lat: 35.69,  lng: 51.39,  note: "Persian plateau timing centre" },
+  { city: "Riyadh",       flag: "🇸🇦", ctry: "Saudi Arabia",  region: "Middle East", tz: "Asia/Riyadh",       lat: 24.71,  lng: 46.68 },
+  { city: "Damascus",     flag: "🇸🇾", ctry: "Syria",         region: "Middle East", tz: "Asia/Damascus",     lat: 33.51,  lng: 36.30 },
+  { city: "Baghdad",      flag: "🇮🇶", ctry: "Iraq",          region: "Middle East", tz: "Asia/Baghdad",      lat: 33.32,  lng: 44.36, note: "Mesopotamian zero-meridian of civilisation" },
+
+  // Eurasia
+  { city: "Moscow",       flag: "🇷🇺", ctry: "Russia",        region: "Eurasia",     tz: "Europe/Moscow",     lat: 55.75,  lng: 37.62, note: "Largest landmass · 11 time zones" },
+  { city: "Vladivostok",  flag: "🇷🇺", ctry: "Russia (Far East)", region: "Eurasia", tz: "Asia/Vladivostok",  lat: 43.13,  lng: 131.91, note: "Pacific edge of Eurasian plate" },
+  { city: "Kyiv",         flag: "🇺🇦", ctry: "Ukraine",       region: "Eurasia",     tz: "Europe/Kyiv",       lat: 50.45,  lng: 30.52, note: "Black-Sea breadbasket node" },
+  { city: "Istanbul",     flag: "🇹🇷", ctry: "Türkiye",       region: "Eurasia",     tz: "Europe/Istanbul",   lat: 41.01,  lng: 28.98, note: "Bosphorus continental seam" },
+
+  // Europe
+  { city: "London",       flag: "🇬🇧", ctry: "UK",            region: "Europe",      tz: "Europe/London",     lat: 51.51,  lng: -0.13, note: "Greenwich prime meridian · UTC reference" },
+  { city: "Paris",        flag: "🇫🇷", ctry: "France",        region: "Europe",      tz: "Europe/Paris",      lat: 48.86,  lng: 2.35 },
+  { city: "Berlin",       flag: "🇩🇪", ctry: "Germany",       region: "Europe",      tz: "Europe/Berlin",     lat: 52.52,  lng: 13.40 },
+  { city: "Rome",         flag: "🇮🇹", ctry: "Italy",         region: "Europe",      tz: "Europe/Rome",       lat: 41.90,  lng: 12.50 },
+  { city: "Madrid",       flag: "🇪🇸", ctry: "Spain",         region: "Europe",      tz: "Europe/Madrid",     lat: 40.42,  lng: -3.70 },
+  { city: "Stockholm",    flag: "🇸🇪", ctry: "Sweden",        region: "Europe",      tz: "Europe/Stockholm",  lat: 59.33,  lng: 18.07, note: "Sub-arctic light cycle" },
+
+  // Africa
+  { city: "Cairo",        flag: "🇪🇬", ctry: "Egypt",         region: "Africa",      tz: "Africa/Cairo",      lat: 30.04,  lng: 31.24, note: "Kemetic 360+5 calendar origin" },
+  { city: "Addis Ababa",  flag: "🇪🇹", ctry: "Ethiopia",      region: "Africa",      tz: "Africa/Addis_Ababa", lat: 9.03,  lng: 38.74, note: "13-month Geʿez calendar still active" },
+  { city: "Lagos",        flag: "🇳🇬", ctry: "Nigeria",       region: "Africa",      tz: "Africa/Lagos",      lat: 6.52,   lng: 3.38 },
+  { city: "Johannesburg", flag: "🇿🇦", ctry: "South Africa",  region: "Africa",      tz: "Africa/Johannesburg", lat: -26.20, lng: 28.05 },
+  { city: "Nairobi",      flag: "🇰🇪", ctry: "Kenya",         region: "Africa",      tz: "Africa/Nairobi",    lat: -1.29,  lng: 36.82, note: "Equatorial reference · ~12h day year-round" },
+
+  // Americas — USA states explicitly listed
+  { city: "Honolulu",     flag: "🇺🇸", ctry: "USA · Hawaiʻi", region: "Americas",    tz: "Pacific/Honolulu",  lat: 21.31,  lng: -157.86, note: "Mid-Pacific time anchor" },
+  { city: "Anchorage",    flag: "🇺🇸", ctry: "USA · Alaska",  region: "Americas",    tz: "America/Anchorage", lat: 61.22,  lng: -149.90 },
+  { city: "Los Angeles",  flag: "🇺🇸", ctry: "USA · California", region: "Americas", tz: "America/Los_Angeles", lat: 34.05, lng: -118.24 },
+  { city: "Denver",       flag: "🇺🇸", ctry: "USA · Colorado", region: "Americas",   tz: "America/Denver",    lat: 39.74,  lng: -104.99 },
+  { city: "Chicago",      flag: "🇺🇸", ctry: "USA · Illinois", region: "Americas",   tz: "America/Chicago",   lat: 41.88,  lng: -87.63 },
+  { city: "New York",     flag: "🇺🇸", ctry: "USA · New York", region: "Americas",   tz: "America/New_York",  lat: 40.71,  lng: -74.01, note: "UN HQ · global finance daylight" },
+  { city: "Washington DC",flag: "🇺🇸", ctry: "USA · District", region: "Americas",   tz: "America/New_York",  lat: 38.91,  lng: -77.04, note: "US federal centre" },
+  { city: "Mexico City",  flag: "🇲🇽", ctry: "Mexico",        region: "Americas",    tz: "America/Mexico_City", lat: 19.43, lng: -99.13, note: "Mexica calendar latitude" },
+  { city: "Brasília",     flag: "🇧🇷", ctry: "Brazil",        region: "Americas",    tz: "America/Sao_Paulo", lat: -15.78, lng: -47.93 },
+  { city: "Buenos Aires", flag: "🇦🇷", ctry: "Argentina",     region: "Americas",    tz: "America/Argentina/Buenos_Aires", lat: -34.61, lng: -58.38 },
+  { city: "Ottawa",       flag: "🇨🇦", ctry: "Canada",        region: "Americas",    tz: "America/Toronto",   lat: 45.42,  lng: -75.70 },
+
+  // Oceania
+  { city: "Sydney",       flag: "🇦🇺", ctry: "Australia",     region: "Oceania",     tz: "Australia/Sydney",  lat: -33.87, lng: 151.21, note: "South-Pacific sunrise lead" },
+  { city: "Auckland",     flag: "🇳🇿", ctry: "New Zealand",   region: "Oceania",     tz: "Pacific/Auckland",  lat: -36.85, lng: 174.76, note: "First major city to greet each new day" },
+  { city: "Suva",         flag: "🇫🇯", ctry: "Fiji",          region: "Oceania",     tz: "Pacific/Fiji",      lat: -18.14, lng: 178.44 },
+
+  // Polar / Other
+  { city: "Reykjavík",    flag: "🇮🇸", ctry: "Iceland",       region: "Polar/Other", tz: "Atlantic/Reykjavik", lat: 64.15, lng: -21.94, note: "Sub-arctic geothermal lattice" },
+  { city: "McMurdo",      flag: "🇦🇶", ctry: "Antarctica (Ross)", region: "Polar/Other", tz: "Pacific/Auckland", lat: -77.85, lng: 166.67, note: "Polar science · 6-mo day/night swing" },
+];
+
+const REGION_ORDER: Region[] = ["East Asia","South Asia","Middle East","Eurasia","Europe","Africa","Americas","Oceania","Polar/Other"];
+
+// ── Solar geometry ───────────────────────────────────────────────
+// Returns sun elevation (deg) for given lat/lng at given Date (UTC base)
+function solarElevation(date: Date, lat: number, lng: number): number {
+  const N = Math.floor((date.getTime() - Date.UTC(date.getUTCFullYear(),0,0)) / 86400000);
+  const decl = 23.45 * Math.sin(((360/365) * (284 + N)) * Math.PI/180);
+  const utcH = date.getUTCHours() + date.getUTCMinutes()/60 + date.getUTCSeconds()/3600;
+  const solarHour = utcH + lng/15;
+  const H = 15 * (solarHour - 12);
+  const latR = lat * Math.PI/180;
+  const decR = decl * Math.PI/180;
+  const HR = H * Math.PI/180;
+  const sinEl = Math.sin(latR)*Math.sin(decR) + Math.cos(latR)*Math.cos(decR)*Math.cos(HR);
+  return Math.asin(Math.max(-1, Math.min(1, sinEl))) * 180/Math.PI;
+}
+
+// Phase classification
+type SolarPhase = "deep-night"|"pre-dawn"|"sunrise"|"morning"|"midday"|"afternoon"|"sunset"|"dusk"|"night";
+function classifyPhase(prevEl: number, el: number): SolarPhase {
+  const rising = el > prevEl;
+  if (el >= 60) return "midday";
+  if (el >= 25) return rising ? "morning" : "afternoon";
+  if (el >= 5)  return rising ? "morning" : "afternoon";
+  if (el >=  -2) return rising ? "sunrise" : "sunset";
+  if (el >=  -8) return rising ? "pre-dawn" : "dusk";
+  if (el >= -18) return "night";
+  return "deep-night";
+}
+
+const PHASE_META: Record<SolarPhase, { label: string; icon: string; col: string }> = {
+  "deep-night":{ label:"Deep night",  icon:"🌑", col:"#1e1b4b" },
+  "night":     { label:"Night",       icon:"🌙", col:"#312e81" },
+  "pre-dawn":  { label:"Pre-dawn",    icon:"🌌", col:"#7c3aed" },
+  "sunrise":   { label:"Sunrise",     icon:"🌅", col:"#fb923c" },
+  "morning":   { label:"Morning",     icon:"🌤", col:"#facc15" },
+  "midday":    { label:"Midday",      icon:"☀️", col:"#fde047" },
+  "afternoon": { label:"Afternoon",   icon:"🌞", col:"#fb923c" },
+  "sunset":    { label:"Sunset",      icon:"🌇", col:"#f97316" },
+  "dusk":      { label:"Dusk",        icon:"🌆", col:"#a855f7" },
+};
+
+// Format Intl-tz-aware time string
+function tzTime(d: Date, tz: string): { time: string; date: string } {
+  try {
+    const time = new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(d);
+    const date = new Intl.DateTimeFormat("en-GB", { timeZone: tz, weekday: "short", day: "2-digit", month: "short" }).format(d);
+    return { time, date };
+  } catch {
+    return { time: "—:—:—", date: "—" };
+  }
+}
 
 const IFC_MONTHS = [
   "January","February","March","April","May","June",
@@ -81,7 +217,7 @@ const HISTORY = [
 ];
 
 export default function FibonacciCalendarPage() {
-  const [tab, setTab] = useState<"calendar"|"mathematics"|"history"|"aether">("calendar");
+  const [tab, setTab] = useState<"calendar"|"mathematics"|"history"|"aether"|"world">("calendar");
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null);
 
   const monthGrid = useMemo(() => Array.from({ length: 4 }, (_, w) =>
@@ -122,7 +258,7 @@ export default function FibonacciCalendarPage() {
 
       {/* Tabs */}
       <div className="flex border-b px-6" style={{ background: C.panel + "88", borderColor: C.gold + "20" }}>
-        {([["calendar","THE CALENDAR"],["mathematics","MATHEMATICS"],["history","HISTORY"],["aether","AETHER TIME"]] as const).map(([k,l]) => (
+        {([["calendar","THE CALENDAR"],["mathematics","MATHEMATICS"],["history","HISTORY"],["aether","AETHER TIME"],["world","WORLD CLOCK"]] as const).map(([k,l]) => (
           <button key={k} onClick={() => setTab(k)}
             className={`px-5 py-2.5 text-[11px] tracking-widest font-['Cinzel',serif] border-b-2 transition-all ${
               tab===k ? "border-yellow-500 text-yellow-300" : "border-transparent text-yellow-800/40 hover:text-yellow-500"}`}>
@@ -357,7 +493,283 @@ export default function FibonacciCalendarPage() {
             </div>
           </motion.div>
         )}
+
+        {/* ════ WORLD CLOCK ════ */}
+        {tab === "world" && (
+          <motion.div key="world" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} className="p-5">
+            <WorldClockPanel />
+          </motion.div>
+        )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════
+// WORLD CLOCK · planetary time, solar phase per city, AETHER coherence
+// ════════════════════════════════════════════════════════════════
+function WorldClockPanel() {
+  const [now, setNow] = useState(() => new Date());
+  const [filter, setFilter] = useState<Region | "all">("all");
+  const [query, setQuery] = useState("");
+
+  // Tick every second
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const visibleCities = useMemo(() => {
+    return CITIES.filter(c =>
+      (filter === "all" || c.region === filter) &&
+      (!query || (c.city + " " + c.ctry).toLowerCase().includes(query.toLowerCase()))
+    );
+  }, [filter, query]);
+
+  // Group by region for layout
+  const byRegion = useMemo(() => {
+    const out: Partial<Record<Region, CityRow[]>> = {};
+    for (const c of visibleCities) (out[c.region] ||= []).push(c);
+    return out;
+  }, [visibleCities]);
+
+  // Global coherence reading: how many cities are currently in daylight?
+  const dayCount = useMemo(() => {
+    return CITIES.reduce((acc, c) => acc + (solarElevation(now, c.lat, c.lng) > 0 ? 1 : 0), 0);
+  }, [now]);
+  const coherenceFrac = dayCount / CITIES.length;
+  // φ-bridge phase: maps real-world UTC seconds to a 0..2π φ-locked angle
+  const utcSec = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
+  const PHI = 1.6180339887;
+  const phiPhase = ((utcSec / 86400) * 2 * Math.PI * PHI) % (2 * Math.PI);
+  const phiLockPct = (Math.cos(phiPhase) * 0.5 + 0.5) * 100;
+
+  // Find earliest sunrise window (sun within ±5° of horizon, rising)
+  const sunriseCities = useMemo(() => {
+    return CITIES.map(c => {
+      const el = solarElevation(now, c.lat, c.lng);
+      const elPrev = solarElevation(new Date(now.getTime() - 60_000), c.lat, c.lng);
+      return { c, el, rising: el > elPrev };
+    }).filter(x => x.el > -2 && x.el < 8 && x.rising)
+      .sort((a, b) => Math.abs(a.el) - Math.abs(b.el))
+      .slice(0, 3);
+  }, [now]);
+
+  // 13-tick coherence ring (one tick per IFC month)
+  const ring13 = useMemo(() => Array.from({ length: 13 }, (_, i) => i), []);
+
+  return (
+    <div data-testid="world-clock-root" className="flex flex-col gap-5">
+
+      {/* TOP STRIP — Universal time + φ-bridge gauge */}
+      <div className="border rounded-xl p-5 grid gap-5"
+        style={{ borderColor: C.gold + "30", background: "linear-gradient(135deg," + C.panel + "ee, #0a0218ee)", gridTemplateColumns: "1fr 1fr 1fr" }}>
+        <div>
+          <p className="text-[9px] tracking-[0.25em] font-['Cinzel',serif]" style={{ color: C.gold + "70" }}>
+            COORDINATED UNIVERSAL TIME · UTC
+          </p>
+          <p data-testid="utc-clock" className="text-3xl font-['Cinzel',serif] mt-1" style={{ color: C.gold }}>
+            {tzTime(now, "UTC").time}
+          </p>
+          <p className="text-[10px] mt-1" style={{ color: C.gold + "55" }}>
+            {tzTime(now, "UTC").date} · Greenwich meridian (0°)
+          </p>
+          <p className="text-[9px] mt-2 leading-5" style={{ color: C.text + "" }}>
+            <span style={{ color: C.cyan }}>φ-bridge</span>: temporal substrate ticking on the same Fibonacci grid that drives the calendar, the spin-bath envelope, and the mycelial bridge layer.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-[9px] tracking-[0.25em] font-['Cinzel',serif]" style={{ color: C.teal + "70" }}>
+            PLANETARY DAYLIGHT COHERENCE
+          </p>
+          <p className="text-3xl font-['Cinzel',serif] mt-1" style={{ color: C.teal }} data-testid="coherence-pct">
+            {(coherenceFrac * 100).toFixed(1)}%
+          </p>
+          <p className="text-[10px] mt-1" style={{ color: C.teal + "55" }}>
+            {dayCount} of {CITIES.length} tracked cities currently in daylight
+          </p>
+          <div className="mt-2 h-2 rounded overflow-hidden" style={{ background: "rgba(255,255,255,0.05)" }}>
+            <div style={{ width: (coherenceFrac * 100) + "%", height: "100%", background: `linear-gradient(90deg, ${C.purple}, ${C.teal}, ${C.gold})`, transition: "width 0.6s" }} />
+          </div>
+          <p className="text-[9px] mt-2 leading-5" style={{ color: C.teal + "80" }}>
+            Stratified-quantum reading: the night→day terminator is the planet's running gradient, exactly the seafloor→air gradient AETHER models at biological scale.
+          </p>
+        </div>
+
+        <div>
+          <p className="text-[9px] tracking-[0.25em] font-['Cinzel',serif]" style={{ color: C.purple + "70" }}>
+            φ-LOCK PHASE · NV SPIN-BATH ANALOGUE
+          </p>
+          <div className="flex items-center gap-3 mt-1">
+            <svg width="78" height="78" viewBox="0 0 78 78" data-testid="phi-ring">
+              <circle cx="39" cy="39" r="32" fill="none" stroke={C.purple + "20"} strokeWidth="2" />
+              {ring13.map(i => {
+                const a = (i / 13) * Math.PI * 2 - Math.PI / 2;
+                const x1 = 39 + Math.cos(a) * 28, y1 = 39 + Math.sin(a) * 28;
+                const x2 = 39 + Math.cos(a) * 34, y2 = 39 + Math.sin(a) * 34;
+                return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={C.gold + "55"} strokeWidth="1" />;
+              })}
+              {/* φ phase needle */}
+              <line x1="39" y1="39"
+                x2={39 + Math.cos(phiPhase - Math.PI / 2) * 30}
+                y2={39 + Math.sin(phiPhase - Math.PI / 2) * 30}
+                stroke={C.purple} strokeWidth="2" />
+              <circle cx="39" cy="39" r="3" fill={C.purple} />
+            </svg>
+            <div>
+              <p className="text-2xl font-['Cinzel',serif]" style={{ color: C.purple }} data-testid="phi-lock-pct">
+                {phiLockPct.toFixed(1)}%
+              </p>
+              <p className="text-[9px]" style={{ color: C.purple + "55" }}>cos(φ · θ_UTC)</p>
+            </div>
+          </div>
+          <p className="text-[9px] mt-2 leading-5" style={{ color: C.purple + "80" }}>
+            13-tick ring = the Fixed Calendar's 13 months. Needle is the φ-locked phase angle: the same kind of recursive timing the NV spin bath uses to extend T₂.
+          </p>
+        </div>
+      </div>
+
+      {/* SUNRISE NOW STRIP */}
+      <div className="border rounded-xl p-4" style={{ borderColor: C.orange + "30", background: C.orange + "08" }}>
+        <p className="text-[9px] tracking-[0.25em] font-['Cinzel',serif]" style={{ color: C.orange }}>
+          🌅 RIGHT NOW · CITIES AT SUNRISE
+        </p>
+        {sunriseCities.length === 0 ? (
+          <p className="text-[10px] mt-2" style={{ color: C.orange + "70" }}>
+            No tracked city is currently inside the sunrise band (sun within 0–8° rising). The terminator is over open ocean or sparsely populated longitudes.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-3 mt-2" data-testid="sunrise-list">
+            {sunriseCities.map(s => (
+              <div key={s.c.city} className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: C.orange + "18", border: "1px solid " + C.orange + "30" }}>
+                <span>{s.c.flag}</span>
+                <span className="text-[11px] font-['Cinzel',serif]" style={{ color: C.orange }}>{s.c.city}</span>
+                <span className="text-[9px]" style={{ color: C.orange + "70" }}>{s.c.ctry}</span>
+                <span className="text-[9px]" style={{ color: C.gold }}>sun {s.el.toFixed(1)}°</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* FILTER BAR */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <button onClick={() => setFilter("all")} className="px-3 py-1 rounded-full text-[9px] font-['Cinzel',serif] border" data-testid="filter-all"
+          style={{ borderColor: filter === "all" ? C.gold : C.gold + "30", color: filter === "all" ? C.gold : C.gold + "70", background: filter === "all" ? C.gold + "18" : "transparent" }}>
+          ALL · {CITIES.length}
+        </button>
+        {REGION_ORDER.map(r => {
+          const n = CITIES.filter(c => c.region === r).length;
+          const active = filter === r;
+          return (
+            <button key={r} onClick={() => setFilter(r)} className="px-3 py-1 rounded-full text-[9px] font-['Cinzel',serif] border"
+              style={{ borderColor: active ? C.teal : C.teal + "30", color: active ? C.teal : C.teal + "70", background: active ? C.teal + "18" : "transparent" }}>
+              {r.toUpperCase()} · {n}
+            </button>
+          );
+        })}
+        <input
+          type="text" value={query} onChange={e => setQuery(e.target.value)}
+          placeholder="search city or country…"
+          data-testid="city-search"
+          className="ml-auto px-3 py-1 rounded text-[10px] font-['JetBrains_Mono',monospace] outline-none"
+          style={{ background: C.panel, border: "1px solid " + C.gold + "30", color: C.gold, minWidth: 200 }}
+        />
+      </div>
+
+      {/* REGION SECTIONS */}
+      {REGION_ORDER.map(region => {
+        const cities = byRegion[region];
+        if (!cities || cities.length === 0) return null;
+        return (
+          <div key={region} className="border rounded-xl overflow-hidden" style={{ borderColor: C.teal + "20", background: C.panel + "55" }}>
+            <div className="px-4 py-2 flex items-center justify-between" style={{ background: C.teal + "08", borderBottom: "1px solid " + C.teal + "20" }}>
+              <p className="text-[9px] tracking-[0.25em] font-['Cinzel',serif]" style={{ color: C.teal }}>
+                {region.toUpperCase()}
+              </p>
+              <p className="text-[8px]" style={{ color: C.teal + "55" }}>{cities.length} centres</p>
+            </div>
+            <div className="grid gap-px" style={{ background: C.teal + "12", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+              {cities.map(c => {
+                const el = solarElevation(now, c.lat, c.lng);
+                // Sample 1 minute earlier to determine rising vs. setting, side-effect-free
+                const elPrev = solarElevation(new Date(now.getTime() - 60_000), c.lat, c.lng);
+                const phase = classifyPhase(elPrev, el);
+                const meta = PHASE_META[phase];
+                const t = tzTime(now, c.tz);
+                return (
+                  <div key={c.city + c.tz} data-testid={`city-${c.city.toLowerCase().replace(/\s+/g, "-")}`}
+                    className="p-3" style={{ background: C.panel }}>
+                    <div className="flex items-start justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span style={{ fontSize: 18 }}>{c.flag}</span>
+                        <div>
+                          <p className="text-[12px] font-['Cinzel',serif]" style={{ color: meta.col }}>{c.city}</p>
+                          <p className="text-[8px]" style={{ color: meta.col + "90", opacity: 0.7 }}>{c.ctry}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[15px] font-['JetBrains_Mono',monospace]" style={{ color: meta.col }}>{t.time}</p>
+                        <p className="text-[8px]" style={{ color: meta.col, opacity: 0.6 }}>{t.date}</p>
+                      </div>
+                    </div>
+                    {/* Phase strip */}
+                    <div className="flex items-center gap-2 mt-2">
+                      <span style={{ fontSize: 13 }}>{meta.icon}</span>
+                      <span className="text-[9px] font-['Cinzel',serif]" style={{ color: meta.col }}>{meta.label}</span>
+                      <span className="text-[8px] ml-auto font-['JetBrains_Mono',monospace]" style={{ color: meta.col, opacity: 0.7 }}>
+                        sun {el >= 0 ? "+" : ""}{el.toFixed(1)}°
+                      </span>
+                    </div>
+                    {/* Solar elevation bar (-90 to +90 mapped to 0..100%) */}
+                    <div className="mt-2 h-1 rounded overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <div style={{
+                        marginLeft: "50%",
+                        width: Math.abs(el) / 90 * 50 + "%",
+                        height: "100%",
+                        background: meta.col,
+                        transform: el < 0 ? "translateX(-100%)" : "none",
+                        transition: "all 0.6s",
+                      }} />
+                    </div>
+                    {c.note && (
+                      <p className="text-[8px] mt-2 leading-4 italic" style={{ color: C.text + "aa" }}>
+                        {c.note}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* COHERENCE-ACROSS-SCALES SYNTHESIS */}
+      <div className="border rounded-xl p-5" style={{ borderColor: C.gold + "25", background: "linear-gradient(135deg, " + C.panel + ", #0a0a02)" }}>
+        <p className="text-[9px] tracking-[0.25em] font-['Cinzel',serif] mb-3" style={{ color: C.gold + "75" }}>
+          ONE FOR ALL · COHERENCE MAPPED ACROSS SCALES
+        </p>
+        <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {[
+            { col: C.cyan,   tag: "NV SPIN-BATH",        body: "Diamond NV⁻ centre coupled to ¹³C bath. β(n) → 1 as Fibonacci depth grows. Same recursive principle drives the φ-lock needle on the ring above." },
+            { col: C.gold,   tag: "φ-BRIDGE TIMING",     body: "τ(n) = φⁿ · τ₀. The temporal substrate this clock ticks on. UTC seconds wrap onto a φ-locked phase angle that crosses every region simultaneously." },
+            { col: C.teal,   tag: "STRATIFIED LIVING Q", body: "Mycelium bridge between seafloor and air. ENAQT exploits thermal noise the way the planetary terminator routes warmth between hemispheres." },
+            { col: C.purple, tag: "13-MONTH SUBSTRATE",  body: "The 13-tick ring is also the Fixed Calendar. Every region — Tokyo, Moscow, Kyiv, NYC, Addis Ababa — runs on the same Fibonacci-quantised epoch length." },
+            { col: C.green,  tag: "HISTORICAL WATCH",    body: "Coverage chosen for breadth, not preference: nuclear-armed states, neutral mediators, ancient calendric cultures, polar science stations — all observed as one field." },
+            { col: C.rose,   tag: "NO BIAS PRINCIPLE",   body: "Each city contributes equally to the daylight-coherence sum. There is no privileged meridian. The terminator owes nothing to any flag." },
+          ].map(card => (
+            <div key={card.tag} className="border rounded-lg p-3" style={{ borderColor: card.col + "30", background: card.col + "06" }}>
+              <p className="text-[9px] tracking-[0.2em] font-['Cinzel',serif] mb-2" style={{ color: card.col }}>{card.tag}</p>
+              <p className="text-[10px] leading-5" style={{ color: card.col + "b0" }}>{card.body}</p>
+            </div>
+          ))}
+        </div>
+        <p className="text-[9px] mt-4 italic text-center" style={{ color: C.gold + "55" }}>
+          "One clock for all scales — the spin bath, the mycelial bridge, the 13-month calendar, and the rotating planet are the same recursive structure observed at different magnifications."
+        </p>
+      </div>
     </div>
   );
 }
