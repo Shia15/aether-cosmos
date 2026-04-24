@@ -1,508 +1,548 @@
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const COLORS = {
-  bg:        "#050a07",
-  bg2:       "#0a1209",
-  mycelium:  "#5dba6e",
-  mycDim:    "#2e7d3a",
-  ferro:     "#e8a820",
-  ferroDim:  "#b8860b",
-  metabolite:"#4fc3f7",
-  rogue:     "#e84040",
-  rogueDim:  "#8b2020",
-  feedback:  "#a78bfa",
-  cream:     "#e8f0e2",
-  text:      "#8faa88",
-  dim:       "#4a6045",
-  border:    "rgba(93,186,110,0.18)",
+const C = {
+  bg: "#050a07", bg2: "#0a1209", panel: "rgba(5,12,7,0.9)",
+  border: "rgba(93,186,110,0.12)",
+  white: "#E8F0E2", text: "#8FAA88", muted: "#5F7A5A", dim: "#4A6045",
+  mycelium: "#5DBA6E", mycDim: "#2E7D3A",
+  ferro: "#E8A820", ferro2: "#B8860B",
+  metabolite: "#4FC3F7",
+  rogue: "#E84040", feedback: "#A78BFA",
 };
 
 type Phase = "sense" | "deliver" | "activate" | "feedback";
 
-const PHASE_INFO: Record<Phase, { label: string; color: string; desc: string }> = {
-  sense:    { label: "SENSE",    color: COLORS.mycelium,  desc: "Mycelium spatial mapping · DBiT-Plus tumor microenvironment scan" },
-  deliver:  { label: "DELIVER",  color: COLORS.ferro,     desc: "Ferrofluid magnetic guidance · metabolite payload routing" },
-  activate: { label: "ACTIVATE", color: COLORS.rogue,     desc: "Hyperthermia + ROS overload · selective rogue cell elimination" },
-  feedback: { label: "FEEDBACK", color: COLORS.feedback,  desc: "Outcome processed · entropy reduced · model recalibrated" },
+const PHASE_INFO: Record<Phase, { col: string; n: string; name: string; desc: string }> = {
+  sense:    { col: C.mycelium,   n: "01", name: "SENSE",    desc: "Spatial gene mapping initiated · DBiT-Plus scan · mycelium network observes tumor microenvironment" },
+  deliver:  { col: C.ferro,      n: "02", name: "DELIVER",  desc: "Ferrofluid vehicles mobilized · metabolite payload loaded · magnetic guidance engaged" },
+  activate: { col: C.rogue,      n: "03", name: "ACTIVATE", desc: "Hyperthermia threshold reached · ROS overload · selective elimination of rogue cells" },
+  feedback: { col: C.feedback,   n: "04", name: "FEEDBACK", desc: "Outcome data processed · trial entropy reducing · model updated for next cycle" },
 };
 
 const PHASE_ORDER: Phase[] = ["sense", "deliver", "activate", "feedback"];
-const PHASE_DUR = 220;
 
-type LogEntry = { phase: Phase; msg: string; t: number };
+interface Node   { x: number; y: number; r: number; phase: number; active: boolean; activeT: number; }
+interface Edge   { a: number; b: number; pulse: number; }
+interface Rogue  { x: number; y: number; r: number; vx: number; vy: number; alive: boolean; dyingT: number; phase: number; }
+interface Ferro  { x: number; y: number; vx: number; vy: number; r: number; phase: number; loaded: boolean; deliveredT: number; }
+interface Burst  { x: number; y: number; r: number; maxR: number; t: number; }
+interface Sig    { x: number; y: number; tx: number; ty: number; t: number; speed: number; type: "scan" | "deliver"; }
+interface Arc    { x: number; y: number; tx: number; ty: number; t: number; speed: number; }
+interface Meta   { x: number; y: number; vx: number; vy: number; life: number; }
 
-export default function DiscoveryLoopView() {
+interface LogEvent { ts: string; phase: Phase; msg: string; }
+
+export default function DiscoveryLoopPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const runningRef = useRef(true);
-  const phaseRef = useRef<Phase>("sense");
-  const phaseTimeRef = useRef(0);
-  const cycleRef = useRef(0);
-  const frameRef = useRef(0);
-  const timeRef = useRef(0);
-  const rafRef = useRef(0);
-
-  const myceliumNodesRef = useRef<{ x: number; y: number; r: number; phase: number; active: boolean; activeT: number }[]>([]);
-  const myceliumNetRef   = useRef<{ a: number; b: number; pulse: number }[]>([]);
-  const rogueRef         = useRef<{ x: number; y: number; r: number; vx: number; vy: number; alive: boolean; dyingT: number; phase: number }[]>([]);
-  const ferroRef         = useRef<{ x: number; y: number; vx: number; vy: number; r: number; phase: number; loaded: boolean; deliveredT: number }[]>([]);
-  const metabRef         = useRef<{ x: number; y: number; vx: number; vy: number; life: number; targetIdx: number }[]>([]);
-  const burstsRef        = useRef<{ x: number; y: number; t: number; max: number }[]>([]);
-
-  const [phaseUI, setPhaseUI] = useState<Phase>("sense");
-  const [cycle, setCycle] = useState(0);
-  const [log, setLog] = useState<LogEntry[]>([]);
-  const [killed, setKilled] = useState(0);
+  const stateRef = useRef({
+    nodes: [] as Node[], edges: [] as Edge[], rogue: [] as Rogue[],
+    ferro: [] as Ferro[], bursts: [] as Burst[], sigs: [] as Sig[],
+    arcs: [] as Arc[], meta: [] as Meta[],
+    phase: "sense" as Phase, phaseTime: 0, frame: 0, time: 0,
+    cycle: 1, speed: 1, running: true,
+  });
+  const [phase, setPhase] = useState<Phase>("sense");
   const [running, setRunning] = useState(true);
+  const [speed, setSpeed] = useState(1);
+  const [cycle, setCycle] = useState(1);
+  const [metrics, setMetrics] = useState({ targeting: 0, kill: 0, myc: 25, feed: 0, risk: 60 });
+  const [events, setEvents] = useState<LogEvent[]>([]);
 
-  const pushLog = (phase: Phase, msg: string) => {
-    setLog((l) => [{ phase, msg, t: Date.now() }, ...l].slice(0, 12));
-  };
+  function logEvent(ph: Phase, msg: string) {
+    const now = new Date();
+    const ts = [now.getHours(), now.getMinutes(), now.getSeconds()]
+      .map(n => String(n).padStart(2, "0")).join(":");
+    setEvents(prev => [{ ts, phase: ph, msg }, ...prev].slice(0, 40));
+  }
 
-  const eventFor = (ph: Phase, c: number): string => {
-    const m: Record<Phase, string[]> = {
-      sense:    [`DBiT-Plus scan cycle ${c}`, "Spatial gene mapping initiated", "Tumor microenvironment observed"],
-      deliver:  ["Ferrofluid vehicles mobilized", "Metabolite payload loaded", "Magnetic guidance engaged"],
-      activate: ["Hyperthermia threshold reached", "ROS overload initiated", "Selective elimination in progress"],
-      feedback: [`Learning cycle ${c} complete`, `Model updated · iter ${c}`, "Trial entropy reducing"],
-    };
-    const a = m[ph]; return a[Math.floor(Math.random() * a.length)];
-  };
+  function resetSim() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const W = canvas.width, H = canvas.height;
+    const s = stateRef.current;
+    s.nodes = []; s.edges = []; s.rogue = []; s.ferro = [];
+    s.bursts = []; s.sigs = []; s.arcs = []; s.meta = [];
+    s.phase = "sense"; s.phaseTime = 0; s.frame = 0; s.cycle = 1;
+    setPhase("sense"); setCycle(1);
 
-  const initSim = (W: number, H: number) => {
-    // mycelium
-    const nodes: typeof myceliumNodesRef.current = [];
-    for (let i = 0; i < 28; i++) {
-      nodes.push({
-        x: 0.05 * W + Math.random() * 0.9 * W,
-        y: 0.05 * H + Math.random() * 0.9 * H,
-        r: Math.random() * 2.5 + 1,
-        phase: Math.random() * Math.PI * 2,
+    // Mycelium nodes
+    for (let i = 0; i < 30; i++) {
+      s.nodes.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: 1.5 + Math.random() * 2, phase: Math.random() * Math.PI * 2,
         active: false, activeT: 0,
       });
     }
-    const net: typeof myceliumNetRef.current = [];
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-        if (d < W * 0.22) net.push({ a: i, b: j, pulse: Math.random() });
-      }
-    }
-    myceliumNodesRef.current = nodes;
-    myceliumNetRef.current = net;
-    // rogue cells
-    const rogues: typeof rogueRef.current = [];
-    const cx = W / 2, cy = H / 2;
+    // Edges (nearest neighbors)
+    s.nodes.forEach((n, i) => {
+      const dists = s.nodes.map((o, j) => ({ j, d: Math.hypot(o.x - n.x, o.y - n.y) }))
+        .filter(p => p.j !== i).sort((a, b) => a.d - b.d);
+      dists.slice(0, 3).forEach(p => {
+        if (p.d < 200) s.edges.push({ a: i, b: p.j, pulse: Math.random() });
+      });
+    });
+    // Rogue cells
     for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      const r = W * 0.08 + Math.random() * W * 0.15;
-      rogues.push({
-        x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r,
-        r: 6 + Math.random() * 10,
+      s.rogue.push({
+        x: W * 0.2 + Math.random() * W * 0.6,
+        y: H * 0.2 + Math.random() * H * 0.6,
+        r: 6 + Math.random() * 8,
         vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
         alive: true, dyingT: 0, phase: Math.random() * Math.PI * 2,
       });
     }
-    rogueRef.current = rogues;
-    // ferro
-    const fd: typeof ferroRef.current = [];
-    for (let i = 0; i < 5; i++) {
-      fd.push({
-        x: W * 0.05 + Math.random() * W * 0.15,
+    // Ferrofluid drops
+    for (let i = 0; i < 4; i++) {
+      s.ferro.push({
+        x: W * 0.05 + Math.random() * W * 0.1,
         y: H * 0.1 + Math.random() * H * 0.8,
-        vx: 0, vy: 0,
-        r: 5 + Math.random() * 4,
-        phase: Math.random() * Math.PI * 2,
-        loaded: true, deliveredT: 0,
+        vx: 0, vy: 0, r: 5 + Math.random() * 4,
+        phase: Math.random() * Math.PI * 2, loaded: true, deliveredT: 0,
       });
     }
-    ferroRef.current = fd;
-    metabRef.current = [];
-    burstsRef.current = [];
-  };
+  }
+
+  useEffect(() => { stateRef.current.running = running; }, [running]);
+  useEffect(() => { stateRef.current.speed = speed; }, [speed]);
 
   useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext("2d"); if (!ctx) return;
-    const resize = () => {
-      const r = c.parentElement!.getBoundingClientRect();
-      c.width = r.width; c.height = Math.max(420, r.height);
-    };
-    resize();
-    initSim(c.width, c.height);
-    const onR = () => { resize(); initSim(c.width, c.height); };
-    window.addEventListener("resize", onR);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 480;
+    resetSim();
+    logEvent("sense", "Closed Discovery Loop initialized");
 
-    const draw = () => {
-      if (!runningRef.current) { rafRef.current = requestAnimationFrame(draw); return; }
-      const W = c.width, H = c.height;
-      timeRef.current += 0.016;
-      frameRef.current++;
-      phaseTimeRef.current++;
+    let raf = 0;
 
-      // phase advance
-      if (phaseTimeRef.current > PHASE_DUR) {
-        const idx = PHASE_ORDER.indexOf(phaseRef.current);
-        const nxt = PHASE_ORDER[(idx + 1) % 4];
-        phaseRef.current = nxt;
-        phaseTimeRef.current = 0;
-        if (nxt === "sense") cycleRef.current++;
-        setPhaseUI(nxt);
-        setCycle(cycleRef.current);
-        pushLog(nxt, eventFor(nxt, cycleRef.current));
+    function nearestNode(x: number, y: number): Node | null {
+      const s = stateRef.current;
+      let best: Node | null = null;
+      let bd = Infinity;
+      for (const n of s.nodes) {
+        const d = Math.hypot(n.x - x, n.y - y);
+        if (d < bd) { bd = d; best = n; }
+      }
+      return best;
+    }
+
+    function advancePhase() {
+      const s = stateRef.current;
+      const idx = PHASE_ORDER.indexOf(s.phase);
+      const next = PHASE_ORDER[(idx + 1) % 4];
+      s.phase = next; s.phaseTime = 0;
+      if (next === "sense") { s.cycle++; setCycle(s.cycle); }
+      setPhase(next);
+      const msgs: Record<Phase, string[]> = {
+        sense:    ["Spatial gene map updated", "DBiT-Plus scan cycle " + s.cycle, "Mycelium network active"],
+        deliver:  ["Ferrofluid vehicles mobilized", "Magnetic guidance engaged", "Localized delivery path computed"],
+        activate: ["Hyperthermia threshold reached", "ROS overload triggered", "Rogue cell targeting locked"],
+        feedback: ["Outcome data processed", "Trial entropy reducing", "Model updated · iteration " + s.cycle],
+      };
+      const m = msgs[next];
+      logEvent(next, m[Math.floor(Math.random() * m.length)]);
+    }
+
+    function draw() {
+      if (!canvas || !ctx) { raf = requestAnimationFrame(draw); return; }
+      const s = stateRef.current;
+      if (!s.running) { raf = requestAnimationFrame(draw); return; }
+      const W = canvas.width, H = canvas.height;
+      s.time += 0.016; s.frame++; s.phaseTime++;
+      if (s.phaseTime >= 240 / Math.max(1, s.speed * 0.4)) advancePhase();
+
+      ctx.fillStyle = "rgba(5,10,7,0.22)"; ctx.fillRect(0, 0, W, H);
+
+      // Mycelium edges
+      const mycAlpha = s.phase === "sense" ? 1 : (s.phase === "feedback" ? 0.6 : 0.3);
+      s.edges.forEach(e => {
+        const a = s.nodes[e.a], b = s.nodes[e.b];
+        const pulse = Math.sin(s.time * 0.7 + e.pulse * Math.PI * 2) * 0.5 + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        const mx = (a.x + b.x) / 2 + Math.sin(s.time * 0.4 + e.pulse * 5) * 8;
+        const my = (a.y + b.y) / 2 + Math.cos(s.time * 0.3 + e.pulse * 4) * 6;
+        ctx.quadraticCurveTo(mx, my, b.x, b.y);
+        ctx.strokeStyle = `rgba(46,125,58,${(0.04 + pulse * 0.05) * mycAlpha})`;
+        ctx.lineWidth = 0.5; ctx.stroke();
+      });
+      // Mycelium nodes
+      s.nodes.forEach(n => {
+        if (n.active) { n.activeT -= 0.012; if (n.activeT <= 0) n.active = false; }
+        const pulse = Math.sin(s.time + n.phase) * 0.5 + 0.5;
+        const intensity = n.active ? n.activeT : 0.1 + pulse * 0.08;
+        const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 5);
+        g.addColorStop(0, `rgba(93,186,110,${intensity * mycAlpha * 0.5})`);
+        g.addColorStop(1, `rgba(93,186,110,0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = `rgba(93,186,110,${(intensity * 0.8 + 0.1) * mycAlpha})`;
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
+      });
+
+      // SENSE → emit scan signals
+      if (s.phase === "sense" && s.frame % 8 === 0) {
+        s.rogue.filter(r => r.alive).forEach(rc => {
+          const nn = nearestNode(rc.x, rc.y);
+          if (nn) {
+            s.sigs.push({ x: nn.x, y: nn.y, tx: rc.x, ty: rc.y, t: 0, speed: 0.03 + Math.random() * 0.02, type: "scan" });
+            nn.active = true; nn.activeT = 1;
+          }
+        });
+      }
+      // DELIVER → ferrofluid moves to rogue
+      if (s.phase === "deliver") {
+        const alive = s.rogue.filter(r => r.alive);
+        s.ferro.filter(f => f.loaded).forEach((fd, i) => {
+          const target = alive[i % alive.length];
+          if (!target) return;
+          const dx = target.x - fd.x, dy = target.y - fd.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist > 5) { fd.vx += dx / dist * 0.06; fd.vy += dy / dist * 0.06; }
+          fd.vx *= 0.94; fd.vy *= 0.94;
+          fd.x += fd.vx; fd.y += fd.vy;
+          if (dist < target.r + fd.r + 2) { fd.loaded = false; fd.deliveredT = 1; }
+        });
+        if (s.frame % 4 === 0) {
+          s.ferro.filter(f => f.loaded).forEach(fd => {
+            for (let i = 0; i < 2; i++) s.meta.push({
+              x: fd.x + Math.random() * 10 - 5, y: fd.y + Math.random() * 10 - 5,
+              vx: (Math.random() - 0.5) * 0.8, vy: (Math.random() - 0.5) * 0.8, life: 1,
+            });
+          });
+        }
+      }
+      // ACTIVATE → kill bursts
+      if (s.phase === "activate" && s.frame % 25 === 0) {
+        const alive = s.rogue.filter(r => r.alive);
+        if (alive.length > 0) {
+          const t = alive[Math.floor(Math.random() * alive.length)];
+          t.alive = false; t.dyingT = 1;
+          s.bursts.push({ x: t.x, y: t.y, r: 0, maxR: t.r * 4, t: 1 });
+          logEvent("activate", `Rogue cell eliminated at (${Math.round(t.x)},${Math.round(t.y)})`);
+        }
+      }
+      // FEEDBACK → arcs back to mycelium
+      if (s.phase === "feedback") {
+        if (s.frame % 15 === 0) {
+          s.bursts.filter(k => k.t <= 0.1).forEach(k => {
+            const nn = nearestNode(k.x, k.y);
+            if (nn) {
+              s.arcs.push({ x: k.x, y: k.y, tx: nn.x, ty: nn.y, t: 0, speed: 0.025 });
+              nn.active = true; nn.activeT = 0.8;
+            }
+          });
+        }
+        if (s.frame % 40 === 0 && s.ferro.filter(f => f.loaded).length < 5) {
+          s.ferro.push({
+            x: W * 0.05 + Math.random() * W * 0.1, y: H * 0.1 + Math.random() * H * 0.8,
+            vx: 0, vy: 0, r: 5 + Math.random() * 4, phase: 0, loaded: true, deliveredT: 0,
+          });
+        }
       }
 
-      // bg
-      ctx.fillStyle = COLORS.bg;
-      ctx.fillRect(0, 0, W, H);
-
-      // mycelium net
-      const net = myceliumNetRef.current;
-      const nodes = myceliumNodesRef.current;
-      net.forEach((e) => {
-        const a = nodes[e.a], b = nodes[e.b];
-        const pulse = (Math.sin(timeRef.current * 0.6 + e.pulse * 6) + 1) / 2;
-        ctx.strokeStyle = `rgba(93,186,110,${0.05 + pulse * 0.13})`;
-        ctx.lineWidth = 0.6;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      // Signals
+      s.sigs = s.sigs.filter(sg => sg.t <= 1);
+      s.sigs.forEach(sg => {
+        sg.t += sg.speed;
+        const x = sg.x + (sg.tx - sg.x) * sg.t;
+        const y = sg.y + (sg.ty - sg.y) * sg.t;
+        const life = 1 - Math.abs(sg.t - 0.5) * 2;
+        const col = sg.type === "scan" ? "93,186,110" : "232,168,32";
+        ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${col},${life * 0.8})`; ctx.fill();
       });
-      nodes.forEach((n) => {
-        if (n.active) { n.activeT -= 0.015; if (n.activeT <= 0) { n.active = false; n.activeT = 0; } }
-        const pulse = Math.sin(timeRef.current + n.phase) * 0.5 + 0.5;
-        const intensity = n.active ? n.activeT : 0.15 + pulse * 0.12;
-        const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 6);
-        grd.addColorStop(0, `rgba(93,186,110,${intensity * 0.3})`); grd.addColorStop(1, "rgba(93,186,110,0)");
-        ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 6, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = `rgba(93,186,110,${intensity * 0.9 + 0.1})`;
-        ctx.beginPath(); ctx.arc(n.x, n.y, n.r * (n.active ? 1.4 : 1), 0, Math.PI * 2); ctx.fill();
+      // Feedback arcs
+      s.arcs = s.arcs.filter(a => a.t <= 1);
+      s.arcs.forEach(a => {
+        a.t += a.speed;
+        const x = a.x + (a.tx - a.x) * a.t;
+        const y = a.y + (a.ty - a.y) * a.t;
+        const life = 1 - a.t;
+        ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167,139,250,${life * 0.7})`; ctx.fill();
       });
-
-      // rogue cells
-      rogueRef.current.forEach((r) => {
-        if (!r.alive) {
-          if (r.dyingT > 0) {
-            r.dyingT -= 0.03;
-            ctx.fillStyle = `rgba(232,64,64,${r.dyingT * 0.7})`;
-            ctx.beginPath(); ctx.arc(r.x, r.y, r.r * (1.5 - r.dyingT), 0, Math.PI * 2); ctx.fill();
-          }
+      // Bursts
+      s.bursts.forEach(k => {
+        if (k.t > 0) {
+          k.t -= 0.015; k.r = k.maxR * (1 - k.t);
+          const g = ctx.createRadialGradient(k.x, k.y, 0, k.x, k.y, k.r);
+          g.addColorStop(0, `rgba(232,64,64,${k.t * 0.6})`);
+          g.addColorStop(1, `rgba(232,64,64,0)`);
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2); ctx.fill();
+        }
+      });
+      // Rogue cells
+      s.rogue.forEach(rc => {
+        if (rc.dyingT > 0) {
+          rc.dyingT -= 0.015;
+          if (rc.dyingT <= 0) return;
+          const g = ctx.createRadialGradient(rc.x, rc.y, 0, rc.x, rc.y, rc.r * (2 - rc.dyingT));
+          g.addColorStop(0, `rgba(232,64,64,${rc.dyingT * 0.3})`);
+          g.addColorStop(1, `rgba(232,64,64,0)`);
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(rc.x, rc.y, rc.r * (2 - rc.dyingT), 0, Math.PI * 2); ctx.fill();
           return;
         }
-        r.x += r.vx; r.y += r.vy;
-        if (r.x < r.r || r.x > W - r.r) r.vx *= -1;
-        if (r.y < r.r || r.y > H - r.r) r.vy *= -1;
-        const pulse = Math.sin(timeRef.current * 1.4 + r.phase) * 0.3 + 0.7;
-        const grd = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.r * 2);
-        grd.addColorStop(0, `rgba(232,64,64,${0.85 * pulse})`);
-        grd.addColorStop(0.6, "rgba(139,32,32,0.4)");
-        grd.addColorStop(1, "rgba(139,32,32,0)");
-        ctx.fillStyle = grd;
-        ctx.beginPath(); ctx.arc(r.x, r.y, r.r * 2, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = `rgba(232,64,64,${0.9 * pulse})`;
-        ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2); ctx.fill();
+        if (!rc.alive) return;
+        rc.x += rc.vx; rc.y += rc.vy;
+        if (rc.x <= rc.r || rc.x >= W - rc.r) rc.vx *= -1;
+        if (rc.y <= rc.r || rc.y >= H - rc.r) rc.vy *= -1;
+        rc.x = Math.max(rc.r, Math.min(W - rc.r, rc.x));
+        rc.y = Math.max(rc.r, Math.min(H - rc.r, rc.y));
+        const pulse = Math.sin(s.time * 1.5 + rc.phase) * 0.5 + 0.5;
+        const g = ctx.createRadialGradient(rc.x, rc.y, rc.r * 0.5, rc.x, rc.y, rc.r * 2.5);
+        g.addColorStop(0, `rgba(232,64,64,${0.15 + pulse * 0.08})`);
+        g.addColorStop(1, `rgba(232,64,64,0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(rc.x, rc.y, rc.r * 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(rc.x, rc.y, rc.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(139,32,32,0.8)`; ctx.fill();
+        ctx.strokeStyle = `rgba(232,64,64,${0.4 + pulse * 0.3})`;
+        ctx.lineWidth = 0.8; ctx.stroke();
       });
-
-      // ferro drops
-      ferroRef.current.forEach((fd) => {
-        if (phaseRef.current === "deliver" && fd.loaded) {
-          // seek nearest rogue
-          let best = -1, bestD = Infinity;
-          rogueRef.current.forEach((r, i) => {
-            if (!r.alive) return;
-            const d = Math.hypot(r.x - fd.x, r.y - fd.y);
-            if (d < bestD) { bestD = d; best = i; }
-          });
-          if (best >= 0) {
-            const r = rogueRef.current[best];
-            const dx = r.x - fd.x, dy = r.y - fd.y, d = Math.hypot(dx, dy) || 1;
-            fd.vx += (dx / d) * 0.06; fd.vy += (dy / d) * 0.06;
-            if (d < r.r + fd.r) {
-              metabRef.current.push({ x: fd.x, y: fd.y, vx: dx / d * 1.2, vy: dy / d * 1.2, life: 1, targetIdx: best });
-              fd.loaded = false; fd.deliveredT = 1;
-            }
-          }
-        }
-        fd.vx *= 0.94; fd.vy *= 0.94;
-        fd.x += fd.vx; fd.y += fd.vy;
-        fd.x = Math.max(fd.r, Math.min(W - fd.r, fd.x));
-        fd.y = Math.max(fd.r, Math.min(H - fd.r, fd.y));
-        // spike body
+      // Ferrofluid
+      s.ferro.forEach(fd => {
+        if (!fd.loaded && fd.deliveredT > 0) { fd.deliveredT -= 0.01; return; }
+        const pulse = Math.sin(s.time * 2 + fd.phase) * 0.5 + 0.5;
         const spikes = 6;
-        const mag = Math.min(1, Math.hypot(fd.vx, fd.vy) * 10);
-        ctx.save(); ctx.translate(fd.x, fd.y);
-        ctx.rotate(Math.atan2(fd.vy, fd.vx));
+        ctx.save(); ctx.translate(fd.x, fd.y); ctx.rotate(s.time * 0.5 + fd.phase);
         ctx.beginPath();
         for (let i = 0; i < spikes * 2; i++) {
-          const a = (i / spikes) * Math.PI - Math.PI / 2;
-          const r2 = i % 2 === 0 ? fd.r * (1 + mag * 0.6) : fd.r * 0.5;
-          i === 0 ? ctx.moveTo(Math.cos(a) * r2, Math.sin(a) * r2) : ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+          const a = (i / spikes) * Math.PI;
+          const r2 = i % 2 === 0 ? fd.r * (1 + pulse * 0.5) : fd.r * 0.5;
+          const px = Math.cos(a) * r2, py = Math.sin(a) * r2;
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
         ctx.closePath();
         const fg = ctx.createRadialGradient(0, 0, 0, 0, 0, fd.r * 1.5);
-        fg.addColorStop(0, `rgba(232,168,32,${fd.loaded ? 0.95 : 0.4})`);
-        fg.addColorStop(1, "rgba(184,134,11,0.05)");
+        fg.addColorStop(0, `rgba(232,168,32,0.95)`);
+        fg.addColorStop(1, `rgba(184,134,11,0.1)`);
         ctx.fillStyle = fg; ctx.fill();
         ctx.restore();
       });
-
-      // metabolites
-      metabRef.current = metabRef.current.filter((m) => m.life > 0.05);
-      metabRef.current.forEach((m) => {
-        m.x += m.vx; m.y += m.vy; m.life -= 0.01;
-        const t = rogueRef.current[m.targetIdx];
-        if (t && t.alive && Math.hypot(t.x - m.x, t.y - m.y) < t.r * 0.8) {
-          if (phaseRef.current === "activate" || phaseRef.current === "deliver") {
-            t.alive = false; t.dyingT = 1;
-            burstsRef.current.push({ x: t.x, y: t.y, t: 1, max: t.r * 4 });
-            setKilled((k) => k + 1);
-            m.life = 0;
-          }
-        }
-        ctx.fillStyle = `rgba(79,195,247,${m.life * 0.85})`;
-        ctx.beginPath(); ctx.arc(m.x, m.y, 2.5, 0, Math.PI * 2); ctx.fill();
+      // Metabolites
+      s.meta = s.meta.filter(m => m.life > 0.01);
+      s.meta.forEach(m => {
+        m.x += m.vx; m.y += m.vy; m.life -= 0.005;
+        ctx.beginPath(); ctx.arc(m.x, m.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(79,195,247,${m.life * 0.7})`; ctx.fill();
       });
 
-      // bursts
-      burstsRef.current = burstsRef.current.filter((b) => b.t > 0.05);
-      burstsRef.current.forEach((b) => {
-        b.t -= 0.04;
-        ctx.strokeStyle = `rgba(232,64,64,${b.t * 0.6})`;
-        ctx.lineWidth = 2 * b.t;
-        ctx.beginPath(); ctx.arc(b.x, b.y, b.max * (1 - b.t), 0, Math.PI * 2); ctx.stroke();
-      });
+      // Update metrics
+      const alive = s.rogue.filter(r => r.alive).length;
+      const total = s.rogue.length;
+      const killed = Math.max(0, total - alive);
+      const killPct = total > 0 ? Math.round(killed / total * 100) : 0;
+      const ferroAct = s.ferro.filter(f => f.loaded).length;
+      const targeting = Math.round(Math.min(100, ferroAct / 5 * 100));
+      const myc = Math.round(Math.min(100, 20 + s.cycle * 8 + Math.sin(s.time) * 5));
+      const feed = Math.round(Math.min(100, s.cycle * 12));
+      const risk = Math.max(0, 60 - s.cycle * 5 - killPct * 0.2);
+      if (s.frame % 10 === 0) setMetrics({ targeting, kill: killPct, myc, feed, risk: Math.round(risk) });
 
-      // feedback arcs (purple) when feedback phase
-      if (phaseRef.current === "feedback" && phaseTimeRef.current % 8 === 0) {
-        const n = nodes[Math.floor(Math.random() * nodes.length)];
-        n.active = true; n.activeT = 1;
-      }
+      raf = requestAnimationFrame(draw);
+    }
 
-      rafRef.current = requestAnimationFrame(draw);
-    };
-    rafRef.current = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(rafRef.current); window.removeEventListener("resize", onR); };
+    function onClick(e: MouseEvent) {
+      const s = stateRef.current;
+      const rect = canvas!.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (canvas!.width / rect.width);
+      const my = (e.clientY - rect.top) * (canvas!.height / rect.height);
+      s.ferro.push({ x: mx, y: my, vx: 0, vy: 0, r: 6 + Math.random() * 4, phase: Math.random() * Math.PI * 2, loaded: true, deliveredT: 0 });
+      logEvent("deliver", `Manual ferrofluid injection at (${Math.round(mx)},${Math.round(my)})`);
+    }
+    canvas.addEventListener("click", onClick);
+
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); canvas.removeEventListener("click", onClick); };
   }, []);
 
-  const togglePlay = () => {
-    runningRef.current = !runningRef.current;
-    setRunning(runningRef.current);
-  };
-  const reset = () => {
-    const c = canvasRef.current; if (!c) return;
-    initSim(c.width, c.height);
-    cycleRef.current = 0; phaseRef.current = "sense"; phaseTimeRef.current = 0;
-    setCycle(0); setPhaseUI("sense"); setKilled(0); setLog([]);
-  };
-  const inject = () => {
-    pushLog(phaseRef.current, "User-injected metabolite burst");
-    const c = canvasRef.current; if (!c) return;
-    for (let i = 0; i < 6; i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const tIdx = Math.floor(Math.random() * rogueRef.current.length);
-      metabRef.current.push({
-        x: c.width * 0.5 + Math.cos(ang) * 40, y: c.height * 0.5 + Math.sin(ang) * 40,
-        vx: Math.cos(ang) * 1.4, vy: Math.sin(ang) * 1.4, life: 1, targetIdx: tIdx,
-      });
-    }
-  };
+  const phaseInfo = PHASE_INFO[phase];
 
   return (
-    <div style={{ minHeight: "100%", background: COLORS.bg, color: COLORS.text, fontFamily: "'EB Garamond', Georgia, serif", cursor: "crosshair" }}>
-      <header style={{ padding: "1.5rem 2rem", borderBottom: `1px solid ${COLORS.border}` }}>
-        <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.62rem", letterSpacing: "0.3em", opacity: 0.6, textTransform: "uppercase" }}>
-          AETHER · Bio-Intelligent Oncology · v1
-        </div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: "clamp(1.6rem, 3vw, 2.6rem)", color: COLORS.cream, fontWeight: 800, marginTop: "0.4rem", letterSpacing: "-0.01em" }}>
-          The Closed <span style={{ color: COLORS.mycelium }}>Discovery Loop</span>
+    <div data-testid="discovery-root" className="min-h-screen p-6"
+         style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+
+      <div className="border-b pb-5 mb-6" style={{ borderColor: C.border }}>
+        <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>
+          AETHER · Closed Discovery Loop · Bio-Intelligent Oncology System
+        </p>
+        <h1 className="font-['Cinzel',serif] font-light leading-none tracking-tight" style={{ fontSize: "clamp(34px,4.8vw,58px)", color: C.white }}>
+          Closed <em style={{ color: C.mycelium, fontStyle: "italic" }}>Discovery</em> Loop
         </h1>
-        <div style={{ fontSize: "0.85rem", fontStyle: "italic", color: COLORS.dim, marginTop: "0.3rem" }}>
-          Mycelium × Ferrofluid × Metabolite — sense, deliver, activate, learn.
-        </div>
-        <div style={{ display: "flex", gap: "0.4rem", marginTop: "0.9rem", flexWrap: "wrap" }}>
-          {PHASE_ORDER.map((p) => {
-            const info = PHASE_INFO[p];
-            const active = phaseUI === p;
-            return (
-              <div key={p} data-testid={`phase-${p}`} style={{
-                padding: "0.35rem 0.7rem",
-                border: `1px solid ${active ? info.color : "transparent"}`,
-                color: active ? info.color : COLORS.dim,
-                fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.14em",
-                display: "flex", alignItems: "center", gap: 6,
-              }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: info.color, opacity: active ? 1 : 0.4, boxShadow: active ? `0 0 6px ${info.color}` : "none" }} />
-                {info.label}
-              </div>
-            );
-          })}
-        </div>
-      </header>
+        <p className="font-['Cinzel',serif] italic mt-2" style={{ fontSize: "clamp(13px,1.6vw,18px)", color: C.muted }}>
+          Mycelium · Ferrofluid · Metabolite — sense → deliver → activate → feedback
+        </p>
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "1.2rem", padding: "1.2rem 2rem 2rem", alignItems: "start" }}>
-        <main>
-          <div style={{ display: "flex", gap: "0.5rem", padding: "0.6rem 0", borderBottom: `1px solid ${COLORS.border}`, flexWrap: "wrap" }}>
-            <button onClick={togglePlay} data-testid="btn-play" style={btnStyle(running)}>{running ? "PAUSE" : "PLAY"}</button>
-            <button onClick={reset} data-testid="btn-reset" style={btnStyle(false)}>RESET</button>
-            <button onClick={inject} data-testid="btn-inject" style={{ ...btnStyle(false), borderColor: COLORS.ferro, color: COLORS.ferro }}>INJECT METABOLITE</button>
-            <div style={{ marginLeft: "auto", display: "flex", gap: "1.2rem", color: COLORS.dim, fontFamily: "monospace", fontSize: "0.7rem", alignItems: "center", letterSpacing: "0.1em" }}>
-              <div>CYCLE <span style={{ color: COLORS.cream }}>{cycle}</span></div>
-              <div>KILLED <span style={{ color: COLORS.rogue }}>{killed}</span></div>
-            </div>
-          </div>
-          <div style={{ position: "relative", border: `1px solid ${COLORS.border}`, background: COLORS.bg2, marginTop: "0.7rem", overflow: "hidden", height: 560 }}>
-            <canvas ref={canvasRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="bio-canvas" />
-            {(["tl","tr","bl","br"] as const).map((c) => {
-              const pos: React.CSSProperties = { position: "absolute", width: 22, height: 22, opacity: 0.5 };
-              if (c === "tl") Object.assign(pos, { top: 8, left: 8, borderTop: `1px solid ${COLORS.mycDim}`, borderLeft: `1px solid ${COLORS.mycDim}` });
-              if (c === "tr") Object.assign(pos, { top: 8, right: 8, borderTop: `1px solid ${COLORS.mycDim}`, borderRight: `1px solid ${COLORS.mycDim}` });
-              if (c === "bl") Object.assign(pos, { bottom: 8, left: 8, borderBottom: `1px solid ${COLORS.mycDim}`, borderLeft: `1px solid ${COLORS.mycDim}` });
-              if (c === "br") Object.assign(pos, { bottom: 8, right: 8, borderBottom: `1px solid ${COLORS.mycDim}`, borderRight: `1px solid ${COLORS.mycDim}` });
-              return <div key={c} style={pos} />;
+      <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 320px" }}>
+
+        <div>
+          {/* Phase pips */}
+          <div className="flex gap-2 mb-3 flex-wrap">
+            {PHASE_ORDER.map(p => {
+              const info = PHASE_INFO[p];
+              const active = phase === p;
+              return (
+                <button key={p} data-testid={`pip-${p}`} onClick={() => {
+                  stateRef.current.phase = p; stateRef.current.phaseTime = 0;
+                  setPhase(p); logEvent(p, info.desc);
+                }}
+                  className="flex items-center gap-2 px-3 py-1.5 text-[9px] tracking-[0.18em] uppercase border transition-colors"
+                  style={{
+                    color: info.col, borderColor: active ? info.col : "transparent",
+                    background: active ? info.col + "10" : "transparent",
+                  }}>
+                  <span className="rounded-full" style={{
+                    width: 6, height: 6, background: info.col, boxShadow: "0 0 6px " + info.col,
+                  }} />
+                  {info.n} · {info.name}
+                </button>
+              );
             })}
-            <div style={{ position: "absolute", top: 12, right: 14, fontFamily: "monospace", fontSize: "0.5rem", letterSpacing: "0.18em", color: COLORS.mycelium, opacity: 0.4, textAlign: "right", lineHeight: 1.7 }}>
-              MICROSCOPE · 400×<br />DBiT-PLUS LAYER<br />T = {Math.floor(timeRef.current * 60)}f
+          </div>
+
+          {/* Canvas */}
+          <div className="border relative" style={{ borderColor: C.border, background: C.bg2 }}>
+            <canvas ref={canvasRef} style={{ display: "block", width: "100%" }} data-testid="bio-canvas" />
+            <div className="absolute top-3 right-4 text-right pointer-events-none">
+              <p className="text-[8px] tracking-[0.22em]" style={{ color: C.mycelium, opacity: 0.5 }}>MICROSCOPE · 200×</p>
+              <p className="text-[8px] tracking-[0.22em]" style={{ color: C.mycelium, opacity: 0.4 }}>CYCLE {cycle}</p>
             </div>
           </div>
 
-          {/* Phase narrative */}
-          <div style={{ marginTop: "1rem", padding: "0.9rem 1rem", border: `1px solid ${COLORS.border}`, background: "rgba(93,186,110,0.04)" }}>
-            <div style={{ color: PHASE_INFO[phaseUI].color, fontFamily: "monospace", letterSpacing: "0.18em", fontSize: "0.6rem", textTransform: "uppercase" }}>
-              CURRENT PHASE · {PHASE_INFO[phaseUI].label}
+          {/* Controls */}
+          <div className="flex flex-wrap gap-2 mt-3 items-center">
+            <button data-testid="btn-run" onClick={() => setRunning(r => !r)}
+              className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+              style={{ color: running ? C.mycelium : C.text, borderColor: running ? C.mycelium : C.border }}>
+              {running ? "⏵ Running" : "⏸ Paused"}
+            </button>
+            <button data-testid="btn-inject" onClick={() => {
+              const canvas = canvasRef.current; if (!canvas) return;
+              const W = canvas.width, H = canvas.height; const s = stateRef.current;
+              for (let i = 0; i < 3; i++) s.ferro.push({
+                x: W * 0.05 + Math.random() * W * 0.1, y: H * 0.1 + Math.random() * H * 0.8,
+                vx: 0, vy: 0, r: 5 + Math.random() * 5,
+                phase: Math.random() * Math.PI * 2, loaded: true, deliveredT: 0,
+              });
+              logEvent("deliver", "Ferrofluid vehicle batch injected");
+            }} className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+              style={{ color: C.ferro, borderColor: C.ferro }}>↯ Inject Ferrofluid</button>
+            <button data-testid="btn-rogue" onClick={() => {
+              const canvas = canvasRef.current; if (!canvas) return;
+              const W = canvas.width, H = canvas.height; const s = stateRef.current;
+              s.rogue.push({
+                x: W * 0.2 + Math.random() * W * 0.6,
+                y: H * 0.2 + Math.random() * H * 0.6,
+                r: 6 + Math.random() * 10,
+                vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+                alive: true, dyingT: 0, phase: Math.random() * Math.PI * 2,
+              });
+              logEvent("sense", "New rogue cell detected in microenvironment");
+            }} className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+              style={{ color: C.rogue, borderColor: C.rogue }}>+ Rogue Cell</button>
+            <button data-testid="btn-reset" onClick={() => {
+              resetSim(); logEvent("feedback", "System reset · loop reinitialized");
+            }} className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+              style={{ color: C.text, borderColor: C.border }}>↺ Reset</button>
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-[9px] tracking-[0.18em]" style={{ color: C.dim }}>SPEED</span>
+              <input data-testid="speed-slider" type="range" min="0.5" max="3" step="0.1"
+                value={speed} onChange={e => setSpeed(+e.target.value)} style={{ width: 80, accentColor: C.mycelium }} />
             </div>
-            <div style={{ marginTop: 6, fontSize: "0.95rem", color: COLORS.cream, fontStyle: "italic" }}>
-              {PHASE_INFO[phaseUI].desc}
+          </div>
+
+          {/* Breakthrough metrics */}
+          <div className="grid gap-px mt-4" style={{ gridTemplateColumns: "1fr 1fr", background: C.border }}>
+            <div className="p-3" style={{ background: C.bg2 }}>
+              <p className="font-['Cinzel',serif]" style={{ color: C.mycelium, fontSize: 28 }}>59%</p>
+              <p className="text-[8px] tracking-[0.22em] mt-1" style={{ color: C.dim }}>2025 · GLIOBLASTOMA KILL RATE WITH FERROFLUID-CHEMO HYBRIDS</p>
+            </div>
+            <div className="p-3" style={{ background: C.bg2 }}>
+              <p className="font-['Cinzel',serif]" style={{ color: C.feedback, fontSize: 28 }}>70-80%</p>
+              <p className="text-[8px] tracking-[0.22em] mt-1" style={{ color: C.dim }}>RESPONSE RATE · MYCELIUM-ASSISTED PRECISION MEDICINE EARLY STUDIES</p>
             </div>
           </div>
-        </main>
+        </div>
 
-        <aside style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: "0.9rem", background: "rgba(93,186,110,0.03)" }}>
-            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase" }}>Empirical Signals</div>
-            <div style={{ marginTop: 8, color: COLORS.cream, fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 700 }}>59%</div>
-            <div style={{ color: COLORS.text, fontSize: "0.78rem" }}>GBM kill rate · ferrofluid + chemo hybrids (2025 data)</div>
-            <div style={{ marginTop: 12, color: COLORS.cream, fontFamily: "'Syne', sans-serif", fontSize: "1.6rem", fontWeight: 700 }}>70-80%</div>
-            <div style={{ color: COLORS.text, fontSize: "0.78rem" }}>Mycelium-assisted precision response (early studies)</div>
+        {/* Sidebar */}
+        <div className="space-y-3">
+          <div className="border" style={{ borderColor: C.border, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.24em] p-3 border-b" style={{ color: C.mycelium, borderColor: C.border }}>PHASE STEPS</p>
+            <div className="py-2">
+              {PHASE_ORDER.map(p => {
+                const info = PHASE_INFO[p];
+                const active = phase === p;
+                return (
+                  <button key={p} onClick={() => {
+                    stateRef.current.phase = p; stateRef.current.phaseTime = 0;
+                    setPhase(p); logEvent(p, info.desc);
+                  }} className="w-full text-left px-4 py-3 transition-colors"
+                    style={{
+                      borderLeft: "2px solid " + (active ? info.col : "transparent"),
+                      background: active ? "rgba(0,0,0,0.3)" : "transparent",
+                    }}>
+                    <p className="text-[9px]" style={{ color: info.col, opacity: 0.7 }}>{info.n}</p>
+                    <p className="font-['Cinzel',serif]" style={{ color: info.col, fontSize: 13 }}>{info.name}</p>
+                    <p className="text-[10px] mt-1 italic" style={{ color: C.muted }}>{info.desc}</p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: "0.9rem" }}>
-            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6 }}>Loop Stages</div>
-            {PHASE_ORDER.map((p) => (
-              <div key={p} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "0.45rem 0", borderTop: `1px dashed ${COLORS.border}` }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: PHASE_INFO[p].color, marginTop: 5, opacity: phaseUI === p ? 1 : 0.4, boxShadow: phaseUI === p ? `0 0 8px ${PHASE_INFO[p].color}` : "none" }} />
-                <div>
-                  <div style={{ color: PHASE_INFO[p].color, fontFamily: "monospace", fontSize: "0.65rem", letterSpacing: "0.12em" }}>{PHASE_INFO[p].label}</div>
-                  <div style={{ color: COLORS.text, fontSize: "0.78rem" }}>{PHASE_INFO[p].desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: "0.9rem", background: "rgba(0,0,0,0.3)" }}>
-            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6 }}>Event Log</div>
-            <div style={{ maxHeight: 180, overflow: "auto" }} data-testid="event-log">
-              {log.length === 0 && <div style={{ color: COLORS.dim, fontSize: "0.75rem", fontStyle: "italic" }}>Awaiting first signal…</div>}
-              {log.map((e, i) => (
-                <div key={i} style={{ fontFamily: "monospace", fontSize: "0.65rem", padding: "0.25rem 0", color: PHASE_INFO[e.phase].color, opacity: 1 - i * 0.06, letterSpacing: "0.04em" }}>
-                  <span style={{ color: COLORS.dim, marginRight: 6 }}>[{PHASE_INFO[e.phase].label}]</span>{e.msg}
+          <div className="border" style={{ borderColor: C.border, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.24em] p-3 border-b" style={{ color: C.mycelium, borderColor: C.border }}>LOOP METRICS</p>
+            <div className="p-3 space-y-2">
+              {[
+                { k: "Targeting",         v: metrics.targeting, c: C.ferro },
+                { k: "Kill rate (cycle)", v: metrics.kill,      c: C.rogue },
+                { k: "Mycelium coverage", v: metrics.myc,       c: C.mycelium },
+                { k: "Feedback maturity", v: metrics.feed,      c: C.feedback },
+                { k: "Residual risk",     v: metrics.risk,      c: C.metabolite },
+              ].map(m => (
+                <div key={m.k}>
+                  <div className="flex justify-between text-[9px]" style={{ color: C.muted }}>
+                    <span>{m.k}</span>
+                    <span data-testid={`metric-${m.k.toLowerCase().replace(/\W+/g, "-")}`} style={{ color: m.c }}>{m.v}%</span>
+                  </div>
+                  <div style={{ height: 3, background: "rgba(255,255,255,0.07)", marginTop: 2 }}>
+                    <div style={{ height: "100%", width: m.v + "%", background: m.c, transition: "width 0.6s ease" }} />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </aside>
+
+          <div className="border" style={{ borderColor: C.border, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.24em] p-3 border-b" style={{ color: C.mycelium, borderColor: C.border }}>EVENT LOG</p>
+            <div data-testid="event-log" className="max-h-72 overflow-y-auto p-2 space-y-1 text-[10px]">
+              <AnimatePresence initial={false}>
+                {events.map((e, i) => (
+                  <motion.div key={e.ts + i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                    className="flex gap-2 px-2 py-1">
+                    <span style={{ color: C.dim, minWidth: 60 }}>{e.ts}</span>
+                    <span style={{ color: PHASE_INFO[e.phase].col, minWidth: 32 }}>{e.phase.slice(0, 3).toUpperCase()}</span>
+                    <span style={{ color: C.text }}>{e.msg}</span>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ── BIOLUMINESCENT MYCELIUM · AETHER SYMBOLIC LAYER ── */}
-      <div data-testid="biolum-section" style={{ marginTop: "2.5rem", padding: "1.5rem 1.4rem 2rem", borderTop: `1px solid ${COLORS.border}`, background: "linear-gradient(180deg, rgba(93,186,110,0.04), rgba(0,0,0,0.0))" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
-          <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.65rem", letterSpacing: "0.3em", textTransform: "uppercase" }}>
-            Living Resonance Layer · v1.0
-          </div>
-          <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.18em" }}>
-            Panellus stipticus · Mycena · Armillaria
-          </div>
-        </div>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: "1.8rem", color: COLORS.cream, fontWeight: 600, letterSpacing: "-0.01em", marginBottom: 8 }}>
-          Bioluminescent Mycelium <span style={{ color: COLORS.mycelium, fontStyle: "italic", fontWeight: 300 }}>— the visible coherence layer</span>
-        </h2>
-        <p style={{ color: COLORS.text, fontSize: "0.95rem", lineHeight: 1.7, maxWidth: 820, marginBottom: 22 }}>
-          Bioluminescent mycelium harnesses the natural glow of fungi (luciferin–luciferase reactions) to create soft, oxygen-dependent light without electricity.
-          Within the AETHER framework this becomes a <em style={{ color: COLORS.cream }}>visible resonance layer</em> — emergent coherence (Φ) made readable as living light, woven directly into the discovery loop.
-        </p>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: "0.85rem", marginBottom: "1.6rem" }}>
-          {[
-            { tag: "Eco Lighting", body: "Hybrid wood/substrate composites infused with bioluminescent fungi for ambient glow (hours to days with moisture/oxygen). Room-temperature phosphorescent (RTP) variants tune afterglow blue→red." },
-            { tag: "MycelioTronics", body: "Mycelium 'skins' as flexible, self-healing substrates for circuits, sensors, and batteries (~3.8 mAh/cm²). Compostable hybrid devices that integrate with silicon while reducing e-waste." },
-            { tag: "Bio-Indicator", body: "Glow intensity acts as a living signal for soil health, toxins, and humidity. Mycelial networks remediate pollutants while pulsing visible activity." },
-            { tag: "Living Architecture", body: "Grown composites for insulation, packaging, and acoustics. Speculative glowing underground networks form the substrate for an Internet of Living Things." },
-          ].map((card) => (
-            <div key={card.tag} data-testid={`biolum-card-${card.tag.toLowerCase().replace(/\s+/g, "-")}`} style={{ border: `1px solid ${COLORS.border}`, padding: "0.9rem 1rem", background: "rgba(0,0,0,0.25)", position: "relative" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, width: 24, height: 2, background: COLORS.mycelium, opacity: 0.7 }} />
-              <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 6 }}>{card.tag}</div>
-              <div style={{ color: COLORS.text, fontSize: "0.82rem", lineHeight: 1.55 }}>{card.body}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: "1rem", marginBottom: "1.4rem" }}>
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: "1rem 1.1rem", background: "rgba(93,186,110,0.04)" }}>
-            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: 10 }}>Extended Symbolic Mappings</div>
-            {[
-              { sym: "מΦ", name: "Mem + Phi", desc: "Fluid resonant field — mycelial flow with harmonic glow/coherence." },
-              { sym: "נΨ", name: "Nun + Psi", desc: "Emergent information field — seed-like growth of glowing networks." },
-              { sym: "ΛΦ", name: "Lattice Coherence", desc: "Ordered mycelial structures with phase-locked light." },
-              { sym: "Φ_glow", name: "State Transition", desc: "Bioluminescent coherence in living infrastructure." },
-            ].map((m) => (
-              <div key={m.sym} style={{ display: "grid", gridTemplateColumns: "70px 1fr", gap: 12, padding: "0.55rem 0", borderTop: `1px dashed ${COLORS.border}` }}>
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.4rem", color: COLORS.mycelium, lineHeight: 1.1 }}>{m.sym}</div>
-                <div>
-                  <div style={{ color: COLORS.cream, fontFamily: "monospace", fontSize: "0.62rem", letterSpacing: "0.12em", textTransform: "uppercase" }}>{m.name}</div>
-                  <div style={{ color: COLORS.text, fontSize: "0.8rem", marginTop: 2 }}>{m.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ border: `1px solid ${COLORS.border}`, padding: "1rem 1.1rem", background: "rgba(0,0,0,0.3)" }}>
-            <div style={{ color: COLORS.dim, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: 10 }}>Progression Extension</div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1.05rem", lineHeight: 1.9, color: COLORS.cream, fontStyle: "italic", marginBottom: 14 }}>
-              ψ <span style={{ color: COLORS.dim }}>→</span> Φ <span style={{ color: COLORS.dim }}>→</span> σ <span style={{ color: COLORS.dim }}>→</span> Λ <span style={{ color: COLORS.dim }}>→</span> Ω
-            </div>
-            <div style={{ color: COLORS.text, fontSize: "0.82rem", lineHeight: 1.6 }}>
-              Chaotic substrate → mycelial oscillation/glow → structural tension in network → self-healing lattice → stabilized living system.
-            </div>
-            <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${COLORS.border}` }}>
-              <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 4 }}>Composite Example</div>
-              <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "1rem", color: COLORS.cream, fontStyle: "italic" }}>
-                אמΦ — glowing origin fluid resonance in mycelial grids powering FerroDrive roads or Resonant Medicine sensors.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ border: `1px solid ${COLORS.border}`, padding: "0.95rem 1.1rem", background: "rgba(93,186,110,0.05)" }}>
-          <div style={{ color: COLORS.mycelium, fontFamily: "monospace", fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase", marginBottom: 8 }}>Tie to the Symphonic Protocol</div>
-          <ul style={{ paddingLeft: "1.1rem", color: COLORS.text, fontSize: "0.85rem", lineHeight: 1.7, margin: 0 }}>
-            <li><strong style={{ color: COLORS.cream }}>Living Infrastructure</strong> — underground mycelial grids as decentralized servers/sensors with visible bioluminescent pulses; an Internet of Living Things that reclaims the friction tax via zero-cooling, self-healing pathways.</li>
-            <li><strong style={{ color: COLORS.cream }}>Circulatory Mobility</strong> — glowing mycelial road substrates interacting with ferrofluid (∇ flow under B fields) for inductive resonant charging.</li>
-            <li><strong style={{ color: COLORS.cream }}>Resonant Medicine</strong> — bioluminescent signals for non-invasive frequency alignment and biosensing.</li>
-            <li><strong style={{ color: COLORS.cream }}>Sovereignty Dividend</strong> — regenerative, low-impact lighting and materials that turn waste into vitality credits.</li>
-          </ul>
-          <div style={{ marginTop: 12, color: COLORS.dim, fontSize: "0.75rem", fontStyle: "italic", lineHeight: 1.5 }}>
-            Field dominance — electromagnetic and biological — over randomness. Mirroring condensed plasmoid order in living matter.
-          </div>
-        </div>
+      <div className="mt-12 pt-4 border-t flex justify-between text-[8px] tracking-[0.16em] uppercase" style={{ borderColor: C.border, color: C.dim }}>
+        <span>AETHER · Closed Discovery Loop · Cycle {cycle}</span>
+        <span style={{ fontFamily: "serif", fontSize: 14, color: C.mycelium, fontStyle: "italic" }}>sense · deliver · activate · feedback</span>
+        <span>click canvas to inject ferrofluid</span>
       </div>
     </div>
   );
-}
-
-function btnStyle(active: boolean): React.CSSProperties {
-  return {
-    fontFamily: "monospace", fontSize: "0.62rem", letterSpacing: "0.12em",
-    textTransform: "uppercase",
-    padding: "0.4rem 0.85rem",
-    background: active ? "rgba(93,186,110,0.08)" : "transparent",
-    border: `1px solid ${active ? COLORS.mycelium : COLORS.border}`,
-    color: active ? COLORS.mycelium : COLORS.text,
-    cursor: "pointer",
-  };
 }

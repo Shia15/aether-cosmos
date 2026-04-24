@@ -17,7 +17,7 @@ The AETHER system is built as a pnpm workspace monorepo using TypeScript, featur
 ### UI/UX Decisions
 - **Color Palette:** A consistent theme using "Void", "Navy", "Deep", "Violet", "Mid", "Gold", "Bright Gold", "Coral", "Crimson", and "Teal" for a sophisticated and cosmic aesthetic.
 - **Interactive Visualizations:** Extensive use of live canvases for simulations, graphs (e.g., force-directed graph, mind maps, sky dials), and dynamic data representations (e.g., solar system, planetary alignments, neural simulations).
-- **Navigation:** Over 60 distinct routes covering various features, including a primary Graph Map, ecosystem views, architectural breakdowns, and specialized simulators. Many pages feature interactive elements and scroll-anchored sections.
+- **Navigation:** Over 60 distinct routes (currently 60+ pages) covering various features, including a primary Graph Map, ecosystem views, architectural breakdowns, specialized simulators, the AETHER Whitepaper v1, the Six-Planet March 2026 Alignment, the Closed Discovery Loop, the Fibonacci Quantization Processor (FQP), the Symphonic Protocol OS v2 (7-layer), and the Symphonic Protocol v0.1 Glass-Box Ecosystem (4-layer). The legacy Coherence Bus / heads-up display has been removed in favor of dedicated pages. Many pages feature interactive elements and scroll-anchored sections.
 
 ### Technical Implementations
 - **Frontend:** React with Vite for a fast and reactive user interface.

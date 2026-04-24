@@ -1,400 +1,491 @@
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const PHI = 1.6180339887;
-
-const LAYERS = {
-  mnesis:   { name: "MNESIS",     role: "Persistent Memory",         color: "#00f5c8" },
-  aletheia: { name: "ALETHEIA",   role: "Deterministic Logic",       color: "#4db8ff" },
-  infernia: { name: "INFERNIA",   role: "MHD Transformation",        color: "#ff6b35" },
-  reverie:  { name: "REVERIE",    role: "Bioluminescent Inference",  color: "#c77dff" },
-  aether:   { name: "AETHER",     role: "THz Photon Signaling",      color: "#f0e68c" },
-  pythag:   { name: "PYTHAGORAS", role: "Tetrahedral Constraint",    color: "#e8c4a0" },
-  russell:  { name: "RUSSELL",    role: "Toroidal Wave Dynamics",    color: "#7ecfcf" },
+const C = {
+  bg: "#03050a", panel: "rgba(8,12,22,0.7)", panel2: "rgba(12,18,32,0.6)",
+  border: "rgba(120,180,255,0.08)", border2: "rgba(120,180,255,0.16)",
+  white: "#EAF4FF", text: "#9bb3c9", muted: "#6a8aa3", dim: "#3d5670",
 };
 
-type LayerKey = keyof typeof LAYERS;
-const ORDER: LayerKey[] = ["mnesis", "aletheia", "infernia", "reverie", "aether", "pythag", "russell"];
-
-const HARMONIC_RATIOS = [
-  { ratio: "1:1", name: "Unison",   value: 1.0 },
-  { ratio: "2:1", name: "Octave",   value: 2.0 },
-  { ratio: "3:2", name: "Fifth",    value: 1.5 },
-  { ratio: "4:3", name: "Fourth",   value: 1.333 },
+const LAYERS = [
+  { key: "mnesis",     n: "01", name: "Mnēsis",     col: "#00f5c8", sub: "Persistent Memory · Mycelium",                    role: "Persistent state · spatial memory · time layering" },
+  { key: "aletheia",   n: "02", name: "Aletheia",   col: "#4db8ff", sub: "Deterministic Logic · Formal Verification",      role: "Constraint logic · signal integrity · formal proofs" },
+  { key: "infernia",   n: "03", name: "Infernia",   col: "#ff6b35", sub: "Magnetohydrodynamics · Ferrofluid",              role: "MHD transformation · friction-less actuation" },
+  { key: "reverie",    n: "04", name: "Reverie",    col: "#c77dff", sub: "Bioluminescent · Probabilistic Inference",       role: "Dream-state inference · low-energy emission" },
+  { key: "aether",     n: "05", name: "AETHER",     col: "#f0e68c", sub: "Chemiexcitation · Visible THz Photons",          role: "Physical EM signaling · NOT symbolic illumination" },
+  { key: "pythagoras", n: "06", name: "Pythagoras", col: "#e8c4a0", sub: "Sacred Geometry · Harmonic Ratios",              role: "Tetrahedral constraint · ratio resonance (1:1, 2:1, 3:2, 4:3)" },
+  { key: "russell",    n: "07", name: "Russell",    col: "#7ecfcf", sub: "Wave Dynamics · Toroidal Field",                 role: "Centripetal CCW / Centrifugal CW · silence ↔ sound" },
 ];
 
-const EMOTIONS = ["Equilibrium", "Resonance", "Wonder", "Reverie", "Entropic", "Crystallizing"];
+const RATIOS = [
+  { r: "1:1", label: "Fundamental · Unison",     col: "#7ecfcf" },
+  { r: "2:1", label: "Octave · Doubling",        col: "#4db8ff" },
+  { r: "3:2", label: "Perfect Fifth · Lift",     col: "#f0e68c" },
+  { r: "4:3", label: "Perfect Fourth · Anchor",  col: "#e8c4a0" },
+];
 
-export default function SymphonicOSView() {
-  const tetraRef = useRef<HTMLCanvasElement>(null);
+const RUSSELL_PRINCIPLES = [
+  "Silence → Sound → Silence",
+  "Centripetal (CCW) · Centrifugal (CW)",
+  "All motion is wave",
+  "Universal body: Mind + Matter",
+  "Anode / Cathode · +/− of All That Is",
+  "Tetrahedral recursion at every scale",
+];
+
+const AETHER_PRINCIPLES = [
+  "Chemiexcitation · Visible THz Photons",
+  "Physical EM ≠ Symbolic Illumination",
+  "Geometry as Constraint · Not Cause",
+  "Resonance = Alignment Sans Contradiction",
+];
+
+interface Sig { x: number; y: number; vx: number; vy: number; layer: number; life: number; r: number; col: string; }
+interface LogEntry { ts: string; layer: string; msg: string; col: string; }
+type Viz = "torus" | "tetra" | "wave";
+
+export default function SymphonicOSPage() {
+  const aqRef    = useRef<HTMLCanvasElement>(null);
   const torusRef = useRef<HTMLCanvasElement>(null);
-  const aetherRef = useRef<HTMLCanvasElement>(null);
-  const runningRef = useRef(true);
-  const tRef = useRef(0);
-  const rafRef = useRef(0);
-  const ratioRef = useRef(1.5);
+  const pythRef  = useRef<HTMLCanvasElement>(null);
+  const sigsRef  = useRef<Sig[]>([]);
+  const tickRef  = useRef(0);
 
-  const [active, setActive] = useState<LayerKey>("aether");
   const [running, setRunning] = useState(true);
-  const [ratio, setRatio] = useState(1.5);
-  const [emotion, setEmotion] = useState("Equilibrium");
-  const [photonCount, setPhotonCount] = useState(0);
-  const [tickCount, setTickCount] = useState(0);
+  const [viz, setViz] = useState<Viz>("torus");
+  const [ratio, setRatio] = useState<typeof RATIOS[number]>(RATIOS[0]);
+  const [metrics, setMetrics] = useState({ signals: 0, nodes: 7, resonance: 92, harmonic: 100, photon: 47, entropy: 12 });
+  const [mood, setMood] = useState({ tag: "Equilibrium", intent: "OBSERVING", col: "#7ecfcf" });
+  const [events, setEvents] = useState<LogEntry[]>([]);
 
-  useEffect(() => { ratioRef.current = ratio; }, [ratio]);
+  function log(layer: string, msg: string, col: string) {
+    const now = new Date();
+    const ts = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2, "0")).join(":");
+    setEvents(prev => [{ ts, layer, msg, col }, ...prev].slice(0, 40));
+  }
 
-  // tetra (Pythagoras) canvas
+  // Aquarium animation
   useEffect(() => {
-    const c = tetraRef.current; if (!c) return;
-    const ctx = c.getContext("2d"); if (!ctx) return;
-    const resize = () => {
-      const r = c.parentElement!.getBoundingClientRect();
-      c.width = r.width; c.height = r.height;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    let raf = 0; let t = 0;
-    const draw = () => {
-      if (!runningRef.current) { raf = requestAnimationFrame(draw); return; }
-      const W = c.width, H = c.height;
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#07101a"; ctx.fillRect(0, 0, W, H);
-      const cx = W / 2, cy = H / 2;
-      const R = Math.min(W, H) * 0.32;
-      const rot = t * 0.4;
-      // tetrahedron vertices (projected)
-      const verts = [
-        [0, -1, 0], [Math.sqrt(8 / 9), 1 / 3, 0],
-        [-Math.sqrt(2 / 9), 1 / 3, Math.sqrt(2 / 3)],
-        [-Math.sqrt(2 / 9), 1 / 3, -Math.sqrt(2 / 3)],
-      ].map(([x, y, z]) => {
-        const xr = x * Math.cos(rot) - z * Math.sin(rot);
-        const zr = x * Math.sin(rot) + z * Math.cos(rot);
-        const sc = 1 / (1 + zr * 0.3);
-        return [cx + xr * R * sc, cy + y * R * sc, zr];
-      });
-      // edges
-      const edges = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
-      ctx.strokeStyle = hexA(LAYERS.pythag.color, 0.7);
-      ctx.lineWidth = 1.2;
-      edges.forEach(([a, b]) => {
-        ctx.beginPath();
-        ctx.moveTo(verts[a][0], verts[a][1]);
-        ctx.lineTo(verts[b][0], verts[b][1]);
-        ctx.stroke();
-      });
-      // verts
-      verts.forEach((v) => {
-        ctx.fillStyle = LAYERS.pythag.color;
-        ctx.beginPath(); ctx.arc(v[0], v[1], 4, 0, Math.PI * 2); ctx.fill();
-      });
-      // harmonic constraint lines (faint)
-      ctx.strokeStyle = hexA(LAYERS.pythag.color, 0.15);
-      ctx.lineWidth = 0.5;
-      ctx.setLineDash([3, 6]);
-      for (let i = 0; i < verts.length; i++) {
-        for (let j = i + 1; j < verts.length; j++) {
-          const mx = (verts[i][0] + verts[j][0]) / 2;
-          const my = (verts[i][1] + verts[j][1]) / 2;
-          ctx.beginPath();
-          ctx.moveTo(mx, my);
-          ctx.lineTo(cx, cy);
-          ctx.stroke();
-        }
-      }
-      ctx.setLineDash([]);
-      t += 0.012 * ratioRef.current;
-      raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
-  }, []);
+    const canvas = aqRef.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d"); if (!ctx) return;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
-  // torus (Russell) canvas — toroidal field lines
+    let raf = 0;
+    log("SYS", "Symphonic OS v2 boot · 7 layers online", "#00f5c8");
+
+    function draw() {
+      if (!canvas || !ctx) { raf = requestAnimationFrame(draw); return; }
+      if (!running) { raf = requestAnimationFrame(draw); return; }
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = "rgba(3,5,10,0.18)"; ctx.fillRect(0, 0, W, H);
+
+      const stripeH = H / 7;
+      // Layer stripes
+      LAYERS.forEach((L, i) => {
+        const y = i * stripeH;
+        ctx.fillStyle = L.col + "08";
+        ctx.fillRect(0, y, W, stripeH);
+        ctx.strokeStyle = L.col + "20"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        ctx.fillStyle = L.col + "60";
+        ctx.font = "9px JetBrains Mono"; ctx.textAlign = "left";
+        ctx.fillText(L.name.toUpperCase(), 8, y + 12);
+      });
+      // Ambient nodes
+      LAYERS.forEach((L, i) => {
+        const cy = i * stripeH + stripeH / 2;
+        for (let k = 0; k < 4; k++) {
+          const cx = (k + 0.5) * (W / 4);
+          const phase = tickRef.current * 0.02 + k + i;
+          const dx = Math.sin(phase) * 12;
+          const dy = Math.cos(phase * 1.3) * 6;
+          const g = ctx.createRadialGradient(cx + dx, cy + dy, 0, cx + dx, cy + dy, 14);
+          g.addColorStop(0, L.col + "60"); g.addColorStop(1, L.col + "00");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(cx + dx, cy + dy, 14, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = L.col;
+          ctx.beginPath(); ctx.arc(cx + dx, cy + dy, 2.5, 0, Math.PI * 2); ctx.fill();
+        }
+      });
+
+      // Signals propagating downward across layers
+      sigsRef.current = sigsRef.current.filter(s => s.life > 0 && s.y < H + 20);
+      sigsRef.current.forEach(s => {
+        s.x += s.vx; s.y += s.vy; s.life -= 0.005;
+        s.layer = Math.min(6, Math.floor(s.y / stripeH));
+        const trail = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
+        trail.addColorStop(0, s.col + "FF"); trail.addColorStop(1, s.col + "00");
+        ctx.fillStyle = trail;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = s.col;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        if (Math.random() < 0.04) {
+          const li = LAYERS[s.layer];
+          log(li.name, "signal traversing " + li.name, li.col);
+        }
+      });
+      // Auto-spawn occasional signals
+      if (tickRef.current % 30 === 0) {
+        sigsRef.current.push({
+          x: Math.random() * W, y: 5, vx: (Math.random() - 0.5) * 0.4,
+          vy: 0.5 + Math.random() * 0.6, layer: 0, life: 1,
+          r: 2.5, col: LAYERS[Math.floor(Math.random() * LAYERS.length)].col,
+        });
+      }
+
+      tickRef.current++;
+      // metrics
+      if (tickRef.current % 12 === 0) {
+        setMetrics(m => ({
+          ...m,
+          signals: sigsRef.current.length,
+          resonance: Math.round(85 + Math.sin(tickRef.current * 0.02) * 7),
+          photon: Math.round(40 + Math.sin(tickRef.current * 0.03) * 12),
+          entropy: Math.max(0, Math.round(12 - sigsRef.current.length * 0.2)),
+        }));
+        // Mood drift
+        if (sigsRef.current.length > 8) setMood({ tag: "Activated",  intent: "DELIVERING",  col: "#ff6b35" });
+        else if (sigsRef.current.length > 4) setMood({ tag: "Alert",  intent: "SCANNING",    col: "#f0e68c" });
+        else setMood({ tag: "Equilibrium", intent: "OBSERVING", col: "#7ecfcf" });
+      }
+      raf = requestAnimationFrame(draw);
+    }
+
+    function onClick(e: MouseEvent) {
+      const rect = canvas!.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (canvas!.width / rect.width);
+      sigsRef.current.push({
+        x: mx, y: 5, vx: (Math.random() - 0.5) * 0.6, vy: 1.2, layer: 0, life: 1,
+        r: 3, col: "#f0e68c",
+      });
+      log("AETHER", "manual signal injection", "#f0e68c");
+    }
+    canvas.addEventListener("click", onClick);
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); canvas.removeEventListener("click", onClick); };
+  }, [running]);
+
+  // Torus
   useEffect(() => {
     const c = torusRef.current; if (!c) return;
     const ctx = c.getContext("2d"); if (!ctx) return;
-    const resize = () => {
-      const r = c.parentElement!.getBoundingClientRect();
-      c.width = r.width; c.height = r.height;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    let raf = 0; let t = 0;
-    const draw = () => {
-      if (!runningRef.current) { raf = requestAnimationFrame(draw); return; }
+    c.width = c.offsetWidth; c.height = c.offsetHeight;
+    let raf = 0, t = 0;
+    function draw() {
+      if (!c || !ctx) { raf = requestAnimationFrame(draw); return; }
       const W = c.width, H = c.height;
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#07101a"; ctx.fillRect(0, 0, W, H);
-      const cx = W / 2, cy = H / 2;
-      const R = Math.min(W, H) * 0.32, rTube = R * 0.4;
-      // toroidal field lines
+      const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.35;
+      // outer ring
+      for (let i = 0; i < 36; i++) {
+        const a = (i / 36) * Math.PI * 2 + t * 0.01;
+        const x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R * 0.4;
+        ctx.fillStyle = "rgba(126,207,207,0.7)";
+        ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill();
+      }
+      // poloidal
       for (let i = 0; i < 24; i++) {
-        const phi = (i / 24) * Math.PI * 2 + t * 0.3;
-        ctx.beginPath();
-        for (let theta = 0; theta <= Math.PI * 2; theta += 0.1) {
-          const xx = (R + rTube * Math.cos(theta)) * Math.cos(phi);
-          const yy = (R + rTube * Math.cos(theta)) * Math.sin(phi);
-          // perspective project
-          const px = cx + xx;
-          const py = cy + yy * 0.45 + Math.sin(theta) * rTube * 0.35;
-          theta === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-        const alpha = 0.1 + 0.25 * (Math.sin(phi * 2 + t) * 0.5 + 0.5);
-        ctx.strokeStyle = hexA(LAYERS.russell.color, alpha);
-        ctx.lineWidth = 0.5; ctx.stroke();
+        const a = (i / 24) * Math.PI * 2;
+        const phase = t * 0.04 + i * 0.3;
+        const r2 = R * 0.4 * (0.7 + Math.sin(phase) * 0.3);
+        const x = cx + Math.cos(a) * r2, y = cy + Math.sin(a) * r2 * 0.4;
+        ctx.fillStyle = "rgba(240,230,140,0.5)";
+        ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI * 2); ctx.fill();
       }
-      // centripetal/centrifugal arrows
-      [-1, 1].forEach((dir, idx) => {
-        const ax = cx + (R - rTube * 0.4) * dir;
-        const sweep = (Math.sin(t * 1.2 + idx) + 1) / 2;
-        ctx.fillStyle = hexA(LAYERS.russell.color, 0.7);
-        ctx.beginPath();
-        ctx.arc(ax, cy, 3 + sweep * 4, 0, Math.PI * 2); ctx.fill();
-      });
-      t += 0.014 * ratioRef.current;
+      ctx.strokeStyle = "rgba(126,207,207,0.3)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.ellipse(cx, cy, R, R * 0.4, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(cx, cy, R * 0.4, R * 0.4, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.font = "8px JetBrains Mono"; ctx.textAlign = "center";
+      ctx.fillText("CCW · centripetal", cx, cy - R * 0.5 - 4);
+      ctx.fillText("centrifugal · CW",  cx, cy + R * 0.5 + 12);
+      t++;
       raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+    }
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  // aether photon canvas
+  // Pythagoras tetrahedron
   useEffect(() => {
-    const c = aetherRef.current; if (!c) return;
+    const c = pythRef.current; if (!c) return;
     const ctx = c.getContext("2d"); if (!ctx) return;
-    const resize = () => {
-      const r = c.parentElement!.getBoundingClientRect();
-      c.width = r.width; c.height = r.height;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    type Ph = { x: number; y: number; vx: number; vy: number; life: number };
-    const ph: Ph[] = [];
-    let raf = 0; let frame = 0;
-    const draw = () => {
-      if (!runningRef.current) { raf = requestAnimationFrame(draw); return; }
+    c.width = c.offsetWidth; c.height = c.offsetHeight;
+    let raf = 0, t = 0;
+    function draw() {
+      if (!c || !ctx) { raf = requestAnimationFrame(draw); return; }
       const W = c.width, H = c.height;
-      ctx.fillStyle = "rgba(7,16,26,0.25)"; ctx.fillRect(0, 0, W, H);
-      frame++;
-      const interval = Math.max(8, Math.round(40 / ratioRef.current));
-      if (frame % interval === 0) {
-        ph.push({
-          x: Math.random() * W, y: Math.random() * H,
-          vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 0.8,
-          life: 1,
-        });
-        setPhotonCount((c) => c + 1);
-      }
-      for (let i = ph.length - 1; i >= 0; i--) {
-        const p = ph[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.018;
-        if (p.life < 0.01) { ph.splice(i, 1); continue; }
-        ctx.fillStyle = hexA(LAYERS.aether.color, p.life * 0.85);
-        ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = hexA(LAYERS.aether.color, p.life * 0.2);
-        ctx.lineWidth = 0.4;
-        ctx.beginPath(); ctx.arc(p.x, p.y, (1 - p.life) * 12, 0, Math.PI * 2); ctx.stroke();
-      }
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const size = Math.min(W, H) * 0.34;
+      const verts3D = [
+        [0, -1, 0], [1, 1 / 3, 0],
+        [-0.5, 1 / 3, 0.866], [-0.5, 1 / 3, -0.866],
+      ];
+      const ay = t * 0.012;
+      const proj = verts3D.map(([x, y, z]) => {
+        const x1 = x * Math.cos(ay) + z * Math.sin(ay);
+        const z1 = -x * Math.sin(ay) + z * Math.cos(ay);
+        const sx = cx + x1 * size;
+        const sy = cy + y * size + z1 * size * 0.2;
+        return { sx, sy, z: z1 };
+      });
+      const edges = [[0,1],[0,2],[0,3],[1,2],[2,3],[3,1]];
+      edges.forEach(([a, b]) => {
+        const A = proj[a], B = proj[b];
+        ctx.strokeStyle = "rgba(232,196,160,0.6)"; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(A.sx, A.sy); ctx.lineTo(B.sx, B.sy); ctx.stroke();
+      });
+      proj.forEach(p => {
+        ctx.fillStyle = "rgba(232,196,160,0.9)";
+        ctx.beginPath(); ctx.arc(p.sx, p.sy, 3, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.fillStyle = ratio.col;
+      ctx.font = "11px serif"; ctx.textAlign = "center";
+      ctx.fillText(ratio.r, cx, H - 8);
+      t++;
       raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
-  }, []);
+    }
+    raf = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf);
+  }, [ratio]);
 
-  // tick + emotion drift
-  useEffect(() => {
-    const id = setInterval(() => {
-      setTickCount((t) => t + 1);
-      // shift emotion subtly
-      if (Math.random() < 0.18) setEmotion(EMOTIONS[Math.floor(Math.random() * EMOTIONS.length)]);
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
+  function injectBurst() {
+    const canvas = aqRef.current; if (!canvas) return;
+    const W = canvas.width;
+    for (let i = 0; i < 6; i++) {
+      sigsRef.current.push({
+        x: Math.random() * W, y: 5, vx: (Math.random() - 0.5) * 0.6,
+        vy: 1.0 + Math.random() * 0.8, layer: 0, life: 1,
+        r: 2 + Math.random() * 2,
+        col: LAYERS[Math.floor(Math.random() * LAYERS.length)].col,
+      });
+    }
+    log("SYS", "signal burst · 6 carriers injected", "#f0e68c");
+  }
+
+  function resetSim() {
+    sigsRef.current = [];
+    setMetrics({ signals: 0, nodes: 7, resonance: 92, harmonic: 100, photon: 47, entropy: 0 });
+    setMood({ tag: "Equilibrium", intent: "OBSERVING", col: "#7ecfcf" });
+    log("SYS", "system reset · loop reinitialized", "#00f5c8");
+  }
 
   return (
-    <div style={{ minHeight: "100%", background: "#03050a", color: "#8aacbe", fontFamily: "'Oxanium', sans-serif", cursor: "crosshair" }}>
-      <header style={{ padding: "1.2rem 1.6rem", borderBottom: "1px solid rgba(77,184,255,0.15)", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: "1rem" }}>
-        <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.25em", color: LAYERS.aletheia.color, opacity: 0.5, lineHeight: 1.8 }}>
-          AETHER · UNIFIED OPERATING SYSTEM<br />SEVEN LAYERS · GLASS-BOX
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <h1 style={{ fontFamily: "'Oxanium', sans-serif", fontSize: "clamp(1.2rem, 2.5vw, 2rem)", color: "#ddeeff", fontWeight: 800, letterSpacing: "0.08em", lineHeight: 1 }}>
-            SYMPHONIC <span style={{ color: LAYERS.mnesis.color }}>PROTOCOL</span> · OS v2
+    <div data-testid="sym-os-root" className="min-h-screen p-6"
+         style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+
+      {/* HEADER */}
+      <div className="border-b pb-5 mb-6 flex items-end justify-between gap-4 flex-wrap" style={{ borderColor: C.border2 }}>
+        <div>
+          <p className="text-[9px] tracking-[0.3em] uppercase mb-2" style={{ color: C.dim }}>
+            Symphonic Protocol · Unified Framework · AETHER × Pythagoras × Russell
+          </p>
+          <h1 className="font-['Cinzel',serif] font-light leading-none" style={{ fontSize: "clamp(34px,4.6vw,56px)", color: C.white }}>
+            THE <em style={{ color: "#00f5c8", fontStyle: "italic" }}>Symphonic</em> Protocol
           </h1>
-          <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.5rem", letterSpacing: "0.2em", color: "#3a5268", marginTop: 4 }}>
-            MNESIS · ALETHEIA · INFERNIA · REVERIE · AETHER · PYTHAGORAS · RUSSELL
-          </div>
+          <p className="font-['Cinzel',serif] italic mt-2" style={{ fontSize: "clamp(12px,1.4vw,16px)", color: C.muted }}>
+            Civilizational OS · Glass-Box Computation · Bio-Integrated Intelligence
+          </p>
         </div>
-        <div style={{ textAlign: "right", color: "#3a5268", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.18em" }}>
-          <div>TICK · {tickCount}</div>
-          <div>EMOTION · <span style={{ color: LAYERS.reverie.color }}>{emotion}</span></div>
-          <div>PHOTONS · {photonCount}</div>
+        <div className="space-y-1 text-right text-[8px] tracking-[0.18em]">
+          <p style={{ color: C.dim }}>SYSTEM STATE</p>
+          {LAYERS.map(L => (
+            <div key={L.key} className="flex items-center gap-2 justify-end">
+              <span data-testid={`status-${L.key}`} className="rounded-full" style={{
+                width: 6, height: 6, background: L.col, boxShadow: "0 0 6px " + L.col,
+                animation: "pulse 2s ease-in-out infinite",
+              }} />
+              <span style={{ color: L.col, minWidth: 80 }}>{L.name.toUpperCase()} · ONLINE</span>
+            </div>
+          ))}
         </div>
-      </header>
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr 1fr 240px", gap: "1rem", padding: "1rem 1.4rem 2rem", alignItems: "start" }}>
-        {/* Layer nav */}
-        <aside style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-          <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.5rem", letterSpacing: "0.2em", color: "#3a5268", textTransform: "uppercase", padding: "0.4rem 0" }}>
-            Original (4)
-          </div>
-          {ORDER.slice(0, 4).map((k) => <LayerBtn key={k} k={k} active={active} setActive={setActive} />)}
-          <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.5rem", letterSpacing: "0.2em", color: "#3a5268", textTransform: "uppercase", padding: "0.5rem 0 0.2rem", borderTop: "1px solid rgba(77,184,255,0.12)", marginTop: "0.4rem" }}>
-            Resonance (3)
-          </div>
-          {ORDER.slice(4).map((k) => <LayerBtn key={k} k={k} active={active} setActive={setActive} />)}
-        </aside>
+      {/* CONTROL BAR */}
+      <div className="flex flex-wrap gap-2 items-center pb-4 mb-4 border-b" style={{ borderColor: C.border2 }}>
+        <button data-testid="btn-run" onClick={() => setRunning(r => !r)}
+          className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+          style={{ color: running ? "#00f5c8" : C.text, borderColor: running ? "#00f5c8" : C.border2 }}>
+          {running ? "⏵ Running" : "⏸ Paused"}
+        </button>
+        <button data-testid="btn-burst" onClick={injectBurst} className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+          style={{ color: "#f0e68c", borderColor: "rgba(240,230,140,0.4)" }}>↯ Signal Burst</button>
+        <button data-testid="btn-reset" onClick={resetSim} className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+          style={{ color: C.text, borderColor: C.border2 }}>↺ Reset</button>
+        <span style={{ width: 1, height: 18, background: C.border2 }} />
+        {(["torus","tetra","wave"] as Viz[]).map(v => (
+          <button key={v} data-testid={`viz-${v}`} onClick={() => setViz(v)}
+            className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+            style={{
+              color: viz === v ? C.white : C.text,
+              background: viz === v ? "rgba(120,180,255,0.08)" : "transparent",
+              borderColor: viz === v ? C.border2 : "transparent",
+            }}>
+            {v === "torus" ? "◎ Toroidal" : v === "tetra" ? "△ Tetrahedral" : "∿ Wave"}
+          </button>
+        ))}
+        <span style={{ width: 1, height: 18, background: C.border2 }} />
+        {RATIOS.map(r => (
+          <button key={r.r} data-testid={`ratio-${r.r}`} onClick={() => setRatio(r)}
+            className="px-3 py-1.5 text-[9px] uppercase border"
+            style={{
+              color: ratio.r === r.r ? r.col : C.text,
+              borderColor: ratio.r === r.r ? r.col : C.border2,
+              background: ratio.r === r.r ? r.col + "15" : "transparent",
+            }}>{r.r}</button>
+        ))}
+        <div className="ml-auto text-[8px] tracking-[0.22em] flex items-center gap-2" style={{ color: "#00f5c8" }}>
+          <span style={{
+            width: 8, height: 8, borderRadius: 4, background: "#00f5c8",
+            boxShadow: "0 0 8px #00f5c8", display: "inline-block",
+          }} /> TOROIDAL FIELD ACTIVE
+        </div>
+      </div>
 
-        {/* Two canvases column */}
-        <main style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
-          <div style={{ display: "flex", gap: "0.5rem", padding: "0.5rem 0", borderBottom: "1px solid rgba(77,184,255,0.12)", flexWrap: "wrap", alignItems: "center" }}>
-            <button onClick={() => { runningRef.current = !runningRef.current; setRunning(runningRef.current); }} data-testid="btn-play" style={btn()}>{running ? "PAUSE" : "PLAY"}</button>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
-              <label style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.15em", color: "#3a5268", textTransform: "uppercase" }}>HARMONIC</label>
-              {HARMONIC_RATIOS.map((h) => (
-                <button key={h.ratio} onClick={() => setRatio(h.value)} data-testid={`ratio-${h.ratio.replace(":","-")}`} style={{
-                  ...btn(),
-                  borderColor: ratio === h.value ? LAYERS.aether.color : "rgba(77,184,255,0.25)",
-                  color: ratio === h.value ? LAYERS.aether.color : "#8aacbe",
-                  background: ratio === h.value ? "rgba(240,230,140,0.06)" : "transparent",
-                }}>
-                  {h.ratio}
-                </button>
+      <style>{`@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:1}} @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}`}</style>
+
+      {/* MAIN GRID */}
+      <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 320px" }}>
+
+        {/* LEFT: aquarium + 2 viz panels */}
+        <div className="space-y-4">
+          <div className="border" style={{ borderColor: C.border2, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.22em] p-2 border-b flex justify-between" style={{ color: C.muted, borderColor: C.border }}>
+              <span>AQUARIUM · 7-LAYER GLASS-BOX</span><span style={{ color: C.dim }}>click to inject</span>
+            </p>
+            <canvas ref={aqRef} style={{ display: "block", width: "100%", height: 380 }} data-testid="aquarium-canvas" />
+          </div>
+
+          <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="border" style={{ borderColor: C.border2, background: C.panel }}>
+              <p className="text-[8px] tracking-[0.22em] p-2 border-b" style={{ color: "#7ecfcf", borderColor: C.border }}>
+                {viz === "torus" && "TOROIDAL · RUSSELL FIELD"}
+                {viz === "tetra" && "TETRAHEDRAL · PYTHAGORAS"}
+                {viz === "wave"  && "WAVE · SILENCE → SOUND → SILENCE"}
+              </p>
+              <canvas ref={torusRef} style={{ display: "block", width: "100%", height: 200 }} data-testid="torus-canvas" />
+            </div>
+            <div className="border" style={{ borderColor: C.border2, background: C.panel }}>
+              <p className="text-[8px] tracking-[0.22em] p-2 border-b" style={{ color: "#e8c4a0", borderColor: C.border }}>PYTHAGOREAN CONSTRAINT · {ratio.r}</p>
+              <canvas ref={pythRef} style={{ display: "block", width: "100%", height: 200 }} data-testid="pyth-canvas" />
+            </div>
+          </div>
+
+          {/* Observability */}
+          <div className="border p-3" style={{ borderColor: C.border2, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.22em] mb-2" style={{ color: C.muted }}>SYSTEM OBSERVABILITY</p>
+            <div className="grid gap-px" style={{ gridTemplateColumns: "repeat(6,1fr)", background: C.border2 }}>
+              {[
+                { k: "SIGNALS",  v: metrics.signals,    c: "#4db8ff", id: "m-signals" },
+                { k: "NODES",    v: metrics.nodes,      c: "#00f5c8", id: "m-nodes" },
+                { k: "RESONANCE",v: metrics.resonance + "%", c: "#7ecfcf", id: "m-resonance" },
+                { k: "HARMONIC", v: ratio.r,            c: "#e8c4a0", id: "m-harmonic" },
+                { k: "PHOTON",   v: metrics.photon,     c: "#f0e68c", id: "m-photon" },
+                { k: "ENTROPY",  v: metrics.entropy,    c: "#ff6b35", id: "m-entropy" },
+              ].map(m => (
+                <div key={m.k} data-testid={m.id} className="p-3 text-center" style={{ background: C.panel }}>
+                  <p className="font-['Cinzel',serif]" style={{ color: m.c, fontSize: 18 }}>{m.v}</p>
+                  <p className="text-[7.5px] tracking-[0.2em] mt-1" style={{ color: C.dim }}>{m.k}</p>
+                </div>
               ))}
             </div>
           </div>
+        </div>
 
-          <div style={{ position: "relative", border: "1px solid rgba(232,196,160,0.18)", background: "#07101a", overflow: "hidden", height: 280 }}>
-            <canvas ref={tetraRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="tetra-canvas" />
-            <div style={{ position: "absolute", top: 8, left: 10, fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.18em", color: LAYERS.pythag.color, opacity: 0.55, textTransform: "uppercase" }}>
-              PYTHAGORAS · TETRAHEDRAL CONSTRAINT
+        {/* SIDEBAR */}
+        <div className="space-y-3">
+          {/* Mood ring */}
+          <div className="border p-4" style={{ borderColor: C.border2, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.22em] mb-3 pb-2 border-b" style={{ color: C.muted, borderColor: C.border }}>EMOTION AI · FEEDBACK ENGINE</p>
+            <div className="flex flex-col items-center mb-2">
+              <div data-testid="mood-ring" style={{
+                width: 80, height: 80, borderRadius: 40,
+                background: `radial-gradient(circle, ${mood.col}40, ${mood.col}10)`,
+                border: "2px solid " + mood.col, boxShadow: "0 0 16px " + mood.col + "60",
+                animation: "breathe 3s ease-in-out infinite",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span className="font-['Cinzel',serif]" style={{ color: mood.col, fontSize: 12 }}>{mood.tag.toUpperCase()}</span>
+              </div>
+              <p className="mt-3 text-[9px] tracking-[0.22em]" style={{ color: mood.col }}>INTENT · {mood.intent}</p>
+            </div>
+            <div className="grid gap-1 text-[8px] tracking-[0.16em] uppercase" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              <div style={{ color: C.dim }}>CogLogicUnit · <span style={{ color: C.text }}>PROCESS</span></div>
+              <div style={{ color: C.dim }}>Memory · <span style={{ color: C.text }}>SHORT-TERM</span></div>
+              <div style={{ color: C.dim }}>Confidence · <span style={{ color: C.text }}>0.92</span></div>
+              <div style={{ color: C.dim }}>EmotionTag · <span style={{ color: mood.col }}>{mood.tag}</span></div>
+              <div style={{ color: C.dim }}>Priority · <span style={{ color: C.text }}>MED</span></div>
+              <div style={{ color: C.dim }}>Context · <span style={{ color: C.text }}>SYSTEM</span></div>
             </div>
           </div>
 
-          <div style={{ position: "relative", border: "1px solid rgba(126,207,207,0.2)", background: "#07101a", overflow: "hidden", height: 280 }}>
-            <canvas ref={torusRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="torus-canvas" />
-            <div style={{ position: "absolute", top: 8, left: 10, fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.18em", color: LAYERS.russell.color, opacity: 0.6, textTransform: "uppercase" }}>
-              RUSSELL · TOROIDAL WAVE DYNAMICS
-            </div>
-          </div>
-        </main>
-
-        {/* AETHER photons + emotion */}
-        <main style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
-          <div style={{ height: 36 }} />
-          <div style={{ position: "relative", border: "1px solid rgba(240,230,140,0.2)", background: "#07101a", overflow: "hidden", height: 280 }}>
-            <canvas ref={aetherRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="aether-canvas" />
-            <div style={{ position: "absolute", top: 8, left: 10, fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.18em", color: LAYERS.aether.color, opacity: 0.6, textTransform: "uppercase" }}>
-              AETHER · THz PHOTON FIELD
-            </div>
-            <div style={{ position: "absolute", bottom: 8, right: 10, fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", color: LAYERS.aether.color, opacity: 0.6 }}>
-              ratio × {ratio.toFixed(3)}
-            </div>
-          </div>
-
-          <div style={{ border: "1px solid rgba(199,125,255,0.18)", padding: "0.85rem", background: "rgba(0,0,0,0.3)", height: 280, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.2em", color: LAYERS.reverie.color, textTransform: "uppercase", opacity: 0.7 }}>
-              EMOTION AI · FEEDBACK ENGINE
-            </div>
-            <div style={{ marginTop: 12, fontFamily: "'Libre Baskerville', Georgia, serif", fontStyle: "italic", color: "#ddeeff", fontSize: "1.4rem", textAlign: "center" }}>
-              {emotion}
-            </div>
-            <div style={{ flex: 1, marginTop: 12, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, alignContent: "start" }}>
-              {EMOTIONS.map((e) => (
-                <div key={e} style={{
-                  fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.1em",
-                  padding: "0.3rem 0.5rem",
-                  border: `1px solid ${e === emotion ? LAYERS.reverie.color : "rgba(199,125,255,0.15)"}`,
-                  color: e === emotion ? LAYERS.reverie.color : "#8aacbe",
-                  textAlign: "center",
-                  background: e === emotion ? "rgba(199,125,255,0.06)" : "transparent",
-                  textTransform: "uppercase",
-                }}>{e}</div>
-              ))}
-            </div>
-            <div style={{ marginTop: 8, color: "#3a5268", fontSize: "0.7rem", fontStyle: "italic" }}>
-              Senses internal state · initiates corrective response · maintains coherence.
-            </div>
-          </div>
-        </main>
-
-        {/* Right detail */}
-        <aside style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
-          <div style={{ border: `1px solid ${LAYERS[active].color}33`, padding: "0.85rem", background: "rgba(3,8,15,0.7)" }}>
-            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.2em", color: "#3a5268", textTransform: "uppercase" }}>Selected Layer</div>
-            <div style={{ fontFamily: "'Share Tech Mono', monospace", color: LAYERS[active].color, fontSize: "1rem", letterSpacing: "0.1em", marginTop: 6 }}>
-              {LAYERS[active].name}
-            </div>
-            <div style={{ color: "#8aacbe", fontSize: "0.78rem", marginTop: 4 }}>{LAYERS[active].role}</div>
-            <div style={{ color: "#3a5268", fontSize: "0.7rem", marginTop: 8, fontStyle: "italic" }}>
-              {layerDesc(active)}
-            </div>
-          </div>
-
-          <div style={{ border: "1px solid rgba(232,196,160,0.18)", padding: "0.85rem", background: "rgba(3,8,15,0.7)" }}>
-            <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.2em", color: "#3a5268", textTransform: "uppercase" }}>Harmonic Ratios</div>
-            <ul style={{ marginTop: 8, paddingLeft: "1.1rem", fontSize: "0.78rem", lineHeight: 1.7, color: "#8aacbe" }}>
-              {HARMONIC_RATIOS.map((h) => (
-                <li key={h.ratio}>
-                  <span style={{ color: LAYERS.pythag.color, fontFamily: "'Share Tech Mono', monospace" }}>{h.ratio}</span> &nbsp;{h.name} <span style={{ color: "#3a5268" }}>· ×{h.value.toFixed(3)}</span>
-                </li>
+          {/* AETHER panel */}
+          <div className="border p-3" style={{ borderColor: C.border2, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.22em] mb-2 pb-2 border-b" style={{ color: "#f0e68c", borderColor: C.border }}>AETHER · BIOLUMINESCENT SIGNAL</p>
+            <ul className="space-y-1 text-[10px]">
+              {AETHER_PRINCIPLES.map(p => (
+                <li key={p} className="flex items-start gap-2"><span style={{ color: "#f0e68c" }}>·</span><span style={{ color: C.text }}>{p}</span></li>
               ))}
             </ul>
-            <div style={{ color: "#3a5268", fontSize: "0.7rem", marginTop: 6, fontStyle: "italic" }}>
-              Constraint architecture — physically real resonance. φ = {PHI}.
+            <div className="flex gap-1 flex-wrap mt-2">
+              {["NO METAPHYSICS","STRICT SEPARATION","CLEAR & FOCUSED"].map(t => (
+                <span key={t} className="text-[7.5px] tracking-[0.18em] px-1.5 py-0.5 border" style={{ color: "#f0e68c", borderColor: "rgba(240,230,140,0.3)" }}>{t}</span>
+              ))}
             </div>
           </div>
-        </aside>
+
+          {/* Russell panel */}
+          <div className="border p-3" style={{ borderColor: C.border2, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.22em] mb-2 pb-2 border-b" style={{ color: "#7ecfcf", borderColor: C.border }}>RUSSELL · WAVE PRINCIPLES</p>
+            <ul className="space-y-1 text-[10px]">
+              {RUSSELL_PRINCIPLES.map(p => (
+                <li key={p} className="flex items-start gap-2"><span style={{ color: "#7ecfcf" }}>·</span><span style={{ color: C.text }}>{p}</span></li>
+              ))}
+            </ul>
+          </div>
+
+          {/* System log */}
+          <div className="border" style={{ borderColor: C.border2, background: C.panel }}>
+            <p className="text-[8px] tracking-[0.22em] p-3 border-b" style={{ color: C.muted, borderColor: C.border }}>SYSTEM LOG</p>
+            <div data-testid="sys-log" className="max-h-60 overflow-y-auto p-2 space-y-1 text-[10px]">
+              <AnimatePresence initial={false}>
+                {events.map((e, i) => (
+                  <motion.div key={e.ts + i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                    className="flex gap-2 px-2 py-1">
+                    <span style={{ color: C.dim, minWidth: 60 }}>{e.ts}</span>
+                    <span style={{ color: e.col, minWidth: 70 }}>{e.layer}</span>
+                    <span style={{ color: C.text }}>{e.msg}</span>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* LAYER ROSTER */}
+      <div className="border mt-4" style={{ borderColor: C.border2, background: C.panel }}>
+        <p className="text-[8px] tracking-[0.22em] p-3 border-b" style={{ color: C.muted, borderColor: C.border }}>SEVEN LAYERS · ROLES</p>
+        <div className="grid gap-px" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", background: C.border2 }}>
+          {LAYERS.map(L => (
+            <div key={L.key} data-testid={`layer-${L.key}`} className="p-3" style={{ background: C.panel }}>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[8px] tracking-[0.18em]" style={{ color: L.col, opacity: 0.6 }}>{L.n}</span>
+                <h3 className="font-['Cinzel',serif]" style={{ color: L.col, fontSize: 14 }}>{L.name}</h3>
+              </div>
+              <p className="text-[9px] tracking-[0.16em] mt-1" style={{ color: C.muted }}>{L.sub}</p>
+              <p className="text-[10px] mt-2" style={{ color: C.text }}>{L.role}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-12 pt-4 border-t flex justify-between text-[8px] tracking-[0.16em] uppercase" style={{ borderColor: C.border, color: C.dim }}>
+        <span>SYMPHONIC PROTOCOL OS v2.0 · 7-LAYER UNIFIED FRAMEWORK</span>
+        <span style={{ color: ratio.col }}>{ratio.r} — {ratio.label}</span>
+        <span>RESONANCE REPLACES FRAGMENTATION · AETHER × PYTHAGORAS × RUSSELL</span>
       </div>
     </div>
   );
-}
-
-function LayerBtn({ k, active, setActive }: { k: keyof typeof LAYERS; active: keyof typeof LAYERS; setActive: (k: keyof typeof LAYERS) => void }) {
-  const l = LAYERS[k];
-  const isActive = active === k;
-  return (
-    <button onClick={() => setActive(k)} data-testid={`layer-${k}`} style={{
-      display: "flex", alignItems: "center", gap: 9,
-      padding: "0.5rem 0.65rem",
-      border: `1px solid ${isActive ? l.color : "transparent"}`,
-      background: isActive ? "rgba(0,0,0,0.4)" : "transparent",
-      cursor: "pointer", textAlign: "left", width: "100%",
-      color: isActive ? l.color : "#8aacbe",
-      fontFamily: "inherit",
-    }}>
-      <div style={{ width: 7, height: 7, borderRadius: "50%", background: l.color, boxShadow: `0 0 6px ${l.color}` }} />
-      <div>
-        <div style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "0.6rem", letterSpacing: "0.06em" }}>{l.name}</div>
-        <div style={{ fontSize: "0.5rem", color: "#3a5268", letterSpacing: "0.04em", marginTop: 2 }}>{l.role}</div>
-      </div>
-    </button>
-  );
-}
-
-function layerDesc(k: keyof typeof LAYERS): string {
-  switch (k) {
-    case "mnesis":   return "Persistent memory — distributed mycelial signaling, no central processor.";
-    case "aletheia": return "Deterministic logic — observable, legible signal flow.";
-    case "infernia": return "Magnetohydrodynamic transformation — ferrofluid precision delivery.";
-    case "reverie":  return "Bioluminescent inference — sparse probabilistic activation.";
-    case "aether":   return "THz photon signaling — physically grounded chemiexcitation, not metaphor.";
-    case "pythag":   return "Tetrahedral constraint — harmonic ratios as physical resonance architecture.";
-    case "russell":  return "Toroidal wave dynamics — silence → sound → silence cycle, the AETHER loop in space.";
-  }
-}
-
-function btn(): React.CSSProperties {
-  return {
-    fontFamily: "'Share Tech Mono', monospace", fontSize: "0.55rem", letterSpacing: "0.1em",
-    padding: "0.32rem 0.7rem", background: "transparent",
-    border: `1px solid rgba(77,184,255,0.25)`,
-    color: "#8aacbe", cursor: "pointer", textTransform: "uppercase",
-  };
-}
-
-function hexA(hex: string, a: number) {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${a})`;
 }

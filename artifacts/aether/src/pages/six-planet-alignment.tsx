@@ -1,300 +1,334 @@
 import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const PHI = 1.6180339887;
-
-type Planet = {
-  name: string;
-  color: string;
-  angular: number;     // degrees in arc
-  period: string;
-  size: number;
-  coherence: number;   // %
+const C = {
+  bg: "#000814", panel: "#040C1F", panel2: "#06122A",
+  border: "rgba(0,229,200,0.1)", border2: "rgba(0,229,200,0.18)",
+  white: "#EAF6FF", text: "#7AA6C5", muted: "#5A809F", dim: "#33536D",
+  teal: "#00E5C8", gold: "#FFD166", purple: "#7B4FFF",
+  orange: "#F77F00", red: "#D62828",
 };
 
-const PLANETS: Planet[] = [
-  { name: "MERCURY", color: "#ff9b6b", angular: 15.2, period: "87.97d",  size: 4, coherence: 73 },
-  { name: "VENUS",   color: "#ffd966", angular: 28.7, period: "224.7d",  size: 6, coherence: 85 },
-  { name: "JUPITER", color: "#e8a55a", angular: 45.1, period: "11.86y",  size: 11, coherence: 92 },
-  { name: "SATURN",  color: "#d4a878", angular: 52.8, period: "29.46y",  size: 9, coherence: 88 },
-  { name: "URANUS",  color: "#7ec8d4", angular: 67.4, period: "84.01y",  size: 7, coherence: 81 },
-  { name: "NEPTUNE", color: "#5b8fc4", angular: 73.9, period: "164.8y",  size: 7, coherence: 76 },
+const PLANETS = [
+  { name: "Mercury", color: "#8c7853", size: 4,  angle: 15.2, period: "87.97d",  x: 0.15 },
+  { name: "Venus",   color: "#ffa500", size: 7,  angle: 28.7, period: "224.7d",  x: 0.25 },
+  { name: "Jupiter", color: "#d8ca9d", size: 12, angle: 45.1, period: "11.86y",  x: 0.45 },
+  { name: "Saturn",  color: "#fad5a5", size: 10, angle: 52.8, period: "29.46y",  x: 0.52 },
+  { name: "Uranus",  color: "#4fd0e7", size: 8,  angle: 67.4, period: "84.01y",  x: 0.67 },
+  { name: "Neptune", color: "#4b70dd", size: 8,  angle: 73.9, period: "164.8y",  x: 0.75 },
 ];
 
-export default function SixPlanetAlignmentView() {
-  const skyRef   = useRef<HTMLCanvasElement>(null);
-  const wavesRef = useRef<HTMLCanvasElement>(null);
-  const phiRef   = useRef<HTMLCanvasElement>(null);
-  const [tick, setTick] = useState(0);
+const PHI = 1.618034;
+
+type View = "alignment" | "resonance" | "dynamics";
+
+export default function SixPlanetAlignmentPage() {
+  const skyRef = useRef<HTMLCanvasElement>(null);
+  const waveRef = useRef<HTMLCanvasElement>(null);
+  const [view, setView] = useState<View>("alignment");
+  const [coherence, setCoherence] = useState(83.7);
 
   // Sky canvas
   useEffect(() => {
-    const c = skyRef.current; if (!c) return;
-    const ctx = c.getContext("2d"); if (!ctx) return;
-    let raf = 0; let t = 0;
-    const stars = Array.from({ length: 220 }, () => ({
-      x: Math.random(), y: Math.random() * 0.7,
-      r: Math.random() * 1.2 + 0.2,
-      tw: Math.random() * Math.PI * 2,
-    }));
-    const resize = () => {
-      const r = c.parentElement!.getBoundingClientRect();
-      c.width = r.width; c.height = r.height;
-    };
+    const canvas = skyRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let raf = 0, t = 0;
+
+    function resize() {
+      if (!canvas) return;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
     resize();
-    const onResize = () => resize();
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", resize);
 
-    const draw = () => {
-      const W = c.width, H = c.height;
-      // gradient sky
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, "#0a0d18");
-      grad.addColorStop(0.55, "#13182c");
-      grad.addColorStop(0.78, "#3d2547");
-      grad.addColorStop(0.92, "#7a3a40");
-      grad.addColorStop(1, "#a05533");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-
-      // horizon line
-      ctx.strokeStyle = "rgba(255,180,120,0.4)";
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, H * 0.78); ctx.lineTo(W, H * 0.78); ctx.stroke();
-
-      // distant landscape
-      ctx.fillStyle = "rgba(0,0,0,0.85)";
-      ctx.beginPath();
-      ctx.moveTo(0, H);
-      for (let x = 0; x <= W; x += 12) {
-        const y = H * 0.78 + Math.sin(x * 0.012 + 1) * 4 + Math.sin(x * 0.04) * 2;
-        ctx.lineTo(x, y);
+    function draw() {
+      if (!canvas || !ctx) return;
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      // starfield
+      for (let i = 0; i < 200; i++) {
+        const x = (i * 137.5) % W;
+        const y = (i * 97.3 + 123) % H;
+        const br = ((i * 17) % 5) * 0.08 + 0.2;
+        ctx.fillStyle = `rgba(255,255,255,${br})`;
+        ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI * 2); ctx.fill();
       }
-      ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+      // horizon
+      const horizonY = H * 0.75;
+      ctx.strokeStyle = "rgba(0,229,200,0.3)";
+      ctx.setLineDash([4, 8]);
+      ctx.beginPath(); ctx.moveTo(0, horizonY); ctx.lineTo(W, horizonY); ctx.stroke();
+      ctx.setLineDash([]);
+      // arc
+      const arcCY = horizonY + 50;
+      const arcR = W * 0.8;
+      ctx.strokeStyle = "rgba(255,209,102,0.2)";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(W / 2, arcCY, arcR, Math.PI * 0.85, Math.PI * 0.15, true); ctx.stroke();
 
-      // stars
-      stars.forEach((s) => {
-        const tw = 0.5 + 0.5 * Math.sin(t * 1.2 + s.tw);
-        ctx.fillStyle = `rgba(220,230,255,${0.4 + tw * 0.6})`;
-        ctx.beginPath(); ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2); ctx.fill();
-      });
-
-      // arc of planets across western horizon
-      const cx = W * 0.5, cy = H * 0.95;
-      const radius = Math.min(W * 0.42, H * 0.7);
       PLANETS.forEach((p, i) => {
-        const baseAngle = Math.PI * 1.05; // start
-        const span = Math.PI * 0.85;
-        const a = baseAngle + (i / (PLANETS.length - 1)) * span;
-        const wobble = Math.sin(t * 0.6 + i) * 0.005;
-        const x = cx + Math.cos(a + wobble) * radius;
-        const y = cy + Math.sin(a + wobble) * radius * 0.55;
-
-        // glow
-        const grd = ctx.createRadialGradient(x, y, 0, x, y, p.size * 5);
-        grd.addColorStop(0, p.color);
-        grd.addColorStop(0.4, p.color + "55");
-        grd.addColorStop(1, p.color + "00");
-        ctx.fillStyle = grd;
-        ctx.beginPath(); ctx.arc(x, y, p.size * 5, 0, Math.PI * 2); ctx.fill();
-
-        // body
+        const a = Math.PI * (0.85 - p.x * 0.7);
+        const x = W / 2 + Math.cos(a) * arcR;
+        const y = arcCY + Math.sin(a) * arcR;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, p.size * 3);
+        g.addColorStop(0, p.color + "60");
+        g.addColorStop(0.5, p.color + "20");
+        g.addColorStop(1, p.color + "00");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, p.size * 3, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = p.color;
         ctx.beginPath(); ctx.arc(x, y, p.size, 0, Math.PI * 2); ctx.fill();
+        if (p.name === "Saturn") {
+          ctx.strokeStyle = p.color + "80"; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.ellipse(x, y, p.size * 1.8, p.size * 0.6, 0, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font = "9px JetBrains Mono"; ctx.textAlign = "center";
+        ctx.fillText(p.name.toUpperCase(), x, y - p.size - 12);
+        ctx.fillStyle = "rgba(255,209,102,0.7)";
+        ctx.font = "7px JetBrains Mono";
+        ctx.fillText(`${p.angle}°`, x, y - p.size - 2);
 
-        // label
-        ctx.fillStyle = "rgba(255,255,255,0.6)";
-        ctx.font = "8px 'Share Tech Mono', monospace";
-        ctx.textAlign = "center";
-        ctx.fillText(p.name, x, y - p.size - 6);
+        if (view === "resonance") {
+          const next = PLANETS[i + 1];
+          if (next) {
+            const ratio = next.angle / p.angle;
+            const close = Math.abs(ratio - PHI) < 0.1;
+            ctx.strokeStyle = close ? "rgba(255,209,102,0.85)" : "rgba(0,229,200,0.3)";
+            ctx.lineWidth = close ? 2 : 1;
+            ctx.setLineDash(close ? [] : [2, 4]);
+            const na = Math.PI * (0.85 - next.x * 0.7);
+            const nx = W / 2 + Math.cos(na) * arcR;
+            const ny = arcCY + Math.sin(na) * arcR;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
+            ctx.setLineDash([]);
+            if (close) {
+              ctx.fillStyle = "rgba(255,209,102,0.95)";
+              ctx.font = "10px serif"; ctx.textAlign = "center";
+              ctx.fillText("φ", (x + nx) / 2, (y + ny) / 2);
+            }
+          }
+        }
       });
 
-      // toroidal coupling field overlay
-      ctx.strokeStyle = "rgba(0,229,200,0.12)";
-      ctx.lineWidth = 0.6;
-      for (let r = 30; r < radius; r += 30) {
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, r, r * 0.55, 0, Math.PI * 1.05, Math.PI * 1.95);
-        ctx.stroke();
+      if (view === "dynamics") {
+        ctx.save(); ctx.globalAlpha = 0.4;
+        for (let ring = 0; ring < 3; ring++) {
+          const radius = 100 + ring * 80;
+          const cxR = W * 0.5, cyR = H * 0.4;
+          for (let i = 0; i < 16; i++) {
+            const a = (i / 16) * Math.PI * 2 + t * 0.01;
+            const x1 = cxR + Math.cos(a) * radius;
+            const y1 = cyR + Math.sin(a) * radius * 0.3;
+            const na = ((i + 1) / 16) * Math.PI * 2 + t * 0.01;
+            const x2 = cxR + Math.cos(na) * radius;
+            const y2 = cyR + Math.sin(na) * radius * 0.3;
+            const phase = Math.sin(t * 0.05 + ring) * 0.5 + 0.5;
+            ctx.strokeStyle = `rgba(0,229,200,${0.3 * phase})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+          }
+        }
+        ctx.restore();
       }
+    }
 
-      t += 0.012;
-      raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
-  }, []);
+    function loop() { t++; draw(); raf = requestAnimationFrame(loop); }
+    loop();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+  }, [view]);
 
-  // Waves canvas (resonance)
+  // Wave canvas
   useEffect(() => {
-    const c = wavesRef.current; if (!c) return;
-    const ctx = c.getContext("2d"); if (!ctx) return;
-    let raf = 0; let t = 0;
-    const resize = () => {
-      const r = c.parentElement!.getBoundingClientRect();
-      c.width = r.width; c.height = r.height;
-    };
-    resize();
-    const onR = () => resize(); window.addEventListener("resize", onR);
-    const draw = () => {
-      const W = c.width, H = c.height;
+    const canvas = waveRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let raf = 0, t = 0;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    function draw() {
+      if (!canvas || !ctx) return;
+      const W = canvas.width, H = canvas.height;
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "rgba(8,10,18,0.7)"; ctx.fillRect(0, 0, W, H);
-      // Three coupled waves: quantum, biological, planetary
-      const freqs = [{ f: 0.06, c: "#a78bfa", amp: 0.5 }, { f: 0.025, c: "#5dba6e", amp: 0.7 }, { f: 0.01, c: "#00e5c8", amp: 0.9 }];
-      freqs.forEach((wf, idx) => {
-        ctx.strokeStyle = wf.c;
-        ctx.lineWidth = 1.2;
-        ctx.globalAlpha = 0.7;
+      const waves = [
+        { freq: 0.10, amp: 20, phase: t * 0.02, color: "rgba(0,229,200,0.6)" },
+        { freq: 0.16, amp: 15, phase: t * 0.03, color: "rgba(255,209,102,0.5)" },
+        { freq: 0.26, amp: 10, phase: t * 0.05, color: "rgba(123,79,255,0.4)" },
+      ];
+      waves.forEach(w => {
+        ctx.strokeStyle = w.color; ctx.lineWidth = 1.5;
         ctx.beginPath();
-        for (let x = 0; x <= W; x += 2) {
-          const y = H / 2 + Math.sin(x * wf.f + t * (1 + idx * 0.3)) * H * 0.18 * wf.amp;
+        for (let x = 0; x < W; x += 2) {
+          const y = H / 2 + Math.sin(x * w.freq + w.phase) * w.amp;
           x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
         ctx.stroke();
       });
-      ctx.globalAlpha = 1;
-      t += 0.05;
-      raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onR); };
+    }
+
+    function loop() { t++; draw(); raf = requestAnimationFrame(loop); }
+    loop();
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Fibonacci spiral canvas
+  // Coherence ticker
   useEffect(() => {
-    const c = phiRef.current; if (!c) return;
-    const ctx = c.getContext("2d"); if (!ctx) return;
-    const draw = () => {
-      const rect = c.parentElement!.getBoundingClientRect();
-      c.width = rect.width; c.height = rect.height;
-      const W = c.width, H = c.height;
-      ctx.clearRect(0, 0, W, H);
-      ctx.strokeStyle = "rgba(244,209,59,0.7)";
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      const cx = W / 2, cy = H / 2;
-      const a = 0.16;
-      for (let theta = 0; theta < Math.PI * 6; theta += 0.05) {
-        const r2 = a * Math.exp(theta * Math.log(PHI) / (Math.PI / 2));
-        const x = cx + r2 * Math.cos(theta) * 14;
-        const y = cy + r2 * Math.sin(theta) * 14;
-        theta === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      [1, 2, 3, 5, 8, 13].forEach((fi, i) => {
-        const theta = (i + 1) * 0.65;
-        const r2 = a * Math.exp(theta * Math.log(PHI) / (Math.PI / 2));
-        const x = cx + r2 * Math.cos(theta) * 14;
-        const y = cy + r2 * Math.sin(theta) * 14;
-        ctx.fillStyle = "#f4d13b";
-        ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = "rgba(244,209,59,0.7)";
-        ctx.font = "9px monospace"; ctx.textAlign = "center";
-        ctx.fillText(String(fi), x, y - 6);
-      });
-    };
-    draw();
-    window.addEventListener("resize", draw);
-    return () => window.removeEventListener("resize", draw);
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    const id = setInterval(() => setCoherence(83.7 + Math.sin(Date.now() * 0.001) * 2.3), 200);
     return () => clearInterval(id);
   }, []);
 
+  function exportData() {
+    const data = {
+      alignment: "March 2026 Six-Planet Arc",
+      planets: PLANETS,
+      phiRatios: PLANETS.map((p, i) => i === 0 ? null : ({
+        planets: [PLANETS[i - 1].name, p.name],
+        ratio: (p.angle / PLANETS[i - 1].angle).toFixed(3),
+        phiMatch: Math.abs(p.angle / PLANETS[i - 1].angle - PHI) < 0.1,
+      })).filter(Boolean),
+      coherence: 0.837,
+    };
+    console.log("AETHER Planetary Alignment Data:", data);
+    alert("Alignment data exported to console");
+  }
+
   return (
-    <div style={{ minHeight: "100%", background: "#0a0d18", color: "#e2e8f0", fontFamily: "'Inter', system-ui, sans-serif" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1.4rem 2rem", borderBottom: "1px solid rgba(0,229,200,0.18)", background: "linear-gradient(90deg, rgba(0,229,200,0.04), transparent)" }}>
-        <div>
-          <div style={{ color: "#00e5c8", fontFamily: "'Cinzel', serif", letterSpacing: "0.3em", fontSize: "0.72rem", textTransform: "uppercase" }}>AETHER · Planetary Alignment Analysis</div>
-          <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "clamp(1.4rem, 2.4vw, 2rem)", marginTop: 6, letterSpacing: "0.04em" }}>
-            Six-Planet Evening Arc · <span style={{ color: "#00e5c8" }}>March 2026</span>
-          </h1>
-        </div>
-        <div style={{ textAlign: "right", color: "#94a3b8", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.7rem", letterSpacing: "0.15em" }}>
-          <div>MARCH 1–8, 2026</div>
-          <div style={{ color: "#475569", marginTop: 2 }}>WESTERN HORIZON · t = {tick}s</div>
-        </div>
-      </header>
+    <div data-testid="six-planet-root" className="min-h-screen p-6"
+         style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
 
-      <div style={{ display: "grid", gridTemplateColumns: "260px 1fr 280px", gap: "1rem", padding: "1rem", height: "calc(100vh - 88px)" }}>
-        {/* LEFT */}
-        <aside style={{ display: "flex", flexDirection: "column", gap: "0.7rem", overflow: "auto" }}>
-          <div style={{ color: "#475569", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.2em", fontSize: "0.62rem", textTransform: "uppercase" }}>Planetary Configuration</div>
-          {PLANETS.map((p) => (
-            <div key={p.name} style={{ display: "flex", alignItems: "center", gap: "0.7rem", border: "1px solid rgba(255,255,255,0.06)", padding: "0.6rem 0.7rem", background: "rgba(255,255,255,0.02)" }} data-testid={`planet-${p.name.toLowerCase()}`}>
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: p.color, boxShadow: `0 0 12px ${p.color}` }} />
-              <div style={{ flex: 1 }}>
-                <div style={{ color: p.color, fontFamily: "'Share Tech Mono', monospace", fontSize: "0.78rem", letterSpacing: "0.1em" }}>{p.name}</div>
-                <div style={{ color: "#94a3b8", fontSize: "0.7rem", marginTop: 2 }}>Angular: {p.angular}° · Period: {p.period}</div>
+      <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
+        <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>
+          AETHER · Six-Planet Alignment · March 2026 · Western Horizon
+        </p>
+        <h1 className="font-['Cinzel',serif] font-light leading-none tracking-tight" style={{ fontSize: "clamp(34px,4.8vw,58px)", color: C.white }}>
+          Six-Planet <em style={{ color: C.gold, fontStyle: "italic" }}>Evening Arc</em>
+        </h1>
+        <p className="font-['Cinzel',serif] italic mt-2" style={{ fontSize: "clamp(13px,1.6vw,18px)", color: C.muted }}>
+          Multi-scale phase-lock detected across quantum · biological · planetary
+        </p>
+      </div>
+
+      <div className="grid gap-4" style={{ gridTemplateColumns: "300px 1fr 280px" }}>
+
+        {/* LEFT: planet roster */}
+        <div className="border p-4 space-y-3" style={{ borderColor: C.border2, background: C.panel }}>
+          <p className="text-[8px] tracking-[0.3em] mb-2 pb-2 border-b" style={{ color: C.dim, borderColor: C.border }}>PLANETARY BODIES</p>
+          {PLANETS.map(p => (
+            <div key={p.name} data-testid={`planet-${p.name.toLowerCase()}`}
+                 className="flex items-center gap-3 p-2"
+                 style={{ background: "rgba(0,229,200,0.03)" }}>
+              <span style={{
+                width: 12, height: 12, borderRadius: 6,
+                background: p.color, boxShadow: "0 0 8px " + p.color,
+              }} />
+              <div className="flex-1">
+                <p className="text-[10px] tracking-[0.1em]" style={{ color: p.color }}>{p.name.toUpperCase()}</p>
+                <p className="text-[8px]" style={{ color: C.muted }}>Angular {p.angle}° · Period {p.period}</p>
+              </div>
+            </div>
+          ))}
+          <div className="border p-3 mt-3" style={{ borderColor: "rgba(123,79,255,0.3)", background: "rgba(123,79,255,0.06)" }}>
+            <p className="font-['Cinzel',serif] mb-2" style={{ color: C.purple, fontSize: 13 }}>Phi-Ratio Analysis</p>
+            <p className="text-center" style={{ color: C.gold, fontFamily: "serif", fontSize: 16 }}>φ = 1.618034…</p>
+            <p className="text-[8px] text-center mt-1" style={{ color: C.muted }}>Angular spacing follows Fibonacci quantization</p>
+          </div>
+        </div>
+
+        {/* CENTER: sky canvas */}
+        <div className="border relative" style={{ borderColor: C.border2, background: C.bg, minHeight: 540 }}>
+          <canvas ref={skyRef} style={{ width: "100%", height: 540, display: "block" }} data-testid="sky-canvas" />
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-center pointer-events-none">
+            <p className="font-['Cinzel',serif]" style={{ color: C.teal, fontSize: 22, textShadow: "0 0 20px rgba(0,229,200,0.6)" }}>Six-Planet Evening Arc</p>
+            <p className="text-[10px] tracking-[0.22em] mt-1" style={{ color: C.gold }}>MARCH 2026 · WESTERN HORIZON</p>
+          </div>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 space-y-2 pointer-events-none">
+            {[
+              { col: C.purple, lbl: "QUANTUM" },
+              { col: C.teal,   lbl: "BIOLOGICAL" },
+              { col: C.gold,   lbl: "PLANETARY" },
+            ].map(s => (
+              <div key={s.lbl} className="flex items-center gap-2">
+                <span className="rounded-full" style={{ width: 8, height: 8, background: s.col }} />
+                <span className="text-[8px] tracking-[0.1em]" style={{ color: C.muted }}>{s.lbl}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT: equation + coherence */}
+        <div className="border p-4 space-y-3" style={{ borderColor: C.border2, background: C.panel }}>
+          <p className="text-[8px] tracking-[0.3em] mb-2 pb-2 border-b" style={{ color: C.dim, borderColor: C.border }}>WAVE DYNAMICS</p>
+          <div className="border p-3" style={{ borderColor: "rgba(255,209,102,0.3)", background: "rgba(255,209,102,0.06)" }}>
+            <p className="text-[8px] tracking-[0.22em]" style={{ color: C.gold }}>SCALE-INVARIANT COUPLING</p>
+            <p className="text-[18px] text-center mt-2" style={{ color: C.white, fontFamily: "serif" }}>∇²Ψ = k²φⁿΨ</p>
+            <p className="text-[8px] mt-1 text-center" style={{ color: C.muted }}>φ = golden ratio resonance</p>
+          </div>
+
+          <p className="text-[8px] tracking-[0.3em] mt-3 pb-2 border-b" style={{ color: C.dim, borderColor: C.border }}>COHERENCE METRICS</p>
+          {[
+            { lbl: "QUANTUM FIELD COUPLING", v: 73, c: C.purple },
+            { lbl: "BIOLOGICAL RESONANCE",   v: 85, c: C.teal },
+            { lbl: "PLANETARY SYNCHRONY",    v: 92, c: C.gold },
+          ].map(m => (
+            <div key={m.lbl}>
+              <p className="text-[8px] mb-1" style={{ color: C.muted }}>{m.lbl}</p>
+              <div style={{ height: 4, background: "rgba(255,255,255,0.1)" }}>
+                <div style={{ height: "100%", width: m.v + "%", background: m.c, transition: "width 1s ease" }} />
               </div>
             </div>
           ))}
 
-          <div style={{ marginTop: "0.5rem", border: "1px solid rgba(244,209,59,0.25)", padding: "0.9rem", background: "rgba(244,209,59,0.04)" }}>
-            <div style={{ color: "#f4d13b", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.18em", fontSize: "0.62rem", textTransform: "uppercase", textAlign: "center" }}>Phi-Ratio Analysis</div>
-            <div style={{ color: "#f4d13b", fontFamily: "'Cinzel', serif", fontSize: "1.4rem", textAlign: "center", margin: "0.5rem 0" }}>φ = 1.618034…</div>
-            <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.55)", textAlign: "center" }}>Angular spacing follows Fibonacci quantization</div>
-          </div>
-        </aside>
+          <p className="text-[8px] tracking-[0.3em] mt-3 pb-2 border-b" style={{ color: C.dim, borderColor: C.border }}>SYSTEM STATE</p>
+          <p data-testid="coherence-readout" className="text-center font-['Cinzel',serif]" style={{ color: C.teal, fontSize: 18 }}>
+            COHERENCE: {coherence.toFixed(1)}%
+          </p>
+          <p className="text-[8px] text-center" style={{ color: C.muted }}>Multi-scale phase-lock detected</p>
+        </div>
+      </div>
 
-        {/* MAIN VIZ */}
-        <main style={{ display: "grid", gridTemplateRows: "1.4fr 0.7fr", gap: "0.6rem", minHeight: 0 }}>
-          <div style={{ position: "relative", border: "1px solid rgba(0,229,200,0.18)", overflow: "hidden", background: "#000" }}>
-            <canvas ref={skyRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="sky-canvas" />
-            <div style={{ position: "absolute", top: 12, left: 14, color: "rgba(0,229,200,0.7)", fontFamily: "'Cinzel', serif", letterSpacing: "0.15em", fontSize: "0.78rem" }}>
-              Six-Planet Evening Arc
-            </div>
-            <div style={{ position: "absolute", top: 32, left: 14, color: "#94a3b8", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.6rem", letterSpacing: "0.18em" }}>
-              MARCH 2026 · WESTERN HORIZON
-            </div>
-            <div style={{ position: "absolute", bottom: 10, right: 12, display: "flex", flexDirection: "column", gap: 4, fontFamily: "'Share Tech Mono', monospace", fontSize: "0.58rem", color: "#94a3b8" }}>
-              {[
-                ["#a78bfa", "QUANTUM"],
-                ["#5dba6e", "BIOLOGICAL"],
-                ["#00e5c8", "PLANETARY"],
-              ].map(([col, lbl]) => (
-                <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <div style={{ width: 8, height: 8, background: col, borderRadius: "50%" }} /> {lbl}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ position: "relative", border: "1px solid rgba(0,229,200,0.18)", overflow: "hidden", background: "#000" }}>
-            <canvas ref={wavesRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="waves-canvas" />
-            <div style={{ position: "absolute", top: 8, left: 12, color: "rgba(0,229,200,0.7)", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.18em", fontSize: "0.6rem", textTransform: "uppercase" }}>
-              Coupled Wave Dynamics — Quantum · Biological · Planetary
-            </div>
-          </div>
-        </main>
+      {/* BOTTOM: waves + controls */}
+      <div className="grid gap-4 mt-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+        <div className="border p-3" style={{ borderColor: C.border2, background: C.panel }}>
+          <p className="text-[8px] tracking-[0.3em] pb-2 border-b" style={{ color: C.dim, borderColor: C.border }}>FIBONACCI WAVE PATTERNS</p>
+          <canvas ref={waveRef} style={{ width: "100%", height: 120, display: "block" }} data-testid="wave-canvas" />
+        </div>
 
-        {/* RIGHT */}
-        <aside style={{ display: "flex", flexDirection: "column", gap: "0.8rem", overflow: "auto" }}>
-          <div style={{ color: "#475569", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.2em", fontSize: "0.62rem", textTransform: "uppercase" }}>Wave Dynamics</div>
-          <div style={{ border: "1px solid rgba(255,255,255,0.08)", padding: "0.9rem", background: "rgba(0,229,200,0.04)" }}>
-            <div style={{ color: "#94a3b8", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.62rem", letterSpacing: "0.15em", textTransform: "uppercase" }}>Scale-Invariant Coupling</div>
-            <div style={{ color: "#00e5c8", fontFamily: "'Cinzel', serif", fontSize: "1.45rem", textAlign: "center", margin: "0.5rem 0" }}>∇²Ψ = k²φⁿΨ</div>
-            <div style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.7rem", textAlign: "center" }}>The same field equation governs quantum, biological, and orbital coherence — only n changes.</div>
+        <div className="border p-3" style={{ borderColor: C.border2, background: C.panel }}>
+          <p className="text-[8px] tracking-[0.3em] pb-2 border-b mb-3" style={{ color: C.dim, borderColor: C.border }}>ANALYSIS CONTROLS</p>
+          <div className="flex flex-wrap gap-2">
+            {(["alignment","resonance","dynamics"] as View[]).map(v => (
+              <button key={v} data-testid={`view-${v}`} onClick={() => setView(v)}
+                className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border transition-colors"
+                style={{
+                  color: view === v ? C.bg : C.teal,
+                  background: view === v ? C.teal : "transparent",
+                  borderColor: C.teal,
+                }}>{v}</button>
+            ))}
+            <button data-testid="export-btn" onClick={exportData}
+              className="px-3 py-1.5 text-[9px] tracking-[0.2em] uppercase border"
+              style={{ color: C.gold, borderColor: C.gold }}>EXPORT DATA</button>
           </div>
+          <AnimatePresence mode="wait">
+            <motion.p key={view} initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+              className="text-[10px] mt-3" style={{ color: C.muted }}>
+              {view === "alignment" && "Plain alignment view — six planets along the western horizon arc with angular markers."}
+              {view === "resonance" && "Inter-planetary angular ratios highlighted. Gold lines marked φ where ratio is within 0.1 of the golden ratio."}
+              {view === "dynamics"  && "Toroidal field overlay — three nested rings rotating to visualize the centripetal/centrifugal cycle."}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
 
-          <div style={{ color: "#475569", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.2em", fontSize: "0.62rem", textTransform: "uppercase" }}>Coherence Meters</div>
-          {PLANETS.slice(2, 5).map((p) => (
-            <div key={p.name}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "'Share Tech Mono', monospace", fontSize: "0.62rem", color: p.color, letterSpacing: "0.1em" }}>
-                <span>{p.name}</span><span>{p.coherence}%</span>
-              </div>
-              <div style={{ height: 6, background: "rgba(255,255,255,0.06)", marginTop: 4, position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", inset: 0, width: `${p.coherence}%`, background: `linear-gradient(90deg, ${p.color}, ${p.color}AA)`, boxShadow: `0 0 8px ${p.color}` }} />
-              </div>
-            </div>
-          ))}
-
-          <div style={{ marginTop: "0.4rem", color: "#475569", fontFamily: "'Share Tech Mono', monospace", letterSpacing: "0.2em", fontSize: "0.62rem", textTransform: "uppercase" }}>Fibonacci Spiral</div>
-          <div style={{ border: "1px solid rgba(244,209,59,0.2)", height: 200, background: "#000", overflow: "hidden" }}>
-            <canvas ref={phiRef} style={{ display: "block", width: "100%", height: "100%" }} data-testid="phi-canvas" />
-          </div>
-        </aside>
+      <div className="mt-12 pt-4 border-t flex justify-between text-[8px] tracking-[0.16em] uppercase" style={{ borderColor: C.border, color: C.dim }}>
+        <span>AETHER · Six-Planet Alignment · March 2026</span>
+        <span style={{ fontFamily: "serif", fontSize: 14, color: C.gold, fontStyle: "italic" }}>∇²Ψ = k²φⁿΨ</span>
+        <span>quantum · biological · planetary</span>
       </div>
     </div>
   );
