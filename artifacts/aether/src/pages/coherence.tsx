@@ -2,8 +2,9 @@ import { useGetCoherenceSummary } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Activity, Zap, TrendingUp, AlertTriangle, GitMerge, BarChart2, Waves, Sigma } from "lucide-react";
+import { Activity, Zap, TrendingUp, AlertTriangle, GitMerge, BarChart2, Waves, Sigma, Radio } from "lucide-react";
 import { motion } from "framer-motion";
+import fieldReceptionImg from "@assets/field_reception_shia_miller-01.jpg";
 
 // ─── Field-statistic helpers (computed client-side from graph data) ───────────
 // These mirror the simulation engine's metrics applied to the knowledge graph's
@@ -116,6 +117,61 @@ export default function CoherenceView() {
           knowledge graph's coherence distribution.
         </p>
       </header>
+
+      {/* External Field Reception — independent observer echoes */}
+      <Card className="p-6 bg-primary/[0.03] border-primary/20 relative overflow-hidden" data-testid="field-reception-panel">
+        <div className="flex items-center gap-2 mb-4">
+          <Radio className="w-4 h-4 text-primary" />
+          <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-primary">
+            Field Reception · External Resonance
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
+          <div className="space-y-4">
+            <blockquote className="font-serif text-lg leading-relaxed text-foreground border-l-2 border-primary/60 pl-5 italic">
+              "What you're building is a diagnostic language for coherence, where every symbol corresponds
+              to a measurable property of a physical system. If it can't be computed or observed, it doesn't belong."
+            </blockquote>
+            <div className="font-serif text-base leading-relaxed text-muted-foreground pl-5 border-l border-white/10">
+              Stability emerges when a system is forced to live inside a thin, highly structured slice
+              of its possible configurations — the same shape showing up in
+              <span className="text-primary"> quasicrystals</span>,
+              <span className="text-primary"> arithmetic geometry</span>,
+              <span className="text-primary"> resonant stone fields</span>, and
+              <span className="text-primary"> lattice intuition</span>. Glowing rings where slope
+              corresponds to T₂ decay — that's more than aesthetic; it can become a diagnostic language.
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-muted-foreground pl-5">
+              <span className="text-foreground">— Shia Miller</span>
+              <span className="opacity-50">·</span>
+              <span>@StrategicProce</span>
+              <span className="opacity-50">·</span>
+              <span>13K posts</span>
+              <span className="opacity-50">·</span>
+              <span className="text-primary/80">Independent observer echo, 2026</span>
+            </div>
+            <div className="text-[11px] font-mono text-muted-foreground/60 pl-5 leading-relaxed max-w-xl">
+              Treated as an external coherence reading. Mapped to AETHER nodes:
+              <span className="text-primary"> C_Diagnostic_Language</span>,
+              <span className="text-primary"> C_Configuration_Slice</span>,
+              <span className="text-primary"> C_T2_Decay_Mapping</span>,
+              <span className="text-primary"> S_Lattice_Resonance</span>.
+            </div>
+          </div>
+          <div>
+            <a href={fieldReceptionImg} target="_blank" rel="noopener noreferrer"
+              className="block border border-primary/20 hover:border-primary/40 transition-colors"
+              data-testid="field-reception-thumb"
+              aria-label="View source screenshot — Shia Miller post">
+              <img src={fieldReceptionImg} alt="External field reception — Shia Miller post"
+                className="w-full md:w-44 lg:w-56 object-cover" loading="lazy" />
+            </a>
+            <div className="text-center text-[9px] tracking-widest font-mono mt-2 text-muted-foreground/60 uppercase">
+              Source · click to view
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* Primary stats row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

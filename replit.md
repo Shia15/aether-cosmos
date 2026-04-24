@@ -13,7 +13,7 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 **M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
 **Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
 
-### Routes (50 pages)
+### Routes (51 pages)
 - `/aether-intake` — AETHER OS Batch Intake v5: drop up to 20 docs, AI auto-titles & section analysis (Anthropic via Replit AI proxy), 9-shell coherence mapping, 26-dimensional freedom signatures, live mind map (radial/tree/cluster), archive filter. Backend route: `/api/aether-intake/{title,analyze}`.
 `/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir` · `/phi-framework` · `/aquarium-chip` · `/quaternions` · `/biomimetic-symphony` · `/ecological-intelligence` · `/fibonacci-calendar` · `/gobekli-tepe` · `/unified-timeline` · `/cerebral-organoids` · `/cosmic-convergence` · `/atlantis-alignment`
 

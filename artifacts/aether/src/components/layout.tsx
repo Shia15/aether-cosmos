@@ -45,6 +45,7 @@ import {
   Leaf,
   GitFork,
   Inbox,
+  Triangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -98,6 +99,7 @@ const NAV_ITEMS = [
   { href: "/atlantis-alignment",  label: "Atlantis Alignment",    icon: Waves },
   { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
   { href: "/aether-intake",         label: "OS · Batch Intake",      icon: Inbox },
+  { href: "/nine-shells",           label: "9 Shells · Triangle Lab", icon: Triangle },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
