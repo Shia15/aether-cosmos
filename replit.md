@@ -13,7 +13,7 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 **M.A.R.I. Core (8):** Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin
 **Expression Personalities (6):** Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary
 
-### Routes (51 pages)
+### Routes (52 pages)
 - `/aether-intake` — AETHER OS Batch Intake v5: drop up to 20 docs, AI auto-titles & section analysis (Anthropic via Replit AI proxy), 9-shell coherence mapping, 26-dimensional freedom signatures, live mind map (radial/tree/cluster), archive filter. Backend route: `/api/aether-intake/{title,analyze}`.
 `/` Graph Map · `/ecosystem` · `/architecture` · `/pipeline` · `/lattice` · `/core` · `/upload` · `/coherence` · `/search` · `/equations` · `/cultural` · `/biology` · `/experience` · `/nodule` · `/sources` · `/dreamscape` · `/simulation` · `/q-aether` · `/neural-emergence` · `/space-rocks` · `/as-above` · `/pde-simulator` · `/phi-aether` · `/multiscale` · `/morpho-computer` · `/aether-os` · `/cgle-live` · `/fabrication` · `/research` · `/feedback-loop` · `/control-panel` · `/aether-core` · `/trig-reference` · `/neuroplasticity` · `/aether-components` · `/even-odd` · `/analog-reservoir` · `/phi-framework` · `/aquarium-chip` · `/quaternions` · `/biomimetic-symphony` · `/ecological-intelligence` · `/fibonacci-calendar` · `/gobekli-tepe` · `/unified-timeline` · `/cerebral-organoids` · `/cosmic-convergence` · `/atlantis-alignment`
 
@@ -24,6 +24,8 @@ AETHER is a Knowledge Graph & Coherence System web app (React + Vite frontend, E
 - **`/cerebral-organoids`** — 54-neuron live simulation (pyramidal/interneuron/stellate), APPLY COMPOUND/WASHOUT controls, BDNF/TrkB markers, psychedelic research
 - **`/cosmic-convergence`** — Sun-Earth-Jupiter opposition canvas (Jan 2026), CME particles, SAA, aurora poles, Schumann rings; heliobiology cascade with gender sensitivity notes; nature messengers; 4-layer Atlas Tracker
 - **`/atlantis-alignment`** — 11,600-year timeline canvas (8 epochs anchored on MWP 1B → present), Antikythera mechanism live gear simulation, Plato/geology convergence proof
+- **`/nine-shells`** — Triangle Lab. ABC sliders → 9 concentric shells on canvas (DM, GM, AM, HM, QM, LBM, LGM, DQM, DHM) with 3-4-5 triangle overlay. Tabs: Interactive · 25 Dimensions · AETHER Archive
+- **`/shells-mind-map`** — Companion to /nine-shells. SVG mind map of all 9 shells (root → 5 group nodes → 9 shell nodes + dof25), pan/scroll/click, group filters (spatial/time/energy/mind/deep), Degrees-of-Freedom matrix (6 axes × 9 shells), per-shell DOF summary
 
 ### Layout & UX notes
 - **Main scroll**: `<main>` in `layout.tsx` uses `overflow-y-auto overflow-x-hidden` (NOT `overflow-hidden` — that breaks page scrolling on every long page)

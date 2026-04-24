@@ -100,6 +100,7 @@ const NAV_ITEMS = [
   { href: "/gobekli-tepe",          label: "Göbekli Tepe Engine",    icon: Network },
   { href: "/aether-intake",         label: "OS · Batch Intake",      icon: Inbox },
   { href: "/nine-shells",           label: "9 Shells · Triangle Lab", icon: Triangle },
+  { href: "/shells-mind-map",       label: "9 Shells · Mind Map",     icon: Workflow },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
