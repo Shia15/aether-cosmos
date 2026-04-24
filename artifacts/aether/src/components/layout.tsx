@@ -140,6 +140,7 @@ const NAV_ITEMS = [
   { href: "/geometry-of-permission",label: "Geometry of Permission",   icon: KeySquare },
   { href: "/math-engine",           label: "Math Engine · Workbench",  icon: Calculator },
   { href: "/product-research",      label: "Product Research",         icon: FlaskRound },
+  { href: "/ultra-magnetism",       label: "Ultra-Magnetism · SC",     icon: Hexagon },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

@@ -75,6 +75,7 @@ import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
 import ProductResearchPage from "@/pages/product-research";
+import UltraMagnetismPage from "@/pages/ultra-magnetism";
 
 const queryClient = new QueryClient();
 
@@ -153,6 +154,7 @@ function Router() {
         <Route path="/geometry-of-permission" component={GeometryOfPermissionView} />
         <Route path="/math-engine" component={MathEnginePage} />
         <Route path="/product-research" component={ProductResearchPage} />
+        <Route path="/ultra-magnetism" component={UltraMagnetismPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
