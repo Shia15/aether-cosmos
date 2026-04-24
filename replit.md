@@ -17,7 +17,7 @@ The AETHER system is built as a pnpm workspace monorepo using TypeScript, featur
 ### UI/UX Decisions
 - **Color Palette:** A consistent theme using "Void", "Navy", "Deep", "Violet", "Mid", "Gold", "Bright Gold", "Coral", "Crimson", and "Teal" for a sophisticated and cosmic aesthetic.
 - **Interactive Visualizations:** Extensive use of live canvases for simulations, graphs (e.g., force-directed graph, mind maps, sky dials), and dynamic data representations (e.g., solar system, planetary alignments, neural simulations).
-- **Navigation:** Over 60 distinct routes (currently 60+ pages) covering various features, including a primary Graph Map, ecosystem views, architectural breakdowns, specialized simulators, the AETHER Whitepaper v1, the Six-Planet March 2026 Alignment, the Closed Discovery Loop, the Fibonacci Quantization Processor (FQP), the Symphonic Protocol OS v2 (7-layer), and the Symphonic Protocol v0.1 Glass-Box Ecosystem (4-layer). The legacy Coherence Bus / heads-up display has been removed in favor of dedicated pages. Many pages feature interactive elements and scroll-anchored sections.
+- **Navigation:** Over 60 distinct routes (currently 60+ pages) covering various features, including a primary Graph Map, ecosystem views, architectural breakdowns, specialized simulators, the AETHER Whitepaper v1, the Six-Planet March 2026 Alignment, the Closed Discovery Loop, the Fibonacci Quantization Processor (FQP), the Symphonic Protocol OS v2 (7-layer), the Symphonic Protocol v0.1 Glass-Box Ecosystem (4-layer), the FerroDrive Bio-Magnetic Civilization Stack, the AETHER-CLA Coupled Phase Lattice (water · animal · human three-domain CGLE), the φ-AETHER Cancer Coherence brief (rational classifier + crackling-noise universality + 5-layer pipeline + living hardware), and the Biomimetic Quantum Computing page (FMO exciton walk + H⁺ tunnelling). The legacy Coherence Bus / heads-up display has been removed in favor of dedicated pages. Many pages feature interactive elements and scroll-anchored sections.
 
 ### Technical Implementations
 - **Frontend:** React with Vite for a fast and reactive user interface.
@@ -37,6 +37,10 @@ The AETHER system is built as a pnpm workspace monorepo using TypeScript, featur
 - **Symphonic Protocol OS:** A 7-layer system with interactive canvases for geometric shapes (tetrahedron, torus) and THz photon fields, modulated by harmonic ratios.
 - **UFO Ascent Simulation:** A physics-driven simulation of a UFO trajectory with vehicle state, dynamics, and environmental factors.
 - **Discovery Loop:** A multi-phase simulation involving mycelium, ferrofluid, and metabolites, illustrating a sense-deliver-activate-feedback cycle.
+- **FerroDrive (`/ferrodrive`):** Bio-magnetic civilizational stack with five modules (Propulsion, Medicine, Mycelium, Earth-Grid, Plasma) and an interactive ferrofluid simulation responsive to applied B-field and carrier viscosity.
+- **AETHER-CLA Coupled Fields (`/cla-coupled-fields`):** Three coupled CGLE lattices (water, animal, human) with tunable cross-coupling ε_WA, ε_AH, ε_WH and optional periodic planetary forcing F(t). Live R(t) order-parameter telemetry.
+- **Cancer Coherence (`/cancer-coherence`):** φ-AETHER clinical brief with an interactive rational classifier f(x)=4(x−1)/[(x+2)(x−3)], crackling-noise universality calculator (α−1)/(τ−1), 5-layer closed-loop pipeline, and living-hardware stack (firefly · mycelium · dolphin · ferrofluid).
+- **Biomimetic Quantum (`/biomimetic-quantum`):** Photonic FMO-7 exciton walk plus protonic tunnelling barrier with three modes (Photonic / Protonic / Hybrid) and tunable site-coupling J, dephasing γ, barrier V₀.
 
 ## External Dependencies
 

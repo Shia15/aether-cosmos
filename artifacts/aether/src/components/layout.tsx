@@ -54,6 +54,10 @@ import {
   Rocket,
   HeartHandshake,
   Binary,
+  Magnet,
+  Waypoints,
+  TestTube,
+  Hexagon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -118,6 +122,10 @@ const NAV_ITEMS = [
   { href: "/ufo-ascent",            label: "UFO Ascent · Trajectory", icon: Rocket },
   { href: "/brain-metabolism",      label: "Brain-First Metabolism",  icon: HeartHandshake },
   { href: "/hypercomputation",      label: "Hypercomputation Lang",   icon: Binary },
+  { href: "/ferrodrive",            label: "FerroDrive · Bio-Magnetic", icon: Magnet },
+  { href: "/cla-coupled-fields",    label: "AETHER-CLA · Coupled",     icon: Waypoints },
+  { href: "/cancer-coherence",      label: "Cancer Coherence · φ",     icon: TestTube },
+  { href: "/biomimetic-quantum",    label: "Biomimetic Quantum",       icon: Hexagon },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

@@ -64,6 +64,10 @@ import SymphonicProtocolView from "@/pages/symphonic-protocol";
 import UFOAscentView from "@/pages/ufo-ascent";
 import BrainMetabolismView from "@/pages/brain-metabolism";
 import HypercomputationView from "@/pages/hypercomputation";
+import FerroDriveView from "@/pages/ferrodrive";
+import CLACoupledFieldsView from "@/pages/cla-coupled-fields";
+import CancerCoherenceView from "@/pages/cancer-coherence";
+import BiomimeticQuantumView from "@/pages/biomimetic-quantum";
 
 const queryClient = new QueryClient();
 
@@ -131,6 +135,10 @@ function Router() {
         <Route path="/ufo-ascent" component={UFOAscentView} />
         <Route path="/brain-metabolism" component={BrainMetabolismView} />
         <Route path="/hypercomputation" component={HypercomputationView} />
+        <Route path="/ferrodrive" component={FerroDriveView} />
+        <Route path="/cla-coupled-fields" component={CLACoupledFieldsView} />
+        <Route path="/cancer-coherence" component={CancerCoherenceView} />
+        <Route path="/biomimetic-quantum" component={BiomimeticQuantumView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

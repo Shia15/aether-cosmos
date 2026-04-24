@@ -1,386 +1,368 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
-  bg: "#04070E", panel: "#080D1A", panel2: "#0B1220",
-  border: "#0E1A2C", border2: "#152438",
-  white: "#EBF4FF", text: "#7AA6C5", muted: "#486888", dim: "#243850",
-  teal: "#00C9B1", gold: "#F5C518", orange: "#F97316",
-  red: "#EF4444", yellow: "#FBBF24", purple: "#7C5CFC", blue: "#3B82F6",
-  green: "#10B981", pink: "#F472B6", silver: "#C0CFDB",
+  bg: "#020608", bg2: "#04090d", panel: "rgba(4,9,13,0.86)",
+  border: "rgba(0,245,200,0.14)", border2: "rgba(0,245,200,0.28)",
+  white: "#E5FBF5", text: "#9BBFB5", muted: "#5F8378", dim: "#3F5C53",
+  photon: "#00f5c8", proton: "#FFD66B", hybrid: "#C77DFF",
+  site: "#4FC3F7", barrier: "#E84040", tunnel: "#FFD66B",
 };
 
-type Tab = "abstract" | "patterns" | "qbio" | "photonic" | "protonic" | "hybrid" | "metrics" | "challenges";
+type Mode = "photonic" | "protonic" | "hybrid";
 
-const PATTERNS = [
-  { name: "ENERGY MINIMIZATION",   col: C.gold,    body: "Biological systems exploit quantum effects for low-energy operations. Photosynthesis: near-100% efficient exciton transport via quantum coherence. Proton tunneling in enzymes reduces activation energies." },
-  { name: "SCALABLE MODULARITY",   col: C.teal,    body: "Termite mounds use passive ventilation. Neuromorphic chips mimicking brain efficiency are ~1,000,000× more energy-efficient than silicon for similar tasks." },
-  { name: "RESILIENCE TO NOISE",   col: C.purple,  body: "Biological quantum processes operate at room temperature amid thermal noise. Avian magnetoreception via radical pairs uses environmental coupling for stability." },
-  { name: "HYBRID INTEGRATION",    col: C.orange,  body: "Ecosystems blend discrete and continuous elements (photon-protein interactions in vision). This informs hybrid CV-DV (continuous-variable / discrete-variable) quantum systems." },
+const MODES: { key: Mode; n: string; label: string; col: string; lead: string }[] = [
+  { key: "photonic", n: "01", label: "Photonic",  col: C.photon,
+    lead: "FMO-complex-inspired exciton transport. Coherent quantum walk across 7 chlorosome sites with environment-assisted dephasing. Energy hops as a delocalised wavepacket." },
+  { key: "protonic", n: "02", label: "Protonic",  col: C.proton,
+    lead: "Hydrogen-atom tunnelling through enzymatic barriers. Probability mass leaks through a forbidden region — quantum gating without a thermal step." },
+  { key: "hybrid",   n: "03", label: "Hybrid",    col: C.hybrid,
+    lead: "Photonic walk drives protonic tunnelling. Energy from coherent excitons opens proton gates · biomimetic two-stage quantum logic." },
 ];
 
-const QBIO = [
-  { title: "PHOTONIC PROCESSES",  col: C.gold,   body: "Photosynthesis uses quantum superposition and entanglement for efficient light harvesting. Excitons delocalize across chromophores achieving unity quantum yield. Biophotons — ultraweak coherent emissions from metabolic processes — function as quantum light sources." },
-  { title: "PROTON MANIPULATION", col: C.teal,   body: "Proton tunneling underpins enzyme catalysis and DNA mutations, enabling barrier penetration with minimal energy. In hydrogen bonds, protons exhibit quantum delocalization influencing biological stability." },
-  { title: "INTEGRATED SYSTEMS",  col: C.purple, body: "Proteins can sustain quantum superpositions, turning cells into proto-quantum processors. Quantum biomimetic protocols encode self-replication and mutation, mimicking evolutionary algorithms." },
-];
+const SITES = 7;
 
-const PHOTONIC = [
-  { tag: "LIGHT-HARVESTING MIMICRY",   col: C.gold,    body: "Emulate photosynthetic antennas for efficient photon sources. Deterministic quantum-dot emitters mimic chromophore arrays, reducing multiplexing needs and boosting scalability. Squeezed states inspired by biophoton coherence minimize uncertainty in continuous-variable encoding." },
-  { tag: "NOISE-RESILIENT GATES",      col: C.purple,  body: "Avian-navigation radical-pair mechanism inspires error-corrected photonic gates tolerating 11.5% photon loss using GHZ states. Enables all-photonic universal QC at room temperature." },
-  { tag: "EFFICIENCY GAINS",           col: C.teal,    body: "Polarization encoding, redundant multi-photon pulses, and hybrid CV-DV models reduce resource overheads (~2.07 × 10⁶ for 10⁻⁶ accuracy). Applications: simulating molecular energies, photonic hydrogen spectrum calculations." },
-];
-
-const PROTONIC = [
-  { tag: "TUNNELING-INSPIRED GATES",   col: C.orange,  body: "Enzyme-like proton tunneling enables low-energy quantum gates. NMR QC manipulates proton spins; biomimicry enhances this with delocalized proton networks for dense encoding." },
-  { tag: "HYBRID PHOTONIC-PROTONIC",   col: C.pink,    body: "Integrate photonic qubits with protonic ones, mimicking biophoton-protein interactions. Trapped H⁺ ions could interface with photons for quantum networks, drawing from mitogenetic UV photon-cellular response." },
-  { tag: "SCALABILITY & EFFICIENCY",   col: C.green,   body: "Multi-proton biomimetic redundancy reduces errors. Simulations show proton-based systems could simulate complex biomolecules with lower energy than superconducting QC." },
-];
-
-const ARCHITECTURE = [
-  { layer: "01 · PHOTONIC BACKBONE",   col: C.gold,    desc: "Fast, low-loss computation. Linear optics, quantum-dot single-photon sources, polarization-encoded qubits. Room-temperature operation." },
-  { layer: "02 · PROTONIC MODULES",    col: C.orange,  desc: "Stable storage and tunneling-based operations. Trapped H⁺ ions or NMR proton spins. Long coherence times." },
-  { layer: "03 · GHZ ENTANGLED CLUSTERS", col: C.purple, desc: "Modular blocks tolerating high photon loss (11.5%+). Fault-tolerant via biological-redundancy patterns." },
-  { layer: "04 · BIOPHOTON INTERFACE", col: C.teal,    desc: "UV/optical signal translation between photonic backbone and protonic stores — mimicking mitogenetic activation." },
-  { layer: "05 · ENVIRONMENTAL COUPLING", col: C.green, desc: "Engineered ENAQT (environment-assisted quantum transport) using thermal noise as resource, not enemy." },
-  { layer: "06 · ADAPTIVE ERROR-CORRECT", col: C.pink, desc: "Radical-pair-inspired gates and self-replicating biomimetic protocols for runtime error mitigation." },
-];
-
-const METRICS = [
-  { k: "ENERGY REDUCTION",    v: "10–100×",   n: "vs superconducting QC, via coherence mimicry", col: C.gold },
-  { k: "PHOTON LOSS TOLERANCE", v: "11.5%",   n: "with GHZ-cluster encoding",                     col: C.purple },
-  { k: "RESOURCE OVERHEAD",   v: "2.07 × 10⁶", n: "for 10⁻⁶ accuracy in CV-DV hybrid",            col: C.teal },
-  { k: "EXCITON YIELD",       v: "~100%",     n: "biological photosynthesis benchmark",          col: C.green },
-  { k: "TEMPERATURE",         v: "300 K",     n: "room-temperature operation target",            col: C.orange },
-  { k: "NEUROMORPHIC EDGE",   v: "10⁶×",      n: "energy advantage of brain-mimetic chips",      col: C.pink },
-];
+interface ExciState { amp: number[]; phase: number[]; }
+interface ProtonPkt { x: number; e: number; alive: boolean; tunneled: boolean; }
+interface LogEntry { ts: string; mode: string; msg: string; col: string; }
 
 export default function BiomimeticQuantumPage() {
-  const [tab, setTab] = useState<Tab>("abstract");
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const stateRef = useRef({
+    exci: { amp: new Array(SITES).fill(0), phase: new Array(SITES).fill(0) } as ExciState,
+    protons: [] as ProtonPkt[],
+    mode: "photonic" as Mode,
+    coupling: 50, deph: 25, barrier: 50,
+    running: true, frame: 0, time: 0,
+    fidelity: 1, walkDist: 0, tunnelCount: 0, totalProtons: 0,
+  });
+  const [mode, setMode] = useState<Mode>("photonic");
+  const [running, setRunning] = useState(true);
+  const [coupling, setCoupling] = useState(50);
+  const [deph, setDeph] = useState(25);
+  const [barrier, setBarrier] = useState(50);
+  const [metrics, setMetrics] = useState({ T1: 320, T2: 180, fidelity: 100, tunnel: 0, walk: 0 });
+  const [events, setEvents] = useState<LogEntry[]>([]);
 
-  const TABS: [Tab, string][] = [
-    ["abstract","ABSTRACT"], ["patterns","BIOMIMETIC PATTERNS"], ["qbio","QUANTUM BIOLOGY"],
-    ["photonic","PHOTONIC QC"], ["protonic","PROTONIC QC"], ["hybrid","INTEGRATED ARCHITECTURE"],
-    ["metrics","METRICS"], ["challenges","CHALLENGES"],
-  ];
+  function log(m: string, msg: string, col: string) {
+    const now = new Date();
+    const ts = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n => String(n).padStart(2, "0")).join(":");
+    setEvents(prev => [{ ts, mode: m, msg, col }, ...prev].slice(0, 36));
+  }
 
-  return (
-    <div data-testid="biomimetic-quantum-root" className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+  useEffect(() => { stateRef.current.running = running; }, [running]);
+  useEffect(() => { stateRef.current.coupling = coupling; }, [coupling]);
+  useEffect(() => { stateRef.current.deph = deph; }, [deph]);
+  useEffect(() => { stateRef.current.barrier = barrier; }, [barrier]);
+  useEffect(() => {
+    stateRef.current.mode = mode;
+    const m = MODES.find(x => x.key === mode)!;
+    log("MODE", `Engaged ${m.label.toUpperCase()} substrate`, m.col);
+    // reset state on mode swap
+    stateRef.current.exci.amp = new Array(SITES).fill(0);
+    stateRef.current.exci.phase = new Array(SITES).fill(0);
+    stateRef.current.exci.amp[0] = 1;
+    stateRef.current.protons = [];
+    stateRef.current.tunnelCount = 0;
+    stateRef.current.totalProtons = 0;
+  }, [mode]);
 
-      <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
-        <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>
-          AETHER · Biomimetic Quantum Computing · Photonic + Protonic Synthesis
-        </p>
-        <h1 className="font-['Cinzel',serif] font-light leading-none tracking-tight" style={{ fontSize: "clamp(34px,4.8vw,58px)", color: C.white }}>
-          Biomimetic <em style={{ color: C.green, fontStyle: "italic" }}>Quantum</em> Computing
-        </h1>
-        <p className="font-['Cinzel',serif] italic mt-2" style={{ fontSize: "clamp(13px,1.6vw,18px)", color: C.muted }}>
-          Patterned synthesis · light-based + proton-based manipulations · room-temperature QC
-        </p>
-        <p className="mt-4 max-w-3xl text-[12px] leading-7 border-l-2 pl-4" style={{ color: C.text, borderColor: C.green }}>
-          Biomimicry — the emulation of nature's optimized designs — has yielded efficiency gains across energy,
-          materials, and computing. This page synthesizes recurring patterns (minimal energy, adaptive resilience,
-          scalable architectures) and applies them to quantum computing through photonic and protonic systems.
-          Quantum biology provides direct blueprints for room-temperature, noise-tolerant quantum information handling.
-        </p>
-      </div>
+  useEffect(() => {
+    const c = cvRef.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    c.width = c.offsetWidth; c.height = c.offsetHeight;
 
-      {/* TABS */}
-      <div className="flex gap-1 mb-5 border-b overflow-x-auto" style={{ borderColor: C.border2 }}>
-        {TABS.map(([k, lbl]) => (
-          <button key={k} data-testid={`tab-${k}`} onClick={() => setTab(k)}
-            className="px-3 py-2 text-[8px] tracking-[0.22em] whitespace-nowrap transition-colors"
-            style={{
-              color: tab === k ? C.green : C.muted,
-              borderBottom: tab === k ? "2px solid " + C.green : "2px solid transparent",
-              marginBottom: "-1px",
-            }}>{lbl}</button>
-        ))}
-      </div>
+    stateRef.current.exci.amp[0] = 1;
+    log("SYS", "Biomimetic QC stack online · FMO-7 lattice + H-tunnel barrier loaded", C.photon);
 
-      <AnimatePresence mode="wait">
+    let raf = 0;
+    function frame() {
+      const s = stateRef.current;
+      if (!s.running) { raf = requestAnimationFrame(frame); return; }
+      s.frame++; s.time += 0.016;
+      const W = c!.width, Hh = c!.height;
 
-        {tab === "abstract" && (
-          <motion.div key="abstract" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="00" t="Abstract" />
-            <p className="text-[12.5px] leading-7 max-w-3xl" style={{ color: C.text }}>
-              Biological systems — photosynthesis, enzyme tunneling, avian magnetoreception — operate as
-              proto-quantum processors at <strong style={{ color: C.gold }}>room temperature</strong> amid
-              <strong style={{ color: C.gold }}> thermal noise</strong>, using environmental interactions
-              for stability rather than fighting them. Engineered QC has historically required cryogenic
-              isolation. We propose a hybrid framework that imports the biological resilience strategies
-              into photonic and protonic QC, achieving 10–100× energy reduction, 11.5% photon-loss tolerance
-              via GHZ entangled clusters, and room-temperature universal computation.
-            </p>
-            <div className="grid mt-6" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 1, background: C.border, border: "1px solid " + C.border }}>
-              {[
-                ["TARGET",     "Universal QC", C.gold],
-                ["TEMPERATURE", "300 K",       C.green],
-                ["BACKBONE",   "Photonic",    C.purple],
-                ["MEMORY",     "Protonic",    C.orange],
-                ["INSPIRATION","Quantum Bio", C.teal],
-              ].map(([k,v,col]) => (
-                <div key={k as string} className="p-3" style={{ background: C.panel }}>
-                  <p className="text-[7.5px] tracking-[0.22em]" style={{ color: C.dim }}>{k}</p>
-                  <p className="text-[14px] mt-1 font-['Cinzel',serif]" style={{ color: col as string }}>{v}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+      // background
+      ctx!.fillStyle = C.bg; ctx!.fillRect(0, 0, W, Hh);
+      const bgg = ctx!.createRadialGradient(W * 0.5, Hh * 0.5, 30, W * 0.5, Hh * 0.5, Math.max(W, Hh) * 0.6);
+      const accent = MODES.find(m => m.key === s.mode)!.col;
+      bgg.addColorStop(0, `${accent}10`);
+      bgg.addColorStop(1, "rgba(2,6,8,0)");
+      ctx!.fillStyle = bgg; ctx!.fillRect(0, 0, W, Hh);
 
-        {tab === "patterns" && (
-          <motion.div key="patterns" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="01" t="Biomimetic Patterns · Efficiency Across Fields" />
-            <p className="text-[12px] leading-7 mb-4 max-w-3xl">
-              Four recurring patterns that biology uses to extract performance from constrained resources.
-              Examples already deployed: whale-fin tubercles (+40% wind-turbine efficiency), shark-skin riblets
-              (aircraft drag reduction).
-            </p>
-            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
-              {PATTERNS.map(p => (
-                <div key={p.name} data-testid={`pattern-${p.name.toLowerCase().replace(/\W+/g, "-")}`} className="border p-4" style={{ borderColor: p.col + "40", background: p.col + "08" }}>
-                  <p className="text-[10px] tracking-[0.22em] mb-2" style={{ color: p.col }}>{p.name}</p>
-                  <p className="text-[11px] leading-6" style={{ color: C.text }}>{p.body}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+      // grid
+      ctx!.strokeStyle = "rgba(0,245,200,0.05)"; ctx!.lineWidth = 1;
+      for (let x = 0; x < W; x += 40) { ctx!.beginPath(); ctx!.moveTo(x, 0); ctx!.lineTo(x, Hh); ctx!.stroke(); }
+      for (let y = 0; y < Hh; y += 40) { ctx!.beginPath(); ctx!.moveTo(0, y); ctx!.lineTo(W, y); ctx!.stroke(); }
 
-        {tab === "qbio" && (
-          <motion.div key="qbio" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="02" t="Insights from Quantum Biology" />
-            <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))" }}>
-              {QBIO.map(q => (
-                <div key={q.title} className="border p-4" style={{ borderColor: q.col + "40", background: q.col + "08" }}>
-                  <p className="text-[10px] tracking-[0.22em] mb-2" style={{ color: q.col }}>{q.title}</p>
-                  <p className="text-[11px] leading-6" style={{ color: C.text }}>{q.body}</p>
-                </div>
-              ))}
-            </div>
-            <Callout col={C.gold} k="OPERATING REGIME">
-              These phenomena operate efficiently <strong>without isolation</strong>, suggesting QC can
-              borrow resilience strategies rather than requiring millikelvin shielding.
-            </Callout>
-          </motion.div>
-        )}
+      // Photonic FMO walk (top half)
+      const padX = 60;
+      const yPhot = Hh * 0.32;
+      const cellW = (W - padX * 2) / (SITES - 1);
 
-        {tab === "photonic" && (
-          <motion.div key="photonic" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="03" t="Photonic Quantum Computing · Inspired by Biology" />
-            <p className="text-[12px] leading-7 mb-4 max-w-3xl">
-              Photonic QC uses photons as qubits via linear optics, single-photon sources, and detectors.
-              Biology supplies three direct inspirations.
-            </p>
-            <div className="flex flex-col gap-2">
-              {PHOTONIC.map(p => (
-                <div key={p.tag} className="grid border p-4" style={{
-                  borderColor: C.border, borderLeft: "3px solid " + p.col, background: C.panel2,
-                  gridTemplateColumns: "240px 1fr", gap: 16,
-                }}>
-                  <p className="text-[10px] tracking-[0.2em] self-start" style={{ color: p.col }}>{p.tag}</p>
-                  <p className="text-[11.5px] leading-6" style={{ color: C.text }}>{p.body}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 border p-4 flex justify-center" style={{ borderColor: C.gold + "30", background: C.panel }}>
-              <PhotonAntennaSVG />
-            </div>
-          </motion.div>
-        )}
-
-        {tab === "protonic" && (
-          <motion.div key="protonic" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="04" t="Proton Manipulation in Quantum Computing" />
-            <p className="text-[12px] leading-7 mb-4 max-w-3xl">
-              Protons, as nuclear spins, offer long coherence times for qubits. Biological tunneling
-              provides the gate primitives.
-            </p>
-            <div className="flex flex-col gap-2">
-              {PROTONIC.map(p => (
-                <div key={p.tag} className="grid border p-4" style={{
-                  borderColor: C.border, borderLeft: "3px solid " + p.col, background: C.panel2,
-                  gridTemplateColumns: "240px 1fr", gap: 16,
-                }}>
-                  <p className="text-[10px] tracking-[0.2em] self-start" style={{ color: p.col }}>{p.tag}</p>
-                  <p className="text-[11.5px] leading-6" style={{ color: C.text }}>{p.body}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 border p-4 flex justify-center" style={{ borderColor: C.orange + "30", background: C.panel }}>
-              <TunnelingSVG />
-            </div>
-          </motion.div>
-        )}
-
-        {tab === "hybrid" && (
-          <motion.div key="hybrid" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="05" t="Integrated Revolution · Biomimetic QC Architecture" badge="6-LAYER STACK" badgeCol={C.purple} />
-            <p className="text-[12px] leading-7 mb-4 max-w-3xl">
-              A patterned synthesis: photonic backbone for fast low-loss computation; protonic modules for stable
-              storage and tunneling-based operations. Mimics biological quantum integration.
-            </p>
-            <div className="grid gap-px" style={{ background: C.border, border: "1px solid " + C.border }}>
-              {ARCHITECTURE.map(a => (
-                <div key={a.layer} data-testid={`arch-${a.layer.substring(0,2)}`} className="grid p-3" style={{ background: C.panel, gridTemplateColumns: "240px 1fr", gap: 16 }}>
-                  <p className="text-[10px] font-['Cinzel',serif]" style={{ color: a.col }}>{a.layer}</p>
-                  <p className="text-[11px]" style={{ color: C.text }}>{a.desc}</p>
-                </div>
-              ))}
-            </div>
-            <Callout col={C.green} k="APPLICATIONS">
-              Drug discovery via enzyme-tunneling simulation. Photosynthetic-analog energy modeling.
-              Photonic hydrogen-spectrum calculations. Fault-tolerant overheads drop significantly with
-              biological-inspired error correction.
-            </Callout>
-          </motion.div>
-        )}
-
-        {tab === "metrics" && (
-          <motion.div key="metrics" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="06" t="Resource Estimates · Where Biomimicry Wins" />
-            <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))" }}>
-              {METRICS.map(m => (
-                <div key={m.k} data-testid={`metric-${m.k.toLowerCase().replace(/\W+/g, "-")}`} className="border p-4" style={{ borderColor: m.col + "40", background: m.col + "08" }}>
-                  <p className="text-[8px] tracking-[0.22em]" style={{ color: m.col }}>{m.k}</p>
-                  <p className="font-['Cinzel',serif] mt-1" style={{ color: m.col, fontSize: 28 }}>{m.v}</p>
-                  <p className="text-[10px] mt-1" style={{ color: C.muted }}>{m.n}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {tab === "challenges" && (
-          <motion.div key="challenges" initial={{ opacity:0,y:8 }} animate={{ opacity:1,y:0 }} exit={{ opacity:0 }}>
-            <SectionTitle n="07" t="Challenges and Future Directions" />
-            <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1fr" }}>
-              <div className="border p-4" style={{ borderColor: C.red + "40", background: C.red + "06" }}>
-                <p className="text-[10px] tracking-[0.22em] mb-2" style={{ color: C.red }}>OPEN PROBLEMS</p>
-                <ul className="text-[11px] space-y-2 leading-6" style={{ color: C.text }}>
-                  <li>· Generating deterministic multiphoton states at scale</li>
-                  <li>· Integrating protonic elements at chip scale</li>
-                  <li>· Maintaining coherence across hybrid CV-DV interface</li>
-                  <li>· Engineered ENAQT calibration in noisy environments</li>
-                  <li>· Manufacturing reproducibility of bio-inspired emitters</li>
-                </ul>
-              </div>
-              <div className="border p-4" style={{ borderColor: C.green + "40", background: C.green + "06" }}>
-                <p className="text-[10px] tracking-[0.22em] mb-2" style={{ color: C.green }}>NEXT STEPS</p>
-                <ul className="text-[11px] space-y-2 leading-6" style={{ color: C.text }}>
-                  <li>· Experimental prototypes with quantum dots as photonic sources</li>
-                  <li>· Ion traps for proton qubit modules</li>
-                  <li>· Integration with AETHER mycelial substrate (see <code>/biomimetic-symphony</code>)</li>
-                  <li>· Refinement of patterns from new quantum biology research</li>
-                  <li>· Cross-link with NV spin-bath β(n) framework (see <code>/aquarium-chip</code>)</li>
-                </ul>
-              </div>
-            </div>
-            <Callout col={C.yellow} k="ETHICAL CONSIDERATION">
-              Biomimetic QC could accelerate AI capability — raising energy and equity questions that should
-              be addressed by the architecture, not by patches.
-            </Callout>
-          </motion.div>
-        )}
-
-      </AnimatePresence>
-
-      <div className="mt-12 pt-4 border-t flex justify-between text-[8px] tracking-[0.16em] uppercase" style={{ borderColor: C.border, color: C.dim }}>
-        <span>AETHER · Biomimetic Quantum · Photonic + Protonic Synthesis</span>
-        <span style={{ fontFamily: "serif", fontSize: 16, color: C.green }}>η ≈ 100%</span>
-        <span>nature is the ultimate innovator</span>
-      </div>
-    </div>
-  );
-}
-
-function SectionTitle({ n, t, badge, badgeCol }: { n: string; t: string; badge?: string; badgeCol?: string }) {
-  return (
-    <div className="flex items-baseline gap-3 mb-4 pb-2 border-b" style={{ borderColor: C.border2 }}>
-      <span className="text-[8px] tracking-[0.22em]" style={{ color: C.dim }}>{n}</span>
-      <h2 className="font-['Cinzel',serif] flex-1" style={{ color: C.white, fontSize: "clamp(17px,2.4vw,23px)", fontWeight: 400 }}>{t}</h2>
-      {badge && (
-        <span className="text-[7.5px] tracking-[0.18em] uppercase px-2 py-1 border" style={{ color: badgeCol, borderColor: badgeCol }}>{badge}</span>
-      )}
-    </div>
-  );
-}
-
-function Callout({ col, k, children }: { col: string; k: string; children: React.ReactNode }) {
-  return (
-    <div className="border p-3 mt-4" style={{ borderColor: C.border, borderLeft: "3px solid " + col, background: C.panel2 }}>
-      <p className="text-[8px] tracking-[0.26em] uppercase mb-1" style={{ color: col }}>{k}</p>
-      <p className="text-[12px] leading-6" style={{ color: C.text }}>{children}</p>
-    </div>
-  );
-}
-
-function PhotonAntennaSVG() {
-  const cx = 220, cy = 130;
-  return (
-    <svg width="100%" viewBox="0 0 440 260" style={{ maxWidth: 600 }} data-testid="photon-antenna-svg"
-         role="img" aria-labelledby="photon-title photon-desc">
-      <title id="photon-title">Photosynthetic Antenna Array</title>
-      <desc id="photon-desc">Chromophore array delocalizing exciton across multiple sites toward reaction center.</desc>
-      {/* Chromophores in ring */}
-      {Array.from({ length: 8 }, (_, i) => {
-        const a = (i / 8) * Math.PI * 2;
-        const x = cx + Math.cos(a) * 70;
-        const y = cy + Math.sin(a) * 70;
-        return (
-          <g key={i}>
-            <circle cx={x} cy={y} r="14" fill={C.green} opacity="0.18" />
-            <circle cx={x} cy={y} r="9" fill={C.green} opacity="0.5" />
-            <circle cx={x} cy={y} r="4" fill={C.green} />
-            <line x1={x} y1={y} x2={cx} y2={cy} stroke={C.gold + "60"} strokeDasharray="2,2" />
-          </g>
-        );
-      })}
-      {/* Reaction center */}
-      <circle cx={cx} cy={cy} r="20" fill={C.gold} opacity="0.2" />
-      <circle cx={cx} cy={cy} r="12" fill={C.gold} />
-      <text x={cx} y={cy + 4} textAnchor="middle" fontSize="9" fill="#000" fontFamily="Cinzel, serif">RC</text>
-      {/* Incoming photon */}
-      <path d="M 380 30 L 320 90" stroke={C.yellow} strokeWidth="2" markerEnd="url(#photonArrow)" />
-      <text x="385" y="26" fontSize="10" fill={C.yellow} fontFamily="JetBrains Mono">hν</text>
-      <text x={cx} y="240" textAnchor="middle" fontSize="9" fill={C.muted}>chromophore array · η ≈ 100% exciton transport</text>
-      <defs>
-        <marker id="photonArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <polygon points="0 0, 6 3, 0 6" fill={C.yellow} />
-        </marker>
-      </defs>
-    </svg>
-  );
-}
-
-function TunnelingSVG() {
-  return (
-    <svg width="100%" viewBox="0 0 440 220" style={{ maxWidth: 560 }} data-testid="tunneling-svg"
-         role="img" aria-labelledby="tun-title tun-desc">
-      <title id="tun-title">Proton Tunneling Through Energy Barrier</title>
-      <desc id="tun-desc">Wavefunction with non-zero amplitude on both sides of an enzyme energy barrier.</desc>
-      {/* Energy barrier */}
-      <path d="M 30 180 L 150 180 L 200 60 L 280 60 L 330 180 L 410 180" fill="none" stroke={C.orange} strokeWidth="2" />
-      {/* Proton wavefunction (sine envelope) */}
-      <path d={(() => {
-        let d = "M 30 130";
-        for (let x = 30; x <= 410; x += 4) {
-          const env = Math.exp(-Math.pow((x - 240) / 90, 2)) * 30;
-          const y = 130 - Math.cos((x - 30) * 0.3) * env;
-          d += ` L ${x} ${y}`;
+      // step amplitudes (simple discrete-time quantum walk with dephasing)
+      if (s.mode === "photonic" || s.mode === "hybrid") {
+        const J = (s.coupling / 100) * 0.18;
+        const g = (s.deph / 100) * 0.04;
+        const newAmp = [...s.exci.amp];
+        const newPh = [...s.exci.phase];
+        for (let i = 0; i < SITES; i++) {
+          const left = i > 0 ? s.exci.amp[i - 1] : 0;
+          const right = i < SITES - 1 ? s.exci.amp[i + 1] : 0;
+          newAmp[i] = s.exci.amp[i] * (1 - g) + J * (left + right - 2 * s.exci.amp[i]) * 0.4;
+          newPh[i] = s.exci.phase[i] + 0.06 + g * (Math.random() - 0.5);
         }
-        return d;
-      })()}
-      fill="none" stroke={C.teal} strokeWidth="1.5" />
-      {/* Proton dot */}
-      <circle cx="80" cy="130" r="6" fill={C.teal} />
-      <text x="80" y="115" textAnchor="middle" fontSize="9" fill={C.teal}>H⁺</text>
-      {/* Tunneled proton */}
-      <circle cx="380" cy="130" r="6" fill={C.teal} opacity="0.4" />
-      <text x="380" y="115" textAnchor="middle" fontSize="9" fill={C.teal} opacity="0.6">H⁺ (tunneled)</text>
-      <text x="220" y="200" textAnchor="middle" fontSize="9" fill={C.muted}>energy barrier (enzyme active site)</text>
-      <text x="220" y="40" textAnchor="middle" fontSize="9" fill={C.orange} fontFamily="Cinzel, serif">classical-impossible barrier crossing</text>
-    </svg>
+        // renormalise
+        let sum = 0; newAmp.forEach(a => sum += a * a);
+        if (sum > 0) {
+          const k = 1 / Math.sqrt(sum);
+          for (let i = 0; i < SITES; i++) newAmp[i] *= k;
+        }
+        s.exci.amp = newAmp; s.exci.phase = newPh;
+
+        // walk distance estimator
+        let wsum = 0;
+        s.exci.amp.forEach((a, i) => { wsum += i * a * a; });
+        s.walkDist = wsum;
+      }
+
+      // Draw FMO chain
+      for (let i = 0; i < SITES; i++) {
+        const x = padX + i * cellW;
+        ctx!.strokeStyle = "rgba(155,191,181,0.2)"; ctx!.lineWidth = 1;
+        if (i < SITES - 1) {
+          ctx!.beginPath(); ctx!.moveTo(x, yPhot); ctx!.lineTo(padX + (i + 1) * cellW, yPhot); ctx!.stroke();
+        }
+      }
+      for (let i = 0; i < SITES; i++) {
+        const x = padX + i * cellW;
+        const a = s.exci.amp[i];
+        const r = 8 + a * a * 26;
+        const ph = s.exci.phase[i];
+        ctx!.fillStyle = `${C.site}${Math.floor(60 + a * a * 180).toString(16).padStart(2, "0")}`;
+        ctx!.beginPath(); ctx!.arc(x, yPhot, r, 0, Math.PI * 2); ctx!.fill();
+        ctx!.strokeStyle = C.photon; ctx!.lineWidth = 1.2;
+        ctx!.beginPath(); ctx!.arc(x, yPhot, r + 1, ph, ph + a * a * Math.PI * 2); ctx!.stroke();
+        ctx!.fillStyle = C.muted; ctx!.font = "10px JetBrains Mono, monospace";
+        ctx!.fillText(`|${i + 1}⟩`, x - 9, yPhot + r + 14);
+      }
+      ctx!.fillStyle = C.text; ctx!.font = "11px JetBrains Mono, monospace";
+      ctx!.fillText("FMO-7 · exciton wavepacket", padX, yPhot - 40);
+
+      // Protonic tunnelling (bottom half)
+      const yProt = Hh * 0.72;
+      const barX = W * 0.5;
+      const barW = 50;
+      const barH = 80 + (s.barrier / 100) * 60;
+
+      // ground line
+      ctx!.strokeStyle = "rgba(155,191,181,0.25)"; ctx!.lineWidth = 1;
+      ctx!.beginPath(); ctx!.moveTo(20, yProt); ctx!.lineTo(W - 20, yProt); ctx!.stroke();
+
+      // barrier
+      ctx!.fillStyle = `${C.barrier}33`;
+      ctx!.fillRect(barX - barW / 2, yProt - barH, barW, barH);
+      ctx!.strokeStyle = C.barrier; ctx!.lineWidth = 1.5;
+      ctx!.strokeRect(barX - barW / 2, yProt - barH, barW, barH);
+      ctx!.fillStyle = C.barrier; ctx!.font = "10px JetBrains Mono, monospace";
+      ctx!.fillText(`V₀ = ${s.barrier}%`, barX - 24, yProt - barH - 6);
+
+      if (s.mode === "protonic" || s.mode === "hybrid") {
+        // spawn protons periodically
+        const spawnRate = s.mode === "hybrid" ? Math.max(20, 90 - s.exci.amp[SITES - 1] * s.exci.amp[SITES - 1] * 70) : 60;
+        if (s.frame % Math.floor(spawnRate) === 0) {
+          const e = 0.2 + Math.random() * 0.7;
+          s.protons.push({ x: 30, e, alive: true, tunneled: false });
+          s.totalProtons++;
+        }
+        s.protons.forEach(p => {
+          if (!p.alive) return;
+          p.x += 1.2;
+          // hit barrier
+          if (!p.tunneled && p.x > barX - barW / 2 - 4 && p.x < barX - barW / 2 + 4) {
+            const v = s.barrier / 100;
+            const T = Math.exp(-2 * Math.max(0, v - p.e) * 6);
+            if (Math.random() < T) {
+              p.tunneled = true;
+              s.tunnelCount++;
+              // teleport across barrier (visualisation)
+              p.x = barX + barW / 2 + 4;
+              log("QTUN", `H⁺ tunnelled · E=${p.e.toFixed(2)} V₀=${v.toFixed(2)} T≈${T.toFixed(3)}`, C.tunnel);
+            } else {
+              p.alive = false;
+            }
+          }
+          if (p.x > W) p.alive = false;
+          // draw
+          ctx!.fillStyle = p.tunneled ? C.tunnel : C.proton;
+          ctx!.beginPath();
+          ctx!.arc(p.x, yProt - p.e * 50, 4, 0, Math.PI * 2);
+          ctx!.fill();
+          // trail
+          ctx!.strokeStyle = `${p.tunneled ? C.tunnel : C.proton}66`;
+          ctx!.lineWidth = 1;
+          ctx!.beginPath();
+          ctx!.moveTo(p.x - 16, yProt - p.e * 50);
+          ctx!.lineTo(p.x, yProt - p.e * 50);
+          ctx!.stroke();
+        });
+        s.protons = s.protons.filter(p => p.alive);
+      }
+
+      ctx!.fillStyle = C.text; ctx!.font = "11px JetBrains Mono, monospace";
+      ctx!.fillText("H⁺ tunnelling · barrier traversal", 30, yProt - 60);
+
+      if (s.frame % 8 === 0) {
+        const T1 = Math.round(280 + (1 - s.deph / 100) * 220);
+        const T2 = Math.round(120 + (1 - s.deph / 100) * 280);
+        // fidelity = norm preservation proxy
+        let sum = 0; s.exci.amp.forEach(a => sum += a * a);
+        const fid = Math.round(Math.min(1, sum) * 100);
+        const tun = s.totalProtons > 0 ? Math.round(s.tunnelCount / s.totalProtons * 100) : 0;
+        setMetrics({ T1, T2, fidelity: fid, tunnel: tun, walk: Math.round(s.walkDist * 100) / 100 });
+      }
+      if (s.frame % 280 === 0) {
+        log("STAT", `walk⟨n⟩=${s.walkDist.toFixed(2)} · tunnel rate=${s.totalProtons > 0 ? Math.round(s.tunnelCount / s.totalProtons * 100) : 0}%`, accent);
+      }
+
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  function reseed() {
+    const s = stateRef.current;
+    s.exci.amp = new Array(SITES).fill(0);
+    s.exci.phase = new Array(SITES).fill(0);
+    s.exci.amp[0] = 1;
+    s.protons = [];
+    s.tunnelCount = 0; s.totalProtons = 0;
+    log("SYS", "State re-prepared · |1⟩ exciton at site 1 · proton queue cleared", C.photon);
+  }
+
+  const m = MODES.find(x => x.key === mode)!;
+
+  return (
+    <div className="min-h-screen p-6 md:p-10 font-mono text-sm" style={{ background: C.bg, color: C.text }} data-testid="page-biomimetic-quantum">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-6">
+          <div className="text-xs tracking-[0.4em] uppercase mb-2" style={{ color: C.photon }}>
+            Biomimetic Quantum Computing
+          </div>
+          <h1 className="text-3xl md:text-5xl tracking-tight mb-2" style={{ fontFamily: "Cinzel, serif", color: C.white }}>
+            Photonic · Protonic
+          </h1>
+          <div className="text-sm" style={{ color: C.muted }}>
+            FMO-complex exciton walk · hydrogen tunnelling gates · hybrid two-stage bio-quantum logic
+          </div>
+        </header>
+
+        <div className="flex flex-wrap gap-2 mb-4" data-testid="mode-tabs">
+          {MODES.map(mm => (
+            <button
+              key={mm.key}
+              onClick={() => setMode(mm.key)}
+              data-testid={`mode-${mm.key}`}
+              className="px-3 py-2 text-xs tracking-[0.18em] uppercase border transition-colors"
+              style={{
+                borderColor: mode === mm.key ? mm.col : C.border,
+                color: mode === mm.key ? mm.col : C.text,
+                background: mode === mm.key ? `${mm.col}14` : "transparent",
+              }}
+            >
+              <span style={{ color: mode === mm.key ? mm.col : C.dim, marginRight: 8 }}>{mm.n}</span>
+              {mm.label}
+            </button>
+          ))}
+          <button
+            onClick={reseed}
+            data-testid="btn-reseed"
+            className="px-3 py-2 text-xs tracking-[0.18em] uppercase border ml-auto"
+            style={{ borderColor: C.border2, color: C.text }}
+          >Re-prepare |1⟩</button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
+          <div className="border" style={{ borderColor: C.border, background: C.panel }}>
+            <div className="border-b px-4 py-2 flex items-center justify-between" style={{ borderColor: C.border }}>
+              <div className="flex items-center gap-2">
+                <span style={{ color: m.col }}>●</span>
+                <span className="text-xs uppercase tracking-[0.2em]">{m.label} Substrate</span>
+              </div>
+              <button
+                onClick={() => setRunning(r => !r)}
+                data-testid="btn-toggle-run"
+                className="px-2 py-1 text-[11px] uppercase border"
+                style={{ borderColor: C.border2, color: running ? m.col : C.muted }}
+              >{running ? "Pause" : "Run"}</button>
+            </div>
+            <div className="relative" style={{ height: 460 }}>
+              <canvas ref={cvRef} className="w-full h-full block" data-testid="canvas-bioqc" />
+            </div>
+            <div className="border-t px-4 py-3 grid grid-cols-3 gap-4 text-xs" style={{ borderColor: C.border }}>
+              <label>
+                <div className="flex justify-between mb-1"><span style={{ color: C.muted }}>Site coupling J</span><span style={{ color: C.photon }}>{coupling}%</span></div>
+                <input type="range" min={0} max={100} value={coupling} onChange={e => setCoupling(Number(e.target.value))} className="w-full" data-testid="slider-coupling" />
+              </label>
+              <label>
+                <div className="flex justify-between mb-1"><span style={{ color: C.muted }}>Dephasing γ</span><span style={{ color: C.hybrid }}>{deph}%</span></div>
+                <input type="range" min={0} max={100} value={deph} onChange={e => setDeph(Number(e.target.value))} className="w-full" data-testid="slider-deph" />
+              </label>
+              <label>
+                <div className="flex justify-between mb-1"><span style={{ color: C.muted }}>Barrier V₀</span><span style={{ color: C.proton }}>{barrier}%</span></div>
+                <input type="range" min={0} max={100} value={barrier} onChange={e => setBarrier(Number(e.target.value))} className="w-full" data-testid="slider-barrier" />
+              </label>
+            </div>
+          </div>
+
+          <aside className="space-y-4">
+            <div className="border p-4" style={{ borderColor: C.border, background: C.panel }} data-testid="metrics-panel">
+              <div className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: C.muted }}>Quantum Telemetry</div>
+              {[
+                { l: "T₁ [μs]",        v: metrics.T1,       col: C.photon },
+                { l: "T₂ [μs]",        v: metrics.T2,       col: C.hybrid },
+                { l: "Fidelity [%]",   v: metrics.fidelity, col: C.site },
+                { l: "Tunnel rate [%]", v: metrics.tunnel,  col: C.tunnel },
+                { l: "⟨n⟩ walk dist",  v: metrics.walk,     col: C.photon },
+              ].map(mm => (
+                <div key={mm.l} className="flex justify-between py-1 text-xs">
+                  <span style={{ color: C.muted }}>{mm.l}</span>
+                  <span style={{ color: mm.col }} data-testid={`metric-${mm.l}`}>{mm.v}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border p-4" style={{ borderColor: C.border, background: C.panel }}>
+              <div className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: C.muted }}>Substrate</div>
+              <div className="text-xs leading-relaxed" style={{ color: C.text }}>{m.lead}</div>
+            </div>
+
+            <div className="border" style={{ borderColor: C.border, background: C.panel }}>
+              <div className="px-4 py-2 border-b text-xs tracking-[0.2em] uppercase" style={{ borderColor: C.border, color: C.muted }}>Event Log</div>
+              <div className="max-h-72 overflow-y-auto p-3 space-y-1 text-[11px]" data-testid="log-panel">
+                <AnimatePresence initial={false}>
+                  {events.map((e, i) => (
+                    <motion.div
+                      key={`${e.ts}-${i}`}
+                      initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}
+                      className="flex gap-2"
+                    >
+                      <span style={{ color: C.dim }}>{e.ts}</span>
+                      <span style={{ color: e.col, width: 56 }} className="uppercase">{e.mode}</span>
+                      <span style={{ color: C.text }}>{e.msg}</span>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div className="mt-8 text-xs text-center tracking-[0.6em] uppercase" style={{ color: C.dim }}>
+          ψ · |1⟩ · H⁺ · ⟨φ|ψ⟩
+        </div>
+      </div>
+    </div>
   );
 }
