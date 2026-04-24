@@ -64,6 +64,7 @@ import {
   Thermometer,
   KeySquare,
   Calculator,
+  FlaskRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -138,6 +139,7 @@ const NAV_ITEMS = [
   { href: "/thermal-hierarchy",     label: "Thermal Hierarchy",        icon: Thermometer },
   { href: "/geometry-of-permission",label: "Geometry of Permission",   icon: KeySquare },
   { href: "/math-engine",           label: "Math Engine · Workbench",  icon: Calculator },
+  { href: "/product-research",      label: "Product Research",         icon: FlaskRound },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
