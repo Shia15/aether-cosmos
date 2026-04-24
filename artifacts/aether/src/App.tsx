@@ -68,6 +68,11 @@ import FerroDriveView from "@/pages/ferrodrive";
 import CLACoupledFieldsView from "@/pages/cla-coupled-fields";
 import CancerCoherenceView from "@/pages/cancer-coherence";
 import BiomimeticQuantumView from "@/pages/biomimetic-quantum";
+import ClosedLoopCoherenceView from "@/pages/closed-loop-coherence";
+import PhiHOTView from "@/pages/phi-hot";
+import PhiHOTZipperView from "@/pages/phi-hot-zipper";
+import ThermalHierarchyView from "@/pages/thermal-hierarchy";
+import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 
 const queryClient = new QueryClient();
 
@@ -139,6 +144,11 @@ function Router() {
         <Route path="/cla-coupled-fields" component={CLACoupledFieldsView} />
         <Route path="/cancer-coherence" component={CancerCoherenceView} />
         <Route path="/biomimetic-quantum" component={BiomimeticQuantumView} />
+        <Route path="/closed-loop-coherence" component={ClosedLoopCoherenceView} />
+        <Route path="/phi-hot" component={PhiHOTView} />
+        <Route path="/phi-hot-zipper" component={PhiHOTZipperView} />
+        <Route path="/thermal-hierarchy" component={ThermalHierarchyView} />
+        <Route path="/geometry-of-permission" component={GeometryOfPermissionView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

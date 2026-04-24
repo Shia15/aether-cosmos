@@ -58,6 +58,11 @@ import {
   Waypoints,
   TestTube,
   Hexagon,
+  RotateCcw,
+  Aperture,
+  GitMerge,
+  Thermometer,
+  KeySquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -126,6 +131,11 @@ const NAV_ITEMS = [
   { href: "/cla-coupled-fields",    label: "AETHER-CLA · Coupled",     icon: Waypoints },
   { href: "/cancer-coherence",      label: "Cancer Coherence · φ",     icon: TestTube },
   { href: "/biomimetic-quantum",    label: "Biomimetic Quantum",       icon: Hexagon },
+  { href: "/closed-loop-coherence", label: "Closed-Loop Coherence",    icon: RotateCcw },
+  { href: "/phi-hot",               label: "φ-HOT · Tweezer",          icon: Aperture },
+  { href: "/phi-hot-zipper",        label: "φ-HOT · Zipper",           icon: GitMerge },
+  { href: "/thermal-hierarchy",     label: "Thermal Hierarchy",        icon: Thermometer },
+  { href: "/geometry-of-permission",label: "Geometry of Permission",   icon: KeySquare },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
