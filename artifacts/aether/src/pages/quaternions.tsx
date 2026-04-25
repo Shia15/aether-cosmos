@@ -297,7 +297,7 @@ export default function QuaternionsPage() {
   ];
   const [selA,setSelA]=useState(1);
   const [selB,setSelB]=useState(2);
-  const productCell = multTable[selA+1]?.[selB+1] ?? "?";
+  const productCell = multTable[selA-1]?.[selB] ?? "?";
   const productExplain: Record<string,string> = {
     "i":"i", "-1":"−1 (imaginary² = negative reality)",
     "k":"k", "-j":"−j", "j":"j", "-k":"−k",
@@ -575,7 +575,7 @@ export default function QuaternionsPage() {
                       <tr key={row}>
                         <td className="text-[10px] font-['Cinzel',serif] text-purple-300/70">{row}</td>
                         {UNITS.map((_,ci)=>{
-                          const val=multTable[ri+1][ci+1];
+                          const val=multTable[ri]?.[ci+1] ?? "?";
                           const isSelected=(ri===selA-1&&ci===selB-1)||(ri===selB-1&&ci===selA-1);
                           const isDiag=ri===ci;
                           return (
@@ -599,10 +599,10 @@ export default function QuaternionsPage() {
               <div className="border border-yellow-900/30 rounded-xl p-4" style={{background:"#0a060080"}}>
                 <p className="text-[9px] text-yellow-600/50 font-['Cinzel',serif] mb-1.5">SELECTED PRODUCT</p>
                 <div className="text-xl font-['Cinzel',serif] text-yellow-300 text-center py-2">
-                  {UNITS[selA-1]} · {UNITS[selB-1]} = {String(multTable[selA][selB])}
+                  {UNITS[selA-1]} · {UNITS[selB-1]} = {String(multTable[selA-1]?.[selB] ?? "?")}
                 </div>
                 <p className="text-[9px] text-yellow-700/50 text-center leading-4">
-                  {productExplain[String(multTable[selA][selB])]||String(multTable[selA][selB])}
+                  {productExplain[String(multTable[selA-1]?.[selB] ?? "?")]||String(multTable[selA-1]?.[selB] ?? "?")}
                 </p>
               </div>
 
