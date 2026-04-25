@@ -152,6 +152,8 @@ const NAV_ITEMS = [
   { href: "/vortex-math",           label: "Vortex Math · 3·6·9 / 144", icon: Sigma },
   { href: "/octonion-aether",       label: "Octonion · Æther 8D",      icon: Atom },
   { href: "/early-universe",        label: "Early Universe · ToE",     icon: Telescope },
+  { href: "/phonon-stack",          label: "Phonon · 3D Stack",        icon: Thermometer },
+  { href: "/cosmic-refine",         label: "Cosmic Refine · DM Halo",  icon: Aperture },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

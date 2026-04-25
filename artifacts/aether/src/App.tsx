@@ -87,6 +87,8 @@ import FerroModesPage from "@/pages/ferro-modes";
 import VortexMathPage from "@/pages/vortex-math";
 import OctonionAetherPage from "@/pages/octonion-aether";
 import EarlyUniversePage from "@/pages/early-universe";
+import PhononStackPage from "@/pages/phonon-stack";
+import CosmicRefinePage from "@/pages/cosmic-refine";
 
 const queryClient = new QueryClient();
 
@@ -177,6 +179,8 @@ function Router() {
         <Route path="/vortex-math" component={VortexMathPage} />
         <Route path="/octonion-aether" component={OctonionAetherPage} />
         <Route path="/early-universe" component={EarlyUniversePage} />
+        <Route path="/phonon-stack" component={PhononStackPage} />
+        <Route path="/cosmic-refine" component={CosmicRefinePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
