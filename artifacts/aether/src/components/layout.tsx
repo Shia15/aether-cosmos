@@ -65,6 +65,7 @@ import {
   KeySquare,
   Calculator,
   FlaskRound,
+  Printer,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -154,6 +155,7 @@ const NAV_ITEMS = [
   { href: "/early-universe",        label: "Early Universe · ToE",     icon: Telescope },
   { href: "/phonon-stack",          label: "Phonon · 3D Stack",        icon: Thermometer },
   { href: "/cosmic-refine",         label: "Cosmic Refine · DM Halo",  icon: Aperture },
+  { href: "/liquid-print",          label: "Liquid Print · Bio-Hybrid",  icon: Printer },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

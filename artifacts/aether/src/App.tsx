@@ -89,6 +89,7 @@ import OctonionAetherPage from "@/pages/octonion-aether";
 import EarlyUniversePage from "@/pages/early-universe";
 import PhononStackPage from "@/pages/phonon-stack";
 import CosmicRefinePage from "@/pages/cosmic-refine";
+import LiquidPrintPage from "@/pages/liquid-print";
 
 const queryClient = new QueryClient();
 
@@ -181,6 +182,7 @@ function Router() {
         <Route path="/early-universe" component={EarlyUniversePage} />
         <Route path="/phonon-stack" component={PhononStackPage} />
         <Route path="/cosmic-refine" component={CosmicRefinePage} />
+        <Route path="/liquid-print" component={LiquidPrintPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
