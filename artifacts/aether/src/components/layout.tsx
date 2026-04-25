@@ -143,6 +143,7 @@ const NAV_ITEMS = [
   { href: "/ultra-magnetism",       label: "Ultra-Magnetism · SC",     icon: Hexagon },
   { href: "/quantum-vacuum",        label: "Quantum Vacuum · Non-Local",icon: Sparkles },
   { href: "/resonant-cell",         label: "Resonant Cell · Prospectus",icon: Boxes },
+  { href: "/spin-vacuum",           label: "Spin · Vacuum Gates",      icon: FlipHorizontal },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
