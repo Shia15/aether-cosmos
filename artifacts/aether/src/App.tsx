@@ -81,6 +81,7 @@ import ResonantCellPage from "@/pages/resonant-cell";
 import SpinVacuumPage from "@/pages/spin-vacuum";
 import SymbolicPillarsPage from "@/pages/symbolic-pillars";
 import MariPage from "@/pages/mari";
+import OrganoidIntelPage from "@/pages/organoid-intel";
 
 const queryClient = new QueryClient();
 
@@ -165,6 +166,7 @@ function Router() {
         <Route path="/spin-vacuum" component={SpinVacuumPage} />
         <Route path="/symbolic-pillars" component={SymbolicPillarsPage} />
         <Route path="/mari" component={MariPage} />
+        <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
