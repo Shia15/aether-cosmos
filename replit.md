@@ -1,68 +1,63 @@
 # AETHER Knowledge System
 
 ## Overview
-
-AETHER is a web application designed as a Knowledge Graph & Coherence System, implementing the Crystallization Model of Intelligence. It features a force-directed knowledge graph, a 4-layer architecture, and an 8-agent ecosystem named M.A.R.I. (Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin). The system also incorporates a CGLE lattice with body-systems mapping, a live crystallization pipeline, cultural perception geometry, and a biological systems layer. Key functionalities include semantic search, equation generation, and an interactive "Smart Animate" experience flow. The platform also integrates 6 Expression Personality agents (Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary) with fragments of a Theory of Everything.
-
-The project's ambition is to create a dynamic, interconnected knowledge system that models intelligence through coherence and crystallization, offering a novel approach to information synthesis and discovery.
+AETHER is a web application that functions as a Knowledge Graph & Coherence System, grounded in the Crystallization Model of Intelligence. It employs a force-directed knowledge graph, a 4-layer architecture, and an 8-agent M.A.R.I. ecosystem (Mnēsis, Aletheia, Inferaia, Reverie, Vērus, Caelus, Nyra, Orin). The system integrates a CGLE lattice with body-systems mapping, a live crystallization pipeline, cultural perception geometry, and a biological systems layer. Its core capabilities include semantic search, equation generation, and an interactive "Smart Animate" experience flow. The platform also incorporates 6 Expression Personality agents (Dreamer, Catalyst, Nurturer, Guardian, Rebel, Visionary) linked to fragments of a Theory of Everything. The project aims to develop a dynamic, interconnected knowledge system for advanced information synthesis and discovery, modeling intelligence through coherence and crystallization.
 
 ## User Preferences
-
 I want iterative development. I prefer detailed explanations. Ask before making major changes. Do not make changes to the `artifacts-monorepo/lib/api-client-react` folder. Do not make changes to the `artifacts-monorepo/lib/api-zod` folder.
 
 ## System Architecture
-
-The AETHER system is built as a pnpm workspace monorepo using TypeScript, featuring a React + Vite frontend and an Express backend.
+The AETHER system is a pnpm workspace monorepo, developed with TypeScript, featuring a React + Vite frontend and an Express backend.
 
 ### UI/UX Decisions
-- **Color Palette:** A consistent theme using "Void", "Navy", "Deep", "Violet", "Mid", "Gold", "Bright Gold", "Coral", "Crimson", and "Teal" for a sophisticated and cosmic aesthetic.
-- **Interactive Visualizations:** Extensive use of live canvases for simulations, graphs (e.g., force-directed graph, mind maps, sky dials), and dynamic data representations (e.g., solar system, planetary alignments, neural simulations).
-- **Navigation:** Over 60 distinct routes (currently 60+ pages) covering various features, including a primary Graph Map, ecosystem views, architectural breakdowns, specialized simulators, the AETHER Whitepaper v1, the Six-Planet March 2026 Alignment, the Closed Discovery Loop, the Fibonacci Quantization Processor (FQP), the Symphonic Protocol OS v2 (7-layer), the Symphonic Protocol v0.1 Glass-Box Ecosystem (4-layer), the FerroDrive Bio-Magnetic Civilization Stack, the AETHER-CLA Coupled Phase Lattice (water · animal · human three-domain CGLE), the φ-AETHER Cancer Coherence brief (rational classifier + crackling-noise universality + 5-layer pipeline + living hardware), and the Biomimetic Quantum Computing page (FMO exciton walk + H⁺ tunnelling). The legacy Coherence Bus / heads-up display has been removed in favor of dedicated pages. Many pages feature interactive elements and scroll-anchored sections.
+- **Color Palette:** Utilizes "Void", "Navy", "Deep", "Violet", "Mid", "Gold", "Bright Gold", "Coral", "Crimson", and "Teal" for a sophisticated aesthetic.
+- **Interactive Visualizations:** Employs live canvases for simulations, graphs (force-directed, mind maps, sky dials), and dynamic data representations (solar system, planetary alignments, neural simulations).
+- **Navigation:** Over 60 distinct routes covering features such as a Graph Map, ecosystem views, architectural breakdowns, specialized simulators, and dedicated pages for complex models like the Symphonic Protocol OS, FerroDrive Bio-Magnetic Civilization Stack, and Biomimetic Quantum Computing.
 
 ### Technical Implementations
-- **Frontend:** React with Vite for a fast and reactive user interface.
-- **Backend:** Express 5 API server handling data processing and serving requests.
-- **Data Persistence:** PostgreSQL database managed with Drizzle ORM.
-- **API Definition:** OpenAPI 3.1 specification for API consistency, with Orval used for codegen to generate React Query hooks and Zod schemas.
-- **Validation:** Zod for robust request and response validation.
-- **Monorepo Structure:** Organised into `artifacts/` (deployable apps like `api-server`), `lib/` (shared libraries like `db`, `api-spec`, `api-client-react`, `api-zod`), and `scripts/` (utility scripts).
-- **TypeScript Configuration:** Utilizes composite TypeScript projects with `tsconfig.base.json` for shared settings and root `tsconfig.json` for project references, ensuring proper type-checking across packages.
-- **Build System:** `esbuild` for efficient bundling of backend services.
+- **Frontend:** React with Vite.
+- **Backend:** Express 5 API server.
+- **Data Persistence:** PostgreSQL with Drizzle ORM.
+- **API Definition:** OpenAPI 3.1 specification; Orval generates React Query hooks and Zod schemas.
+- **Validation:** Zod for robust schema validation.
+- **Monorepo Structure:** Divided into `artifacts/` (deployable apps), `lib/` (shared libraries), and `scripts/` (utilities).
+- **TypeScript Configuration:** Composite TypeScript projects with shared and project-specific `tsconfig.json`.
+- **Build System:** `esbuild` for backend services.
 
 ### Feature Specifications
-- **AETHER OS Batch Intake:** Allows ingestion of up to 20 documents, with AI-powered auto-titling and section analysis, 9-shell coherence mapping, and live mind map visualization.
-- **Hypercomputation Language (HCL):** A dedicated section exploring a custom language with oracle-class primitives and related visualizations like an Antikythera Sky Dial and Solar System representation.
-- **Fibonacci Calendar:** A 13-month calendar with mathematical, historical, and AETHER-specific time perspectives, including a live world clock with solar elevation and coherence metrics.
-- **Simulator Pages:** Includes advanced simulators for Partial Differential Equations (CGLE, Swift-Hohenberg), a φ-AETHER Coherent Criticality Engine with agent-based networks, Multi-Scale Integration for complex systems, and a Morphogenetic Computer for photonic reservoir computing.
-- **Symphonic Protocol OS:** A 7-layer system with interactive canvases for geometric shapes (tetrahedron, torus) and THz photon fields, modulated by harmonic ratios.
-- **UFO Ascent Simulation:** A physics-driven simulation of a UFO trajectory with vehicle state, dynamics, and environmental factors.
-- **Discovery Loop:** A multi-phase simulation involving mycelium, ferrofluid, and metabolites, illustrating a sense-deliver-activate-feedback cycle.
-- **FerroDrive (`/ferrodrive`):** Bio-magnetic civilizational stack with five modules (Propulsion, Medicine, Mycelium, Earth-Grid, Plasma) and an interactive ferrofluid simulation responsive to applied B-field and carrier viscosity.
-- **AETHER-CLA Coupled Fields (`/cla-coupled-fields`):** Three coupled CGLE lattices (water, animal, human) with tunable cross-coupling ε_WA, ε_AH, ε_WH and optional periodic planetary forcing F(t). Live R(t) order-parameter telemetry.
-- **Cancer Coherence (`/cancer-coherence`):** φ-AETHER clinical brief with an interactive rational classifier f(x)=4(x−1)/[(x+2)(x−3)], crackling-noise universality calculator (α−1)/(τ−1), 5-layer closed-loop pipeline, and living-hardware stack (firefly · mycelium · dolphin · ferrofluid).
-- **Biomimetic Quantum (`/biomimetic-quantum`):** Photonic FMO-7 exciton walk plus protonic tunnelling barrier with three modes (Photonic / Protonic / Hybrid) and tunable site-coupling J, dephasing γ, barrier V₀.
-- **Closed-Loop Coherence (`/closed-loop-coherence`):** Centerpiece multi-domain feedback simulator. Four coupled control loops — Robotics (joint-angle PID), Environmental (thermal regulation), Contamination (HEPA hysteresis), Autonomous (vehicle MPC) — share cross-domain coupling ε so each loop's error perturbs its neighbours. Live PID gain tuning (Kp/Ki/Kd), disturbance shock injection, sensor-noise σ, integral reset, and a 5-step Sense → Deliver → Activate → Feedback → Learn breakdown per active domain.
-- **φ-HOT · Holographic Tweezer (`/phi-hot`):** Single-laser SLM-projected Fibonacci-spiral qubit array. Quantum-state ensemble bars (|0⟩, |1⟩, coherence, entanglement), gate triggers (H · CZ · Reset), coherent vs decoherent modes, and trap-geometry pills (φ-Spiral · Square · Hex · Random) with rings/radius/laser/Γ sliders.
-- **φ-HOT · Zipper (`/phi-hot-zipper`):** Twisted dual φ-spirals interlocking at the golden-angle 137.5°. Five auto-cycling idea cards (The Zipper · Localization · Group Control · Entanglement · φ as Structure) with Zip / Pulse / Scatter triggers and Cinzel insight overlays.
-- **Thermal Hierarchy (`/thermal-hierarchy`):** Five-layer multiplicative cascade — Universal Field → State Structure → Coupling → Medium Filter → Observed. Live Planck vs Rayleigh-Jeans spectral comparison, T/ε/μ sliders, density-of-states modes (blackbody · phonon · structured), four-truth invariant banner, and the rule I_obs(ν) = B · g · ε · μ.
-- **Geometry of Permission (`/geometry-of-permission`):** Five-step Tour walkthrough (Field is Already There → Geometry Decides What Can Exist → Coupling Decides Who is Heard → Medium is the Final Filter → What You Observe is What Survived) with paired spectrum + cavity canvases, key-equation boxes, "look-here" prompts, layer-strip legend lighting per step, and an Explore mode with field-control sliders and presets (Vacuum · Cavity · Stellar).
-- **Math Engine · Workbench (`/math-engine`):** Unified mathematical workbench with five tabs — Inspect (predictive √, ∛, ∜ for any N + spinor angle θ = 2π·{N·φ} + prime factorisation + continued fractions), Primes (live sieve, π(N) vs N/ln N, twin-prime / max-gap stats, isPrime test), Logic Gates (8-bit register A/B with AND/OR/XOR/NAND/NOR/NOT/SHL/SHR/ADD/SWAP), Matrices (2×2 composer with det/tr/eigenvalues + A+B, A·B, A⁻¹, Aᵀ, I·A, A·A⁻¹ identity verification + transformed-grid canvas), and Constants (live convergence series for π, e, φ, γ, √2, ln 2 with continued-fraction expansions). Operations push to a workbench queue and event log; coherence meter rises with use.
-- **Product Research (`/product-research`):** Unified product-research workbench with five tabs — Profile (name/category/audience/problem/solution brief + 5-axis radar over Need · Reach · Margin · Speed · Defence), Features · RICE (editable backlog, live RICE = (Reach×Impact×Conf)/Effort scoring, ranked horizontal-bar canvas), Competitors (editable matrix with strength × differentiation scatter, bubble size = reach, colour by price tier, avg/diff-gap stats), Market · TAM (TAM/SAM/SOM sliders + ARPU + CAGR with nested-circles canvas where areas are proportional and 5-yr projection), and Risk Register (probability × impact sliders with heat-map canvas, weighted risk + top-risk flag). Operations push to an insight queue and event log; confidence meter rises with use.
-- **Quantum Vacuum · Non-Local EM (`/quantum-vacuum`):** Four-tab workbench for quantum effects in apparently field-free regions — Aharonov-Bohm (electron interferometer with two paths around a solenoid; fringes shift via Δφ = 2π·Φ/Φ₀ even though both arms see B = 0 outside; live electron animation through the splitter / arms / detector with cos² fringe pattern), Vector Potential A (visualizes that A ≠ 0 outside a solenoid where B = 0; B-dots inside, curling cyan A_φ arrows outside with A_φ(r) = B·R²/(2r), so ∮A·dl = Φ around any enclosing loop), Casimir · Vacuum (two parallel plates with restricted standing-wave modes between vs full continuum outside; computes F/A = π²ℏc/(240·d⁴) live with d and area sliders; references Robert Forward's vacuum-energy extraction proposal), Pais · Room-T SC (vibrating coil with Lorentzian Tc(ω) curve crossing the 300 K reference line at the resonance peak; speculative high-frequency-vibration superconductivity from Pais's Navy patents). Telemetry shows Δφ, F/A, Tc, ω, plus phenomena bars and event log.
-- **Ultra-Magnetism · SC (`/ultra-magnetism`):** Five-tab condensed-matter bench coupling antiferromagnetic order with spin-triplet superconductivity — Lattice · Spins (12×12 spin lattice with click-to-flip, Metropolis Monte-Carlo dynamics, ferro/anti/para phases, ⟨m⟩ vs ⟨m_stag⟩ readouts, exchange J + temperature T sliders), Cooper · Flow (electron particles drifting through atomic lattice; below Tc they pair into Cooper pairs gold↔cyan and glide unobstructed, above Tc or with scattering ON they collide with sites; gap Δ = tanh(1.74√((Tc−T)/Tc))), Triplet · Pairing (singlet S=0 ↑↓ vs triplet S=1 ↑↑ side-by-side orbital animations with d-vector hint), k-Space · Waterfall (live FFT-projected structure factor S(k,t) scrolling down — antiferromagnet peaks at k=π, ferromagnet at k=0, single spin flip propagates as magnon ripple), Broken Symmetries (4-quadrant table lighting up U(1) gauge / Time-Reversal / Parity / SU(2)_spin depending on phase + pairing channel). Telemetry sidebar shows order-parameter bars (Δ, |m|, |m_stag|, coherence).
+- **AETHER OS Batch Intake:** AI-powered document ingestion, auto-titling, section analysis, 9-shell coherence mapping, and live mind map visualization.
+- **Hypercomputation Language (HCL):** Dedicated section exploring a custom language with oracle-class primitives and visualizations (Antikythera Sky Dial, Solar System).
+- **Fibonacci Calendar:** A 13-month calendar integrating mathematical, historical, and AETHER-specific time perspectives, with a live world clock and coherence metrics.
+- **Simulator Pages:** Includes advanced simulators for Partial Differential Equations (CGLE, Swift-Hohenberg), a φ-AETHER Coherent Criticality Engine, Multi-Scale Integration, and a Morphogenetic Computer.
+- **Symphonic Protocol OS:** A 7-layer system with interactive canvases for geometric shapes and THz photon fields.
+- **UFO Ascent Simulation:** Physics-driven simulation of UFO trajectory, dynamics, and environmental factors.
+- **Discovery Loop:** Multi-phase simulation involving mycelium, ferrofluid, and metabolites, illustrating a sense-deliver-activate-feedback cycle.
+- **FerroDrive (`/ferrodrive`):** Bio-magnetic civilizational stack with five modules and an interactive ferrofluid simulation.
+- **AETHER-CLA Coupled Fields (`/cla-coupled-fields`):** Three coupled CGLE lattices (water, animal, human) with tunable cross-coupling and optional planetary forcing.
+- **Cancer Coherence (`/cancer-coherence`):** φ-AETHER clinical brief with an interactive rational classifier, crackling-noise universality calculator, 5-layer pipeline, and living-hardware stack.
+- **Biomimetic Quantum (`/biomimetic-quantum`):** Photonic FMO-7 exciton walk plus protonic tunnelling barrier with three modes and tunable parameters.
+- **Closed-Loop Coherence (`/closed-loop-coherence`):** Multi-domain feedback simulator with four coupled control loops (Robotics, Environmental, Contamination, Autonomous) and live PID tuning.
+- **φ-HOT · Holographic Tweezer (`/phi-hot`):** Single-laser SLM-projected Fibonacci-spiral qubit array with quantum-state ensemble bars, gate triggers, and trap-geometry pills.
+- **φ-HOT · Zipper (`/phi-hot-zipper`):** Twisted dual φ-spirals interlocking at the golden-angle 137.5° with auto-cycling idea cards.
+- **Thermal Hierarchy (`/thermal-hierarchy`):** Five-layer multiplicative cascade, live Planck vs Rayleigh-Jeans spectral comparison, and interactive sliders.
+- **Geometry of Permission (`/geometry-of-permission`):** Five-step Tour walkthrough explaining field, geometry, coupling, medium, and observation with paired spectrum + cavity canvases.
+- **Math Engine · Workbench (`/math-engine`):** Unified mathematical workbench with tabs for Inspect, Primes, Logic Gates, Matrices, and Constants.
+- **Product Research (`/product-research`):** Unified product-research workbench with tabs for Profile, Features · RICE, Competitors, Market · TAM, and Risk Register.
+- **Resonant Cell · Prospectus (`/resonant-cell`):** 11-slide grant prospectus and narrative spine for the system with custom styling and animations.
+- **Quantum Vacuum · Non-Local EM (`/quantum-vacuum`):** Four-tab workbench for quantum effects including Aharonov-Bohm, Vector Potential A, Casimir · Vacuum, and Pais · Room-T SC.
+- **Ultra-Magnetism · SC (`/ultra-magnetism`):** Five-tab condensed-matter bench coupling antiferromagnetic order with spin-triplet superconductivity, featuring Lattice · Spins, Cooper · Flow, Triplet · Pairing, k-Space · Waterfall, and Broken Symmetries.
 
 ## External Dependencies
-
 - **pnpm:** Monorepo management.
 - **Node.js 24:** Runtime environment.
 - **TypeScript 5.9:** Programming language.
 - **Express 5:** Backend API framework.
 - **PostgreSQL:** Primary database.
-- **Drizzle ORM:** Object-Relational Mapper for PostgreSQL.
-- **Zod (v4):** Schema declaration and validation library.
-- **drizzle-zod:** Integration between Drizzle ORM and Zod.
+- **Drizzle ORM:** Object-Relational Mapper.
+- **Zod:** Schema declaration and validation.
+- **drizzle-zod:** Drizzle ORM and Zod integration.
 - **Orval:** OpenAPI codegen tool.
 - **React:** Frontend library.
 - **Vite:** Frontend build tool.
-- **Anthropic (via Replit AI proxy):** Used for AI auto-titling and section analysis in AETHER OS Batch Intake.
-- **React Query:** Data fetching and caching for React applications.
+- **Anthropic (via Replit AI proxy):** Used for AI auto-titling and section analysis.
+- **React Query:** Data fetching and caching.

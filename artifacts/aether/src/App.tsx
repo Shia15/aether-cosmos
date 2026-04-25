@@ -77,6 +77,7 @@ import MathEnginePage from "@/pages/math-engine";
 import ProductResearchPage from "@/pages/product-research";
 import UltraMagnetismPage from "@/pages/ultra-magnetism";
 import QuantumVacuumPage from "@/pages/quantum-vacuum";
+import ResonantCellPage from "@/pages/resonant-cell";
 
 const queryClient = new QueryClient();
 
@@ -157,6 +158,7 @@ function Router() {
         <Route path="/product-research" component={ProductResearchPage} />
         <Route path="/ultra-magnetism" component={UltraMagnetismPage} />
         <Route path="/quantum-vacuum" component={QuantumVacuumPage} />
+        <Route path="/resonant-cell" component={ResonantCellPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
