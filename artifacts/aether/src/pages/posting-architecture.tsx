@@ -21,6 +21,15 @@ import qAffirmations   from "@assets/03a338f7-a5e3-4380-b7f6-6722b6244929_177715
 import qHermetics      from "@assets/6aead329-7647-460d-85d1-6c94a308ca03_1777154359400.png";
 import qMerkaba        from "@assets/c7ba1a76-5fdb-4670-84bc-0f1dca7a7ffe_1777154436263.png";
 import qAkasha         from "@assets/c96a7f66-e932-4e8a-8dcc-e9d4d7178214_1777154461464.png";
+// new card-deck additions
+import qLostSauce      from "@assets/2a23415f-8bde-40b7-9829-e21fdeee8e5a_1777156543957.png";
+import qConsuming      from "@assets/48d52b5e-f6cf-4576-8750-75b3a0c53e9f_1777156615549.png";
+import qMagnetism      from "@assets/b699464a-6ea8-4174-936a-07c021bbba47_1777156431150.png";
+import qNeedEachOther  from "@assets/31cc112e-68f3-4af4-b2ec-442c0efe4044_1777156455603.png";
+import qMotionInk      from "@assets/2e16e31d-7bd4-4419-b975-7266e2cfd9d6_1777156273285.png";
+import qMotionPeach    from "@assets/c493de26-0f95-48d8-8333-37c3629de2c4_1777156341681.png";
+import qClarityNebula  from "@assets/43858f84-97d7-436c-9e7b-0b5fded25aff_1777156378840.png";
+import qClarityBoutique from "@assets/82d70821-48a7-4c03-aa2e-408e23bb6ff0_1777156402767.png";
 
 const B = {
   bg:        "#F4EDE0",
@@ -128,6 +137,28 @@ const FREQUENCIES: Frequency[] = [
         accent: B.goldDeep,
         best: "Best at 8:08 (Abundance ledger) or 9:19 (Mission Alignment) — when calling out drift protects the work.",
       },
+      {
+        image: qLostSauce,
+        alt: "Dark charcoal Boho Formula card with cream serif text reading lost in the sauce but somehow clearer than ever, with hashtags Growth and Alignment in the lower right corner",
+        headline: "Lost in the sauce — but somehow clearer than ever.",
+        body:
+          "The paradox the questioning frequency lives in. Disorientation is not the opposite of clarity; it is how clarity gets remixed. Post when the receipts of your own growth are illegible to anyone but you.",
+        closer: "— #Growth · #Alignment",
+        tag: "9:19 · 3:33",
+        accent: B.brownDeep,
+        best: "Best at 9:19 (Mission Alignment) or 3:33 (Master Teachers) — when growth is louder than the map.",
+      },
+      {
+        image: qConsuming,
+        alt: "Sky-blue washed AETHER card with deep navy serif text reading am I still consuming, or am I coming back to it, that's the question you should be asking yourself, AETHER seal in the lower right corner",
+        headline: "Am I still consuming, or am I coming back to it?",
+        body:
+          "The diagnostic question the AETHER field actually wants you to run on yourself. Consuming is exit; returning is signal. The first card written in the AETHER colorway, not the Boho Formula one — the system asking the question of the system.",
+        closer: "— AETHER · field-test",
+        tag: "1:11 · 11:11",
+        accent: B.navy,
+        best: "Best at 1:11 (Seed of Becoming) or 11:11 (Awakening) — the audit hour.",
+      },
     ],
   },
   {
@@ -158,6 +189,17 @@ const FREQUENCIES: Frequency[] = [
         tag: "8:08 · 1:11",
         accent: B.gold,
         best: "Best at 8:08 (Abundance) or 1:11 (Seed of Becoming).",
+      },
+      {
+        image: qMagnetism,
+        alt: "Deep red Boho Formula card with gold serif text reading clarity moves when light expands, stillness breaks when flow begins, belief is powerful but belief alone is a spark, action is the current, together they create magnetism, with a small red rose glyph and a note that we don't always need the perfect map before moving — clarity is born through movement",
+        headline: "Belief is the spark. Action is the current. Together — magnetism.",
+        body:
+          "Clarity moves when light expands. Stillness breaks when flow begins. Belief alone never closes the circuit; action grounds the charge. We do not always need the perfect map before moving — clarity is born through movement.",
+        closer: "— the magnetism card",
+        tag: "8:08 · 12:12",
+        accent: B.roseDeep,
+        best: "Best at 8:08 (Abundance ledger) or 12:12 (Cosmic Alignment) — when the field needs to feel the current, not the theory.",
       },
     ],
   },
@@ -191,14 +233,24 @@ const FREQUENCIES: Frequency[] = [
         accent: B.rose,
         best: "Best at 11:11 (Awakening) or 2:22 (Faithful Now).",
       },
+      {
+        image: qNeedEachOther,
+        alt: "Cream Boho Formula card with deep ink serif text reading we need each other yet we also need ourselves, the up-and-down doesn't mean broken — it means options, freedom, and growth",
+        headline: "We need each other — yet we also need ourselves.",
+        body:
+          "The up-and-down doesn't mean broken. It means options, freedom, and growth. Leadership of others starts with leadership of self; the oscillation is the architecture, not the failure.",
+        tag: "12:12 · 2:22",
+        accent: B.olive,
+        best: "Best at 12:12 (Cosmic Alignment) or 2:22 (Faithful Now) — when the team needs permission to breathe and re-converge.",
+      },
     ],
   },
   {
     num: "04",
-    title: "Echo Pair · Choose the Now-You",
-    subtitle: "The same wisdom in dark and in light.",
+    title: "Echo Pairs · One Truth, Many Readings",
+    subtitle: "Same transmission, different visual register.",
     blurb:
-      "The same Boho Formula transmission given two ways — once in the storm-toned 3D wash, once in the daisy-soft cream. Two readings of one truth: your reality is an echo of your previous now-yous, so choose forward.",
+      "Three pairs of cards that say the same thing twice — once in one dialect, once in another. Now-You in storm vs daylight, Motion in ink vs gold-on-peach, Clarity in cosmic nebula vs the original 2021 boho boutique. Use the pair: post one reading on the questioning hour, the other on the alignment hour. The repetition is the point — the field needs the same equation in both registers before it lands.",
     icon: Layers,
     accent: B.terracotta,
     quotes: [
@@ -208,7 +260,7 @@ const FREQUENCIES: Frequency[] = [
         headline: "Your 3D reality is an echo of the previous now-yous.",
         body:
           "What you're experiencing right now is a return-signal from the choices the earlier versions of you already made. Don't get caught up in that. Choose the now-you.",
-        closer: "— storm reading",
+        closer: "— Now-You · storm reading",
         tag: "1:11 · 11:11",
         accent: B.terracotta,
         best: "Best at 1:11 (Seed) or 11:11 (Awakening).",
@@ -219,10 +271,54 @@ const FREQUENCIES: Frequency[] = [
         headline: "Your 3D reality is an echo of the previous now-yous.",
         body:
           "Same instruction, lighter register. Don't get caught up in the echo. Choose the now-you.",
-        closer: "— daylight reading",
+        closer: "— Now-You · daylight reading",
         tag: "1:11 · 11:11",
         accent: B.gold,
         best: "Best at 1:11 (Seed) or 11:11 (Awakening) — pair with the storm reading for contrast.",
+      },
+      {
+        image: qMotionInk,
+        alt: "Cream Boho Formula card with deep ink serif text Motion clears the rot Flow breaks the spiral, even one small step is movement, plus the numerology lines 999 endings clear space, 88 infinite loops into forward, 333 mind body spirit in sync, 222 alignment, 77 trust, and a closer about wanting to talk more than work but posting still being motion that transforms",
+        headline: "Motion clears the rot. Flow breaks the spiral.",
+        body:
+          "Even one small step is movement. 999 → endings clear space. 88 → infinite loops into forward. 333 → mind, body, spirit in sync. 222 → alignment. 77 → trust. Sometimes I want to talk more than work — but posting is still motion, and motion transforms.",
+        closer: "— Motion · ink reading · the numerology card",
+        tag: "9:19 · 2:22",
+        accent: B.brownDeep,
+        best: "Best at 9:19 (Mission Alignment) or 2:22 (Faithful Now) — the literal manifesto of the Posting Architecture.",
+      },
+      {
+        image: qMotionPeach,
+        alt: "Soft peach Boho Formula card with warm gold serif text repeating the same Motion clears the rot Flow breaks the spiral message and 999 88 333 222 77 numerology in a lighter daylight register",
+        headline: "Motion clears the rot. Flow breaks the spiral.",
+        body:
+          "Same numerology, same instruction, in a lighter register. 999 endings, 88 forward, 333 sync, 222 alignment, 77 trust. Even when you'd rather talk than work, the act of posting is still motion — and motion transforms.",
+        closer: "— Motion · daylight reading · gold-on-peach",
+        tag: "8:18 · 1:11",
+        accent: B.gold,
+        best: "Best at 8:18 (Refinement of New Beginnings) or 1:11 (Seed) — pair with the ink reading for contrast.",
+      },
+      {
+        image: qClarityNebula,
+        alt: "Red and green nebula card with cream serif text Clarity moves when light expands, stillness breaks when flow begins, energy always follows direction",
+        headline: "Clarity moves when light expands.",
+        body:
+          "Stillness breaks when flow begins. Energy always follows direction. The cosmic reading: light is the operator, flow is the verb, direction is the equation. The frequency announces itself before the form does.",
+        closer: "— Clarity · nebula reading",
+        tag: "11:11 · 12:12",
+        accent: B.terracotta,
+        best: "Best at 11:11 (Awakening) or 12:12 (Cosmic Alignment) — when the field is naming itself.",
+      },
+      {
+        image: qClarityBoutique,
+        alt: "Vintage 2021 Boho Formula Boutique card with golden script Clarity moves when light expands, surrounded by hand-drawn strawberry, sun face, palm frond and a small pink flower above the BOHO FORMULA Boutique 2021 mark",
+        headline: "Clarity moves when light expands.",
+        body:
+          "Same equation, the boutique reading. Strawberries, sun face, palm frond — the original 2021 dialect. The same frequency the AETHER lattice will eventually formalize, just spoken in the boutique's first vocabulary.",
+        closer: "— Clarity · Boho Formula Boutique · 2021",
+        tag: "8:08 · 3:33",
+        accent: B.gold,
+        best: "Best at 8:08 (Abundance ledger) or 3:33 (Master Teachers) — pair with the nebula reading.",
       },
     ],
   },
@@ -485,7 +581,7 @@ export default function PostingArchitecturePage() {
             </div>
             <div className="text-[10px]"
                  style={{ color: B.muted, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
-              five frequencies
+              five frequencies · seventeen cards
             </div>
           </div>
 
