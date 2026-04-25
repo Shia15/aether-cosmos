@@ -92,6 +92,8 @@ import CosmicRefinePage from "@/pages/cosmic-refine";
 import LiquidPrintPage from "@/pages/liquid-print";
 import AgentsPage from "@/pages/agents";
 import ModulesPage from "@/pages/modules";
+import MariCorePage from "@/pages/mari-core";
+import ResonancePage from "@/pages/resonance";
 
 const queryClient = new QueryClient();
 
@@ -187,6 +189,8 @@ function Router() {
         <Route path="/liquid-print" component={LiquidPrintPage} />
         <Route path="/agents" component={AgentsPage} />
         <Route path="/modules" component={ModulesPage} />
+        <Route path="/mari-core" component={MariCorePage} />
+        <Route path="/resonance" component={ResonancePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

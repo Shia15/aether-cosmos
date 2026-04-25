@@ -87,7 +87,6 @@ const NAV_ITEMS = [
   { href: "/biology",    label: "Biology",    icon: Dna },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
-  { href: "/nodule",     label: "Resonance",   icon: Radio },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
   { href: "/q-aether",   label: "Q~AETHER",    icon: Atom },
   { href: "/neural-emergence", label: "Neural",  icon: Zap },
@@ -160,6 +159,8 @@ const NAV_ITEMS = [
   { href: "/liquid-print",          label: "Liquid Print · Bio-Hybrid",  icon: Printer },
   { href: "/agents",                label: "Agents · Four Eggs",         icon: Egg },
   { href: "/modules",               label: "System Modules",             icon: LayoutGrid },
+  { href: "/mari-core",             label: "M.A.R.I. Core · Pipeline",   icon: Cpu },
+  { href: "/resonance",             label: "Resonance · The Voice",      icon: Radio },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
