@@ -90,6 +90,8 @@ import EarlyUniversePage from "@/pages/early-universe";
 import PhononStackPage from "@/pages/phonon-stack";
 import CosmicRefinePage from "@/pages/cosmic-refine";
 import LiquidPrintPage from "@/pages/liquid-print";
+import AgentsPage from "@/pages/agents";
+import ModulesPage from "@/pages/modules";
 
 const queryClient = new QueryClient();
 
@@ -183,6 +185,8 @@ function Router() {
         <Route path="/phonon-stack" component={PhononStackPage} />
         <Route path="/cosmic-refine" component={CosmicRefinePage} />
         <Route path="/liquid-print" component={LiquidPrintPage} />
+        <Route path="/agents" component={AgentsPage} />
+        <Route path="/modules" component={ModulesPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
