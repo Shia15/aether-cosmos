@@ -80,6 +80,7 @@ import QuantumVacuumPage from "@/pages/quantum-vacuum";
 import ResonantCellPage from "@/pages/resonant-cell";
 import SpinVacuumPage from "@/pages/spin-vacuum";
 import SymbolicPillarsPage from "@/pages/symbolic-pillars";
+import MariPage from "@/pages/mari";
 
 const queryClient = new QueryClient();
 
@@ -163,6 +164,7 @@ function Router() {
         <Route path="/resonant-cell" component={ResonantCellPage} />
         <Route path="/spin-vacuum" component={SpinVacuumPage} />
         <Route path="/symbolic-pillars" component={SymbolicPillarsPage} />
+        <Route path="/mari" component={MariPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
