@@ -95,6 +95,7 @@ import ModulesPage from "@/pages/modules";
 import MariCorePage from "@/pages/mari-core";
 import ResonancePage from "@/pages/resonance";
 import BohoFormulaPage from "@/pages/boho-formula";
+import PostingArchitecturePage from "@/pages/posting-architecture";
 
 const queryClient = new QueryClient();
 
@@ -193,6 +194,7 @@ function Router() {
         <Route path="/mari-core" component={MariCorePage} />
         <Route path="/resonance" component={ResonancePage} />
         <Route path="/boho-formula" component={BohoFormulaPage} />
+        <Route path="/posting-architecture" component={PostingArchitecturePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

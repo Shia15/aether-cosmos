@@ -68,6 +68,7 @@ import {
   Printer,
   Egg,
   LayoutGrid,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -162,6 +163,7 @@ const NAV_ITEMS = [
   { href: "/mari-core",             label: "M.A.R.I. Core · Pipeline",   icon: Cpu },
   { href: "/resonance",             label: "Resonance · The Voice",      icon: Radio },
   { href: "/boho-formula",          label: "Boho Formula · Alchemy",     icon: Leaf },
+  { href: "/posting-architecture",  label: "Posting Architecture · Angel Hours", icon: Clock },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

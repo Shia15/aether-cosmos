@@ -48,6 +48,7 @@ AETHER includes a wide array of specialized features:
 - **M.A.R.I. Core · Pipeline:** The full system pipeline from input to output generation, involving four agents.
 - **Resonance · The Voice:** Gallery of five-signal manifestos.
 - **Boho Formula · Alchemy:** Companion page exploring transformation/growth concepts through business dynamics.
+- **Posting Architecture · Angel Hours:** Boho Formula × AETHER posting system foundation. Eight Angel Hours (8:08, 8:18, 9:19, 11:11, 12:12, 1:11, 2:22, 3:33) as the heartbeat schedule, a five-frequency motivational card library (Consciousness, Flow, Leadership, Echo Pair, Code×Bloom) routed to those slots, the four-pillar Daily Affirmations card, and the Hermetic trinity (Hermetics · Merkaba · Akasha) as the philosophical bridge toward AETHER's mathematical-coherence proof engine. Unified circuit-tree sigil and brand palette quad close the page; cream/gold/navy/brown palette extending the Boho Formula language.
 - **Phonon · 3D Stacked Transistor Cooling:** Thermal/hardware workbench.
 - **Early Universe · From Quadratic Gravity to the Standard Model:** Workbench tracing cosmological evolution.
 - **Octonion · Æther Model:** 8D normed-division-algebra workbench for QM⇌GR coupling.
