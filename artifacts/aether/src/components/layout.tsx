@@ -144,6 +144,7 @@ const NAV_ITEMS = [
   { href: "/quantum-vacuum",        label: "Quantum Vacuum · Non-Local",icon: Sparkles },
   { href: "/resonant-cell",         label: "Resonant Cell · Prospectus",icon: Boxes },
   { href: "/spin-vacuum",           label: "Spin · Vacuum Gates",      icon: FlipHorizontal },
+  { href: "/symbolic-pillars",      label: "Symbolic Pillars · GT",    icon: Triangle },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
