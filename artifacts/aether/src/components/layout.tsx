@@ -151,6 +151,7 @@ const NAV_ITEMS = [
   { href: "/ferro-modes",           label: "Ferrofluid · Two-Mode",    icon: Magnet },
   { href: "/vortex-math",           label: "Vortex Math · 3·6·9 / 144", icon: Sigma },
   { href: "/octonion-aether",       label: "Octonion · Æther 8D",      icon: Atom },
+  { href: "/early-universe",        label: "Early Universe · ToE",     icon: Telescope },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

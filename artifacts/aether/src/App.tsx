@@ -86,6 +86,7 @@ import PlantIntelPage from "@/pages/plant-intel";
 import FerroModesPage from "@/pages/ferro-modes";
 import VortexMathPage from "@/pages/vortex-math";
 import OctonionAetherPage from "@/pages/octonion-aether";
+import EarlyUniversePage from "@/pages/early-universe";
 
 const queryClient = new QueryClient();
 
@@ -175,6 +176,7 @@ function Router() {
         <Route path="/ferro-modes" component={FerroModesPage} />
         <Route path="/vortex-math" component={VortexMathPage} />
         <Route path="/octonion-aether" component={OctonionAetherPage} />
+        <Route path="/early-universe" component={EarlyUniversePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
