@@ -161,6 +161,7 @@ const NAV_ITEMS = [
   { href: "/modules",               label: "System Modules",             icon: LayoutGrid },
   { href: "/mari-core",             label: "M.A.R.I. Core · Pipeline",   icon: Cpu },
   { href: "/resonance",             label: "Resonance · The Voice",      icon: Radio },
+  { href: "/boho-formula",          label: "Boho Formula · Alchemy",     icon: Leaf },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
