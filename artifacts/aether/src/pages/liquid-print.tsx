@@ -2,12 +2,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
-  bg: "#0B0C0F", panel: "rgba(17,19,24,0.86)",
-  border: "rgba(232,200,120,0.14)", border2: "rgba(232,200,120,0.32)",
-  white: "#DCD8CC", text: "#A89E88", muted: "#60607A", dim: "#383850",
+  bg: "#06070C",
+  panel: "rgba(20,18,32,0.62)",
+  panelHi: "rgba(28,24,44,0.78)",
+  border: "rgba(200,180,240,0.08)",
+  border2: "rgba(232,200,120,0.22)",
+  white: "#EAE6F2", text: "#A4A0B8", muted: "#6A6680", dim: "#2E2A40",
   gold: "#E8C878", goldDim: "#7A6830", goldPale: "#F5E8B0",
-  cyan: "#5AB8E8", green: "#6EC87A", rose: "#E06878",
-  violet: "#C890E8", amber: "#E87035",
+  cyan: "#7AC5E8", green: "#7DCC92", rose: "#E68090",
+  violet: "#B596E8", amber: "#F09060",
 };
 
 type TabKey = "gel" | "conduct" | "dna" | "stack";
@@ -644,53 +647,87 @@ export default function LiquidPrintPage() {
   }, [parallel, gateMix]);
 
   return (
-    <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
-      <div className="mb-5">
-        <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
-          aether · rapid liquid printing · bio-hybrid computer · DNA switching · soft electronics
+    <div className="min-h-screen relative overflow-hidden" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <style>{`
+        @keyframes lp-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
+        @keyframes lp-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }
+        @keyframes lp-pulse   { 0%, 100% { opacity: .35; transform: scale(1); } 50% { opacity: 1; transform: scale(1.45); } }
+        @keyframes lp-fadein  { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes lp-shimmer { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
+        .lp-pulse-dot { animation: lp-pulse 2.6s ease-in-out infinite; transform-origin: center; }
+        .lp-glow-1 { animation: lp-breathe 9s ease-in-out infinite, lp-drift 22s ease-in-out infinite; }
+        .lp-glow-2 { animation: lp-breathe 11s ease-in-out infinite, lp-drift 28s ease-in-out infinite reverse; }
+        .lp-glow-3 { animation: lp-breathe 13s ease-in-out infinite, lp-drift 34s ease-in-out infinite; }
+        .lp-event   { animation: lp-fadein 320ms ease-out; }
+        .lp-rule    { animation: lp-shimmer 6s ease-in-out infinite; }
+        .lp-card    { box-shadow: 0 1px 0 rgba(255,255,255,0.025) inset, 0 30px 70px -30px rgba(0,0,0,0.78); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+      `}</style>
+
+      {/* atmospheric glow layer */}
+      <div className="pointer-events-none absolute inset-0 select-none" aria-hidden>
+        <div className="lp-glow-1 absolute" style={{ top: "-12%",  left: "-8%",   width: 720, height: 720, background: "radial-gradient(circle, rgba(181,150,232,0.18) 0%, rgba(181,150,232,0) 70%)", filter: "blur(20px)" }} />
+        <div className="lp-glow-2 absolute" style={{ top:  "28%",  right: "-15%", width: 640, height: 640, background: "radial-gradient(circle, rgba(232,200,120,0.10) 0%, rgba(232,200,120,0) 70%)", filter: "blur(20px)" }} />
+        <div className="lp-glow-3 absolute" style={{ bottom: "-22%", left: "22%", width: 760, height: 760, background: "radial-gradient(circle, rgba(122,197,232,0.10) 0%, rgba(122,197,232,0) 70%)", filter: "blur(20px)" }} />
+      </div>
+
+      <div className="relative px-8 py-8">
+      <div className="mb-7 max-w-4xl">
+        <div className="text-[10px] tracking-[0.4em] uppercase italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
+          aether · rapid liquid printing · bio-hybrid computer · soft electronics
         </div>
-        <h1 className="text-[34px] mt-1" style={{ color: C.white, letterSpacing: "0.02em" }}>
+        <h1 className="text-[40px] mt-2 leading-[1.05]" style={{ color: C.white, letterSpacing: "0.015em" }}>
           Liquid Print · <span style={{ color: C.gold }}>Bio-Hybrid Computer</span>
         </h1>
-        <p className="text-[13px] mt-2 max-w-3xl" style={{ color: C.text }}>
+        <div className="lp-rule mt-3 mb-4 h-px" style={{ background: `linear-gradient(90deg, ${C.gold}66 0%, ${C.violet}40 35%, transparent 100%)`, width: "62%" }} />
+        <p className="text-[13.5px] mt-3 leading-relaxed" style={{ color: C.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
           A <span style={{ color: C.cyan }}>shear-thinning hydrogel</span> holds every printed material in place mid-air, removing gravity from the build process.
           That single change collapses build time from <span style={{ color: C.gold }}>hours to minutes</span> and lets the print head deposit
           <span style={{ color: C.amber }}> conductive ink and liquid metal</span> in 3D — no vias, no rigid substrate. Then we swap the solid parts of a conventional computer for
           a <span style={{ color: C.green }}>DNA / RNA switching layer</span> that does massively parallel logic by strand displacement, and stitch the whole thing together with a
           <span style={{ color: C.violet }}> hybrid interface</span> on top. The result is one merged-substrate device — circuits, biocomputation, and sensors all printed into the same gel.
-          This is the live prototype board. We're still learning.
+        </p>
+        <p className="text-[12px] mt-3 italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
+          — a living prototype board · still learning
         </p>
       </div>
 
-      <div className="flex gap-2 mb-4 flex-wrap" data-testid="lp-tabs">
+      <div className="flex gap-2 mb-5 flex-wrap" data-testid="lp-tabs">
         {TABS.map(T => {
           const active = tab === T.key;
           return (
             <button key={T.key} onClick={() => { setTab(T.key); pushLog("tab", `→ ${T.label}`, T.col); }}
               data-testid={`tab-${T.key}`} aria-pressed={active}
               aria-label={`Switch to ${T.label}`}
-              className="px-4 py-2 text-[11px] tracking-[0.2em] uppercase border"
+              className="px-4 py-2.5 text-[11px] tracking-[0.2em] uppercase border rounded-full inline-flex items-center gap-2 transition-colors"
               style={{
-                borderColor: active ? T.col : C.border,
-                background:  active ? `${T.col}14` : "transparent",
+                borderColor: active ? `${T.col}88` : C.border,
+                background:  active ? `${T.col}10` : "rgba(20,18,32,0.45)",
                 color:       active ? T.col : C.text,
                 fontFamily:  "Cinzel, ui-serif, Georgia, serif",
+                boxShadow:   active ? `0 0 24px ${T.col}33, inset 0 0 12px ${T.col}11` : "none",
               }}>
-              <span className="mr-2">{T.sym}</span>{T.label}
+              {active ? (
+                <span className="lp-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: T.col, boxShadow: `0 0 8px ${T.col}` }} />
+              ) : (
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "transparent", border: `1px solid ${C.dim}` }} />
+              )}
+              <span style={{ color: active ? T.col : C.muted }}>{T.sym}</span>
+              <span>{T.label}</span>
             </button>
           );
         })}
       </div>
 
-      <div className="grid gap-5" style={{ gridTemplateColumns: "minmax(0,1fr) 320px" }}>
+      <div className="grid gap-5" style={{ gridTemplateColumns: "minmax(0,1fr) 340px" }}>
         <div>
-          <div className="border" style={{ borderColor: C.border, background: C.panel }}>
-            <div className="flex justify-between items-center px-4 py-2 border-b" style={{ borderColor: C.border }}>
-              <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: TABS.find(t => t.key === tab)!.col }}>
-                <span className="mr-2">●</span>{TABS.find(t => t.key === tab)!.label} · LIVE RENDER
+          <div className="lp-card border rounded-[10px] overflow-hidden" style={{ borderColor: C.border, background: C.panel }}>
+            <div className="flex justify-between items-center px-5 py-2.5 border-b" style={{ borderColor: C.border }}>
+              <div className="text-[10px] tracking-[0.3em] uppercase inline-flex items-center gap-2" style={{ color: TABS.find(t => t.key === tab)!.col }}>
+                <span className="lp-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: TABS.find(t => t.key === tab)!.col, boxShadow: `0 0 8px ${TABS.find(t => t.key === tab)!.col}` }} />
+                {TABS.find(t => t.key === tab)!.label} · LIVE RENDER
               </div>
-              <div className="text-[10px]" style={{ color: C.muted }}>
-                ops: <span style={{ color: C.gold }}>{ops}</span>
+              <div className="text-[10px] tracking-[0.2em] uppercase" style={{ color: C.muted }}>
+                ops · <span style={{ color: C.gold, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{ops}</span>
               </div>
             </div>
             <canvas ref={cvRef} data-testid="lp-canvas" style={{ width: "100%", height: 520, display: "block" }} />
@@ -698,8 +735,8 @@ export default function LiquidPrintPage() {
 
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="mt-5 border p-5" style={{ borderColor: C.border, background: C.panel }}>
+              transition={{ duration: 0.22 }}
+              className="lp-card mt-5 border rounded-[10px] p-6" style={{ borderColor: C.border, background: C.panel }}>
 
               {tab === "gel" && (
                 <>
@@ -808,9 +845,9 @@ export default function LiquidPrintPage() {
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-5 border p-4" style={{ borderColor: C.border, background: C.panel }}>
-            <div className="text-[10px] tracking-[0.3em] uppercase mb-3" style={{ color: C.muted }}>print phenomena</div>
-            <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
+          <div className="lp-card mt-5 border rounded-[10px] p-5" style={{ borderColor: C.border, background: C.panel }}>
+            <div className="text-[10px] tracking-[0.4em] uppercase mb-4 italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>print phenomena</div>
+            <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
               <Bar label="gel suspension"     val={1 - shearN}                              c={C.cyan}   />
               <Bar label="conductive σ"        val={conduct}                                c={C.amber}  />
               <Bar label="DNA parallelism"     val={Math.min(1, parallel / 12)}              c={C.green}  />
@@ -819,8 +856,8 @@ export default function LiquidPrintPage() {
           </div>
         </div>
 
-        <aside className="border p-5" style={{ borderColor: C.border, background: C.panel }}>
-          <div className="text-[10px] tracking-[0.3em] uppercase mb-3" style={{ color: C.muted }}>telemetry</div>
+        <aside className="lp-card border rounded-[10px] p-5" style={{ borderColor: C.border, background: C.panel }}>
+          <div className="text-[10px] tracking-[0.4em] uppercase mb-4 italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>telemetry</div>
           <div className="space-y-2 text-[11px]" style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
             <Row k="active workbench" v={TABS.find(t => t.key === tab)!.label} c={TABS.find(t => t.key === tab)!.col} />
             <Row k="v_print"       v={`${printSpeed.toFixed(0)} mm/s`}        c={C.gold} />
@@ -848,19 +885,21 @@ export default function LiquidPrintPage() {
         </aside>
       </div>
 
-      <div className="mt-6 border" style={{ borderColor: C.border, background: C.panel }}>
-        <div className="px-4 py-2 text-[10px] tracking-[0.3em] uppercase border-b" style={{ color: C.muted, borderColor: C.border }}>
+      <div className="lp-card mt-6 border rounded-[10px] overflow-hidden" style={{ borderColor: C.border, background: C.panel }}>
+        <div className="px-5 py-2.5 text-[10px] tracking-[0.4em] uppercase border-b italic inline-flex items-center gap-2" style={{ color: C.muted, borderColor: C.border, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
+          <span className="lp-pulse-dot" style={{ width: 5, height: 5, borderRadius: "50%", background: C.gold, boxShadow: `0 0 6px ${C.gold}` }} />
           event log
         </div>
-        <div className="px-4 py-3 max-h-48 overflow-y-auto text-[11px] font-mono" data-testid="event-log">
+        <div className="px-5 py-3 max-h-48 overflow-y-auto text-[11px]" data-testid="event-log" style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
           {log.map((L, i) => (
-            <div key={i} className="flex gap-3">
+            <div key={i} className="lp-event flex gap-3 py-0.5">
               <span style={{ color: C.muted }}>{L.ts}</span>
               <span style={{ color: L.col, minWidth: 80 }}>[{L.tag}]</span>
               <span style={{ color: C.text }}>{L.msg}</span>
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
@@ -871,23 +910,23 @@ function nowStamp() {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
 }
 function Title({ children, col }: { children: React.ReactNode; col: string }) {
-  return <div className="text-[14px] tracking-[0.05em] mb-2" style={{ color: col, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>{children}</div>;
+  return <div className="text-[15px] tracking-[0.04em] mb-3" style={{ color: col, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>{children}</div>;
 }
 function Body({ children }: { children: React.ReactNode }) {
-  return <div className="text-[12.5px] leading-relaxed" style={{ color: C.text }}>{children}</div>;
+  return <div className="text-[12.5px] leading-relaxed" style={{ color: C.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>{children}</div>;
 }
 function Stat({ k, v, c }: { k: string; v: string; c: string }) {
   return (
-    <div className="border px-3 py-2" style={{ borderColor: C.border }}>
-      <div className="text-[9px] tracking-[0.2em] uppercase" style={{ color: C.muted }}>{k}</div>
-      <div className="mt-1" style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v}</div>
+    <div className="border rounded-[6px] px-3 py-2.5" style={{ borderColor: C.border, background: "rgba(20,18,32,0.4)" }}>
+      <div className="text-[9px] tracking-[0.25em] uppercase" style={{ color: C.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>{k}</div>
+      <div className="mt-1 text-[12px]" style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v}</div>
     </div>
   );
 }
 function Row({ k, v, c }: { k: string; v: string; c: string }) {
   return (
-    <div className="flex justify-between">
-      <span style={{ color: C.muted }}>{k}</span>
+    <div className="flex justify-between items-baseline">
+      <span style={{ color: C.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", fontSize: 10.5, letterSpacing: "0.04em" }}>{k}</span>
       <span style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v}</span>
     </div>
   );
@@ -896,12 +935,12 @@ function Bar({ label, val, c }: { label: string; val: number; c: string }) {
   const v = Math.max(0, Math.min(1, val));
   return (
     <div>
-      <div className="flex justify-between text-[10px] mb-1">
-        <span style={{ color: "#60607A" }}>{label}</span>
+      <div className="flex justify-between text-[10px] mb-1.5">
+        <span style={{ color: "#6A6680", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", letterSpacing: "0.04em" }}>{label}</span>
         <span style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v.toFixed(2)}</span>
       </div>
-      <div className="h-[3px]" style={{ background: "rgba(255,255,255,0.05)" }}>
-        <div className="h-full" style={{ width: `${v * 100}%`, background: c }} />
+      <div className="h-[4px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
+        <div className="h-full rounded-full" style={{ width: `${v * 100}%`, background: `linear-gradient(90deg, ${c}55 0%, ${c} 100%)`, boxShadow: `0 0 8px ${c}66` }} />
       </div>
     </div>
   );
