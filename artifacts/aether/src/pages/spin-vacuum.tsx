@@ -47,6 +47,8 @@ export default function SpinVacuumPage() {
   const gateRef = useRef(gateThresh); useEffect(() => { gateRef.current = gateThresh; }, [gateThresh]);
   const [flipPhase, setFlipPhase] = useState(1);   // 0..1 animation of flip
   const flipRef = useRef(flipPhase); useEffect(() => { flipRef.current = flipPhase; }, [flipPhase]);
+  const [portCount, setPortCount] = useState<3 | 4>(4);  // 3-opening or 4-opening variant
+  const portCountRef = useRef(portCount); useEffect(() => { portCountRef.current = portCount; }, [portCount]);
 
   // ==== Charge balance controls ====
   const [nPos, setNpos] = useState(1.0);       // positive population (a.u.)
@@ -85,7 +87,7 @@ export default function SpinVacuumPage() {
     // GATES: when UP, port open with strength χ_v
     const portOpen = ultraUp;
     const chiV = portOpen ? gateThresh * flipPhase : 0;              // vacuum coupling
-    const ports = portOpen ? 4 : 0;
+    const ports = portOpen ? portCount : 0;
     const zptap = chiV * 0.84;                                       // zero-point tap rate (a.u.)
 
     // CHARGE: net = (n+ - n-)
@@ -94,7 +96,7 @@ export default function SpinVacuumPage() {
     const spinFlow = (nPos + nNeg) * (persistent ? 0.6 : 0.15);
 
     return { Js, Jn, sigmaN, tauPersist, Mz, gradM, torqueSign, chiV, ports, zptap, netQ, spinFlow, persistent };
-  }, [bias, sgap, scatter, qwind, mtxt, ultraUp, gateThresh, flipPhase, nPos, nNeg]);
+  }, [bias, sgap, scatter, qwind, mtxt, ultraUp, gateThresh, flipPhase, portCount, nPos, nNeg]);
 
   // ==== Animate flip transition when ultraUp changes ====
   useEffect(() => {
@@ -368,10 +370,12 @@ export default function SpinVacuumPage() {
       ctx.textAlign = "center";
       ctx.fillText(up ? "ULTRA ↑" : "ULTRA ↓", cx, cy + blockR + 16);
 
-      // 4 vacuum ports around the block
+      // N vacuum ports around the block (3 or 4)
+      const N = portCountRef.current;
       const portR = 22;
-      for (let i = 0; i < 4; i++) {
-        const a = (i / 4) * Math.PI * 2 - Math.PI / 4;
+      const angOff = N === 3 ? -Math.PI / 2 : -Math.PI / 4;
+      for (let i = 0; i < N; i++) {
+        const a = (i / N) * Math.PI * 2 + angOff;
         const px = cx + Math.cos(a) * R;
         const py = cy + Math.sin(a) * R;
         // line from center to port
@@ -407,7 +411,7 @@ export default function SpinVacuumPage() {
       ctx.fillStyle = up ? "rgba(110,200,122,0.85)" : "rgba(224,104,120,0.85)";
       ctx.fillText(`vacuum coupling χᵥ = ${obs.chiV.toFixed(2)}`, w - 14, 24);
       ctx.fillStyle = "rgba(168,158,136,0.85)";
-      ctx.fillText(`zero-point tap = ${obs.zptap.toFixed(2)}  · ports ${obs.ports}/4`, w - 14, 40);
+      ctx.fillText(`zero-point tap = ${obs.zptap.toFixed(2)}  · ports ${obs.ports}/${N}`, w - 14, 40);
 
       // tagline bottom
       ctx.font = "italic 13px ui-serif, Georgia, serif";
@@ -515,6 +519,10 @@ export default function SpinVacuumPage() {
   function flipUltra() {
     setUltraUp(u => !u);
     pushLog("FLIP", ultraUp ? "ultra ↓ · ports CLOSED" : "ultra ↑ · ports OPEN", C.violet);
+  }
+  function setPortCountL(n: 3 | 4) {
+    setPortCount(n);
+    pushLog("PORTS", `geometry → ${n}-opening vacuum`, C.violet);
   }
   function balanceCharge() {
     const avg = (nPos + nNeg) / 2;
@@ -639,8 +647,27 @@ export default function SpinVacuumPage() {
                     state and every port closes — the on/off is gated entirely by the ultra direction,
                     not by adding energy.
                   </Body>
-                  <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "1fr 1fr" }}>
+                  <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
                     <Slider id="gate"  label="port amplitude" value={gateThresh} min={0} max={1.0} step={0.01} col={C.violet} fmt={v => v.toFixed(2)} onChange={setGateL} />
+                    <div>
+                      <div className="text-[11px] mb-1" style={{ color: C.muted }}>vacuum geometry</div>
+                      <div className="flex gap-1">
+                        <button onClick={() => setPortCountL(3)} data-testid="btn-ports-3"
+                          aria-pressed={portCount === 3}
+                          aria-label="3-opening vacuum geometry"
+                          className="flex-1 py-2 text-[10px] tracking-[0.2em] uppercase border"
+                          style={{ borderColor: portCount === 3 ? C.violet : C.border, background: portCount === 3 ? `${C.violet}1A` : "transparent", color: portCount === 3 ? C.violet : C.text }}>
+                          3 openings
+                        </button>
+                        <button onClick={() => setPortCountL(4)} data-testid="btn-ports-4"
+                          aria-pressed={portCount === 4}
+                          aria-label="4-opening vacuum geometry"
+                          className="flex-1 py-2 text-[10px] tracking-[0.2em] uppercase border"
+                          style={{ borderColor: portCount === 4 ? C.violet : C.border, background: portCount === 4 ? `${C.violet}1A` : "transparent", color: portCount === 4 ? C.violet : C.text }}>
+                          4 openings
+                        </button>
+                      </div>
+                    </div>
                     <button onClick={flipUltra} data-testid="btn-flip"
                       aria-pressed={ultraUp}
                       aria-label="Flip ultra-magnet to toggle vacuum ports"
@@ -649,10 +676,11 @@ export default function SpinVacuumPage() {
                       flip ultra · ports {ultraUp ? "open" : "closed"}
                     </button>
                   </div>
-                  <div className="grid gap-3 mt-4 text-[11px]" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+                  <div className="grid gap-3 mt-4 text-[11px]" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
                     <Stat k="state"     v={ultraUp ? "ULTRA ↑ · OPEN" : "ULTRA ↓ · CLOSED"}  c={ultraUp ? C.green : C.rose} />
                     <Stat k="χᵥ"        v={obs.chiV.toFixed(2)}                              c={C.violet} />
-                    <Stat k="ports"     v={`${obs.ports}/4`}                                  c={obs.ports > 0 ? C.green : C.muted} />
+                    <Stat k="ports"     v={`${obs.ports}/${portCount}`}                       c={obs.ports > 0 ? C.green : C.muted} />
+                    <Stat k="geometry"  v={portCount === 3 ? "△ trine" : "□ tetrad"}         c={C.violet} />
                   </div>
                 </>
               )}
@@ -735,7 +763,7 @@ export default function SpinVacuumPage() {
               <Row k="τ_spin sign"      v={obs.torqueSign > 0 ? "+" : "−"}     c={obs.torqueSign > 0 ? C.green : C.rose} />
               <Row k="ultra state"      v={ultraUp ? "↑" : "↓"}                c={ultraUp ? C.green : C.rose} />
               <Row k="vacuum χᵥ"        v={obs.chiV.toFixed(2)}                c={C.violet} />
-              <Row k="open ports"       v={`${obs.ports} / 4`}                  c={obs.ports > 0 ? C.green : C.muted} />
+              <Row k="open ports"       v={`${obs.ports} / ${portCount}`}       c={obs.ports > 0 ? C.green : C.muted} />
               <Row k="net Q"            v={obs.netQ.toFixed(2)}                c={Math.abs(obs.netQ) < 0.05 ? C.green : C.rose} />
               <Row k="ops"              v={String(ops)}                         c={C.gold} />
             </div>
