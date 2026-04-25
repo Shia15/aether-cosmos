@@ -43,6 +43,10 @@ The AETHER system is a pnpm workspace monorepo built with TypeScript, featuring 
 - **Geometry of Permission:** Five-step Tour walkthrough explaining field, geometry, coupling, medium, and observation with paired spectrum + cavity canvases.
 - **Math Engine · Workbench:** Unified mathematical workbench with tabs for Inspect, Primes, Logic Gates, Matrices, and Constants.
 - **Product Research:** Unified product-research workbench with tabs for Profile, Features · RICE, Competitors, Market · TAM, and Risk Register.
+- **Octonion · Æther Model:** 8D normed-division-algebra workbench — singularity → {1, e₁..e₇} expansion, toroidal (1,7) quanta winding, Fano-plane non-associativity check (a·b)·c vs a·(b·c), and dual-metric QM⇌GR coupling bridge.
+- **Vortex Math · 3·6·9 / 7·8·9 / 144:** Tesla-style digital-root workbench — 1·2·4·8·7·5 doubling figure-8, 3·6·9 control triangle, 7·8·9 capstone with angelic-choir overlay, and 12×12 = 144 latent grid with root filtering.
+- **Ferrofluid · Two-Mode Hardware:** Two-mode propulsion workbench — Rosensweig hexagonal peak array with ion electrospray (high-Isp), gradient-driven peristaltic bulk flow (high mass-flow), hybrid switch with auto-toggle, and live thrust telemetry.
+- **Plant Intelligence · Pre-Neural Cognition:** Workbench treating plants as hardware and channel — slime-mould Physarum maze solver, mycorrhizal wood-wide-web nutrient trade, willow/redwood VOC air signaling, and salt-stress ion-channel Morse trains.
 - **Organoid Intelligence · Bio-Ferrofluid Hardware:** Hardware workbench for the X144 bio-hybrid array, simulating brain, skeleton, muscle, vasculature, and soil components.
 - **M.A.R.I. · Four-Egg Resonance Engine:** Interactive workbench for the M.A.R.I. four-agent core (Mnesis · Aletheia · Reverie · Infernia), integrating CGLE, Symbol Atlas, and Kerr Ringdown simulations.
 - **Symbolic Pillars · GT:** Symbolic pillar mapper treating the ~9600–8200 BCE site as a pre-digital information system, with features like animal co-occurrence graphs, 3·6·9 pattern analysis, and celestial alignments.

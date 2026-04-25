@@ -82,6 +82,10 @@ import SpinVacuumPage from "@/pages/spin-vacuum";
 import SymbolicPillarsPage from "@/pages/symbolic-pillars";
 import MariPage from "@/pages/mari";
 import OrganoidIntelPage from "@/pages/organoid-intel";
+import PlantIntelPage from "@/pages/plant-intel";
+import FerroModesPage from "@/pages/ferro-modes";
+import VortexMathPage from "@/pages/vortex-math";
+import OctonionAetherPage from "@/pages/octonion-aether";
 
 const queryClient = new QueryClient();
 
@@ -167,6 +171,10 @@ function Router() {
         <Route path="/symbolic-pillars" component={SymbolicPillarsPage} />
         <Route path="/mari" component={MariPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
+        <Route path="/plant-intel" component={PlantIntelPage} />
+        <Route path="/ferro-modes" component={FerroModesPage} />
+        <Route path="/vortex-math" component={VortexMathPage} />
+        <Route path="/octonion-aether" component={OctonionAetherPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
