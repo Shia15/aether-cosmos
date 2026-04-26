@@ -30,6 +30,10 @@ import qMotionInk      from "@assets/2e16e31d-7bd4-4419-b975-7266e2cfd9d6_177715
 import qMotionPeach    from "@assets/c493de26-0f95-48d8-8333-37c3629de2c4_1777156341681.png";
 import qClarityNebula  from "@assets/43858f84-97d7-436c-9e7b-0b5fded25aff_1777156378840.png";
 import qClarityBoutique from "@assets/82d70821-48a7-4c03-aa2e-408e23bb6ff0_1777156402767.png";
+import qLenaChaos       from "@assets/a126c364-6cab-4711-87f2-ef9b888386a3_1777219700882.png";
+import qLaplacian       from "@assets/ChatGPT_Image_Apr_26,_2026,_12_09_11_PM_1777219760373.png";
+import qAgentsStructure from "@assets/acfdc033-3b49-4cae-ba3f-27cc0c5e0ec7_1777219786581.png";
+import qSnowClarity     from "@assets/3cf4c1ca-dcce-49ee-89e4-5303ae4959b0_1777219889196.png";
 
 const B = {
   bg:        "#F4EDE0",
@@ -938,6 +942,151 @@ export default function PostingArchitecturePage() {
                 — more to come · the boutique and the architecture, living together
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* SECTION 07 — Field Notes · Recent additions to the frequency library */}
+        <section className="pa-fadein mb-10" style={{ animationDelay: "780ms" }} data-testid="field-notes-section">
+          <div className="text-[10px] uppercase tracking-[0.3em] mb-3"
+               style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+            Section 07 · Field notes · new cards entering the library
+          </div>
+          <p className="text-[13px] leading-relaxed mb-5 max-w-3xl"
+             style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+            Four cards arrived this cycle. Two are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
+            Lena Stone signal, the snow observation) — they belong in the post queue. Two are
+            <span style={{ color: B.navy }}> AETHER architecture posters</span> (the Laplacian principle, the
+            structure-not-messages aphorism) — they belong on the manifesto wall. All four route to existing
+            Angel Hour slots.
+          </p>
+
+          <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
+            {/* Lena Stone — chaos becomes a skill */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-lena-chaos">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qLenaChaos}
+                     alt="Sun-toned Lena Stone card with cream serif text reading this is what it feels like when chaos becomes a skill — most people live in chaos and drown in it, you learned how to surf it, and once you know how to surf waves are fun not scary, you're throwing things out now because you trust yourself, and that is shift"
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.terracotta, boxShadow: `0 0 8px ${B.terracotta}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Frequency 02 · Flow · Lena Stone
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Chaos becomes a skill.
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  The boutique reading of phase transition. You stop drowning when you learn to surf —
+                  and "throwing things out because you trust yourself" is the operational signature of
+                  <span style={{ color: B.terracotta }}> shift</span>. Routes to
+                  <span style={{ color: B.gold }}> 3:33</span> (afternoon flow) or
+                  <span style={{ color: B.gold }}> 9:19</span> (evening release).
+                </p>
+              </div>
+            </article>
+
+            {/* Snow brings clarity */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-snow-clarity">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qSnowClarity}
+                     alt="Pale-grey snow-toned observation card titled does snow bring clarity, with four bullets — noise drops as sound is absorbed and edges soften, contrast increases so footprints structures motion and color stand out, the environment simplifies as complexity collapses into a clean field with fewer variables, and internal chatter syncs to the slower external pace inviting more coherent thought"
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.navy, boxShadow: `0 0 8px ${B.navy}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Frequency 01 · Consciousness · Observation
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Does snow bring clarity?
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  Four mechanisms in one teaching card: <span style={{ color: B.navy }}>noise drops</span>,
+                  <span style={{ color: B.navy }}> contrast rises</span>,
+                  <span style={{ color: B.navy }}> variables collapse</span>, and
+                  <span style={{ color: B.navy }}> internal chatter syncs to external pace</span>. The same
+                  principle the AETHER lattice runs on at colder τ — fewer attractors, sharper signal.
+                  Routes to <span style={{ color: B.gold }}>11:11</span> (morning clarity).
+                </p>
+              </div>
+            </article>
+
+            {/* Laplacian Regularization */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-laplacian">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qLaplacian}
+                     alt="Deep forest green Boho Formula card titled Emergent Intelligence Through Laplacian Regularization, explaining how multi-agent coherence emerges without explicit coordination by enforcing smoothness across a graph, enabling role specialization, task handoffs, adaptive group decision-making and stable collective intelligence — no central controller, no choreography, just alignment through structure"
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.olive, boxShadow: `0 0 8px ${B.olive}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Manifesto · AETHER architecture
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Coherence → Coordination → Emergence.
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  Laplacian regularization makes the substrate the communication layer. Not messages,
+                  not rules — the <span style={{ color: B.olive }}>geometry of the graph itself</span>.
+                  This is the principle behind AETHER: build the right substrate, and intelligence
+                  organizes itself. Routes to <span style={{ color: B.gold }}>8:18</span> (sunset architecture).
+                </p>
+              </div>
+            </article>
+
+            {/* Agents don't need messages */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-agents-structure">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qAgentsStructure}
+                     alt="Pure black AETHER card with cream serif text reading agents don't need messages they need structure — Laplacian regularization turns the substrate into the communication layer and suddenly intelligence starts to organize itself, signed AETHER with the gold palm-frond mark"
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.goldDeep, boxShadow: `0 0 8px ${B.goldDeep}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Manifesto · AETHER aphorism
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Agents don't need messages. They need structure.
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  The pithy version of the principle. The dark twin of the green card — same mechanism,
+                  two-line summary. The <span style={{ color: B.goldDeep }}>thesis statement</span> of the
+                  AETHER manifesto wall. Routes to <span style={{ color: B.gold }}>3:33</span> (afternoon
+                  structure post).
+                </p>
+              </div>
+            </article>
           </div>
         </section>
 

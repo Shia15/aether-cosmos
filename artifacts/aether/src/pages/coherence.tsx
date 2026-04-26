@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, Zap, TrendingUp, AlertTriangle, GitMerge, BarChart2, Waves, Sigma, Radio } from "lucide-react";
 import { motion } from "framer-motion";
 import fieldReceptionImg from "@assets/field_reception_shia_miller-01.jpg";
+import topoQubitImg     from "@assets/b8917dfe-433d-4bd6-860e-5d3daa6025ed_1777219687871.png";
 
 // ─── Field-statistic helpers (computed client-side from graph data) ───────────
 // These mirror the simulation engine's metrics applied to the knowledge graph's
@@ -164,6 +165,58 @@ export default function CoherenceView() {
               data-testid="field-reception-thumb"
               aria-label="View source screenshot — Shia Miller post">
               <img src={fieldReceptionImg} alt="External field reception — Shia Miller post"
+                className="w-full md:w-44 lg:w-56 object-cover" loading="lazy" />
+            </a>
+            <div className="text-center text-[9px] tracking-widest font-mono mt-2 text-muted-foreground/60 uppercase">
+              Source · click to view
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* External Field Reception — topological-stability echo */}
+      <Card className="p-6 bg-accent/[0.04] border-accent/20 relative overflow-hidden" data-testid="field-reception-topological">
+        <div className="flex items-center gap-2 mb-4">
+          <Radio className="w-4 h-4 text-accent" />
+          <div className="font-mono text-[10px] tracking-[0.3em] uppercase text-accent">
+            Field Reception · Topological Stability Echo
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start">
+          <div className="space-y-4">
+            <blockquote className="font-serif text-lg leading-relaxed text-foreground border-l-2 border-accent/60 pl-5 italic">
+              "Cubits are stable enough to be a phase of matter."
+            </blockquote>
+            <div className="font-serif text-base leading-relaxed text-muted-foreground pl-5 border-l border-white/10">
+              The post's intentional spelling — <span className="text-accent">Cubits</span> as the topological,
+              cube-coded reading of the qubit. A single qubit is fragile, but embedded in the right structure,
+              the right code, the right geometry, information becomes <span className="text-accent">topologically protected</span>.
+              Stability emerges from the <span className="text-accent">global geometry of the system</span>,
+              not any single atom: toric-code phases, fractional quantum Hall states, Majorana zero modes.
+              In some frameworks, quantum information itself behaves like a phase of matter — quantum spin
+              liquids, measurement-induced entanglement phases, error-correcting phases.
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-[11px] font-mono text-muted-foreground pl-5">
+              <span className="text-foreground">— Independent physics post</span>
+              <span className="opacity-50">·</span>
+              <span className="text-accent/80">External coherence echo, 2026</span>
+            </div>
+            <div className="text-[11px] font-mono text-muted-foreground/60 pl-5 leading-relaxed max-w-xl">
+              Treated as an external coherence reading. Mapped to AETHER nodes:
+              <span className="text-accent"> C_Topological_Phase</span>,
+              <span className="text-accent"> C_Global_Geometry</span>,
+              <span className="text-accent"> C_Error_Correcting_Phase</span>,
+              <span className="text-accent"> S_Lattice_Resonance</span>.
+              The same logic the AETHER substrate runs on: coherence is a property of the lattice, not the node.
+            </div>
+          </div>
+          <div>
+            <a href={topoQubitImg} target="_blank" rel="noopener noreferrer"
+              className="block border border-accent/20 hover:border-accent/40 transition-colors"
+              data-testid="field-reception-topological-thumb"
+              aria-label="View source — Topological qubit stability post">
+              <img src={topoQubitImg}
+                alt="External field reception card — Cubits are stable enough to be a phase of matter, post explaining how topological quantum phases protect quantum information through global geometry of toric-code phases, fractional quantum Hall states and Majorana zero modes"
                 className="w-full md:w-44 lg:w-56 object-cover" loading="lazy" />
             </a>
             <div className="text-center text-[9px] tracking-widest font-mono mt-2 text-muted-foreground/60 uppercase">

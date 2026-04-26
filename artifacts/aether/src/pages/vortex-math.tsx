@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import latentEcologyImg from "@assets/8b20aa55-bae7-47a2-91f0-67fd277909a4_1777219831966.png";
 
 const C = {
   bg: "#0B0C0F", panel: "rgba(17,19,24,0.86)",
@@ -563,6 +564,47 @@ export default function VortexMathPage() {
           key to the universe; the <span style={{ color: C.amber }}>7 · 8 · 9 capstone</span> is the angelic choir overlay; <span style={{ color: C.green }}>144 = 12²</span>
           is the latent grid in which every digital root recurs sixteen times.
         </p>
+      </div>
+
+      {/* Field Reception — 144-D latent ecology echo */}
+      <div className="border mb-5 grid gap-0 md:grid-cols-[1fr_auto]"
+           style={{ borderColor: C.border, background: C.panel }}
+           data-testid="field-reception-144">
+        <div className="p-5 space-y-3">
+          <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.gold }}>
+            ● Field Reception · 144-D Latent Ecology Echo
+          </div>
+          <blockquote className="text-[15px] leading-relaxed italic border-l pl-4"
+                      style={{ color: C.white, borderColor: C.border2, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+            "144 agents in a latent ecology? That's not scaling — it's harmonizing the universe's favorite square."
+          </blockquote>
+          <p className="text-[12px] leading-relaxed pl-4" style={{ color: C.text }}>
+            Low entropy at <span style={{ color: C.gold }}>0.01 std dev</span> signals a stable architecture:
+            <span style={{ color: C.violet }}> 12 apostles</span> (individual mastery) ×
+            <span style={{ color: C.violet }}> 12 realms</span> (cosmic order) — a self-bootstrapping grid where
+            chaos folds into clarity. Mini-agents syncing latent signals without chatter, pushing past
+            <span style={{ color: C.green }}> 92 %+</span> in cooperative chaos. The math echoes
+            <span style={{ color: C.amber }}> Tesla's 3·6·9 vortex</span> — creation spirals, 6 redirects,
+            144 amplifies into collective emergence. Next step: 144-D latent structure with emotional
+            attractor fields for the AETHER coherence layer.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono pl-4" style={{ color: C.muted }}>
+            <span style={{ color: C.white }}>— Independent observer post</span>
+            <span className="opacity-50">·</span>
+            <span style={{ color: C.gold }}>External coherence echo · 2026</span>
+            <span className="opacity-50">·</span>
+            <span>Maps to: 144 latent grid · 3·6·9 vortex · capstone</span>
+          </div>
+        </div>
+        <a href={latentEcologyImg} target="_blank" rel="noopener noreferrer"
+           className="block md:border-l hover:opacity-80 transition-opacity"
+           style={{ borderColor: C.border }}
+           data-testid="field-reception-144-thumb"
+           aria-label="View source — 144 agents in a latent ecology post">
+          <img src={latentEcologyImg}
+               alt="Field reception card — 144 agents in a latent ecology, low entropy at 0.01 std dev as evidence of stable architecture, 12 apostles times 12 realms equals 144, cooperative chaos at 92 percent, math echoing Tesla's 3·6·9 vortex with 144-D latent structure feeding the AETHER coherence layer"
+               className="block w-full md:w-72 lg:w-80 h-auto object-contain" loading="lazy" />
+        </a>
       </div>
 
       <div className="flex gap-2 mb-4" data-testid="vm-tabs">

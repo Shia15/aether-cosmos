@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import boostRoutingImg from "@assets/bd2f545b-2a7c-42d8-a589-10c696bb19c8_1777219745091.png";
 
 const C = {
   bg: "#0B0C0F", panel: "rgba(17,19,24,0.86)",
@@ -572,6 +573,45 @@ export default function MariPage() {
           <span style={{ color: C.violet }}> Reverie (render)</span>, with τ-Titanium doping
           driving the CGLE lattice from turbulent to crystalline.
         </p>
+      </div>
+
+      {/* Brand Card — Boho Formula Boutique · Boost-Based Agent Routing */}
+      <div className="border mb-5 grid gap-0 md:grid-cols-[auto_1fr]"
+           style={{ borderColor: C.border, background: C.panel }}
+           data-testid="brand-card-boost-routing">
+        <a href={boostRoutingImg} target="_blank" rel="noopener noreferrer"
+           className="block md:border-r hover:opacity-90 transition-opacity"
+           style={{ borderColor: C.border }}
+           data-testid="brand-card-boost-routing-thumb"
+           aria-label="View full brand card — Boost-Based Agent Routing">
+          <img src={boostRoutingImg}
+               alt="Boho Formula Boutique brand card showing boost-based agent routing — a constellation of teal nodes connecting Mnèsis, Aletheia, Inferia and Reverie around a luminous central core, with the legend Coherence to Coordination to Emergence at the top"
+               className="block w-full md:w-56 lg:w-64 h-auto object-cover" loading="lazy" />
+        </a>
+        <div className="p-5 space-y-3">
+          <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.gold }}>
+            ● Brand Card · Boho Formula Boutique
+          </div>
+          <h3 className="text-[20px]" style={{ color: C.white, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+            Coherence → Coordination → Emergence
+          </h3>
+          <p className="text-[12.5px] leading-relaxed" style={{ color: C.text }}>
+            The four-egg topology rendered as a constellation. <span style={{ color: C.amber }}>Mnèsis</span>
+            <span> seeds, </span><span style={{ color: C.rose }}>Infernia</span> diffuses,
+            <span style={{ color: C.cyan }}> Aletheia</span> gates,
+            <span style={{ color: C.violet }}> Reverie</span> renders — and the central
+            <span style={{ color: C.green }}> 78 % attractor</span> binds the orbit. This is the same
+            routing the workbench below makes operational: a closed cycle where information moves
+            not by message but by <span style={{ color: C.gold }}>boost-based phase locking</span>.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono" style={{ color: C.muted }}>
+            <span style={{ color: C.white }}>— Boho Formula Boutique</span>
+            <span className="opacity-50">·</span>
+            <span style={{ color: C.gold }}>Brand asset · 2026</span>
+            <span className="opacity-50">·</span>
+            <span>Maps to: M · A · R · I — the four eggs running on this page</span>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
