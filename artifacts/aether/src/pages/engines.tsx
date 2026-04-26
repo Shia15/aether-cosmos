@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import {
   FlaskConical, FlaskRound, Calculator, Sigma, Egg, Network,
   Music, KeySquare, Microscope, Binary, Sprout, Cpu, ArrowUpRight,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -167,6 +168,19 @@ const IMPLICIT_ENGINES: Engine[] = [
   },
 ];
 
+const VISIBLE_ENGINES: Engine[] = [
+  {
+    num: "12",
+    name: "Aqua Cxe · Resonant Nexus Engine",
+    route: "/aqua-cxe",
+    role: "Visible-by-design free-energy stack",
+    signature: "decahedron-tetrahedral star · 3 inputs · 3 agents · zero-waste loop",
+    body: "The end of the black box. A ten-pointed star body with a tetrahedral inner triad, fed by piezo / thermal / Schumann inputs and resolved by Mnésis · Aletheia · Infernia in a closed loop. The first engine in the stack whose state is its own display.",
+    icon: Sparkles,
+    accent: B.terracotta,
+  },
+];
+
 function EngineCard({ e }: { e: Engine }) {
   const Icon = e.icon;
   const deep = deepOf(e.accent);
@@ -290,7 +304,7 @@ export default function EnginesPage() {
         {/* HERO */}
         <header className="eng-fadein mb-10" data-testid="engines-hero">
           <div className="text-[10px] tracking-[0.4em] uppercase italic mb-3" style={{ color: B.muted }}>
-            AETHER · ROLL CALL · ELEVEN ENGINES · ONE LATTICE
+            AETHER · ROLL CALL · TWELVE ENGINES · ONE LATTICE
           </div>
           <h1
             className="eng-shimmer-text leading-[0.98] mb-5"
@@ -307,7 +321,7 @@ export default function EnginesPage() {
             className="text-[15px] leading-relaxed max-w-3xl mb-3"
             style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
           >
-            Eleven engines compose the AETHER stack. Seven are named explicitly{" "}
+            Twelve engines compose the AETHER stack. Seven are named explicitly{" "}
             <span style={{ color: B.goldDeep, fontWeight: 600 }}>Engine</span>;{" "}
             four are functionally one and earn the title here. Each card opens the engine's own page.
           </p>
@@ -319,10 +333,11 @@ export default function EnginesPage() {
             <span style={{ color: B.goldDeep, fontWeight: 600 }}>foundation</span> (Core),{" "}
             through <span style={{ color: B.terracotta, fontWeight: 600 }}>runtime</span> (Crystalline Intelligence, Math, φ-Criticality, M.A.R.I.),{" "}
             into <span style={{ color: B.navyDeep, fontWeight: 600 }}>substrate</span> (Göbekli Tepe, Symphonic OS),{" "}
-            and out to the <span style={{ color: B.roseDeep, fontWeight: 600 }}>implicit</span> engines that make the lattice closed.
+            out to the <span style={{ color: B.roseDeep, fontWeight: 600 }}>implicit</span> engines that close the lattice,{" "}
+            and across to the <span style={{ color: B.terracotta, fontWeight: 600 }}>visible</span> engine class — Aqua Cxe — whose state is its own display.
           </p>
           <p className="mt-4 italic text-[12px] uppercase tracking-[0.28em]" style={{ color: B.muted }}>
-            — seven named · four implicit · one mastered stack
+            — seven named · four implicit · one visible · one mastered stack
           </p>
         </header>
 
@@ -370,6 +385,28 @@ export default function EnginesPage() {
           </div>
         </section>
 
+        {/* SECTION 03 — VISIBLE / ENGINE-CLASS SYSTEMS */}
+        <section className="eng-fadein mb-12" style={{ animationDelay: "320ms" }} data-testid="engines-visible">
+          <div className="flex items-baseline justify-between mb-4">
+            <div
+              className="text-[10px] uppercase tracking-[0.3em]"
+              style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
+            >
+              Section 03 · Engine-Class Systems · the visible engines
+            </div>
+            <div
+              className="text-[10px]"
+              style={{ color: B.muted, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}
+            >
+              1 · visible · live
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {VISIBLE_ENGINES.map((e) => <EngineCard key={e.num} e={e} />)}
+          </div>
+        </section>
+
         {/* CODA */}
         <section className="eng-fadein" style={{ animationDelay: "360ms" }} data-testid="engines-coda">
           <article
@@ -391,14 +428,14 @@ export default function EnginesPage() {
               className="text-[18px] leading-snug max-w-3xl mx-auto"
               style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
             >
-              Foundation engine, four runtimes, two substrates, four implicit closers —{" "}
-              <span style={{ color: B.navyDeep, fontWeight: 600 }}>eleven engines</span>{" "}
+              Foundation engine, four runtimes, two substrates, four implicit closers, one visible engine —{" "}
+              <span style={{ color: B.navyDeep, fontWeight: 600 }}>twelve engines</span>{" "}
               tuned to one lattice. The mastery is not that any one of them is novel. It is that{" "}
               <span style={{ color: B.roseDeep, fontWeight: 600 }}>they all play together</span>{" "}
               without a conductor.
             </p>
             <p className="mt-3 text-[12px] italic" style={{ color: B.muted }}>
-              — eleven engines · one mastered stack · zero conductors
+              — twelve engines · one mastered stack · zero conductors
             </p>
           </article>
         </section>

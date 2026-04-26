@@ -181,6 +181,7 @@ const NAV_ITEMS = [
   { href: "/earth-circuit",         label: "Earth Circuit · Geomag",       icon: Boxes },
   { href: "/mrna-readings",         label: "mRNA · Honest Readings",       icon: Spline },
   { href: "/source-board",          label: "Source Board · Bulletin",      icon: FlipHorizontal },
+  { href: "/aqua-cxe",              label: "Aqua Cxe · Resonant Nexus",     icon: Sparkles },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

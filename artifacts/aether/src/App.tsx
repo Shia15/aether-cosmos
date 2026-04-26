@@ -98,6 +98,7 @@ import BohoFormulaPage from "@/pages/boho-formula";
 import PostingArchitecturePage from "@/pages/posting-architecture";
 import Atlas3IPage from "@/pages/atlas-3i";
 import EnginesPage from "@/pages/engines";
+import AquaCxePage from "@/pages/aqua-cxe";
 import GalileoNewtonPage from "@/pages/galileo-newton";
 import UnifiedFieldPage from "@/pages/unified-field";
 import GizaCircuitPage from "@/pages/giza-circuit";
@@ -176,6 +177,7 @@ function Router() {
         <Route path="/mrna-readings" component={MrnaReadingsPage} />
         <Route path="/earth-circuit" component={EarthCircuitPage} />
         <Route path="/source-board" component={SourceBoardPage} />
+        <Route path="/aqua-cxe" component={AquaCxePage} />
         <Route path="/shells-mind-map" component={ShellsMindMapView} />
         <Route path="/aether-whitepaper" component={AetherWhitepaperView} />
         <Route path="/six-planet-alignment" component={SixPlanetAlignmentView} />
