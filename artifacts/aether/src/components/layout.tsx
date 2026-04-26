@@ -185,6 +185,9 @@ const NAV_ITEMS = [
   { href: "/cultural-interpretations", label: "Cultural Interpretations · 3I/ATLAS", icon: Sun },
   { href: "/stack-fabric",          label: "Stackable Fabric · 64-Node",         icon: Layers },
   { href: "/bio-engine",            label: "Bio-Engine · Land + Ocean",          icon: Sprout },
+  { href: "/phi-time",              label: "φ-Time · The Unified Clock",         icon: Clock },
+  { href: "/bio-hybrid-mirror",     label: "Bio-Hybrid · Visible Thinking",      icon: CircuitBoard },
+  { href: "/mycelium-substrate",    label: "Mycelium Bricks · Living Substrate", icon: Dna },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

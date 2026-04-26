@@ -102,6 +102,9 @@ import AquaCxePage from "@/pages/aqua-cxe";
 import CulturalInterpretationsPage from "@/pages/cultural-interpretations";
 import StackFabricPage from "@/pages/stack-fabric";
 import BioEnginePage from "@/pages/bio-engine";
+import PhiTimePage from "@/pages/phi-time";
+import BioHybridMirrorPage from "@/pages/bio-hybrid-mirror";
+import MyceliumSubstratePage from "@/pages/mycelium-substrate";
 import GalileoNewtonPage from "@/pages/galileo-newton";
 import UnifiedFieldPage from "@/pages/unified-field";
 import GizaCircuitPage from "@/pages/giza-circuit";
@@ -184,6 +187,9 @@ function Router() {
         <Route path="/cultural-interpretations" component={CulturalInterpretationsPage} />
         <Route path="/stack-fabric" component={StackFabricPage} />
         <Route path="/bio-engine" component={BioEnginePage} />
+        <Route path="/phi-time" component={PhiTimePage} />
+        <Route path="/bio-hybrid-mirror" component={BioHybridMirrorPage} />
+        <Route path="/mycelium-substrate" component={MyceliumSubstratePage} />
         <Route path="/shells-mind-map" component={ShellsMindMapView} />
         <Route path="/aether-whitepaper" component={AetherWhitepaperView} />
         <Route path="/six-planet-alignment" component={SixPlanetAlignmentView} />
