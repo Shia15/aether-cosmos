@@ -229,6 +229,7 @@ export default function CoherenceEnginePage() {
             <Bridge to="/piano-arithmetic"      label="Piano Arithmetic · Hydrogen Lines" accent={B.amber} />
             <Bridge to="/phi-coherent-wave"     label="φ-Coherent Wave"                 accent={B.violet} />
             <Bridge to="/aqua-cxe"              label="Aqua Cxe · Resonant Nexus"       accent={B.rose} />
+            <Bridge to="/q-aether-stack"        label="Q~AETHER Stack · 10⁹-Atom"       accent={B.cyan} />
             <Bridge to="/aether-doctrine"       label="The Doctrine"                    accent={B.gold} />
           </div>
         </section>

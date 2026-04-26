@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgPaper from "@assets/ChatGPT_Image_Apr_26,_2026,_02_31_25_PM_1777228289506.png";
+import imgPaper from "@assets/ChatGPT_Image_Apr_26,_2026,_02_31_27_PM_1777228289506.png";
 
 const B = {
   bg:        "#070918",

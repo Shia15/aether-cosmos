@@ -1,8 +1,8 @@
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgCavity      from "@assets/ChatGPT_Image_Apr_26,_2026,_02_35_05_PM_1777228501496.png";
-import imgQAether     from "@assets/ChatGPT_Image_Apr_26,_2026,_02_35_19_PM_1777228515908.png";
-import imgBlueprint   from "@assets/ChatGPT_Image_Apr_26,_2026,_02_35_47_PM_1777228543985.png";
+import imgCavity      from "@assets/ChatGPT_Image_Apr_26,_2026,_02_34_58_PM_1777228501496.png";
+import imgQAether     from "@assets/ChatGPT_Image_Apr_26,_2026,_02_35_10_PM_1777228515908.png";
+import imgBlueprint   from "@assets/ChatGPT_Image_Apr_26,_2026,_02_35_41_PM_1777228543985.png";
 
 const B = {
   bg:        "#06070f",
