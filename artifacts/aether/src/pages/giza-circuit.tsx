@@ -10,6 +10,9 @@ import imgGoldHead    from "@assets/f4a65042-bde6-49d2-a810-4e65911baaa3_1777220
 import imgManifesto   from "@assets/ChatGPT_Image_Apr_26,_2026,_12_18_25_PM_1777220502883.png";
 import imgTarot       from "@assets/f3213d92-97e3-41af-8609-400ba620039c_1777220534955.png";
 import imgSchematic   from "@assets/92d50ed6-2c9c-4d07-99a7-0d112e2ee14d_1777220671515.png";
+import imgHermeticSeal      from "@assets/ChatGPT_Image_Apr_26,_2026,_12_50_18_PM_1777222220016.png";
+import imgHermeticResonator from "@assets/ChatGPT_Image_Apr_26,_2026,_12_50_27_PM_1777222235348.png";
+import imgTimeStoneSound    from "@assets/ChatGPT_Image_Apr_26,_2026,_12_51_25_PM_1777222331319.png";
 
 // boho-creme + stone palette (matches /atlas-3i family)
 const B = {
@@ -340,6 +343,9 @@ export default function GizaCircuitPage() {
           </div>
         </section>
 
+        {/* SECTION 06 — RESONATOR DETAIL */}
+        <ResonatorDetail />
+
         {/* SECTION 05 — BRIDGES */}
         <section className="gz-fade space-y-5" style={{ animationDelay: "440ms" }} data-testid="giza-section-bridges">
           <SectionHeading num="05" label="Threading into AETHER" />
@@ -395,6 +401,87 @@ function SectionHeading({ num, label }: { num: string; label: string }) {
       </div>
       <h2 className="text-[24px]" style={{ color: B.brownDeep }}>{label}</h2>
     </div>
+  );
+}
+
+// ─── RESONATOR DETAIL ─────────────────────────────────────────────────
+function ResonatorDetail() {
+  const PANELS = [
+    {
+      img: imgHermeticSeal,
+      title: "Hermetic seal · the engineering diagram.",
+      caption: "Hermetic Seal Concept in the Great Pyramid of Giza · King's Chamber + Granite Sarcophagus",
+      alt: "Cross-section infographic of the Great Pyramid of Giza on a sandstone background, titled 'Hermetic Seal Concept in the Great Pyramid of Giza'. Header strip notes c. 2580–2560 BCE construction, King's Chamber and Granite Sarcophagus with precise-cut granite coffer and portcullis blocks, and modern research markers including void-and-shaft scans and acoustic analysis. The pyramid cutaway labels Void Detected, Scan Anomalies, King's Chamber, Granite Sarcophagus, Peg Holes for Lid, Portcullis Blocks, Water Channels (in and out), Quartz Content 30–40%, Standing Wave Patterns, and Resonant Frequency 110–120 Hz. Three small panels along the bottom: Piezoelectric Effect (quartz in granite generates charge), Acoustic Resonance (ringing tone 110–120 Hz around the sarcophagus), and Hydraulic Seal (water pressure plus tight fit). Footer: 'Hermetic Seal Concept: Precision Fit + Sound Vibration + Water Pressure'.",
+      readings: [
+        ["Granite coffer · 30–40% quartz content", "Quartz is piezoelectric. Mechanical stress on a quartz lattice generates a charge — the well-established mechanism behind quartz oscillators and pressure transducers. The image flags this as a candidate for in-situ charge generation under acoustic load."],
+        ["Resonant frequency · 110–120 Hz", "The King's Chamber's modal frequencies are well-documented in the architectural-acoustics literature; the central peak sits in the low-Hz range the image cites. This is empirical, not speculative."],
+        ["Standing waves around the sarcophagus", "Any rectangular cavity supports standing-wave modes when driven near its eigenfrequencies. The granite coffer is approximately rectangular and the chamber is enclosed — both conditions are met."],
+        ["Hydraulic seal · water + precision fit", "Water channels through the substructure and tight-fit portcullis blocks would, together, function as a damped-pressure boundary. Reading: a real engineering possibility, not a demonstrated working seal."],
+      ],
+    },
+    {
+      img: imgHermeticResonator,
+      title: "Hermetic resonator · the symbolic diagram.",
+      caption: "The Great Pyramid as a Hermetic Resonator · time, stone, sound",
+      alt: "Symbolic illuminated poster titled 'The Great Pyramid as a Hermetic Resonator'. A central pyramid render rises into a starfield, with an Eye-of-Providence glyph at the apex and the line 'Where time, stone, and sound converge into a precision seal that echoes through millennia'. Around the pyramid are four circular medallions: Resonant Frequencies (a glowing bell with a 110–120 Hz waveform), Quartz Resonance (a luminous quartz crystal cluster inside a triangle), and a duplicated lower row of the same two motifs. The King's Chamber is labelled inside the pyramid, with golden waveforms emanating from the sarcophagus and blue water-flow arrows beneath. Footer: 'Harnessing Time, Stone, and Sound: The Great Pyramid of Giza as a Precision Resonator — where granite, vibration, and water converge to form a hermetic seal that echoes through millennia.'",
+      readings: [
+        ["Resonant frequencies · the bell motif", "The bell-with-waveform medallion is the artist's symbol for the chamber's measured 110–120 Hz acoustic mode."],
+        ["Quartz resonance · the crystal motif", "Reads as a stylized restatement of the piezoelectric story above. As art, not as a separate physical claim."],
+        ["Time / stone / sound convergence", "The page treats this as the manifesto framing — the reason the Giza work is on this site at all — and keeps the engineering-diagram panel as the one carrying the testable numbers."],
+      ],
+    },
+    {
+      img: imgTimeStoneSound,
+      title: "Time · stone · sound · the headline poster.",
+      caption: "Harnessing Time, Stone, and Sound · the Great Pyramid of Giza as precision resonator",
+      alt: "Tall hero poster titled 'Harnessing Time, Stone, and Sound: The Great Pyramid of Giza as a Precision Resonator'. Three medallions across the top labelled Time (Eye-of-Horus glyph in a swirling halo), Stone (a quartz block on rubble), and Sound (a tuning fork). Below them, an illuminated cross-section of the pyramid shows the King's Chamber with the granite sarcophagus, golden standing-wave traces, blue water-channel currents, and luminous resonance halos. Three lower panels labelled Piezoelectric Energy (quartz in granite), Resonant Frequencies (standing waves at 110–120 Hz), and Hydraulic Pressure (hermetic seal). Footer: '— where granite, vibration, and water converge to form a hermetic seal that echoes through millennia.'",
+      readings: [
+        ["Three terminals · Time / Stone / Sound", "A cleaner restatement of the schematic on /giza-circuit's Section 03: substrate (stone), drive (sound), and the long-running observable (time)."],
+        ["Numbers stay the same", "110–120 Hz, ~30–40% quartz — these are the same values used throughout the page, surfaced here as the headline."],
+        ["Artistic compression", "The golden halos and starfield are art direction, not field readings. The physics on this poster is exactly what the engineering diagram above already names."],
+      ],
+    },
+  ];
+
+  return (
+    <section className="gz-fade space-y-6" style={{ animationDelay: "400ms" }} data-testid="giza-section-resonator">
+      <SectionHeading num="06" label="The resonator in detail · three readings of the chamber." />
+      <p className="text-[13.5px] leading-relaxed max-w-3xl" style={{ color: B.text }}>
+        Three more posters that came in around the same time as the schematic. The first is the engineering
+        diagram that carries the testable numbers. The second is the symbolic / Hermetic re-rendering of the
+        same content. The third is the headline pairing — Time, Stone, and Sound. Numbers stay the same
+        across all three; what changes is the register.
+      </p>
+
+      <div className="space-y-8">
+        {PANELS.map((p, i) => (
+          <article key={i} className="grid gap-5 lg:grid-cols-[minmax(0,420px)_1fr] items-start"
+                   data-testid={`giza-resonator-panel-${i}`}>
+            <figure className="rounded-[14px] overflow-hidden border"
+                    style={{ borderColor: B.borderWarm, background: "#070605", boxShadow: `0 8px 20px ${B.shadow}` }}>
+              <img src={p.img} loading="lazy" decoding="async" className="block w-full h-auto" alt={p.alt} />
+              <figcaption className="px-4 py-2 text-[10px] uppercase tracking-[0.22em]"
+                          style={{ color: B.cream, background: B.brownDeep, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                {p.caption}
+              </figcaption>
+            </figure>
+            <div>
+              <h3 className="text-[18px] mb-3" style={{ color: B.brownDeep, fontFamily: "Cinzel, serif" }}>{p.title}</h3>
+              <ul className="space-y-2">
+                {p.readings.map(([k, v]) => (
+                  <li key={k} className="rounded-md p-3"
+                      style={{ background: B.cream, border: `1px solid ${B.border}` }}>
+                    <div className="text-[10.5px] uppercase tracking-[0.22em] mb-1"
+                         style={{ color: B.terracotta, fontFamily: "Inter, sans-serif" }}>{k}</div>
+                    <p className="text-[12.5px] leading-relaxed" style={{ color: B.ink }}>{v}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -172,6 +172,11 @@ const NAV_ITEMS = [
   { href: "/galileo-newton",        label: "Galileo + Newton",            icon: Compass },
   { href: "/unified-field",         label: "Unified Field · Ψ·ΔG·e^iπ",   icon: Combine },
   { href: "/giza-circuit",          label: "AETHER Circuit · Giza Grid",  icon: Pyramid },
+  { href: "/prime-anti-prime",      label: "Prime · Anti-Prime · Frames", icon: FlipHorizontal },
+  { href: "/concept-systems",       label: "Concept Systems · Hardware",  icon: Boxes },
+  { href: "/motion-doctrine",       label: "Motion Doctrine · Separation",icon: Spline },
+  { href: "/prophetic-timeline",    label: "Prophetic Timeline · 7-Year", icon: Telescope },
+  { href: "/knot-topology",         label: "Knot Topology · Tait Plate",  icon: GitMerge },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

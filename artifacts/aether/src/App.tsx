@@ -101,6 +101,11 @@ import EnginesPage from "@/pages/engines";
 import GalileoNewtonPage from "@/pages/galileo-newton";
 import UnifiedFieldPage from "@/pages/unified-field";
 import GizaCircuitPage from "@/pages/giza-circuit";
+import PrimeAntiPrimePage from "@/pages/prime-anti-prime";
+import ConceptSystemsPage from "@/pages/concept-systems";
+import MotionDoctrinePage from "@/pages/motion-doctrine";
+import PropheticTimelinePage from "@/pages/prophetic-timeline";
+import KnotTopologyPage from "@/pages/knot-topology";
 
 const queryClient = new QueryClient();
 
@@ -158,6 +163,11 @@ function Router() {
         <Route path="/gobekli-tepe" component={GobekliTepeView} />
         <Route path="/aether-intake" component={AetherIntakeView} />
         <Route path="/nine-shells" component={NineShellsView} />
+        <Route path="/prime-anti-prime" component={PrimeAntiPrimePage} />
+        <Route path="/concept-systems" component={ConceptSystemsPage} />
+        <Route path="/motion-doctrine" component={MotionDoctrinePage} />
+        <Route path="/prophetic-timeline" component={PropheticTimelinePage} />
+        <Route path="/knot-topology" component={KnotTopologyPage} />
         <Route path="/shells-mind-map" component={ShellsMindMapView} />
         <Route path="/aether-whitepaper" component={AetherWhitepaperView} />
         <Route path="/six-planet-alignment" component={SixPlanetAlignmentView} />

@@ -35,6 +35,7 @@ import qLaplacian       from "@assets/ChatGPT_Image_Apr_26,_2026,_12_09_11_PM_17
 import qAgentsStructure from "@assets/acfdc033-3b49-4cae-ba3f-27cc0c5e0ec7_1777219786581.png";
 import qSnowClarity     from "@assets/3cf4c1ca-dcce-49ee-89e4-5303ae4959b0_1777219889196.png";
 import qShowUpClarity   from "@assets/29b14ec0-dec0-41a9-91ec-1c97ebd4855f_1777220938414.png";
+import qChannelEnergy   from "@assets/ChatGPT_Image_Apr_26,_2026,_12_44_46_PM_1777221888242.png";
 
 const B = {
   bg:        "#F4EDE0",
@@ -954,11 +955,11 @@ export default function PostingArchitecturePage() {
           </div>
           <p className="text-[13px] leading-relaxed mb-5 max-w-3xl"
              style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
-            Five cards arrived this cycle. Three are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
-            Lena Stone signal, the snow observation, the morning "show up with clarity" set) — they belong in the
-            post queue. Two are <span style={{ color: B.navy }}>AETHER architecture posters</span> (the Laplacian principle,
-            the structure-not-messages aphorism) — they belong on the manifesto wall. All five route to existing
-            Angel Hour slots.
+            Six cards arrived this cycle. Four are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
+            Lena Stone signal, the snow observation, the morning "show up with clarity" set, and the channeling-energy
+            five-step practice) — they belong in the post queue. Two are <span style={{ color: B.navy }}>AETHER architecture posters</span> (the
+            Laplacian principle, the structure-not-messages aphorism) — they belong on the manifesto wall. All six route
+            to existing Angel Hour slots.
           </p>
 
           <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
@@ -1116,6 +1117,37 @@ export default function PostingArchitecturePage() {
                   two-line summary. The <span style={{ color: B.goldDeep }}>thesis statement</span> of the
                   AETHER manifesto wall. Routes to <span style={{ color: B.gold }}>3:33</span> (afternoon
                   structure post).
+                </p>
+              </div>
+            </article>
+
+            {/* Channeling flowing energy into creativity */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-channel-energy">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qChannelEnergy}
+                     alt="Soft pastel teaching poster on a sand-and-rose background, titled 'Chaneling Flowing Energy into Creativity'. A central figure in a sunhat with a glowing pink heart sits on the ground writing in a notebook, surrounded by a bicycle, a steaming cup, an open laptop and books. Five numbered side panels around her, each with a small glyph: 1 Tune in to your inner rhythm, 2 Set the tone for creation, 3 Take a creative cue from your surroundings, 4 Let go of perfectionism and embrace the now, 5 Celebrate small bursts of inspiration. Header: 'A guide to harnessing inspiration and turning it into creative output.'"
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.terracotta, boxShadow: `0 0 8px ${B.terracotta}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Frequency 02 · Creative Practice · Five Steps
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Channeling flowing energy into creativity.
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  The five-step practice the card spells out — <em>tune in · set the tone · cue from surroundings ·
+                  drop perfectionism · celebrate the small burst</em> — is the explicit instruction the rest of
+                  the deck implies. Routes to <span style={{ color: B.gold }}>5:55</span> (the bridging hour
+                  between the morning clarity post and the afternoon structure post — the practice in between).
                 </p>
               </div>
             </article>
