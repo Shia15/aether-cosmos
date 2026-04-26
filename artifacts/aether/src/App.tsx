@@ -99,6 +99,7 @@ import PostingArchitecturePage from "@/pages/posting-architecture";
 import Atlas3IPage from "@/pages/atlas-3i";
 import EnginesPage from "@/pages/engines";
 import GalileoNewtonPage from "@/pages/galileo-newton";
+import UnifiedFieldPage from "@/pages/unified-field";
 
 const queryClient = new QueryClient();
 
@@ -201,6 +202,7 @@ function Router() {
         <Route path="/atlas-3i" component={Atlas3IPage} />
         <Route path="/engines" component={EnginesPage} />
         <Route path="/galileo-newton" component={GalileoNewtonPage} />
+        <Route path="/unified-field" component={UnifiedFieldPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
