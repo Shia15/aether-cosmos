@@ -62,6 +62,7 @@ AETHER integrates a broad range of specialized features:
 - **mRNA · Honest Readings:** Compares and contrasts circulating information on mRNA.
 - **Earth Circuit · Geomagnetism · Global Electric Loop:** Treats Earth as a coupled energetic system.
 - **Aqua Cxe · Resonant Nexus Engine:** A "visible-by-design" engine, twelfth in the stack.
+- **Cultural Interpretations · Symbolic Solar Spectrum (`/cultural-interpretations`):** Reads culture as an observer-sensitivity function f(o) over the absolute solar signal S₀ ≈ −26.74. Anchored on 3I/ATLAS as the timestamp from outside the solar system. Five cultural lenses (South Asia · East Asia · Mesopotamia · Europe · The Americas), the Saturn-Neptune ~36-year cycle landing on 0° Aries 2025–2026, heliospheric coupling, Göbekli Tepe precedent, and an explicit honest line separating settled physics from observed pattern from symbolic anchor.
 - **Source Board · Curated Posters · Honest Readings:** Bulletin for new posters and their analysis.
 - **Knot Topology · Tait Plate IX:** Reading of Peter Guthrie Tait's knot atlas.
 - **Unified Field:** Cinematic landing page framing physics, chemistry, and mathematics as one conceptual space.
