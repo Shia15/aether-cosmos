@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import imgFoundationalLayer from "@assets/b0238d9b-2d7f-4378-818d-76a8e6f8623c_1777221801707.png";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Section = "exercise" | "diet" | "sleep" | "ex-diet" | "ex-sleep" | "diet-sleep" | "center" | null;
@@ -413,7 +414,7 @@ export default function NeuroplasticityView() {
   const [selected, setSelected] = useState<Section>(null);
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif", overflow: "hidden" }}>
+    <div style={{ minHeight: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif" }}>
 
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(192,132,252,0.1)", padding: "12px 28px 10px", flexShrink: 0 }}>
@@ -429,7 +430,7 @@ export default function NeuroplasticityView() {
       </div>
 
       {/* Body */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+      <div style={{ height: "min(720px, 82vh)", flexShrink: 0, display: "flex", overflow: "hidden" }}>
 
         {/* Venn panel */}
         <div style={{ width: 500, borderRight: "1px solid rgba(192,132,252,0.07)", display: "flex", flexDirection: "column", padding: "16px 12px 16px 20px", flexShrink: 0 }}>
@@ -462,6 +463,115 @@ export default function NeuroplasticityView() {
           <ContentPanel section={selected} />
         </div>
       </div>
+
+      {/* ── FOUNDATIONAL LAYER ────────────────────────────────────────── */}
+      <FoundationalLayer />
     </div>
+  );
+}
+
+// ── Foundational Layer (triptych: Coherence / Mind-Body-Emotion / AETHER Axiom) ──
+function FoundationalLayer() {
+  const PANELS = [
+    {
+      kicker: "Panel 01 · Coherence Layer",
+      title: "Early system structure.",
+      body: "Before any acceleration, a substrate. Physical structure, mind/body distinction, distant connection — the three primitives that have to be in place for plasticity to land somewhere. Read alongside the Venn above, this is why the diagram has a centre at all: orientation before acceleration.",
+      accent: "#FACC15",
+    },
+    {
+      kicker: "Panel 02 · Mind–Body–Emotion",
+      title: "Synchronization, with limits.",
+      body: "The same three-circle topology as the Venn diagram, lifted to the human scale: Mind · Body · Emotion meeting at coherence. Reach is the upper bound the system can sustain when the three sync; limits is what marks the floor when they don't. The neuroplasticity Venn (Diet · Exercise · Sleep) is the physiological reading of this same shape.",
+      accent: "#F97316",
+    },
+    {
+      kicker: "Panel 03 · AETHER Foundational Axiom",
+      title: "Cognition acceleration sits inside the triangle.",
+      body: "Coherence in the centre, two failure modes on the outside — disintegrates on one edge, stagnation on the other. The axiom is simple: cognition only accelerates inside the bounded region where the three primitives stay synchronized. Step outside, and you get either flight (disintegration) or freeze (stagnation). The neuroplasticity protocol is one route into that region.",
+      accent: "#22D3EE",
+    },
+  ];
+  return (
+    <section style={{ borderTop: "1px solid rgba(192,132,252,0.12)", padding: "28px 28px 36px" }}
+             data-testid="foundational-layer">
+      <div style={{ fontFamily: "Cinzel, serif", fontSize: 10, color: "#c084fc", letterSpacing: "0.25em", marginBottom: 4 }}>
+        Foundational Layer · Coherence before plasticity
+      </div>
+      <h2 style={{ fontFamily: "Cinzel, serif", fontSize: 18, color: "#e0d8ff", margin: "0 0 6px", letterSpacing: "0.06em" }}>
+        Why the Venn has a centre.
+      </h2>
+      <p style={{ fontSize: 12.5, color: "rgba(200,195,240,0.6)", margin: "0 0 18px", maxWidth: 880, lineHeight: 1.6 }}>
+        The interactive diagram above isolates Diet · Exercise · Sleep, but the Venn-with-a-centre is a shape AETHER
+        uses at three different scales. Below: the same topology read at the system, the human, and the axiomatic level.
+      </p>
+
+      <figure style={{ margin: "0 0 22px", borderRadius: 12, overflow: "hidden",
+                      border: "1px solid rgba(192,132,252,0.18)",
+                      boxShadow: "0 12px 28px rgba(0,0,0,0.45)" }}>
+        <img src={imgFoundationalLayer} loading="lazy" decoding="async"
+             style={{ display: "block", width: "100%", height: "auto" }}
+             alt="AETHER triptych: Coherence Layer, Mind–Body–Emotion Synchronization, and the Foundational Axiom on Cognition Acceleration."
+             aria-describedby="foundational-layer-longdesc" />
+        <figcaption style={{ background: "rgba(3,5,20,0.85)", padding: "8px 14px", fontSize: 10,
+                             letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(200,195,240,0.55)",
+                             fontFamily: "Cinzel, serif" }}>
+          AETHER · coherence layer · mind–body–emotion · foundational axiom
+        </figcaption>
+      </figure>
+      {/* Visually-hidden long description for screen readers */}
+      <p id="foundational-layer-longdesc"
+         style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1,
+                  overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", border: 0 }}>
+        Deep-navy three-panel infographic. Left panel — Coherence Layer · Early System Structure: a constellation
+        map of the United States with golden node lights linking cities, a young boy writing at a desk inset
+        above, and three icons below labelled physical structure, mind/body distinction, and distant connection,
+        with the caption Orientation before Acceleration. Centre panel — Mind–Body–Emotion Synchronization: a
+        Venn of three luminous circles labelled Mind (brain), Body (child silhouette on a mountain), and Emotion
+        (hands holding a glowing heart), intersecting at a region marked Coherence, with Reach at the top and
+        Limits at the bottom. Right panel — AETHER Foundational Axiom: a triangle containing a glowing sphere
+        over the words Cognition Acceleration, two intertwined ring icons at centre, and two human silhouettes
+        outside the triangle labelled Disintegrates on the left and Stagnation on the right.
+      </p>
+
+      <div style={{ display: "grid", gap: 14,
+                    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+        {PANELS.map(p => (
+          <article key={p.title}
+                   style={{ background: "rgba(255,255,255,0.025)",
+                            border: `1px solid ${p.accent}33`,
+                            borderRadius: 10, padding: "14px 16px" }}
+                   data-testid={`panel-${p.kicker.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`}>
+            <div style={{ fontFamily: "Cinzel, serif", fontSize: 9, letterSpacing: "0.22em",
+                          textTransform: "uppercase", color: p.accent, marginBottom: 6 }}>
+              {p.kicker}
+            </div>
+            <h3 style={{ fontFamily: "Cinzel, serif", fontSize: 14.5, color: "#e0d8ff",
+                         margin: "0 0 8px", letterSpacing: "0.04em" }}>
+              {p.title}
+            </h3>
+            <p style={{ fontSize: 12, color: "rgba(200,195,240,0.7)", margin: 0, lineHeight: 1.55 }}>
+              {p.body}
+            </p>
+          </article>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 22, padding: "14px 16px", borderRadius: 10,
+                    border: "1px solid rgba(192,132,252,0.22)",
+                    background: "linear-gradient(135deg, rgba(192,132,252,0.06), rgba(34,211,238,0.04))" }}
+           data-testid="foundational-bridge">
+        <div style={{ fontFamily: "Cinzel, serif", fontSize: 9, letterSpacing: "0.22em",
+                      textTransform: "uppercase", color: "rgba(192,132,252,0.7)", marginBottom: 6 }}>
+          Bridge to the Venn
+        </div>
+        <p style={{ fontSize: 12.5, color: "rgba(200,195,240,0.78)", margin: 0, lineHeight: 1.6 }}>
+          Read as a model: Coherence Layer is the substrate, Mind–Body–Emotion is the human scale, and the
+          AETHER axiom names the bounded region where, in this framing, cognition is said to accelerate. The
+          Diet · Exercise · Sleep diagram above is one of AETHER's lifestyle protocols for staying inside that
+          modeled region — the place where the literature suggests neuroplasticity has the best chance of taking.
+        </p>
+      </div>
+    </section>
   );
 }
