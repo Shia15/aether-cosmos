@@ -69,6 +69,7 @@ import {
   Egg,
   LayoutGrid,
   Clock,
+  Compass,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -166,6 +167,7 @@ const NAV_ITEMS = [
   { href: "/posting-architecture",  label: "Posting Architecture · Angel Hours", icon: Clock },
   { href: "/atlas-3i",              label: "3I/ATLAS · Panspermia",       icon: Orbit },
   { href: "/engines",               label: "Mastered Engines",            icon: Cpu },
+  { href: "/galileo-newton",        label: "Galileo + Newton",            icon: Compass },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

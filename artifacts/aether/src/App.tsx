@@ -98,6 +98,7 @@ import BohoFormulaPage from "@/pages/boho-formula";
 import PostingArchitecturePage from "@/pages/posting-architecture";
 import Atlas3IPage from "@/pages/atlas-3i";
 import EnginesPage from "@/pages/engines";
+import GalileoNewtonPage from "@/pages/galileo-newton";
 
 const queryClient = new QueryClient();
 
@@ -199,6 +200,7 @@ function Router() {
         <Route path="/posting-architecture" component={PostingArchitecturePage} />
         <Route path="/atlas-3i" component={Atlas3IPage} />
         <Route path="/engines" component={EnginesPage} />
+        <Route path="/galileo-newton" component={GalileoNewtonPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
