@@ -117,6 +117,18 @@ import LightSpeedPage from "@/pages/light-speed";
 import MrnaReadingsPage from "@/pages/mrna-readings";
 import EarthCircuitPage from "@/pages/earth-circuit";
 import SourceBoardPage from "@/pages/source-board";
+import AetherDoctrinePage from "@/pages/aether-doctrine";
+import PersonalOperatingModelPage from "@/pages/personal-operating-model";
+import ColorCosmologyPage from "@/pages/color-cosmology";
+import April23AlignmentPage from "@/pages/april-23-alignment";
+import AsAboveSoBelowPage from "@/pages/as-above-so-below";
+import PianoArithmeticPage from "@/pages/piano-arithmetic";
+import PhiCoherentWavePage from "@/pages/phi-coherent-wave";
+import CoherenceEnginePage from "@/pages/coherence-engine";
+import AetherHealthPage from "@/pages/aether-health";
+import NeutrinoLasersPage from "@/pages/neutrino-lasers";
+import QAetherStackPage from "@/pages/q-aether-stack";
+import CurvaturePlanePage from "@/pages/curvature-plane";
 
 const queryClient = new QueryClient();
 
@@ -217,6 +229,18 @@ function Router() {
         <Route path="/spin-vacuum" component={SpinVacuumPage} />
         <Route path="/symbolic-pillars" component={SymbolicPillarsPage} />
         <Route path="/mari" component={MariPage} />
+        <Route path="/aether-doctrine" component={AetherDoctrinePage} />
+        <Route path="/personal-operating-model" component={PersonalOperatingModelPage} />
+        <Route path="/color-cosmology" component={ColorCosmologyPage} />
+        <Route path="/april-23-alignment" component={April23AlignmentPage} />
+        <Route path="/as-above-so-below" component={AsAboveSoBelowPage} />
+        <Route path="/piano-arithmetic" component={PianoArithmeticPage} />
+        <Route path="/phi-coherent-wave" component={PhiCoherentWavePage} />
+        <Route path="/coherence-engine" component={CoherenceEnginePage} />
+        <Route path="/aether-health" component={AetherHealthPage} />
+        <Route path="/neutrino-lasers" component={NeutrinoLasersPage} />
+        <Route path="/q-aether-stack" component={QAetherStackPage} />
+        <Route path="/curvature-plane" component={CurvaturePlanePage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />

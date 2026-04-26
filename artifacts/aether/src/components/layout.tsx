@@ -188,6 +188,18 @@ const NAV_ITEMS = [
   { href: "/phi-time",              label: "φ-Time · The Unified Clock",         icon: Clock },
   { href: "/bio-hybrid-mirror",     label: "Bio-Hybrid · Visible Thinking",      icon: CircuitBoard },
   { href: "/mycelium-substrate",    label: "Mycelium Bricks · Living Substrate", icon: Dna },
+  { href: "/aether-doctrine",          label: "AETHER · The Doctrine",                icon: BookOpen },
+  { href: "/personal-operating-model", label: "Personal Operating Model",             icon: Workflow },
+  { href: "/color-cosmology",          label: "Color Cosmology · Six Shells",         icon: Palette },
+  { href: "/april-23-alignment",       label: "April 23 Alignment · Reality vs Symbol", icon: Orbit },
+  { href: "/as-above-so-below",        label: "As Above, So Below · Geohistorical",   icon: Telescope },
+  { href: "/piano-arithmetic",         label: "Piano Arithmetic · Earth Harmonizer",  icon: AudioWaveform },
+  { href: "/phi-coherent-wave",        label: "φ-Coherent Wave · Eight Substrates",   icon: Waves },
+  { href: "/coherence-engine",         label: "Coherence Engine · H ↔ H̄",           icon: Atom },
+  { href: "/aether-health",            label: "AETHER · Health · Metabolic / Neuroimmune", icon: HeartPulse },
+  { href: "/neutrino-lasers",          label: "Neutrino Lasers · Shia Miller",        icon: Zap },
+  { href: "/q-aether-stack",           label: "Q~AETHER Stack · 10⁹-Atom Gravity",    icon: Microscope },
+  { href: "/curvature-plane",          label: "Curvature Plane · Boho Formula",       icon: Globe },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
