@@ -72,6 +72,7 @@ import {
   Compass,
   Combine,
   Pyramid,
+  Sunrise,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -201,6 +202,7 @@ const NAV_ITEMS = [
   { href: "/q-aether-stack",           label: "Q~AETHER Stack · 10⁹-Atom Gravity",    icon: Microscope },
   { href: "/curvature-plane",          label: "Curvature Plane · Boho Formula",       icon: Globe },
   { href: "/seasonal-coherence",       label: "Seasonal Engine · Φ(t) · 4 Clocks",    icon: Compass },
+  { href: "/terraform-sunrise",        label: "Terraform Sunrise · Game · 4 Eggs",    icon: Sunrise },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

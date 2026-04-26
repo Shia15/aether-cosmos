@@ -130,6 +130,7 @@ import NeutrinoLasersPage from "@/pages/neutrino-lasers";
 import QAetherStackPage from "@/pages/q-aether-stack";
 import CurvaturePlanePage from "@/pages/curvature-plane";
 import SeasonalCoherencePage from "@/pages/seasonal-coherence";
+import TerraformSunrisePage from "@/pages/terraform-sunrise";
 
 const queryClient = new QueryClient();
 
@@ -243,6 +244,7 @@ function Router() {
         <Route path="/q-aether-stack" component={QAetherStackPage} />
         <Route path="/curvature-plane" component={CurvaturePlanePage} />
         <Route path="/seasonal-coherence" component={SeasonalCoherencePage} />
+        <Route path="/terraform-sunrise" component={TerraformSunrisePage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
