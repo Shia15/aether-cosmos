@@ -164,6 +164,7 @@ const NAV_ITEMS = [
   { href: "/resonance",             label: "Resonance · The Voice",      icon: Radio },
   { href: "/boho-formula",          label: "Boho Formula · Alchemy",     icon: Leaf },
   { href: "/posting-architecture",  label: "Posting Architecture · Angel Hours", icon: Clock },
+  { href: "/atlas-3i",              label: "3I/ATLAS · Panspermia",       icon: Orbit },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
