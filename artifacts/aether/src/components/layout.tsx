@@ -200,6 +200,7 @@ const NAV_ITEMS = [
   { href: "/neutrino-lasers",          label: "Neutrino Lasers · Shia Miller",        icon: Zap },
   { href: "/q-aether-stack",           label: "Q~AETHER Stack · 10⁹-Atom Gravity",    icon: Microscope },
   { href: "/curvature-plane",          label: "Curvature Plane · Boho Formula",       icon: Globe },
+  { href: "/seasonal-coherence",       label: "Seasonal Engine · Φ(t) · 4 Clocks",    icon: Compass },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
