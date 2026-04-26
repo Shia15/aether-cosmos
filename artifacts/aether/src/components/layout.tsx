@@ -183,6 +183,8 @@ const NAV_ITEMS = [
   { href: "/source-board",          label: "Source Board · Bulletin",      icon: FlipHorizontal },
   { href: "/aqua-cxe",              label: "Aqua Cxe · Resonant Nexus",     icon: Sparkles },
   { href: "/cultural-interpretations", label: "Cultural Interpretations · 3I/ATLAS", icon: Sun },
+  { href: "/stack-fabric",          label: "Stackable Fabric · 64-Node",         icon: Layers },
+  { href: "/bio-engine",            label: "Bio-Engine · Land + Ocean",          icon: Sprout },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

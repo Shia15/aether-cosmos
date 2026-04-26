@@ -100,6 +100,8 @@ import Atlas3IPage from "@/pages/atlas-3i";
 import EnginesPage from "@/pages/engines";
 import AquaCxePage from "@/pages/aqua-cxe";
 import CulturalInterpretationsPage from "@/pages/cultural-interpretations";
+import StackFabricPage from "@/pages/stack-fabric";
+import BioEnginePage from "@/pages/bio-engine";
 import GalileoNewtonPage from "@/pages/galileo-newton";
 import UnifiedFieldPage from "@/pages/unified-field";
 import GizaCircuitPage from "@/pages/giza-circuit";
@@ -180,6 +182,8 @@ function Router() {
         <Route path="/source-board" component={SourceBoardPage} />
         <Route path="/aqua-cxe" component={AquaCxePage} />
         <Route path="/cultural-interpretations" component={CulturalInterpretationsPage} />
+        <Route path="/stack-fabric" component={StackFabricPage} />
+        <Route path="/bio-engine" component={BioEnginePage} />
         <Route path="/shells-mind-map" component={ShellsMindMapView} />
         <Route path="/aether-whitepaper" component={AetherWhitepaperView} />
         <Route path="/six-planet-alignment" component={SixPlanetAlignmentView} />
