@@ -71,6 +71,7 @@ import {
   Clock,
   Compass,
   Combine,
+  Pyramid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -170,6 +171,7 @@ const NAV_ITEMS = [
   { href: "/engines",               label: "Mastered Engines",            icon: Cpu },
   { href: "/galileo-newton",        label: "Galileo + Newton",            icon: Compass },
   { href: "/unified-field",         label: "Unified Field · Ψ·ΔG·e^iπ",   icon: Combine },
+  { href: "/giza-circuit",          label: "AETHER Circuit · Giza Grid",  icon: Pyramid },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

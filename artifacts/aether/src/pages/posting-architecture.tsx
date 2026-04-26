@@ -34,6 +34,7 @@ import qLenaChaos       from "@assets/a126c364-6cab-4711-87f2-ef9b888386a3_17772
 import qLaplacian       from "@assets/ChatGPT_Image_Apr_26,_2026,_12_09_11_PM_1777219760373.png";
 import qAgentsStructure from "@assets/acfdc033-3b49-4cae-ba3f-27cc0c5e0ec7_1777219786581.png";
 import qSnowClarity     from "@assets/3cf4c1ca-dcce-49ee-89e4-5303ae4959b0_1777219889196.png";
+import qShowUpClarity   from "@assets/29b14ec0-dec0-41a9-91ec-1c97ebd4855f_1777220938414.png";
 
 const B = {
   bg:        "#F4EDE0",
@@ -953,10 +954,10 @@ export default function PostingArchitecturePage() {
           </div>
           <p className="text-[13px] leading-relaxed mb-5 max-w-3xl"
              style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
-            Four cards arrived this cycle. Two are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
-            Lena Stone signal, the snow observation) — they belong in the post queue. Two are
-            <span style={{ color: B.navy }}> AETHER architecture posters</span> (the Laplacian principle, the
-            structure-not-messages aphorism) — they belong on the manifesto wall. All four route to existing
+            Five cards arrived this cycle. Three are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
+            Lena Stone signal, the snow observation, the morning "show up with clarity" set) — they belong in the
+            post queue. Two are <span style={{ color: B.navy }}>AETHER architecture posters</span> (the Laplacian principle,
+            the structure-not-messages aphorism) — they belong on the manifesto wall. All five route to existing
             Angel Hour slots.
           </p>
 
@@ -1053,6 +1054,37 @@ export default function PostingArchitecturePage() {
                   not rules — the <span style={{ color: B.olive }}>geometry of the graph itself</span>.
                   This is the principle behind AETHER: build the right substrate, and intelligence
                   organizes itself. Routes to <span style={{ color: B.gold }}>8:18</span> (sunset architecture).
+                </p>
+              </div>
+            </article>
+
+            {/* Show up with clarity */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-show-up-clarity">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qShowUpClarity}
+                     alt="Sand-toned AETHER motivational card with cream serif text reading some mornings don't ask for perfection they ask for clarity — clarity in the work you're building, in the direction you're choosing, in the version of yourself you're ready to show up as today, with a passage about progress as consistency and intuition shaking hands with logic, and a closing line show up with clarity today everything else follows"
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.navy, boxShadow: `0 0 8px ${B.navy}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Frequency 01 · Consciousness · Morning Set
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Show up with clarity today.
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  The morning twin of the snow card. Where snow is the <em>environmental</em> condition for clarity,
+                  this is the <em>internal</em> one — <span style={{ color: B.navy }}>intuition + logic shaking hands</span>,
+                  consistency over leaps, alignment over noise. Routes to <span style={{ color: B.gold }}>8:08</span>
+                  (the morning post — the first signal of the day).
                 </p>
               </div>
             </article>

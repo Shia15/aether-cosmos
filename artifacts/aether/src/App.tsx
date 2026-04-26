@@ -100,6 +100,7 @@ import Atlas3IPage from "@/pages/atlas-3i";
 import EnginesPage from "@/pages/engines";
 import GalileoNewtonPage from "@/pages/galileo-newton";
 import UnifiedFieldPage from "@/pages/unified-field";
+import GizaCircuitPage from "@/pages/giza-circuit";
 
 const queryClient = new QueryClient();
 
@@ -203,6 +204,7 @@ function Router() {
         <Route path="/engines" component={EnginesPage} />
         <Route path="/galileo-newton" component={GalileoNewtonPage} />
         <Route path="/unified-field" component={UnifiedFieldPage} />
+        <Route path="/giza-circuit" component={GizaCircuitPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
