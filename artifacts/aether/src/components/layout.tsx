@@ -177,6 +177,10 @@ const NAV_ITEMS = [
   { href: "/motion-doctrine",       label: "Motion Doctrine · Separation",icon: Spline },
   { href: "/prophetic-timeline",    label: "Prophetic Timeline · 7-Year", icon: Telescope },
   { href: "/knot-topology",         label: "Knot Topology · Tait Plate",  icon: GitMerge },
+  { href: "/light-speed",           label: "Light Speed · c-System",       icon: Telescope },
+  { href: "/earth-circuit",         label: "Earth Circuit · Geomag",       icon: Boxes },
+  { href: "/mrna-readings",         label: "mRNA · Honest Readings",       icon: Spline },
+  { href: "/source-board",          label: "Source Board · Bulletin",      icon: FlipHorizontal },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

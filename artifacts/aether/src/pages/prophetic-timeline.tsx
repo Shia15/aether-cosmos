@@ -1,4 +1,5 @@
 import imgTimeline from "@assets/ChatGPT_Image_Apr_26,_2026,_12_50_01_PM_1777222210963.png";
+import img2026 from "@assets/ChatGPT_Image_Apr_26,_2026,_01_05_04_PM_1777223110893.png";
 
 const B = {
   bg: "#0a0d1c", panel: "#11172a", ink: "#eaf0ff",
@@ -84,9 +85,31 @@ export default function PropheticTimelineView() {
           </ol>
         </section>
 
-        {/* SECTION 03 — Honest line */}
-        <section className="pt-fade space-y-3" style={{ animationDelay: "280ms" }} data-testid="pt-honest-line">
-          <SectionHead num="03" label="Reading the timeline honestly." accent={B.violet} />
+        {/* SECTION 03 — 2026 So Far */}
+        <section className="pt-fade space-y-3" style={{ animationDelay: "260ms" }} data-testid="pt-section-2026">
+          <SectionHead num="03" label="Zoom in · 2026 so far · the early-wave window in detail." accent={B.blue} />
+          <figure className="rounded-md overflow-hidden" style={{ border: `1px solid ${B.border}`, background: "#000" }}>
+            <img src={img2026} loading="lazy" decoding="async" className="block w-full h-auto"
+                 alt="Wide poster on a soft warm-grey background titled '2026 SO FAR — An Uncertain Beginning' with subtitle 'A year shaped by lingering inflation, slowing growth, geopolitical risk and the AI productivity question.' Five evenly-spaced panels along a horizontal timeline tape: '01 January — Soft consumer demand. Nascent recovery in services. Early signs of disinflation.' '02 February — Tightening monetary tone. Renewed focus on supply-chain risk and inventory cycles.' '03 March — Slowing global demand. Modest recovery in industrial inventories.' '04 April — Sticky inflation. Energy-price uncertainty. Markets wary of policy errors.' '05 May — Outlook signals — Reading early cycle, geopolitical headwinds, AI-driven productivity questions, signs of soft-landing or stalling.' Bottom strip: 'EARLY 2026 — Cycle Reading.'" />
+            <figcaption className="px-4 py-2 text-[10.5px] uppercase tracking-[0.22em]"
+                        style={{ color: B.muted, background: B.panel }}>
+              Source poster · 2026 so far · first five months as cycle reading
+            </figcaption>
+          </figure>
+          <div className="rounded-md p-4" style={{ background: B.panel, border: `1px solid ${B.blue}33` }}>
+            <p className="text-[12.5px] leading-relaxed" style={{ color: B.text }}>
+              The seven-year poster names <em>January 2026 · early wave</em> as Now. This second poster is the
+              high-resolution view of that same window — sticky inflation, slow demand, the AI-productivity
+              question, geopolitical drag — read as a soft-landing-or-stall reading rather than a forecast.
+              AETHER files it next to the long arc so the user can see the macro and the month-by-month at the
+              same time.
+            </p>
+          </div>
+        </section>
+
+        {/* SECTION 04 — Honest line */}
+        <section className="pt-fade space-y-3" style={{ animationDelay: "340ms" }} data-testid="pt-honest-line">
+          <SectionHead num="04" label="Reading the timeline honestly." accent={B.violet} />
           <div className="rounded-md p-4" style={{ background: "linear-gradient(135deg, rgba(180,140,255,0.05), rgba(124,200,255,0.04))",
                        border: `1px solid ${B.violet}33` }}>
             <p className="text-[12.5px] leading-relaxed" style={{ color: B.text }}>

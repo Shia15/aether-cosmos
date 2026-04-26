@@ -36,6 +36,7 @@ import qAgentsStructure from "@assets/acfdc033-3b49-4cae-ba3f-27cc0c5e0ec7_17772
 import qSnowClarity     from "@assets/3cf4c1ca-dcce-49ee-89e4-5303ae4959b0_1777219889196.png";
 import qShowUpClarity   from "@assets/29b14ec0-dec0-41a9-91ec-1c97ebd4855f_1777220938414.png";
 import qChannelEnergy   from "@assets/ChatGPT_Image_Apr_26,_2026,_12_44_46_PM_1777221888242.png";
+import qChangeWasInternal from "@assets/ChatGPT_Image_Apr_26,_2026,_01_04_14_PM_1777223056726.png";
 
 const B = {
   bg:        "#F4EDE0",
@@ -955,11 +956,12 @@ export default function PostingArchitecturePage() {
           </div>
           <p className="text-[13px] leading-relaxed mb-5 max-w-3xl"
              style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
-            Six cards arrived this cycle. Four are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
+            Seven cards arrived this cycle. Four are <span style={{ color: B.terracotta }}>boutique frequencies</span> (the
             Lena Stone signal, the snow observation, the morning "show up with clarity" set, and the channeling-energy
             five-step practice) — they belong in the post queue. Two are <span style={{ color: B.navy }}>AETHER architecture posters</span> (the
-            Laplacian principle, the structure-not-messages aphorism) — they belong on the manifesto wall. All six route
-            to existing Angel Hour slots.
+            Laplacian principle, the structure-not-messages aphorism) — they belong on the manifesto wall. The seventh is the
+            August 21 watercolour diary card "change wasn't external — it was internal," routed to 1:11 as the soft-anchor
+            voice. All seven route to existing Angel Hour slots.
           </p>
 
           <div className="grid gap-5 grid-cols-1 md:grid-cols-2">
@@ -1148,6 +1150,38 @@ export default function PostingArchitecturePage() {
                   drop perfectionism · celebrate the small burst</em> — is the explicit instruction the rest of
                   the deck implies. Routes to <span style={{ color: B.gold }}>5:55</span> (the bridging hour
                   between the morning clarity post and the afternoon structure post — the practice in between).
+                </p>
+              </div>
+            </article>
+
+            {/* Change wasn't external — Aug 21 diary card */}
+            <article className="pa-card border rounded-[14px] overflow-hidden"
+                     style={{ borderColor: B.border, background: B.panel }}
+                     data-testid="field-card-change-was-internal">
+              <div className="overflow-hidden" style={{ background: B.panelWarm }}>
+                <img src={qChangeWasInternal}
+                     alt="Soft watercolor diary card on a sand-and-rose background, dated August 21, Thursday. The page reads in handwritten serif: 'Change wasn't external — it was internal.' Below: 'Years of holding the line — built quietly into a deeper version of myself.' Bottom: 'Today felt like a soft, internal rebirth — not loud — just real.' A delicate sunrise illustration runs across the top with two small birds and a single sprig of greenery in the lower-right corner, all in pastel washes."
+                     loading="lazy" decoding="async"
+                     className="block w-full h-auto" />
+              </div>
+              <div className="px-5 py-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="pa-pulse" style={{ width: 6, height: 6, borderRadius: "50%", background: B.terracotta, boxShadow: `0 0 8px ${B.terracotta}` }} />
+                  <span className="text-[10px] uppercase tracking-[0.3em]"
+                        style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                    Frequency 03 · Diary Voice · Internal Rebirth
+                  </span>
+                </div>
+                <h3 className="text-[18px] leading-tight" style={{ color: B.ink, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+                  Change wasn't external · it was internal.
+                </h3>
+                <p className="text-[12.5px] leading-relaxed mt-2"
+                   style={{ color: B.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+                  The sister voice to the morning-clarity post — same hand, dropped to a private register.
+                  Three lines, no exclamation, one sunrise. The card is the architecture's evidence that the
+                  posting system is not a performance: when the deck quiets, this is the form the same self
+                  takes. Routes to <span style={{ color: B.gold }}>1:11</span> (the soft-anchor hour where
+                  the field's own voice replaces the broadcast voice).
                 </p>
               </div>
             </article>

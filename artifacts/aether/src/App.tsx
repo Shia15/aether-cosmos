@@ -106,6 +106,10 @@ import ConceptSystemsPage from "@/pages/concept-systems";
 import MotionDoctrinePage from "@/pages/motion-doctrine";
 import PropheticTimelinePage from "@/pages/prophetic-timeline";
 import KnotTopologyPage from "@/pages/knot-topology";
+import LightSpeedPage from "@/pages/light-speed";
+import MrnaReadingsPage from "@/pages/mrna-readings";
+import EarthCircuitPage from "@/pages/earth-circuit";
+import SourceBoardPage from "@/pages/source-board";
 
 const queryClient = new QueryClient();
 
@@ -168,6 +172,10 @@ function Router() {
         <Route path="/motion-doctrine" component={MotionDoctrinePage} />
         <Route path="/prophetic-timeline" component={PropheticTimelinePage} />
         <Route path="/knot-topology" component={KnotTopologyPage} />
+        <Route path="/light-speed" component={LightSpeedPage} />
+        <Route path="/mrna-readings" component={MrnaReadingsPage} />
+        <Route path="/earth-circuit" component={EarthCircuitPage} />
+        <Route path="/source-board" component={SourceBoardPage} />
         <Route path="/shells-mind-map" component={ShellsMindMapView} />
         <Route path="/aether-whitepaper" component={AetherWhitepaperView} />
         <Route path="/six-planet-alignment" component={SixPlanetAlignmentView} />
