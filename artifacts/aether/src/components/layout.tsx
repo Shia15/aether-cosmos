@@ -207,6 +207,7 @@ const NAV_ITEMS = [
   { href: "/carbon-layered",           label: "Carbon · Forged Then Layered",         icon: Layers },
   { href: "/stromatolite-automaton",   label: "Stromatolite Automaton · Layers",      icon: Waves },
   { href: "/photosynthesis-spark",     label: "Photosynthesis · Spark of New Life",   icon: Sun },
+  { href: "/universal-grammar",        label: "Universal Grammar · Paper",            icon: BookOpen },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
