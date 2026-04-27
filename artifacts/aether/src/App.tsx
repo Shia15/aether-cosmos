@@ -133,6 +133,7 @@ import SeasonalCoherencePage from "@/pages/seasonal-coherence";
 import TerraformSunrisePage from "@/pages/terraform-sunrise";
 import LogicFlowersPage from "@/pages/logic-flowers";
 import CarbonLayeredPage from "@/pages/carbon-layered";
+import StromatoliteAutomatonPage from "@/pages/stromatolite-automaton";
 
 const queryClient = new QueryClient();
 
@@ -249,6 +250,7 @@ function Router() {
         <Route path="/terraform-sunrise" component={TerraformSunrisePage} />
         <Route path="/logic-flowers" component={LogicFlowersPage} />
         <Route path="/carbon-layered" component={CarbonLayeredPage} />
+        <Route path="/stromatolite-automaton" component={StromatoliteAutomatonPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
