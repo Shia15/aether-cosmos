@@ -206,6 +206,7 @@ const NAV_ITEMS = [
   { href: "/logic-flowers",            label: "Logic Flowers · 8-Node Field",         icon: Hexagon },
   { href: "/carbon-layered",           label: "Carbon · Forged Then Layered",         icon: Layers },
   { href: "/stromatolite-automaton",   label: "Stromatolite Automaton · Layers",      icon: Waves },
+  { href: "/photosynthesis-spark",     label: "Photosynthesis · Spark of New Life",   icon: Sun },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
