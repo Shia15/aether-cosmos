@@ -204,6 +204,7 @@ const NAV_ITEMS = [
   { href: "/seasonal-coherence",       label: "Seasonal Engine · Φ(t) · 4 Clocks",    icon: Compass },
   { href: "/terraform-sunrise",        label: "Terraform Sunrise · Game · 4 Eggs",    icon: Sunrise },
   { href: "/logic-flowers",            label: "Logic Flowers · 8-Node Field",         icon: Hexagon },
+  { href: "/carbon-layered",           label: "Carbon · Forged Then Layered",         icon: Layers },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
