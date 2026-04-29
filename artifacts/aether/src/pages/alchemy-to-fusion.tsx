@@ -490,6 +490,111 @@ function DiagnosticsRingGlyph() {
   );
 }
 
+/* Fuel cycles — five reactive materials with their channels and hardness */
+function FuelCycleGlyph() {
+  const rows = [
+    { fuel: "D + T", products: "⁴He (3.5) + n (14.1)", t: 10, color: B.amber, neutron: true, label: "today's standard" },
+    { fuel: "D + D", products: "³He+n  /  T+p (50/50)", t: 50, color: B.cyan, neutron: true, label: "fuel from seawater" },
+    { fuel: "D + ³He", products: "⁴He (3.6) + p (14.7)", t: 100, color: B.violet, neutron: false, label: "aneutronic · ³He scarce" },
+    { fuel: "p + ¹¹B", products: "3 ⁴He (≈8.7 total)", t: 600, color: B.gold, neutron: false, label: "aneutronic · very high T" },
+    { fuel: "³He + ³He", products: "⁴He + 2 p", t: 200, color: B.rose, neutron: false, label: "aneutronic · scarcer still" },
+  ];
+  const xLabel = (v: number) => 60 + (Math.log10(v) - 0.7) * 130;
+  return (
+    <svg viewBox="0 0 380 240" width="100%" style={{ display: "block" }} role="img" aria-label="Fuel cycle reactivity chart — five candidate fusion fuels plotted against required ion temperature on a logarithmic axis from ten to six hundred kilo electron volts, showing deuterium tritium as the easiest, deuterium deuterium next, and aneutronic options like deuterium helium three, proton boron eleven, and helium three helium three at progressively higher temperatures">
+      {/* axis */}
+      <line x1={60} y1={210} x2={350} y2={210} stroke={B.dim} strokeWidth={0.8} />
+      {[10, 30, 100, 300, 600].map((v) => (
+        <g key={v}>
+          <line x1={xLabel(v)} y1={210} x2={xLabel(v)} y2={214} stroke={B.dim} strokeWidth={0.8} />
+          <text x={xLabel(v)} y={224} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>{v}</text>
+        </g>
+      ))}
+      <text x={205} y={236} textAnchor="middle" fontSize={9.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>required ion temperature · keV (log scale)</text>
+      {/* rows */}
+      {rows.map((r, i) => {
+        const y = 22 + i * 36;
+        return (
+          <g key={r.fuel}>
+            <text x={56} y={y + 4} textAnchor="end" fontSize={11} fill={r.color} fontFamily='"Cinzel", serif' fontVariant="small-caps">{r.fuel}</text>
+            <line x1={60} y1={y} x2={xLabel(r.t)} y2={y} stroke={r.color} strokeWidth={1.4} />
+            <circle cx={xLabel(r.t)} cy={y} r={4} fill={r.color} />
+            <text x={xLabel(r.t) + 8} y={y - 2} fontSize={10} fill={B.ink} fontFamily="Inter, sans-serif">{r.products}</text>
+            <text x={xLabel(r.t) + 8} y={y + 10} fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>
+              {r.label}{r.neutron ? " · neutron channel" : " · charged products only"}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/* Tritium loop — closed fuel cycle with neutron multiplier */
+function TritiumLoopGlyph() {
+  return (
+    <svg viewBox="0 0 380 256" width="100%" style={{ display: "block" }} role="img" aria-label="Tritium breeding loop with realistic losses — a fusion plasma at top emits a fourteen point one mega electron volt neutron, which strikes a beryllium or lead neutron multiplier ideally producing two neutrons but real blankets lose some to leakage, structure activation, and parasitic absorption, so most of the remaining neutrons are captured by lithium six in the breeding blanket each yielding one tritium nucleus, and the tritium is recycled back to the plasma, closing a fuel cycle whose breeding ratio in working designs sits around one point one rather than the ideal two">
+      <defs>
+        <marker id="trit-arrow" viewBox="0 0 10 10" refX={9} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill={B.cyan} />
+        </marker>
+      </defs>
+
+      {/* Plasma — top */}
+      <g transform="translate(190, 36)">
+        <ellipse cx={0} cy={0} rx={48} ry={18} fill={`${B.ember}22`} stroke={B.ember} strokeWidth={1.2} />
+        <text x={0} y={4} textAnchor="middle" fontSize={11} fill={B.ember} fontFamily='"Cinzel", serif' fontVariant="small-caps">D + T plasma</text>
+        <text x={0} y={-26} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>α (3.5 MeV) stays · n (14.1 MeV) escapes</text>
+      </g>
+
+      {/* Neutron arrow plasma → multiplier */}
+      <line x1={190} y1={56} x2={190} y2={94} stroke={B.cyan} strokeWidth={1.2} markerEnd="url(#trit-arrow)" />
+      <text x={196} y={78} fontSize={9.5} fill={B.cyan} fontFamily="Inter, sans-serif" letterSpacing={1.2}>1 n · 14.1 MeV</text>
+
+      {/* Multiplier — middle */}
+      <g transform="translate(190, 116)">
+        <rect x={-72} y={-16} width={144} height={32} rx={4} fill={`${B.violet}1A`} stroke={B.violet} strokeWidth={1.2} />
+        <text x={0} y={-2} textAnchor="middle" fontSize={11} fill={B.violet} fontFamily='"Cinzel", serif' fontVariant="small-caps">Neutron Multiplier</text>
+        <text x={0} y={11} textAnchor="middle" fontSize={9.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>⁹Be(n,2n) · or Pb(n,2n)</text>
+      </g>
+
+      {/* Two neutrons fan to lithium left + right */}
+      <line x1={170} y1={132} x2={104} y2={172} stroke={B.cyan} strokeWidth={1.2} markerEnd="url(#trit-arrow)" />
+      <line x1={210} y1={132} x2={276} y2={172} stroke={B.cyan} strokeWidth={1.2} markerEnd="url(#trit-arrow)" />
+      <text x={130} y={150} fontSize={9.5} fill={B.cyan} fontFamily="Inter, sans-serif" letterSpacing={1.2}>n</text>
+      <text x={244} y={150} fontSize={9.5} fill={B.cyan} fontFamily="Inter, sans-serif" letterSpacing={1.2}>n</text>
+
+      {/* Losses — neutrons leaked to structure / ports */}
+      <line x1={262} y1={116} x2={356} y2={102} stroke={B.dim} strokeWidth={0.9} strokeDasharray="2 3" markerEnd="url(#trit-arrow)" opacity={0.7} />
+      <line x1={118} y1={116} x2={24} y2={102} stroke={B.dim} strokeWidth={0.9} strokeDasharray="2 3" markerEnd="url(#trit-arrow)" opacity={0.7} />
+      <text x={356} y={94} textAnchor="end" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>leakage · structure</text>
+      <text x={24} y={94} textAnchor="start" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>parasitic absorption</text>
+
+      {/* Two lithium captures */}
+      <g transform="translate(78, 188)">
+        <rect x={-44} y={-16} width={88} height={32} rx={4} fill={`${B.gold}1A`} stroke={B.gold} strokeWidth={1.2} />
+        <text x={0} y={-2} textAnchor="middle" fontSize={10.5} fill={B.gold} fontFamily='"Cinzel", serif' fontVariant="small-caps">⁶Li + n</text>
+        <text x={0} y={11} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>→ ⁴He + T</text>
+      </g>
+      <g transform="translate(302, 188)">
+        <rect x={-44} y={-16} width={88} height={32} rx={4} fill={`${B.gold}1A`} stroke={B.gold} strokeWidth={1.2} />
+        <text x={0} y={-2} textAnchor="middle" fontSize={10.5} fill={B.gold} fontFamily='"Cinzel", serif' fontVariant="small-caps">⁶Li + n</text>
+        <text x={0} y={11} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>→ ⁴He + T</text>
+      </g>
+
+      {/* Two tritons curl back to plasma */}
+      <path d="M 78 172 Q 24 110 142 32" fill="none" stroke={B.amber} strokeWidth={1.2} markerEnd="url(#trit-arrow)" strokeDasharray="3 3" />
+      <path d="M 302 172 Q 356 110 238 32" fill="none" stroke={B.amber} strokeWidth={1.2} markerEnd="url(#trit-arrow)" strokeDasharray="3 3" />
+      <text x={42} y={94} fontSize={9.5} fill={B.amber} fontFamily="Inter, sans-serif" letterSpacing={1.2}>T returns</text>
+      <text x={310} y={94} fontSize={9.5} fill={B.amber} fontFamily="Inter, sans-serif" letterSpacing={1.2}>T returns</text>
+
+      {/* TBR readout */}
+      <text x={190} y={234} textAnchor="middle" fontSize={10} fill={B.green} fontFamily='"Cinzel", serif' fontVariant="small-caps">ideal arithmetic ≤ 2 · real designs target ≈ 1.1</text>
+      <text x={190} y={248} textAnchor="middle" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>any TBR &gt; 1 (after losses) keeps the loop alive</text>
+    </svg>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
@@ -1158,9 +1263,175 @@ export default function AlchemyToFusionPage() {
           </div>
         </section>
 
-        {/* §13 Honest line — what's been done, what's hard */}
+        {/* §13 Fuel cycles — beyond D-T */}
         <section style={{ marginBottom: 44 }} data-testid="section-13">
-          <H num="13" label="Honest Line · What Fusion Has Done, What Stays Hard" accent={B.dim} />
+          <H num="13" label="Fuel Cycles · More Reactive Materials Beyond D-T" accent={B.amber} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <Card accent={B.amber}>
+              <FuelCycleGlyph />
+              <div style={{ marginTop: 4, fontFamily: "Inter, sans-serif", fontSize: 10.5, color: B.dim, letterSpacing: 1.2 }}>
+                Five candidate fuels · log-scale temperature · neutron vs aneutronic
+              </div>
+            </Card>
+            <Card accent={B.amber}>
+              <P>
+                D-T is not the only reactive pairing — it is the easiest. Other materials
+                also liberate binding energy when fused, and several of them avoid the
+                neutron problem entirely. The cost is temperature, density, or fuel scarcity.
+                The trade space is real and it is what every alternative-fuel program is
+                negotiating.
+              </P>
+              <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-fuel-cycles">
+                <thead>
+                  <tr>
+                    <Th>Fuel</Th><Th>Why it's interesting</Th><Th>What's hard</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <Td accent={B.amber}>D + T</Td>
+                    <Td>Lowest ignition temperature (~10 keV); largest cross-section; biggest energy per reaction (17.6 MeV).</Td>
+                    <Td>14.1 MeV neutron activates structure; tritium is rare and must be bred.</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.cyan}>D + D</Td>
+                    <Td>Deuterium is in seawater (~33 g per m³); no tritium needed up front; T and ³He are by-products that can feed back.</Td>
+                    <Td>Needs ~5× the temperature of D-T; reactivity is ~100× lower at burn conditions.</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.violet}>D + ³He</Td>
+                    <Td>Aneutronic in the primary channel — ⁴He + p, both charged. Direct conversion to electricity is possible.</Td>
+                    <Td>³He is essentially absent on Earth; lunar regolith is the proposed source. D-D side reactions still produce neutrons.</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.gold}>p + ¹¹B</Td>
+                    <Td>Boron-11 is abundant and cheap; products are three α particles, no neutrons; truly aneutronic.</Td>
+                    <Td>Peak reactivity needs ~600 keV — about 60× hotter than D-T; bremsstrahlung losses may exceed fusion power. Hard.</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.rose}>³He + ³He</Td>
+                    <Td>Aneutronic, clean products (⁴He + 2 p). The dream fuel.</Td>
+                    <Td>Both reactants are scarce; needs higher T than D-³He; mostly theoretical for now.</Td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style={{ marginTop: 8 }}>
+                <Chip color={B.amber}>aneutronic ≠ no neutrons everywhere</Chip>{" "}
+                <Chip color={B.dim}>side reactions still leak some</Chip>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        {/* §14 Tritium loop — breeding and neutron multipliers */}
+        <section style={{ marginBottom: 44 }} data-testid="section-14">
+          <H num="14" label="The Tritium Loop · Breeding It and Multiplying Neutrons" accent={B.gold} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <Card accent={B.gold}>
+              <TritiumLoopGlyph />
+              <div style={{ marginTop: 4, fontFamily: "Inter, sans-serif", fontSize: 10.5, color: B.dim, letterSpacing: 1.2 }}>
+                Ideal: 1 n in → multiplier ×2 → ⁶Li capture → T returns. Real designs lose
+                some neutrons to leakage and structure; the surviving fraction must still
+                breed TBR &gt; 1.
+              </div>
+            </Card>
+            <Card accent={B.gold}>
+              <P>
+                Tritium has a half-life of <strong style={{ color: B.amber }}>12.3 years</strong>.
+                That means there is essentially none of it lying around in nature. The world's
+                inventory — almost all from CANDU heavy-water reactors — is roughly{" "}
+                <strong style={{ color: B.amber }}>25 kg</strong> and shrinking. ITER alone
+                will need on the order of a kilogram per year of operation. A fusion power
+                economy at scale would need tonnes per reactor per year. There is no mine for
+                this. A working fusion plant <em>must</em> manufacture its own tritium, or it
+                is not a working fusion plant.
+              </P>
+              <P>
+                The reaction that does the work lives in the blanket — a layer of lithium
+                wrapped around the plasma chamber. Every D-T fusion produces a 14.1 MeV
+                neutron that the magnetic field cannot hold. That neutron is the messenger
+                the blanket is built to catch:
+              </P>
+              <ul style={{ fontFamily: "Inter, sans-serif", fontSize: 13.2, lineHeight: 1.7, color: B.ink, paddingLeft: 18, margin: "0 0 10px 0" }}>
+                <li><strong style={{ color: B.gold }}>⁶Li + n → ⁴He + T + 4.78 MeV</strong> — exothermic, easy, the workhorse.</li>
+                <li><strong style={{ color: B.gold }}>⁷Li + n → ⁴He + T + n′ − 2.47 MeV</strong> — endothermic, but spits the neutron back for another try.</li>
+              </ul>
+              <P>
+                The accounting variable is the <strong style={{ color: B.green }}>tritium
+                breeding ratio</strong> (TBR): tritons produced per triton burned. A reactor
+                with TBR &lt; 1 starves itself; TBR = 1 stays alive only on paper, because
+                some tritium decays, some leaks, some sits in inventory. Real designs target
+                TBR ≈ <strong style={{ color: B.green }}>1.05–1.15</strong> to be honestly
+                self-sufficient. This is what "operating at full efficiency to keep tritium
+                supplied" really means: closing the loop arithmetically.
+              </P>
+            </Card>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 20 }}>
+            <Card accent={B.violet}>
+              <P>
+                The trick that makes TBR &gt; 1 possible is the{" "}
+                <strong style={{ color: B.violet }}>neutron multiplier</strong> — a material
+                that absorbs one neutron and emits two. The arithmetic only closes if every
+                fusion neutron breeds <em>more</em> than one triton, and bare lithium cannot
+                do that on its own.
+              </P>
+              <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-multipliers">
+                <thead>
+                  <tr><Th>Multiplier</Th><Th>Reaction</Th><Th>Threshold</Th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <Td accent={B.violet}>Beryllium-9</Td>
+                    <Td>⁹Be + n → 2 ⁴He + 2 n</Td>
+                    <Td>~1.85 MeV</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.violet}>Lead-208</Td>
+                    <Td>²⁰⁸Pb (n, 2n) ²⁰⁷Pb</Td>
+                    <Td>~7.4 MeV</Td>
+                  </tr>
+                </tbody>
+              </table>
+              <P>
+                A 14.1 MeV D-T neutron clears either threshold easily. The blanket designs
+                that actually get built integrate the multiplier and the breeder into one
+                volume. <strong style={{ color: B.cyan }}>HCPB</strong> (helium-cooled pebble
+                bed) packs Be pebbles next to lithium-ceramic pebbles. <strong style={{ color: B.cyan }}>WCLL</strong>{" "}
+                (water-cooled lithium-lead) flows molten Pb-Li that does <em>both</em> jobs
+                in the same fluid. Both are headed for ITER and DEMO test modules.
+              </P>
+            </Card>
+            <Card accent={B.green}>
+              <P>
+                Read the loop in the diagram opposite as a closed circuit:
+              </P>
+              <ul style={{ fontFamily: "Inter, sans-serif", fontSize: 13.2, lineHeight: 1.7, color: B.ink, paddingLeft: 18, margin: "0 0 10px 0" }}>
+                <li>Plasma fuses D + T → α stays, n leaves with 14.1 MeV.</li>
+                <li>Neutron hits the multiplier → 2 neutrons emerge.</li>
+                <li>Both neutrons captured by ⁶Li → 2 ⁴He + 2 T.</li>
+                <li>Tritium extracted, fed back into the plasma. Loop closes.</li>
+              </ul>
+              <P>
+                This is why "100% efficiency" matters in the user's framing. A reactor that
+                wastes neutrons — to scattering, to structure activation, to leakage out the
+                ports — drives the TBR below break-even. The neutron is the only delivery
+                truck for new fuel; lose too many and the fuel cycle starves. It is the
+                tightest engineering constraint in the field, and the one that decides
+                whether fusion is a power source or a science project.
+              </P>
+              <div style={{ marginTop: 8 }}>
+                <Chip color={B.green}>TBR &gt; 1 · or it doesn't run</Chip>{" "}
+                <Chip color={B.violet}>multiplier · 1 in, 2 out</Chip>{" "}
+                <Chip color={B.amber}>blanket · breeder + coolant in one</Chip>
+              </div>
+            </Card>
+          </div>
+        </section>
+
+        {/* §15 Honest line — what's been done, what's hard */}
+        <section style={{ marginBottom: 44 }} data-testid="section-15">
+          <H num="15" label="Honest Line · What Fusion Has Done, What Stays Hard" accent={B.dim} />
           <Card accent={B.dim}>
             <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-honest-line">
               <thead>
@@ -1206,9 +1477,9 @@ export default function AlchemyToFusionPage() {
           </Card>
         </section>
 
-        {/* §14 Why this is in AETHER */}
-        <section style={{ marginBottom: 44 }} data-testid="section-14">
-          <H num="14" label="Why This Page Sits Inside AETHER" accent={B.rose} />
+        {/* §16 Why this is in AETHER */}
+        <section style={{ marginBottom: 44 }} data-testid="section-16">
+          <H num="16" label="Why This Page Sits Inside AETHER" accent={B.rose} />
           <Card accent={B.rose}>
             <P>
               Three reasons. First, transmutation is the cleanest possible example of physics
@@ -1223,9 +1494,9 @@ export default function AlchemyToFusionPage() {
           </Card>
         </section>
 
-        {/* §15 Bridges */}
+        {/* §17 Bridges */}
         <section data-testid="section-bridges">
-          <H num="15" label="Bridges · Where This Page Connects" accent={B.cyan} />
+          <H num="17" label="Bridges · Where This Page Connects" accent={B.cyan} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
             <Bridge to="/coherence-engine" label="Coherence Engine · H ↔ H̄" sub="Hydrogen and antihydrogen — the same orbital map, mirrored." accent={B.cyan} />
             <Bridge to="/ultra-magnetism" label="Ultra-Magnetism · Spin Pairings" sub="Singlet and triplet — orbital symmetries that decide what binds." accent={B.violet} />
