@@ -208,6 +208,7 @@ const NAV_ITEMS = [
   { href: "/stromatolite-automaton",   label: "Stromatolite Automaton · Layers",      icon: Waves },
   { href: "/photosynthesis-spark",     label: "Photosynthesis · Spark of New Life",   icon: Sun },
   { href: "/universal-grammar",        label: "Universal Grammar · Paper",            icon: BookOpen },
+  { href: "/aether-edge-constraint",   label: "Edge Constraint · Section 32",          icon: Aperture },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
