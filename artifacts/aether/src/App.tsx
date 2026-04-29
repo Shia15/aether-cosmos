@@ -139,6 +139,7 @@ import PhotosynthesisSparkPage from "@/pages/photosynthesis-spark";
 import UniversalGrammarPage from "@/pages/universal-grammar";
 import AetherEdgeConstraintView from "@/pages/aether-edge-constraint";
 import QuantumLivingSystemsView from "@/pages/quantum-living-systems";
+import DiamondNanothreadsPage from "@/pages/diamond-nanothreads";
 
 const queryClient = new QueryClient();
 
@@ -255,6 +256,7 @@ function Router() {
         <Route path="/terraform-sunrise" component={TerraformSunrisePage} />
         <Route path="/logic-flowers" component={LogicFlowersPage} />
         <Route path="/carbon-layered" component={CarbonLayeredPage} />
+        <Route path="/diamond-nanothreads" component={DiamondNanothreadsPage} />
         <Route path="/stromatolite-automaton" component={StromatoliteAutomatonPage} />
         <Route path="/photosynthesis-spark" component={PhotosynthesisSparkPage} />
         <Route path="/universal-grammar" component={UniversalGrammarPage} />
