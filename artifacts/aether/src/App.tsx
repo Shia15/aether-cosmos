@@ -137,6 +137,7 @@ import StromatoliteAutomatonPage from "@/pages/stromatolite-automaton";
 import PhotosynthesisSparkPage from "@/pages/photosynthesis-spark";
 import UniversalGrammarPage from "@/pages/universal-grammar";
 import AetherEdgeConstraintView from "@/pages/aether-edge-constraint";
+import QuantumLivingSystemsView from "@/pages/quantum-living-systems";
 
 const queryClient = new QueryClient();
 
@@ -257,6 +258,7 @@ function Router() {
         <Route path="/photosynthesis-spark" component={PhotosynthesisSparkPage} />
         <Route path="/universal-grammar" component={UniversalGrammarPage} />
         <Route path="/aether-edge-constraint" component={AetherEdgeConstraintView} />
+        <Route path="/quantum-living-systems" component={QuantumLivingSystemsView} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
