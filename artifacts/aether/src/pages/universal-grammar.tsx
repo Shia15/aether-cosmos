@@ -472,11 +472,11 @@ export default function UniversalGrammarPage() {
 
         {/* Section 05 — Universal Pattern (Table 6) */}
         <section data-testid="section-universal-pattern" style={{ marginTop: 36 }}>
-          <H num="05" label="The Universal Pattern · Across Seven Domains" accent={B.pearl} />
+          <H num="05" label="The Universal Pattern · Across Eight Domains" accent={B.pearl} />
           <Card accent={B.pearl}>
             <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: B.ink, opacity: 0.92, marginBottom: 12, lineHeight: 1.6 }}>
               The skeleton — <strong>local rule + constraint + time → path-dependent irreversible form</strong> — is not a biological accident.
-              It is a structural pattern instantiated across radically different substrates. Below: seven domains, the same skeleton.
+              It is a structural pattern instantiated across radically different substrates. Below: eight domains, the same skeleton.
             </div>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-universal-pattern">
@@ -490,13 +490,14 @@ export default function UniversalGrammarPage() {
                 </thead>
                 <tbody>
                   {[
-                    { d: "Stromatolites",   r: "Microbial growth",      c: "Light + sediment",      f: "Layered domes",            col: B.green  },
-                    { d: "Crystals",        r: "Lattice bonding",       c: "Energy minimisation",   f: "Symmetry + facets",        col: B.pearl  },
-                    { d: "Coral Reefs",     r: "Polyp secretion",       c: "Light + nutrient",      f: "Branching colonies",       col: B.cyan   },
-                    { d: "Neural Networks", r: "Weight update",         c: "Loss function",         f: "Learned representations",  col: B.violet },
-                    { d: "Culture",         r: "Behaviour replication", c: "Social constraints",    f: "Norms + institutions",     col: B.rose   },
-                    { d: "Dune Fields",     r: "Sand transport",        c: "Wind direction",        f: "Repeating dune forms",     col: B.amber  },
-                    { d: "AETHER Memory",   r: "State write",           c: "Energy + coherence",    f: "Layered identity",         col: B.gold   },
+                    { d: "Stromatolites",   r: "Microbial growth",      c: "Light + sediment",      f: "Layered domes",                       col: B.green  },
+                    { d: "Crystals",        r: "Lattice bonding",       c: "Energy minimisation",   f: "Symmetry + facets",                   col: B.pearl  },
+                    { d: "Coral Reefs",     r: "Polyp secretion",       c: "Light + nutrient",      f: "Branching colonies",                  col: B.cyan   },
+                    { d: "Neural Networks", r: "Weight update",         c: "Loss function",         f: "Learned representations",             col: B.violet },
+                    { d: "Culture",         r: "Behaviour replication", c: "Social constraints",    f: "Norms + institutions",                col: B.rose   },
+                    { d: "Dune Fields",     r: "Sand transport",        c: "Wind direction",        f: "Repeating dune forms",                col: B.amber  },
+                    { d: "Solar Dynamo",    r: "Differential rotation + plasma flow", c: "Magnetic flux conservation", f: "~11-year sunspot cycle (Schwabe)", col: B.amber  },
+                    { d: "AETHER Memory",   r: "State write",           c: "Energy + coherence",    f: "Layered identity",                    col: B.gold   },
                   ].map((row, i) => (
                     <tr key={i}>
                       <Td color={row.col}>{row.d}</Td>
@@ -684,6 +685,7 @@ export default function UniversalGrammarPage() {
             <Bridge to="/logic-flowers"          label="Logic Flowers · 8-Node Field"           sub="Same skeleton, different substrate"   accent={B.violet} />
             <Bridge to="/coherence-engine"       label="Coherence Engine · H ↔ H̄"             sub="Coherence at the atomic mirror"       accent={B.cyan} />
             <Bridge to="/seasonal-coherence"     label="Φ(t) · Seasonal Coherence"             sub="Time as a layered, recurring structure" accent={B.gold} />
+            <Bridge to="/heliospheric-coherence" label="Heliospheric Coherence · 11-yr Cycle"  sub="The Solar Dynamo row, in depth"        accent={B.amber} />
           </div>
         </section>
 
