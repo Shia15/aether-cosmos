@@ -75,6 +75,8 @@ import HeliosphericCoherenceView from "@/pages/heliospheric-coherence";
 import AetherEggEnginePage from "@/pages/aether-egg-engine";
 import UnderIceEcosystemPage from "@/pages/under-ice-ecosystem";
 import AlchemyToFusionPage from "@/pages/alchemy-to-fusion";
+import ImplicateOrderPage from "@/pages/implicate-order";
+import KnowableUniversePage from "@/pages/knowable-universe";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -269,6 +271,8 @@ function Router() {
         <Route path="/aether-egg-engine" component={AetherEggEnginePage} />
         <Route path="/under-ice-ecosystem" component={UnderIceEcosystemPage} />
         <Route path="/alchemy-to-fusion" component={AlchemyToFusionPage} />
+        <Route path="/implicate-order" component={ImplicateOrderPage} />
+        <Route path="/knowable-universe" component={KnowableUniversePage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />

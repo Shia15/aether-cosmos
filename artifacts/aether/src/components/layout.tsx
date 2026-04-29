@@ -216,6 +216,8 @@ const NAV_ITEMS = [
   { href: "/aether-egg-engine",        label: "Egg Engine · Positive Reinforcement",   icon: Egg },
   { href: "/under-ice-ecosystem",      label: "Under the Ice · George VI",              icon: Snowflake },
   { href: "/alchemy-to-fusion",        label: "Alchemy to Fusion · Transmutation",      icon: Flame },
+  { href: "/implicate-order",          label: "Implicate Order · Bohm + Sensoria",      icon: Layers },
+  { href: "/knowable-universe",        label: "Knowable Universe · Euler + SM",         icon: Atom },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
