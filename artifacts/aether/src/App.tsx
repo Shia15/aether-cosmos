@@ -72,6 +72,7 @@ import ClosedLoopCoherenceView from "@/pages/closed-loop-coherence";
 import PhiHOTView from "@/pages/phi-hot";
 import PhiHOTZipperView from "@/pages/phi-hot-zipper";
 import HeliosphericCoherenceView from "@/pages/heliospheric-coherence";
+import AetherEggEnginePage from "@/pages/aether-egg-engine";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -263,6 +264,7 @@ function Router() {
         <Route path="/aether-edge-constraint" component={AetherEdgeConstraintView} />
         <Route path="/quantum-living-systems" component={QuantumLivingSystemsView} />
         <Route path="/heliospheric-coherence" component={HeliosphericCoherenceView} />
+        <Route path="/aether-egg-engine" component={AetherEggEnginePage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />

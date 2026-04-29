@@ -212,6 +212,7 @@ const NAV_ITEMS = [
   { href: "/aether-edge-constraint",   label: "Edge Constraint · Section 32",          icon: Aperture },
   { href: "/quantum-living-systems",   label: "Quantum Living · DNA Piano",            icon: Music },
   { href: "/heliospheric-coherence",   label: "Heliospheric Coherence · World in One", icon: Sun },
+  { href: "/aether-egg-engine",        label: "Egg Engine · Positive Reinforcement",   icon: Egg },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
