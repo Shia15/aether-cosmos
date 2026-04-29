@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
+import imgReactor from "@assets/PNG_image_1777497089577.png";
 
 const B = {
   bg: "#070918",
@@ -358,6 +359,133 @@ function EnergyArithmeticGlyph() {
         );
       })}
       <text x={360} y={118} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.4}>same arithmetic · five different units</text>
+    </svg>
+  );
+}
+
+/* D-D branches — the two equally probable outcomes when two deuterons fuse */
+function DDBranchGlyph() {
+  return (
+    <svg viewBox="0 0 360 240" width="100%" style={{ display: "block" }} role="img" aria-label="Deuterium plus deuterium fusion branches — two deuterium nuclei fuse and split into two equally probable channels: one branch produces helium-3 plus a neutron, the other produces tritium plus a proton, each with about fifty percent probability">
+      {/* input — two D nuclei merging */}
+      <g transform="translate(40, 110)">
+        <circle cx={0} cy={-12} r={10} fill={`${B.cyan}33`} stroke={B.cyan} strokeWidth={1.2} />
+        <text x={0} y={-9} textAnchor="middle" fontSize={11} fill={B.ink} fontFamily='"Cinzel", serif'>D</text>
+        <circle cx={0} cy={12} r={10} fill={`${B.cyan}33`} stroke={B.cyan} strokeWidth={1.2} />
+        <text x={0} y={15} textAnchor="middle" fontSize={11} fill={B.ink} fontFamily='"Cinzel", serif'>D</text>
+        <text x={0} y={42} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>two deuterons</text>
+      </g>
+      {/* central fork */}
+      <line x1={62} y1={110} x2={130} y2={60} stroke={B.violet} strokeWidth={1.2} />
+      <line x1={62} y1={110} x2={130} y2={160} stroke={B.violet} strokeWidth={1.2} />
+      <text x={86} y={78} fontSize={10} fill={B.violet} fontFamily="Inter, sans-serif" letterSpacing={1.4}>~50%</text>
+      <text x={86} y={152} fontSize={10} fill={B.violet} fontFamily="Inter, sans-serif" letterSpacing={1.4}>~50%</text>
+      {/* upper branch — He-3 + n */}
+      <g transform="translate(180, 60)">
+        <circle cx={0} cy={0} r={14} fill={`${B.amber}33`} stroke={B.amber} strokeWidth={1.2} />
+        <text x={0} y={4} textAnchor="middle" fontSize={11} fill={B.ink} fontFamily='"Cinzel", serif'>³He</text>
+        <circle cx={50} cy={0} r={8} fill="none" stroke={B.green} strokeWidth={1.2} />
+        <text x={50} y={3} textAnchor="middle" fontSize={9} fill={B.green} fontFamily='"Cinzel", serif'>n</text>
+        <line x1={14} y1={0} x2={42} y2={0} stroke={B.line} strokeWidth={0.8} />
+        <text x={32} y={-22} textAnchor="middle" fontSize={10} fill={B.amber} fontFamily="Inter, sans-serif" letterSpacing={1.2}>3.27 MeV</text>
+      </g>
+      {/* lower branch — T + p */}
+      <g transform="translate(180, 160)">
+        <circle cx={0} cy={0} r={14} fill={`${B.rose}33`} stroke={B.rose} strokeWidth={1.2} />
+        <text x={0} y={4} textAnchor="middle" fontSize={11} fill={B.ink} fontFamily='"Cinzel", serif'>T</text>
+        <circle cx={50} cy={0} r={8} fill="none" stroke={B.gold} strokeWidth={1.2} />
+        <text x={50} y={3} textAnchor="middle" fontSize={9} fill={B.gold} fontFamily='"Cinzel", serif'>p</text>
+        <line x1={14} y1={0} x2={42} y2={0} stroke={B.line} strokeWidth={0.8} />
+        <text x={32} y={-22} textAnchor="middle" fontSize={10} fill={B.rose} fontFamily="Inter, sans-serif" letterSpacing={1.2}>4.03 MeV</text>
+      </g>
+      {/* alpha particle reminder (off to the right) */}
+      <g transform="translate(280, 110)">
+        <circle cx={0} cy={0} r={18} fill={`${B.ember}55`} stroke={B.ember} strokeWidth={1.4} />
+        <text x={0} y={5} textAnchor="middle" fontSize={13} fill={B.ink} fontFamily='"Cinzel", serif'>⁴He</text>
+        <text x={0} y={-30} textAnchor="middle" fontSize={9.5} fill={B.ember} fontFamily="Inter, sans-serif" letterSpacing={1.4} style={{ textTransform: "uppercase" }}>α particle</text>
+        <text x={0} y={32} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>D + T product</text>
+        <text x={0} y={46} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>charged · stays in plasma</text>
+      </g>
+    </svg>
+  );
+}
+
+/* Sun vs tokamak — timescale clock */
+function SunVsTokamakClockGlyph() {
+  return (
+    <svg viewBox="0 0 360 200" width="100%" style={{ display: "block" }} role="img" aria-label="Two timescale clocks compared on the same metric — mean waiting time per ion before fusing — the Sun's proton waits about ten billion years because the first step is weak interaction limited, while a deuteron in a tokamak at burn conditions waits about one hundred seconds, a span of roughly fifteen orders of magnitude">
+      {/* Sun clock (left) */}
+      <g transform="translate(80, 100)">
+        <circle cx={0} cy={0} r={56} fill={`${B.gold}11`} stroke={B.gold} strokeWidth={1.2} />
+        <circle cx={0} cy={0} r={3} fill={B.gold} />
+        {/* very slow hand pointing up */}
+        <line x1={0} y1={0} x2={0} y2={-46} stroke={B.gold} strokeWidth={1.2} />
+        <text x={0} y={-72} textAnchor="middle" fontSize={11} fill={B.gold} fontFamily='"Cinzel", serif' fontVariant="small-caps">The Sun</text>
+        <text x={0} y={76} textAnchor="middle" fontSize={10} fill={B.gold} fontFamily="Inter, sans-serif" letterSpacing={1.2}>~10¹⁰ yr per proton</text>
+        <text x={0} y={90} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>weak-interaction limited</text>
+      </g>
+      {/* gap arrow */}
+      <line x1={150} y1={100} x2={210} y2={100} stroke={B.dim} strokeWidth={0.8} strokeDasharray="3 3" />
+      <text x={180} y={92} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.6} style={{ textTransform: "uppercase" }}>~25 orders</text>
+      <text x={180} y={114} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>of magnitude</text>
+      {/* Tokamak clock (right) — fast hand sweeping */}
+      <g transform="translate(280, 100)">
+        <circle cx={0} cy={0} r={56} fill={`${B.ember}11`} stroke={B.ember} strokeWidth={1.2} />
+        <circle cx={0} cy={0} r={3} fill={B.ember} />
+        {/* fast hand pointing right (motion blur via 3 hands) */}
+        <line x1={0} y1={0} x2={36} y2={-30} stroke={B.ember} strokeWidth={1.2} opacity={0.4} />
+        <line x1={0} y1={0} x2={46} y2={0} stroke={B.ember} strokeWidth={1.2} opacity={0.7} />
+        <line x1={0} y1={0} x2={36} y2={30} stroke={B.ember} strokeWidth={1.2} />
+        <text x={0} y={-72} textAnchor="middle" fontSize={11} fill={B.ember} fontFamily='"Cinzel", serif' fontVariant="small-caps">A Tokamak</text>
+        <text x={0} y={76} textAnchor="middle" fontSize={10} fill={B.ember} fontFamily="Inter, sans-serif" letterSpacing={1.2}>~10² s per D ion at burn</text>
+        <text x={0} y={90} textAnchor="middle" fontSize={9} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>strong-interaction limited</text>
+      </g>
+    </svg>
+  );
+}
+
+/* Diagnostics ring — four detector types around a plasma */
+function DiagnosticsRingGlyph() {
+  return (
+    <svg viewBox="0 0 360 240" width="100%" style={{ display: "block" }} role="img" aria-label="Plasma diagnostics ring — a central plasma ring surrounded by four detector types: neutron counter top, gamma spectrometer right, charged particle detector bottom, calorimeter left, each labeled with what it measures">
+      <defs>
+        <radialGradient id="diagPlasma" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={B.ember} stopOpacity={0.85} />
+          <stop offset="100%" stopColor={B.amber} stopOpacity={0} />
+        </radialGradient>
+      </defs>
+      {/* central plasma */}
+      <circle cx={180} cy={120} r={42} fill="url(#diagPlasma)" />
+      <circle cx={180} cy={120} r={42} fill="none" stroke={B.ember} strokeWidth={0.8} opacity={0.7} />
+      <text x={180} y={123} textAnchor="middle" fontSize={9} fill={B.ink} fontFamily="Inter, sans-serif" letterSpacing={1.4} style={{ textTransform: "uppercase" }}>plasma</text>
+      {/* TOP — neutron counter */}
+      <g transform="translate(180, 30)">
+        <rect x={-32} y={-12} width={64} height={24} rx={3} fill={B.panel} stroke={B.green} strokeWidth={1.1} />
+        <text x={0} y={4} textAnchor="middle" fontSize={9.5} fill={B.green} fontFamily='"Cinzel", serif' fontVariant="small-caps">Neutron Counter</text>
+        <line x1={0} y1={12} x2={0} y2={64} stroke={B.green} strokeWidth={0.9} strokeDasharray="2 3" />
+        <text x={0} y={-18} textAnchor="middle" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>14.1 MeV n · D-T rate</text>
+      </g>
+      {/* RIGHT — gamma spectrometer */}
+      <g transform="translate(330, 120)">
+        <rect x={-32} y={-12} width={64} height={24} rx={3} fill={B.panel} stroke={B.violet} strokeWidth={1.1} />
+        <text x={0} y={4} textAnchor="middle" fontSize={9.5} fill={B.violet} fontFamily='"Cinzel", serif' fontVariant="small-caps">Gamma Spec</text>
+        <line x1={-32} y1={0} x2={-92} y2={0} stroke={B.violet} strokeWidth={0.9} strokeDasharray="2 3" />
+        <text x={0} y={26} textAnchor="middle" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>impurity lines · Te</text>
+      </g>
+      {/* BOTTOM — charged particle detector */}
+      <g transform="translate(180, 210)">
+        <rect x={-44} y={-12} width={88} height={24} rx={3} fill={B.panel} stroke={B.amber} strokeWidth={1.1} />
+        <text x={0} y={4} textAnchor="middle" fontSize={9.5} fill={B.amber} fontFamily='"Cinzel", serif' fontVariant="small-caps">Charged-Particle</text>
+        <line x1={0} y1={-12} x2={0} y2={-48} stroke={B.amber} strokeWidth={0.9} strokeDasharray="2 3" />
+        <text x={0} y={26} textAnchor="middle" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>α · proton · 3He</text>
+      </g>
+      {/* LEFT — calorimeter */}
+      <g transform="translate(30, 120)">
+        <rect x={-26} y={-12} width={56} height={24} rx={3} fill={B.panel} stroke={B.cyan} strokeWidth={1.1} />
+        <text x={0} y={4} textAnchor="middle" fontSize={9.5} fill={B.cyan} fontFamily='"Cinzel", serif' fontVariant="small-caps">Calorimeter</text>
+        <line x1={26} y1={0} x2={108} y2={0} stroke={B.cyan} strokeWidth={0.9} strokeDasharray="2 3" />
+        <text x={0} y={26} textAnchor="middle" fontSize={8.5} fill={B.dim} fontFamily="Inter, sans-serif" letterSpacing={1.2}>wall heat · total Q</text>
+      </g>
     </svg>
   );
 }
@@ -782,9 +910,257 @@ export default function AlchemyToFusionPage() {
           </Card>
         </section>
 
-        {/* §09 Honest line — what's been done, what's hard */}
+        {/* §09 D-D branches and the alpha particle */}
         <section style={{ marginBottom: 44 }} data-testid="section-09">
-          <H num="09" label="Honest Line · What Fusion Has Done, What Stays Hard" accent={B.dim} />
+          <H num="09" label="D-D Branches · The Alpha Particle and Helium-3" accent={B.amber} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 20 }}>
+            <Card accent={B.amber}>
+              <P>
+                When two deuterons fuse, the universe flips a coin. About half the time the
+                product is a helium-3 nucleus and a free neutron. The other half it is a
+                tritium nucleus and a free proton. Both branches are real, both are measured,
+                and both happen at very nearly the same rate inside any D-D plasma.
+              </P>
+              <P>
+                The deuterium-tritium reaction (the easier one for power plants) gives
+                something different: a helium-4 nucleus — the <strong style={{ color: B.ember }}>alpha
+                particle</strong> — plus a fast neutron. The α carries 3.5 MeV; because it
+                is doubly charged, the magnetic field that holds the plasma also holds the α.
+                It loops along field lines and dumps its kinetic energy back into the plasma
+                as heat. This is the self-heating mechanism that lets a fusion plasma
+                eventually sustain itself: more reactions → more αs → more heating → more
+                reactions. Crossing this self-heating threshold is what "ignition" means.
+              </P>
+              <div style={{ marginTop: 8 }}>
+                <Chip color={B.ember}>α stays in the bottle</Chip>{" "}
+                <Chip color={B.green}>n leaves and carries energy out</Chip>
+              </div>
+            </Card>
+            <Card accent={B.amber}>
+              <DDBranchGlyph />
+            </Card>
+          </div>
+          <Card accent={B.dim} style={{ marginTop: 16 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-products">
+              <thead>
+                <tr>
+                  <Th>Reaction</Th>
+                  <Th>Charged products (stay in plasma)</Th>
+                  <Th>Neutral products (escape to wall)</Th>
+                  <Th>Useful for</Th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <Td accent={B.ember}>D + T → ⁴He + n</Td>
+                  <Td>α (3.5 MeV) — heats the plasma</Td>
+                  <Td>n (14.1 MeV) — heats the wall, breeds tritium in lithium blanket</Td>
+                  <Td>Power plants · ITER's reference reaction</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.amber}>D + D → ³He + n</Td>
+                  <Td>³He (0.82 MeV)</Td>
+                  <Td>n (2.45 MeV)</Td>
+                  <Td>D-only fuel cycle · diagnostics rate</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.rose}>D + D → T + p</Td>
+                  <Td>T (1.01 MeV) + p (3.02 MeV)</Td>
+                  <Td>none</Td>
+                  <Td>Same fuel · different signature for measurement</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.green}>D + ³He → ⁴He + p</Td>
+                  <Td>α (3.6 MeV) + p (14.7 MeV) — fully charged</Td>
+                  <Td>none (aneutronic)</Td>
+                  <Td>Aspirational · no neutron damage but needs much higher T</Td>
+                </tr>
+              </tbody>
+            </table>
+            <P>
+              Two facts the table makes plain. First, the alpha particle is the gift the D-T
+              reaction gives to the engineer — it is the part of the energy that never leaves.
+              Second, an aneutronic cycle (D + ³He) would solve the wall-damage problem in one
+              move, but it asks for plasma temperatures that no current device can sustain.
+            </P>
+          </Card>
+        </section>
+
+        {/* §10 Why the Sun is slow */}
+        <section style={{ marginBottom: 44 }} data-testid="section-10">
+          <H num="10" label="The Sun is Slow · Why Stars Last Billions of Years" accent={B.gold} />
+          <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1fr", gap: 20 }}>
+            <Card accent={B.gold}>
+              <P>
+                The Sun does not run on D-T. It runs on the proton-proton chain, and its
+                first step is far harder than anything we attempt on Earth: two protons must
+                stick, and one must convert into a neutron mid-collision. That conversion is
+                a weak-interaction process, and the weak interaction is — by name and by
+                fact — extraordinarily weak.
+              </P>
+              <P>
+                The number is striking. The mean lifetime of a proton in the Sun's core,
+                before it finally fuses, is on the order of <strong style={{ color: B.gold }}>10
+                billion years</strong>. The Sun is forty-six hundred million years old. The
+                average proton in the core has not yet had its turn. The Sun is bright not
+                because individual fusions are fast — they are absurdly slow — but because
+                there are about 10⁵⁶ protons in the core and any tiny fraction of an enormous
+                number is still a large number.
+              </P>
+              <P>
+                On Earth we cannot wait ten billion years for a proton to convert. So we
+                cheat. We start with deuterium (which already has the neutron pre-installed)
+                or with tritium (which has two), and we use the strong interaction directly.
+                Comparing on the same metric — mean waiting time per ion before it fuses —
+                a deuteron in a tokamak at burn conditions (n ≈ 10²⁰ m⁻³, T ≈ 15 keV, ⟨σv⟩
+                ≈ 10⁻²² m³/s) waits about <strong style={{ color: B.ember }}>10² seconds</strong>,
+                versus <strong style={{ color: B.gold }}>10¹⁰ years</strong> for a solar
+                proton. Same drive, roughly fifteen orders of magnitude difference in rate.
+              </P>
+              <div style={{ marginTop: 8 }}>
+                <Chip color={B.gold}>weak-interaction limited</Chip>{" "}
+                <Chip color={B.ember}>strong-interaction limited</Chip>
+              </div>
+            </Card>
+            <Card accent={B.gold}>
+              <SunVsTokamakClockGlyph />
+            </Card>
+          </div>
+          <Card accent={B.dim} style={{ marginTop: 16 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-sun-vs-earth">
+              <thead>
+                <tr>
+                  <Th>Quantity</Th>
+                  <Th>Sun (p-p chain, core)</Th>
+                  <Th>Earth (D-T, tokamak)</Th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <Td accent={B.gold}>Limiting interaction</Td>
+                  <Td>Weak (proton → neutron)</Td>
+                  <Td>Strong (already a neutron in the fuel)</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.gold}>Mean time per proton to fuse</Td>
+                  <Td>~10¹⁰ years</Td>
+                  <Td>nanoseconds at burn conditions</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.gold}>Core temperature</Td>
+                  <Td>~15 million K</Td>
+                  <Td>~150 million K (10× hotter)</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.gold}>Density</Td>
+                  <Td>~150 g/cm³ (denser than gold)</Td>
+                  <Td>~10⁻¹⁰ g/cm³ (vacuum-like)</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.gold}>Power density</Td>
+                  <Td>~270 W/m³ (less than a compost heap, by volume)</Td>
+                  <Td>~MW/m³ (millions of times more intense)</Td>
+                </tr>
+              </tbody>
+            </table>
+            <P>
+              The often-cited surprise: the Sun's core is, watt for cubic-metre, less
+              energetic than your compost bin. The Sun is luminous because it is enormous, not
+              because it is intense. Tokamaks make the opposite trade — small volume, ferocious
+              intensity — because we cannot wait the way the Sun can.
+            </P>
+          </Card>
+        </section>
+
+        {/* §11 Measuring fusion on Earth */}
+        <section style={{ marginBottom: 44 }} data-testid="section-11">
+          <H num="11" label="Measuring Fusion on Earth · The Diagnostics" accent={B.cyan} />
+          <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 20 }}>
+            <Card accent={B.cyan}>
+              <P>
+                Saying "fusion happened" is not a slogan; it is a measurement. Every fusion
+                reaction throws off a specific set of products at a specific energy. The
+                diagnostics suite of a serious fusion experiment is, in effect, a ring of
+                detectors looking inward, each one tuned to a different signature.
+              </P>
+              <P>
+                The four primary channels are simple. Count <strong style={{ color: B.green }}>neutrons</strong>
+                {" "}— a 14.1 MeV neutron flux from a D-T plasma is the cleanest possible proof
+                that D-T fusion is the source. Look for <strong style={{ color: B.violet }}>gamma rays</strong>{" "}
+                — characteristic lines tell you what impurities the plasma is contaminated with
+                and indirectly its electron temperature. Catch <strong style={{ color: B.amber }}>charged
+                particles</strong> — αs, protons, ³He nuclei that escape the magnetic bottle
+                tell you the reaction-channel mix. Measure <strong style={{ color: B.cyan }}>heat
+                </strong> at the wall with calorimetry — the integral of all the energy that
+                left the plasma is what defines Q.
+              </P>
+              <P>
+                The Q numbers from §08 are not assertions, they are arithmetic done on
+                detector outputs. Q_fuel at NIF in December 2022 was inferred from the
+                measured neutron yield, converted to a reaction count (one detected neutron
+                ≈ one D-T reaction), then multiplied by the total fusion energy of
+                <strong style={{ color: B.cyan }}> 17.6 MeV per reaction</strong> (14.1 MeV
+                in the neutron + 3.5 MeV in the α), and divided by the measured laser energy
+                delivered to the target. Counting only the 14.1 MeV that the neutron carries
+                undercounts the yield by the alpha share — an easy mistake the field is
+                careful not to make. Both numbers had error bars; both were reproduced.
+              </P>
+              <div style={{ marginTop: 8 }}>
+                <Chip color={B.cyan}>measurement first · then claim</Chip>
+              </div>
+            </Card>
+            <Card accent={B.cyan}>
+              <DiagnosticsRingGlyph />
+            </Card>
+          </div>
+        </section>
+
+        {/* §12 Reactor schematic */}
+        <section style={{ marginBottom: 44 }} data-testid="section-12">
+          <H num="12" label="Reactor Vessel · The Pieces in One Cutaway" accent={B.ember} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <Card accent={B.ember}>
+              <img
+                src={imgReactor}
+                alt="Cutaway blueprint of a compact fusion reactor showing the plasma confinement zone in the centre, surrounded by toroidal field coils, plasma vessel walls, plasma shield, cryostat shield, superconducting magnets, and outer neutron shielding, drawn at roughly one metre scale"
+                data-testid="img-reactor-cutaway"
+                style={{
+                  width: "100%", height: "auto", display: "block",
+                  borderRadius: 4, border: `1px solid ${B.line}`,
+                }}
+              />
+              <div style={{ marginTop: 8, fontFamily: "Inter, sans-serif", fontSize: 10.5, color: B.dim, letterSpacing: 1.2 }}>
+                Schematic blueprint · roughly 1 m scale · annotated cutaway, not a literal device
+              </div>
+            </Card>
+            <Card accent={B.ember}>
+              <P>
+                The cutaway names every piece this page has talked about, in one frame.
+                Reading from the centre outward:
+              </P>
+              <ul style={{ fontFamily: "Inter, sans-serif", fontSize: 13.2, lineHeight: 1.7, color: B.ink, paddingLeft: 18, margin: "0 0 10px 0" }}>
+                <li><strong style={{ color: B.ember }}>Plasma confinement zone</strong> — the bright core where D and T at ~150 MK fuse. Tiny by volume, ferociously intense.</li>
+                <li><strong style={{ color: B.cyan }}>Plasma vessel</strong> — the inner wall the plasma must never touch. First line of containment.</li>
+                <li><strong style={{ color: B.violet }}>Plasma shield</strong> — absorbs stray heat and edge plasma, protects the structure behind it.</li>
+                <li><strong style={{ color: B.amber }}>Toroidal field coils</strong> — generate the strong field that wraps the long way around the torus and shapes the magnetic bottle.</li>
+                <li><strong style={{ color: B.gold }}>Superconducting magnets</strong> — produce field strength impossible with copper wire; require liquid helium temperatures to work.</li>
+                <li><strong style={{ color: B.green }}>Cryostat shield</strong> — keeps the magnets near absolute zero while the plasma 1 m away is at 150 million K. The thermal gradient is one of the most extreme on Earth.</li>
+                <li><strong style={{ color: B.rose }}>Neutron shielding</strong> — the outermost layer. 14.1 MeV neutrons pass straight through magnetic fields and must be absorbed by mass. In a power plant the shielding is also the lithium blanket that breeds new tritium.</li>
+              </ul>
+              <P>
+                The honest caveat: the schematic is artistic — proportions and the "x64
+                efficiency" figure are illustrative, not specifications of any particular
+                reactor. ITER's vacuum vessel is roughly twenty metres across, not one. The
+                value of the picture is conceptual: every system on the page lives somewhere
+                in this stack, and they only work together.
+              </P>
+            </Card>
+          </div>
+        </section>
+
+        {/* §13 Honest line — what's been done, what's hard */}
+        <section style={{ marginBottom: 44 }} data-testid="section-13">
+          <H num="13" label="Honest Line · What Fusion Has Done, What Stays Hard" accent={B.dim} />
           <Card accent={B.dim}>
             <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-honest-line">
               <thead>
@@ -830,9 +1206,9 @@ export default function AlchemyToFusionPage() {
           </Card>
         </section>
 
-        {/* §10 Why this is in AETHER */}
-        <section style={{ marginBottom: 44 }} data-testid="section-10">
-          <H num="10" label="Why This Page Sits Inside AETHER" accent={B.rose} />
+        {/* §14 Why this is in AETHER */}
+        <section style={{ marginBottom: 44 }} data-testid="section-14">
+          <H num="14" label="Why This Page Sits Inside AETHER" accent={B.rose} />
           <Card accent={B.rose}>
             <P>
               Three reasons. First, transmutation is the cleanest possible example of physics
@@ -847,9 +1223,9 @@ export default function AlchemyToFusionPage() {
           </Card>
         </section>
 
-        {/* §11 Bridges */}
+        {/* §15 Bridges */}
         <section data-testid="section-bridges">
-          <H num="11" label="Bridges · Where This Page Connects" accent={B.cyan} />
+          <H num="15" label="Bridges · Where This Page Connects" accent={B.cyan} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
             <Bridge to="/coherence-engine" label="Coherence Engine · H ↔ H̄" sub="Hydrogen and antihydrogen — the same orbital map, mirrored." accent={B.cyan} />
             <Bridge to="/ultra-magnetism" label="Ultra-Magnetism · Spin Pairings" sub="Singlet and triplet — orbital symmetries that decide what binds." accent={B.violet} />
