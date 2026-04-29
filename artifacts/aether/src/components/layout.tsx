@@ -73,6 +73,7 @@ import {
   Combine,
   Pyramid,
   Sunrise,
+  Snowflake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -213,6 +214,7 @@ const NAV_ITEMS = [
   { href: "/quantum-living-systems",   label: "Quantum Living · DNA Piano",            icon: Music },
   { href: "/heliospheric-coherence",   label: "Heliospheric Coherence · World in One", icon: Sun },
   { href: "/aether-egg-engine",        label: "Egg Engine · Positive Reinforcement",   icon: Egg },
+  { href: "/under-ice-ecosystem",      label: "Under the Ice · George VI",              icon: Snowflake },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

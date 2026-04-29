@@ -245,7 +245,7 @@ function EngineCard({ e }: { e: Engine }) {
 export default function EnginesPage() {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative"
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="engines-page"
     >

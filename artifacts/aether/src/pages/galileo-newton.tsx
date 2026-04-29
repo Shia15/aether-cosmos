@@ -596,7 +596,7 @@ function ParabolaComposition() {
 export default function GalileoNewtonPage() {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative"
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="galileo-newton-page"
     >
