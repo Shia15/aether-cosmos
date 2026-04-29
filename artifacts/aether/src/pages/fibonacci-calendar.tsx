@@ -216,6 +216,238 @@ const HISTORY = [
   },
 ];
 
+/* ────────────────────────────────────────────────────────────────────
+   Multi-Cycle Life Energy Index · Φ(t)
+   Visualises four interfering biological cycles + composite + coherence
+   over a 7-day window, anchored to the Fibonacci Calendar's 28-day month.
+   Static visualisation — no controls, no state, no animation.
+   ─────────────────────────────────────────────────────────────────── */
+function MultiCycleLifeEnergy() {
+  // Cycle periods (hours)
+  const T_D = 24;          // circadian
+  const T_S = 1.5;         // ultradian (90 min)
+  const T_G = 28 * 24;     // monthly / infradian — equals 1 IFC month exactly
+  const T_Y = 365 * 24;    // yearly / seasonal
+
+  // Amplitudes weighted toward the daily rhythm (per source spec)
+  const a_D = 0.50, a_S = 0.20, a_G = 0.15, a_Y = 0.10;
+
+  const HOURS = 168;       // 7 days
+  const STEP  = 0.5;       // 30-min resolution → captures the 90-min ultradian cleanly
+
+  type Series = { t: number; D: number; S: number; G: number; Y: number; phi: number; coh: number };
+
+  const data: Series[] = useMemo(() => {
+    const out: Series[] = [];
+    for (let t = 0; t <= HOURS; t += STEP) {
+      // Circadian peaks roughly mid-afternoon (t = 14h → near noon-trough → mid-PM peak)
+      const D = Math.sin(2 * Math.PI * (t - 6) / T_D);
+      const S = Math.sin(2 * Math.PI * t / T_S);
+      const G = Math.sin(2 * Math.PI * (t / T_G));
+      const Y = Math.sin(2 * Math.PI * (t / T_Y) + 0.6);
+      // Coherence: gentle daily envelope, peaks near 1.0, dips around 0.7 overnight
+      const coh = 0.85 + 0.13 * Math.sin(2 * Math.PI * (t - 6) / T_D);
+      const phi = coh * (a_D * D + a_S * S + a_G * G + a_Y * Y);
+      out.push({ t, D, S, G, Y, phi, coh });
+    }
+    return out;
+  }, []);
+
+  // Chart geometry
+  const W = 880, H = 260, PADL = 36, PADR = 14, PADT = 14, PADB = 28;
+  const innerW = W - PADL - PADR;
+  const innerH = H - PADT - PADB;
+  // Both charts use the same [-1, +1] y-domain so values are never visually clipped.
+  const xOf = (t: number) => PADL + (t / HOURS) * innerW;
+  const yOf = (v: number, range = 1)  => PADT + (1 - (v + range) / (2 * range)) * innerH;
+
+  const polyline = (key: keyof Series, range = 1) =>
+    data.map(d => `${xOf(d.t)},${yOf(d[key] as number, range)}`).join(" ");
+
+  // Day boundaries (every 24h) for x-axis ticks
+  const dayTicks = Array.from({ length: 8 }, (_, i) => i); // 0..7
+
+  // Range observed in composite Φ(t)
+  const phiVals = data.map(d => d.phi);
+  const phiMin = Math.min(...phiVals).toFixed(2);
+  const phiMax = Math.max(...phiVals).toFixed(2);
+
+  const seriesMeta = [
+    { key: "D" as const, color: C.blue,   label: "Φ_D · Circadian",  period: "24 h",          a: 0.50 },
+    { key: "S" as const, color: C.orange, label: "Φ_S · Ultradian",  period: "≈ 90 min",      a: 0.20 },
+    { key: "G" as const, color: C.purple, label: "Φ_G · Infradian",  period: "28 days",       a: 0.15 },
+    { key: "Y" as const, color: C.green,  label: "Φ_Y · Circannual", period: "365 days",      a: 0.10 },
+  ];
+
+  return (
+    <div data-testid="multi-cycle-energy" className="border rounded-xl p-5"
+         style={{ borderColor: C.red + "25", background: "linear-gradient(135deg,#030514,#0a0212)" }}>
+
+      {/* Header */}
+      <div className="flex items-baseline justify-between flex-wrap gap-3 mb-4">
+        <div>
+          <p className="text-[9px] font-['Cinzel',serif] tracking-[0.3em]" style={{ color: C.red + "90" }}>
+            MULTI-CYCLE LIFE ENERGY INDEX · Φ(t)
+          </p>
+          <p className="text-[10px] mt-1" style={{ color: C.text }}>
+            Four nested biological cycles, weighted and gated by coherence — over a 168-hour window
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          <span className="text-[9px] px-2 py-1 rounded border font-['Cinzel',serif]"
+                style={{ borderColor: C.red + "40", color: C.red, background: C.red + "08" }}>
+            Φ(t) = C(t) · Σᵢ aᵢ · sin(2π t / Tᵢ + φᵢ)
+          </span>
+          <span className="text-[9px] px-2 py-1 rounded border font-['Cinzel',serif]"
+                style={{ borderColor: C.purple + "40", color: C.purple, background: C.purple + "08" }}>
+            Φ_G · 28 d  =  1 IFC month
+          </span>
+        </div>
+      </div>
+
+      {/* Cycle legend chips */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+        {seriesMeta.map(s => (
+          <div key={s.key} className="flex items-start gap-2 px-3 py-2 rounded border"
+               style={{ borderColor: s.color + "30", background: s.color + "06" }}>
+            <span className="block w-3 h-3 rounded-sm mt-0.5" style={{ background: s.color }} />
+            <div>
+              <p className="text-[9px] font-['Cinzel',serif]" style={{ color: s.color }}>{s.label}</p>
+              <p className="text-[8px]" style={{ color: s.color + "80" }}>
+                T = {s.period}  ·  a = {s.a.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* CHART 1 — components overlaid */}
+      <div className="rounded-lg p-2 mb-3" style={{ background: "#02010a", border: `1px solid ${C.gold}15` }}>
+        <p className="text-[8px] font-['Cinzel',serif] tracking-widest mb-1 ml-2" style={{ color: C.gold + "80" }}>
+          COMPONENT WAVES · Φ_D, Φ_S, Φ_G, Φ_Y
+        </p>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img"
+             aria-label="Four overlaid component waveforms over seven days: circadian in blue, ultradian in orange, infradian in purple, circannual in green">
+          {/* day-boundary grid */}
+          {dayTicks.map(d => (
+            <g key={d}>
+              <line x1={xOf(d * 24)} y1={PADT} x2={xOf(d * 24)} y2={H - PADB}
+                    stroke={C.gold + "12"} strokeWidth={d === 0 || d === 7 ? 1 : 0.6}
+                    strokeDasharray={d === 0 || d === 7 ? "" : "2 3"} />
+              <text x={xOf(d * 24)} y={H - PADB + 14} textAnchor="middle"
+                    fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>
+                Day {d + 1}
+              </text>
+            </g>
+          ))}
+          {/* zero line */}
+          <line x1={PADL} y1={yOf(0, 1)} x2={W - PADR} y2={yOf(0, 1)}
+                stroke={C.gold + "25"} strokeWidth={0.6} strokeDasharray="3 3" />
+          {/* y-axis labels */}
+          <text x={PADL - 4} y={yOf(1, 1) + 3}  textAnchor="end" fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>+1</text>
+          <text x={PADL - 4} y={yOf(0, 1) + 3}  textAnchor="end" fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>0</text>
+          <text x={PADL - 4} y={yOf(-1, 1) + 3} textAnchor="end" fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>−1</text>
+          {/* component polylines */}
+          {seriesMeta.map(s => (
+            <polyline key={s.key} fill="none" stroke={s.color} strokeOpacity={0.85}
+                      strokeWidth={s.key === "S" ? 0.7 : 1.1} points={polyline(s.key, 1)} />
+          ))}
+        </svg>
+      </div>
+
+      {/* CHART 2 — composite + coherence */}
+      <div className="rounded-lg p-2 mb-4" style={{ background: "#02010a", border: `1px solid ${C.red}20` }}>
+        <p className="text-[8px] font-['Cinzel',serif] tracking-widest mb-1 ml-2" style={{ color: C.red + "90" }}>
+          COMPOSITE Φ(t) · WITH COHERENCE ENVELOPE
+        </p>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img"
+             aria-label="Composite Phi of t in red overlaid with coherence envelope as a dashed gray line over seven days">
+          {/* day boundaries */}
+          {dayTicks.map(d => (
+            <g key={d}>
+              <line x1={xOf(d * 24)} y1={PADT} x2={xOf(d * 24)} y2={H - PADB}
+                    stroke={C.gold + "12"} strokeWidth={d === 0 || d === 7 ? 1 : 0.6}
+                    strokeDasharray={d === 0 || d === 7 ? "" : "2 3"} />
+              <text x={xOf(d * 24)} y={H - PADB + 14} textAnchor="middle"
+                    fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>
+                Day {d + 1}
+              </text>
+            </g>
+          ))}
+          {/* zero line */}
+          <line x1={PADL} y1={yOf(0, 1)} x2={W - PADR} y2={yOf(0, 1)}
+                stroke={C.gold + "25"} strokeWidth={0.6} strokeDasharray="3 3" />
+          {/* y-axis labels */}
+          <text x={PADL - 4} y={yOf( 1, 1) + 3} textAnchor="end" fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>+1</text>
+          <text x={PADL - 4} y={yOf( 0, 1) + 3} textAnchor="end" fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>0</text>
+          <text x={PADL - 4} y={yOf(-1, 1) + 3} textAnchor="end" fontFamily="Cinzel, serif" fontSize={8} fill={C.gold + "60"}>−1</text>
+          {/* coherence envelope (rescaled from its raw [~0.72, ~0.98] range to fit the display band) */}
+          <polyline fill="none" stroke={C.text} strokeOpacity={0.7} strokeWidth={1}
+                    strokeDasharray="4 4"
+                    points={data.map(d => `${xOf(d.t)},${yOf((d.coh - 0.85) * 6.0, 1)}`).join(" ")} />
+          {/* composite Φ(t) */}
+          <polyline fill="none" stroke={C.red} strokeWidth={1.8} strokeOpacity={0.95}
+                    points={polyline("phi", 1)} />
+          {/* legend chip inside chart */}
+          <g transform={`translate(${PADL + 8}, ${PADT + 8})`}>
+            <rect width={210} height={32} rx={4} fill="#02010a" stroke={C.red + "30"} />
+            <line x1={8} y1={11} x2={22} y2={11} stroke={C.red} strokeWidth={2} />
+            <text x={28} y={14} fontFamily="Cinzel, serif" fontSize={9} fill={C.red}>Φ(t) composite</text>
+            <line x1={8} y1={24} x2={22} y2={24} stroke={C.text} strokeWidth={1} strokeDasharray="3 3" opacity={0.7} />
+            <text x={28} y={27} fontFamily="Cinzel, serif" fontSize={9} fill={C.text}>Coherence C(t)</text>
+          </g>
+        </svg>
+        <p className="text-[9px] mt-1 ml-2" style={{ color: C.text }}>
+          Observed range over 7 days · Φ(t) ∈ [{phiMin}, +{phiMax}] · stays well inside [−1, +1]
+        </p>
+      </div>
+
+      {/* Observations grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { col: C.gold,   title: "HIGH-ENERGY PEAKS",
+            body: `When circadian + ultradian align constructively and coherence is near 1.0 — typical of well-rested mid-afternoon focus windows. In this 7-day window the composite reaches +${phiMax}, well inside the ceiling of +1.` },
+          { col: C.red,    title: "LOW-ENERGY DIPS",
+            body: `Cycles interfere destructively or coherence drops — overnight troughs, post-prandial slumps, jet-lag, sleep debt. The deepest dip in this window is ${phiMin}, never saturating to the floor of −1.` },
+          { col: C.purple, title: "INFRADIAN ANCHOR · 28 d",
+            body: "Φ_G's period equals exactly one IFC month. Each Fixed-Calendar month is one full infradian wave — the calendar month is not arbitrary, it's an envelope on a real biological cycle." },
+          { col: C.green,  title: "QUASI-PERIODIC",
+            body: "In this idealised model the four periods (1.5h, 24h, 28d, 365d) are rationally related, so a strict mathematical period exists at one year. In real biology the periods drift and jitter — the composite then never exactly repeats, which the IFC's Year-Day reset acknowledges at the year boundary." },
+        ].map(o => (
+          <div key={o.title} className="rounded-lg border p-3"
+               style={{ borderColor: o.col + "30", background: o.col + "06" }}>
+            <p className="text-[9px] font-['Cinzel',serif] mb-1.5" style={{ color: o.col }}>{o.title}</p>
+            <p className="text-[9px] leading-5" style={{ color: o.col + "80" }}>{o.body}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar tie-in chip strip */}
+      <div className="mt-4 flex items-center gap-2 flex-wrap justify-center">
+        {[
+          "T_S = 90 min",
+          "→",
+          "T_D = 24 h",
+          "→",
+          "T_G = 28 d  (= 1 IFC month)",
+          "→",
+          "T_Y = 365 d  (= 13 IFC months + Year Day)",
+        ].map((t, i) => (
+          <span key={i}
+                className={`text-[9px] font-['Cinzel',serif] ${t === "→" ? "text-yellow-800/30" : "px-2 py-1 rounded border"}`}
+                style={t !== "→" ? { borderColor: C.gold + "20", color: C.gold + "80" } : {}}>
+            {t}
+          </span>
+        ))}
+      </div>
+      <p className="text-[9px] text-yellow-400/40 leading-5 mt-3 text-center italic">
+        "Time in AETHER isn't a single tick — it's a stack of nested oscillators, gated by coherence.
+        The 13-month calendar isn't a substitute clock; it's the one whose units actually fit the body."
+      </p>
+    </div>
+  );
+}
+
 export default function FibonacciCalendarPage() {
   const [tab, setTab] = useState<"calendar"|"mathematics"|"history"|"aether"|"world">("calendar");
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null);
@@ -477,6 +709,9 @@ export default function FibonacciCalendarPage() {
                 </div>
               ))}
             </div>
+
+            <MultiCycleLifeEnergy />
+
             <div className="border rounded-xl p-5" style={{ borderColor: C.gold+"25", background: "linear-gradient(135deg,#030514,#0a0a02)" }}>
               <p className="text-[9px] font-['Cinzel',serif] mb-3" style={{ color: C.gold+"60" }}>THE UNIFIED TEMPORAL ARCHITECTURE</p>
               <div className="flex items-center gap-2 flex-wrap justify-center">
