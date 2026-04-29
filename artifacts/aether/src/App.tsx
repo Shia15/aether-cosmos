@@ -77,6 +77,7 @@ import UnderIceEcosystemPage from "@/pages/under-ice-ecosystem";
 import AlchemyToFusionPage from "@/pages/alchemy-to-fusion";
 import ImplicateOrderPage from "@/pages/implicate-order";
 import KnowableUniversePage from "@/pages/knowable-universe";
+import NonPhysicalPhenomenaPage from "@/pages/non-physical-phenomena";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -273,6 +274,7 @@ function Router() {
         <Route path="/alchemy-to-fusion" component={AlchemyToFusionPage} />
         <Route path="/implicate-order" component={ImplicateOrderPage} />
         <Route path="/knowable-universe" component={KnowableUniversePage} />
+        <Route path="/non-physical-phenomena" component={NonPhysicalPhenomenaPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />

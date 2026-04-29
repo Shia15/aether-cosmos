@@ -218,6 +218,7 @@ const NAV_ITEMS = [
   { href: "/alchemy-to-fusion",        label: "Alchemy to Fusion · Transmutation",      icon: Flame },
   { href: "/implicate-order",          label: "Implicate Order · Bohm + Sensoria",      icon: Layers },
   { href: "/knowable-universe",        label: "Knowable Universe · Euler + SM",         icon: Atom },
+  { href: "/non-physical-phenomena",   label: "Non-Physical Phenomena · Real, Not Particles", icon: Sigma },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
