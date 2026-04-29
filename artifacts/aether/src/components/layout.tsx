@@ -210,6 +210,7 @@ const NAV_ITEMS = [
   { href: "/universal-grammar",        label: "Universal Grammar · Paper",            icon: BookOpen },
   { href: "/aether-edge-constraint",   label: "Edge Constraint · Section 32",          icon: Aperture },
   { href: "/quantum-living-systems",   label: "Quantum Living · DNA Piano",            icon: Music },
+  { href: "/heliospheric-coherence",   label: "Heliospheric Coherence · World in One", icon: Sun },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

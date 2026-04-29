@@ -595,9 +595,9 @@ export default function AetherEdgeConstraintView() {
           <StackLadder />
         </section>
 
-        {/* Section 8 — Section 33 add-on */}
+        {/* Section 8 — Section 33.1 Language axes */}
         <section style={{ marginBottom: 36 }} data-testid="section-language">
-          <H num="08" label="Coda · Language as the Human Workaround" accent={B.cyan} />
+          <H num="08" label="§33.1 · Language as the Human Workaround" accent={B.cyan} />
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, color: B.dim, marginBottom: 14, lineHeight: 1.6, maxWidth: 880 }}>
             The same Edge Constraint applies to cognition. Animals reach the constraint when forced to symbolize the absent.
             Human language is the workaround: it offloads the binary, periodic, sharp-edged demand from the analog brain
@@ -627,6 +627,125 @@ export default function AetherEdgeConstraintView() {
           </div>
         </section>
 
+        {/* Section 9 — Section 33.2 Dual-form + 33.3 Shared Failure Mode */}
+        <section style={{ marginBottom: 36 }} data-testid="section-shared-failure">
+          <H num="09" label="§33.2–33.3 · Dual-Form & The Shared Failure Mode" accent={B.violet} />
+
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, color: B.dim, marginBottom: 12, lineHeight: 1.6, maxWidth: 880 }}>
+            Both substrates render <span style={{ color: B.ink }}>X(t)</span> — an external demand to express a coherent state.
+            They differ only in whether the field is rendered <span style={{ color: B.cyan }}>directly</span> as
+            spatial coherence or <span style={{ color: B.violet }}>compressed</span> through a transferable symbolic channel.
+            Neither is superior; they are adapted to different coherence-propagation requirements.
+          </div>
+
+          {/* 33.2 — dual-form rendering equations */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 14, marginBottom: 22 }}>
+            <Card accent={B.cyan}>
+              <div style={{ fontFamily: '"Cinzel", serif', fontSize: 14, color: B.cyan, fontVariant: "small-caps", letterSpacing: 0.6, marginBottom: 8 }}>
+                Octopus · Direct Spatial Field
+              </div>
+              <div style={{ fontFamily: "ui-monospace, Menlo, Consolas, monospace", fontSize: 12.5, color: B.ink, lineHeight: 1.7, padding: "10px 12px", background: "rgba(0,0,0,0.32)", border: `1px solid ${B.cyan}33`, borderRadius: 4 }}>
+                X(t) → C(x,t)
+              </div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, marginTop: 10, lineHeight: 1.55 }}>
+                Full spatial field · visible · real-time · <span style={{ color: B.ink }}>non-transferable</span>.
+                Optimal for immediate, local, high-fidelity coherence expression.
+              </div>
+            </Card>
+            <Card accent={B.violet}>
+              <div style={{ fontFamily: '"Cinzel", serif', fontSize: 14, color: B.violet, fontVariant: "small-caps", letterSpacing: 0.6, marginBottom: 8 }}>
+                Human · Compressed Symbolic Channel
+              </div>
+              <div style={{ fontFamily: "ui-monospace, Menlo, Consolas, monospace", fontSize: 12.5, color: B.ink, lineHeight: 1.7, padding: "10px 12px", background: "rgba(0,0,0,0.32)", border: `1px solid ${B.violet}33`, borderRadius: 4 }}>
+                X(t) → Z = compress(C) → transmit → D(Z) → C′(x,t)
+              </div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, marginTop: 10, lineHeight: 1.55 }}>
+                Compressed reconstruction · transferable across distance and time.
+                Optimal for long-range, asynchronous, cross-environment propagation —
+                exactly what CUCA's <span style={{ color: B.ink }}>L6 replication layer</span> does.
+              </div>
+            </Card>
+          </div>
+
+          {/* 33.3 — shared failure mode */}
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, letterSpacing: 2.2, color: B.dim, textTransform: "uppercase", marginBottom: 8 }}>
+            §33.3 — <span style={{ color: B.violet }}>The Shared Failure Mode</span>
+          </div>
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, color: B.dim, marginBottom: 12, lineHeight: 1.6, maxWidth: 880 }}>
+            Both systems share the same failure mode, expressed in different substrates. When demand exceeds the
+            coupled analog bandwidth, the field collapses to whatever coherent state remains achievable.
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 14, marginBottom: 22 }}>
+            <Card accent={B.cyan}>
+              <div style={{ fontFamily: '"Cinzel", serif', fontSize: 13.5, color: B.cyan, fontVariant: "small-caps", letterSpacing: 0.6, marginBottom: 6 }}>
+                Octopus · Chessboard
+              </div>
+              <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11.5, color: B.ink, marginBottom: 8 }}>C(x,t) → 0</div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, lineHeight: 1.55 }}>
+                When environmental demand exceeds chromatophore bandwidth.
+                <br /><span style={{ color: B.ink }}>Fallback:</span> disruptive uniform.
+              </div>
+            </Card>
+            <Card accent={B.rose}>
+              <div style={{ fontFamily: '"Cinzel", serif', fontSize: 13.5, color: B.rose, fontVariant: "small-caps", letterSpacing: 0.6, marginBottom: 6 }}>
+                Human · Simultaneous Contradictions
+              </div>
+              <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11.5, color: B.ink, marginBottom: 8 }}>cognition → fragment</div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, lineHeight: 1.55 }}>
+                When symbolic demand exceeds working memory and attentional coherence bandwidth.
+                <br /><span style={{ color: B.ink }}>Fallback:</span> confabulation or paralysis.
+              </div>
+            </Card>
+            <Card accent={B.violet}>
+              <div style={{ fontFamily: '"Cinzel", serif', fontSize: 13.5, color: B.violet, fontVariant: "small-caps", letterSpacing: 0.6, marginBottom: 6 }}>
+                CUCA · Overconstraint
+              </div>
+              <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11.5, color: B.ink, marginBottom: 8 }}>C(x,t) → 0 when ‖E(t)‖ ≫ capacity</div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, lineHeight: 1.55 }}>
+                When the demand vector exceeds total system capacity.
+                <br /><span style={{ color: B.ink }}>Fallback:</span> simplified achievable coherent state.
+              </div>
+            </Card>
+          </div>
+
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, color: B.dim, marginBottom: 14, lineHeight: 1.6, maxWidth: 880 }}>
+            The AETHER Cephalopod Edge Constraint is not a biological curiosity. The model proposes it as a
+            <span style={{ color: B.ink }}> universal law of coherence systems</span>: when demand exceeds the
+            coupled analog bandwidth, the field collapses to whatever coherent state remains achievable. The octopus,
+            the human brain, and the CUCA architecture all obey the same constraint.
+          </div>
+
+          {/* Canonical form box */}
+          <div style={{
+            display: "flex", alignItems: "stretch",
+            background: "rgba(0,0,0,0.32)", border: `1px solid ${B.gold}33`,
+            borderLeft: `3px solid ${B.gold}`, borderRadius: 4, overflow: "hidden",
+          }}>
+            <div style={{
+              padding: "14px 16px",
+              background: "rgba(230,184,92,0.10)",
+              borderRight: `1px solid ${B.gold}33`,
+              fontFamily: "Inter, sans-serif", fontSize: 10.5, letterSpacing: 2,
+              textTransform: "uppercase", color: B.gold,
+              display: "flex", alignItems: "center", whiteSpace: "nowrap",
+            }}>
+              Canonical<br />Form
+            </div>
+            <div style={{ padding: "14px 16px", flex: 1 }}>
+              <div style={{ fontFamily: "ui-monospace, Menlo, Consolas, monospace", fontSize: 13, color: B.ink, lineHeight: 1.6 }}>
+                ‖E(t)‖ ↑ &nbsp;⟹&nbsp; coupling conflict &nbsp;⟹&nbsp; C(x,t) ↓ &nbsp;⟹&nbsp; emergent instability
+              </div>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, marginTop: 8, fontStyle: "italic", lineHeight: 1.55 }}>
+                The failure is not lack of intelligence. It is the cost of being continuous in a discontinuous demand space.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 10.5, letterSpacing: 1.6, color: B.dim, textTransform: "uppercase", textAlign: "center", marginTop: 18 }}>
+            — End of Section 32–33 Addendum —
+          </div>
+        </section>
+
         {/* Closing line */}
         <section style={{ marginBottom: 36 }} data-testid="section-closing">
           <Card accent={B.gold} style={{ background: "rgba(230,184,92,0.04)" }}>
@@ -637,14 +756,14 @@ export default function AetherEdgeConstraintView() {
               It is the cost of being continuous in a discontinuous demand space.
             </div>
             <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11.5, color: B.dim, marginTop: 12, fontStyle: "italic" }}>
-              — AETHER · Section 32, closing
+              — AETHER · Sections 32–33, closing
             </div>
           </Card>
         </section>
 
         {/* Bridges */}
         <section data-testid="section-bridges">
-          <H num="09" label="Bridges" accent={B.pearl} />
+          <H num="10" label="Bridges" accent={B.pearl} />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 10 }}>
             <Bridge to="/universal-grammar"      label="Universal Grammar"     sub="Stromatolite as the same coupled-field architecture" accent={B.green} />
             <Bridge to="/stromatolite-automaton" label="Stromatolite Automaton" sub="The continuous prior the cephalopod falls back onto" accent={B.amber} />
