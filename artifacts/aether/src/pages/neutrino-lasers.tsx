@@ -206,8 +206,73 @@ export default function NeutrinoLasersPage() {
           </div>
         </section>
 
+        <section className="mb-14" data-testid="section-plasmoid">
+          <H num="05" label="Plasmoid Coherence Factor · Φc framing" accent={B.violet} />
+
+          {/* Speculative banner — consistent with §04 hedge */}
+          <div className="rounded-md p-4 mb-4 border" data-testid="plasmoid-speculative-banner"
+               style={{ borderColor: "rgba(180,140,255,0.35)",
+                        background: "linear-gradient(135deg, rgba(180,140,255,0.10), rgba(180,140,255,0.04))" }}>
+            <div className="text-[10px] uppercase tracking-[0.28em] mb-1.5"
+                 style={{ color: "#c4b5fd", fontFamily: "Inter, sans-serif" }}>
+              Speculative · framing, not measurement
+            </div>
+            <div className="text-[12.5px] leading-relaxed" style={{ color: B.textWarm }}>
+              The expression below is an AETHER-internal coherence framing for what a "plasmoid bubble" would
+              have to satisfy if it were treated as a coherent quantum object — not an established result from
+              plasma physics. It groups three components (oscillation rate, magnetic confinement, particle
+              correlation) into a single composite, but it has not been derived from first principles or
+              validated against an external standard. Read as a checklist for what would have to be jointly true,
+              not as a predictive formula.
+            </div>
+          </div>
+
+          {/* Formula chip */}
+          <div className="rounded-md p-5 mb-5 border text-center" data-testid="plasmoid-formula"
+               style={{ borderColor: B.border, background: "#000",
+                        fontFamily: "ui-monospace, monospace" }}>
+            <div className="text-[11px] uppercase tracking-[0.28em] mb-3" style={{ color: B.muted }}>
+              Composite coherence factor
+            </div>
+            <div className="text-[20px] sm:text-[24px]" style={{ color: B.violet }}>
+              Φ<sub>c</sub> &nbsp;=&nbsp; (ω<sub>pe</sub> / 2π) &nbsp;×&nbsp; (B / B<sub>0</sub>) &nbsp;×&nbsp; Γ<sub>eff</sub>
+            </div>
+            <div className="text-[11px] mt-3" style={{ color: B.muted }}>
+              wave activity · magnetic trapping · particle correlation
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-3">
+            <Card accent={B.cyan} eyebrow="Term 1 · ω_pe / 2π"
+                  title="Plasma frequency · oscillation rate"
+                  body="The electron plasma frequency ω_pe = √(4π e² n_e / m_e) sets the natural oscillation rate of the electron fluid. Faster wave dynamics raise the rate at which the plasmoid can sample its own internal phase before decohering. This term is real plasma physics; the coherence claim built on top of it is not." />
+            <Card accent={B.amber} eyebrow="Term 2 · B / B₀"
+                  title="Magnetic field ratio · confinement"
+                  body="The local-to-reference magnetic field ratio B / B₀ stands in for how tightly the structure is magnetically confined. Higher ratio is read as stronger trapping of the constituent particles inside the proposed plasmoid envelope. This is a parameter, not a stability proof." />
+            <Card accent={B.green} eyebrow="Term 3 · Γ_eff"
+                  title="Effective coupling · particle ordering"
+                  body="The effective coupling Γ_eff = (e² / 4π ε₀ k_B T) ⟨1/r⟩ is the plasma-physics dimensionless ratio of Coulomb potential energy to thermal energy. Above ~1, the system is strongly coupled and particles begin to order. The framing here treats Γ_eff > 1 as a proxy for non-trivial particle correlation inside the structure." />
+          </div>
+
+          <div className="mt-4 rounded-md p-4 border" data-testid="plasmoid-honest-line"
+               style={{ borderColor: B.border, background: B.panel }}>
+            <div className="text-[10px] uppercase tracking-[0.28em] mb-1.5"
+                 style={{ color: B.red, fontFamily: "Inter, sans-serif" }}>
+              Honest line · what Φc is not
+            </div>
+            <div className="text-[12.5px] leading-relaxed" style={{ color: B.text }}>
+              Φ<sub>c</sub> being large in this framing is necessary, not sufficient, for the kind of
+              long-coherence behaviour the paper invokes. None of the three terms is a coherence guarantee:
+              high ω<sub>pe</sub> means many oscillations, not phase locking; high B/B₀ means trapping, not
+              ordering; high Γ<sub>eff</sub> means correlation, not macroscopic coherence. Treat the product as
+              a screening checklist for which regimes are even worth modelling — not as a derivation that
+              fusion-relevant or biologically-relevant plasmoid coherence has been established.
+            </div>
+          </div>
+        </section>
+
         <section data-testid="section-bridges">
-          <H num="05" label="Bridges · Where the Paper Touches the Stack" accent={B.gold} />
+          <H num="06" label="Bridges · Where the Paper Touches the Stack" accent={B.gold} />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Bridge to="/coherence-engine"   label="Coherence Engine · H ↔ H̄"      accent={B.cyan} />
             <Bridge to="/coherence"          label="Coherence · Live Lattice"        accent={B.green} />

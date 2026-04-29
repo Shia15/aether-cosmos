@@ -466,7 +466,106 @@ export default function NeuroplasticityView() {
 
       {/* ── FOUNDATIONAL LAYER ────────────────────────────────────────── */}
       <FoundationalLayer />
+
+      {/* ── PHARMACOLOGICAL ADJUNCT ───────────────────────────────────── */}
+      <PharmacologicalAdjunct />
     </div>
+  );
+}
+
+// ── Pharmacological Adjunct (TBG / Silent Neuroplasticity) ──────────────────
+function PharmacologicalAdjunct() {
+  const ROWS = [
+    {
+      kicker: "Mechanism · proposed split",
+      title: "Two receptor populations, two effects.",
+      body: "Reading: classical psychedelics activate 5-HT2A receptors in two compartments — a surface population that drives the perceptual / 'trip' experience via cortical glutamate bursts, and an intracellular population that drives structural growth and synaptic remodelling. The proposal under discussion is that these two effects are at least partially separable — that the structural-plasticity arm can be engaged without the full perceptual arm.",
+      accent: "#c084fc",
+    },
+    {
+      kicker: "Compound · TBG (tabernanthalog)",
+      title: "Lipophilic, low-trip, plasticity-leaning.",
+      body: "Tabernanthalog (TBG), an ibogaine analogue developed by the Olson lab at UC Davis, is highly lipophilic, crosses cell membranes easily, and reaches intracellular 5-HT2A sites. In rodent assays it has been reported as a partial agonist that triggers neurite growth and dendritic-spine density increases, with substantially reduced head-twitch response — the standard rodent proxy for the perceptual psychedelic effect.",
+      accent: "#7be4ea",
+    },
+    {
+      kicker: "Framing · gap vs growth",
+      title: "Distinguish 'gap' from 'plasticity'.",
+      body: "Useful distinction: the 'trip' may matter for its own reasons — disrupting the default-mode network and habitual patterns, opening a window where new behavioural patterns can install ('the gap'). The molecular plasticity (BDNF, TrkB signalling, spine remodelling) is a separate axis. A compound that engages the second without the first is a different clinical object than one that engages both — it is not equivalent to a 'mini psychedelic'.",
+      accent: "#7be59f",
+    },
+  ];
+  return (
+    <section style={{ borderTop: "1px solid rgba(192,132,252,0.12)", padding: "28px 28px 36px" }}
+             data-testid="pharmacological-adjunct">
+      <div style={{ fontFamily: "Cinzel, serif", fontSize: 10, color: "#c084fc", letterSpacing: "0.25em", marginBottom: 4 }}>
+        Pharmacological Adjunct · TBG · Intracellular 5-HT2A
+      </div>
+      <h2 style={{ fontFamily: "Cinzel, serif", fontSize: 18, color: "#e0d8ff", margin: "0 0 6px", letterSpacing: "0.06em" }}>
+        Silent neuroplasticity — do you actually need the trip?
+      </h2>
+      <p style={{ fontSize: 12.5, color: "rgba(200,195,240,0.6)", margin: "0 0 14px", maxWidth: 880, lineHeight: 1.6 }}>
+        The Diet · Exercise · Sleep Venn above is the lifestyle floor. This panel records a separate, contested
+        scientific reading on top of that floor: whether the structural-plasticity effects of psychedelic
+        compounds can be accessed pharmacologically without the full perceptual experience.
+      </p>
+
+      {/* Speculative banner */}
+      <div style={{ background: "linear-gradient(135deg, rgba(180,140,255,0.10), rgba(180,140,255,0.04))",
+                    border: "1px solid rgba(180,140,255,0.35)",
+                    borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}
+           data-testid="pharma-speculative-banner">
+        <div style={{ fontFamily: "Cinzel, serif", fontSize: 9, letterSpacing: "0.22em",
+                      textTransform: "uppercase", color: "#c4b5fd", marginBottom: 4 }}>
+          Speculative · contested mechanism
+        </div>
+        <div style={{ fontSize: 12, color: "rgba(220,215,250,0.82)", lineHeight: 1.6 }}>
+          The split between perceptual and structural arms is an active research hypothesis, not a settled
+          mechanism. TBG and related non-hallucinogenic analogues are early-stage; rodent plasticity assays do
+          not yet translate to demonstrated human clinical benefit. This page logs the framing for record; it is
+          not clinical guidance and does not endorse self-administration.
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gap: 14,
+                    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))" }}>
+        {ROWS.map(p => (
+          <article key={p.title}
+                   style={{ background: "rgba(255,255,255,0.025)",
+                            border: `1px solid ${p.accent}33`,
+                            borderRadius: 10, padding: "14px 16px" }}
+                   data-testid={`pharma-${p.kicker.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`}>
+            <div style={{ fontFamily: "Cinzel, serif", fontSize: 9, letterSpacing: "0.22em",
+                          textTransform: "uppercase", color: p.accent, marginBottom: 6 }}>
+              {p.kicker}
+            </div>
+            <h3 style={{ fontFamily: "Cinzel, serif", fontSize: 14.5, color: "#e0d8ff",
+                         margin: "0 0 8px", letterSpacing: "0.04em" }}>
+              {p.title}
+            </h3>
+            <p style={{ fontSize: 12, color: "rgba(200,195,240,0.7)", margin: 0, lineHeight: 1.55 }}>
+              {p.body}
+            </p>
+          </article>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 18, padding: "14px 16px", borderRadius: 10,
+                    border: "1px solid rgba(192,132,252,0.22)",
+                    background: "linear-gradient(135deg, rgba(192,132,252,0.06), rgba(123,228,234,0.04))" }}
+           data-testid="pharma-bridge">
+        <div style={{ fontFamily: "Cinzel, serif", fontSize: 9, letterSpacing: "0.22em",
+                      textTransform: "uppercase", color: "rgba(192,132,252,0.7)", marginBottom: 6 }}>
+          Bridge to the protocol
+        </div>
+        <p style={{ fontSize: 12.5, color: "rgba(200,195,240,0.78)", margin: 0, lineHeight: 1.6 }}>
+          Read alongside the Venn: lifestyle drivers (exercise · diet · sleep) are the broad-spectrum,
+          well-evidenced floor for BDNF and synaptogenesis. A pharmacological adjunct that selectively engages
+          the intracellular plasticity arm — if the split survives further trials — would sit on top of, not
+          replace, that floor. It would be a sharpener, not a substitute.
+        </p>
+      </div>
+    </section>
   );
 }
 
