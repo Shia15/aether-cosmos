@@ -12,6 +12,7 @@ import {
   Waves,
   Brain,
   FlaskConical,
+  Beaker,
   Palette,
   Dna,
   Sparkles,
@@ -220,6 +221,7 @@ const NAV_ITEMS = [
   { href: "/knowable-universe",        label: "Knowable Universe · Euler + SM",         icon: Atom },
   { href: "/non-physical-phenomena",   label: "Non-Physical Phenomena · Real, Not Particles", icon: Sigma },
   { href: "/three-rs-reality",         label: "3Rs Reality · Animal Use in Pharma",     icon: FlaskConical },
+  { href: "/alchemical-protocol",      label: "Alchemical Protocol · Seven Stages",     icon: Beaker },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

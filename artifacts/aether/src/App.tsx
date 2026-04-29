@@ -79,6 +79,7 @@ import ImplicateOrderPage from "@/pages/implicate-order";
 import KnowableUniversePage from "@/pages/knowable-universe";
 import NonPhysicalPhenomenaPage from "@/pages/non-physical-phenomena";
 import ThreeRsRealityPage from "@/pages/three-rs-reality";
+import AlchemicalProtocolPage from "@/pages/alchemical-protocol";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -277,6 +278,7 @@ function Router() {
         <Route path="/knowable-universe" component={KnowableUniversePage} />
         <Route path="/non-physical-phenomena" component={NonPhysicalPhenomenaPage} />
         <Route path="/three-rs-reality" component={ThreeRsRealityPage} />
+        <Route path="/alchemical-protocol" component={AlchemicalProtocolPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
