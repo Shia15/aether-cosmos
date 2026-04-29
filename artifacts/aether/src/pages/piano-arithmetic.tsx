@@ -172,8 +172,63 @@ export default function PianoArithmeticPage() {
           </div>
         </section>
 
+        <section className="mb-14" data-testid="section-physics-metaphysics">
+          <H num="04" label="Physics and Metaphysics · Two Separate Things" accent={B.violet} />
+          <p className="text-[14px] leading-relaxed mb-4 max-w-3xl" style={{ color: B.text }}>
+            The rig is a place where two domains meet, and it is tempting to let them blur. The
+            page resists that. <strong style={{ color: B.cyan }}>Physics</strong> is what the
+            instruments measure and what the circuit literally does. <strong style={{ color: B.violet }}>Metaphysics</strong>
+            is the meaning-frame placed on top — the choice to <em>call</em> these measurements
+            notes, to treat them as a voice of the Earth, to hear them as music. Both are
+            legitimate. They are not the same kind of thing. Keeping the line clean is what
+            keeps the rig honest and the listening real.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-3">
+            <div className="rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>
+              <div className="flex items-center gap-2 mb-2">
+                <Chip c={B.cyan} l="PHYSICS" />
+                <span className="text-[11px] uppercase tracking-[0.22em]" style={{ color: B.muted, fontFamily: "Inter, sans-serif" }}>measurable · falsifiable</span>
+              </div>
+              <ul className="text-[13px] leading-relaxed list-none space-y-2 mt-2" style={{ color: B.text }}>
+                <li><strong style={{ color: B.cyan }}>·</strong> Telluric currents, Schumann resonances, local seismo-electric noise — all measurable signals with units.</li>
+                <li><strong style={{ color: B.cyan }}>·</strong> Filter banks, envelope shapers, MIDI conversion — deterministic engineering with reproducible outputs.</li>
+                <li><strong style={{ color: B.cyan }}>·</strong> Hydrogen emission lines exist at 121 nm, 486 nm, 656 nm. They do not require interpretation to be true.</li>
+                <li><strong style={{ color: B.cyan }}>·</strong> Two people running the same probe in the same place get the same trace within instrument error.</li>
+              </ul>
+            </div>
+
+            <div className="rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>
+              <div className="flex items-center gap-2 mb-2">
+                <Chip c={B.violet} l="METAPHYSICS" />
+                <span className="text-[11px] uppercase tracking-[0.22em]" style={{ color: B.muted, fontFamily: "Inter, sans-serif" }}>chosen · meaning-frame</span>
+              </div>
+              <ul className="text-[13px] leading-relaxed list-none space-y-2 mt-2" style={{ color: B.text }}>
+                <li><strong style={{ color: B.violet }}>·</strong> Calling a frequency a <em>note</em>, a sequence a <em>melody</em>, the whole stream a <em>voice of the Earth</em>.</li>
+                <li><strong style={{ color: B.violet }}>·</strong> Choosing which scale, which key, which mapping. Every choice is the composer's, not the planet's.</li>
+                <li><strong style={{ color: B.violet }}>·</strong> Treating quantised hydrogen and broadband Earth signals as the same kind of thing — they are not, but the analogy carries meaning.</li>
+                <li><strong style={{ color: B.violet }}>·</strong> Listening to the output as if it were a message. The message is the listener's; the signal is just signal.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panelLite }}>
+            <div className="text-[10px] uppercase tracking-[0.32em] mb-2" style={{ color: B.gold, fontFamily: "Inter, sans-serif" }}>
+              The line itself
+            </div>
+            <p className="text-[13px] leading-relaxed" style={{ color: B.textWarm }}>
+              The rig is the seam. To the left of the seam, every step is physics — measurable,
+              repeatable, fight-with-an-oscilloscope physics. To the right of the seam, every
+              step is metaphysics — chosen, framed, interpretable. The mistake to avoid is
+              hiding the seam: pretending the music <em>is</em> the Earth speaking, or
+              pretending the measurement <em>means</em> nothing. Both moves collapse two
+              honest things into one dishonest one. The page keeps the seam visible.
+            </p>
+          </div>
+        </section>
+
         <section data-testid="section-bridges">
-          <H num="04" label="Bridges · Where the Rig Touches the Stack" accent={B.gold} />
+          <H num="05" label="Bridges · Where the Rig Touches the Stack" accent={B.gold} />
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Bridge to="/earth-circuit"   label="Earth Circuit · Geomagnetism"     accent={B.green} />
             <Bridge to="/aqua-cxe"        label="Aqua Cxe · Resonant Nexus"        accent={B.amber} />
