@@ -215,6 +215,7 @@ const NAV_ITEMS = [
   { href: "/heliospheric-coherence",   label: "Heliospheric Coherence · World in One", icon: Sun },
   { href: "/aether-egg-engine",        label: "Egg Engine · Positive Reinforcement",   icon: Egg },
   { href: "/under-ice-ecosystem",      label: "Under the Ice · George VI",              icon: Snowflake },
+  { href: "/alchemy-to-fusion",        label: "Alchemy to Fusion · Transmutation",      icon: Flame },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

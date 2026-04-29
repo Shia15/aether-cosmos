@@ -74,6 +74,7 @@ import PhiHOTZipperView from "@/pages/phi-hot-zipper";
 import HeliosphericCoherenceView from "@/pages/heliospheric-coherence";
 import AetherEggEnginePage from "@/pages/aether-egg-engine";
 import UnderIceEcosystemPage from "@/pages/under-ice-ecosystem";
+import AlchemyToFusionPage from "@/pages/alchemy-to-fusion";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -267,6 +268,7 @@ function Router() {
         <Route path="/heliospheric-coherence" component={HeliosphericCoherenceView} />
         <Route path="/aether-egg-engine" component={AetherEggEnginePage} />
         <Route path="/under-ice-ecosystem" component={UnderIceEcosystemPage} />
+        <Route path="/alchemy-to-fusion" component={AlchemyToFusionPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
