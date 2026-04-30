@@ -81,6 +81,7 @@ import NonPhysicalPhenomenaPage from "@/pages/non-physical-phenomena";
 import ThreeRsRealityPage from "@/pages/three-rs-reality";
 import AlchemicalProtocolPage from "@/pages/alchemical-protocol";
 import WarpDriveLiteraturePage from "@/pages/warp-drive-literature";
+import PuthoffMetricEngineeringPage from "@/pages/puthoff-metric-engineering";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -281,6 +282,7 @@ function Router() {
         <Route path="/three-rs-reality" component={ThreeRsRealityPage} />
         <Route path="/alchemical-protocol" component={AlchemicalProtocolPage} />
         <Route path="/warp-drive-literature" component={WarpDriveLiteraturePage} />
+        <Route path="/puthoff-metric-engineering" component={PuthoffMetricEngineeringPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
