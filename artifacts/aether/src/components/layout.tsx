@@ -240,6 +240,7 @@ const NAV_ITEMS = [
   { href: "/substrate-synthesis",      label: "Substrate Studio · Live Photochem + Synthesis Bridges", icon: FlaskConical },
   { href: "/sparkle-text",             label: "Sparkle Studio · Sparkly Text Generator", icon: Sparkles },
   { href: "/lunar-coherence",          label: "Lunar Coherence · Tides · Groundwater · Ambient Field", icon: Moon },
+  { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

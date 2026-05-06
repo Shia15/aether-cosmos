@@ -97,6 +97,7 @@ import AetherFoundationsPage from "@/pages/aether-foundations";
 import SubstrateSynthesisPage from "@/pages/substrate-synthesis";
 import SparkleTextPage from "@/pages/sparkle-text";
 import LunarCoherencePage from "@/pages/lunar-coherence";
+import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -313,6 +314,7 @@ function Router() {
         <Route path="/substrate-synthesis" component={SubstrateSynthesisPage} />
         <Route path="/sparkle-text" component={SparkleTextPage} />
         <Route path="/lunar-coherence" component={LunarCoherencePage} />
+        <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
