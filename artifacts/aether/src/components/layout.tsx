@@ -75,6 +75,7 @@ import {
   Pyramid,
   Sunrise,
   Snowflake,
+  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -238,6 +239,7 @@ const NAV_ITEMS = [
   { href: "/aether-foundations",       label: "AETHER Foundations · Substrate · Crystal · Field", icon: Microscope },
   { href: "/substrate-synthesis",      label: "Substrate Studio · Live Photochem + Synthesis Bridges", icon: FlaskConical },
   { href: "/sparkle-text",             label: "Sparkle Studio · Sparkly Text Generator", icon: Sparkles },
+  { href: "/lunar-coherence",          label: "Lunar Coherence · Tides · Groundwater · Ambient Field", icon: Moon },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

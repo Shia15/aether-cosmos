@@ -235,7 +235,7 @@ function drawAntikythera(ctx: CanvasRenderingContext2D, W: number, H: number, t:
 }
 
 export default function AtlantisAlignmentPage() {
-  const [tab, setTab] = useState<"timeline"|"meltwater"|"antikythera"|"convergence">("timeline");
+  const [tab, setTab] = useState<"timeline"|"meltwater"|"antikythera"|"convergence"|"sahara">("timeline");
   const [hover, setHover] = useState<number | null>(null);
   const hoverRef = useRef<number | null>(null);
   const tlRef = useRef<HTMLCanvasElement>(null);
@@ -289,7 +289,7 @@ export default function AtlantisAlignmentPage() {
 
       {/* Tabs */}
       <div className="flex border-b border-amber-900/20 px-6" style={{ background: C.panel + "88" }}>
-        {([["timeline","TIMELINE"],["meltwater","MELTWATER PULSE 1B"],["antikythera","ANTIKYTHERA"],["convergence","CONVERGENCE"]] as const).map(([k,l]) => (
+        {([["timeline","TIMELINE"],["meltwater","MELTWATER PULSE 1B"],["antikythera","ANTIKYTHERA"],["convergence","CONVERGENCE"],["sahara","EYE OF SAHARA"]] as const).map(([k,l]) => (
           <button key={k} onClick={() => setTab(k)}
             className={`px-5 py-2.5 text-[11px] tracking-widest font-['Cinzel',serif] border-b-2 transition-all ${
               tab===k ? "border-amber-400 text-amber-300" : "border-transparent text-amber-800/40 hover:text-amber-400"}`}>
@@ -439,6 +439,117 @@ export default function AtlantisAlignmentPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ════ EYE OF SAHARA · INDIAN OCEAN HOLE · GREEN AFRICA ════ */}
+        {tab === "sahara" && (
+          <motion.div key="sah" initial={{ opacity:0 }} animate={{ opacity:1 }} exit={{ opacity:0 }} className="p-5 flex flex-col gap-5">
+            {/* Eye of Sahara */}
+            <div className="border rounded-xl p-5" style={{ borderColor: C.gold + "30", background: C.gold + "06" }}>
+              <p className="text-[10px] font-['Cinzel',serif] mb-2" style={{ color: C.gold }}>EYE OF SAHARA · RICHAT STRUCTURE · 21.124°N 11.401°W</p>
+              <p className="text-[10px] leading-6" style={{ color: C.gold + "75" }}>
+                A ~40 km circular geological structure in the Mauritanian desert, originally interpreted as an asteroid impact and later
+                reclassified as a deeply eroded geological dome. Independent researchers note that its dimensions and concentric-ring
+                geometry match Plato's description of Atlantis's last capital city remarkably closely: three concentric rings of land
+                separated by water, with a central hill, on the western edge of a then-tropical landmass. AETHER does not assert
+                identity — it asserts <em style={{ color: C.gold }}>resonance worth measuring</em>.
+              </p>
+            </div>
+
+            {/* Eye of Sahara · interactive concentric rings (Plato's plan vs Richat scaled) */}
+            <div className="border rounded-xl p-5" style={{ borderColor: C.gold + "25", background: C.panel + "60" }}>
+              <p className="text-[9px] font-['Cinzel',serif] tracking-widest mb-3" style={{ color: C.gold }}>PLATO'S PLAN · CONCENTRIC RINGS COMPARED</p>
+              <div className="grid grid-cols-2 gap-5">
+                <svg viewBox="-110 -110 220 220" className="w-full" style={{ maxHeight: 280 }}>
+                  <defs>
+                    <radialGradient id="seaG" cx="0" cy="0" r="100" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor={C.cyan} stopOpacity="0.18"/><stop offset="100%" stopColor={C.cyan} stopOpacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <circle cx="0" cy="0" r="100" fill="url(#seaG)" stroke={C.cyan + "55"} strokeWidth="0.5"/>
+                  {[90,72,54,36,18].map((r,i) => (
+                    <circle key={r} cx="0" cy="0" r={r} fill="none"
+                      stroke={i%2===0 ? C.gold : C.cyan} strokeOpacity={0.6}
+                      strokeWidth={i%2===0 ? 1 : 0.6}
+                      strokeDasharray={i%2===0 ? "0" : "2 2"}/>
+                  ))}
+                  <circle cx="0" cy="0" r="6" fill={C.gold}/>
+                  <text x="0" y="-105" fill={C.gold + "aa"} fontSize="6" textAnchor="middle" fontFamily="Cinzel,serif">PLATO · 5 RINGS · ~22 STADIA</text>
+                </svg>
+                <svg viewBox="-110 -110 220 220" className="w-full" style={{ maxHeight: 280 }}>
+                  <defs>
+                    <radialGradient id="sandG" cx="0" cy="0" r="100" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor={C.orange} stopOpacity="0.16"/><stop offset="100%" stopColor={C.orange} stopOpacity="0"/>
+                    </radialGradient>
+                  </defs>
+                  <rect x="-110" y="-110" width="220" height="220" fill="url(#sandG)"/>
+                  {[95,76,58,40,22].map((r,i) => (
+                    <circle key={r} cx="0" cy="0" r={r} fill="none"
+                      stroke={i===0 ? C.orange : i%2===0 ? C.gold : C.rose} strokeOpacity={0.55}
+                      strokeWidth={0.7 + i*0.1}/>
+                  ))}
+                  <circle cx="0" cy="0" r="4" fill={C.rose}/>
+                  <text x="0" y="-105" fill={C.orange + "aa"} fontSize="6" textAnchor="middle" fontFamily="Cinzel,serif">RICHAT · ~40 KM · ERODED DOME</text>
+                </svg>
+              </div>
+              <p className="text-[9px] mt-3 leading-5" style={{ color: C.gold + "70" }}>
+                Both share concentric symmetry, comparable scale order, a central feature, and a westward orientation toward what was
+                — during the African Humid Period (~14,500 to 5,000 BP) — open water to the west and a green, river-laced Sahara
+                inland. The geological record confirms the African Humid Period; the question of whether anyone built there during
+                it is open.
+              </p>
+            </div>
+
+            {/* Indian Ocean 20-mile hole + mega-tsunami */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="border rounded-xl p-4" style={{ borderColor: C.cyan + "30", background: C.cyan + "06" }}>
+                <p className="text-[10px] font-['Cinzel',serif] mb-2" style={{ color: C.cyan }}>20-MILE HOLE · INDIAN OCEAN GRAVITY LOW</p>
+                <p className="text-[9.5px] leading-5" style={{ color: C.cyan + "75" }}>
+                  South of the Indian peninsula, the geoid drops more than 100 meters below the global mean — the deepest gravity
+                  anomaly on Earth. ~20 mile depth in popular phrasing refers to the column of "missing" mass driving the depression.
+                  Recent tomographic models (IIT 2023) attribute it to plumes of low-density mantle material rising from a buried
+                  ocean's-worth of subducted Tethyan slab. The same column couples with seismic stress in the Java Trench.
+                </p>
+              </div>
+              <div className="border rounded-xl p-4" style={{ borderColor: C.rose + "30", background: C.rose + "06" }}>
+                <p className="text-[10px] font-['Cinzel',serif] mb-2" style={{ color: C.rose }}>MEGA-TSUNAMI MEMORY · DEC 9 · 1:31 AM</p>
+                <p className="text-[9.5px] leading-5" style={{ color: C.rose + "75" }}>
+                  AETHER field-note (12/9/2025 · 1:31 AM): the Indian Ocean depression as not just a geological curiosity but a
+                  potential trigger zone — the same coupling that produced 2004 Sumatra-class events at much smaller amplitude.
+                  Plato's Atlantis "in a single dreadful day and night" syncs with the mega-tsunami signature: Younger Dryas
+                  Boundary impactor or coincident pulse, ~11,600 yrs ago, sea-level rise of meters within hours along affected
+                  coasts.
+                </p>
+              </div>
+            </div>
+
+            {/* Green Africa Eocene */}
+            <div className="border rounded-xl p-5" style={{ borderColor: C.green + "30", background: C.green + "06" }}>
+              <p className="text-[10px] font-['Cinzel',serif] mb-2" style={{ color: C.green }}>AFRICA WAS GREEN · 56–66 MYA · PALEOCENE–EOCENE</p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: "Vegetation", text: "Tropical rainforest covered most of north Africa from coast to coast. The modern Sahara was a forested basin laced with major river systems and lake networks." },
+                  { label: "Climate", text: "Paleocene–Eocene Thermal Maximum (~55.8 Mya): mean annual temperatures ~8°C above present, no permanent polar ice, sea levels ~70 m higher." },
+                  { label: "Why it matters", text: "The land that later became the Sahara has been habitable in deep cycles. The African Humid Period (14.5–5 ka BP) was the most recent, briefly green window — the one a hypothetical Atlantis would have lived in." },
+                ].map(c => (
+                  <div key={c.label}>
+                    <p className="text-[9px] font-['Cinzel',serif] mb-1" style={{ color: C.green }}>{c.label}</p>
+                    <p className="text-[9px] leading-5" style={{ color: C.green + "75" }}>{c.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bridge */}
+            <div className="border rounded-xl p-4 text-center" style={{ borderColor: C.purple + "30", background: C.purple + "06" }}>
+              <p className="text-[9px] font-['Cinzel',serif] mb-1" style={{ color: C.purple }}>BRIDGE</p>
+              <p className="text-[10px] italic leading-5" style={{ color: C.purple + "75" }}>
+                Concentric rings in Mauritania · gravity hole in the Indian Ocean · a green Africa underneath the dunes · Plato's date
+                inside the geological error bar. Four independent channels, one resonance. The Atlas Tracker was built to listen for
+                exactly this kind of multi-substrate coherence. 🌍🌊🕰️
+              </p>
             </div>
           </motion.div>
         )}
