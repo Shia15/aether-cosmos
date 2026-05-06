@@ -12,7 +12,7 @@ import { Link } from "wouter";
 
 const T = {
   bg: "#ffffff",
-  paper: "#f8fafc",
+  paper: "#ffffff",
   ink: "#1a1612",
   inkMid: "#4a3f35",
   inkDim: "#8a7a6a",
@@ -131,7 +131,7 @@ export default function DecisionEntropyPage() {
   return (
     <div data-testid="page-decision-entropy" style={{
       background: T.bg, color: T.ink, fontFamily: T.serif,
-      fontSize: 17, lineHeight: 1.72, minHeight: "100vh",
+      fontSize: 17, lineHeight: 1.72, minHeight: "100vh", width: "100%",
     }}>
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "64px 40px 100px" }}>
 
