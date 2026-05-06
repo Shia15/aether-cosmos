@@ -57,6 +57,9 @@ AETHER provides a platform for advanced knowledge synthesis and discovery throug
 - **AETHER Dashboard (`/aether-dashboard`):** Multi-agent control panel (Mnesis/Aletheia/Inferaia/Reverie) with EIE, Memory, Integrations, Prompt Modes, Trigger Table.
 - **CUCA Hybrid Skin v2.1 (`/cuca-hybrid-skin`):** 3-panel live canvas sim — octopus-only vs cuttlefish-disruptive vs hybrid (cephalopod + reptilian nanocrystal stabilizer) under chess/tumor/hunt scenarios.
 - **CUCA Gyroid v3.0 (`/cuca-gyroid`):** 4-panel photonic stack sim + full-synthesis canvas + P0–P9 layer table (Bouligand → Gyroid → Reflectin → Chromatophore → Kill Switch).
+- **AETHER Dashboard v2 (`/aether-dashboard`):** Full agent control panel — 7 tabs (Chat/Overview/EIE/Memory/Integrations/Triggers/Agent Map). Four agents (Mnesis/Aletheia/Inferaia/Reverie) with EggNode SVG, ResonanceCore, NebulaBackground, CharacterDNA stats. Chat module routes by trigger keywords; replies are local agent-quote stubs (live AI inference not wired).
+- **AETHER Children's Realm (`/aether-childrens-realm`):** Glowing landing-page library for ages 5–10 — 4 book cards (Boho Bloom, Zoom the Zipper, Computer Brains, The Flow Notebook) with gradient covers, animated nebula bg, twinkling stars, sparkle-rain.
+- **AETHER Seasons (`/aether-seasons`):** Brand-strategy document — 5 pillars, 4-layer product stack, 4 seasonal palettes (Spring/Summer/Autumn/Winter), Static/Dynamic/Field narrator voices, "Layers of Becoming" series spine (3 seasons / 8 books), Q1–Q4 roadmap, 12-month posting timeline, revenue tiers, guardrails, 3-year vision.
 
 ## User preferences
 
