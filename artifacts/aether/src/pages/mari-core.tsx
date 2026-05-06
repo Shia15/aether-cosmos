@@ -103,7 +103,7 @@ const CORE_BITS: CoreBit[] = [
 export default function MariCorePage() {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative overflow-x-hidden"
       style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="mari-core-page"
     >

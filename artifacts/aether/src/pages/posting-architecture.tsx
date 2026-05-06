@@ -408,7 +408,7 @@ function Wings({ color, className = "" }: { color: string; className?: string })
 export default function PostingArchitecturePage() {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative overflow-x-hidden"
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="posting-architecture-page"
     >

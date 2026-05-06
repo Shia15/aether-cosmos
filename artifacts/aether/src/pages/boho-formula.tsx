@@ -175,7 +175,7 @@ const PALETTE = [
 export default function BohoFormulaPage() {
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative overflow-x-hidden"
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="boho-formula-page"
     >
