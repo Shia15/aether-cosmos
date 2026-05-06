@@ -228,6 +228,10 @@ const NAV_ITEMS = [
   { href: "/knowledge-map",            label: "Knowledge Map · 3000+ Video Engine",     icon: LayoutGrid },
   { href: "/decision-entropy",         label: "Decision Entropy · Time-Cost Formalism", icon: Clock },
   { href: "/unified-synthesis",        label: "Unified Synthesis · Coherence of Life",  icon: Combine },
+  { href: "/clcs-architecture",        label: "CLCS · Closed Loop Coherence System",    icon: Workflow },
+  { href: "/aether-dashboard",         label: "AETHER Dashboard · Agent Console",       icon: LayoutDashboard },
+  { href: "/cuca-hybrid-skin",         label: "CUCA Hybrid Skin · Cephalopod + Reptile",icon: Hexagon },
+  { href: "/cuca-gyroid",              label: "CUCA Gyroid v3.0 · 3D Photonic Floor",   icon: Pyramid },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

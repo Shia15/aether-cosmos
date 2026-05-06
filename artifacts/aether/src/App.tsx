@@ -86,6 +86,10 @@ import EniacMonteCarloPage from "@/pages/eniac-monte-carlo";
 import KnowledgeMapPage from "@/pages/knowledge-map";
 import DecisionEntropyPage from "@/pages/decision-entropy";
 import UnifiedSynthesisPage from "@/pages/unified-synthesis";
+import ClcsArchitecturePage from "@/pages/clcs-architecture";
+import AetherDashboardPage from "@/pages/aether-dashboard";
+import CucaHybridSkinPage from "@/pages/cuca-hybrid-skin";
+import CucaGyroidPage from "@/pages/cuca-gyroid";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -291,6 +295,10 @@ function Router() {
         <Route path="/knowledge-map" component={KnowledgeMapPage} />
         <Route path="/decision-entropy" component={DecisionEntropyPage} />
         <Route path="/unified-synthesis" component={UnifiedSynthesisPage} />
+        <Route path="/clcs-architecture" component={ClcsArchitecturePage} />
+        <Route path="/aether-dashboard" component={AetherDashboardPage} />
+        <Route path="/cuca-hybrid-skin" component={CucaHybridSkinPage} />
+        <Route path="/cuca-gyroid" component={CucaGyroidPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
