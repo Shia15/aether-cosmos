@@ -1,12 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type PresetKey = "aether" | "cosmic" | "flower" | "silk" | "wave" | "sand";
+type PresetKey =
+  | "aether"
+  | "lunar"
+  | "boho"
+  | "verdant"
+  | "eris"
+  | "cosmic"
+  | "flower"
+  | "silk"
+  | "wave"
+  | "sand";
 
 interface Stop { offset: number; color: string; }
 interface Preset {
   key: PresetKey;
   label: string;
   kicker: string;
+  source?: string;
   // DOM rendering
   bg: string;
   textGradient: string;
@@ -29,6 +40,7 @@ const PRESETS: Preset[] = [
     key: "aether",
     label: "Aether",
     kicker: "Resonance · Indigo · Aura",
+    source: "Resonance Core",
     bg: "radial-gradient(ellipse at 50% 35%, #2a1f5c 0%, #150a3a 45%, #060216 100%)",
     textGradient: "linear-gradient(110deg, #88e1ff 0%, #c4a8ff 28%, #ffffff 50%, #a78bfa 72%, #5fc8ff 100%)",
     sparkleColors: ["#ffffff", "#88e1ff", "#a78bfa", "#c4a8ff"],
@@ -54,6 +66,125 @@ const PRESETS: Preset[] = [
       { offset: 1,    color: "rgba(0,0,0,0)" },
     ],
     glowColor: "rgba(167,139,250,0.55)",
+  },
+  {
+    key: "lunar",
+    label: "Lunar Tide",
+    kicker: "Silver · Tide · Moon",
+    source: "Lunar Coherence",
+    bg: "radial-gradient(ellipse at 50% 30%, #1c2a4a 0%, #0a1228 50%, #02050f 100%)",
+    textGradient: "linear-gradient(115deg, #e6efff 0%, #b8c8e8 25%, #ffffff 50%, #8aa3d4 75%, #d8e4ff 100%)",
+    sparkleColors: ["#ffffff", "#cfd9f5", "#a8b8d8", "#e8eeff"],
+    fontFamily: "'Cinzel', serif",
+    shadow: "0 0 38px rgba(220,232,255,0.55), 0 0 95px rgba(140,168,220,0.35)",
+    bgType: "radial",
+    bgStops: [
+      { offset: 0,   color: "#1c2a4a" },
+      { offset: 0.5, color: "#0a1228" },
+      { offset: 1,   color: "#02050f" },
+    ],
+    textAngle: 115,
+    textStops: [
+      { offset: 0,    color: "#e6efff" },
+      { offset: 0.25, color: "#b8c8e8" },
+      { offset: 0.5,  color: "#ffffff" },
+      { offset: 0.75, color: "#8aa3d4" },
+      { offset: 1,    color: "#d8e4ff" },
+    ],
+    aura: [
+      { offset: 0,    color: "rgba(220,232,255,0.32)" },
+      { offset: 0.5,  color: "rgba(140,168,220,0.14)" },
+      { offset: 1,    color: "rgba(0,0,0,0)" },
+    ],
+    glowColor: "rgba(220,232,255,0.55)",
+  },
+  {
+    key: "boho",
+    label: "Boho Bloom",
+    kicker: "Cream · Terracotta · Sage",
+    source: "Boho Formula",
+    bg: "radial-gradient(ellipse at 45% 30%, #f4e6cf 0%, #e3c8a4 45%, #b88565 100%)",
+    textGradient: "linear-gradient(110deg, #6f3a26 0%, #c47a55 25%, #e8b78a 50%, #8a9b6e 75%, #6f3a26 100%)",
+    sparkleColors: ["#ffffff", "#fce8c4", "#e8b78a", "#c47a55"],
+    fontFamily: "'Cinzel', serif",
+    shadow: "0 0 26px rgba(255,235,200,0.7), 0 2px 8px rgba(110,60,30,0.3)",
+    bgType: "radial",
+    bgStops: [
+      { offset: 0,    color: "#f4e6cf" },
+      { offset: 0.45, color: "#e3c8a4" },
+      { offset: 1,    color: "#b88565" },
+    ],
+    textAngle: 110,
+    textStops: [
+      { offset: 0,    color: "#6f3a26" },
+      { offset: 0.25, color: "#c47a55" },
+      { offset: 0.5,  color: "#e8b78a" },
+      { offset: 0.75, color: "#8a9b6e" },
+      { offset: 1,    color: "#6f3a26" },
+    ],
+    glowColor: "rgba(255,235,200,0.6)",
+  },
+  {
+    key: "verdant",
+    label: "Verdant Spark",
+    kicker: "Chlorophyll · Gold · Emerald",
+    source: "Photosynthesis Spark",
+    bg: "radial-gradient(ellipse at 50% 35%, #0d3a26 0%, #052216 50%, #01080a 100%)",
+    textGradient: "linear-gradient(115deg, #ffe082 0%, #b6f08c 28%, #ffffff 50%, #4fcf7c 72%, #ffd860 100%)",
+    sparkleColors: ["#ffffff", "#b6f08c", "#ffe082", "#7ee0a8"],
+    fontFamily: "'Cinzel', serif",
+    shadow: "0 0 42px rgba(150,240,140,0.55), 0 0 95px rgba(255,224,130,0.35)",
+    bgType: "radial",
+    bgStops: [
+      { offset: 0,   color: "#0d3a26" },
+      { offset: 0.5, color: "#052216" },
+      { offset: 1,   color: "#01080a" },
+    ],
+    textAngle: 115,
+    textStops: [
+      { offset: 0,    color: "#ffe082" },
+      { offset: 0.28, color: "#b6f08c" },
+      { offset: 0.5,  color: "#ffffff" },
+      { offset: 0.72, color: "#4fcf7c" },
+      { offset: 1,    color: "#ffd860" },
+    ],
+    aura: [
+      { offset: 0,    color: "rgba(150,240,140,0.3)" },
+      { offset: 0.5,  color: "rgba(255,224,130,0.15)" },
+      { offset: 1,    color: "rgba(0,0,0,0)" },
+    ],
+    glowColor: "rgba(150,240,140,0.5)",
+  },
+  {
+    key: "eris",
+    label: "Eris Field",
+    kicker: "Crimson · Void · Violet",
+    source: "Divine Timing",
+    bg: "radial-gradient(ellipse at 50% 35%, #4a0a1a 0%, #1a0210 55%, #050006 100%)",
+    textGradient: "linear-gradient(115deg, #ff5577 0%, #c44f8a 28%, #ffffff 50%, #8d3fdb 72%, #ff7a7a 100%)",
+    sparkleColors: ["#ffffff", "#ff8aa8", "#c4a0ff", "#ff5577"],
+    fontFamily: "'Cinzel', serif",
+    shadow: "0 0 48px rgba(255,80,120,0.55), 0 0 110px rgba(141,63,219,0.4)",
+    bgType: "radial",
+    bgStops: [
+      { offset: 0,    color: "#4a0a1a" },
+      { offset: 0.55, color: "#1a0210" },
+      { offset: 1,    color: "#050006" },
+    ],
+    textAngle: 115,
+    textStops: [
+      { offset: 0,    color: "#ff5577" },
+      { offset: 0.28, color: "#c44f8a" },
+      { offset: 0.5,  color: "#ffffff" },
+      { offset: 0.72, color: "#8d3fdb" },
+      { offset: 1,    color: "#ff7a7a" },
+    ],
+    aura: [
+      { offset: 0,    color: "rgba(255,80,120,0.32)" },
+      { offset: 0.5,  color: "rgba(141,63,219,0.16)" },
+      { offset: 1,    color: "rgba(0,0,0,0)" },
+    ],
+    glowColor: "rgba(255,80,120,0.55)",
   },
   {
     key: "cosmic",
@@ -199,6 +330,12 @@ const PRESETS: Preset[] = [
 
 interface Sparkle { x: number; y: number; r: number; vx: number; vy: number; life: number; max: number; col: string; rot: number; vrot: number; }
 
+const VIDEO_DURATIONS: { sec: number; label: string }[] = [
+  { sec: 3, label: "3s" },
+  { sec: 5, label: "5s" },
+  { sec: 8, label: "8s" },
+];
+
 export default function SparkleTextPage() {
   const [text, setText] = useState("AETHER");
   const [size, setSize] = useState(140);
@@ -206,6 +343,9 @@ export default function SparkleTextPage() {
   const [presetKey, setPresetKey] = useState<PresetKey>("aether");
   const [paused, setPaused] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [recCountdown, setRecCountdown] = useState(0);
+  const [videoDuration, setVideoDuration] = useState<number>(5);
   const preset = useMemo(() => PRESETS.find(p => p.key === presetKey) ?? PRESETS[0]!, [presetKey]);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -220,7 +360,7 @@ export default function SparkleTextPage() {
   useEffect(() => { presetRef.current = preset; }, [preset]);
   useEffect(() => { densityRef.current = density; }, [density]);
 
-  // ── Sparkle animation loop
+  // ── Live sparkle animation loop (on-screen)
   useEffect(() => {
     const canvas = canvasRef.current;
     const stage = stageRef.current;
@@ -316,8 +456,8 @@ export default function SparkleTextPage() {
     };
   }, []);
 
-  // ── Helper: paint one of the preset gradients into a canvas ctx
-  const paintBg = (ctx: CanvasRenderingContext2D, W: number, H: number) => {
+  // ── Helper: paint preset bg + aura into a ctx
+  const paintBg = (ctx: CanvasRenderingContext2D, W: number, H: number, auraIntensity = 1) => {
     let g: CanvasGradient;
     if (preset.bgType === "radial") {
       g = ctx.createRadialGradient(W * 0.5, H * 0.35, 0, W * 0.5, H * 0.35, Math.max(W, H) * 0.75);
@@ -332,21 +472,57 @@ export default function SparkleTextPage() {
     ctx.fillRect(0, 0, W, H);
 
     if (preset.aura) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, auraIntensity));
       const aura = ctx.createRadialGradient(W * 0.5, H * 0.5, 0, W * 0.5, H * 0.5, Math.min(W, H) * 0.55);
       preset.aura.forEach(s => aura.addColorStop(s.offset, s.color));
       ctx.fillStyle = aura;
       ctx.fillRect(0, 0, W, H);
+      ctx.restore();
     }
   };
 
-  // ── Download composed PNG (background + aura + text + current sparkles)
+  // ── Helper: draw the glowing text into a ctx with optional shimmer phase (0..1)
+  const paintText = (ctx: CanvasRenderingContext2D, W: number, H: number, scale: number, shimmer = 0) => {
+    const txt = (text || "Sparkle").trim();
+    let fs = Math.round(size * scale * 0.95);
+    const fontFor = (n: number) => `800 ${n}px ${preset.fontFamily}`;
+    ctx.font = fontFor(fs);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const maxW = W - 60 * scale;
+    while (fs > 24 && ctx.measureText(txt).width > maxW) {
+      fs -= 6;
+      ctx.font = fontFor(fs);
+    }
+    const tw = ctx.measureText(txt).width;
+    const ta = ((preset.textAngle ?? 110) - 90) * Math.PI / 180;
+    // Shimmer: shift the gradient endpoints sideways along the gradient axis
+    const shift = (shimmer - 0.5) * 0.55;
+    const cx = W / 2 + Math.cos(ta) * tw * shift;
+    const cy = H / 2 + Math.sin(ta) * fs * shift;
+    const tdx = Math.cos(ta) * tw / 2;
+    const tdy = Math.sin(ta) * fs / 2;
+    const tg = ctx.createLinearGradient(cx - tdx, cy - tdy, cx + tdx, cy + tdy);
+    preset.textStops.forEach(s => tg.addColorStop(s.offset, s.color));
+
+    ctx.save();
+    ctx.shadowColor = preset.glowColor;
+    ctx.shadowBlur = 60 * scale / 2;
+    ctx.fillStyle = tg;
+    ctx.fillText(txt, W / 2, H / 2);
+    ctx.shadowBlur = 30 * scale / 2;
+    ctx.fillText(txt, W / 2, H / 2);
+    ctx.restore();
+  };
+
+  // ── Download composed PNG (single still frame)
   const downloadPNG = async () => {
     const stage = stageRef.current;
     const liveSparkles = canvasRef.current;
     if (!stage || !liveSparkles) return;
     setExporting(true);
     try {
-      // Best-effort: ensure Cinzel is loaded so canvas fillText uses it
       try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch { /* ignore */ }
 
       const r = stage.getBoundingClientRect();
@@ -359,39 +535,8 @@ export default function SparkleTextPage() {
       const ctx = out.getContext("2d");
       if (!ctx) return;
 
-      paintBg(ctx, W, H);
-
-      // Text
-      const txt = (text || "Sparkle").trim();
-      const maxW = W - 120 * scale / 2;
-      let fs = Math.round(size * scale * 0.95);
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      const fontFor = (n: number) => `800 ${n}px ${preset.fontFamily}`;
-      ctx.font = fontFor(fs);
-      while (fs > 24 && ctx.measureText(txt).width > maxW) {
-        fs -= 6;
-        ctx.font = fontFor(fs);
-      }
-
-      // Build text-fill gradient sized to the rendered text
-      const tw = ctx.measureText(txt).width;
-      const th = fs;
-      const ta = ((preset.textAngle ?? 110) - 90) * Math.PI / 180;
-      const tdx = Math.cos(ta) * tw / 2;
-      const tdy = Math.sin(ta) * th / 2;
-      const tg = ctx.createLinearGradient(W / 2 - tdx, H / 2 - tdy, W / 2 + tdx, H / 2 + tdy);
-      preset.textStops.forEach(s => tg.addColorStop(s.offset, s.color));
-
-      // Glow halo (two passes, like the CSS drop-shadow)
-      ctx.save();
-      ctx.shadowColor = preset.glowColor;
-      ctx.shadowBlur = 60 * scale / 2;
-      ctx.fillStyle = tg;
-      ctx.fillText(txt, W / 2, H / 2);
-      ctx.shadowBlur = 30 * scale / 2;
-      ctx.fillText(txt, W / 2, H / 2);
-      ctx.restore();
+      paintBg(ctx, W, H, 0.85);
+      paintText(ctx, W, H, scale, 0.5);
 
       // Current sparkle frame on top, scaled
       ctx.save();
@@ -403,7 +548,7 @@ export default function SparkleTextPage() {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      const safe = (txt.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 24) || "sparkle");
+      const safe = ((text || "sparkle").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 24) || "sparkle");
       a.href = url;
       a.download = `${safe}-${presetKey}.png`;
       document.body.appendChild(a);
@@ -412,6 +557,177 @@ export default function SparkleTextPage() {
       setTimeout(() => URL.revokeObjectURL(url), 1500);
     } finally {
       setExporting(false);
+    }
+  };
+
+  // ── Record video (WebM via MediaRecorder + offscreen canvas)
+  const downloadVideo = async () => {
+    if (typeof MediaRecorder === "undefined") {
+      alert("Your browser doesn't support video recording. Try Chrome, Edge, Firefox, or Safari 14.3+.");
+      return;
+    }
+    const stage = stageRef.current;
+    if (!stage) return;
+    setRecording(true);
+    setRecCountdown(videoDuration);
+    let countdownTimer: ReturnType<typeof setInterval> | null = null;
+    let rafId: number | null = null;
+    let stream: MediaStream | null = null;
+    try {
+      try { await (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready; } catch { /* ignore */ }
+
+      const r = stage.getBoundingClientRect();
+      const scale = 1.5;
+      const W = Math.max(800, Math.round(r.width * scale));
+      const H = Math.max(500, Math.round(r.height * scale));
+      const out = document.createElement("canvas");
+      out.width = W;
+      out.height = H;
+      const ctx = out.getContext("2d");
+      if (!ctx) {
+        setRecording(false);
+        return;
+      }
+
+      // Pick a supported MIME type
+      const candidates = [
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm",
+      ];
+      const mime = candidates.find(c => MediaRecorder.isTypeSupported(c)) ?? "video/webm";
+
+      stream = out.captureStream(30);
+      const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5_000_000 });
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      // Independent particle sim for the video (don't share with on-screen)
+      const sparkles: Sparkle[] = [];
+      const start = performance.now();
+      let lastFrame = start;
+      let stopFlag = false;
+
+      const drawParticle = (s: Sparkle) => {
+        const a = Math.sin((s.life / s.max) * Math.PI);
+        ctx.save();
+        ctx.translate(s.x, s.y);
+        ctx.rotate(s.rot);
+        ctx.globalAlpha = a;
+        ctx.globalCompositeOperation = "lighter";
+        ctx.fillStyle = s.col;
+        ctx.shadowColor = s.col;
+        ctx.shadowBlur = s.r * 4;
+        ctx.beginPath();
+        const r2 = s.r, k = s.r * 0.18;
+        ctx.moveTo(0, -r2); ctx.lineTo(k, -k);
+        ctx.lineTo(r2, 0);  ctx.lineTo(k, k);
+        ctx.lineTo(0, r2);  ctx.lineTo(-k, k);
+        ctx.lineTo(-r2, 0); ctx.lineTo(-k, -k);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      };
+
+      const renderFrame = (now: number) => {
+        if (stopFlag) return;
+        const t = (now - start) / 1000;
+        const dt = Math.min(50, now - lastFrame) / 16.67;
+        lastFrame = now;
+
+        // Pulsing aura intensity (matches CSS auraBreathe ~6s cycle)
+        const phase = (Math.sin(t * Math.PI * 2 / 6 - Math.PI / 2) + 1) / 2;
+        const auraIntensity = 0.55 + 0.4 * phase;
+
+        paintBg(ctx, W, H, auraIntensity);
+
+        // Drifting border ring (matches CSS ringDrift ~28s)
+        if (preset.aura) {
+          ctx.save();
+          ctx.translate(W / 2, H / 2);
+          ctx.rotate(t * Math.PI * 2 / 28);
+          ctx.strokeStyle = preset.glowColor;
+          ctx.globalAlpha = 0.22;
+          ctx.lineWidth = 1.5 * scale;
+          ctx.setLineDash([6 * scale, 14 * scale]);
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.min(W, H) * 0.21, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Shimmer phase (~8s loop)
+        const shimmer = (Math.sin(t * Math.PI * 2 / 8) + 1) / 2;
+        paintText(ctx, W, H, scale, shimmer);
+
+        // Particle sim
+        const spawn = Math.max(1, Math.round(density / 28 * dt));
+        for (let i = 0; i < spawn; i++) {
+          const cols = preset.sparkleColors;
+          sparkles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            r: (1.2 + Math.random() * 4) * scale,
+            vx: (Math.random() - 0.5) * 0.6 * scale,
+            vy: (-0.2 - Math.random() * 0.45) * scale,
+            life: 0,
+            max: 60 + Math.random() * 90,
+            col: cols[Math.floor(Math.random() * cols.length)] ?? "#fff",
+            rot: Math.random() * Math.PI,
+            vrot: (Math.random() - 0.5) * 0.04,
+          });
+        }
+        if (sparkles.length > 900) sparkles.splice(0, sparkles.length - 900);
+
+        const kept: Sparkle[] = [];
+        for (const s of sparkles) {
+          s.life += dt;
+          s.x += s.vx * dt;
+          s.y += s.vy * dt;
+          s.rot += s.vrot * dt;
+          if (s.life < s.max && s.y > -20 && s.y < H + 20 && s.x > -20 && s.x < W + 20) {
+            drawParticle(s);
+            kept.push(s);
+          }
+        }
+        sparkles.length = 0;
+        sparkles.push(...kept);
+
+        rafId = requestAnimationFrame(renderFrame);
+      };
+
+      rafId = requestAnimationFrame(renderFrame);
+      rec.start();
+
+      // Countdown UI
+      countdownTimer = setInterval(() => {
+        setRecCountdown(c => Math.max(0, c - 1));
+      }, 1000);
+
+      await new Promise<void>(res => setTimeout(res, videoDuration * 1000));
+      stopFlag = true;
+      if (rafId !== null) cancelAnimationFrame(rafId);
+
+      const stopped = new Promise<void>(res => { rec.onstop = () => res(); });
+      rec.stop();
+      await stopped;
+
+      const blob = new Blob(chunks, { type: "video/webm" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const safe = ((text || "sparkle").toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 24) || "sparkle");
+      a.href = url;
+      a.download = `${safe}-${presetKey}-${videoDuration}s.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2500);
+    } finally {
+      if (countdownTimer !== null) clearInterval(countdownTimer);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      setRecording(false);
+      setRecCountdown(0);
     }
   };
 
@@ -436,6 +752,10 @@ export default function SparkleTextPage() {
           0%   { transform: translate(-50%, -50%) rotate(0deg); }
           100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
+        @keyframes recPulse {
+          0%, 100% { opacity: 0.65; }
+          50%      { opacity: 1; }
+        }
       `}</style>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
@@ -445,8 +765,10 @@ export default function SparkleTextPage() {
             fontFamily:"'DM Mono',monospace", textTransform:"uppercase", marginBottom:8 }}>AETHER · Sparkle Studio</div>
           <h1 style={{ fontSize:"clamp(1.8rem, 4vw, 2.6rem)", fontWeight:800, color:"#f1f5f9",
             margin:"0 0 0.4rem", letterSpacing:"-0.02em" }}>Sparkly Text Generator</h1>
-          <p style={{ fontSize:"0.95rem", color:"#cbd5e1", maxWidth:720, lineHeight:1.6 }}>
-            Type something. Pick a texture. Watch it shimmer. Aether · Cosmic Sunset · Flower · Silk · Wave · Sand. Download what you make as a PNG.
+          <p style={{ fontSize:"0.95rem", color:"#cbd5e1", maxWidth:780, lineHeight:1.6 }}>
+            Type something. Pick a texture. Watch it shimmer. Ten textures pulled from across the AETHER system —
+            Aether · Lunar Tide · Boho Bloom · Verdant Spark · Eris Field · Cosmic · Flower · Silk · Wave · Sand.
+            Export a still PNG or a short looping WebM video.
           </p>
         </header>
 
@@ -478,8 +800,8 @@ export default function SparkleTextPage() {
                 position:"absolute", left:"50%", top:"50%",
                 width:"42%", aspectRatio:"1 / 1",
                 borderRadius:"50%",
-                border:`1px solid ${preset.glowColor}`,
-                opacity:0.18,
+                border:`1px dashed ${preset.glowColor}`,
+                opacity:0.22,
                 transform:"translate(-50%, -50%)",
                 animation: paused ? "none" : "ringDrift 28s linear infinite",
                 pointerEvents:"none",
@@ -514,16 +836,35 @@ export default function SparkleTextPage() {
           }}>
             {text || "Sparkle"}
           </div>
+
+          {/* Recording badge */}
+          {recording && (
+            <div data-testid="rec-badge" style={{
+              position:"absolute", top:14, right:14, zIndex:3,
+              display:"flex", alignItems:"center", gap:8,
+              padding:"6px 12px", borderRadius:999,
+              background:"rgba(0,0,0,0.55)", border:"1px solid rgba(255,80,100,0.6)",
+              fontSize:12, fontFamily:"'DM Mono',monospace", letterSpacing:"0.18em",
+              textTransform:"uppercase", color:"#ffd0d8",
+            }}>
+              <span style={{
+                width:10, height:10, borderRadius:"50%", background:"#ff5060",
+                boxShadow:"0 0 12px #ff5060",
+                animation:"recPulse 1s ease-in-out infinite",
+              }}/>
+              REC · {recCountdown}s
+            </div>
+          )}
         </div>
 
-        {/* Action row: download + pause */}
-        <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:"1.2rem" }}>
+        {/* Action row: PNG + Video + Pause */}
+        <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:"1rem" }}>
           <button
             onClick={downloadPNG}
-            disabled={exporting}
-            data-testid="btn-download"
+            disabled={exporting || recording}
+            data-testid="btn-download-png"
             style={{
-              flex:"1 1 220px",
+              flex:"1 1 200px",
               padding:"0.85rem 1.1rem", borderRadius:12,
               background: exporting
                 ? "rgba(167,139,250,0.18)"
@@ -531,29 +872,80 @@ export default function SparkleTextPage() {
               border:"1px solid rgba(167,139,250,0.55)",
               color:"#f8fafc",
               fontSize:"0.95rem", fontWeight:700, letterSpacing:"0.04em",
-              cursor: exporting ? "wait" : "pointer",
+              cursor: (exporting || recording) ? "not-allowed" : "pointer",
               fontFamily:"inherit",
+              opacity: recording ? 0.5 : 1,
               boxShadow:"0 0 30px rgba(167,139,250,0.25), inset 0 1px 0 rgba(255,255,255,0.08)",
-              transition:"transform 0.18s ease, box-shadow 0.18s ease",
+              transition:"transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease",
             }}>
             {exporting ? "✦ Composing PNG…" : "↓ Download PNG"}
           </button>
           <button
+            onClick={downloadVideo}
+            disabled={recording || exporting}
+            data-testid="btn-download-video"
+            style={{
+              flex:"1 1 200px",
+              padding:"0.85rem 1.1rem", borderRadius:12,
+              background: recording
+                ? "rgba(255,80,100,0.22)"
+                : "linear-gradient(135deg, rgba(255,140,100,0.3), rgba(167,139,250,0.22))",
+              border:`1px solid ${recording ? "rgba(255,80,100,0.6)" : "rgba(255,170,140,0.55)"}`,
+              color:"#f8fafc",
+              fontSize:"0.95rem", fontWeight:700, letterSpacing:"0.04em",
+              cursor: (recording || exporting) ? "wait" : "pointer",
+              fontFamily:"inherit",
+              opacity: exporting ? 0.5 : 1,
+              boxShadow:"0 0 30px rgba(255,140,100,0.18), inset 0 1px 0 rgba(255,255,255,0.08)",
+              transition:"all 0.18s ease",
+            }}>
+            {recording ? `● Recording · ${recCountdown}s` : `▸ Download Video (${videoDuration}s · WebM)`}
+          </button>
+          <button
             onClick={() => setPaused(p => !p)}
             data-testid="btn-pause"
+            disabled={recording}
             style={{
-              flex:"1 1 220px",
+              flex:"1 1 180px",
               padding:"0.85rem 1.1rem", borderRadius:12,
               background: paused ? "rgba(167,139,250,0.2)" : "rgba(15,23,42,0.55)",
               border:"1px solid rgba(255,255,255,0.12)", color:"#f1f5f9",
-              fontSize:"0.95rem", fontWeight:600, cursor:"pointer", fontFamily:"inherit",
+              fontSize:"0.95rem", fontWeight:600,
+              cursor: recording ? "not-allowed" : "pointer",
+              fontFamily:"inherit",
+              opacity: recording ? 0.5 : 1,
             }}>
-            {paused ? "▶ Resume Sparkle" : "⏸ Pause Sparkle"}
+            {paused ? "▶ Resume" : "⏸ Pause"}
           </button>
         </div>
 
+        {/* Video duration pills */}
+        <div style={{ display:"flex", gap:6, marginBottom:"1.2rem", alignItems:"center" }}>
+          <span style={{ fontSize:11, color:"#94a3b8", fontFamily:"'DM Mono',monospace",
+            letterSpacing:1.5, textTransform:"uppercase", marginRight:6 }}>Video Length</span>
+          {VIDEO_DURATIONS.map(d => {
+            const active = d.sec === videoDuration;
+            return (
+              <button key={d.sec}
+                onClick={() => setVideoDuration(d.sec)}
+                disabled={recording}
+                data-testid={`dur-${d.sec}`}
+                style={{
+                  padding:"0.4rem 0.9rem", borderRadius:999,
+                  background: active ? "rgba(167,139,250,0.28)" : "rgba(15,23,42,0.55)",
+                  border:`1px solid ${active ? "rgba(167,139,250,0.55)" : "rgba(255,255,255,0.1)"}`,
+                  color:"#f1f5f9", fontSize:"0.82rem", fontWeight:600,
+                  cursor: recording ? "not-allowed" : "pointer",
+                  fontFamily:"inherit",
+                  opacity: recording ? 0.5 : 1,
+                }}>{d.label}</button>
+            );
+          })}
+        </div>
+
         {/* Preset chips */}
-        <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:"1.2rem" }}>
+        <div style={{ display:"grid", gap:8, marginBottom:"1.2rem",
+          gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))" }}>
           {PRESETS.map(p => {
             const active = p.key === presetKey;
             return (
@@ -561,7 +953,6 @@ export default function SparkleTextPage() {
                 onClick={() => setPresetKey(p.key)}
                 data-testid={`preset-${p.key}`}
                 style={{
-                  flex:"1 1 180px", minWidth:160,
                   padding:"0.7rem 0.9rem", borderRadius:12,
                   background: active
                     ? "linear-gradient(135deg, rgba(167,139,250,0.18), rgba(56,189,248,0.14))"
@@ -570,8 +961,16 @@ export default function SparkleTextPage() {
                   color:"#f1f5f9", textAlign:"left", cursor:"pointer",
                   transition:"all 0.2s",
                 }}>
-                <div style={{ fontSize:11, color:"#a78bfa", fontFamily:"'DM Mono',monospace", letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>{p.kicker}</div>
-                <div style={{ fontSize:"0.95rem", fontWeight:700 }}>{p.label}</div>
+                <div style={{ fontSize:10, color:"#a78bfa", fontFamily:"'DM Mono',monospace",
+                  letterSpacing:1.5, textTransform:"uppercase", marginBottom:3 }}>{p.kicker}</div>
+                <div style={{ fontSize:"0.95rem", fontWeight:700, display:"flex",
+                  alignItems:"baseline", justifyContent:"space-between", gap:8 }}>
+                  <span>{p.label}</span>
+                  {p.source && (
+                    <span style={{ fontSize:9, color:"#64748b", fontFamily:"'DM Mono',monospace",
+                      letterSpacing:1, textTransform:"uppercase" }}>· {p.source}</span>
+                  )}
+                </div>
                 <div style={{ marginTop:6, height:6, borderRadius:3, background: p.textGradient }} />
               </button>
             );
@@ -611,7 +1010,7 @@ export default function SparkleTextPage() {
           fontSize:"0.78rem", color:"#64748b",
           fontFamily:"'DM Mono',monospace", letterSpacing:"0.18em", textTransform:"uppercase",
           textAlign:"center" }}>
-          6 textures · pulsing aura · 4-point sparkles · gradient text · png export
+          10 textures · pulsing aura · drifting ring · 4-point sparkles · png + webm export
         </footer>
       </div>
     </div>
