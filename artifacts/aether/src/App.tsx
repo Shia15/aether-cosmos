@@ -174,6 +174,7 @@ import UniversalGrammarPage from "@/pages/universal-grammar";
 import AetherEdgeConstraintView from "@/pages/aether-edge-constraint";
 import QuantumLivingSystemsView from "@/pages/quantum-living-systems";
 import DiamondNanothreadsPage from "@/pages/diamond-nanothreads";
+import ComputerBrainsPage from "@/pages/computer-brains";
 
 const queryClient = new QueryClient();
 
@@ -316,6 +317,7 @@ function Router() {
         <Route path="/cuca-hybrid-skin" component={CucaHybridSkinPage} />
         <Route path="/cuca-gyroid" component={CucaGyroidPage} />
         <Route path="/aether-childrens-realm" component={AetherChildrensRealmPage} />
+        <Route path="/computer-brains" component={ComputerBrainsPage} />
         <Route path="/aether-seasons" component={AetherSeasonsPage} />
         <Route path="/aether-flow" component={AetherFlowPage} />
         <Route path="/aether-foundations" component={AetherFoundationsPage} />

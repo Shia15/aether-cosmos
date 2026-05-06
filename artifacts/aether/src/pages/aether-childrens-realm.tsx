@@ -8,6 +8,7 @@ type Book = {
   gradient: string;
   glyph: string;
   accent: string;
+  href?: string;
 };
 
 const BOOKS: Book[] = [
@@ -34,6 +35,7 @@ const BOOKS: Book[] = [
     gradient: "linear-gradient(135deg, #67e8f9 0%, #38bdf8 50%, #6366f1 100%)",
     glyph: "◈",
     accent: "#06b6d4",
+    href: "/computer-brains",
   },
   {
     id: "flow-notebook",
@@ -187,16 +189,8 @@ export default function AetherChildrensRealmPage() {
           maxWidth: 1500,
           margin: "0 auto",
         }}>
-          {BOOKS.map(b => (
-            <div key={b.id} className="realm-card" style={{
-              background: "rgba(0, 0, 40, 0.7)",
-              borderRadius: 32,
-              overflow: "hidden",
-              boxShadow: "0 15px 50px rgba(0,0,0,0.7)",
-              backdropFilter: "blur(8px)",
-              cursor: "pointer",
-            }}>
-              <div className="conic-glow" />
+          {BOOKS.map(b => {
+            const inner = (
               <div style={{ position: "relative", zIndex: 1, background: "rgba(0,0,40,0.7)", borderRadius: 32, overflow: "hidden" }}>
                 {/* Cover placeholder */}
                 <div style={{
@@ -231,6 +225,28 @@ export default function AetherChildrensRealmPage() {
                       boxShadow: "0 0 8px white",
                     }} />
                   ))}
+                  {/* available badge */}
+                  {b.href && (
+                    <div style={{
+                      position: "absolute", top: 14, right: 14,
+                      background: "rgba(6,182,212,0.9)",
+                      color: "white", fontSize: 11, fontWeight: 700,
+                      padding: "4px 10px", borderRadius: 20,
+                      letterSpacing: "0.12em", textTransform: "uppercase",
+                      boxShadow: "0 0 12px rgba(6,182,212,0.6)",
+                    }}>Read Now ›</div>
+                  )}
+                  {/* coming soon badge */}
+                  {!b.href && (
+                    <div style={{
+                      position: "absolute", top: 14, right: 14,
+                      background: "rgba(0,0,0,0.55)",
+                      color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600,
+                      padding: "4px 10px", borderRadius: 20,
+                      letterSpacing: "0.12em", textTransform: "uppercase",
+                      backdropFilter: "blur(4px)",
+                    }}>Coming Soon</div>
+                  )}
                 </div>
 
                 <div style={{
@@ -254,8 +270,37 @@ export default function AetherChildrensRealmPage() {
                   }}>{b.subtitle}</p>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+
+            return b.href ? (
+              <Link key={b.id} href={b.href} style={{ textDecoration: "none" }}>
+                <div className="realm-card" style={{
+                  background: "rgba(0, 0, 40, 0.7)",
+                  borderRadius: 32,
+                  overflow: "hidden",
+                  boxShadow: "0 15px 50px rgba(0,0,0,0.7)",
+                  backdropFilter: "blur(8px)",
+                  cursor: "pointer",
+                }}>
+                  <div className="conic-glow" />
+                  {inner}
+                </div>
+              </Link>
+            ) : (
+              <div key={b.id} className="realm-card" style={{
+                background: "rgba(0, 0, 40, 0.7)",
+                borderRadius: 32,
+                overflow: "hidden",
+                boxShadow: "0 15px 50px rgba(0,0,0,0.7)",
+                backdropFilter: "blur(8px)",
+                cursor: "default",
+                opacity: 0.75,
+              }}>
+                <div className="conic-glow" />
+                {inner}
+              </div>
+            );
+          })}
         </div>
 
         {/* Companion · Weston's baby rhythm */}
