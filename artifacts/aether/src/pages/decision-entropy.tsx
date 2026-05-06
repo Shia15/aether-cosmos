@@ -11,8 +11,8 @@ import { Link } from "wouter";
    ─────────────────────────────────────────────────────────────────── */
 
 const T = {
-  bg: "#f8f5ef",
-  paper: "#fdfaf4",
+  bg: "#ffffff",
+  paper: "#f8fafc",
   ink: "#1a1612",
   inkMid: "#4a3f35",
   inkDim: "#8a7a6a",
@@ -374,10 +374,13 @@ export default function DecisionEntropyPage() {
           }}>Bridges</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {[
-              ["/unified-synthesis", "Unified Synthesis · Coherence as Substrate"],
-              ["/aether-doctrine", "AETHER Doctrine"],
-              ["/coherence", "Coherence Engine"],
-              ["/ecosystem", "M.A.R.I. Ecosystem"],
+              ["/unified-synthesis",  "Unified Synthesis · Coherence as Substrate"],
+              ["/clcs-architecture",  "CLCS Architecture · L1→L5 Threading"],
+              ["/cancer-dynamics",    "Cancer Dynamics · Tumor Coherence"],
+              ["/aether-doctrine",    "AETHER Doctrine"],
+              ["/coherence",          "Coherence Engine"],
+              ["/ecosystem",          "M.A.R.I. Ecosystem"],
+              ["/glossary",           "Glossary · 40 Terms"],
             ].map(([href, label]) => (
               <Link key={href} href={href} data-testid={`bridge-${href.replace(/^\//, "")}`}
                 style={{

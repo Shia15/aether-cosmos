@@ -330,6 +330,144 @@ export default function ClcsArchitecturePage() {
           ))}
         </div>
 
+        {/* ── L0 · PARALLEL EXECUTION BUS ── */}
+        <div data-testid="section-threading" style={{
+          marginTop: 64, border: `1px solid ${T.blue}44`,
+          borderRadius: 12, overflow: "hidden",
+          boxShadow: `0 0 40px rgba(10,240,255,0.06)`,
+        }}>
+          <div style={{
+            background: `linear-gradient(90deg, rgba(10,240,255,0.08) 0%, rgba(157,78,221,0.06) 100%)`,
+            borderBottom: `1px solid ${T.border}`,
+            padding: "20px 28px", display: "flex", alignItems: "center", gap: 16,
+          }}>
+            <div style={{
+              fontFamily: T.display, fontSize: 13, fontWeight: 700,
+              color: T.blue, letterSpacing: 3, textTransform: "uppercase",
+              textShadow: "0 0 20px rgba(10,240,255,0.4)",
+            }}>⚡ L0 · Parallel Execution &amp; Threading</div>
+            <div style={{
+              marginLeft: "auto", fontSize: 9, color: T.muted,
+              letterSpacing: 2, textTransform: "uppercase",
+            }}>Concurrency · Multi-thread · Event Bus</div>
+          </div>
+
+          <div style={{ padding: "28px 32px", display: "grid", gap: 28 }}>
+            <p style={{ fontSize: 13, lineHeight: 1.85, color: T.text, margin: 0 }}>
+              CLCS does not run L1→L5 sequentially. Each layer executes as a{" "}
+              <span style={{ color: T.blue }}>dedicated OS thread</span> (or async
+              coroutine on constrained hardware), communicating via a lock-free
+              event bus. This allows biological sensing, coherence calculation,
+              meta-AI evolution, and replication to{" "}
+              <span style={{ color: T.green }}>proceed simultaneously</span> —
+              exactly as life itself computes in parallel across cells, organs, and
+              ecosystems at once. Cancer detection, atmospheric monitoring, and
+              planetary-health telemetry all benefit from this architecture: no
+              single pipeline blocks another.
+            </p>
+
+            {/* Thread table */}
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}>
+                <thead>
+                  <tr style={{ borderBottom: `1px solid ${T.border}` }}>
+                    {["Thread", "Layer", "Loop rate", "Blocked by", "Domain examples"].map(h => (
+                      <th key={h} style={{ padding: "8px 14px", color: T.blue, letterSpacing: 1.5,
+                        textTransform: "uppercase", fontFamily: T.mono, textAlign: "left",
+                        fontWeight: 400, whiteSpace: "nowrap" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ["T-IO",      "L1 · Hardware I/O",       "1 kHz",   "Hardware latency",       "Particle counters · VOC sensors · weather probes"],
+                    ["T-BIO",     "L2 · Bio Sensing",         "10 Hz",   "T-IO (X_raw ready)",     "ctDNA lysis pipeline · immune cell counts · bloom detection"],
+                    ["T-CTRL",    "L3 · Coherence Engine",    "100 Hz",  "T-BIO (X(t) ready)",     "Tumor-immune error · atmospheric PID · ocean pH loop"],
+                    ["T-META",    "L4 · Meta-AI",             "0.1 Hz",  "E_history accumulates",  "Synthetic lethality hypothesis · weather pattern recognition"],
+                    ["T-REP",     "L5 · Replication",         "On demand","T-META (C(t) stable)",   "Knowledge capsule export · new CLCS node spin-up"],
+                    ["T-BUS",     "L0 · Event Bus",           "∞ (async)","—",                     "Inter-thread messaging · priority queue · back-pressure control"],
+                  ].map(([thread, layer, rate, blocked, domain]) => (
+                    <tr key={thread as string} style={{ borderBottom: `1px solid ${T.border}22` }}>
+                      <td style={{ padding: "9px 14px", color: T.blue, fontFamily: T.mono, fontSize: 11 }}>{thread}</td>
+                      <td style={{ padding: "9px 14px", color: T.text, fontSize: 11 }}>{layer}</td>
+                      <td style={{ padding: "9px 14px", color: T.orange, fontFamily: T.mono, fontSize: 11 }}>{rate}</td>
+                      <td style={{ padding: "9px 14px", color: T.muted, fontSize: 11 }}>{blocked}</td>
+                      <td style={{ padding: "9px 14px", color: "#a0b4cc", fontSize: 11 }}>{domain}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pseudocode */}
+            <div style={{ background: "rgba(0,0,0,0.35)", borderRadius: 8, padding: "20px 24px" }}>
+              <div style={{ fontSize: 9, color: T.muted, letterSpacing: 2, marginBottom: 12 }}>THREAD ORCHESTRATOR · PSEUDOCODE</div>
+              <pre style={{ fontFamily: T.mono, fontSize: 11, lineHeight: 2, color: T.text, margin: 0, overflowX: "auto", whiteSpace: "pre" }}>
+                <CM>{"// L0 · Parallel Execution Bus — spawns all layers as concurrent threads"}</CM>{"\n"}
+                <KW>class</KW> <FN>CLCSOrchestrator</FN>:{"\n"}
+                {"  "}<KW>fn</KW> <FN>start</FN>(<V>node_config</V>):{"\n"}
+                {"    "}<V>bus</V>      = <FN>EventBus</FN>(<V>mode</V>=<S>"lock-free"</S>, <V>priority</V>=<S>"coherence-first"</S>){"\n"}
+                {"    "}<V>threads</V>  = [<FN>T_IO</FN>, <FN>T_BIO</FN>, <FN>T_CTRL</FN>, <FN>T_META</FN>, <FN>T_REP</FN>]{"\n\n"}
+                {"    "}<CM>{"// Spawn all layers simultaneously"}</CM>{"\n"}
+                {"    "}<KW>parallel_for</KW> <V>T</V> <KW>in</KW> <V>threads</V>:{"\n"}
+                {"      "}<FN>spawn_thread</FN>(<V>T</V>, <V>bus</V>, <V>node_config</V>){"\n\n"}
+                {"    "}<CM>{"// Event bus routes typed messages between layers"}</CM>{"\n"}
+                {"    "}<V>bus</V>.<FN>subscribe</FN>(<S>"X_raw"</S>,    <V>handler</V>=<FN>T_BIO</FN>.<FN>process</FN>){"\n"}
+                {"    "}<V>bus</V>.<FN>subscribe</FN>(<S>"X(t)"</S>,     <V>handler</V>=<FN>T_CTRL</FN>.<FN>tick</FN>){"\n"}
+                {"    "}<V>bus</V>.<FN>subscribe</FN>(<S>"E_history"</S>, <V>handler</V>=<FN>T_META</FN>.<FN>evolve</FN>){"\n"}
+                {"    "}<V>bus</V>.<FN>subscribe</FN>(<S>"C(t)"</S>,      <V>handler</V>=<FN>T_REP</FN>.<FN>replicate</FN>){"\n\n"}
+                {"    "}<CM>{"// Back-pressure: T_META won't starve T_CTRL for CPU"}</CM>{"\n"}
+                {"    "}<V>bus</V>.<FN>set_priority</FN>(<S>"X_raw"</S>, <N>10</N>)  <CM>{"// highest"}</CM>{"\n"}
+                {"    "}<V>bus</V>.<FN>set_priority</FN>(<S>"C(t)"</S>,  <N>1</N>)   <CM>{"// background"}</CM>
+              </pre>
+            </div>
+
+            {/* Math chips */}
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              {[
+                "T = { T-IO ‖ T-BIO ‖ T-CTRL ‖ T-META ‖ T-REP }",
+                "Throughput = Σ Lᵢ.rate  (parallel, not sequential)",
+                "Latency(detect) ≈ max(T-IO, T-BIO)  not sum",
+                "Coherence preserved across threads via shared X*(t)",
+              ].map(m => (
+                <div key={m} style={{
+                  fontSize: 11, color: T.blue, background: "rgba(10,240,255,0.05)",
+                  border: "1px solid rgba(10,240,255,0.15)",
+                  borderRadius: 6, padding: "6px 14px", letterSpacing: 0.5, fontFamily: T.mono,
+                }}>{m}</div>
+              ))}
+            </div>
+
+            {/* Domain applications */}
+            <div style={{
+              display: "grid", gap: 16,
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%,240px), 1fr))",
+            }}>
+              {[
+                { icon: "🧬", title: "Cancer Detection",
+                  body: "T-BIO streams ctDNA and scRNA-seq simultaneously. T-CTRL computes tumor-immune coherence in real time. T-META runs synthetic lethality regression in background. Detection latency collapses from days to minutes." },
+                { icon: "🌿", title: "Chemical Biology",
+                  body: "VOC bouquet GC-MS data flows T-IO→T-BIO at 10 Hz. Floral signal coherence vectors are computed by T-CTRL against pollinator tuning curves. New terpene pathway hypotheses emerge from T-META symbolic regression." },
+                { icon: "🌤", title: "Weather & Atmosphere",
+                  body: "Atmospheric sensors feed T-IO at 1 kHz. T-CTRL tracks Schumann + ionosphere phase lock. T-META identifies climate coherence breaks (El Niño precursors, bloom triggers) weeks before classical models." },
+                { icon: "🌍", title: "Planetary Health",
+                  body: "Ocean pH, soil carbon, Schumann and solar wind all run as parallel CQA streams. T-REP exports coherence maps across a distributed node network — one CLCS per bioregion, all sharing C(t) capsules." },
+              ].map(d => (
+                <div key={d.title} style={{
+                  padding: "16px 20px", borderRadius: 8,
+                  border: `1px solid ${T.border}`,
+                  background: "rgba(10,240,255,0.025)",
+                }}>
+                  <div style={{ fontSize: 16, marginBottom: 8 }}>{d.icon}</div>
+                  <div style={{ fontFamily: T.display, fontSize: 13, fontWeight: 700,
+                    color: T.white, marginBottom: 8, letterSpacing: 0.5 }}>{d.title}</div>
+                  <div style={{ fontSize: 12, color: T.text, lineHeight: 1.7 }}>{d.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* FOOTER */}
         <div style={{ marginTop: 64, textAlign: "center", padding: 32, borderTop: `1px solid ${T.border}` }}>
           <p style={{ fontSize: 10, color: T.muted, letterSpacing: 2, margin: 0 }}>

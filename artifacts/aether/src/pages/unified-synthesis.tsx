@@ -10,7 +10,7 @@ import refImg from "@assets/image_(27)_1778042504322.jpg";
 
 const T = {
   ink: "#0a0c08",
-  parchment: "#f5f0e8",
+  parchment: "#ffffff",
   gold: "#c8a84b",
   goldDim: "#8a6f2c",
   sage: "#4a6741",
@@ -638,10 +638,13 @@ export default function UnifiedSynthesisPage() {
           }}>Bridges</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {[
-              ["/decision-entropy", "Decision Entropy · Time-Cost Formalism"],
-              ["/aether-doctrine", "AETHER Doctrine"],
+              ["/decision-entropy",       "Decision Entropy · Time-Cost Formalism"],
+              ["/clcs-architecture",      "CLCS Architecture · L0 Threading"],
+              ["/cancer-dynamics",        "Cancer Dynamics · Tumor Micro-environment"],
+              ["/aether-doctrine",        "AETHER Doctrine"],
               ["/aether-edge-constraint", "Edge Constraint · CUCA Stack"],
               ["/quantum-living-systems", "Quantum Living Systems"],
+              ["/glossary",               "Glossary · 40 Terms"],
             ].map(([href, label]) => (
               <Link key={href} href={href} data-testid={`bridge-${href.replace(/^\//, "")}`}
                 style={{

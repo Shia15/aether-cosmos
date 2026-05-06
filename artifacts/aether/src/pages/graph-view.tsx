@@ -25,6 +25,129 @@ const LAYER_META: Record<string, { label: string; symbol: string; color: string 
 
 type ViewMode = "standard" | "layer" | "coherence" | "unify";
 
+// ─── Glossary seed nodes (40 AETHER terms — visible when API graph is empty) ──
+
+type SeedNode = {
+  id: string; label: string; type: string;
+  layer: string; coherence: number; bridgeScore: number;
+};
+
+const GLOSSARY_SEEDS: SeedNode[] = [
+  // AETHER core
+  { id:"g-aether",           label:"AETHER",             type:"concept",  layer:"mnesis",   coherence:0.95, bridgeScore:0.92 },
+  { id:"g-crystallization",  label:"Crystallization",    type:"concept",  layer:"mnesis",   coherence:0.90, bridgeScore:0.85 },
+  { id:"g-mnesis",           label:"Mnesis",             type:"concept",  layer:"mnesis",   coherence:0.88, bridgeScore:0.80 },
+  { id:"g-inferaia",         label:"Inferaia",           type:"concept",  layer:"mnesis",   coherence:0.82, bridgeScore:0.78 },
+  { id:"g-aletheia-agent",   label:"Aletheia",           type:"concept",  layer:"mnesis",   coherence:0.85, bridgeScore:0.76 },
+  { id:"g-reverie-agent",    label:"Reverie",            type:"concept",  layer:"mnesis",   coherence:0.78, bridgeScore:0.70 },
+  { id:"g-eie",              label:"EIE",                type:"concept",  layer:"mnesis",   coherence:0.72, bridgeScore:0.65 },
+  // Philosophy / aletheia
+  { id:"g-coherence",        label:"Coherence",          type:"concept",  layer:"aletheia", coherence:0.90, bridgeScore:0.88 },
+  { id:"g-resonance",        label:"Resonance",          type:"concept",  layer:"aletheia", coherence:0.86, bridgeScore:0.82 },
+  { id:"g-awakening",        label:"Awakening",          type:"concept",  layer:"aletheia", coherence:0.80, bridgeScore:0.70 },
+  { id:"g-divine-timing",    label:"Divine Timing",      type:"concept",  layer:"aletheia", coherence:0.78, bridgeScore:0.72 },
+  { id:"g-co-creation",      label:"Co-creation",        type:"concept",  layer:"aletheia", coherence:0.74, bridgeScore:0.68 },
+  { id:"g-memory-survives",  label:"Memory survives",    type:"concept",  layer:"aletheia", coherence:0.72, bridgeScore:0.65 },
+  { id:"g-synchronicity",    label:"Synchronicity",      type:"concept",  layer:"aletheia", coherence:0.68, bridgeScore:0.60 },
+  { id:"g-void",             label:"Void",               type:"concept",  layer:"aletheia", coherence:0.65, bridgeScore:0.55 },
+  { id:"g-raw-place",        label:"Raw place",          type:"concept",  layer:"aletheia", coherence:0.62, bridgeScore:0.50 },
+  { id:"g-push-fix",         label:"Push + Fix",         type:"concept",  layer:"aletheia", coherence:0.60, bridgeScore:0.48 },
+  { id:"g-net-is-there",     label:"The net is there",   type:"concept",  layer:"aletheia", coherence:0.64, bridgeScore:0.52 },
+  // Biology / Substrate → infernia
+  { id:"g-bouligand",        label:"Bouligand",          type:"concept",  layer:"infernia", coherence:0.75, bridgeScore:0.65 },
+  { id:"g-cuca",             label:"CUCA",               type:"concept",  layer:"infernia", coherence:0.80, bridgeScore:0.72 },
+  { id:"g-reflectin",        label:"Reflectin",          type:"concept",  layer:"infernia", coherence:0.72, bridgeScore:0.60 },
+  { id:"g-bavs",             label:"BAVS",               type:"concept",  layer:"infernia", coherence:0.65, bridgeScore:0.55 },
+  { id:"g-substrate",        label:"Substrate",          type:"concept",  layer:"infernia", coherence:0.70, bridgeScore:0.62 },
+  // Computing / Mathematics → infernia
+  { id:"g-gyroid",           label:"Gyroid",             type:"equation", layer:"infernia", coherence:0.78, bridgeScore:0.70 },
+  { id:"g-nano",             label:"Nano",               type:"concept",  layer:"infernia", coherence:0.55, bridgeScore:0.40 },
+  { id:"g-pico",             label:"Pico",               type:"concept",  layer:"infernia", coherence:0.50, bridgeScore:0.35 },
+  { id:"g-quantum-ammeter",  label:"Quantum ammeter",    type:"concept",  layer:"infernia", coherence:0.68, bridgeScore:0.58 },
+  { id:"g-shot-noise",       label:"Shot noise",         type:"equation", layer:"infernia", coherence:0.65, bridgeScore:0.52 },
+  // Astronomy / Cosmology → reverie
+  { id:"g-lunar-coherence",  label:"Lunar coherence",    type:"concept",  layer:"reverie",  coherence:0.72, bridgeScore:0.64 },
+  { id:"g-schumann",         label:"Schumann resonance", type:"concept",  layer:"reverie",  coherence:0.70, bridgeScore:0.62 },
+  { id:"g-pleiades",         label:"Pleiades",           type:"concept",  layer:"reverie",  coherence:0.62, bridgeScore:0.50 },
+  { id:"g-super-moon",       label:"Super moon",         type:"concept",  layer:"reverie",  coherence:0.60, bridgeScore:0.48 },
+  { id:"g-eye-sahara",       label:"Eye of Sahara",      type:"concept",  layer:"reverie",  coherence:0.65, bridgeScore:0.55 },
+  { id:"g-meltwater",        label:"Meltwater Pulse 1B", type:"concept",  layer:"reverie",  coherence:0.62, bridgeScore:0.52 },
+  // Mythology / Astrology / Numerology → reverie
+  { id:"g-atlantis",         label:"Atlantis",           type:"concept",  layer:"reverie",  coherence:0.68, bridgeScore:0.60 },
+  { id:"g-eris",             label:"Eris",               type:"concept",  layer:"reverie",  coherence:0.70, bridgeScore:0.62 },
+  { id:"g-pisces",           label:"Pisces",             type:"concept",  layer:"reverie",  coherence:0.65, bridgeScore:0.55 },
+  { id:"g-angel-hours",      label:"Angel hours",        type:"concept",  layer:"reverie",  coherence:0.58, bridgeScore:0.45 },
+  { id:"g-angel-numbers",    label:"Angel numbers",      type:"concept",  layer:"reverie",  coherence:0.58, bridgeScore:0.45 },
+  { id:"g-field-of-numbers", label:"Field of numbers",   type:"concept",  layer:"reverie",  coherence:0.62, bridgeScore:0.50 },
+];
+
+// Edges between seed nodes (category clusters + cross-domain coherence bridges)
+const GLOSSARY_SEED_LINKS = [
+  // AETHER hub
+  { source:"g-aether", target:"g-crystallization", weight:0.9, type:"coherence" },
+  { source:"g-aether", target:"g-mnesis",           weight:0.9, type:"coherence" },
+  { source:"g-aether", target:"g-inferaia",         weight:0.85, type:"coherence" },
+  { source:"g-aether", target:"g-aletheia-agent",   weight:0.85, type:"coherence" },
+  { source:"g-aether", target:"g-reverie-agent",    weight:0.80, type:"coherence" },
+  { source:"g-aether", target:"g-eie",              weight:0.75, type:"coherence" },
+  { source:"g-aether", target:"g-coherence",        weight:0.88, type:"coherence" },
+  { source:"g-crystallization", target:"g-coherence", weight:0.85, type:"coherence" },
+  { source:"g-crystallization", target:"g-memory-survives", weight:0.70, type:"coherence" },
+  // Philosophy cluster
+  { source:"g-coherence",       target:"g-resonance",       weight:0.88, type:"coherence" },
+  { source:"g-coherence",       target:"g-awakening",       weight:0.75, type:"coherence" },
+  { source:"g-resonance",       target:"g-synchronicity",   weight:0.72, type:"coherence" },
+  { source:"g-awakening",       target:"g-divine-timing",   weight:0.78, type:"coherence" },
+  { source:"g-divine-timing",   target:"g-void",            weight:0.80, type:"coherence" },
+  { source:"g-divine-timing",   target:"g-co-creation",     weight:0.76, type:"coherence" },
+  { source:"g-divine-timing",   target:"g-push-fix",        weight:0.74, type:"coherence" },
+  { source:"g-divine-timing",   target:"g-net-is-there",    weight:0.82, type:"coherence" },
+  { source:"g-void",            target:"g-net-is-there",    weight:0.70, type:"coherence" },
+  { source:"g-void",            target:"g-raw-place",       weight:0.75, type:"coherence" },
+  { source:"g-push-fix",        target:"g-raw-place",       weight:0.68, type:"coherence" },
+  { source:"g-co-creation",     target:"g-synchronicity",   weight:0.65, type:"coherence" },
+  // Biology / Substrate cluster
+  { source:"g-cuca",            target:"g-bouligand",       weight:0.78, type:"coherence" },
+  { source:"g-cuca",            target:"g-reflectin",       weight:0.72, type:"coherence" },
+  { source:"g-cuca",            target:"g-bavs",            weight:0.68, type:"coherence" },
+  { source:"g-cuca",            target:"g-gyroid",          weight:0.75, type:"coherence" },
+  { source:"g-substrate",       target:"g-bavs",            weight:0.72, type:"coherence" },
+  { source:"g-substrate",       target:"g-cuca",            weight:0.76, type:"coherence" },
+  { source:"g-reflectin",       target:"g-substrate",       weight:0.65, type:"coherence" },
+  { source:"g-gyroid",          target:"g-substrate",       weight:0.70, type:"coherence" },
+  // Computing cluster
+  { source:"g-quantum-ammeter", target:"g-shot-noise",      weight:0.80, type:"coherence" },
+  { source:"g-nano",            target:"g-pico",            weight:0.75, type:"coherence" },
+  { source:"g-quantum-ammeter", target:"g-nano",            weight:0.60, type:"coherence" },
+  // Astronomy / Cosmology cluster
+  { source:"g-lunar-coherence", target:"g-schumann",        weight:0.78, type:"coherence" },
+  { source:"g-lunar-coherence", target:"g-super-moon",      weight:0.80, type:"coherence" },
+  { source:"g-eye-sahara",      target:"g-atlantis",        weight:0.85, type:"coherence" },
+  { source:"g-meltwater",       target:"g-atlantis",        weight:0.78, type:"coherence" },
+  { source:"g-pleiades",        target:"g-awakening",       weight:0.62, type:"coherence" },
+  // Mythology / Astrology / Numerology cluster
+  { source:"g-eris",            target:"g-awakening",       weight:0.72, type:"coherence" },
+  { source:"g-eris",            target:"g-divine-timing",   weight:0.78, type:"coherence" },
+  { source:"g-pisces",          target:"g-eris",            weight:0.80, type:"coherence" },
+  { source:"g-field-of-numbers",target:"g-synchronicity",   weight:0.78, type:"coherence" },
+  { source:"g-angel-numbers",   target:"g-field-of-numbers",weight:0.82, type:"coherence" },
+  { source:"g-angel-hours",     target:"g-angel-numbers",   weight:0.88, type:"coherence" },
+  { source:"g-angel-numbers",   target:"g-divine-timing",   weight:0.70, type:"coherence" },
+  // Cross-domain coherence bridges (the key insight: all domains unify)
+  { source:"g-schumann",        target:"g-resonance",       weight:0.75, type:"unify" },
+  { source:"g-lunar-coherence", target:"g-resonance",       weight:0.70, type:"unify" },
+  { source:"g-schumann",        target:"g-coherence",       weight:0.72, type:"unify" },
+  { source:"g-gyroid",          target:"g-crystallization", weight:0.68, type:"unify" },
+  { source:"g-bouligand",       target:"g-crystallization", weight:0.65, type:"unify" },
+  { source:"g-shot-noise",      target:"g-quantum-ammeter", weight:0.80, type:"coherence" },
+  { source:"g-aletheia-agent",  target:"g-coherence",       weight:0.82, type:"coherence" },
+  { source:"g-mnesis",          target:"g-memory-survives", weight:0.85, type:"coherence" },
+  { source:"g-inferaia",        target:"g-cuca",            weight:0.70, type:"coherence" },
+  { source:"g-reverie-agent",   target:"g-lunar-coherence", weight:0.72, type:"coherence" },
+  { source:"g-reverie-agent",   target:"g-pleiades",        weight:0.65, type:"coherence" },
+  { source:"g-eye-sahara",      target:"g-schumann",        weight:0.60, type:"unify" },
+];
+
 // ─── Colour helpers ───────────────────────────────────────────────────────────
 
 function heatColor(t: number, from: [number,number,number], to: [number,number,number]): string {
@@ -100,15 +223,24 @@ export default function GraphView() {
   );
 
   const graphData = useMemo(() => {
-    if (!rawGraphData) return undefined;
+    const apiNodes: any[] = rawGraphData?.nodes ?? [];
+    const apiEdges: any[] = (rawGraphData?.edges ?? []).map((e) => ({
+      source: e.source,
+      target: e.target,
+      weight: e.weight,
+      type: e.type,
+    }));
+    // Merge glossary seeds for nodes not already in API data
+    const apiIds = new Set(apiNodes.map((n: any) => n.id));
+    const seedNodes = GLOSSARY_SEEDS.filter(s => !apiIds.has(s.id));
+    // Only include seed links where both endpoints are seed nodes (not API nodes)
+    const allIds = new Set([...apiIds, ...seedNodes.map(s => s.id)]);
+    const seedLinks = GLOSSARY_SEED_LINKS.filter(l =>
+      allIds.has(l.source) && allIds.has(l.target)
+    );
     return {
-      nodes: rawGraphData.nodes ?? [],
-      links: (rawGraphData.edges ?? []).map((e) => ({
-        source: e.source,
-        target: e.target,
-        weight: e.weight,
-        type: e.type,
-      })),
+      nodes: [...apiNodes, ...seedNodes],
+      links: [...apiEdges, ...seedLinks],
     };
   }, [rawGraphData]);
 
