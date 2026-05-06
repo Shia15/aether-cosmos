@@ -235,6 +235,7 @@ const NAV_ITEMS = [
   { href: "/aether-childrens-realm",   label: "AETHER Children's Realm · Library",       icon: Sparkles },
   { href: "/aether-seasons",           label: "AETHER Seasons · Brand Strategy",         icon: Sprout },
   { href: "/aether-flow",              label: "AETHER Flow · Unified Daily Alignment",   icon: Egg },
+  { href: "/aether-foundations",       label: "AETHER Foundations · Substrate · Crystal · Field", icon: Microscope },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
