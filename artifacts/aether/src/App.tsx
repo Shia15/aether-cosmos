@@ -100,6 +100,7 @@ import LunarCoherencePage from "@/pages/lunar-coherence";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
+import CliNanoPage from "@/pages/cli-nano";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -319,6 +320,7 @@ function Router() {
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
+        <Route path="/cli-nano" component={CliNanoPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />

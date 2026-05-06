@@ -76,6 +76,7 @@ import {
   Sunrise,
   Snowflake,
   Moon,
+  Terminal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -243,6 +244,7 @@ const NAV_ITEMS = [
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
+  { href: "/cli-nano",                 label: "CLI · nano · Cheat Sheet + Live Key Tester (Engine 01)", icon: Terminal },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
