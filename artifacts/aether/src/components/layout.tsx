@@ -239,6 +239,8 @@ const NAV_ITEMS = [
   { href: "/cuca-hybrid-skin",         label: "CUCA Hybrid Skin · Cephalopod + Reptile",icon: Hexagon },
   { href: "/cuca-gyroid",              label: "CUCA Gyroid v3.0 · 3D Photonic Floor",   icon: Pyramid },
   { href: "/aether-childrens-realm",   label: "AETHER Children's Realm · Library",       icon: Sparkles },
+  { href: "/computer-brains",          label: "Computer Brains · Interactive Book",       icon: Sparkles },
+  { href: "/learning-layers",          label: "Learning in Layers · Children's Media Brand", icon: Sprout },
   { href: "/aether-seasons",           label: "AETHER Seasons · Brand Strategy",         icon: Sprout },
   { href: "/aether-flow",              label: "AETHER Flow · Unified Daily Alignment",   icon: Egg },
   { href: "/aether-foundations",       label: "AETHER Foundations · Substrate · Crystal · Field", icon: Microscope },
