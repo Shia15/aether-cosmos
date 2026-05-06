@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 
 type Book = {
   id: string;
@@ -255,6 +256,35 @@ export default function AetherChildrensRealmPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Companion · Weston's baby rhythm */}
+        <div style={{ maxWidth: 1500, margin: "3rem auto 0", padding: "0 1rem" }}>
+          <Link href="/baby-rhythm" data-testid="link-baby-rhythm" style={{
+            display: "block", textDecoration: "none",
+            padding: "1.5rem 1.8rem", borderRadius: 24,
+            background: "linear-gradient(135deg, rgba(249,168,212,0.15), rgba(167,139,250,0.15), rgba(56,189,248,0.10))",
+            border: "1px solid rgba(249,168,212,0.4)",
+            backdropFilter: "blur(8px)",
+            boxShadow: "0 10px 40px rgba(249,168,212,0.15)",
+          }}>
+            <div style={{
+              fontSize: 11, letterSpacing: "0.32em", color: "#f9a8d4",
+              fontFamily: "'DM Mono', monospace", textTransform: "uppercase", marginBottom: 8,
+            }}>Companion · For New Moms & Dads</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+              <div style={{ fontSize: "2.5rem", filter: "drop-shadow(0 0 16px #f9a8d4)" }}>👶</div>
+              <div style={{ flex: "1 1 280px" }}>
+                <h3 style={{ margin: 0, fontSize: "1.4rem", fontWeight: 700, color: "white",
+                  textShadow: "0 0 12px #f9a8d4" }}>
+                  Weston Chase · the Rhythm →
+                </h3>
+                <p style={{ margin: "0.4rem 0 0", fontSize: "0.95rem", color: "#fbcfe8", opacity: 0.95, lineHeight: 1.5 }}>
+                  Daily routine · weekly plan · finger foods · 7–9 month feeding guide · interactive diaper-bag checklist · why rhythm matters even without children.
+                </p>
+              </div>
+            </div>
+          </Link>
         </div>
 
         <div style={{
