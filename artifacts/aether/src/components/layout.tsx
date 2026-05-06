@@ -225,6 +225,7 @@ const NAV_ITEMS = [
   { href: "/warp-drive-literature",    label: "Warp-Drive Literature · Metric, Not Plan", icon: Rocket },
   { href: "/puthoff-metric-engineering", label: "Puthoff · Metric Engineering In Tiers",  icon: Aperture },
   { href: "/eniac-monte-carlo",        label: "ENIAC · Monte Carlo · LLN · k",          icon: GitFork },
+  { href: "/knowledge-map",            label: "Knowledge Map · 3000+ Video Engine",     icon: LayoutGrid },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

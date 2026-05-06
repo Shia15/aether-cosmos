@@ -83,6 +83,7 @@ import AlchemicalProtocolPage from "@/pages/alchemical-protocol";
 import WarpDriveLiteraturePage from "@/pages/warp-drive-literature";
 import PuthoffMetricEngineeringPage from "@/pages/puthoff-metric-engineering";
 import EniacMonteCarloPage from "@/pages/eniac-monte-carlo";
+import KnowledgeMapPage from "@/pages/knowledge-map";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -285,6 +286,7 @@ function Router() {
         <Route path="/warp-drive-literature" component={WarpDriveLiteraturePage} />
         <Route path="/puthoff-metric-engineering" component={PuthoffMetricEngineeringPage} />
         <Route path="/eniac-monte-carlo" component={EniacMonteCarloPage} />
+        <Route path="/knowledge-map" component={KnowledgeMapPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
