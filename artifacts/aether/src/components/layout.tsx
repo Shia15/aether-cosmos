@@ -226,6 +226,8 @@ const NAV_ITEMS = [
   { href: "/puthoff-metric-engineering", label: "Puthoff · Metric Engineering In Tiers",  icon: Aperture },
   { href: "/eniac-monte-carlo",        label: "ENIAC · Monte Carlo · LLN · k",          icon: GitFork },
   { href: "/knowledge-map",            label: "Knowledge Map · 3000+ Video Engine",     icon: LayoutGrid },
+  { href: "/decision-entropy",         label: "Decision Entropy · Time-Cost Formalism", icon: Clock },
+  { href: "/unified-synthesis",        label: "Unified Synthesis · Coherence of Life",  icon: Combine },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
