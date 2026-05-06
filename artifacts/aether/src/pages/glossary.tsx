@@ -127,6 +127,15 @@ const ENTRIES: Entry[] = [
   { term:"Void", cat:"Philosophy",
     def:"The threshold state between the timeline you were on and the one you are entering. The 11/11 letter notes 'enters void' as a stage on the way to divine timing.",
     link:"/divine-timing" },
+  { term:"Raw place", cat:"Philosophy",
+    def:"The unfinished, un-decorated state in which growth actually happens. The 11/11 letter places it in the literal — 'staying with parents' — and in the figurative: anywhere you are unable to perform the polished version of yourself.",
+    link:"/divine-timing" },
+  { term:"Push + Fix", cat:"Philosophy",
+    def:"The two-stroke instruction from the 11/11 letter. Push is the willingness to keep the structure under load while it stress-tests itself; Fix is the willingness to repair the parts that break. Together they replace the fantasy that anything important arrives pre-assembled.",
+    link:"/divine-timing" },
+  { term:"The net is there", cat:"Philosophy",
+    def:"The closing principle of the field-of-numbers list. The leap is not faith in the absence of evidence — it is action taken because the evidence has accumulated quietly for months and the body finally says now. The net is the accumulated confirmation.",
+    link:"/divine-timing" },
 ];
 
 export default function GlossaryPage() {

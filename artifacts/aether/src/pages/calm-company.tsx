@@ -101,14 +101,42 @@ const SCHOOLS = [
   { name:"Advice column", glyph:"❦", color:"#fbbf24", lessons:"weekly · letter + AETHER reading" },
 ];
 
-// ── Deterministic daily 2-post pair (rotates by date)
-function pickToday(date: Date): { primary: Bucket; secondary: Bucket } {
+// ── Calendar overrides · angel hours, lunar anchors, Eris windows
+// On these dates the deterministic rotation is overridden — the primary slot fires the listed bucket.
+type Anchor = { month: number; day: number; bucketId: string; label: string };
+const ANCHORS: Anchor[] = [
+  { month: 10, day: 15, bucketId: "awakening", label: "Eris · tracking begins" },
+  { month: 10, day: 21, bucketId: "awakening", label: "Eris · more dynamic" },
+  { month: 11, day:  5, bucketId: "awakening", label: "Super moon" },
+  { month: 11, day:  6, bucketId: "awakening", label: "Pleiades window · day 1" },
+  { month: 11, day:  7, bucketId: "awakening", label: "Pleiades window · day 2" },
+  { month: 11, day:  8, bucketId: "awakening", label: "Pleiades window · day 3" },
+  { month: 11, day: 11, bucketId: "awakening", label: "11/11 · Divine Timing" },
+  { month: 11, day: 29, bucketId: "awakening", label: "Eris · inflection" },
+];
+function findAnchor(date: Date): Anchor | undefined {
+  return ANCHORS.find(a => a.month === date.getMonth() + 1 && a.day === date.getDate());
+}
+
+// ── Deterministic daily 2-post pair (rotates by date) — anchors override the primary slot
+function pickToday(date: Date): { primary: Bucket; secondary: Bucket; anchor?: Anchor } {
   // day-of-year (1-366)
   const start = new Date(date.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86400000);
   const a = dayOfYear % BUCKETS.length;
   const b = (dayOfYear * 7 + 5) % BUCKETS.length; // coprime stride avoids sticking
-  return { primary: BUCKETS[a]!, secondary: BUCKETS[a === b ? (b + 1) % BUCKETS.length : b]! };
+  let primaryIdx = a;
+  let secondaryIdx = a === b ? (b + 1) % BUCKETS.length : b;
+  const anchor = findAnchor(date);
+  if (anchor) {
+    const overrideIdx = BUCKETS.findIndex(x => x.id === anchor.bucketId);
+    if (overrideIdx >= 0) {
+      primaryIdx = overrideIdx;
+      // make sure secondary isn't a duplicate of overridden primary
+      if (secondaryIdx === primaryIdx) secondaryIdx = (primaryIdx + 5) % BUCKETS.length;
+    }
+  }
+  return { primary: BUCKETS[primaryIdx]!, secondary: BUCKETS[secondaryIdx]!, anchor };
 }
 
 // Pull a deterministic idea + format from a bucket using a seed
@@ -119,14 +147,26 @@ function pickIdea(b: Bucket, seed: number): { idea: string; format: string } {
   };
 }
 
-function PostCard({ b, when, seed, slot }: { b: Bucket; when: string; seed: number; slot: "AM" | "PM" }) {
+function PostCard({ b, when, seed, slot, anchorLabel }: {
+  b: Bucket; when: string; seed: number; slot: "AM" | "PM"; anchorLabel?: string;
+}) {
   const { idea, format } = pickIdea(b, seed);
-  const draft = `[${b.name} · ${format}]\n\n${idea}\n\n— ${when}`;
+  const draft = `[${b.name} · ${format}]${anchorLabel ? ` · ${anchorLabel}` : ""}\n\n${idea}\n\n— ${when}`;
   const [copied, setCopied] = useState(false);
   return (
-    <div style={{ padding:"1.2rem 1.4rem", borderRadius:14,
+    <div style={{ padding:"1.2rem 1.4rem", borderRadius:14, position:"relative",
       background:`linear-gradient(135deg, ${b.color}1a, rgba(15,23,42,0.75))`,
-      border:`1px solid ${b.color}55`, borderLeft:`3px solid ${b.color}` }}>
+      border:`1px solid ${b.color}55`, borderLeft:`3px solid ${b.color}`,
+      boxShadow: anchorLabel ? `0 0 0 1px ${b.color}66, 0 0 30px ${b.color}22` : undefined }}>
+      {anchorLabel && (
+        <div style={{ position:"absolute", top:-10, right:14,
+          padding:"0.18rem 0.6rem", borderRadius:99,
+          background:`linear-gradient(90deg, ${b.color}, #fbbf24)`,
+          color:"#020617", fontSize:"0.66rem", fontFamily:"'DM Mono',monospace",
+          letterSpacing:"0.12em", textTransform:"uppercase", fontWeight:700 }}>
+          ★ {anchorLabel}
+        </div>
+      )}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
         <div style={{ ...KICKER, color:b.color }}>{slot} · {b.cadence}</div>
         <div style={{ fontSize:"1.6rem", color:b.color, lineHeight:1 }}>{b.glyph}</div>
@@ -169,7 +209,7 @@ function DailyEngine() {
     const s = new Date(date.getFullYear(), 0, 0);
     return Math.floor((date.getTime() - s.getTime()) / 86400000);
   }, [date]);
-  const { primary, secondary } = useMemo(() => pickToday(date), [date]);
+  const { primary, secondary, anchor } = useMemo(() => pickToday(date), [date]);
   const dateLabel = date.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric", year:"numeric" });
   const shift = (days: number) => setDate(d => { const n = new Date(d); n.setDate(n.getDate() + days); return n; });
   return (
@@ -195,8 +235,19 @@ function DailyEngine() {
           ))}
         </div>
       </div>
+      {anchor && (
+        <div style={{ marginBottom:14, padding:"0.7rem 1rem", borderRadius:8,
+          background:"linear-gradient(90deg, rgba(167,139,250,0.15), rgba(251,191,36,0.10))",
+          border:"1px solid rgba(167,139,250,0.4)",
+          fontSize:"0.84rem", color:"#fef3c7" }}>
+          <span style={{ ...KICKER, color:"#c4b5fd", marginBottom:0, marginRight:10,
+            display:"inline-block" }}>★ Calendar anchor</span>
+          {anchor.label} · primary slot overridden to <strong style={{ color:"#fbbf24" }}>{primary.name}</strong>
+        </div>
+      )}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap:"0.9rem" }}>
-        <PostCard b={primary}   when={dateLabel + " · AM"} seed={dayOfYear}     slot="AM"/>
+        <PostCard b={primary}   when={dateLabel + " · AM"} seed={dayOfYear}     slot="AM"
+          anchorLabel={anchor?.label}/>
         <PostCard b={secondary} when={dateLabel + " · PM"} seed={dayOfYear + 3} slot="PM"/>
       </div>
 
@@ -207,13 +258,17 @@ function DailyEngine() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap:"0.5rem" }}>
           {Array.from({ length: 7 }).map((_, i) => {
             const d = new Date(date); d.setDate(d.getDate() + i + 1);
-            const { primary:p, secondary:s } = pickToday(d);
+            const { primary:p, secondary:s, anchor:a } = pickToday(d);
             return (
               <div key={i} style={{ padding:"0.55rem 0.7rem", borderRadius:8,
-                background:"rgba(15,23,42,0.6)", border:"1px solid rgba(255,255,255,0.06)" }}>
-                <div style={{ fontSize:"0.7rem", color:"#94a3b8", fontFamily:"'DM Mono',monospace",
-                  textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:5 }}>
-                  {d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })}
+                background: a ? "linear-gradient(135deg, rgba(167,139,250,0.18), rgba(15,23,42,0.6))" : "rgba(15,23,42,0.6)",
+                border: a ? "1px solid rgba(167,139,250,0.4)" : "1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:5 }}>
+                  <div style={{ fontSize:"0.7rem", color:"#94a3b8", fontFamily:"'DM Mono',monospace",
+                    textTransform:"uppercase", letterSpacing:"0.1em" }}>
+                    {d.toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" })}
+                  </div>
+                  {a && <span style={{ color:"#c4b5fd", fontSize:"0.85rem", lineHeight:1 }}>★</span>}
                 </div>
                 <div style={{ display:"flex", gap:6, alignItems:"center", fontSize:"0.78rem", color:"#fef3c7" }}>
                   <span style={{ color:p.color, fontSize:"1.1rem" }}>{p.glyph}</span>
@@ -223,6 +278,8 @@ function DailyEngine() {
                 <div style={{ fontSize:"0.7rem", color:"#cbd5e1", marginTop:4, lineHeight:1.3 }}>
                   {p.name.split(" · ")[0]} · {s.name.split(" · ")[0]}
                 </div>
+                {a && <div style={{ fontSize:"0.65rem", color:"#c4b5fd", marginTop:4,
+                  fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em" }}>{a.label}</div>}
               </div>
             );
           })}
@@ -420,7 +477,8 @@ export default function CalmCompanyPage() {
             {[
               { w:"NOW", c:"#22c55e", t:"Daily 2-post draft generator", d:"Live on this page · pulls deterministically from the 12 buckets, gives you a copy-able draft prompt with format hint." },
               { w:"NOW", c:"#22c55e", t:"Scheduled-buckets toggle", d:"Click any bucket card to mark it ON/OFF · saves to localStorage · future engine will respect the toggle." },
-              { w:"NEXT", c:"#fbbf24", t:"Angel-hours calendar", d:"Wire `/awakening-timeline` calendar nodes (super moon · Pleiades · 11:11 · 222 · 333) so the right bucket auto-fires on the right day · e.g. Awakening bucket primary on Nov 5." },
+              { w:"NOW", c:"#22c55e", t:"Angel-hours calendar overrides (basic)", d:"Wired · 8 calendar anchors override the rotation: Oct 15 / 21 / Nov 29 (Eris windows) · Nov 5 (super moon) · Nov 6/7/8 (Pleiades) · Nov 11 (11/11 Divine Timing). Today's pair shows a ★ banner when anchored; the 7-day preview marks future anchored days." },
+              { w:"NEXT", c:"#fbbf24", t:"Hourly anchors + custom dates", d:"Add user-defined anchor dates (birthdays, mercury retrogrades, personal angel-number days) and clock-time triggers (11:11 AM, 2:22 PM) for sub-daily granularity." },
               { w:"NEXT", c:"#fbbf24", t:"Server draft store", d:"Move draft generation to the API server · per-user persistence · draft → review → approve flow." },
               { w:"LATER", c:"#a78bfa", t:"Social auto-post", d:"OAuth into the platforms you choose (X · Threads · Bluesky · LinkedIn · Substack · Instagram via API where allowed) · post on approval, not on autopilot, until the rhythm is proven." },
               { w:"LATER", c:"#a78bfa", t:"Performance loop", d:"Light analytics back into the engine · which buckets land · which formats earn replies · adjust the rotation weights." },
