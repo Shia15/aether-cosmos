@@ -236,6 +236,8 @@ const NAV_ITEMS = [
   { href: "/aether-seasons",           label: "AETHER Seasons · Brand Strategy",         icon: Sprout },
   { href: "/aether-flow",              label: "AETHER Flow · Unified Daily Alignment",   icon: Egg },
   { href: "/aether-foundations",       label: "AETHER Foundations · Substrate · Crystal · Field", icon: Microscope },
+  { href: "/substrate-synthesis",      label: "Substrate Studio · Live Photochem + Synthesis Bridges", icon: FlaskConical },
+  { href: "/sparkle-text",             label: "Sparkle Studio · Sparkly Text Generator", icon: Sparkles },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

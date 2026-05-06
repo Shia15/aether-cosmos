@@ -1,0 +1,505 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import shiaCaCO3 from "@assets/IMG_1606_1778070646724.jpeg";
+import shiaSpatialIntention from "@assets/IMG_1603_1778070646724.jpeg";
+import bavsSubstrates from "@assets/IMG_1600_1778070646724.png";
+import photochemHypothesis from "@assets/IMG_1599_1778070646724.png";
+import layeredOpticalFramework from "@assets/5CF0BA96-40F7-436B-878A-8D93871C36B9_1778070646724.png";
+import blueVioletPaper from "@assets/1FCF6888-89B7-4E22-B40A-2DB7BCE6E11D_1778070646724.png";
+import geologicalAccelerator from "@assets/C4A9F181-C71B-4042-96B3-91D5C4AF73A3_1778070646724.png";
+import treeOfLife from "@assets/IMG_1588_1778070646724.jpeg";
+import shiaLifeFormula from "@assets/IMG_1577_1778070646724.jpeg";
+
+// ── Synthesis conditions, rates from 1FCF6888 (mg/L precipitated after 180 min)
+interface Condition {
+  key: string;
+  label: string;
+  wavelength: string;
+  rate: number;          // mg/L/min
+  total180: number;      // mg/L at 180 min
+  color: string;         // light beam color
+  glow: string;
+  jarTint: string;
+}
+const CONDITIONS: Condition[] = [
+  { key:"violet", label:"Violet Light", wavelength:"405 nm", rate:0.72, total180:88.7, color:"#b388ff", glow:"#a259ff", jarTint:"rgba(179,136,255,0.18)" },
+  { key:"blue",   label:"Blue Light",   wavelength:"450 nm", rate:0.55, total180:68.1, color:"#5ec8ff", glow:"#3a9eff", jarTint:"rgba(94,200,255,0.18)" },
+  { key:"white",  label:"White Light",  wavelength:"400–700 nm", rate:0.32, total180:44.3, color:"#e8e4d8", glow:"#cfcabb", jarTint:"rgba(232,228,216,0.14)" },
+  { key:"dark",   label:"Dark Control", wavelength:"—",     rate:0.18, total180:26.7, color:"#3a3445", glow:"#1a1623", jarTint:"rgba(26,22,35,0.5)" },
+];
+
+const KICKER = { fontSize:11, letterSpacing:"0.32em", color:"#a78bfa",
+  fontFamily:"'DM Mono',monospace", textTransform:"uppercase" as const, marginBottom:6 };
+
+function Section({ kicker, title, lead, anchor, children }: {
+  kicker:string; title:string; lead?:string; anchor?:string; children:React.ReactNode;
+}) {
+  return (
+    <section id={anchor} style={{ marginBottom:"3.2rem", scrollMarginTop:"2rem" }}>
+      <div style={KICKER}>{kicker}</div>
+      <h2 style={{ fontSize:"1.7rem", fontWeight:700, color:"#f1f5f9", margin:"0 0 0.55rem", letterSpacing:"-0.01em" }}>{title}</h2>
+      {lead && <p style={{ color:"#cbd5e1", fontSize:"0.97rem", lineHeight:1.65, maxWidth:820, margin:"0 0 1.2rem" }}>{lead}</p>}
+      {children}
+    </section>
+  );
+}
+
+function Card({ children, title, kicker, accent="#a78bfa" }: {
+  children:React.ReactNode; title?:string; kicker?:string; accent?:string;
+}) {
+  return (
+    <div style={{
+      padding:"1.1rem 1.25rem", borderRadius:12,
+      background:"rgba(15,23,42,0.65)",
+      border:"1px solid rgba(255,255,255,0.08)",
+      borderLeft:`3px solid ${accent}`,
+    }}>
+      {kicker && <div style={{...KICKER, color:accent, marginBottom:4 }}>{kicker}</div>}
+      {title && <div style={{ fontSize:"1rem", fontWeight:700, color:"#f1f5f9", marginBottom:6 }}>{title}</div>}
+      <div style={{ fontSize:"0.88rem", color:"#cbd5e1", lineHeight:1.6 }}>{children}</div>
+    </div>
+  );
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// Live photochemistry sim — 4 jars + accumulating precipitate + chart
+function PhotochemSim() {
+  const [running, setRunning] = useState(true);
+  const [tMin, setTMin] = useState(0);          // simulated minutes (0..180)
+  const [speed, setSpeed] = useState(60);       // simulated min per real second
+  const runningRef = useRef(running);
+  const speedRef = useRef(speed);
+  const lastRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => { runningRef.current = running; }, [running]);
+  useEffect(() => { speedRef.current = speed; }, [speed]);
+
+  useEffect(() => {
+    const tick = (now: number) => {
+      if (lastRef.current === null) lastRef.current = now;
+      const dt = (now - lastRef.current) / 1000;
+      lastRef.current = now;
+      if (runningRef.current) {
+        setTMin(prev => {
+          const next = prev + dt * speedRef.current;
+          return next >= 180 ? 180 : next;
+        });
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { if (rafRef.current !== null) cancelAnimationFrame(rafRef.current); };
+  }, []);
+
+  const reset = () => { setTMin(0); setRunning(true); };
+
+  // chart geometry
+  const W = 560, H = 220, padL = 42, padR = 12, padT = 12, padB = 32;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const xMin = 0, xMax = 180;
+  const yMin = 0, yMax = 100;
+  const xScale = (m: number) => padL + (m - xMin) / (xMax - xMin) * innerW;
+  const yScale = (v: number) => padT + (1 - (v - yMin) / (yMax - yMin)) * innerH;
+
+  const curves = CONDITIONS.map(c => {
+    const points: string[] = [];
+    const stepN = 60;
+    for (let i = 0; i <= stepN; i++) {
+      const m = (i / stepN) * Math.min(tMin, 180);
+      const v = c.rate * m;
+      points.push(`${xScale(m).toFixed(1)},${yScale(v).toFixed(1)}`);
+      if (m >= tMin) break;
+    }
+    return { c, points: points.join(" "), current: c.rate * tMin };
+  });
+
+  return (
+    <div style={{
+      padding:"1.4rem", borderRadius:16,
+      background:"rgba(7,10,20,0.7)",
+      border:"1px solid rgba(167,139,250,0.18)",
+    }}>
+      {/* control row */}
+      <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:14, marginBottom:"1.2rem" }}>
+        <div style={{ flex:"1 1 200px" }}>
+          <div style={{ ...KICKER, marginBottom:2 }}>Sim Time</div>
+          <div style={{ fontSize:"1.45rem", color:"#f1f5f9", fontFamily:"'Cinzel',serif" }}>{tMin.toFixed(1)} <span style={{ fontSize:"0.85rem", color:"#94a3b8" }}>/ 180 min</span></div>
+        </div>
+        <button onClick={() => setRunning(r => !r)} data-testid="btn-sim-toggle" style={btn(running ? "#22c55e" : "#a78bfa")}>
+          {running ? "⏸ Pause" : "▶ Run"}
+        </button>
+        <button onClick={reset} data-testid="btn-sim-reset" style={btn("#94a3b8")}>↺ Reset</button>
+        <label style={{ display:"flex", flexDirection:"column", gap:4, minWidth:160 }}>
+          <span style={{ ...KICKER, marginBottom:0 }}>Speed · {speed}× min/s</span>
+          <input type="range" min={5} max={180} value={speed} onChange={e => setSpeed(Number(e.target.value))}
+            style={{ accentColor:"#a78bfa" }}/>
+        </label>
+      </div>
+
+      {/* jars */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:"0.9rem", marginBottom:"1.4rem" }}>
+        {CONDITIONS.map(c => {
+          const v = c.rate * tMin;
+          const fillFrac = Math.min(1, v / 110); // visual fill (sediment ratio)
+          return (
+            <div key={c.key} data-testid={`jar-${c.key}`} style={{
+              padding:"0.7rem 0.5rem", borderRadius:10,
+              background:"rgba(0,0,0,0.45)",
+              border:"1px solid rgba(255,255,255,0.05)",
+              display:"flex", flexDirection:"column", alignItems:"center",
+            }}>
+              {/* lamp */}
+              <div style={{
+                width:38, height:6, borderRadius:3,
+                background: c.key === "dark" ? "#222" : c.color,
+                boxShadow: c.key === "dark" ? "none" : `0 0 14px ${c.glow}`,
+                marginBottom:0,
+              }}/>
+              {/* light beam */}
+              <div style={{
+                width:0, height:30,
+                borderLeft: c.key === "dark" ? "20px solid transparent" : `20px solid ${c.color}33`,
+                borderRight: c.key === "dark" ? "20px solid transparent" : `20px solid ${c.color}33`,
+                borderTop:"6px solid transparent",
+              }}/>
+              {/* jar */}
+              <div style={{
+                position:"relative",
+                width:"100%", maxWidth:90, aspectRatio:"3/5",
+                borderRadius:"6px 6px 14px 14px",
+                background: `linear-gradient(180deg, ${c.jarTint} 0%, rgba(0,0,0,0.7) 100%)`,
+                border:"1px solid rgba(255,255,255,0.18)",
+                boxShadow:`inset 0 0 30px ${c.glow}33`,
+                overflow:"hidden",
+              }}>
+                {/* solution shimmer */}
+                <div style={{
+                  position:"absolute", inset:"6% 6% 24% 6%",
+                  background: c.key === "dark"
+                    ? "rgba(20,18,28,0.4)"
+                    : `radial-gradient(ellipse at 30% 20%, ${c.color}60, transparent 70%)`,
+                  borderRadius:4,
+                }}/>
+                {/* sediment */}
+                <div style={{
+                  position:"absolute", left:"6%", right:"6%", bottom:"6%",
+                  height:`${4 + fillFrac * 38}%`,
+                  background:`linear-gradient(180deg, ${c.color}aa, #eaeaff)`,
+                  borderRadius:"2px 2px 8px 8px",
+                  transition:"height 0.3s ease",
+                }}/>
+              </div>
+              <div style={{ marginTop:6, textAlign:"center" }}>
+                <div style={{ fontSize:11, color:c.color, fontFamily:"'DM Mono',monospace", letterSpacing:1, fontWeight:700 }}>{c.label}</div>
+                <div style={{ fontSize:9, color:"#64748b", fontFamily:"'DM Mono',monospace" }}>{c.wavelength}</div>
+                <div style={{ fontSize:"0.85rem", color:"#f1f5f9", fontWeight:700, marginTop:3 }}>{v.toFixed(1)}<span style={{ fontSize:9, color:"#64748b", fontWeight:400 }}> mg/L</span></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* chart */}
+      <div style={{
+        padding:"0.7rem", borderRadius:10, background:"rgba(0,0,0,0.45)",
+        border:"1px solid rgba(255,255,255,0.05)", overflowX:"auto",
+      }}>
+        <div style={{ ...KICKER, marginBottom:6 }}>Cumulative CaCO₃ · mg/L vs minutes</div>
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width:"100%", maxWidth:W, height:"auto", display:"block" }}>
+          {/* grid */}
+          {[0,25,50,75,100].map(v => (
+            <g key={v}>
+              <line x1={padL} x2={W-padR} y1={yScale(v)} y2={yScale(v)} stroke="rgba(255,255,255,0.06)"/>
+              <text x={padL-6} y={yScale(v)+3} fill="#64748b" fontSize="9" fontFamily="DM Mono,monospace" textAnchor="end">{v}</text>
+            </g>
+          ))}
+          {[0,30,60,90,120,150,180].map(m => (
+            <g key={m}>
+              <line x1={xScale(m)} x2={xScale(m)} y1={padT} y2={H-padB} stroke="rgba(255,255,255,0.04)"/>
+              <text x={xScale(m)} y={H-padB+12} fill="#64748b" fontSize="9" fontFamily="DM Mono,monospace" textAnchor="middle">{m}</text>
+            </g>
+          ))}
+          {/* axes */}
+          <line x1={padL} x2={W-padR} y1={H-padB} y2={H-padB} stroke="rgba(255,255,255,0.18)"/>
+          <line x1={padL} x2={padL} y1={padT} y2={H-padB} stroke="rgba(255,255,255,0.18)"/>
+          {/* curves */}
+          {curves.map(({ c, points, current }) => (
+            <g key={c.key}>
+              <polyline points={points} fill="none" stroke={c.color} strokeWidth={2} strokeLinejoin="round"
+                style={{ filter: c.key==="dark" ? "none" : `drop-shadow(0 0 4px ${c.glow})` }}/>
+              {tMin > 0 && (
+                <circle cx={xScale(Math.min(tMin,180))} cy={yScale(current)} r={3} fill={c.color}/>
+              )}
+            </g>
+          ))}
+          {/* legend */}
+          <g transform={`translate(${padL+12}, ${padT+8})`}>
+            {CONDITIONS.map((c, i) => (
+              <g key={c.key} transform={`translate(0, ${i*14})`}>
+                <rect width={10} height={3} y={4} fill={c.color}/>
+                <text x={16} y={9} fill="#cbd5e1" fontSize="10" fontFamily="DM Mono,monospace">{c.label}</text>
+              </g>
+            ))}
+          </g>
+        </svg>
+      </div>
+
+      <div style={{ marginTop:"0.9rem", fontSize:"0.8rem", color:"#94a3b8", lineHeight:1.55 }}>
+        Rates from <strong style={{ color:"#cbd5e1" }}>1FCF6888</strong>: Violet 0.72 · Blue 0.55 · White 0.32 · Dark 0.18 mg/L/min.
+        Verdict: <strong style={{ color:"#a78bfa" }}>Violet ≻ Blue ≻ White ≻ Dark</strong> — visible-light photochemistry lowers the nucleation barrier via electronic excitation of Ca²⁺, CO₃²⁻ and H₂O.
+      </div>
+    </div>
+  );
+}
+
+const btn = (col: string): React.CSSProperties => ({
+  padding:"0.55rem 0.95rem", borderRadius:8,
+  background:`${col}1f`, border:`1px solid ${col}55`,
+  color:"#f1f5f9", fontSize:"0.85rem", fontFamily:"'DM Mono',monospace",
+  letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer",
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// Synthesis Bridge — auto-cycling 5-stage geological accelerator
+const STAGES = [
+  { num:1, label:"Chemical Layering",  detail:"Introduce calcium, silicates, carbonates and other ions in controlled layers.", color:"#7AC5E8", icon:"≣" },
+  { num:2, label:"Rapid Light Pulse",  detail:"High-intensity light stimulates photochemical reactions and nucleation.",      color:"#FFFFFF", icon:"✺" },
+  { num:3, label:"Cool",                detail:"Rapid cooling creates stress that encourages crystal formation.",                color:"#5EC8E8", icon:"❄" },
+  { num:4, label:"Warm",                detail:"Controlled heating finishes the cycle and stabilises the lattice.",              color:"#F09060", icon:"☼" },
+  { num:5, label:"Dark / Pressure",     detail:"Pressure phase compacts and binds — natural-looking rock formation.",            color:"#9B7AC5", icon:"▮" },
+];
+
+function SynthesisBridges() {
+  const [stageIdx, setStageIdx] = useState(0);
+  const [auto, setAuto] = useState(true);
+  const autoRef = useRef(auto);
+  useEffect(() => { autoRef.current = auto; }, [auto]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (autoRef.current) setStageIdx(i => (i + 1) % STAGES.length);
+    }, 2200);
+    return () => clearInterval(id);
+  }, []);
+  const current = STAGES[stageIdx] ?? STAGES[0]!;
+  return (
+    <div style={{
+      padding:"1.2rem 1.4rem", borderRadius:16,
+      background:"rgba(7,10,20,0.7)",
+      border:"1px solid rgba(56,189,248,0.18)",
+    }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12, marginBottom:"1rem" }}>
+        <div>
+          <div style={KICKER}>Synthesis Bridge · auto-cycling</div>
+          <div style={{ fontSize:"1.1rem", color:"#f1f5f9", fontWeight:700 }}>Recreate Geological Formation Faster</div>
+        </div>
+        <button onClick={() => setAuto(a => !a)} data-testid="btn-auto-toggle" style={btn(auto ? "#22c55e" : "#94a3b8")}>
+          {auto ? "⏸ Pause cycle" : "▶ Resume cycle"}
+        </button>
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:"0.6rem", marginBottom:"1rem" }}>
+        {STAGES.map((s, i) => {
+          const active = i === stageIdx;
+          return (
+            <button key={s.num} onClick={() => { setAuto(false); setStageIdx(i); }}
+              data-testid={`stage-${s.num}`}
+              style={{
+                padding:"0.7rem 0.4rem", borderRadius:10,
+                background: active ? `${s.color}24` : "rgba(0,0,0,0.4)",
+                border:`1px solid ${active ? s.color : "rgba(255,255,255,0.08)"}`,
+                color:"#f1f5f9", cursor:"pointer", textAlign:"center",
+                transition:"all 0.3s",
+                boxShadow: active ? `0 0 18px ${s.color}55` : "none",
+              }}>
+              <div style={{ fontSize:"1.6rem", color:s.color, lineHeight:1 }}>{s.icon}</div>
+              <div style={{ fontSize:9, color:"#64748b", fontFamily:"'DM Mono',monospace", marginTop:4 }}>STAGE {s.num}</div>
+              <div style={{ fontSize:"0.78rem", fontWeight:600, color:"#f1f5f9", marginTop:2, lineHeight:1.2 }}>{s.label}</div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{
+        padding:"0.9rem 1.1rem", borderRadius:10,
+        background:`linear-gradient(135deg, ${current.color}1a, transparent)`,
+        border:`1px solid ${current.color}44`,
+      }}>
+        <div style={{ fontSize:"0.78rem", color:current.color, fontFamily:"'DM Mono',monospace", letterSpacing:1.5, textTransform:"uppercase", marginBottom:5 }}>
+          Stage {current.num} · {current.label}
+        </div>
+        <div style={{ fontSize:"0.92rem", color:"#e2e8f0", lineHeight:1.55 }}>{current.detail}</div>
+      </div>
+    </div>
+  );
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+export default function SubstrateSynthesisPage() {
+  const totalAt180 = useMemo(() => CONDITIONS.reduce((s, c) => s + c.total180, 0), []);
+  return (
+    <div data-testid="page-substrate-synthesis" style={{
+      minHeight:"100vh", width:"100%",
+      background:"radial-gradient(ellipse at top, #0f172a 0%, #020617 55%, #000 100%)",
+      color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
+      padding:"3rem 1.5rem 5rem",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');
+      `}</style>
+
+      <div style={{ maxWidth:1200, margin:"0 auto" }}>
+        {/* Masthead */}
+        <header style={{
+          padding:"2rem 1.8rem", borderRadius:18, marginBottom:"2rem",
+          background:"linear-gradient(135deg, rgba(167,139,250,0.10), rgba(56,189,248,0.10))",
+          border:"1px solid rgba(167,139,250,0.25)",
+        }}>
+          <div style={{ ...KICKER, fontSize:11, letterSpacing:"0.4em", marginBottom:10 }}>AETHER · Substrate Studio</div>
+          <h1 style={{ fontSize:"clamp(1.9rem, 4.4vw, 2.9rem)", fontWeight:800, color:"#f1f5f9",
+            margin:"0 0 0.6rem", letterSpacing:"-0.02em", lineHeight:1.12 }}>
+            Substrate Synthesis · Automated Light, Layered Crystallization
+          </h1>
+          <p style={{ fontSize:"1rem", color:"#cbd5e1", lineHeight:1.7, maxWidth:820, margin:0 }}>
+            Live photochemistry sim of CaCO₃ precipitation under violet · blue · white · dark conditions, an auto-cycling
+            5-stage geological-accelerator bridge, and the substrate stack that grounds AETHER's coherence engine —
+            all driven by Shia Miller's "calculation in matter, under light".
+          </p>
+        </header>
+
+        {/* LIFE = formula */}
+        <Section kicker="Substrate Axiom · Shia Miller (5/3/26)" title="LIFE = Energy Gradient · Medium · Mechanism"
+          lead="Three slots that any living substrate must fill. AETHER's stack reads this triad as: input → carrier → exploit-and-build.">
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap:"0.9rem" }}>
+            <Card kicker="Energy Gradient" title="Sunlight · Chemical · Geothermal" accent="#f7c948">
+              The input that drives everything. Without a gradient, no work; without work, no organisation.
+            </Card>
+            <Card kicker="Medium" title="Water · Atmosphere · Substrate" accent="#5ec8e8">
+              The carrier for processes. Liquid state lets planetary forces in (Steiner) — the medium is itself partly the message.
+            </Card>
+            <Card kicker="Mechanism" title="Molecules / Systems" accent="#a78bfa">
+              That exploit the gradient and build structure. CaCO₃ light-directed precipitation is the canonical example.
+            </Card>
+          </div>
+        </Section>
+
+        {/* Live photochemistry sim */}
+        <Section kicker="I · Live Photochemistry Sim" title="Blue & Violet Light Accelerate CaCO₃ Precipitation"
+          lead="Simulated marine environment (0.5 M NaCl · 10 mM CaCl₂ · 10 mM NaHCO₃ · pH 8.2 · 25 °C). Four jars run in parallel.
+          Press Run; watch the sediment build and the curves diverge in real time. The numbers come straight from the published 180-min experiment.">
+          <PhotochemSim/>
+        </Section>
+
+        {/* Mechanism breakdown */}
+        <Section kicker="II · Mechanism" title="How Visible Light Lowers the Nucleation Barrier (Indirectly)"
+          lead="From the Layered Optical + Noise-Driven Control framework — three coupled photophysical levers.">
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.9rem" }}>
+            <Card kicker="A · Hydration Shell" title="H-bond perturbation" accent="#5ec8e8">
+              Blue/violet light perturbs the H-bond network around Ca²⁺ → faster water reorganisation, easier desolvation,
+              lower nucleation barrier.
+            </Card>
+            <Card kicker="B · Micro-thermal" title="Hot spots & micro-convection" accent="#f09060">
+              Absorption + scattering create local hot spots → increased collision frequency, controlled "noise" that
+              drives exploration of state space.
+            </Card>
+            <Card kicker="C · Interface Activation" title="Charge surface + photochem" accent="#a78bfa">
+              Stronger interaction at impurities / interfaces → more nucleation sites where the field is most intense.
+            </Card>
+          </div>
+          <div style={{ marginTop:"1rem", padding:"1rem 1.2rem", borderRadius:10,
+            background:"rgba(167,139,250,0.06)", border:"1px solid rgba(167,139,250,0.2)" }}>
+            <div style={KICKER}>Nucleation Rate Equation (from §11 of the framework)</div>
+            <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.25rem", color:"#f1f5f9", margin:"0.3rem 0", letterSpacing:"0.5px" }}>
+              J = J₀ · exp(−ΔG* / k T_eff)
+            </div>
+            <div style={{ fontSize:"0.85rem", color:"#cbd5e1" }}>
+              T_eff = T + α_violet · I_violet + α_blue · I_blue + σ_noise.&nbsp;
+              ΔG* = ΔG*₀ − β_hyd − γ_int − δ_light.
+            </div>
+          </div>
+        </Section>
+
+        {/* Synthesis Bridges */}
+        <Section kicker="III · Synthesis Bridges" title="Geological Formation, Hours Instead of Millennia"
+          lead="The 5-stage accelerator: Layer · Pulse · Cool · Warm · Dark. Each stage targets a different phase of the natural mineral cycle. Click a stage to inspect; hit Pause to stop the auto-cycle.">
+          <SynthesisBridges/>
+        </Section>
+
+        {/* BAVS substrates */}
+        <Section kicker="IV · Bio-Adaptive Vortex System (BAVS)" title="Substrate as Ecological Restoration Field"
+          lead="Five-spiral-arm architecture induces vortices and recirculates water through internal feedback loops.
+          Beyond mechanical flow, the system incorporates bioactive surfaces to foster marine micro-ecosystems.">
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap:"0.9rem" }}>
+            <Card kicker="Substrates" title="Algae · Ceramic" accent="#7DCC92">
+              Algae-seeded surfaces and porous ceramic microbial anchors promote nutrient absorption and organic-waste breakdown.
+            </Card>
+            <Card kicker="Materials" title="Marine PVC · HDPE · Silicone" accent="#5ec8e8">
+              Structural components utilise marine-grade PVC, high-density polyethylene (HDPE) and silicone elastomer coatings.
+            </Card>
+            <Card kicker="Networked Impact" title="Cluster Deployment" accent="#a78bfa">
+              Units deployed in clusters within specific zip codes create micro-ecosystem restoration fields that self-organise in high-pollution zones.
+            </Card>
+          </div>
+        </Section>
+
+        {/* Spatial Intention */}
+        <Section kicker="V · Mapping Biological Response → AETHER" title="Molecular Control as 'Spatial Intention' (A)"
+          lead="In AETHER, spatial intention (A) refers to the explicit meaning encoded within a given space. The molecular/industrial scale represents the definition of intention; picogram consistency and live attenuation of the rotavirus are the engineered signals — high-fidelity spatial 'bricks' of meaning.">
+          <Card kicker="Bridge" title="Substrate → Intention → Computation" accent="#a78bfa">
+            Light pattern (intention) → CaCO₃ supersaturation field (substrate) → crystal morphology (output structure).
+            The same loop runs at the BAVS scale (water flow → biofilm) and the AETHER scale (prompt → coherence field → response).
+          </Card>
+        </Section>
+
+        {/* Tree of Life */}
+        <Section kicker="VI · Substrate of Substrates" title="Where the Mechanism Sits in the Tree of Life"
+          lead="LUCA → Bacteria · Archaea · Eukarya. Every substrate-computation experiment AETHER runs is implicitly running on one of these branches. The Institut Pasteur 2023 dendrogram is the cross-check against branch-naïve claims.">
+          <Plate src={treeOfLife} caption="Tree of Life (Institut Pasteur, Feb 2023). LUCA at the centre; Bacteria (purple) and Archaea (cream) on either side; Eukarya inset (teal). Schematic illustrations at each leaf." aspect="16/10"/>
+        </Section>
+
+        {/* Source plates */}
+        <Section kicker="VII · Source Plates" title="Originals" lead="The infographics and tweets that drive this page.">
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.9rem" }}>
+            <Plate src={shiaLifeFormula}    caption="Shia Miller · LIFE = Energy Gradient + Medium + Mechanism (8:21 AM · 5/3/26)"/>
+            <Plate src={shiaCaCO3}          caption="Shia Miller · 'calculation performed not symbolically but spatiotemporally, in matter, under light' (6:06 PM · 5/3/26)"/>
+            <Plate src={shiaSpatialIntention} caption="Shia Miller · Mapping Biological Response to AETHER (5:26 PM · 5/3/26)"/>
+            <Plate src={bavsSubstrates}     caption="BAVS · Bio-Adaptive Vortex System substrates / materials / networked impact (4:48 PM · 5/3/26)"/>
+            <Plate src={photochemHypothesis} caption="Photochemistry Hypothesis Test for CaCO₃ Precipitation · 4-panel experimental design"/>
+            <Plate src={blueVioletPaper}    caption="Blue & Violet Light Accelerate CaCO₃ Precipitation in a Simulated Marine Environment · 180-min results table" aspect="16/10"/>
+            <Plate src={layeredOpticalFramework} caption="Layered Optical + Noise-Driven Control of Crystallization · the 11-section framework" aspect="auto"/>
+            <Plate src={geologicalAccelerator} caption="Recreating Geological Formation Faster · 5-stage dynamic cycle (drives Section III)" aspect="16/10"/>
+          </div>
+        </Section>
+
+        <footer style={{ marginTop:"2rem", paddingTop:"1.4rem",
+          borderTop:"1px solid rgba(255,255,255,0.08)",
+          textAlign:"center", fontSize:"0.78rem", color:"#64748b",
+          fontFamily:"'DM Mono',monospace", letterSpacing:"0.2em", textTransform:"uppercase" }}>
+          Substrate Studio · {totalAt180.toFixed(1)} mg/L total at 180 min · light is the prompt · matter is the answer
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function Plate({ src, caption, aspect = "16/10" }: { src: string; caption: string; aspect?: string }) {
+  const isAuto = aspect === "auto";
+  return (
+    <figure style={{
+      margin:0, borderRadius:12, overflow:"hidden",
+      background:"rgba(15,23,42,0.7)",
+      border:"1px solid rgba(255,255,255,0.08)",
+    }}>
+      <div style={{
+        width:"100%",
+        ...(isAuto ? { maxHeight:560 } : { aspectRatio: aspect }),
+        background:"#000", display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden",
+      }}>
+        <img src={src} alt={caption} loading="lazy"
+          style={{ width: isAuto ? "auto" : "100%", height: isAuto ? "auto" : "100%",
+            maxWidth:"100%", maxHeight: isAuto ? 560 : "100%",
+            objectFit:"contain", display:"block" }}/>
+      </div>
+      <figcaption style={{ padding:"0.7rem 0.9rem", fontSize:"0.8rem", color:"#cbd5e1", lineHeight:1.5 }}>{caption}</figcaption>
+    </figure>
+  );
+}

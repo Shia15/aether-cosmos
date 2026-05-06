@@ -94,6 +94,8 @@ import AetherChildrensRealmPage from "@/pages/aether-childrens-realm";
 import AetherSeasonsPage from "@/pages/aether-seasons";
 import AetherFlowPage from "@/pages/aether-flow";
 import AetherFoundationsPage from "@/pages/aether-foundations";
+import SubstrateSynthesisPage from "@/pages/substrate-synthesis";
+import SparkleTextPage from "@/pages/sparkle-text";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -307,6 +309,8 @@ function Router() {
         <Route path="/aether-seasons" component={AetherSeasonsPage} />
         <Route path="/aether-flow" component={AetherFlowPage} />
         <Route path="/aether-foundations" component={AetherFoundationsPage} />
+        <Route path="/substrate-synthesis" component={SubstrateSynthesisPage} />
+        <Route path="/sparkle-text" component={SparkleTextPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />

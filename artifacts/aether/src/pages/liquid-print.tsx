@@ -647,7 +647,7 @@ export default function LiquidPrintPage() {
   }, [parallel, gateMix]);
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+    <div className="min-h-screen relative overflow-x-hidden" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
       <style>{`
         @keyframes lp-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes lp-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }
