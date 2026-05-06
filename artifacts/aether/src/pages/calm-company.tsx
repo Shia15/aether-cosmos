@@ -359,7 +359,7 @@ function DailyEngine() {
 
 // ── "The number" — the fixed cap that makes it sustainable
 function TheNumber() {
-  // The math: 12 buckets · 2 posts/day · 365 days = 730 stories/year
+  // The math: 18 buckets · 2 posts/day · 365 days = 1,314 stories/year
   return (
     <div style={{
       padding:"1.4rem 1.6rem", borderRadius:14,
@@ -372,10 +372,10 @@ function TheNumber() {
           { n:"1",   l:"company",          c:"#fbbf24" },
           { n:"1",   l:"product · AETHER", c:"#fbbf24" },
           { n:"1",   l:"focus this season", c:"#fbbf24" },
-          { n:"12",  l:"content buckets",  c:"#a78bfa" },
-          { n:"2",   l:"posts per day",    c:"#34d399" },
-          { n:"5",   l:"mini-schools",     c:"#fb923c" },
-          { n:"730", l:"stories per year", c:"#f472b6" },
+          { n:"18",   l:"content buckets",  c:"#a78bfa" },
+          { n:"2",    l:"posts per day",    c:"#34d399" },
+          { n:"5",    l:"mini-schools",     c:"#fb923c" },
+          { n:"1,314",l:"stories per year", c:"#f472b6" },
         ].map(s => (
           <div key={s.l} style={{ padding:"0.9rem 0.8rem", borderRadius:10,
             background:"rgba(15,23,42,0.6)", border:`1px solid ${s.c}40`, textAlign:"center" }}>
@@ -432,7 +432,7 @@ export default function CalmCompanyPage() {
           </h1>
           <p style={{ fontSize:"1rem", color:"#e5e7eb", lineHeight:1.7, maxWidth:820, margin:0,
             fontFamily:"'Cormorant Garamond', Georgia, serif", fontStyle:"italic" }}>
-            Calm company that runs on AETHER's proven systems. Twelve story buckets · two posts a day · five mini-schools · no fixed
+            Calm company that runs on AETHER's proven systems. Eighteen story buckets · two posts a day · five mini-schools · no fixed
             schedule for living, only a fixed cap for publishing. There are no emergencies. The calendar and angel hours
             will eventually post for me. Until then, this page is the autopilot.
           </p>
@@ -446,13 +446,13 @@ export default function CalmCompanyPage() {
 
         {/* II · Daily engine */}
         <Section kicker="II · Daily engine"
-          title="Two posts today · drawn deterministically from the twelve buckets"
+          title="Two posts today · drawn deterministically from the eighteen buckets"
           lead="The pair below rotates on a coprime stride so no two consecutive days repeat. Every day of the year already has its assignment. Click a card to copy a draft prompt to your clipboard, or open the source page for material.">
           <DailyEngine/>
         </Section>
 
         {/* III · The 12 buckets */}
-        <Section kicker="III · The twelve buckets" title="The story spine"
+        <Section kicker="III · The eighteen buckets" title="The story spine"
           lead="Every post lives in exactly one of these. If something doesn't fit, it's a hint that it isn't a post — it's a journal entry, a conversation, or a someday-bucket idea waiting for its season. Tap any bucket to schedule it (saves locally).">
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap:"0.7rem" }}>
             {BUCKETS.map(b => {
@@ -584,7 +584,7 @@ export default function CalmCompanyPage() {
           borderTop:"1px solid rgba(251,191,36,0.18)",
           textAlign:"center", fontSize:"0.78rem", color:"#fbbf24",
           fontFamily:"'DM Mono',monospace", letterSpacing:"0.2em", textTransform:"uppercase" }}>
-          AETHER · Calm Company OS · 12 buckets · 2 posts/day · 730 stories/year · the rest is rhythm
+          AETHER · Calm Company OS · 18 buckets · 2 posts/day · 1,314 stories/year · the rest is rhythm
         </footer>
       </div>
     </div>
