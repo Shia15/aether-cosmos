@@ -78,6 +78,9 @@ import {
   Moon,
   Terminal,
   Feather,
+  Infinity as InfinityIcon,
+  BookA,
+  SunMedium,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -247,6 +250,9 @@ const NAV_ITEMS = [
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
   { href: "/cli-nano",                 label: "CLI · nano · Cheat Sheet + Live Key Tester (Engine 01)", icon: Terminal },
   { href: "/calm-company",             label: "Calm Company OS · 12 Buckets · Daily 2-Post Engine · Mediums", icon: Feather },
+  { href: "/divine-timing",            label: "Divine Timing · Eris-in-Pisces · 11/11 Letter · Field of Numbers", icon: InfinityIcon },
+  { href: "/glossary",                 label: "Glossary · A–Z Vocabulary of AETHER · Filterable", icon: BookA },
+  { href: "/quantum-ammeter",          label: "Quantum Ammeter · Solar Prototype · Live Shot-Noise Sim", icon: SunMedium },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

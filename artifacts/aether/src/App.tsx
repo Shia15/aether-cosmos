@@ -102,6 +102,9 @@ import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
 import CliNanoPage from "@/pages/cli-nano";
 import CalmCompanyPage from "@/pages/calm-company";
+import DivineTimingPage from "@/pages/divine-timing";
+import GlossaryPage from "@/pages/glossary";
+import QuantumAmmeterPage from "@/pages/quantum-ammeter";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -323,6 +326,9 @@ function Router() {
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
         <Route path="/cli-nano" component={CliNanoPage} />
         <Route path="/calm-company" component={CalmCompanyPage} />
+        <Route path="/divine-timing" component={DivineTimingPage} />
+        <Route path="/glossary" component={GlossaryPage} />
+        <Route path="/quantum-ammeter" component={QuantumAmmeterPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
