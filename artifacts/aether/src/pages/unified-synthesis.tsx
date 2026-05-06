@@ -217,33 +217,29 @@ export default function UnifiedSynthesisPage() {
   return (
     <div data-testid="page-unified-synthesis" style={{
       background: T.parchment, color: T.ink, fontFamily: T.serif,
-      fontSize: 17, lineHeight: 1.7, minHeight: "100vh",
+      fontSize: 17, lineHeight: 1.7, minHeight: "100vh", width: "100%",
     }}>
       {/* MASTHEAD */}
       <div style={{
-        background: T.ink, color: T.parchment,
+        background: T.parchment, color: T.ink,
         padding: "56px 48px 40px", position: "relative", overflow: "hidden",
+        borderBottom: `1px solid ${T.border}`,
       }}>
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: `radial-gradient(ellipse at 20% 50%, rgba(200,168,75,0.08) 0%, transparent 60%),
-                       radial-gradient(ellipse at 80% 20%, rgba(74,103,65,0.06) 0%, transparent 50%)`,
-        }} />
         <div style={{ position: "relative" }}>
           <div style={{
             fontFamily: T.mono, fontSize: 10, letterSpacing: "0.24em",
-            color: T.goldDimOnDark, textTransform: "uppercase", marginBottom: 20,
+            color: T.goldDim, textTransform: "uppercase", marginBottom: 20,
           }}>AetherLife.co · @StrategicProce · Synthesis Document v3.0 · April 2026</div>
           <h1 style={{
             fontFamily: T.display, fontSize: "clamp(22px, 5vw, 42px)",
-            fontWeight: 400, letterSpacing: "1px", lineHeight: 1.2, color: T.parchment,
+            fontWeight: 400, letterSpacing: "1px", lineHeight: 1.2, color: T.ink,
           }}>
             AETHER <em style={{ color: T.gold, fontStyle: "normal" }}>Unified Synthesis</em><br />
             Chemical Signals, Biological Computation<br />
             &amp; the Coherence Architecture of Life
           </h1>
           <div style={{
-            marginTop: 14, fontSize: 15, color: "rgba(245,240,232,0.55)",
+            marginTop: 14, fontSize: 15, color: T.textDim,
             fontStyle: "italic", maxWidth: 680, lineHeight: 1.6,
           }}>
             Integrating floral volatile chemistry (FloralScentSim), emotional state routing
@@ -262,7 +258,7 @@ export default function UnifiedSynthesisPage() {
 
       {/* NAV RAIL */}
       <div style={{
-        background: T.ink, borderBottom: `1px solid ${T.border}`,
+        background: T.parchment, borderBottom: `1px solid ${T.border}`,
         padding: "0 48px", display: "flex", overflowX: "auto",
       }}>
         {NAV.map(n => (
@@ -272,13 +268,13 @@ export default function UnifiedSynthesisPage() {
             data-testid={`nav-${n.id}`}
             style={{
               fontFamily: T.mono, fontSize: 10, letterSpacing: "0.16em",
-              textTransform: "uppercase", color: T.textDimOnDark,
+              textTransform: "uppercase", color: T.textDim,
               padding: "14px 20px", textDecoration: "none",
               borderBottom: "2px solid transparent", whiteSpace: "nowrap",
               borderRight: "1px solid rgba(200,168,75,0.1)",
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = T.gold; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = T.textDimOnDark; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = T.textDim; }}
           >{n.label}</a>
         ))}
       </div>
@@ -295,7 +291,7 @@ export default function UnifiedSynthesisPage() {
           </Claim>
 
           {/* Reference image */}
-          <figure style={{ margin: "32px 0 8px", border: `1px solid ${T.border}`, background: T.ink, padding: 12 }}>
+          <figure style={{ margin: "32px 0 8px", border: `1px solid ${T.border}`, background: "rgba(200,168,75,0.04)", padding: 12 }}>
             <img
               src={refImg}
               alt="AETHER reference figure: Landau-Ginzburg models, bio-interface, toroidal waves, Fibonacci anyons, mycelium-ferrofluid hybrids, neuromorphic chips, glass-box resonance"
@@ -371,12 +367,14 @@ export default function UnifiedSynthesisPage() {
 
         {/* HIGHLIGHT BAND */}
         <div style={{
-          background: T.ink, color: T.parchment,
+          background: "rgba(200,168,75,0.06)", color: T.ink,
           padding: "36px 48px", margin: "40px -48px",
+          borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}`,
+          borderLeft: `4px solid ${T.gold}`,
         }}>
           <div style={{
             fontSize: "clamp(16px, 2.5vw, 22px)", fontStyle: "italic",
-            lineHeight: 1.5, maxWidth: 760, color: "rgba(245,240,232,0.85)",
+            lineHeight: 1.5, maxWidth: 760, color: T.ink,
           }}>
             "The floral volatile bouquet is not a decoration — it is a chemical state vector
             whose coherence with the pollinator's receptor tuning curve determines reproductive
@@ -385,7 +383,7 @@ export default function UnifiedSynthesisPage() {
           </div>
           <div style={{
             marginTop: 14, fontFamily: T.mono, fontSize: 9,
-            letterSpacing: "0.16em", color: T.goldDimOnDark, textTransform: "uppercase",
+            letterSpacing: "0.16em", color: T.goldDim, textTransform: "uppercase",
           }}>AETHER Framework · Coherence Bridge Hypothesis · HYP</div>
         </div>
 
