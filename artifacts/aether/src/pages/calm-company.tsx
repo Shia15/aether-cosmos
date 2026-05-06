@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "wouter";
+import {
+  BUCKETS, ANCHORS, pickToday, pickIdea,
+  loadCustomAnchors, saveCustomAnchors,
+  type Bucket, type Anchor, type CustomAnchor,
+} from "@/lib/calm-engine";
 
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#fbbf24",
   fontFamily:"'DM Mono',monospace", textTransform:"uppercase", marginBottom:6 };
@@ -17,56 +22,6 @@ function Section({ kicker, title, lead, children }: {
     </section>
   );
 }
-
-// ── 12 content buckets · the story spine
-type Bucket = {
-  id: string;
-  name: string;
-  glyph: string;
-  color: string;
-  cadence: string;
-  link?: string;
-  formats: string[];
-  ideas: string[];
-};
-const BUCKETS: Bucket[] = [
-  { id:"why",       name:"The Why",            glyph:"❦", color:"#fbbf24", cadence:"weekly",  link:"/aether-why",
-    formats:["long-form essay","quote card","video voiceover"],
-    ideas:["The five fingers of nature","Memory survives 11,600 years","Body is mostly water","What I am building","Plato's date inside the geological error bar"] },
-  { id:"awakening", name:"Awakening",          glyph:"☽", color:"#a78bfa", cadence:"as-it-happens", link:"/awakening-timeline",
-    formats:["dated post","tarot pull image","calendar card"],
-    ideas:["Today's angel number","Weekly tarot pull","Mercury retrograde countdown","Pleiades window opens","Super-moon anchor reflection"] },
-  { id:"lunar",     name:"Lunar & Tides",      glyph:"◐", color:"#60a5fa", cadence:"twice/lunar-month", link:"/lunar-coherence",
-    formats:["sim screenshot","field note","HRV chart"],
-    ideas:["Live tide envelope at moonrise","Groundwater tide explainer","Schumann + Schumann coherence pairing","HRV LF band as moon receiver"] },
-  { id:"atlantis",  name:"Memory & Deep Time", glyph:"◉", color:"#fb7185", cadence:"weekly",   link:"/atlantis-alignment",
-    formats:["map carousel","timeline graphic","myth-vs-data thread"],
-    ideas:["Plato's date vs Meltwater Pulse 1B","Eye of Sahara from orbit","Indian Ocean gravity hole","Green-Africa substrate during AHP"] },
-  { id:"substrate", name:"Substrate & Synthesis", glyph:"◇", color:"#22d3ee", cadence:"weekly", link:"/substrate-synthesis",
-    formats:["lab photo","sim animation","mechanism card"],
-    ideas:["180-min photochem run · 4 jars","Nucleation rate equation in plain words","BAVS substrate pairing","Tree of Life plate"] },
-  { id:"studio",    name:"Studio · Mediums",   glyph:"❀", color:"#f472b6", cadence:"daily",
-    formats:["WIP photo","time-lapse video","material origin story"],
-    ideas:["Watercolor gradient study","Pastel landscape underpainting","Mineral pigment from azurite","Calligraphy alphabet sheet","Raphael master copy"] },
-  { id:"children",  name:"Children's Realm",   glyph:"✿", color:"#fde68a", cadence:"weekly", link:"/aether-childrens-realm",
-    formats:["page spread","read-along clip","baby-rhythm card"],
-    ideas:["Boho Bloom page reveal","Zoom the Zipper short","Computer Brains explainer","Weston's rhythm tip-of-the-day"] },
-  { id:"wellness",  name:"Wellness & Fitness", glyph:"♡", color:"#34d399", cadence:"daily", link:"/baby-rhythm",
-    formats:["routine card","mood-mapping screenshot","short workout clip"],
-    ideas:["Adult version of baby's 3-nap rhythm","Today's mood map","10-min walk after each meal","Brain-first metabolism plate"] },
-  { id:"painting",  name:"Mini-school · Painting", glyph:"☷", color:"#fb923c", cadence:"weekly",
-    formats:["technique tutorial","supply list","before/after"],
-    ideas:["Wet-on-wet basics","Color temperature explainer","Negative space exercise","One brush · one palette challenge"] },
-  { id:"games-cli", name:"Mini-school · Games & CLI", glyph:"⌨", color:"#4ade80", cadence:"weekly", link:"/cli-nano",
-    formats:["GIF demo","cheat-sheet card","speedrun clip"],
-    ideas:["Today's CLI command of the day","nano vs vim swap","Game design principle of the week","Speedrun teardown"] },
-  { id:"calm-co",   name:"Calm Company",       glyph:"◯", color:"#cbd5e1", cadence:"weekly",
-    formats:["principle card","behind-the-scenes","metric snapshot"],
-    ideas:["No emergencies · how I designed the week","Autopilot stack of the month","One company · one product · one focus","What I said no to this week"] },
-  { id:"field",     name:"Field Notes",        glyph:"✧", color:"#e879f9", cadence:"daily",
-    formats:["dated note","photo + caption","dream log"],
-    ideas:["Today I noticed ___","A dream that tracked the calendar","A small synchronicity worth writing down","Something the body knew first"] },
-];
 
 // ── Mediums & substrates · "beautiful things to do on free time"
 type Medium = { name:string; substrate:string; color:string; note:string };
@@ -100,70 +55,6 @@ const SCHOOLS = [
   { name:"Fitness",   glyph:"⚯", color:"#22d3ee", lessons:"3×/week · functional patterns + rest/sleep" },
   { name:"Advice column", glyph:"❦", color:"#fbbf24", lessons:"weekly · letter + AETHER reading" },
 ];
-
-// ── Calendar overrides · angel hours, lunar anchors, Eris windows
-// On these dates the deterministic rotation is overridden — the primary slot fires the listed bucket.
-type Anchor = { month: number; day: number; bucketId: string; label: string };
-const ANCHORS: Anchor[] = [
-  { month: 10, day: 15, bucketId: "awakening", label: "Eris · tracking begins" },
-  { month: 10, day: 21, bucketId: "awakening", label: "Eris · more dynamic" },
-  { month: 11, day:  5, bucketId: "awakening", label: "Super moon" },
-  { month: 11, day:  6, bucketId: "awakening", label: "Pleiades window · day 1" },
-  { month: 11, day:  7, bucketId: "awakening", label: "Pleiades window · day 2" },
-  { month: 11, day:  8, bucketId: "awakening", label: "Pleiades window · day 3" },
-  { month: 11, day: 11, bucketId: "awakening", label: "11/11 · Divine Timing" },
-  { month: 11, day: 29, bucketId: "awakening", label: "Eris · inflection" },
-];
-function findAnchor(date: Date, all: Anchor[]): Anchor | undefined {
-  return all.find(a => a.month === date.getMonth() + 1 && a.day === date.getDate());
-}
-
-// ── Deterministic daily 2-post pair (rotates by date) — anchors override the primary slot
-function pickToday(date: Date, allAnchors: Anchor[]): { primary: Bucket; secondary: Bucket; anchor?: Anchor } {
-  // day-of-year (1-366)
-  const start = new Date(date.getFullYear(), 0, 0);
-  const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86400000);
-  const a = dayOfYear % BUCKETS.length;
-  const b = (dayOfYear * 7 + 5) % BUCKETS.length; // coprime stride avoids sticking
-  let primaryIdx = a;
-  let secondaryIdx = a === b ? (b + 1) % BUCKETS.length : b;
-  const anchor = findAnchor(date, allAnchors);
-  if (anchor) {
-    const overrideIdx = BUCKETS.findIndex(x => x.id === anchor.bucketId);
-    if (overrideIdx >= 0) {
-      primaryIdx = overrideIdx;
-      // make sure secondary isn't a duplicate of overridden primary
-      if (secondaryIdx === primaryIdx) secondaryIdx = (primaryIdx + 5) % BUCKETS.length;
-    }
-  }
-  return { primary: BUCKETS[primaryIdx]!, secondary: BUCKETS[secondaryIdx]!, anchor };
-}
-
-// Custom anchors · localStorage-persisted
-const CUSTOM_ANCHORS_KEY = "aether.calmcompany.customAnchors";
-type CustomAnchor = Anchor & { id: string };
-function loadCustomAnchors(): CustomAnchor[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(CUSTOM_ANCHORS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(a => a && typeof a.month === "number"
-      && typeof a.day === "number" && typeof a.label === "string" && typeof a.bucketId === "string") : [];
-  } catch { return []; }
-}
-function saveCustomAnchors(list: CustomAnchor[]) {
-  if (typeof window === "undefined") return;
-  try { window.localStorage.setItem(CUSTOM_ANCHORS_KEY, JSON.stringify(list)); } catch {}
-}
-
-// Pull a deterministic idea + format from a bucket using a seed
-function pickIdea(b: Bucket, seed: number): { idea: string; format: string } {
-  return {
-    idea: b.ideas[seed % b.ideas.length]!,
-    format: b.formats[seed % b.formats.length]!,
-  };
-}
 
 function PostCard({ b, when, seed, slot, anchorLabel }: {
   b: Bucket; when: string; seed: number; slot: "AM" | "PM"; anchorLabel?: string;

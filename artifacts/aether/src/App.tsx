@@ -102,6 +102,7 @@ import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
 import CliNanoPage from "@/pages/cli-nano";
 import CalmCompanyPage from "@/pages/calm-company";
+import SocialDeployPage from "@/pages/social-deploy";
 import DivineTimingPage from "@/pages/divine-timing";
 import GlossaryPage from "@/pages/glossary";
 import QuantumAmmeterPage from "@/pages/quantum-ammeter";
@@ -326,6 +327,7 @@ function Router() {
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
         <Route path="/cli-nano" component={CliNanoPage} />
         <Route path="/calm-company" component={CalmCompanyPage} />
+        <Route path="/social-deploy" component={SocialDeployPage} />
         <Route path="/divine-timing" component={DivineTimingPage} />
         <Route path="/glossary" component={GlossaryPage} />
         <Route path="/quantum-ammeter" component={QuantumAmmeterPage} />
