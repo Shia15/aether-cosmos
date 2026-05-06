@@ -1,4 +1,5 @@
 import { Leaf, Compass, Feather, Sparkles, Flame, Sun, type LucideIcon } from "lucide-react";
+import bohoRocket     from "@assets/image_1778100676889.png";
 import bohoLogo       from "@assets/ChatGPT_Image_Apr_25,_2026,_05_37_33_PM_1777153057484.png";
 import quoteRest      from "@assets/ChatGPT_Image_Apr_25,_2026,_05_26_31_PM_1777152394705.png";
 import quoteShia      from "@assets/ChatGPT_Image_Apr_25,_2026,_05_30_02_PM_1777152606163.png";
@@ -237,8 +238,24 @@ export default function BohoFormulaPage() {
             — five stages · seven cards · one continuous transformation
           </p>
 
+          {/* rocket hero */}
+          <div className="mt-7 bf-card border rounded-[20px] overflow-hidden relative"
+               style={{ borderColor: "rgba(201,163,94,0.35)", background: "#0a0412", maxHeight: 540 }}
+               data-testid="boho-formula-rocket">
+            <img
+              src={bohoRocket}
+              alt="Glittery pink Boho Formula rocket launching through a starfield"
+              className="block w-full h-full object-cover object-center"
+              style={{ maxHeight: 540, display: "block" }}
+              loading="eager"
+            />
+            {/* edge fade so rocket bleeds softly into the page */}
+            <div className="pointer-events-none absolute inset-0"
+                 style={{ background: "linear-gradient(to bottom, transparent 60%, rgba(10,4,18,0.55) 100%)" }} />
+          </div>
+
           {/* logo strip */}
-          <div className="mt-7 bf-card border rounded-[14px] overflow-hidden flex items-center justify-center"
+          <div className="mt-5 bf-card border rounded-[14px] overflow-hidden flex items-center justify-center"
                style={{ borderColor: B.border, background: B.cream, padding: "18px" }}
                data-testid="boho-formula-logo">
             <img src={bohoLogo} alt="Boho Formula Boutique 2021 logo — palm leaf and serif wordmark" className="block max-w-[420px] w-full h-auto" loading="eager" />
