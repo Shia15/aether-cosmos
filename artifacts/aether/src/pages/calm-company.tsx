@@ -114,12 +114,12 @@ const ANCHORS: Anchor[] = [
   { month: 11, day: 11, bucketId: "awakening", label: "11/11 · Divine Timing" },
   { month: 11, day: 29, bucketId: "awakening", label: "Eris · inflection" },
 ];
-function findAnchor(date: Date): Anchor | undefined {
-  return ANCHORS.find(a => a.month === date.getMonth() + 1 && a.day === date.getDate());
+function findAnchor(date: Date, all: Anchor[]): Anchor | undefined {
+  return all.find(a => a.month === date.getMonth() + 1 && a.day === date.getDate());
 }
 
 // ── Deterministic daily 2-post pair (rotates by date) — anchors override the primary slot
-function pickToday(date: Date): { primary: Bucket; secondary: Bucket; anchor?: Anchor } {
+function pickToday(date: Date, allAnchors: Anchor[]): { primary: Bucket; secondary: Bucket; anchor?: Anchor } {
   // day-of-year (1-366)
   const start = new Date(date.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((date.getTime() - start.getTime()) / 86400000);
@@ -127,7 +127,7 @@ function pickToday(date: Date): { primary: Bucket; secondary: Bucket; anchor?: A
   const b = (dayOfYear * 7 + 5) % BUCKETS.length; // coprime stride avoids sticking
   let primaryIdx = a;
   let secondaryIdx = a === b ? (b + 1) % BUCKETS.length : b;
-  const anchor = findAnchor(date);
+  const anchor = findAnchor(date, allAnchors);
   if (anchor) {
     const overrideIdx = BUCKETS.findIndex(x => x.id === anchor.bucketId);
     if (overrideIdx >= 0) {
@@ -137,6 +137,24 @@ function pickToday(date: Date): { primary: Bucket; secondary: Bucket; anchor?: A
     }
   }
   return { primary: BUCKETS[primaryIdx]!, secondary: BUCKETS[secondaryIdx]!, anchor };
+}
+
+// Custom anchors · localStorage-persisted
+const CUSTOM_ANCHORS_KEY = "aether.calmcompany.customAnchors";
+type CustomAnchor = Anchor & { id: string };
+function loadCustomAnchors(): CustomAnchor[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(CUSTOM_ANCHORS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(a => a && typeof a.month === "number"
+      && typeof a.day === "number" && typeof a.label === "string" && typeof a.bucketId === "string") : [];
+  } catch { return []; }
+}
+function saveCustomAnchors(list: CustomAnchor[]) {
+  if (typeof window === "undefined") return;
+  try { window.localStorage.setItem(CUSTOM_ANCHORS_KEY, JSON.stringify(list)); } catch {}
 }
 
 // Pull a deterministic idea + format from a bucket using a seed
@@ -205,11 +223,36 @@ function PostCard({ b, when, seed, slot, anchorLabel }: {
 
 function DailyEngine() {
   const [date, setDate] = useState(() => new Date());
+  const [customAnchors, setCustomAnchors] = useState<CustomAnchor[]>([]);
+  // hydrate from localStorage on mount (SSR-safe)
+  useEffect(() => { setCustomAnchors(loadCustomAnchors()); }, []);
+  const allAnchors = useMemo<Anchor[]>(() => [...ANCHORS, ...customAnchors], [customAnchors]);
   const dayOfYear = useMemo(() => {
     const s = new Date(date.getFullYear(), 0, 0);
     return Math.floor((date.getTime() - s.getTime()) / 86400000);
   }, [date]);
-  const { primary, secondary, anchor } = useMemo(() => pickToday(date), [date]);
+  const { primary, secondary, anchor } = useMemo(() => pickToday(date, allAnchors), [date, allAnchors]);
+
+  // Form state for adding a custom anchor
+  const [formDate, setFormDate]   = useState(""); // YYYY-MM-DD
+  const [formLabel, setFormLabel] = useState("");
+  const [formBucket, setFormBucket] = useState(BUCKETS[0]!.id);
+  const addAnchor = () => {
+    if (!formDate || !formLabel.trim()) return;
+    const [, mm, dd] = formDate.split("-").map(Number) as [number, number, number];
+    if (!mm || !dd) return;
+    const next: CustomAnchor = {
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+      month: mm, day: dd, bucketId: formBucket, label: formLabel.trim(),
+    };
+    const merged = [...customAnchors, next];
+    setCustomAnchors(merged); saveCustomAnchors(merged);
+    setFormDate(""); setFormLabel("");
+  };
+  const removeAnchor = (id: string) => {
+    const merged = customAnchors.filter(a => a.id !== id);
+    setCustomAnchors(merged); saveCustomAnchors(merged);
+  };
   const dateLabel = date.toLocaleDateString(undefined, { weekday:"long", month:"long", day:"numeric", year:"numeric" });
   const shift = (days: number) => setDate(d => { const n = new Date(d); n.setDate(n.getDate() + days); return n; });
   return (
@@ -258,7 +301,7 @@ function DailyEngine() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap:"0.5rem" }}>
           {Array.from({ length: 7 }).map((_, i) => {
             const d = new Date(date); d.setDate(d.getDate() + i + 1);
-            const { primary:p, secondary:s, anchor:a } = pickToday(d);
+            const { primary:p, secondary:s, anchor:a } = pickToday(d, allAnchors);
             return (
               <div key={i} style={{ padding:"0.55rem 0.7rem", borderRadius:8,
                 background: a ? "linear-gradient(135deg, rgba(167,139,250,0.18), rgba(15,23,42,0.6))" : "rgba(15,23,42,0.6)",
@@ -284,6 +327,140 @@ function DailyEngine() {
             );
           })}
         </div>
+      </div>
+
+      {/* Custom anchors panel · user-defined dates · localStorage-persisted */}
+      <div style={{ marginTop:"1.4rem", padding:"1.2rem 1.3rem", borderRadius:12,
+        background:"linear-gradient(135deg, rgba(167,139,250,0.08), rgba(15,23,42,0.7))",
+        border:"1px solid rgba(167,139,250,0.3)" }}
+        data-testid="panel-custom-anchors">
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline",
+          flexWrap:"wrap", gap:8, marginBottom:10 }}>
+          <div>
+            <div style={{ ...KICKER, color:"#c4b5fd", marginBottom:4 }}>★ Your custom anchors</div>
+            <div style={{ fontSize:"0.86rem", color:"#e5e7eb", lineHeight:1.5 }}>
+              Add personal dates that should override the rotation — birthdays, anniversaries, recurring confirmation days,
+              your own angel-number dates. Saved locally in this browser.
+            </div>
+          </div>
+          <div style={{ fontSize:"0.74rem", color:"#94a3b8", fontFamily:"'DM Mono',monospace",
+            letterSpacing:"0.1em", textTransform:"uppercase" }}>
+            {customAnchors.length} custom · {ANCHORS.length} built-in
+          </div>
+        </div>
+
+        {/* Add form */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 160px), 1fr))",
+          gap:"0.5rem", marginTop:14, padding:"0.8rem 0.9rem", borderRadius:8,
+          background:"rgba(15,23,42,0.6)", border:"1px solid rgba(255,255,255,0.06)" }}>
+          <label style={{ display:"block" }}>
+            <div style={{ ...KICKER, color:"#c4b5fd", fontSize:9, marginBottom:4 }}>Date</div>
+            <input type="date" value={formDate} onChange={(e) => setFormDate(e.target.value)}
+              data-testid="input-anchor-date"
+              style={{ width:"100%", padding:"0.45rem 0.6rem", borderRadius:6,
+                background:"rgba(2,6,23,0.7)", border:"1px solid rgba(167,139,250,0.3)",
+                color:"#fef3c7", fontSize:"0.85rem", fontFamily:"inherit" }}/>
+          </label>
+          <label style={{ display:"block" }}>
+            <div style={{ ...KICKER, color:"#c4b5fd", fontSize:9, marginBottom:4 }}>Label</div>
+            <input type="text" value={formLabel} onChange={(e) => setFormLabel(e.target.value)}
+              placeholder="e.g. Mom's birthday"
+              data-testid="input-anchor-label"
+              style={{ width:"100%", padding:"0.45rem 0.6rem", borderRadius:6,
+                background:"rgba(2,6,23,0.7)", border:"1px solid rgba(167,139,250,0.3)",
+                color:"#fef3c7", fontSize:"0.85rem", fontFamily:"inherit" }}/>
+          </label>
+          <label style={{ display:"block" }}>
+            <div style={{ ...KICKER, color:"#c4b5fd", fontSize:9, marginBottom:4 }}>Bucket</div>
+            <select value={formBucket} onChange={(e) => setFormBucket(e.target.value)}
+              data-testid="select-anchor-bucket"
+              style={{ width:"100%", padding:"0.45rem 0.6rem", borderRadius:6,
+                background:"rgba(2,6,23,0.7)", border:"1px solid rgba(167,139,250,0.3)",
+                color:"#fef3c7", fontSize:"0.85rem", fontFamily:"inherit" }}>
+              {BUCKETS.map(b => <option key={b.id} value={b.id}>{b.glyph} {b.name}</option>)}
+            </select>
+          </label>
+          <div style={{ display:"flex", alignItems:"flex-end" }}>
+            <button onClick={addAnchor}
+              disabled={!formDate || !formLabel.trim()}
+              data-testid="btn-add-anchor"
+              style={{ width:"100%", padding:"0.5rem 0.8rem", borderRadius:6,
+                background: (formDate && formLabel.trim())
+                  ? "linear-gradient(90deg, rgba(167,139,250,0.3), rgba(251,191,36,0.25))"
+                  : "rgba(15,23,42,0.5)",
+                border: `1px solid ${(formDate && formLabel.trim()) ? "#c4b5fd" : "rgba(255,255,255,0.1)"}`,
+                color: (formDate && formLabel.trim()) ? "#fef3c7" : "#475569",
+                fontSize:"0.78rem", fontFamily:"'DM Mono',monospace",
+                letterSpacing:"0.1em", textTransform:"uppercase",
+                cursor: (formDate && formLabel.trim()) ? "pointer" : "not-allowed" }}>
+              + Add anchor
+            </button>
+          </div>
+        </div>
+
+        {/* List */}
+        <div style={{ marginTop:14, display:"grid", gap:6 }}>
+          {customAnchors.length === 0 && (
+            <div style={{ padding:"0.9rem", textAlign:"center", color:"#64748b",
+              fontSize:"0.82rem", fontStyle:"italic" }}>
+              No custom anchors yet · add one above and it'll override the rotation on that month/day every year.
+            </div>
+          )}
+          {customAnchors.map(a => {
+            const bucket = BUCKETS.find(b => b.id === a.bucketId);
+            return (
+              <div key={a.id} data-testid={`row-anchor-${a.id}`}
+                style={{ display:"grid", gridTemplateColumns:"80px 1fr auto auto",
+                  gap:10, alignItems:"center", padding:"0.55rem 0.85rem", borderRadius:8,
+                  background:"rgba(15,23,42,0.6)",
+                  border:"1px solid rgba(167,139,250,0.2)" }}>
+                <div style={{ fontFamily:"'DM Mono',monospace", color:"#c4b5fd",
+                  fontSize:"0.84rem", letterSpacing:"0.05em" }}>
+                  {String(a.month).padStart(2,"0")} · {String(a.day).padStart(2,"0")}
+                </div>
+                <div style={{ fontSize:"0.86rem", color:"#fef3c7" }}>{a.label}</div>
+                <div style={{ fontSize:"0.78rem", color: bucket?.color ?? "#94a3b8",
+                  fontFamily:"'DM Mono',monospace", letterSpacing:"0.06em" }}>
+                  {bucket?.glyph} {bucket?.name.split(" · ")[0]}
+                </div>
+                <button onClick={() => removeAnchor(a.id)}
+                  data-testid={`btn-remove-anchor-${a.id}`}
+                  style={{ padding:"0.3rem 0.65rem", borderRadius:5, cursor:"pointer",
+                    background:"rgba(239,68,68,0.12)", border:"1px solid rgba(239,68,68,0.4)",
+                    color:"#fda4af", fontSize:"0.7rem", fontFamily:"'DM Mono',monospace",
+                    letterSpacing:"0.08em", textTransform:"uppercase" }}>
+                  remove
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Built-in list · for reference */}
+        <details style={{ marginTop:14 }}>
+          <summary style={{ cursor:"pointer", fontSize:"0.78rem", color:"#94a3b8",
+            fontFamily:"'DM Mono',monospace", letterSpacing:"0.1em",
+            textTransform:"uppercase" }}>
+            ▸ {ANCHORS.length} built-in anchors (Eris · super moon · Pleiades · 11/11)
+          </summary>
+          <div style={{ marginTop:8, display:"grid", gap:4 }}>
+            {ANCHORS.map((a, i) => (
+              <div key={i} style={{ display:"grid", gridTemplateColumns:"80px 1fr auto",
+                gap:10, padding:"0.4rem 0.75rem", borderRadius:6,
+                background:"rgba(15,23,42,0.4)" }}>
+                <div style={{ fontFamily:"'DM Mono',monospace", color:"#fbbf24",
+                  fontSize:"0.78rem" }}>
+                  {String(a.month).padStart(2,"0")} · {String(a.day).padStart(2,"0")}
+                </div>
+                <div style={{ fontSize:"0.8rem", color:"#cbd5e1" }}>{a.label}</div>
+                <div style={{ fontSize:"0.75rem", color:"#a78bfa",
+                  fontFamily:"'DM Mono',monospace" }}>
+                  → {BUCKETS.find(b => b.id === a.bucketId)?.name.split(" · ")[0]}
+                </div>
+              </div>
+            ))}
+          </div>
+        </details>
       </div>
     </div>
   );
