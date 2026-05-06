@@ -77,6 +77,7 @@ import {
   Snowflake,
   Moon,
   Terminal,
+  Feather,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -245,6 +246,7 @@ const NAV_ITEMS = [
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
   { href: "/cli-nano",                 label: "CLI · nano · Cheat Sheet + Live Key Tester (Engine 01)", icon: Terminal },
+  { href: "/calm-company",             label: "Calm Company OS · 12 Buckets · Daily 2-Post Engine · Mediums", icon: Feather },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

@@ -58,6 +58,7 @@ AETHER offers advanced knowledge synthesis and discovery through a knowledge gra
     - **CUCA Hybrid Skin v2.1 & Gyroid v3.0:** Live canvas simulations for biological and photonic systems.
     - **CLI · nano:** Interactive CLI documentation with key tester, cheat sheet, and launch flags.
     - **Baby Rhythm:** Digital notebook for baby routines, feeding guides, and diaper-bag checklist.
+    - **Calm Company OS:** Content engine — 12 story buckets, deterministic 2-post/day rotation, 19 mediums & substrates, 5 mini-schools, wiring roadmap to angel-hours calendar + social auto-post.
     - **AETHER Children's Realm:** Landing page for children's content.
     - **AETHER Seasons:** Brand strategy document with product stack, seasonal palettes, and roadmap.
     - **AETHER Flow:** Unified daily-alignment console with mood mapping, agent map, and in-browser CLI.
