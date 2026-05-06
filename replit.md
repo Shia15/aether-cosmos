@@ -71,7 +71,7 @@ AETHER offers advanced knowledge synthesis and discovery through a knowledge gra
     - **Atlantis Alignment:** Compares Plato's city plan to the Richat structure.
     - **AETHER · The Why:** Founders letter outlining the project's vision.
     - **Awakening Timeline:** Personal awakening atlas with astrological and self-development tracking.
-    - **Sparkle Studio:** Customizable sparkly text generator.
+    - **Sparkle Studio:** Customizable sparkly text generator — 6 textures (Aether · Cosmic Sunset · Flower · Silk · Wave · Sand) with pulsing aura ring + drifting border ring on aura-enabled presets, gradient text + 4-point sparkle particles, and one-click PNG export (2× offscreen canvas re-paints bg gradient + glow text + current sparkle frame via composite "lighter").
     - **AETHER Foundations:** Source material gallery for the Crystallization Model.
 
 ## User preferences
