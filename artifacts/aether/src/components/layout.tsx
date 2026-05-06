@@ -234,6 +234,7 @@ const NAV_ITEMS = [
   { href: "/cuca-gyroid",              label: "CUCA Gyroid v3.0 · 3D Photonic Floor",   icon: Pyramid },
   { href: "/aether-childrens-realm",   label: "AETHER Children's Realm · Library",       icon: Sparkles },
   { href: "/aether-seasons",           label: "AETHER Seasons · Brand Strategy",         icon: Sprout },
+  { href: "/aether-flow",              label: "AETHER Flow · Unified Daily Alignment",   icon: Egg },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {

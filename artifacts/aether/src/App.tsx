@@ -92,6 +92,7 @@ import CucaHybridSkinPage from "@/pages/cuca-hybrid-skin";
 import CucaGyroidPage from "@/pages/cuca-gyroid";
 import AetherChildrensRealmPage from "@/pages/aether-childrens-realm";
 import AetherSeasonsPage from "@/pages/aether-seasons";
+import AetherFlowPage from "@/pages/aether-flow";
 import ThermalHierarchyView from "@/pages/thermal-hierarchy";
 import GeometryOfPermissionView from "@/pages/geometry-of-permission";
 import MathEnginePage from "@/pages/math-engine";
@@ -303,6 +304,7 @@ function Router() {
         <Route path="/cuca-gyroid" component={CucaGyroidPage} />
         <Route path="/aether-childrens-realm" component={AetherChildrensRealmPage} />
         <Route path="/aether-seasons" component={AetherSeasonsPage} />
+        <Route path="/aether-flow" component={AetherFlowPage} />
         <Route path="/organoid-intel" component={OrganoidIntelPage} />
         <Route path="/plant-intel" component={PlantIntelPage} />
         <Route path="/ferro-modes" component={FerroModesPage} />
