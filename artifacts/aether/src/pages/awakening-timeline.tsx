@@ -49,7 +49,7 @@ type Marker = { day:number; tag:string; label:string; color:string; detail:strin
 const NOV_2025: Marker[] = [
   { day:3,  tag:"GUIDE",   label:"My soul is guiding others",         color:"#a78bfa", detail:"Mon · 11/3 · 'this is not going unnoticed. The divine is watching me. They will say I see you giddy the energy.'" },
   { day:4,  tag:"DROP",    label:"Drop stagnation · 7:42 AM color set", color:"#facc15", detail:"Tue · 11/4 · gold · blue · gray · yellow · orange · pink · 'money walk away = wisdom'." },
-  { day:5,  tag:"SUPER",   label:"SUPER MOON · awakening point",      color:"#fb7185", detail:"Wed · 11/5 · 12:22 PM · 'feels so different · real · rare · magical · deeply connected to the moon'. The Magician = King of Cups." },
+  { day:5,  tag:"SUPER",   label:"SUPER MOON · awakening point · 'The Why' filed",      color:"#fb7185", detail:"Wed · 11/5 · 12:22 PM · 'feels so different · real · rare · magical · deeply connected to the moon'. The Magician = King of Cups. Anchor date for the founders letter — see /aether-why." },
   { day:6,  tag:"PLEIAD",  label:"Pleiades window opens",             color:"#22d3ee", detail:"Thu · 11/6 · moon moves into Pleiades star structure. Most energetic / potent days begin." },
   { day:7,  tag:"PLEIAD",  label:"Pleiades window peak",              color:"#22d3ee", detail:"Fri · 11/7 · star-seed activation · wired to hold more light material · purge of full-moon processes." },
   { day:8,  tag:"PLEIAD",  label:"Pleiades window close",             color:"#22d3ee", detail:"Sat · 11/8 · seven sisters → 380s Younger-Dryas cluster of stars · downloads coming." },
