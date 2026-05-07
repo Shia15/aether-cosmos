@@ -1,3 +1,4 @@
+import { useState, useMemo, useCallback, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useHealthCheck } from "@workspace/api-client-react";
 import { 
@@ -266,16 +267,109 @@ const NAV_ITEMS = [
   { href: "/quantum-ammeter",          label: "Quantum Ammeter · Solar Prototype · Live Shot-Noise Sim", icon: SunMedium },
 ];
 
+// ── Visit tracking ──────────────────────────────────────────────────────────
+const VISITS_KEY = "aether.nav.visits.v1";
+
+function getVisits(): Record<string, number> {
+  try { return JSON.parse(localStorage.getItem(VISITS_KEY) ?? "{}"); }
+  catch { return {}; }
+}
+function recordVisit(href: string) {
+  try {
+    const v = getVisits();
+    v[href] = (v[href] ?? 0) + 1;
+    localStorage.setItem(VISITS_KEY, JSON.stringify(v));
+  } catch { /* ignore */ }
+}
+
+// ── Highlight helper ─────────────────────────────────────────────────────────
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span style={{ color: "#00ff88", fontWeight: 700 }}>{text.slice(idx, idx + query.length)}</span>
+      {text.slice(idx + query.length)}
+    </>
+  );
+}
+
+// ── Single nav row ───────────────────────────────────────────────────────────
+function NavRow({
+  item, isActive, query, onNavigate,
+}: {
+  item: typeof NAV_ITEMS[0];
+  isActive: boolean;
+  query: string;
+  onNavigate: (href: string) => void;
+}) {
+  const Icon = item.icon;
+  // Short label: first segment before " · "
+  const shortLabel = item.label.split(" · ")[0] ?? item.label;
+  return (
+    <Link key={item.href} href={item.href}>
+      <div
+        onClick={() => onNavigate(item.href)}
+        className={cn(
+          "flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 cursor-pointer group relative overflow-hidden",
+          isActive
+            ? "text-primary bg-primary/5"
+            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+        )}
+      >
+        {isActive && <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />}
+        <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+        <span className="font-mono text-sm tracking-wide truncate">
+          <Highlight text={shortLabel} query={query} />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { data: health } = useHealthCheck();
   const isHealthy = health?.status === "ok";
 
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Most-used: sorted by visit count descending, top 6
+  const mostUsed = useMemo(() => {
+    const v = getVisits();
+    return Object.entries(v)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([href]) => NAV_ITEMS.find(n => n.href === href))
+      .filter(Boolean) as typeof NAV_ITEMS;
+  }, [location]); // re-derive after each nav (location changes)
+
+  // Filtered results when searching
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return NAV_ITEMS;
+    return NAV_ITEMS.filter(item =>
+      item.label.toLowerCase().includes(q) || item.href.toLowerCase().includes(q)
+    );
+  }, [query]);
+
+  const handleNavigate = useCallback((href: string) => {
+    recordVisit(href);
+    setQuery("");
+  }, []);
+
+  const isSearching = query.trim().length > 0;
+
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden selection:bg-primary selection:text-primary-foreground">
       {/* Sidebar */}
       <aside className="w-64 border-r border-border bg-sidebar flex flex-col shrink-0">
-        <div className="p-6 border-b border-border flex items-center gap-3">
+
+        {/* Logo */}
+        <div className="p-6 border-b border-border flex items-center gap-3 shrink-0">
           <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
             <Cpu className="w-4 h-4" />
           </div>
@@ -288,33 +382,85 @@ export function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map((item) => {
-            const isActive = location === item.href;
-            const Icon = item.icon;
-            
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 cursor-pointer group relative overflow-hidden",
-                    isActive 
-                      ? "text-primary bg-primary/5" 
-                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                  )}
-                >
-                  {isActive && (
-                    <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />
-                  )}
-                  <Icon className={cn("w-4 h-4", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
-                  <span className="font-mono text-sm tracking-wide">{item.label}</span>
-                </div>
-              </Link>
-            );
-          })}
+        {/* ── Search bar ── */}
+        <div className="px-3 pt-3 pb-2 shrink-0 border-b border-border/50">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 pointer-events-none" />
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="Search pages…"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-md pl-8 pr-7 py-1.5 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-primary/40 focus:bg-primary/[0.04] transition-all"
+            />
+            {isSearching && (
+              <button
+                onClick={() => { setQuery(""); inputRef.current?.focus(); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground transition-colors leading-none"
+                style={{ fontSize: 14, lineHeight: 1 }}
+              >×</button>
+            )}
+          </div>
+
+          {/* Result count badge */}
+          {isSearching && (
+            <div className="mt-1.5 text-[10px] font-mono text-muted-foreground/40 px-1">
+              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+            </div>
+          )}
+        </div>
+
+        {/* ── Nav list ── */}
+        <nav className="flex-1 overflow-y-auto">
+
+          {/* Most Used — only when not searching and visits exist */}
+          {!isSearching && mostUsed.length > 0 && (
+            <div className="px-3 pt-3 pb-1">
+              <div className="flex items-center gap-2 px-1 mb-1.5">
+                <span className="text-[9px] font-mono tracking-[0.25em] text-muted-foreground/35 uppercase">Most Used</span>
+                <div className="flex-1 h-px bg-border/40" />
+              </div>
+              <div className="space-y-0.5">
+                {mostUsed.map(item => (
+                  <NavRow
+                    key={item.href}
+                    item={item}
+                    isActive={location === item.href}
+                    query=""
+                    onNavigate={handleNavigate}
+                  />
+                ))}
+              </div>
+              <div className="mt-2 mb-0.5 flex items-center gap-2 px-1">
+                <span className="text-[9px] font-mono tracking-[0.25em] text-muted-foreground/35 uppercase">All Pages</span>
+                <div className="flex-1 h-px bg-border/40" />
+              </div>
+            </div>
+          )}
+
+          {/* Search results or full list */}
+          <div className={cn("px-3 space-y-0.5", !isSearching && mostUsed.length > 0 ? "pt-1 pb-4" : "py-4")}>
+            {isSearching && filtered.length === 0 ? (
+              <div className="px-3 py-6 text-center">
+                <div className="text-[10px] font-mono text-muted-foreground/35 uppercase tracking-widest">No results</div>
+                <div className="text-[9px] font-mono text-muted-foreground/20 mt-1">Try a different keyword</div>
+              </div>
+            ) : (
+              filtered.map(item => (
+                <NavRow
+                  key={item.href}
+                  item={item}
+                  isActive={location === item.href}
+                  query={query}
+                  onNavigate={handleNavigate}
+                />
+              ))
+            )}
+          </div>
+
         </nav>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border shrink-0">
           <div className="text-xs font-mono text-muted-foreground/50 text-center">
             AETHER OS v1.2.0
           </div>
