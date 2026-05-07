@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, Trash2, FolderOpen, X, Plus,
   Tag, ChevronDown, CheckCircle2, Loader2, AlertCircle, Sparkles,
-  Link2, Globe, Zap,
+  Link2, Globe, Zap, Eye, BookOpen, ArrowLeft,
 } from "lucide-react";
 import { extractPdfText, isPdfFile, isCodeFile, isTextFile, docTypFromFilename } from "@/lib/pdf-extract";
 
@@ -179,6 +179,9 @@ export default function UploadPage() {
   // File queue
   const [queue, setQueue] = useState<QueuedFile[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Document viewer
+  const [viewDoc, setViewDoc] = useState<any | null>(null);
 
   const readFileAsText = (file: File): Promise<string> =>
     new Promise((res, rej) => {
@@ -709,7 +712,7 @@ export default function UploadPage() {
           ) : (
             <div className="space-y-2">
               {documents?.map((doc: any) => (
-                <ArchiveCard key={doc.id} doc={doc} onDelete={() => handleDelete(doc.id)} />
+                <ArchiveCard key={doc.id} doc={doc} onDelete={() => handleDelete(doc.id)} onView={() => setViewDoc(doc)} />
               ))}
             </div>
           )}
@@ -717,6 +720,115 @@ export default function UploadPage() {
       </div>
 
       <div className="h-8" />
+
+      {/* ── Document Viewer Overlay ── */}
+      <AnimatePresence>
+        {viewDoc && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex"
+            onClick={() => setViewDoc(null)}
+          >
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="ml-auto w-full max-w-2xl h-full bg-background border-l border-border flex flex-col shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-start gap-4 p-6 border-b border-border/40 shrink-0">
+                {(() => {
+                  const lm = LAYER_META[(viewDoc.layer as AetherLayer) ?? "auto"];
+                  return (
+                    <div className="w-9 h-9 rounded border flex items-center justify-center font-mono text-sm shrink-0 mt-0.5"
+                      style={{ borderColor: `${lm.color}40`, color: lm.color, background: `${lm.color}08` }}>
+                      {lm.symbol}
+                    </div>
+                  );
+                })()}
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif text-base text-foreground/90 mb-1 leading-snug">{viewDoc.title}</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(() => {
+                      const lm = LAYER_META[(viewDoc.layer as AetherLayer) ?? "auto"];
+                      return (
+                        <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border"
+                          style={{ borderColor: `${lm.color}30`, color: lm.color }}>
+                          {lm.label}
+                        </span>
+                      );
+                    })()}
+                    {viewDoc.docType && viewDoc.docType !== "other" && (
+                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border border-border/30 text-muted-foreground/50">
+                        {DOC_TYPES.find((d: any) => d.value === viewDoc.docType)?.label ?? viewDoc.docType}
+                      </span>
+                    )}
+                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border border-border/20 text-muted-foreground/30">
+                      {viewDoc.conceptCount} concepts
+                    </span>
+                    {viewDoc.charCount && (
+                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border border-border/20 text-muted-foreground/30">
+                        {(viewDoc.charCount / 1000).toFixed(1)}k chars
+                      </span>
+                    )}
+                  </div>
+                  {viewDoc.source && (
+                    <div className="font-mono text-[9px] text-muted-foreground/30 mt-1 truncate">{viewDoc.source}</div>
+                  )}
+                  {viewDoc.tags && viewDoc.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {viewDoc.tags.map((t: string) => (
+                        <span key={t} className="flex items-center gap-0.5 font-mono text-[9px] px-1.5 py-0.5 rounded bg-primary/5 border border-primary/15 text-primary/60">
+                          <Tag className="w-2 h-2" />{t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setViewDoc(null)}
+                  className="text-muted-foreground/40 hover:text-foreground transition-colors shrink-0 p-1 -mt-1 -mr-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {viewDoc.content ? (
+                  <pre className="font-mono text-xs text-foreground/60 whitespace-pre-wrap leading-relaxed break-words">
+                    {viewDoc.content}
+                  </pre>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground/30">
+                    <div className="text-center">
+                      <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                      <div className="font-mono text-xs">No content stored</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="shrink-0 px-6 py-3 border-t border-border/20 flex items-center justify-between">
+                <button
+                  onClick={() => setViewDoc(null)}
+                  className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                >
+                  <ArrowLeft className="w-3 h-3" /> Close
+                </button>
+                <div className="font-mono text-[9px] text-muted-foreground/20">
+                  {viewDoc.createdAt ? new Date(viewDoc.createdAt).toLocaleString() : ""}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -838,7 +950,7 @@ function QueueCard({ file, isExpanded, onToggle, onUpdate, onRemove, onAddTag, o
 }
 
 // ── Archive Card ──
-function ArchiveCard({ doc, onDelete }: { doc: any; onDelete: () => void }) {
+function ArchiveCard({ doc, onDelete, onView }: { doc: any; onDelete: () => void; onView: () => void }) {
   const layerMeta = LAYER_META[(doc.layer as AetherLayer) ?? "auto"];
   return (
     <div className="group rounded-lg border border-border/20 hover:border-border/40 p-4 transition-all">
@@ -848,7 +960,12 @@ function ArchiveCard({ doc, onDelete }: { doc: any; onDelete: () => void }) {
           {layerMeta.symbol}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="font-serif text-sm text-foreground/80 line-clamp-1 mb-1">{doc.title}</div>
+          <button
+            onClick={onView}
+            className="font-serif text-sm text-foreground/80 line-clamp-1 mb-1 text-left hover:text-foreground transition-colors w-full"
+          >
+            {doc.title}
+          </button>
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="font-mono text-[9px] px-1.5 py-0.5 rounded border"
               style={{ borderColor: `${layerMeta.color}30`, color: layerMeta.color }}>
@@ -883,12 +1000,22 @@ function ArchiveCard({ doc, onDelete }: { doc: any; onDelete: () => void }) {
             </div>
           )}
         </div>
-        <button
-          onClick={onDelete}
-          className="text-muted-foreground/20 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 shrink-0 transition-opacity">
+          <button
+            onClick={onView}
+            className="p-1.5 rounded text-muted-foreground/40 hover:text-primary hover:bg-primary/5 transition-colors"
+            title="Open document"
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-1.5 rounded text-muted-foreground/20 hover:text-red-400 hover:bg-red-400/5 transition-colors"
+            title="Delete document"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );
