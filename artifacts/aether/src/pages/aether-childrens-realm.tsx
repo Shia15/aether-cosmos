@@ -38,6 +38,15 @@ const BOOKS: Book[] = [
     href: "/computer-brains",
   },
   {
+    id: "chaos-to-code",
+    title: "From Chaos to Code",
+    subtitle: "How order emerges from the noise",
+    gradient: "linear-gradient(135deg, #c084fc 0%, #818cf8 40%, #34d399 100%)",
+    glyph: "✦",
+    accent: "#a78bfa",
+    href: "/chaos-to-code",
+  },
+  {
     id: "flow-notebook",
     title: "The Flow Notebook",
     subtitle: "Ari & Flow's cozy adventure in thinking",

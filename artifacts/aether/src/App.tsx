@@ -176,6 +176,7 @@ import QuantumLivingSystemsView from "@/pages/quantum-living-systems";
 import DiamondNanothreadsPage from "@/pages/diamond-nanothreads";
 import ComputerBrainsPage from "@/pages/computer-brains";
 import LearningLayersPage from "@/pages/learning-layers";
+import ChaosToCodingPage from "@/pages/chaos-to-code";
 
 const queryClient = new QueryClient();
 
@@ -319,6 +320,7 @@ function Router() {
         <Route path="/cuca-gyroid" component={CucaGyroidPage} />
         <Route path="/aether-childrens-realm" component={AetherChildrensRealmPage} />
         <Route path="/computer-brains" component={ComputerBrainsPage} />
+        <Route path="/chaos-to-code" component={ChaosToCodingPage} />
         <Route path="/learning-layers" component={LearningLayersPage} />
         <Route path="/aether-seasons" component={AetherSeasonsPage} />
         <Route path="/aether-flow" component={AetherFlowPage} />
