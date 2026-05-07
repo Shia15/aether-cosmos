@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import fusionSubstrate from "@assets/HHvIaowXQAY-n8z_(1)_1778197228444.jpg";
 import shiaCaCO3 from "@assets/IMG_1606_1778070646724.jpeg";
 import shiaSpatialIntention from "@assets/IMG_1603_1778070646724.jpeg";
 import bavsSubstrates from "@assets/IMG_1600_1778070646724.png";
@@ -334,6 +335,249 @@ function SynthesisBridges() {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
+// Plasma Mix Ratio panel
+
+function polarToCart(cx: number, cy: number, r: number, angleDeg: number): [number, number] {
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+}
+function donutArcPath(cx: number, cy: number, r: number, ri: number, a0: number, a1: number): string {
+  if (a1 - a0 >= 360) a1 = a0 + 359.99;
+  const [ox0, oy0] = polarToCart(cx, cy, r,  a0);
+  const [ox1, oy1] = polarToCart(cx, cy, r,  a1);
+  const [ix1, iy1] = polarToCart(cx, cy, ri, a1);
+  const [ix0, iy0] = polarToCart(cx, cy, ri, a0);
+  const lg = a1 - a0 > 180 ? 1 : 0;
+  return `M${ox0},${oy0} A${r},${r} 0 ${lg},1 ${ox1},${oy1} L${ix1},${iy1} A${ri},${ri} 0 ${lg},0 ${ix0},${iy0} Z`;
+}
+
+type GasKey = "H2" | "He" | "Ar" | "N2" | "O2" | "CO2";
+
+const GASES: {
+  key: GasKey; label: string; name: string; color: string; desc: string;
+  coherence: number; nucleation: number; photonic: number; field: number;
+}[] = [
+  { key:"H2",  label:"H₂",  name:"Hydrogen",       color:"#60a5fa",
+    desc:"Fusion fuel · high thermal conductivity · drives reduction & accelerates nucleation.",
+    coherence:0.80, nucleation:1.20, photonic:1.40, field:1.30 },
+  { key:"He",  label:"He",  name:"Helium",          color:"#a78bfa",
+    desc:"Inert carrier · highest field coherence propagation · cryogenic compatible.",
+    coherence:1.40, nucleation:0.60, photonic:0.80, field:1.50 },
+  { key:"Ar",  label:"Ar",  name:"Argon",           color:"#5ec8e8",
+    desc:"Nucleation moderator · uniform ion bombardment · surface activation layer.",
+    coherence:1.20, nucleation:0.90, photonic:0.70, field:1.10 },
+  { key:"N2",  label:"N₂",  name:"Nitrogen",        color:"#34d399",
+    desc:"Surface nitriding · adhesion layer · biological substrate compatibility.",
+    coherence:0.90, nucleation:0.80, photonic:1.10, field:0.90 },
+  { key:"O2",  label:"O₂",  name:"Oxygen",          color:"#f59e0b",
+    desc:"Photochemical oxidiser · drives CaCO₃ formation · powers CUCA photosynthesis loop.",
+    coherence:0.70, nucleation:1.50, photonic:1.30, field:0.80 },
+  { key:"CO2", label:"CO₂", name:"Carbon Dioxide",  color:"#fb7185",
+    desc:"Carbon source · carbonate precipitation · closes atmospheric CO₂ loop in CUCA.",
+    coherence:0.60, nucleation:1.30, photonic:1.00, field:0.70 },
+];
+
+const PLASMA_PRESETS: Record<string, Record<GasKey, number>> = {
+  "AETHER Optimal": { H2:40, He:20, Ar:15, N2:5,  O2:15, CO2:5  },
+  "CUCA Loop":      { H2:30, He:10, Ar:10, N2:10, O2:30, CO2:10 },
+  "Marine CaCO₃":   { H2:10, He:5,  Ar:20, N2:15, O2:35, CO2:15 },
+  "Fusion Blanket":  { H2:70, He:20, Ar:5,  N2:2,  O2:2,  CO2:1  },
+};
+
+const METRIC_META = [
+  { k:"coherence"  as const, label:"Field Coherence",  col:"#a78bfa" },
+  { k:"nucleation" as const, label:"Nucleation Rate",  col:"#f59e0b" },
+  { k:"photonic"   as const, label:"Photonic Yield",   col:"#60a5fa" },
+  { k:"field"      as const, label:"Resonant Field",   col:"#34d399" },
+];
+
+function PlasmaMixer() {
+  const [vals, setVals] = useState<Record<GasKey, number>>({ ...PLASMA_PRESETS["AETHER Optimal"] });
+  const [activePreset, setActivePreset] = useState<string>("AETHER Optimal");
+  const [hoveredGas, setHoveredGas] = useState<GasKey | null>(null);
+
+  const total = useMemo(() =>
+    (Object.values(vals) as number[]).reduce((s, v) => s + v, 0) || 1,
+    [vals]
+  );
+
+  const normed = useMemo(
+    () => Object.fromEntries(GASES.map(g => [g.key, (vals[g.key] ?? 0) / total])) as Record<GasKey, number>,
+    [vals, total]
+  );
+
+  const metrics = useMemo(() => {
+    let coherence = 0, nucleation = 0, photonic = 0, field = 0;
+    GASES.forEach(g => {
+      const w = normed[g.key];
+      coherence  += w * g.coherence;
+      nucleation += w * g.nucleation;
+      photonic   += w * g.photonic;
+      field      += w * g.field;
+    });
+    const sc = (v: number) => Math.round(Math.max(0, Math.min(100, (v - 0.55) / 1.0 * 100)));
+    return { coherence: sc(coherence), nucleation: sc(nucleation), photonic: sc(photonic), field: sc(field) };
+  }, [normed]);
+
+  const arcs = useMemo(() => {
+    const CX = 80, CY = 80, R = 64, RI = 42;
+    let angle = -90;
+    return GASES.map(g => {
+      const sweep = normed[g.key] * 360;
+      const path = donutArcPath(CX, CY, R, RI, angle, angle + (sweep < 0.5 ? 0 : sweep));
+      angle += sweep;
+      return { g, path, pct: Math.round(normed[g.key] * 100) };
+    });
+  }, [normed]);
+
+  const setPreset = (name: string) => {
+    const p = PLASMA_PRESETS[name];
+    if (p) { setVals({ ...p }); setActivePreset(name); }
+  };
+
+  const setGas = (key: GasKey, v: number) => {
+    setVals(prev => ({ ...prev, [key]: v }));
+    setActivePreset("");
+  };
+
+  const hovered = hoveredGas ? GASES.find(g => g.key === hoveredGas) : null;
+
+  return (
+    <div style={{ padding:"1.4rem", borderRadius:16, background:"rgba(7,10,20,0.72)", border:"1px solid rgba(96,165,250,0.2)" }}>
+
+      {/* Presets */}
+      <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:"1.3rem", alignItems:"center" }}>
+        <span style={{ ...KICKER, marginBottom:0 }}>Preset recipes ·</span>
+        {Object.keys(PLASMA_PRESETS).map(p => (
+          <button key={p} onClick={() => setPreset(p)} style={{
+            padding:"0.35rem 0.8rem", borderRadius:6,
+            fontSize:"0.76rem", fontFamily:"'DM Mono',monospace", letterSpacing:1, cursor:"pointer",
+            background: activePreset === p ? "rgba(96,165,250,0.16)" : "rgba(0,0,0,0.4)",
+            border:`1px solid ${activePreset === p ? "#60a5fa88" : "rgba(255,255,255,0.09)"}`,
+            color: activePreset === p ? "#60a5fa" : "#94a3b8", transition:"all 0.2s",
+          }}>{p}</button>
+        ))}
+      </div>
+
+      <div style={{ display:"grid", gridTemplateColumns:"min(160px,35%) 1fr", gap:"1.6rem", alignItems:"start" }}>
+
+        {/* Donut + legend */}
+        <div>
+          <svg viewBox="0 0 160 160" style={{ width:"100%", height:"auto", display:"block" }}>
+            {arcs.map(({ g, path, pct }) => pct === 0 ? null : (
+              <path key={g.key} d={path}
+                fill={g.color}
+                opacity={hoveredGas === null || hoveredGas === g.key ? 0.88 : 0.28}
+                style={{ filter:`drop-shadow(0 0 5px ${g.color}55)`, transition:"opacity 0.2s" }}
+              />
+            ))}
+            <circle cx={80} cy={80} r={38} fill="rgba(7,10,20,0.9)"/>
+            {hovered ? (
+              <>
+                <text x="80" y="74" textAnchor="middle" fill={hovered.color}
+                  fontSize="14" fontFamily="DM Mono,monospace" fontWeight="800">{hovered.label}</text>
+                <text x="80" y="88" textAnchor="middle" fill="#94a3b8"
+                  fontSize="9" fontFamily="DM Mono,monospace">
+                  {Math.round(normed[hovered.key] * 100)}%
+                </text>
+              </>
+            ) : (
+              <>
+                <text x="80" y="76" textAnchor="middle" fill="#e2e8f0"
+                  fontSize="10" fontFamily="DM Mono,monospace" fontWeight="700">PLASMA</text>
+                <text x="80" y="89" textAnchor="middle" fill="#475569"
+                  fontSize="9" fontFamily="DM Mono,monospace">MIX</text>
+              </>
+            )}
+          </svg>
+          <div style={{ display:"flex", flexDirection:"column", gap:4, marginTop:6 }}>
+            {GASES.map(g => (
+              <div key={g.key} style={{ display:"flex", alignItems:"center", gap:6, opacity: normed[g.key] < 0.01 ? 0.3 : 1 }}>
+                <div style={{ width:8, height:8, borderRadius:2, background:g.color, flexShrink:0 }}/>
+                <span style={{ fontSize:9, fontFamily:"'DM Mono',monospace", color:"#94a3b8" }}>
+                  {g.label} <span style={{ color:g.color, fontWeight:700 }}>{Math.round(normed[g.key]*100)}%</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sliders */}
+        <div style={{ display:"flex", flexDirection:"column", gap:"0.9rem" }}>
+          {GASES.map(g => {
+            const pct = Math.round(normed[g.key] * 100);
+            return (
+              <div key={g.key}
+                onMouseEnter={() => setHoveredGas(g.key)}
+                onMouseLeave={() => setHoveredGas(null)}>
+                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
+                  <span style={{ fontSize:11, fontFamily:"'DM Mono',monospace", color:g.color, fontWeight:700 }}>
+                    {g.label} · <span style={{ color:"#94a3b8", fontWeight:400 }}>{g.name}</span>
+                  </span>
+                  <span style={{ fontSize:11, fontFamily:"'DM Mono',monospace", color:"#f1f5f9", fontWeight:700 }}>
+                    {pct}%
+                  </span>
+                </div>
+                <div style={{ position:"relative", height:6, borderRadius:3, background:"rgba(255,255,255,0.06)", marginBottom:4 }}>
+                  <div style={{
+                    position:"absolute", left:0, top:0, height:"100%",
+                    width:`${pct}%`, borderRadius:3,
+                    background:`linear-gradient(90deg, ${g.color}88, ${g.color})`,
+                    boxShadow:`0 0 6px ${g.color}66`,
+                    transition:"width 0.15s ease",
+                  }}/>
+                </div>
+                <input type="range" min={0} max={100} value={vals[g.key]}
+                  onChange={e => setGas(g.key, Number(e.target.value))}
+                  style={{ width:"100%", accentColor:g.color, margin:0 }}/>
+                <div style={{ fontSize:9, color:"#475569", fontFamily:"'DM Mono',monospace", marginTop:3, lineHeight:1.4 }}>
+                  {g.desc}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Output metrics */}
+      <div style={{ marginTop:"1.4rem", borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:"1.1rem" }}>
+        <div style={{ ...KICKER, marginBottom:"0.8rem" }}>Substrate output · derived from mix ratio</div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px,1fr))", gap:"0.75rem" }}>
+          {METRIC_META.map(({ k, label, col }) => {
+            const v = metrics[k];
+            return (
+              <div key={k} style={{
+                padding:"0.75rem 0.9rem", borderRadius:10,
+                background:"rgba(0,0,0,0.38)", border:`1px solid ${col}22`,
+              }}>
+                <div style={{ fontSize:9, color:col, fontFamily:"'DM Mono',monospace",
+                  letterSpacing:1.5, textTransform:"uppercase", marginBottom:6 }}>{label}</div>
+                <div style={{ fontSize:"1.45rem", fontWeight:800, color:col, fontFamily:"'Cinzel',serif", lineHeight:1 }}>
+                  {v}<span style={{ fontSize:"0.75rem", color:"#475569", fontWeight:400 }}>%</span>
+                </div>
+                <div style={{ marginTop:8, height:4, borderRadius:2, background:"rgba(255,255,255,0.06)" }}>
+                  <div style={{
+                    height:"100%", width:`${v}%`, borderRadius:2,
+                    background:`linear-gradient(90deg, ${col}88, ${col})`,
+                    boxShadow:`0 0 6px ${col}88`,
+                    transition:"width 0.4s ease",
+                  }}/>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ marginTop:"0.9rem", fontSize:"0.78rem", color:"#475569", lineHeight:1.55, fontFamily:"'DM Mono',monospace" }}>
+          Weights derived from AETHER CUCA v4.1 + EUROFER97 fusion blanket data.
+          Coherence peaks with He-dominant mix · Nucleation peaks with O₂/CO₂ · Field peaks with He/H₂.
+          Presets are normalised so all ratios always sum to 100 %.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ───────────────────────────────────────────────────────────────────────────
 export default function SubstrateSynthesisPage() {
   const totalAt180 = useMemo(() => CONDITIONS.reduce((s, c) => s + c.total180, 0), []);
   return (
@@ -424,8 +668,19 @@ export default function SubstrateSynthesisPage() {
           <SynthesisBridges/>
         </Section>
 
+        {/* Plasma Mix Ratio */}
+        <Section kicker="IV · Plasma-to-Substrate Mix Ratio" title="Tune the Plasma Gas Composition"
+          lead="Adjust each gas fraction with the sliders — the donut, metric bars, and output scores update live. Hover any gas to highlight its segment. Presets lock in AETHER-recommended profiles derived from the CUCA v4.1 framework and EUROFER97 fusion blanket data.">
+          <PlasmaMixer/>
+          <div style={{ marginTop:"1rem" }}>
+            <Plate src={fusionSubstrate}
+              caption="AETHER // Quantum Substrate State — EUROFER97 (F82H) blanket · substrate quantum diagonalisation · quantum knotting cycle engaged. TBR 1.248 ± 0.003 · extraction efficiency 99.4 % · coherence fidelity 1.000000 ± 2.1×10⁻¹⁸"
+              aspect="16/9"/>
+          </div>
+        </Section>
+
         {/* BAVS substrates */}
-        <Section kicker="IV · Bio-Adaptive Vortex System (BAVS)" title="Substrate as Ecological Restoration Field"
+        <Section kicker="V · Bio-Adaptive Vortex System (BAVS)" title="Substrate as Ecological Restoration Field"
           lead="Five-spiral-arm architecture induces vortices and recirculates water through internal feedback loops.
           Beyond mechanical flow, the system incorporates bioactive surfaces to foster marine micro-ecosystems.">
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap:"0.9rem" }}>
@@ -442,7 +697,7 @@ export default function SubstrateSynthesisPage() {
         </Section>
 
         {/* Spatial Intention */}
-        <Section kicker="V · Mapping Biological Response → AETHER" title="Molecular Control as 'Spatial Intention' (A)"
+        <Section kicker="VI · Mapping Biological Response → AETHER" title="Molecular Control as 'Spatial Intention' (A)"
           lead="In AETHER, spatial intention (A) refers to the explicit meaning encoded within a given space. The molecular/industrial scale represents the definition of intention; picogram consistency and live attenuation of the rotavirus are the engineered signals — high-fidelity spatial 'bricks' of meaning.">
           <Card kicker="Bridge" title="Substrate → Intention → Computation" accent="#a78bfa">
             Light pattern (intention) → CaCO₃ supersaturation field (substrate) → crystal morphology (output structure).
@@ -451,13 +706,13 @@ export default function SubstrateSynthesisPage() {
         </Section>
 
         {/* Tree of Life */}
-        <Section kicker="VI · Substrate of Substrates" title="Where the Mechanism Sits in the Tree of Life"
+        <Section kicker="VII · Substrate of Substrates" title="Where the Mechanism Sits in the Tree of Life"
           lead="LUCA → Bacteria · Archaea · Eukarya. Every substrate-computation experiment AETHER runs is implicitly running on one of these branches. The Institut Pasteur 2023 dendrogram is the cross-check against branch-naïve claims.">
           <Plate src={treeOfLife} caption="Tree of Life (Institut Pasteur, Feb 2023). LUCA at the centre; Bacteria (purple) and Archaea (cream) on either side; Eukarya inset (teal). Schematic illustrations at each leaf." aspect="16/10"/>
         </Section>
 
         {/* Source plates */}
-        <Section kicker="VII · Source Plates" title="Originals" lead="The infographics and tweets that drive this page.">
+        <Section kicker="VIII · Source Plates" title="Originals" lead="The infographics and tweets that drive this page.">
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.9rem" }}>
             <Plate src={shiaLifeFormula}    caption="Shia Miller · LIFE = Energy Gradient + Medium + Mechanism (8:21 AM · 5/3/26)"/>
             <Plate src={shiaCaCO3}          caption="Shia Miller · 'calculation performed not symbolically but spatiotemporally, in matter, under light' (6:06 PM · 5/3/26)"/>
