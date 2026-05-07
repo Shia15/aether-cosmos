@@ -329,6 +329,8 @@ const PRESETS: Preset[] = [
 ];
 
 interface Sparkle { x: number; y: number; r: number; vx: number; vy: number; life: number; max: number; col: string; rot: number; vrot: number; }
+interface Comet   { x: number; y: number; vx: number; vy: number; len: number; col: string; life: number; max: number; alpha: number; }
+interface Ring    { x: number; y: number; r: number; maxR: number; life: number; max: number; col: string; }
 
 const VIDEO_DURATIONS: { sec: number; label: string }[] = [
   { sec: 3, label: "3s" },
@@ -351,6 +353,9 @@ export default function SparkleTextPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const sparklesRef = useRef<Sparkle[]>([]);
+  const cometsRef   = useRef<Comet[]>([]);
+  const ringsRef    = useRef<Ring[]>([]);
+  const cometTimerRef = useRef(0);
   const rafRef = useRef<number | null>(null);
   const pausedRef = useRef(paused);
   const presetRef = useRef(preset);
@@ -383,6 +388,7 @@ export default function SparkleTextPage() {
     const ro = new ResizeObserver(resize);
     ro.observe(stage);
 
+    // ── draw helpers ──────────────────────────────────────────────────────────
     const drawSparkle = (s: Sparkle) => {
       const a = Math.sin((s.life / s.max) * Math.PI);
       ctx.save();
@@ -392,7 +398,7 @@ export default function SparkleTextPage() {
       ctx.globalCompositeOperation = "lighter";
       ctx.fillStyle = s.col;
       ctx.shadowColor = s.col;
-      ctx.shadowBlur = s.r * 4;
+      ctx.shadowBlur = s.r * 5;
       ctx.beginPath();
       const r = s.r, k = s.r * 0.18;
       ctx.moveTo(0, -r); ctx.lineTo(k, -k);
@@ -404,6 +410,74 @@ export default function SparkleTextPage() {
       ctx.restore();
     };
 
+    const drawComet = (c: Comet) => {
+      const progress = c.life / c.max;
+      const alpha = Math.sin(progress * Math.PI) * c.alpha;
+      const tailX = c.x - c.vx * c.len;
+      const tailY = c.y - c.vy * c.len;
+      const grad = ctx.createLinearGradient(tailX, tailY, c.x, c.y);
+      grad.addColorStop(0, `rgba(255,255,255,0)`);
+      grad.addColorStop(0.6, `${c.col}66`);
+      grad.addColorStop(1, c.col);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.globalCompositeOperation = "lighter";
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = c.col;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(c.x, c.y);
+      ctx.stroke();
+      // bright head dot
+      ctx.beginPath();
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowBlur = 18;
+      ctx.arc(c.x, c.y, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    const drawRing = (ring: Ring) => {
+      const progress = ring.life / ring.max;
+      const alpha = (1 - progress) * 0.75;
+      const radius = ring.r + (ring.maxR - ring.r) * progress;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.globalCompositeOperation = "lighter";
+      ctx.strokeStyle = ring.col;
+      ctx.shadowColor = ring.col;
+      ctx.shadowBlur = 8;
+      ctx.lineWidth = 1.5 * (1 - progress * 0.7);
+      ctx.beginPath();
+      ctx.arc(ring.x, ring.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const spawnComet = (w: number, h: number, cols: string[]) => {
+      // Fire from a random edge
+      const edge = Math.floor(Math.random() * 4);
+      let x: number, y: number;
+      const speed = 6 + Math.random() * 8;
+      const angle = Math.random() * Math.PI * 0.45 + Math.PI * 0.1;
+      let vx = Math.cos(angle) * speed;
+      let vy = Math.sin(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
+      if (edge === 0)      { x = -20; y = Math.random() * h; }
+      else if (edge === 1) { x = w + 20; y = Math.random() * h; vx = -vx; }
+      else if (edge === 2) { x = Math.random() * w; y = -20; vy = Math.abs(vy); }
+      else                 { x = Math.random() * w; y = h + 20; vy = -Math.abs(vy); }
+      cometsRef.current.push({
+        x, y, vx, vy,
+        len: 55 + Math.random() * 60,
+        col: cols[Math.floor(Math.random() * cols.length)] ?? "#fff",
+        life: 0,
+        max: 55 + Math.random() * 45,
+        alpha: 0.7 + Math.random() * 0.3,
+      });
+    };
+
     const tick = (now: number) => {
       const dt = Math.min(50, now - last) / 16.67;
       last = now;
@@ -411,36 +485,82 @@ export default function SparkleTextPage() {
       ctx.clearRect(0, 0, w, h);
 
       if (!pausedRef.current) {
-        const spawn = Math.max(0, Math.round(densityRef.current / 30 * dt));
+        const cols = presetRef.current.sparkleColors;
+
+        // ── Spawn sparkles (faster: higher speed, lower lifetime)
+        const spawn = Math.max(0, Math.round(densityRef.current / 18 * dt));
         for (let i = 0; i < spawn; i++) {
-          const cols = presetRef.current.sparkleColors;
           sparklesRef.current.push({
             x: Math.random() * w,
             y: Math.random() * h,
-            r: 1 + Math.random() * 3.5,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: -0.15 - Math.random() * 0.3,
+            r: 1.2 + Math.random() * 4,
+            vx: (Math.random() - 0.5) * 1.4,
+            vy: -0.6 - Math.random() * 1.2,
             life: 0,
-            max: 60 + Math.random() * 90,
+            max: 28 + Math.random() * 40,
             col: cols[Math.floor(Math.random() * cols.length)] ?? "#fff",
             rot: Math.random() * Math.PI,
-            vrot: (Math.random() - 0.5) * 0.04,
+            vrot: (Math.random() - 0.5) * 0.14,
           });
         }
-        if (sparklesRef.current.length > 600) {
-          sparklesRef.current.splice(0, sparklesRef.current.length - 600);
+        if (sparklesRef.current.length > 900) {
+          sparklesRef.current.splice(0, sparklesRef.current.length - 900);
+        }
+
+        // ── Comet timer: fire one every ~2.5–5 s
+        cometTimerRef.current += dt;
+        const cometInterval = 40 + Math.random() * 80;
+        if (cometTimerRef.current > cometInterval) {
+          spawnComet(w, h, cols);
+          cometTimerRef.current = 0;
         }
       }
 
+      // ── Advance & draw comets
+      const nextComets: Comet[] = [];
+      for (const c of cometsRef.current) {
+        c.life += dt;
+        c.x += c.vx * dt;
+        c.y += c.vy * dt;
+        if (c.life < c.max) {
+          drawComet(c);
+          nextComets.push(c);
+        }
+      }
+      cometsRef.current = nextComets;
+
+      // ── Advance & draw resonance drop rings
+      const nextRings: Ring[] = [];
+      for (const ring of ringsRef.current) {
+        ring.life += dt;
+        if (ring.life < ring.max) {
+          drawRing(ring);
+          nextRings.push(ring);
+        }
+      }
+      ringsRef.current = nextRings;
+
+      // ── Advance & draw sparkles; spawn rings on death
       const next: Sparkle[] = [];
       for (const s of sparklesRef.current) {
         s.life += dt;
         s.x += s.vx * dt;
         s.y += s.vy * dt;
         s.rot += s.vrot * dt;
-        if (s.life < s.max && s.y > -10 && s.y < h + 10 && s.x > -10 && s.x < w + 10) {
+        const alive = s.life < s.max && s.y > -10 && s.y < h + 10 && s.x > -10 && s.x < w + 10;
+        if (alive) {
           drawSparkle(s);
           next.push(s);
+        } else if (s.life >= s.max && !pausedRef.current && Math.random() < 0.35) {
+          // Resonance drop ring on sparkle death
+          ringsRef.current.push({
+            x: s.x, y: s.y,
+            r: s.r * 0.5,
+            maxR: s.r * (5 + Math.random() * 6),
+            life: 0,
+            max: 22 + Math.random() * 18,
+            col: s.col,
+          });
         }
       }
       sparklesRef.current = next;
@@ -453,6 +573,8 @@ export default function SparkleTextPage() {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
       ro.disconnect();
       sparklesRef.current = [];
+      cometsRef.current = [];
+      ringsRef.current = [];
     };
   }, []);
 
@@ -604,6 +726,9 @@ export default function SparkleTextPage() {
 
       // Independent particle sim for the video (don't share with on-screen)
       const sparkles: Sparkle[] = [];
+      const vidComets: Comet[] = [];
+      const vidRings:  Ring[]  = [];
+      let vidCometTimer = 0;
       const start = performance.now();
       let lastFrame = start;
       let stopFlag = false;
@@ -611,21 +736,42 @@ export default function SparkleTextPage() {
       const drawParticle = (s: Sparkle) => {
         const a = Math.sin((s.life / s.max) * Math.PI);
         ctx.save();
-        ctx.translate(s.x, s.y);
-        ctx.rotate(s.rot);
-        ctx.globalAlpha = a;
-        ctx.globalCompositeOperation = "lighter";
-        ctx.fillStyle = s.col;
-        ctx.shadowColor = s.col;
-        ctx.shadowBlur = s.r * 4;
+        ctx.translate(s.x, s.y); ctx.rotate(s.rot);
+        ctx.globalAlpha = a; ctx.globalCompositeOperation = "lighter";
+        ctx.fillStyle = s.col; ctx.shadowColor = s.col; ctx.shadowBlur = s.r * 5;
         ctx.beginPath();
         const r2 = s.r, k = s.r * 0.18;
-        ctx.moveTo(0, -r2); ctx.lineTo(k, -k);
-        ctx.lineTo(r2, 0);  ctx.lineTo(k, k);
-        ctx.lineTo(0, r2);  ctx.lineTo(-k, k);
-        ctx.lineTo(-r2, 0); ctx.lineTo(-k, -k);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(0,-r2); ctx.lineTo(k,-k); ctx.lineTo(r2,0); ctx.lineTo(k,k);
+        ctx.lineTo(0,r2);  ctx.lineTo(-k,k); ctx.lineTo(-r2,0); ctx.lineTo(-k,-k);
+        ctx.closePath(); ctx.fill(); ctx.restore();
+      };
+
+      const drawVComet = (c: Comet) => {
+        const progress = c.life / c.max;
+        const alpha = Math.sin(progress * Math.PI) * c.alpha;
+        const tailX = c.x - c.vx * c.len, tailY = c.y - c.vy * c.len;
+        const grad = ctx.createLinearGradient(tailX, tailY, c.x, c.y);
+        grad.addColorStop(0, "rgba(255,255,255,0)");
+        grad.addColorStop(0.6, `${c.col}66`);
+        grad.addColorStop(1, c.col);
+        ctx.save();
+        ctx.globalAlpha = alpha; ctx.globalCompositeOperation = "lighter";
+        ctx.strokeStyle = grad; ctx.lineWidth = 2.5 * scale;
+        ctx.shadowColor = c.col; ctx.shadowBlur = 14 * scale;
+        ctx.beginPath(); ctx.moveTo(tailX, tailY); ctx.lineTo(c.x, c.y); ctx.stroke();
+        ctx.beginPath(); ctx.fillStyle = "#fff"; ctx.shadowBlur = 20 * scale;
+        ctx.arc(c.x, c.y, 2.5 * scale, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      };
+
+      const drawVRing = (ring: Ring) => {
+        const progress = ring.life / ring.max;
+        const radius = ring.r + (ring.maxR - ring.r) * progress;
+        ctx.save();
+        ctx.globalAlpha = (1 - progress) * 0.75; ctx.globalCompositeOperation = "lighter";
+        ctx.strokeStyle = ring.col; ctx.shadowColor = ring.col; ctx.shadowBlur = 8 * scale;
+        ctx.lineWidth = 1.5 * scale * (1 - progress * 0.7);
+        ctx.beginPath(); ctx.arc(ring.x, ring.y, radius, 0, Math.PI * 2); ctx.stroke();
         ctx.restore();
       };
 
@@ -635,13 +781,11 @@ export default function SparkleTextPage() {
         const dt = Math.min(50, now - lastFrame) / 16.67;
         lastFrame = now;
 
-        // Pulsing aura intensity (matches CSS auraBreathe ~6s cycle)
+        // Pulsing aura
         const phase = (Math.sin(t * Math.PI * 2 / 6 - Math.PI / 2) + 1) / 2;
-        const auraIntensity = 0.55 + 0.4 * phase;
+        paintBg(ctx, W, H, 0.55 + 0.4 * phase);
 
-        paintBg(ctx, W, H, auraIntensity);
-
-        // Drifting border ring (matches CSS ringDrift ~28s)
+        // Drifting border ring
         if (preset.aura) {
           ctx.save();
           ctx.translate(W / 2, H / 2);
@@ -656,42 +800,76 @@ export default function SparkleTextPage() {
           ctx.restore();
         }
 
-        // Shimmer phase (~8s loop)
+        // Shimmer + flowing text offset
         const shimmer = (Math.sin(t * Math.PI * 2 / 8) + 1) / 2;
+        // slight vertical flow: paint at offset Y then restore
+        const flowY = Math.sin(t * Math.PI * 2 / 4) * 6 * scale;
+        ctx.save(); ctx.translate(0, flowY);
         paintText(ctx, W, H, scale, shimmer);
+        ctx.restore();
 
-        // Particle sim
-        const spawn = Math.max(1, Math.round(density / 28 * dt));
-        for (let i = 0; i < spawn; i++) {
+        // Comets
+        vidCometTimer += dt;
+        if (vidCometTimer > 55 + Math.random() * 80) {
           const cols = preset.sparkleColors;
+          const edge = Math.floor(Math.random() * 4);
+          const speed = (6 + Math.random() * 8) * scale;
+          const angle = Math.random() * Math.PI * 0.45 + Math.PI * 0.1;
+          let cx2 = 0, cy2 = 0;
+          let cvx = Math.cos(angle) * speed;
+          let cvy = Math.sin(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
+          if (edge === 0)      { cx2 = -20; cy2 = Math.random() * H; }
+          else if (edge === 1) { cx2 = W+20; cy2 = Math.random() * H; cvx = -cvx; }
+          else if (edge === 2) { cx2 = Math.random()*W; cy2 = -20; cvy = Math.abs(cvy); }
+          else                 { cx2 = Math.random()*W; cy2 = H+20; cvy = -Math.abs(cvy); }
+          vidComets.push({ x:cx2, y:cy2, vx:cvx, vy:cvy, len:(55+Math.random()*60)*scale,
+            col: cols[Math.floor(Math.random()*cols.length)] ?? "#fff",
+            life:0, max:55+Math.random()*45, alpha:0.7+Math.random()*0.3 });
+          vidCometTimer = 0;
+        }
+        const keptC: Comet[] = [];
+        for (const c of vidComets) {
+          c.life += dt; c.x += c.vx * dt; c.y += c.vy * dt;
+          if (c.life < c.max) { drawVComet(c); keptC.push(c); }
+        }
+        vidComets.length = 0; vidComets.push(...keptC);
+
+        // Rings
+        const keptR: Ring[] = [];
+        for (const ring of vidRings) {
+          ring.life += dt;
+          if (ring.life < ring.max) { drawVRing(ring); keptR.push(ring); }
+        }
+        vidRings.length = 0; vidRings.push(...keptR);
+
+        // Sparkles (faster)
+        const spawn = Math.max(1, Math.round(density / 18 * dt));
+        const cols2 = preset.sparkleColors;
+        for (let i = 0; i < spawn; i++) {
           sparkles.push({
-            x: Math.random() * W,
-            y: Math.random() * H,
+            x: Math.random() * W, y: Math.random() * H,
             r: (1.2 + Math.random() * 4) * scale,
-            vx: (Math.random() - 0.5) * 0.6 * scale,
-            vy: (-0.2 - Math.random() * 0.45) * scale,
-            life: 0,
-            max: 60 + Math.random() * 90,
-            col: cols[Math.floor(Math.random() * cols.length)] ?? "#fff",
+            vx: (Math.random() - 0.5) * 1.4 * scale,
+            vy: (-0.6 - Math.random() * 1.2) * scale,
+            life: 0, max: 28 + Math.random() * 40,
+            col: cols2[Math.floor(Math.random() * cols2.length)] ?? "#fff",
             rot: Math.random() * Math.PI,
-            vrot: (Math.random() - 0.5) * 0.04,
+            vrot: (Math.random() - 0.5) * 0.14,
           });
         }
-        if (sparkles.length > 900) sparkles.splice(0, sparkles.length - 900);
+        if (sparkles.length > 1100) sparkles.splice(0, sparkles.length - 1100);
 
         const kept: Sparkle[] = [];
         for (const s of sparkles) {
-          s.life += dt;
-          s.x += s.vx * dt;
-          s.y += s.vy * dt;
-          s.rot += s.vrot * dt;
+          s.life += dt; s.x += s.vx * dt; s.y += s.vy * dt; s.rot += s.vrot * dt;
           if (s.life < s.max && s.y > -20 && s.y < H + 20 && s.x > -20 && s.x < W + 20) {
-            drawParticle(s);
-            kept.push(s);
+            drawParticle(s); kept.push(s);
+          } else if (s.life >= s.max && Math.random() < 0.35) {
+            vidRings.push({ x:s.x, y:s.y, r:s.r*0.5,
+              maxR:s.r*(5+Math.random()*6)*scale, life:0, max:22+Math.random()*18, col:s.col });
           }
         }
-        sparkles.length = 0;
-        sparkles.push(...kept);
+        sparkles.length = 0; sparkles.push(...kept);
 
         rafId = requestAnimationFrame(renderFrame);
       };
@@ -740,10 +918,28 @@ export default function SparkleTextPage() {
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');
+
+        /* gradient shift across text */
         @keyframes sparkleShift {
           0%, 100% { background-position: 0% 50%; }
           50%      { background-position: 100% 50%; }
         }
+
+        /* gentle vertical float — the "flow" motion */
+        @keyframes textFloat {
+          0%   { transform: translateY(0px)   skewX(0deg); }
+          25%  { transform: translateY(-7px)  skewX(0.4deg); }
+          50%  { transform: translateY(0px)   skewX(0deg); }
+          75%  { transform: translateY(6px)   skewX(-0.3deg); }
+          100% { transform: translateY(0px)   skewX(0deg); }
+        }
+
+        /* letter-scale shimmer pulse */
+        @keyframes textPulse {
+          0%, 100% { letter-spacing: inherit; filter: brightness(1)   drop-shadow(0 0 0px transparent); }
+          40%      { letter-spacing: 0.04em; filter: brightness(1.18) drop-shadow(0 0 22px currentColor); }
+        }
+
         @keyframes auraBreathe {
           0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.92); }
           50%      { opacity: 0.95; transform: translate(-50%, -50%) scale(1.08); }
@@ -816,25 +1012,31 @@ export default function SparkleTextPage() {
             pointerEvents:"none",
           }}/>
 
-          {/* the text itself */}
+          {/* the text itself — flow wrapper + gradient text */}
           <div style={{
             position:"relative", zIndex:2,
-            fontFamily: preset.fontFamily,
-            fontWeight: 800,
-            fontSize: `clamp(2.5rem, ${size / 10}vw, ${size}px)`,
-            lineHeight: 1.05,
-            textAlign:"center",
-            backgroundImage: preset.textGradient,
-            backgroundSize: "200% 200%",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-            WebkitTextFillColor: "transparent",
-            filter: `drop-shadow(${preset.shadow})`,
-            wordBreak:"break-word",
-            animation: paused ? "none" : "sparkleShift 8s ease-in-out infinite",
+            animation: paused ? "none" : "textFloat 4s ease-in-out infinite",
+            willChange: "transform",
           }}>
-            {text || "Sparkle"}
+            <div style={{
+              fontFamily: preset.fontFamily,
+              fontWeight: 800,
+              fontSize: `clamp(2.5rem, ${size / 10}vw, ${size}px)`,
+              lineHeight: 1.05,
+              textAlign:"center",
+              backgroundImage: preset.textGradient,
+              backgroundSize: "300% 300%",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              WebkitTextFillColor: "transparent",
+              filter: `drop-shadow(${preset.shadow})`,
+              wordBreak:"break-word",
+              animation: paused ? "none"
+                : "sparkleShift 8s ease-in-out infinite, textPulse 5s ease-in-out infinite",
+            }}>
+              {text || "Sparkle"}
+            </div>
           </div>
 
           {/* Recording badge */}
