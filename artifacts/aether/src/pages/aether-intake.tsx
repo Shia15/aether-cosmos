@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { extractPdfText, isPdfFile, isCodeFile } from "@/lib/pdf-extract";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
@@ -372,7 +373,15 @@ export default function AetherIntakeView() {
             setTimeout(() => extractTitle({ ...item, dataURL: url, status: "ready" }), 50);
           };
           r.readAsDataURL(f);
-        } else if (/\.txt$/i.test(f.name)) {
+        } else if (isPdfFile(f)) {
+          extractPdfText(f, 3000).then(text => {
+            updateQItem(item.id, { text, status: "ready" });
+            setTimeout(() => extractTitle({ ...item, text, status: "ready" }), 50);
+          }).catch(() => {
+            updateQItem(item.id, { status: "ready" });
+            setTimeout(() => extractTitle(item), 50);
+          });
+        } else if (isCodeFile(f.name) || /\.(txt|md|rst|csv)$/i.test(f.name)) {
           const r = new FileReader();
           r.onload = e => {
             const text = String(e.target?.result || "").slice(0, 3000);
@@ -623,7 +632,7 @@ export default function AetherIntakeView() {
       {/* Hidden file inputs */}
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" multiple style={{ display: "none" }}
         onChange={e => { addToQueue([...(e.target.files || [])]); e.target.value = ""; }} />
-      <input ref={uploadRef} type="file" accept="image/*,application/pdf,.txt,.doc,.docx,.pptx,.xlsx,.csv" multiple style={{ display: "none" }}
+      <input ref={uploadRef} type="file" accept="image/*,application/pdf,.txt,.md,.rst,.py,.ipynb,.js,.ts,.jsx,.tsx,.r,.m,.cpp,.c,.cs,.java,.go,.rs,.sh,.sql,.tex" multiple style={{ display: "none" }}
         onChange={e => { addToQueue([...(e.target.files || [])]); e.target.value = ""; }} />
 
       {/* Toast */}

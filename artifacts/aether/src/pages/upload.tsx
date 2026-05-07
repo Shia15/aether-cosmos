@@ -9,6 +9,7 @@ import {
   Tag, ChevronDown, CheckCircle2, Loader2, AlertCircle, Sparkles,
   Link2, Globe, Zap,
 } from "lucide-react";
+import { extractPdfText, isPdfFile, isCodeFile, isTextFile, docTypFromFilename } from "@/lib/pdf-extract";
 
 type AetherLayer = "auto" | "mnesis" | "infernia" | "aletheia" | "reverie";
 type DocType = "research" | "whitepaper" | "philosophical" | "technical" | "empirical" | "personal" | "other";
@@ -179,7 +180,7 @@ export default function UploadPage() {
   const [queue, setQueue] = useState<QueuedFile[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const readFile = (file: File): Promise<string> =>
+  const readFileAsText = (file: File): Promise<string> =>
     new Promise((res, rej) => {
       const reader = new FileReader();
       reader.onload = (e) => res(e.target?.result as string ?? "");
@@ -187,13 +188,29 @@ export default function UploadPage() {
       reader.readAsText(file);
     });
 
+  const extractContent = async (file: File): Promise<string> => {
+    if (isPdfFile(file)) {
+      try {
+        return await extractPdfText(file, 8000);
+      } catch {
+        return `[PDF: ${file.name} — text extraction failed, use manual entry]`;
+      }
+    }
+    return readFileAsText(file);
+  };
+
   const addFilesToQueue = useCallback(async (files: FileList | File[]) => {
     const arr = Array.from(files).filter(f =>
-      f.type === "text/plain" || f.name.endsWith(".txt") || f.name.endsWith(".md") || f.name.endsWith(".rst")
+      isPdfFile(f) || isTextFile(f) || isCodeFile(f.name)
     );
+    if (arr.length === 0) return;
     for (const file of arr) {
-      const content = await readFile(file);
-      const { layer, docType, source, tags } = analyzeContent(content, file.name);
+      const content = await extractContent(file);
+      const inferredDocType = docTypFromFilename(file.name);
+      const { layer, source, tags } = analyzeContent(content, file.name);
+      const docType: DocType = (["research","whitepaper","philosophical","technical","empirical","personal"].includes(inferredDocType)
+        ? inferredDocType
+        : analyzeContent(content, file.name).docType) as DocType;
       const qf: QueuedFile = {
         id: `${Date.now()}-${Math.random()}`,
         name: file.name,
@@ -379,7 +396,7 @@ export default function UploadPage() {
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".txt,.md,.rst,text/plain"
+              accept=".pdf,.txt,.md,.rst,.py,.ipynb,.js,.ts,.jsx,.tsx,.r,.m,.cpp,.c,.cs,.java,.go,.rs,.sh,.sql,.tex,text/plain,application/pdf"
               className="hidden"
               onChange={onFileInput}
             />
@@ -387,8 +404,9 @@ export default function UploadPage() {
             <div className="font-mono text-sm text-muted-foreground/60 mb-1">
               Drop files here or click to browse
             </div>
-            <div className="font-mono text-[10px] text-muted-foreground/30">
-              .txt · .md · .rst — multiple files supported
+            <div className="font-mono text-[10px] text-muted-foreground/30 space-y-0.5">
+              <div>.pdf · .txt · .md — white papers &amp; synthesis papers</div>
+              <div>.py · .ipynb · .js · .ts · .r · .sh — computation programs</div>
             </div>
             <button
               onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
