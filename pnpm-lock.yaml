@@ -166,6 +166,9 @@ importers:
 
   artifacts/aether:
     dependencies:
+      katex:
+        specifier: ^0.16.45
+        version: 0.16.45
       pdfjs-dist:
         specifier: ^5.7.284
         version: 5.7.284
@@ -1927,6 +1930,10 @@ packages:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
     engines: {node: '>=20'}
 
+  commander@8.3.0:
+    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
+    engines: {node: '>= 12'}
+
   compare-versions@6.1.1:
     resolution: {integrity: sha512-4hm4VPpIecmlg59CHXnRDnqGplJFrbLG4aFEl5vl6cK1u76ws3LLvX7ikFnTDl5vo39sjWD6AaDPYodJp/NNHg==}
 
@@ -2555,6 +2562,10 @@ packages:
   kapsule@1.16.3:
     resolution: {integrity: sha512-4+5mNNf4vZDSwPhKprKwz3330iisPrb08JyMgbsdFrimBCKNHecua/WBwvVg3n7vwx0C1ARjfhwIpbrbd9n5wg==}
     engines: {node: '>=12'}
+
+  katex@0.16.45:
+    resolution: {integrity: sha512-pQpZbdBu7wCTmQUh7ufPmLr0pFoObnGUoL/yhtwJDgmmQpbkg/0HSVti25Fu4rmd1oCR6NGWe9vqTWuWv3GcNA==}
+    hasBin: true
 
   leven@4.1.0:
     resolution: {integrity: sha512-KZ9W9nWDT7rF7Dazg8xyLHGLrmpgq2nVNFUckhqdW3szVP6YhCpp/RAnpmVExA9JvrMynjwSLVrEj3AepHR6ew==}
@@ -4776,6 +4787,8 @@ snapshots:
 
   commander@14.0.3: {}
 
+  commander@8.3.0: {}
+
   compare-versions@6.1.1: {}
 
   content-disposition@1.0.1: {}
@@ -5296,6 +5309,10 @@ snapshots:
   kapsule@1.16.3:
     dependencies:
       lodash-es: 4.17.23
+
+  katex@0.16.45:
+    dependencies:
+      commander: 8.3.0
 
   leven@4.1.0: {}
 
