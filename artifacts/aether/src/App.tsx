@@ -144,6 +144,7 @@ import QuantumGravityPage from "@/pages/quantum-gravity";
 import MathStudioPage from "@/pages/math-studio";
 import TritiumExtractPage from "@/pages/tritium-extract";
 import CrashoutPage from "@/pages/crashout";
+import CucaClosedLoopPage from "@/pages/cuca-closed-loop";
 import PhiTimePage from "@/pages/phi-time";
 import BioHybridMirrorPage from "@/pages/bio-hybrid-mirror";
 import MyceliumSubstratePage from "@/pages/mycelium-substrate";
@@ -261,6 +262,7 @@ function Router() {
         <Route path="/math-studio" component={MathStudioPage} />
         <Route path="/tritium-extract" component={TritiumExtractPage} />
         <Route path="/crashout" component={CrashoutPage} />
+        <Route path="/cuca-closed-loop" component={CucaClosedLoopPage} />
         <Route path="/phi-time" component={PhiTimePage} />
         <Route path="/bio-hybrid-mirror" component={BioHybridMirrorPage} />
         <Route path="/mycelium-substrate" component={MyceliumSubstratePage} />

@@ -240,6 +240,7 @@ const NAV_ITEMS = [
   { href: "/unified-synthesis",        label: "Unified Synthesis · Coherence of Life",  icon: Combine },
   { href: "/clcs-architecture",        label: "CLCS · Closed Loop Coherence System",    icon: Workflow },
   { href: "/aether-dashboard",         label: "AETHER Dashboard · Agent Console",       icon: LayoutDashboard },
+  { href: "/cuca-closed-loop",          label: "CUCA Closed Loop · Photosynthetic Quantum Engine", icon: Hexagon },
   { href: "/cuca-hybrid-skin",         label: "CUCA Hybrid Skin · Cephalopod + Reptile",icon: Hexagon },
   { href: "/cuca-gyroid",              label: "CUCA Gyroid v3.0 · 3D Photonic Floor",   icon: Pyramid },
   { href: "/aether-childrens-realm",   label: "AETHER Children's Realm · Library",       icon: Sparkles },
