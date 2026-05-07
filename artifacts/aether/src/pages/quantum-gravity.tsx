@@ -404,6 +404,7 @@ export default function QuantumGravityPage() {
               <div style={{ fontSize: 7, letterSpacing: 2, opacity: 0.5, marginBottom: 5 }}>EDGE INSPECTOR · e{hlEdge}</div>
               {(() => {
                 const e = netRef.current!.edges[hlEdge];
+                if (!e) return null;
                 const col = SPIN_COLS[e.j] ?? G;
                 const A = areaEigenvalue(e.j);
                 return (
