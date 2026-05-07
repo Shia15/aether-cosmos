@@ -137,6 +137,7 @@ import AquaCxePage from "@/pages/aqua-cxe";
 import CulturalInterpretationsPage from "@/pages/cultural-interpretations";
 import StackFabricPage from "@/pages/stack-fabric";
 import BioEnginePage from "@/pages/bio-engine";
+import BloodDNALabPage from "@/pages/blood-dna-lab";
 import PhiTimePage from "@/pages/phi-time";
 import BioHybridMirrorPage from "@/pages/bio-hybrid-mirror";
 import MyceliumSubstratePage from "@/pages/mycelium-substrate";
@@ -247,6 +248,7 @@ function Router() {
         <Route path="/cultural-interpretations" component={CulturalInterpretationsPage} />
         <Route path="/stack-fabric" component={StackFabricPage} />
         <Route path="/bio-engine" component={BioEnginePage} />
+        <Route path="/blood-dna-lab" component={BloodDNALabPage} />
         <Route path="/phi-time" component={PhiTimePage} />
         <Route path="/bio-hybrid-mirror" component={BioHybridMirrorPage} />
         <Route path="/mycelium-substrate" component={MyceliumSubstratePage} />
