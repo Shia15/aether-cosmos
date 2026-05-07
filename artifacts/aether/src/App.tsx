@@ -142,6 +142,7 @@ import CircularFarmPage from "@/pages/circular-farm";
 import EyeEvolutionPage from "@/pages/eye-evolution";
 import QuantumGravityPage from "@/pages/quantum-gravity";
 import MathStudioPage from "@/pages/math-studio";
+import TritiumExtractPage from "@/pages/tritium-extract";
 import PhiTimePage from "@/pages/phi-time";
 import BioHybridMirrorPage from "@/pages/bio-hybrid-mirror";
 import MyceliumSubstratePage from "@/pages/mycelium-substrate";
@@ -257,6 +258,7 @@ function Router() {
         <Route path="/eye-evolution" component={EyeEvolutionPage} />
         <Route path="/quantum-gravity" component={QuantumGravityPage} />
         <Route path="/math-studio" component={MathStudioPage} />
+        <Route path="/tritium-extract" component={TritiumExtractPage} />
         <Route path="/phi-time" component={PhiTimePage} />
         <Route path="/bio-hybrid-mirror" component={BioHybridMirrorPage} />
         <Route path="/mycelium-substrate" component={MyceliumSubstratePage} />

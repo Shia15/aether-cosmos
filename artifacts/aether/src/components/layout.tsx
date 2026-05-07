@@ -251,6 +251,7 @@ const NAV_ITEMS = [
   { href: "/substrate-synthesis",      label: "Substrate Studio · Live Photochem + Synthesis Bridges", icon: FlaskConical },
   { href: "/sparkle-text",             label: "Sparkle Studio · Sparkly Text Generator", icon: Sparkles },
   { href: "/math-studio",             label: "Math Studio · Equation Visualizer",        icon: Sigma },
+  { href: "/tritium-extract",         label: "Tritium Extract · AETHER Quantum Fusion",   icon: FlaskConical },
   { href: "/lunar-coherence",          label: "Lunar Coherence · Tides · Groundwater · Ambient Field", icon: Moon },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
