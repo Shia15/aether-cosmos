@@ -260,7 +260,7 @@ function renderToCanvas(canvas: HTMLCanvasElement, re: Float32Array, im: Float32
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BRIDGE CANVAS helpers
+// BRIDGE CANVAS helpers — dramatic sweep morph
 // ─────────────────────────────────────────────────────────────────────────────
 function drawBridge(
   canvas: HTMLCanvasElement,
@@ -270,85 +270,251 @@ function drawBridge(
 ) {
   const ctx = canvas.getContext("2d"); if (!ctx) return;
   const W = canvas.width, H = canvas.height;
-  ctx.clearRect(0, 0, W, H);
 
-  // lattice grid
-  ctx.strokeStyle = "rgba(180,126,248,0.18)";
-  ctx.lineWidth = 1;
-  for (let x = 60; x < W - 60; x += 44) {
-    for (let y = 40; y < H - 40; y += 44) {
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 44, y); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 44); ctx.stroke();
+  // Solid dark background (not transparent — ensures helix is always visible)
+  ctx.fillStyle = "rgb(2,6,16)";
+  ctx.fillRect(0, 0, W, H);
+
+  // Subtle bg split tint: left=lattice-blue, right=molecular-purple
+  const bgGrad = ctx.createLinearGradient(0, 0, W, 0);
+  bgGrad.addColorStop(0, "rgba(0,20,40,0.45)");
+  bgGrad.addColorStop(morphProgress * 0.8, "rgba(0,20,40,0.3)");
+  bgGrad.addColorStop(Math.min(1, morphProgress + 0.05), "rgba(20,0,40,0.4)");
+  bgGrad.addColorStop(1, "rgba(10,0,30,0.55)");
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  const sweepX = morphProgress * W;
+
+  // ── LATTICE (left, fades as sweep passes) ──────────────────────────────────
+  const gridFade = Math.max(0, 1 - morphProgress * 1.6);
+  if (gridFade > 0) {
+    ctx.lineWidth = 0.8;
+    for (let gx = 20; gx <= 460; gx += 38) {
+      for (let gy = 20; gy < H - 20; gy += 38) {
+        if (gx > sweepX) continue;
+        const distBehind = sweepX - gx;
+        const lineFade = Math.max(0, 1 - distBehind / 220) * gridFade;
+        if (lineFade <= 0.01) continue;
+        ctx.globalAlpha = lineFade * 0.22;
+        ctx.strokeStyle = "#b47ef8";
+        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(Math.min(gx + 38, sweepX), gy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + 38); ctx.stroke();
+      }
     }
+    ctx.globalAlpha = 1;
   }
 
-  // node pulses on lattice
-  nodePositions.forEach((pos, i) => {
-    const amp = 5 + Math.sin(t * 2.5 + i * 0.7) * 3;
-    const alpha = 0.5 + 0.4 * Math.sin(t + i);
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.arc(pos.x, pos.y, amp, 0, Math.PI * 2);
-    ctx.fillStyle = i < 11 ? "#00e5c0" : i < 20 ? "#4db8ff" : "#b47ef8";
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-
-  // connection threads between nearby nodes
-  ctx.strokeStyle = "rgba(0,229,192,0.08)";
-  ctx.lineWidth = 0.8;
+  // Connection threads between nodes (pre-sweep only)
+  ctx.lineWidth = 0.7;
   for (let a = 0; a < nodePositions.length; a++) {
-    for (let b = a + 1; b < nodePositions.length; b++) {
-      const dx = nodePositions[a].x - nodePositions[b].x;
-      const dy = nodePositions[a].y - nodePositions[b].y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 120) {
-        ctx.globalAlpha = (1 - dist / 120) * 0.4;
-        ctx.beginPath();
-        ctx.moveTo(nodePositions[a].x, nodePositions[a].y);
-        ctx.lineTo(nodePositions[b].x, nodePositions[b].y);
-        ctx.stroke();
+    if (nodePositions[a].x > sweepX) {
+      for (let b = a + 1; b < nodePositions.length; b++) {
+        if (nodePositions[b].x > sweepX) {
+          const dx = nodePositions[a].x - nodePositions[b].x;
+          const dy = nodePositions[a].y - nodePositions[b].y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 140) {
+            ctx.globalAlpha = (1 - d / 140) * 0.28 * gridFade;
+            ctx.strokeStyle = "#00e5c0";
+            ctx.beginPath();
+            ctx.moveTo(nodePositions[a].x, nodePositions[a].y);
+            ctx.lineTo(nodePositions[b].x, nodePositions[b].y);
+            ctx.stroke();
+          }
+        }
       }
     }
   }
   ctx.globalAlpha = 1;
 
-  // DNA origami helix morph
-  if (morphProgress > 0) {
-    ctx.globalAlpha = morphProgress;
-    const cx = W * 0.62, cy = H * 0.5;
-    ctx.strokeStyle = "#00e5c0";
-    ctx.lineWidth = 3;
-    for (let i = 0; i < 28; i++) {
-      const angle = i * 0.4 + t * 1.5;
-      const x1 = cx + Math.cos(angle) * 110 + Math.sin(angle * 4) * 36 * morphProgress;
-      const y1 = cy + Math.sin(angle) * 22 + i * 11 - 158;
-      const x2 = cx + Math.cos(angle + Math.PI) * 110 + Math.sin((angle + Math.PI) * 4) * 36 * morphProgress;
-      const y2 = cy + Math.sin(angle + Math.PI) * 22 + i * 11 - 158;
+  // Node pulses — pre-sweep pulse, post-sweep dissolve into particle trails
+  nodePositions.forEach((pos, i) => {
+    const col = i < 11 ? "#00e5c0" : i < 20 ? "#4db8ff" : "#b47ef8";
+    if (pos.x > sweepX) {
+      // Not yet swept — animated pulse
+      const amp = 5 + Math.sin(t * 2.5 + i * 0.7) * 2.5;
+      ctx.globalAlpha = 0.55 + 0.35 * Math.sin(t + i);
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, amp, 0, Math.PI * 2);
+      ctx.fillStyle = col;
+      ctx.shadowColor = col; ctx.shadowBlur = 10;
+      ctx.fill(); ctx.shadowBlur = 0;
+    } else {
+      // Swept — particles stream toward molecular center
+      const sweepAge = sweepX - pos.x;
+      const flyFrac = Math.min(1, sweepAge / 280);
+      const molCx = W * 0.70, molCy = H * 0.5;
+      // Target: spiral around DNA helix origin
+      const targetX = molCx + Math.cos(i * 0.93 + t * 0.3) * 72;
+      const targetY = molCy + Math.sin(i * 1.17 + t * 0.2) * 160;
+      for (let p = 0; p < 4; p++) {
+        const pf = Math.min(1, flyFrac * (1 - p * 0.08));
+        const px = pos.x + (targetX - pos.x) * pf;
+        const py = pos.y + (targetY - pos.y) * pf;
+        ctx.globalAlpha = Math.max(0, (1 - pf) * 0.6 * (1 - p * 0.2));
+        ctx.beginPath(); ctx.arc(px, py, 2.5 - p * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = col;
+        ctx.fill();
+      }
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  // ── SWEEP LINE — gold luminous wave ───────────────────────────────────────
+  if (morphProgress > 0 && morphProgress < 1) {
+    const gw = 36;
+    const sg = ctx.createLinearGradient(sweepX - gw, 0, sweepX + gw, 0);
+    sg.addColorStop(0, "rgba(201,162,39,0)");
+    sg.addColorStop(0.35, "rgba(240,190,50,0.35)");
+    sg.addColorStop(0.5, "rgba(255,225,80,0.95)");
+    sg.addColorStop(0.65, "rgba(240,190,50,0.35)");
+    sg.addColorStop(1, "rgba(201,162,39,0)");
+    ctx.fillStyle = sg;
+    ctx.fillRect(sweepX - gw, 0, gw * 2, H);
+    // Deterministic particles along sweep front
+    for (let pi = 0; pi < 28; pi++) {
+      const phase = (pi * 7.43 + t * 90) % H;
+      const jitter = Math.sin(t * 4.7 + pi * 1.3) * 14;
+      ctx.globalAlpha = 0.3 + 0.5 * Math.abs(Math.sin(t * 3.1 + pi));
       ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.quadraticCurveTo(cx, y1 + 24 * morphProgress, x2, y2);
-      ctx.stroke();
+      ctx.arc(sweepX + jitter, phase, 1.5 + Math.abs(Math.sin(t * 6 + pi)) * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffe060";
+      ctx.fill();
     }
-    // cross-rungs
-    ctx.lineWidth = 1.4;
-    ctx.strokeStyle = "rgba(0,229,192,0.5)";
-    for (let i = 0; i < 14; i++) {
-      const yy = cy - 146 + i * 22;
-      ctx.beginPath(); ctx.moveTo(cx - 100, yy); ctx.lineTo(cx + 100, yy); ctx.stroke();
-    }
-    // toroidal spiral ring
-    ctx.strokeStyle = "#b47ef8"; ctx.lineWidth = 1.5;
-    for (let i = 0; i < 60; i++) {
-      const theta = (i / 60) * Math.PI * 2;
-      const phi = theta * 4 + t;
-      const R2 = 90, r2 = 30 * morphProgress;
-      const ox = cx - 240, oy = cy;
-      const px = ox + (R2 + r2 * Math.cos(phi)) * Math.cos(theta);
-      const py = oy + (R2 + r2 * Math.cos(phi)) * Math.sin(theta) * 0.38;
-      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    ctx.globalAlpha = 1;
+  }
+
+  // ── MOLECULAR GEOMETRY (right, materialises as morph progresses) ──────────
+  if (morphProgress > 0.04) {
+    const mA = Math.min(1, (morphProgress - 0.04) / 0.55);
+    const cx = W * 0.70, cy = H * 0.5;
+    const helixH = 380, helixR = 68, nSeg = 80;
+    const helixTop = cy - helixH / 2;
+
+    ctx.globalAlpha = mA;
+
+    // Radial glow behind helix
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 260);
+    glow.addColorStop(0, "rgba(0,200,140,0.07)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // Strand α (teal)
+    ctx.strokeStyle = "#00e5c0";
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = "#00e5c0"; ctx.shadowBlur = 12;
+    ctx.beginPath();
+    for (let j = 0; j <= nSeg; j++) {
+      const frac = j / nSeg;
+      const y = helixTop + frac * helixH;
+      const angle = frac * Math.PI * 8 + t * 0.7;
+      const x = cx + Math.cos(angle) * helixR;
+      j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.stroke();
+
+    // Strand β (violet)
+    ctx.strokeStyle = "#b47ef8";
+    ctx.shadowColor = "#b47ef8";
+    ctx.beginPath();
+    for (let j = 0; j <= nSeg; j++) {
+      const frac = j / nSeg;
+      const y = helixTop + frac * helixH;
+      const angle = frac * Math.PI * 8 + t * 0.7 + Math.PI;
+      const x = cx + Math.cos(angle) * helixR;
+      j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Base pair rungs + node dots
+    for (let j = 0; j < 22; j++) {
+      const frac = j / 22;
+      const y = helixTop + frac * helixH;
+      const angle = frac * Math.PI * 8 + t * 0.7;
+      const x1 = cx + Math.cos(angle) * helixR;
+      const x2 = cx + Math.cos(angle + Math.PI) * helixR;
+      const rCol = j % 3 === 0 ? "#00e5c0" : j % 3 === 1 ? "#b47ef8" : "#4db8ff";
+      ctx.strokeStyle = rCol; ctx.lineWidth = 1.2;
+      ctx.globalAlpha = mA * 0.55;
+      ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+      ctx.globalAlpha = mA * 0.9;
+      ctx.fillStyle = rCol;
+      ctx.beginPath(); ctx.arc(x1, y, 2.8, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x2, y, 2.8, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = mA;
+
+    // Toroidal ring (CGLE phase governs curvature)
+    const tx = cx - 215, ty = cy;
+    const R2 = 72, r2 = 26 * Math.min(1, morphProgress * 2);
+    ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 2;
+    ctx.shadowColor = "#c9a227"; ctx.shadowBlur = 10;
+    ctx.beginPath();
+    for (let j = 0; j <= 120; j++) {
+      const theta = (j / 120) * Math.PI * 2;
+      const phi = theta * 5 + t * 1.1;
+      const px = tx + (R2 + r2 * Math.cos(phi)) * Math.cos(theta);
+      const py = ty + (R2 + r2 * Math.cos(phi)) * Math.sin(theta) * 0.46;
+      j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    // Inner ring
+    ctx.strokeStyle = "#b47ef8"; ctx.lineWidth = 1; ctx.shadowColor = "#b47ef8"; ctx.shadowBlur = 5;
+    ctx.beginPath();
+    for (let j = 0; j <= 100; j++) {
+      const theta = (j / 100) * Math.PI * 2;
+      const phi = theta * 3 - t * 0.9;
+      const px = tx + (R2 * 0.48 + r2 * 0.38 * Math.cos(phi)) * Math.cos(theta);
+      const py = ty + (R2 * 0.48 + r2 * 0.38 * Math.cos(phi)) * Math.sin(theta) * 0.46;
+      j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // CGLE phase dots on toroid surface
+    for (let j = 0; j < 16; j++) {
+      const theta = (j / 16) * Math.PI * 2 + t * 0.4;
+      const px = tx + R2 * Math.cos(theta);
+      const py = ty + R2 * Math.sin(theta) * 0.46;
+      const hue = (j * 22.5 + t * 25) % 360;
+      ctx.fillStyle = `hsl(${hue},100%,68%)`;
+      ctx.globalAlpha = mA * 0.75;
+      ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = mA;
+
+    // Dashed phase arrow: toroid → helix
+    if (morphProgress > 0.65) {
+      const arrowA = (morphProgress - 0.65) / 0.35;
+      ctx.globalAlpha = mA * arrowA * 0.55;
+      ctx.setLineDash([4, 5]);
+      ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(tx + R2, ty);
+      ctx.bezierCurveTo(tx + R2 + 50, ty, cx - helixR - 50, cy, cx - helixR - 4, cy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Labels (fade in near completion)
+    if (morphProgress > 0.72) {
+      const lA = Math.min(1, (morphProgress - 0.72) / 0.28);
+      ctx.globalAlpha = lA;
+      ctx.font = "bold 10px 'DM Mono',monospace";
+      ctx.fillStyle = "#00e5c0";
+      ctx.fillText("STRAND α · Immune", cx + helixR + 14, helixTop + helixH * 0.22);
+      ctx.fillStyle = "#b47ef8";
+      ctx.fillText("STRAND β · Neural", cx + helixR + 14, helixTop + helixH * 0.62);
+      ctx.fillStyle = "#c9a227";
+      ctx.fillText("TOROIDAL CURVATURE", tx - 52, ty - R2 - 14);
+      ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillStyle = "rgba(201,162,39,0.6)";
+      ctx.fillText("φ governed by CGLE phase", tx - 42, ty - R2);
+      ctx.fillStyle = "#4db8ff";
+      ctx.fillText("FLUID ↔ coupling", tx - 30, ty + R2 + 18);
+    }
     ctx.globalAlpha = 1;
   }
 }
@@ -356,7 +522,7 @@ function drawBridge(
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
-type View = "map" | "field" | "bridge" | "framework";
+type View = "map" | "field" | "bridge" | "molecular" | "framework";
 
 export default function LatticePage() {
   const [activeView, setActiveView] = useState<View>("map");
@@ -392,10 +558,10 @@ export default function LatticePage() {
   const [morphProgress, setMorphProgress] = useState(0);
   const morphRunningRef = useRef(false);
 
-  // Build deterministic node positions for bridge canvas
+  // Build deterministic node positions — left 35% of 1200px canvas so molecular geometry has room
   const NODE_POSITIONS = NODES.map((_, i) => ({
-    x: 60 + (i % 10) * 80 + Math.sin(i * 1.3) * 20,
-    y: 60 + Math.floor(i / 10) * 110 + Math.cos(i * 0.9) * 15,
+    x: 36 + (i % 6) * 58 + Math.sin(i * 1.3) * 10,
+    y: 55 + Math.floor(i / 6) * 104 + Math.cos(i * 0.9) * 12,
   }));
 
   // ── CGLE init ───────────────────────────────────────────────────────────────
@@ -475,11 +641,20 @@ export default function LatticePage() {
     if (morphRunningRef.current) return;
     morphRunningRef.current = true;
     morphRef.current = 0; setMorphProgress(0);
-    const interval = setInterval(() => {
-      morphRef.current = Math.min(1, morphRef.current + 0.025);
-      setMorphProgress(morphRef.current);
-      if (morphRef.current >= 1) { clearInterval(interval); morphRunningRef.current = false; }
-    }, 16);
+    const startMs = Date.now();
+    const duration = 3200;
+    const frame = () => {
+      const p = Math.min(1, (Date.now() - startMs) / duration);
+      morphRef.current = p; setMorphProgress(p);
+      if (p < 1) requestAnimationFrame(frame);
+      else morphRunningRef.current = false;
+    };
+    requestAnimationFrame(frame);
+  };
+
+  const resetMorph = () => {
+    morphRunningRef.current = false;
+    morphRef.current = 0; setMorphProgress(0);
   };
 
   // ── Node interactions ────────────────────────────────────────────────────────
@@ -499,11 +674,12 @@ export default function LatticePage() {
       n.body.toLowerCase().includes(searchQ.toLowerCase())
     ));
 
-  const VIEW_BTNS: Array<{ key: View; label: string; icon: string }> = [
-    { key:"map",       label:"≡ Body Map",    icon:"map" },
-    { key:"field",     label:"⟡ CGLE Field",  icon:"field" },
-    { key:"bridge",    label:"⟐ Bridge",      icon:"bridge" },
-    { key:"framework", label:"◈ Framework",   icon:"framework" },
+  const VIEW_BTNS: Array<{ key: View; label: string }> = [
+    { key:"map",       label:"≡ Body Map" },
+    { key:"field",     label:"⟡ CGLE Field" },
+    { key:"bridge",    label:"⟐ Bridge" },
+    { key:"molecular", label:"⬡ Molecular" },
+    { key:"framework", label:"◈ Framework" },
   ];
 
   const tauRegime = tau < 0.6
@@ -830,83 +1006,270 @@ export default function LatticePage() {
               style={{ width:"100%", height:"100%" }}
               width={1200} height={720} />
 
-            {/* Info overlay */}
-            <div className="absolute top-5 left-5 rounded-lg border p-4 w-80 z-10 backdrop-blur-xl"
-              style={{ background:"rgba(3,6,8,0.88)", borderColor:"#c9a22740" }}>
-              <div className="font-mono text-[9px] uppercase tracking-[0.25em] mb-2" style={{ color:"#c9a227" }}>
-                Conceptual Bridge
+            {/* ── Left control panel ───────────────────────────────────────────── */}
+            <div className="absolute top-5 left-5 rounded-xl border p-5 w-[300px] z-10 backdrop-blur-xl space-y-4"
+              style={{ background:"rgba(2,5,12,0.92)", borderColor:"#c9a22740" }}>
+              <div>
+                <div className="font-mono text-[9px] uppercase tracking-[0.25em] mb-1" style={{ color:"#c9a227" }}>
+                  Conceptual Bridge
+                </div>
+                <h3 className="font-serif text-sm text-foreground/90">Lattice → Molecular Geometry</h3>
               </div>
-              <h3 className="font-serif text-sm mb-3">Lattice (discrete CGLE) → Molecular Geometry</h3>
-              {morphProgress < 1 ? (
-                <p className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed mb-3">
-                  The 31-node body-systems lattice is the discrete skeleton of the CGLE field.<br /><br />
-                  Each node = a molecular site: cytokine receptor, tight junction, synaptic vesicle.<br /><br />
-                  Click <strong style={{ color:"#c9a227" }}>MORPH</strong> to project field phase onto a real molecular origami lattice.
-                </p>
-              ) : (
-                <p className="font-mono text-[9px] leading-relaxed mb-3" style={{ color:"#00e5c0" }}>
-                  Morph complete. Lattice points have become real molecular sites.<br /><br />
-                  CGLE phase now governs toroidal curvature of DNA origami nanostructures in living tissue.
+
+              {morphProgress === 0 && (
+                <p className="font-mono text-[9px] text-muted-foreground/45 leading-relaxed">
+                  31-node body-systems lattice = the discrete skeleton of the CGLE field.
+                  Each node becomes a molecular site. Watch the gold sweep transform the canvas.
                 </p>
               )}
-              <button onClick={runMorph} disabled={morphRunningRef.current}
-                className="w-full py-2.5 rounded border font-mono text-[10px] tracking-widest uppercase transition-all"
-                style={{
-                  background: morphProgress >= 1 ? "rgba(201,162,39,0.2)" : "rgba(201,162,39,0.08)",
-                  borderColor:"#c9a22760", color:"#c9a227",
-                  opacity: morphRunningRef.current ? 0.5 : 1,
-                }}>
-                {morphProgress >= 1 ? "✓ MORPH COMPLETE" : morphProgress > 0 ? `MORPHING — ${Math.round(morphProgress * 100)}%` : "MORPH LATTICE → MOLECULAR"}
-              </button>
+
               {morphProgress > 0 && morphProgress < 1 && (
-                <div className="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full transition-all duration-100" style={{ width:`${morphProgress * 100}%`, background:"#c9a227" }} />
+                <div className="space-y-2">
+                  <div className="flex justify-between font-mono text-[9px]" style={{ color:"#c9a227" }}>
+                    <span>MORPHING</span><span>{Math.round(morphProgress * 100)}%</span>
+                  </div>
+                  <div className="h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/10">
+                    <motion.div className="h-full rounded-full"
+                      style={{ width:`${morphProgress * 100}%`, background:"linear-gradient(90deg,#c9a227,#ffe060)" }}
+                      transition={{ duration: 0.05 }} />
+                  </div>
+                  <div className="font-mono text-[8px] text-muted-foreground/30 italic">
+                    Gold sweep dissolving lattice into molecular sites…
+                  </div>
                 </div>
+              )}
+
+              {morphProgress >= 1 && (
+                <div className="space-y-2">
+                  <div className="font-mono text-[9px] leading-relaxed" style={{ color:"#00e5c0" }}>
+                    ✓ Morph complete — CGLE phase now governs toroidal curvature of DNA origami nanostructures.
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    {[
+                      { label:"Strand α", color:"#00e5c0", desc:"Immune sites" },
+                      { label:"Strand β", color:"#b47ef8", desc:"Neural sites" },
+                      { label:"Toroid φ", color:"#c9a227", desc:"Phase curvature" },
+                      { label:"Fluid ↔",  color:"#4db8ff", desc:"Cross coupling" },
+                    ].map(s => (
+                      <div key={s.label} className="rounded border px-2 py-1.5"
+                        style={{ borderColor:`${s.color}30`, background:`${s.color}08` }}>
+                        <div className="font-mono text-[9px] font-bold" style={{ color:s.color }}>{s.label}</div>
+                        <div className="font-mono text-[8px] text-muted-foreground/35">{s.desc}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Main morph button */}
+              <button onClick={morphProgress >= 1 ? resetMorph : runMorph}
+                disabled={morphRunningRef.current && morphProgress < 1}
+                className="w-full py-3 rounded-lg border font-mono text-[10px] tracking-widest uppercase transition-all"
+                style={{
+                  background: morphProgress >= 1 ? "rgba(0,229,192,0.1)" : "rgba(201,162,39,0.1)",
+                  borderColor: morphProgress >= 1 ? "#00e5c060" : "#c9a22770",
+                  color: morphProgress >= 1 ? "#00e5c0" : "#c9a227",
+                  opacity: (morphRunningRef.current && morphProgress < 1) ? 0.5 : 1,
+                  boxShadow: morphProgress >= 1 ? "0 0 16px rgba(0,229,192,0.15)" : "none",
+                }}>
+                {morphProgress >= 1
+                  ? "↺ RESET MORPH"
+                  : morphProgress > 0
+                  ? `MORPHING ${Math.round(morphProgress * 100)}%…`
+                  : "⟐ MORPH LATTICE → MOLECULAR"}
+              </button>
+
+              {morphProgress >= 1 && (
+                <button onClick={() => setActiveView("molecular")}
+                  className="w-full py-2 rounded border font-mono text-[9px] tracking-widest uppercase transition-all"
+                  style={{ borderColor:"#b47ef830", color:"#b47ef8", background:"rgba(180,126,248,0.06)" }}>
+                  VIEW MOLECULAR ATLAS →
+                </button>
               )}
             </div>
 
-            {/* CLA equation overlay */}
-            <div className="absolute top-5 right-5 rounded-lg border p-4 z-10 backdrop-blur-xl max-w-xs"
-              style={{ background:"rgba(3,6,8,0.88)", borderColor:"#4db8ff20" }}>
+            {/* ── Right equation panel ──────────────────────────────────────────── */}
+            <div className="absolute top-5 right-5 rounded-xl border p-4 z-10 backdrop-blur-xl w-64"
+              style={{ background:"rgba(2,5,12,0.92)", borderColor:"#4db8ff20" }}>
               <div className="font-mono text-[8px] uppercase tracking-widest mb-2" style={{ color:"#4db8ff" }}>
                 AETHER-CLA Governing Equation
               </div>
-              <div className="font-mono text-[10px] p-3 rounded" style={{ background:"rgba(0,0,0,0.4)", color:"#a0f0ff", lineHeight:1.6 }}>
-                ∂A_X/∂t = μA_X +<br />
-                &nbsp;&nbsp;(1+iα)∇²A_X −<br />
-                &nbsp;&nbsp;(1+iβ)|A_X|²A_X +<br />
-                &nbsp;&nbsp;Σ_Y ε_XY A_Y
+              <div className="font-mono text-[10px] p-3 rounded space-y-0.5" style={{ background:"rgba(0,0,0,0.4)", color:"#a0f0ff", lineHeight:1.7 }}>
+                <div><span className="text-sky-300">∂A_X</span><span className="text-white/30">/∂t =</span></div>
+                <div className="pl-2"><span className="text-purple-300">μ A_X</span><span className="text-white/30"> +</span></div>
+                <div className="pl-2"><span className="text-orange-300">(1+iα)∇²A_X</span><span className="text-white/30"> −</span></div>
+                <div className="pl-2"><span className="text-red-300">(1+iβ)|A_X|²A_X</span><span className="text-white/30"> +</span></div>
+                <div className="pl-2"><span className="text-yellow-300">Σ_Y ε_XY A_Y</span></div>
               </div>
-              <div className="mt-2 space-y-1">
+              <div className="mt-3 space-y-1.5">
                 {[
-                  { sym:"μ, α, β", def:"growth, dispersion, nonlinearity" },
-                  { sym:"ε_XY",    def:"Mnēsis cross-domain coupling" },
-                  { sym:"A_X",     def:"field amplitude (body system X)" },
+                  { sym:"μ, α, β", color:"#c084fc", def:"growth · dispersion · nonlinearity" },
+                  { sym:"ε_XY",    color:"#4db8ff", def:"Mnēsis cross-domain coupling" },
+                  { sym:"A_X",     color:"#00e5c0", def:"field amplitude (body system X)" },
                 ].map(r => (
-                  <div key={r.sym} className="flex gap-2 font-mono text-[8px]">
-                    <span style={{ color:"#4db8ff", minWidth:36 }}>{r.sym}</span>
-                    <span className="text-muted-foreground/40">{r.def}</span>
+                  <div key={r.sym} className="flex gap-2 font-mono text-[8px] items-start">
+                    <span style={{ color:r.color, minWidth:40, flexShrink:0 }}>{r.sym}</span>
+                    <span className="text-muted-foreground/35 leading-snug">{r.def}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Status */}
-            <div className="absolute bottom-5 right-5 font-mono text-[9px] px-4 py-1.5 rounded-full border z-10"
-              style={{ background:"rgba(0,229,192,0.08)", borderColor:"rgba(0,229,192,0.25)", color:"#00e5c0" }}>
-              <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 animate-pulse" style={{ background:"#00e5c0" }} />
-              BRIDGE ACTIVE • {NODES.length}-node lattice
-            </div>
-
-            {/* Phase → geometry note */}
-            <div className="absolute bottom-5 left-5 font-mono text-[8px] px-3 py-1.5 rounded border z-10"
-              style={{ background:"rgba(3,6,8,0.85)", borderColor:"#b47ef820", color:"#b47ef8" }}>
-              Phase → geometry mapping • Toroidal flow preserved
+            {/* ── Bottom status bar ─────────────────────────────────────────────── */}
+            <div className="absolute bottom-5 left-0 right-0 flex justify-between items-end px-5 z-10 pointer-events-none">
+              <div className="font-mono text-[8px] px-3 py-1.5 rounded-lg border"
+                style={{ background:"rgba(2,5,12,0.85)", borderColor:"#b47ef825", color:"#b47ef8" }}>
+                Phase → geometry mapping • Toroidal flow preserved
+              </div>
+              <div className="flex items-center gap-4">
+                {morphProgress > 0 && morphProgress < 1 && (
+                  <div className="font-mono text-[9px] px-3 py-1.5 rounded-lg border"
+                    style={{ background:"rgba(201,162,39,0.12)", borderColor:"rgba(201,162,39,0.4)", color:"#c9a227" }}>
+                    <motion.span animate={{ opacity:[1,0.4,1] }} transition={{ duration:0.7, repeat:Infinity }}>
+                      ◉
+                    </motion.span>
+                    <span className="ml-1.5">SWEEP {Math.round(morphProgress * 100)}%</span>
+                  </div>
+                )}
+                <div className="font-mono text-[9px] px-4 py-1.5 rounded-full border"
+                  style={{ background:"rgba(0,229,192,0.08)", borderColor:"rgba(0,229,192,0.25)", color:"#00e5c0" }}>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full mr-2 animate-pulse" style={{ background:"#00e5c0" }} />
+                  BRIDGE ACTIVE • {NODES.length}-node lattice
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
+
         {/* ═══════════════════════════════════════════════════════════════════════
-            VIEW 4 — CLA INTEGRATION FRAMEWORK
+            VIEW 4 — MOLECULAR SITE ATLAS
+        ════════════════════════════════════════════════════════════════════════ */}
+        {activeView === "molecular" && (
+          <motion.div key="molecular"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 overflow-y-auto px-8 py-7 space-y-7">
+
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-primary/50 mb-2">
+                  Post-Morph · DNA Origami Site Atlas
+                </div>
+                <h2 className="font-serif text-2xl text-foreground/90 mb-2">
+                  Molecular Site Mapping
+                </h2>
+                <p className="font-mono text-[10px] text-muted-foreground/40 leading-relaxed max-w-2xl">
+                  Each of the 31 body-system lattice nodes corresponds to a discrete molecular site.
+                  The CGLE phase angle at that node governs the local curvature of the DNA origami nanostructure.
+                  {morphProgress < 1 && (
+                    <span className="ml-1" style={{ color:"#c9a227" }}>
+                      Run the Bridge morph to see live phase values.
+                    </span>
+                  )}
+                </p>
+              </div>
+              <button onClick={() => setActiveView("bridge")}
+                className="flex-shrink-0 font-mono text-[9px] px-4 py-2 rounded-lg border transition-all"
+                style={{ borderColor:"#c9a22740", color:"#c9a227", background:"rgba(201,162,39,0.06)" }}>
+                ← BACK TO BRIDGE
+              </button>
+            </div>
+
+            {/* Legend */}
+            <div className="flex items-center gap-5">
+              {([
+                { color:"#00e5c0", label:"Immune (11 sites)" },
+                { color:"#4db8ff", label:"Fluid (9 sites)" },
+                { color:"#b47ef8", label:"Neural (11 sites)" },
+              ] as const).map(s => (
+                <div key={s.label} className="flex items-center gap-2 font-mono text-[9px] text-muted-foreground/50">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: s.color }} />
+                  {s.label}
+                </div>
+              ))}
+            </div>
+
+            {/* Site table */}
+            <div className="rounded-xl border border-border/25 overflow-hidden">
+              {/* Header */}
+              <div className="grid grid-cols-[2fr_1.2fr_2fr_2fr_1fr] border-b border-border/25">
+                {["Body Node", "System", "Molecular Site", "CGLE Role", "Phase θ"].map(h => (
+                  <div key={h} className="px-4 py-2.5 font-mono text-[8px] uppercase tracking-widest text-muted-foreground/30 border-r border-border/15 last:border-r-0">
+                    {h}
+                  </div>
+                ))}
+              </div>
+              {NODES.map((node, i) => {
+                const molSites: Record<string, { site: string; role: string }> = {
+                  "hsc":   { site:"Pluripotent signaling hub",    role:"Field amplitude seed" },
+                  "mye":   { site:"Myeloid receptor complex",     role:"Amplitude node (Mnēsis)" },
+                  "bce":   { site:"BCR signaling scaffold",       role:"Pattern boundary" },
+                  "tce":   { site:"TCR immunological synapse",    role:"Coherence gate (Aletheia)" },
+                  "nke":   { site:"NK activating receptor",       role:"Inhibitor coupling site" },
+                  "dc":    { site:"Antigen-presenting MHC II",    role:"Cross-domain ε seed" },
+                  "macro": { site:"Toll-like receptor cluster",   role:"INFERNIA chaos input" },
+                  "mast":  { site:"IgE-FcεRI complex",            role:"Nonlinear damping β" },
+                  "eosi":  { site:"Eosinophil granule release",   role:"Amplitude burst node" },
+                  "baso":  { site:"Histamine vesicle membrane",   role:"Phase modulator" },
+                  "treg":  { site:"FOXP3+ suppressor junction",   role:"τ-coupling attractor" },
+                  "cap":   { site:"Endothelial tight junction",   role:"Fluid boundary node" },
+                  "lym":   { site:"Lymphatic valve cusp",         role:"Flow coherence channel" },
+                  "ven":   { site:"Venous sinusoid surface",      role:"Pressure wave node" },
+                  "arte":  { site:"Arterial tunica media",        role:"Pulse phase generator" },
+                  "glom":  { site:"Glomerular filtration slit",   role:"Gradient boundary" },
+                  "csfp":  { site:"Choroid plexus epithelium",    role:"CSF phase seed" },
+                  "bile":  { site:"Hepatic bile canaliculus",     role:"Metabolite flux node" },
+                  "syno":  { site:"Synovial membrane surface",    role:"Pressure damping node" },
+                  "peri":  { site:"Peritubular capillary",        role:"Ion gradient coupling" },
+                  "ast":   { site:"Astrocyte end-foot",           role:"BBB phase anchor" },
+                  "syn":   { site:"Synaptic vesicle docking",     role:"REVERIE output node" },
+                  "mye2":  { site:"Myelin paranodal junction",    role:"Propagation gate" },
+                  "mic":   { site:"Microglial synapse pruning",   role:"Phase reset trigger" },
+                  "oli":   { site:"Oligodendrocyte wrapping",     role:"Insulation attractor" },
+                  "drgn":  { site:"DRG nociceptor terminal",      role:"Pain-field node" },
+                  "ento":  { site:"Enteric neural plexus",        role:"Gut-field oscillator" },
+                  "nmd":   { site:"Neuromuscular junction",       role:"Motor output node" },
+                  "cer":   { site:"Cerebellar Purkinje cell",     role:"Timing coherence gate" },
+                  "hyp":   { site:"Hypothalamic median eminence", role:"Neuroendocrine anchor" },
+                  "pin":   { site:"Pineal melatonin vesicle",     role:"Circadian phase lock" },
+                };
+                const info = molSites[node.id] ?? { site:"Molecular origami site", role:"Phase coupling node" };
+                const theta = morphProgress > 0
+                  ? (((i * 137.5 + morphProgress * 360) % 360)).toFixed(1) + "°"
+                  : "—";
+                return (
+                  <div key={node.id}
+                    className="grid grid-cols-[2fr_1.2fr_2fr_2fr_1fr] border-b border-border/10 last:border-b-0 hover:bg-white/[0.015] transition-colors">
+                    <div className="px-4 py-3 border-r border-border/10 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: node.color }} />
+                      <span className="font-serif text-[11px] text-foreground/70">{node.title}</span>
+                    </div>
+                    <div className="px-4 py-3 border-r border-border/10">
+                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded"
+                        style={{ background:`${node.color}18`, color: node.color }}>
+                        {node.col.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="px-4 py-3 border-r border-border/10 font-mono text-[9px] text-muted-foreground/50 flex items-center">
+                      {info.site}
+                    </div>
+                    <div className="px-4 py-3 border-r border-border/10 font-mono text-[9px] text-muted-foreground/35 flex items-center italic">
+                      {info.role}
+                    </div>
+                    <div className="px-4 py-3 font-mono text-[10px] flex items-center"
+                      style={{ color: morphProgress > 0 ? node.color : "rgba(100,120,140,0.4)" }}>
+                      {theta}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="h-8" />
+          </motion.div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════════
+            VIEW 5 — CLA INTEGRATION FRAMEWORK
         ════════════════════════════════════════════════════════════════════════ */}
         {activeView === "framework" && (
           <motion.div key="framework"
