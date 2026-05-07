@@ -144,6 +144,24 @@ function CodeBlock({ lines, color = "#67e8f9", tick }: { lines: string[]; color?
   );
 }
 
+// ── Folder line (animated reveal) ────────────────────────────────────────
+function FolderLine({ indent, label, delay }: { indent: number; label: string; delay: number }) {
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setVis(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+  return (
+    <div style={{
+      paddingLeft: indent * 18,
+      opacity: vis ? 1 : 0,
+      transform: vis ? "translateX(0)" : "translateX(-10px)",
+      transition: "all 0.5s ease",
+      lineHeight: "2",
+    }}>{label}</div>
+  );
+}
+
 // ── Pages ─────────────────────────────────────────────────────────────────
 const PAGES: Page[] = [
   {
@@ -277,19 +295,9 @@ const PAGES: Page[] = [
             { indent: 1, label: "📁 linux-notes/", delay: 600 },
             { indent: 2, label: "📄 commands.txt", delay: 800 },
             { indent: 1, label: "📁 python-notes/", delay: 1000 },
-          ].map((item, i) => {
-            const [vis, setVis] = useState(false);
-            useEffect(() => { const t = setTimeout(() => setVis(true), item.delay); return () => clearTimeout(t); }, []);
-            return (
-              <div key={i} style={{
-                paddingLeft: item.indent * 18,
-                opacity: vis ? 1 : 0,
-                transform: vis ? "translateX(0)" : "translateX(-10px)",
-                transition: "all 0.5s ease",
-                lineHeight: "2",
-              }}>{item.label}</div>
-            );
-          })}
+          ].map((item, i) => (
+            <FolderLine key={i} indent={item.indent} label={item.label} delay={item.delay} />
+          ))}
         </div>
         <p style={{
           fontFamily: "monospace", fontSize: 11, color: "#ffffff40",
