@@ -248,7 +248,25 @@ const TERM_TYPE_LABELS: Record<string, string> = {
   [C.coh]: "AETHER Coherence", [C.lqg]: "Quantum / Planck",
 };
 
-// ── Mini canvas: animated Fibonacci background ───────────────────────────────
+// ── Sunset ombré palette ──────────────────────────────────────────────────────
+// Gold → Amber → Orange → Rose → Fuchsia → Violet → Sky
+const SUNSET = ["#fbbf24","#f59e0b","#f97316","#fb7185","#ec4899","#c084fc","#818cf8","#06b6d4"];
+function sunsetColor(t: number, i: number): string {
+  const idx = ((i * 0.08 + t * 0.002) % 1 + 1) % 1;
+  const n = SUNSET.length - 1;
+  const lo = Math.floor(idx * n), hi = Math.min(lo + 1, n);
+  const mix = idx * n - lo;
+  const hex = (a: string, b: string, m: number) => {
+    const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+    const r = Math.round(((pa >> 16) & 0xff) * (1 - m) + ((pb >> 16) & 0xff) * m);
+    const g = Math.round(((pa >>  8) & 0xff) * (1 - m) + ((pb >>  8) & 0xff) * m);
+    const bl = Math.round(( pa        & 0xff) * (1 - m) + ( pb        & 0xff) * m);
+    return `rgb(${r},${g},${bl})`;
+  };
+  return hex(SUNSET[lo], SUNSET[hi], mix);
+}
+
+// ── Mini canvas: animated Fibonacci background (sunset ombré) ─────────────────
 function usePhiBg(ref: React.RefObject<HTMLCanvasElement | null>) {
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
@@ -261,15 +279,16 @@ function usePhiBg(ref: React.RefObject<HTMLCanvasElement | null>) {
       ctx.clearRect(0, 0, W, H);
       const cx = W / 2, cy = H / 2;
       const R = Math.min(W, H) * 0.45;
-      const φv = 1.618;
-      const ga = 2 * Math.PI / (φv * φv);
-      for (let i = 0; i < 120; i++) {
-        const r = R * Math.sqrt((i + 1) / 120);
+      const ga = 2 * Math.PI / (1.618 * 1.618);
+      for (let i = 0; i < 144; i++) {
+        const r = R * Math.sqrt((i + 1) / 144);
         const a = i * ga + t * 0.003;
         const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
-        const hue = (i * 3 + t * 0.5) % 360;
-        ctx.beginPath(); ctx.arc(x, y, 1.5 + (i % 5 === 0 ? 1 : 0), 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${hue},80%,60%,${0.12 + 0.06 * Math.sin(t * 0.04 + i * 0.3)})`;
+        const alpha = 0.10 + 0.07 * Math.sin(t * 0.04 + i * 0.3);
+        const sz = 1.4 + (i % 8 === 0 ? 1.8 : 0);
+        const col = sunsetColor(t, i);
+        ctx.beginPath(); ctx.arc(x, y, sz, 0, Math.PI * 2);
+        ctx.fillStyle = col.replace("rgb(", "rgba(").replace(")", `,${alpha})`);
         ctx.fill();
       }
       t++; raf = requestAnimationFrame(draw);
@@ -279,38 +298,154 @@ function usePhiBg(ref: React.RefObject<HTMLCanvasElement | null>) {
   }, []);
 }
 
+// ── Saved entry type ──────────────────────────────────────────────────────────
+const LS_SAVED = "aether.mathstudio.saved.v1";
+interface SavedEntry { id: string; name: string; mode: string; latex: string; text: string; ts: number }
+function loadSaved(): SavedEntry[] {
+  try { return JSON.parse(localStorage.getItem(LS_SAVED) ?? "[]"); }
+  catch { return []; }
+}
+
+// ── Mixed renderer: splits input on $...$ and $$...$$ ─────────────────────────
+function renderMixed(input: string): string {
+  const parts: string[] = [];
+  let rem = input;
+  while (rem.length) {
+    // display math $$...$$
+    const d = rem.indexOf("$$");
+    if (d !== -1) {
+      const d2 = rem.indexOf("$$", d + 2);
+      if (d2 !== -1) {
+        if (d > 0) parts.push(`<span class="ms-text">${escHtml(rem.slice(0, d))}</span>`);
+        const inner = rem.slice(d + 2, d2);
+        parts.push(k(inner));
+        rem = rem.slice(d2 + 2); continue;
+      }
+    }
+    // inline math $...$
+    const s = rem.indexOf("$");
+    if (s !== -1) {
+      const s2 = rem.indexOf("$", s + 1);
+      if (s2 !== -1) {
+        if (s > 0) parts.push(`<span class="ms-text">${escHtml(rem.slice(0, s))}</span>`);
+        const inner = rem.slice(s + 1, s2);
+        parts.push(`<span class="ms-inline-katex">${k(inner)}</span>`);
+        rem = rem.slice(s2 + 1); continue;
+      }
+    }
+    parts.push(`<span class="ms-text">${escHtml(rem)}</span>`);
+    break;
+  }
+  return parts.join("");
+}
+
+function escHtml(s: string): string {
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 export default function MathStudioPage() {
   const bgRef = useRef<HTMLCanvasElement>(null);
   usePhiBg(bgRef);
 
-  const [selectedId, setSelectedId] = useState("kuramoto");
-  const [activeCat, setActiveCat]   = useState<string | null>(null);
-  const [customTex, setCustomTex]   = useState("");
-  const [customError, setCustomError] = useState("");
-  const [showCustom, setShowCustom]   = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [selectedId,  setSelectedId]  = useState("kuramoto");
+  const [activeCat,   setActiveCat]   = useState<string | null>(null);
+  const [showCustom,  setShowCustom]  = useState(false);
+  const [inputMode,   setInputMode]   = useState<"latex" | "text" | "mixed">("latex");
+  const [customTex,   setCustomTex]   = useState("");
+  const [customText,  setCustomText]  = useState("");
+  const [saveName,    setSaveName]    = useState("");
+  const [showSaveBar, setShowSaveBar] = useState(false);
+  const [saved,       setSaved]       = useState<SavedEntry[]>(loadSaved);
+  const [loadId,      setLoadId]      = useState("");
+  const [copied,      setCopied]      = useState(false);
+  const [saveFlash,   setSaveFlash]   = useState(false);
 
   const eq = EQUATIONS.find(e => e.id === selectedId) ?? EQUATIONS[0];
-  const displayTex = showCustom ? customTex : eq.tex;
 
-  const rendered = (() => {
-    try {
-      return katex.renderToString(displayTex, {
-        throwOnError: true, output: "html", trust: true,
-        macros: { "\\textcolor": true },
-        displayMode: true,
-      });
-    } catch (err) {
-      return katex.renderToString(displayTex, { throwOnError: false, output: "html", trust: true, displayMode: true });
+  // What source text to copy / save
+  const sourceForCopy = showCustom
+    ? (inputMode === "text" ? customText : inputMode === "mixed" ? customText : customTex)
+    : eq.tex;
+
+  // Rendered HTML for the center panel
+  const rendered: string = (() => {
+    if (!showCustom) {
+      try {
+        return katex.renderToString(eq.tex, {
+          throwOnError: true, output: "html", trust: true, displayMode: true,
+        });
+      } catch {
+        return katex.renderToString(eq.tex, { throwOnError: false, output: "html", trust: true, displayMode: true });
+      }
     }
+    if (inputMode === "latex") {
+      try {
+        return katex.renderToString(customTex, {
+          throwOnError: true, output: "html", trust: true, displayMode: true,
+        });
+      } catch {
+        return katex.renderToString(customTex, { throwOnError: false, output: "html", trust: true, displayMode: true });
+      }
+    }
+    if (inputMode === "text") {
+      // Pure text — wrap lines with sunset spans
+      return customText.split("\n").map((line, li) =>
+        `<div class="ms-textline" style="--li:${li}">${escHtml(line) || "&nbsp;"}</div>`
+      ).join("");
+    }
+    // Mixed
+    return renderMixed(customText);
   })();
 
   const filtered = EQUATIONS.filter(e => !activeCat || e.cat === activeCat);
-
   const mono: React.CSSProperties = { fontFamily: "'Courier New', monospace" };
   const G   = "#00ff88";
   const BRD = "rgba(0,255,136,0.12)";
+
+  // Save to localStorage
+  const handleSave = () => {
+    if (!saveName.trim()) return;
+    const entry: SavedEntry = {
+      id: `${Date.now()}`, name: saveName.trim(), mode: inputMode,
+      latex: customTex, text: customText, ts: Date.now(),
+    };
+    const next = [entry, ...saved].slice(0, 40);
+    setSaved(next);
+    localStorage.setItem(LS_SAVED, JSON.stringify(next));
+    setSaveName(""); setShowSaveBar(false);
+    setSaveFlash(true); setTimeout(() => setSaveFlash(false), 1800);
+  };
+
+  // Load a saved entry
+  const handleLoad = (id: string) => {
+    const e = saved.find(s => s.id === id); if (!e) return;
+    setInputMode(e.mode as "latex" | "text" | "mixed");
+    setCustomTex(e.latex); setCustomText(e.text);
+    setShowCustom(true); setLoadId("");
+  };
+
+  // Delete saved
+  const handleDelete = (id: string) => {
+    const next = saved.filter(s => s.id !== id);
+    setSaved(next);
+    localStorage.setItem(LS_SAVED, JSON.stringify(next));
+  };
+
+  // Copy to clipboard
+  const handleCopy = () => {
+    navigator.clipboard.writeText(sourceForCopy).then(() => {
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      // fallback for insecure contexts
+      const ta = document.createElement("textarea");
+      ta.value = sourceForCopy;
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11, position: "relative" }}>
@@ -323,11 +458,20 @@ export default function MathStudioPage() {
         {/* Header */}
         <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BRD}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span style={{ fontSize: 12, letterSpacing: 4, fontWeight: 700 }}>AETHER MATH STUDIO</span>
-          <span style={{ fontSize: 8, opacity: 0.4 }}>colorized equations · term breakdown · {EQUATIONS.length} AETHER formulas</span>
-          <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-            <button onClick={() => setShowCustom(s => !s)}
-              style={{ background: showCustom ? "rgba(251,191,36,0.15)" : "rgba(0,255,136,0.08)", border: `1px solid ${showCustom ? "#fbbf2460" : "rgba(0,255,136,0.3)"}`, color: showCustom ? "#fbbf24" : G, borderRadius: 4, padding: "2px 12px", cursor: "pointer", fontSize: 9 }}>
-              {showCustom ? "✦ CUSTOM MODE" : "✦ CUSTOM LaTeX"}
+          <span style={{ fontSize: 8, opacity: 0.4 }}>colorized equations · term breakdown · {EQUATIONS.length} formulas · text + LaTeX input</span>
+          <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
+            {showCustom && saved.length > 0 && (
+              <select
+                value={loadId}
+                onChange={e => { setLoadId(e.target.value); handleLoad(e.target.value); }}
+                style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.55)", borderRadius: 4, padding: "2px 6px", fontSize: 8, cursor: "pointer", ...mono }}>
+                <option value="">load saved…</option>
+                {saved.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            )}
+            <button onClick={() => { setShowCustom(s => !s); }}
+              style={{ background: showCustom ? "rgba(251,191,36,0.15)" : "rgba(0,255,136,0.08)", border: `1px solid ${showCustom ? "#fbbf2460" : "rgba(0,255,136,0.3)"}`, color: showCustom ? "#fbbf24" : G, borderRadius: 4, padding: "2px 12px", cursor: "pointer", fontSize: 9, ...mono }}>
+              {showCustom ? "✦ CUSTOM MODE" : "✦ CUSTOM INPUT"}
             </button>
           </div>
         </div>
@@ -340,6 +484,11 @@ export default function MathStudioPage() {
               <span style={{ fontSize: 7, color: col, opacity: 0.8, letterSpacing: 1 }}>{label}</span>
             </div>
           ))}
+          {/* Sunset swatch */}
+          <div style={{ padding: "4px 10px", display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+            {SUNSET.map(c => <div key={c} style={{ width: 6, height: 6, borderRadius: "50%", background: c }} />)}
+            <span style={{ fontSize: 7, color: "rgba(255,255,255,0.3)", marginLeft: 3, letterSpacing: 1 }}>sunset ombré</span>
+          </div>
         </div>
 
         {/* Main 3-panel */}
@@ -347,7 +496,6 @@ export default function MathStudioPage() {
 
           {/* LEFT — Equation library */}
           <div style={{ borderRight: `1px solid ${BRD}`, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-            {/* Category filters */}
             <div style={{ padding: "6px 8px", borderBottom: `1px solid ${BRD}`, display: "flex", flexWrap: "wrap", gap: 4 }}>
               <button onClick={() => setActiveCat(null)}
                 style={{ fontSize: 7, padding: "2px 7px", borderRadius: 12, border: `1px solid ${activeCat === null ? G : "rgba(255,255,255,0.1)"}`, background: activeCat === null ? "rgba(0,255,136,0.1)" : "transparent", color: activeCat === null ? G : "rgba(255,255,255,0.4)", cursor: "pointer" }}>
@@ -360,109 +508,218 @@ export default function MathStudioPage() {
                 </button>
               ))}
             </div>
-
-            {/* Equation list */}
             <div style={{ flex: 1, overflowY: "auto" }}>
               {filtered.map(e => (
                 <button key={e.id} onClick={() => { setSelectedId(e.id); setShowCustom(false); }}
-                  style={{ width: "100%", textAlign: "left", padding: "7px 10px", borderBottom: `1px solid rgba(255,255,255,0.04)`, background: selectedId === e.id ? "rgba(0,255,136,0.07)" : "transparent", border: "none", borderLeft: selectedId === e.id ? `2px solid ${G}` : "2px solid transparent", cursor: "pointer", display: "block" }}>
-                  <div style={{ fontSize: 8, color: selectedId === e.id ? G : "rgba(255,255,255,0.5)", fontWeight: selectedId === e.id ? 700 : 400, letterSpacing: 1, ...mono }}>{e.label}</div>
+                  style={{ width: "100%", textAlign: "left", padding: "7px 10px", borderBottom: `1px solid rgba(255,255,255,0.04)`, background: selectedId === e.id && !showCustom ? "rgba(0,255,136,0.07)" : "transparent", border: "none", borderLeft: selectedId === e.id && !showCustom ? `2px solid ${G}` : "2px solid transparent", cursor: "pointer", display: "block" }}>
+                  <div style={{ fontSize: 8, color: selectedId === e.id && !showCustom ? G : "rgba(255,255,255,0.5)", fontWeight: selectedId === e.id && !showCustom ? 700 : 400, letterSpacing: 1, ...mono }}>{e.label}</div>
                   <div style={{ fontSize: 7, color: "#fbbf2470", marginTop: 2, ...mono }}>{e.cat}</div>
                 </button>
               ))}
+              {/* Saved custom entries */}
+              {saved.length > 0 && (
+                <>
+                  <div style={{ padding: "5px 10px", fontSize: 7, color: "rgba(255,255,255,0.2)", letterSpacing: 2, borderTop: `1px solid ${BRD}` }}>SAVED</div>
+                  {saved.map(s => (
+                    <div key={s.id} style={{ display: "flex", alignItems: "center", borderBottom: `1px solid rgba(255,255,255,0.04)` }}>
+                      <button onClick={() => handleLoad(s.id)}
+                        style={{ flex: 1, textAlign: "left", padding: "5px 10px", background: "transparent", border: "none", cursor: "pointer" }}>
+                        <div style={{ fontSize: 8, color: "#c084fc", ...mono }}>{s.name}</div>
+                        <div style={{ fontSize: 6, color: "rgba(255,255,255,0.2)", ...mono }}>{s.mode}</div>
+                      </button>
+                      <button onClick={() => handleDelete(s.id)} style={{ padding: "4px 6px", background: "transparent", border: "none", color: "rgba(255,255,255,0.2)", cursor: "pointer", fontSize: 10 }}>×</button>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
 
           {/* CENTER — Main equation display */}
           <div style={{ display: "flex", flexDirection: "column", borderRight: `1px solid ${BRD}` }}>
-            {/* Equation title */}
-            {!showCustom && (
-              <div style={{ padding: "10px 20px", borderBottom: `1px solid ${BRD}`, flexShrink: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: G, marginBottom: 3 }}>{eq.label.toUpperCase()}</div>
-                <div style={{ fontSize: 8, opacity: 0.45, lineHeight: 1.6 }}>{eq.desc}</div>
-              </div>
-            )}
 
-            {/* Big equation render */}
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 30px", position: "relative" }}>
-              {/* Glow frame */}
-              <div style={{ position: "absolute", inset: 20, border: "1px solid rgba(0,255,136,0.06)", borderRadius: 12, background: "rgba(0,255,136,0.02)" }} />
+            {/* Title bar / mode switcher */}
+            <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BRD}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 10 }}>
+              {showCustom ? (
+                <>
+                  <span style={{ fontSize: 9, color: "#fbbf24", letterSpacing: 2 }}>INPUT MODE</span>
+                  {(["latex","text","mixed"] as const).map(m => (
+                    <button key={m} onClick={() => setInputMode(m)}
+                      style={{ padding: "2px 10px", borderRadius: 12, fontSize: 8, cursor: "pointer", border: `1px solid ${inputMode === m ? "#fbbf24" : "rgba(255,255,255,0.12)"}`, background: inputMode === m ? "rgba(251,191,36,0.12)" : "transparent", color: inputMode === m ? "#fbbf24" : "rgba(255,255,255,0.4)", letterSpacing: 1, ...mono }}>
+                      {m === "latex" ? "LaTeX" : m === "text" ? "Plain Text" : "Mixed"}
+                    </button>
+                  ))}
+                  <span style={{ fontSize: 7, color: "rgba(255,255,255,0.2)", marginLeft: 4 }}>
+                    {inputMode === "mixed" ? "use $math$ or $$math$$ for equations" : inputMode === "text" ? "rendered with sunset ombré style" : "pure LaTeX · \\textcolor{#hex}{text}"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, color: G }}>{eq.label.toUpperCase()}</div>
+                  <div style={{ fontSize: 8, opacity: 0.4, lineHeight: 1.5, marginLeft: 8 }}>{eq.desc}</div>
+                </>
+              )}
+            </div>
 
-              {/* Custom LaTeX editor */}
-              {showCustom && (
-                <div style={{ width: "100%", maxWidth: 600, marginBottom: 20 }}>
+            {/* Input area (custom mode) */}
+            {showCustom && (
+              <div style={{ padding: "10px 16px", borderBottom: `1px solid ${BRD}`, flexShrink: 0 }}>
+                {inputMode === "latex" ? (
                   <textarea
                     value={customTex}
                     onChange={e => setCustomTex(e.target.value)}
-                    placeholder="Enter LaTeX here, e.g.  \frac{\partial A}{\partial t} = A + \nabla^2 A&#10;Use \textcolor{#00ff88}{text} for color"
-                    style={{ width: "100%", minHeight: 80, background: "rgba(0,255,136,0.04)", border: "1px solid rgba(0,255,136,0.2)", borderRadius: 6, color: G, ...mono, fontSize: 10, padding: 10, resize: "vertical" }}
+                    placeholder={"Enter LaTeX, e.g.  \\frac{\\partial \\psi}{\\partial t} = \\phi \\cdot \\nabla^2 \\psi\nColor: \\textcolor{#fbbf24}{φ} or \\textcolor{#c084fc}{ψ}"}
+                    rows={4}
+                    style={{ width: "100%", background: "rgba(251,191,36,0.03)", border: "1px solid rgba(251,191,36,0.18)", borderRadius: 6, color: "#fbbf24", ...mono, fontSize: 11, padding: "8px 10px", resize: "vertical", outline: "none", boxSizing: "border-box", caretColor: "#fbbf24" }}
                   />
-                </div>
-              )}
-
-              {/* KaTeX rendered equation */}
-              <div
-                style={{ position: "relative", zIndex: 1, maxWidth: "100%", overflowX: "auto" }}
-                className="aether-katex"
-                dangerouslySetInnerHTML={{ __html: rendered }}
-              />
-
-              {/* Copy button */}
-              <button onClick={() => {
-                  navigator.clipboard.writeText(showCustom ? customTex : eq.tex);
-                  setCopied(true); setTimeout(() => setCopied(false), 2000);
-                }}
-                style={{ marginTop: 20, background: "rgba(0,255,136,0.08)", border: `1px solid rgba(0,255,136,0.25)`, color: copied ? "#fbbf24" : G, borderRadius: 4, padding: "4px 16px", cursor: "pointer", fontSize: 8, letterSpacing: 2, ...mono }}>
-                {copied ? "✓ COPIED LaTeX" : "⧉ COPY LaTeX"}
-              </button>
-            </div>
-
-            {/* Term color swatches row */}
-            {!showCustom && eq.terms.length > 0 && (
-              <div style={{ borderTop: `1px solid ${BRD}`, padding: "6px 14px", display: "flex", gap: 8, flexWrap: "wrap", flexShrink: 0 }}>
-                {eq.terms.map((term, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 8px", borderRadius: 12, border: `1px solid ${term.color}30`, background: `${term.color}10` }}>
-                    <span style={{ color: term.color, fontSize: 10, fontWeight: 700 }}>{term.sym}</span>
-                    <span style={{ fontSize: 7, color: term.color, opacity: 0.6 }}>{term.name}</span>
-                  </div>
-                ))}
+                ) : (
+                  <textarea
+                    value={customText}
+                    onChange={e => setCustomText(e.target.value)}
+                    placeholder={inputMode === "mixed"
+                      ? "Write text freely. Wrap math in $...$ inline or $$...$$ for display.\nExample: The golden ratio $\\phi = \\frac{1+\\sqrt{5}}{2}$ powers the AETHER spiral.\n$$\\psi = \\frac{1}{N}\\left|\\sum_k e^{i\\theta_k}\\right|$$"
+                      : "Type anything here — ideas, notes, theories, quotes.\nEach line renders in AETHER sunset ombré colors.\n\nThis is your thinking space."}
+                    rows={5}
+                    style={{ width: "100%", background: "rgba(192,132,252,0.03)", border: "1px solid rgba(192,132,252,0.18)", borderRadius: 6, color: "rgba(255,255,255,0.7)", fontFamily: "system-ui, -apple-system, sans-serif", fontSize: 12, lineHeight: 1.6, padding: "8px 10px", resize: "vertical", outline: "none", boxSizing: "border-box", caretColor: "#c084fc" }}
+                  />
+                )}
               </div>
             )}
+
+            {/* Rendered display */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 30px", position: "relative", overflowY: "auto" }}>
+              <div style={{ position: "absolute", inset: 20, border: "1px solid rgba(0,255,136,0.05)", borderRadius: 12, background: "rgba(0,255,136,0.015)" }} />
+
+              {showCustom && inputMode !== "latex" ? (
+                <div
+                  className="ms-text-render"
+                  style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 640, fontSize: 15, lineHeight: 1.85, textAlign: "left" }}
+                  dangerouslySetInnerHTML={{ __html: rendered || '<span style="opacity:0.2;font-size:11px">start typing above to see your text rendered here</span>' }}
+                />
+              ) : (
+                <div
+                  style={{ position: "relative", zIndex: 1, maxWidth: "100%", overflowX: "auto" }}
+                  className="aether-katex"
+                  dangerouslySetInnerHTML={{ __html: rendered }}
+                />
+              )}
+            </div>
+
+            {/* Action bar: Copy + Save */}
+            <div style={{ borderTop: `1px solid ${BRD}`, padding: "8px 16px", display: "flex", gap: 8, alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
+              {/* Copy */}
+              <button onClick={handleCopy}
+                style={{ background: copied ? "rgba(251,191,36,0.15)" : "rgba(0,255,136,0.08)", border: `1px solid ${copied ? "#fbbf2460" : "rgba(0,255,136,0.25)"}`, color: copied ? "#fbbf24" : G, borderRadius: 4, padding: "4px 16px", cursor: "pointer", fontSize: 8, letterSpacing: 2, ...mono, transition: "all 0.2s" }}>
+                {copied ? "✓ COPIED" : "⧉ COPY TEXT"}
+              </button>
+
+              {/* Save */}
+              {showCustom && (
+                <>
+                  <button onClick={() => setShowSaveBar(s => !s)}
+                    style={{ background: saveFlash ? "rgba(192,132,252,0.2)" : "rgba(192,132,252,0.08)", border: `1px solid ${saveFlash ? "#c084fc80" : "rgba(192,132,252,0.3)"}`, color: saveFlash ? "#c084fc" : "rgba(192,132,252,0.7)", borderRadius: 4, padding: "4px 16px", cursor: "pointer", fontSize: 8, letterSpacing: 2, ...mono, transition: "all 0.2s" }}>
+                    {saveFlash ? "✓ SAVED" : "↓ SAVE ENTRY"}
+                  </button>
+                  {showSaveBar && (
+                    <>
+                      <input
+                        value={saveName}
+                        onChange={e => setSaveName(e.target.value)}
+                        onKeyDown={e => e.key === "Enter" && handleSave()}
+                        placeholder="entry name…"
+                        autoFocus
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(192,132,252,0.25)", borderRadius: 4, color: "rgba(255,255,255,0.7)", ...mono, fontSize: 9, padding: "4px 10px", outline: "none", width: 140 }}
+                      />
+                      <button onClick={handleSave} disabled={!saveName.trim()}
+                        style={{ background: saveName.trim() ? "rgba(192,132,252,0.15)" : "transparent", border: "1px solid rgba(192,132,252,0.3)", color: saveName.trim() ? "#c084fc" : "rgba(255,255,255,0.2)", borderRadius: 4, padding: "4px 12px", cursor: saveName.trim() ? "pointer" : "not-allowed", fontSize: 8, letterSpacing: 2, ...mono }}>
+                        CONFIRM
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
+
+              {/* Term swatches (library mode) */}
+              {!showCustom && eq.terms.length > 0 && (
+                <div style={{ marginLeft: "auto", display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {eq.terms.map((term, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 12, border: `1px solid ${term.color}30`, background: `${term.color}10` }}>
+                      <span style={{ color: term.color, fontSize: 10, fontWeight: 700 }}>{term.sym}</span>
+                      <span style={{ fontSize: 7, color: term.color, opacity: 0.6 }}>{term.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* RIGHT — Term breakdown */}
           <div style={{ display: "flex", flexDirection: "column", overflow: "auto" }}>
             <div style={{ padding: "6px 10px", fontSize: 8, letterSpacing: 3, color: G, opacity: 0.6, borderBottom: `1px solid ${BRD}`, flexShrink: 0 }}>
-              ∑ TERM BREAKDOWN
+              {showCustom ? "✦ INPUT GUIDE" : "∑ TERM BREAKDOWN"}
             </div>
 
-            {!showCustom && eq.terms.map((term, i) => (
-              <div key={i} style={{ padding: "8px 12px", borderBottom: `1px solid rgba(255,255,255,0.04)`, borderLeft: `2px solid ${term.color}50` }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
-                  <span style={{ color: term.color, fontSize: 13, fontWeight: 700 }}>{term.sym}</span>
-                  <span style={{ color: term.color, fontSize: 7, letterSpacing: 1, opacity: 0.7 }}>{term.name.toUpperCase()}</span>
+            {showCustom ? (
+              <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
+                {/* Mode guide */}
+                <div style={{ fontSize: 7, color: "rgba(255,255,255,0.35)", lineHeight: 1.7 }}>
+                  <div style={{ color: "#fbbf24", fontWeight: 700, marginBottom: 4 }}>LaTeX mode</div>
+                  Standard KaTeX. Use <span style={{ color: "#fbbf24" }}>{"\\textcolor{#hex}{x}"}</span> for color.
+                  <br/>e.g. <span style={{ color: "#fbbf24" }}>{"\\frac{\\partial \\psi}{\\partial t}"}</span>
                 </div>
-                <div style={{ fontSize: 7, opacity: 0.45, lineHeight: 1.6 }}>{term.meaning}</div>
-                <div style={{ fontSize: 6, color: term.color, opacity: 0.3, marginTop: 3 }}>{TERM_TYPE_LABELS[term.color] ?? "Term"}</div>
+                <div style={{ fontSize: 7, color: "rgba(255,255,255,0.35)", lineHeight: 1.7 }}>
+                  <div style={{ color: "#c084fc", fontWeight: 700, marginBottom: 4 }}>Plain Text mode</div>
+                  Type freely. Each line renders in the sunset ombré gradient — gold→orange→pink→violet→sky.
+                </div>
+                <div style={{ fontSize: 7, color: "rgba(255,255,255,0.35)", lineHeight: 1.7 }}>
+                  <div style={{ color: "#22c55e", fontWeight: 700, marginBottom: 4 }}>Mixed mode</div>
+                  Text + inline math. Wrap LaTeX in <span style={{ color: "#22c55e" }}>$...$</span> or display math in <span style={{ color: "#22c55e" }}>$$...$$</span>.
+                  <br/>e.g. <i>The coherence is</i> <span style={{ color: "#22c55e" }}>{"$\\psi = 0.99$"}</span>
+                </div>
+                <div style={{ borderTop: `1px solid ${BRD}`, paddingTop: 8, fontSize: 7, color: "rgba(255,255,255,0.25)", lineHeight: 1.7 }}>
+                  <div style={{ color: G, fontWeight: 700, marginBottom: 4 }}>Sunset AETHER Colors</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {SUNSET.map((c, i) => (
+                      <div key={c} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />
+                        <span style={{ color: c, fontSize: 6 }}>{c}</span>
+                        {i < SUNSET.length - 1 && <span style={{ color: "rgba(255,255,255,0.15)" }}>→</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            ))}
-
-            {/* Color key reference */}
-            <div style={{ padding: "8px 12px", borderTop: `1px solid ${BRD}`, marginTop: "auto", flexShrink: 0 }}>
-              <div style={{ fontSize: 7, letterSpacing: 2, opacity: 0.3, marginBottom: 5 }}>COLOR KEY</div>
-              {Object.entries(TERM_TYPE_LABELS).map(([col, label]) => (
-                <div key={col} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: col, flexShrink: 0 }} />
-                  <span style={{ fontSize: 7, color: col, opacity: 0.6 }}>{label}</span>
+            ) : (
+              <>
+                {eq.terms.map((term, i) => (
+                  <div key={i} style={{ padding: "8px 12px", borderBottom: `1px solid rgba(255,255,255,0.04)`, borderLeft: `2px solid ${term.color}50` }}>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 4 }}>
+                      <span style={{ color: term.color, fontSize: 13, fontWeight: 700 }}>{term.sym}</span>
+                      <span style={{ color: term.color, fontSize: 7, letterSpacing: 1, opacity: 0.7 }}>{term.name.toUpperCase()}</span>
+                    </div>
+                    <div style={{ fontSize: 7, opacity: 0.45, lineHeight: 1.6 }}>{term.meaning}</div>
+                    <div style={{ fontSize: 6, color: term.color, opacity: 0.3, marginTop: 3 }}>{TERM_TYPE_LABELS[term.color] ?? "Term"}</div>
+                  </div>
+                ))}
+                <div style={{ padding: "8px 12px", borderTop: `1px solid ${BRD}`, marginTop: "auto", flexShrink: 0 }}>
+                  <div style={{ fontSize: 7, letterSpacing: 2, opacity: 0.3, marginBottom: 5 }}>COLOR KEY</div>
+                  {Object.entries(TERM_TYPE_LABELS).map(([col, label]) => (
+                    <div key={col} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: col, flexShrink: 0 }} />
+                      <span style={{ fontSize: 7, color: col, opacity: 0.6 }}>{label}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </div>
+
         </div>
       </div>
 
-      {/* KaTeX color overrides */}
+      {/* Styles */}
       <style>{`
+        /* KaTeX equation overrides */
         .aether-katex .katex { font-size: 2.2em; color: rgba(255,255,255,0.9); }
         .aether-katex .katex-display { overflow-x: auto; padding: 10px 0; }
         .aether-katex .katex .mord, .aether-katex .katex .mrel,
@@ -473,6 +730,43 @@ export default function MathStudioPage() {
         .aether-katex .katex .mfrac .frac-line { border-bottom-color: rgba(0,255,136,0.6) !important; }
         .aether-katex .katex .sqrt > .sqrt-sign { color: rgba(0,255,136,0.7); }
         .aether-katex .katex .minner { vertical-align: middle; }
+
+        /* Sunset ombré text rendering */
+        .ms-textline {
+          background: linear-gradient(90deg, #fbbf24, #f97316, #ec4899, #c084fc, #06b6d4);
+          background-size: 300% 100%;
+          background-position: calc(var(--li, 0) * 18%) 0;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-family: system-ui, -apple-system, sans-serif;
+          font-size: 15px;
+          font-weight: 500;
+          line-height: 1.85;
+          min-height: 1.85em;
+        }
+
+        /* Mixed mode: text spans */
+        .ms-text-render .ms-text {
+          background: linear-gradient(90deg, #fbbf24 0%, #f97316 25%, #ec4899 50%, #c084fc 75%, #06b6d4 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        /* Mixed mode: inline katex */
+        .ms-text-render .ms-inline-katex .katex {
+          font-size: 1.1em;
+          color: rgba(255,255,255,0.9);
+        }
+        .ms-text-render .ms-inline-katex .katex .base { color: rgba(255,255,255,0.9); }
+        .ms-text-render .ms-inline-katex { vertical-align: middle; }
+
+        /* Mixed mode: display katex blocks */
+        .ms-text-render .katex-display { color: rgba(255,255,255,0.9); font-size: 1.4em; overflow-x: auto; }
+        .ms-text-render .katex .base { color: rgba(255,255,255,0.85); }
+        .ms-text-render .katex .mfrac .frac-line { border-bottom-color: rgba(251,191,36,0.6) !important; }
       `}</style>
     </div>
   );
