@@ -725,6 +725,17 @@ export default function SubstrateSynthesisPage() {
           </div>
         </Section>
 
+        {/* LinkedIn Image Archive */}
+        <Section
+          anchor="linkedin-archive"
+          kicker="IX · LinkedIn Archive"
+          title="Friday April 24th — 227 Slides"
+          lead="Full image archive extracted from the LinkedIn post collection. Slides load on demand — 40 per page. Click any slide to open it full-screen. Use the jump box to go directly to a slide number."
+        >
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          <LinkedInGallery />
+        </Section>
+
         <footer style={{ marginTop:"2rem", paddingTop:"1.4rem",
           borderTop:"1px solid rgba(255,255,255,0.08)",
           textAlign:"center", fontSize:"0.78rem", color:"#64748b",
@@ -732,6 +743,200 @@ export default function SubstrateSynthesisPage() {
           Substrate Studio · {totalAt180.toFixed(1)} mg/L total at 180 min · light is the prompt · matter is the answer
         </footer>
       </div>
+    </div>
+  );
+}
+
+// ── LinkedIn Image Gallery — 227 slides, lazy-loaded via IntersectionObserver ─
+const LI_COUNT = 227;
+const LI_URLS: string[] = Array.from({ length: LI_COUNT }, (_, i) => {
+  const n = String(i + 1).padStart(3, "0");
+  return `${import.meta.env.BASE_URL}linkedin_imgs/li-${n}.jpg`;
+});
+
+function LazyImg({ src, index }: { src: string; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { rootMargin: "300px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <>
+      <div ref={ref}
+        onClick={() => loaded && setOpen(true)}
+        style={{
+          borderRadius: 8, overflow: "hidden",
+          background: "rgba(15,23,42,0.8)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          aspectRatio: "8.5/11",
+          cursor: loaded ? "zoom-in" : "default",
+          position: "relative",
+          transition: "border-color 0.2s",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)")}
+        onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
+      >
+        {visible && (
+          <img src={src} alt={`LinkedIn post ${index + 1}`} loading="lazy"
+            onLoad={() => setLoaded(true)}
+            style={{
+              width: "100%", height: "100%", objectFit: "cover",
+              display: "block",
+              opacity: loaded ? 1 : 0,
+              transition: "opacity 0.3s",
+            }}
+          />
+        )}
+        {!loaded && (
+          <div style={{
+            position: "absolute", inset: 0,
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center", gap: 8,
+          }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: "50%",
+              border: "2px solid rgba(167,139,250,0.25)",
+              borderTopColor: "#a78bfa",
+              animation: "spin 0.9s linear infinite",
+            }}/>
+            <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 10,
+              color: "rgba(167,139,250,0.4)", letterSpacing: "0.2em" }}>
+              {String(index + 1).padStart(3, "0")}
+            </div>
+          </div>
+        )}
+        {/* slide number badge */}
+        <div style={{
+          position: "absolute", bottom: 6, right: 7,
+          fontFamily: "'DM Mono',monospace", fontSize: 9,
+          color: "rgba(167,139,250,0.5)", letterSpacing: "0.15em",
+          pointerEvents: "none",
+        }}>
+          {String(index + 1).padStart(3, "0")} / {LI_COUNT}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999,
+            background: "rgba(0,0,0,0.92)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "zoom-out",
+          }}
+        >
+          <img src={src} alt={`LinkedIn post ${index + 1}`}
+            style={{ maxWidth: "90vw", maxHeight: "90vh", objectFit: "contain",
+              borderRadius: 8, boxShadow: "0 0 60px rgba(167,139,250,0.2)" }}
+            onClick={e => e.stopPropagation()}
+          />
+          <div style={{
+            position: "absolute", top: 24, right: 28,
+            fontFamily: "'DM Mono',monospace", fontSize: 11,
+            color: "rgba(167,139,250,0.6)", letterSpacing: "0.25em",
+          }}>
+            {String(index + 1).padStart(3, "0")} / {LI_COUNT} · click outside to close
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function LinkedInGallery() {
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const PER_PAGE = 40;
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return LI_URLS.map((url, i) => ({ url, i }));
+    const n = parseInt(query.trim(), 10);
+    if (!isNaN(n) && n >= 1 && n <= LI_COUNT)
+      return [{ url: LI_URLS[n - 1], i: n - 1 }];
+    return LI_URLS.map((url, i) => ({ url, i }));
+  }, [query]);
+
+  const pages = Math.ceil(filtered.length / PER_PAGE);
+  const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+
+  return (
+    <div>
+      {/* Controls */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginBottom: "1.2rem" }}>
+        <input
+          placeholder="Jump to slide # (1–227)"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setPage(0); }}
+          style={{
+            background: "rgba(15,23,42,0.7)", border: "1px solid rgba(167,139,250,0.25)",
+            borderRadius: 8, padding: "0.45rem 0.85rem",
+            fontFamily: "'DM Mono',monospace", fontSize: 12,
+            color: "#e2e8f0", outline: "none", width: 220,
+          }}
+        />
+        <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 11,
+          color: "rgba(167,139,250,0.5)", letterSpacing: "0.2em" }}>
+          {filtered.length} slides · page {page + 1} / {pages}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+          <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+            style={{
+              fontFamily: "'DM Mono',monospace", fontSize: 11, letterSpacing: "0.15em",
+              background: "rgba(15,23,42,0.7)", border: "1px solid rgba(167,139,250,0.25)",
+              borderRadius: 6, padding: "0.35rem 0.75rem", color: "#a78bfa",
+              cursor: page === 0 ? "not-allowed" : "pointer", opacity: page === 0 ? 0.4 : 1,
+            }}>← Prev</button>
+          <button onClick={() => setPage(p => Math.min(pages - 1, p + 1))} disabled={page >= pages - 1}
+            style={{
+              fontFamily: "'DM Mono',monospace", fontSize: 11, letterSpacing: "0.15em",
+              background: "rgba(15,23,42,0.7)", border: "1px solid rgba(167,139,250,0.25)",
+              borderRadius: 6, padding: "0.35rem 0.75rem", color: "#a78bfa",
+              cursor: page >= pages - 1 ? "not-allowed" : "pointer", opacity: page >= pages - 1 ? 0.4 : 1,
+            }}>Next →</button>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 180px), 1fr))",
+        gap: "0.75rem",
+      }}>
+        {slice.map(({ url, i }) => (
+          <LazyImg key={i} src={url} index={i} />
+        ))}
+      </div>
+
+      {/* Page dots */}
+      {pages > 1 && (
+        <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: "1.2rem", flexWrap: "wrap" }}>
+          {Array.from({ length: pages }, (_, pi) => (
+            <button key={pi} onClick={() => setPage(pi)}
+              style={{
+                width: 28, height: 28, borderRadius: "50%",
+                background: pi === page ? "#a78bfa" : "rgba(167,139,250,0.12)",
+                border: `1px solid ${pi === page ? "#a78bfa" : "rgba(167,139,250,0.2)"}`,
+                fontFamily: "'DM Mono',monospace", fontSize: 10,
+                color: pi === page ? "#0f172a" : "#a78bfa",
+                cursor: "pointer",
+              }}>
+              {pi + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
