@@ -271,192 +271,206 @@ function drawBridge(
   const ctx = canvas.getContext("2d"); if (!ctx) return;
   const W = canvas.width, H = canvas.height;
 
-  // Solid dark background (not transparent — ensures helix is always visible)
-  ctx.fillStyle = "rgb(2,6,16)";
+  // Solid dark background — visible through both overlay panels
+  ctx.fillStyle = "rgb(3,8,20)";
   ctx.fillRect(0, 0, W, H);
 
-  // Subtle bg split tint: left=lattice-blue, right=molecular-purple
-  const bgGrad = ctx.createLinearGradient(0, 0, W, 0);
-  bgGrad.addColorStop(0, "rgba(0,20,40,0.45)");
-  bgGrad.addColorStop(morphProgress * 0.8, "rgba(0,20,40,0.3)");
-  bgGrad.addColorStop(Math.min(1, morphProgress + 0.05), "rgba(20,0,40,0.4)");
-  bgGrad.addColorStop(1, "rgba(10,0,30,0.55)");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
+  // ── Subtle tinted background zones ─────────────────────────────────────────
+  // Left lattice zone tint
+  const ltGrad = ctx.createLinearGradient(300, 0, 600, 0);
+  ltGrad.addColorStop(0, "rgba(0,40,80,0.18)");
+  ltGrad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = ltGrad; ctx.fillRect(0, 0, W, H);
+  // Right molecular zone tint (appears on morph)
+  if (morphProgress > 0) {
+    const rtGrad = ctx.createLinearGradient(700, 0, W, 0);
+    rtGrad.addColorStop(0, "rgba(0,0,0,0)");
+    rtGrad.addColorStop(1, `rgba(20,0,40,${morphProgress * 0.3})`);
+    ctx.fillStyle = rtGrad; ctx.fillRect(0, 0, W, H);
+  }
 
   const sweepX = morphProgress * W;
+  const lattFade = Math.max(0, 1 - morphProgress * 1.5);
 
-  // ── LATTICE (left, fades as sweep passes) ──────────────────────────────────
-  const gridFade = Math.max(0, 1 - morphProgress * 1.6);
-  if (gridFade > 0) {
-    ctx.lineWidth = 0.8;
-    for (let gx = 20; gx <= 460; gx += 38) {
-      for (let gy = 20; gy < H - 20; gy += 38) {
-        if (gx > sweepX) continue;
-        const distBehind = sweepX - gx;
-        const lineFade = Math.max(0, 1 - distBehind / 220) * gridFade;
-        if (lineFade <= 0.01) continue;
-        ctx.globalAlpha = lineFade * 0.22;
-        ctx.strokeStyle = "#b47ef8";
-        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(Math.min(gx + 38, sweepX), gy); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + 38); ctx.stroke();
+  // ── Background grid — always visible in the lattice zone, fades on morph ──
+  if (lattFade > 0.01) {
+    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = "#8b5cf6";
+    const gx0 = 340, gx1 = 560, gy0 = 20, gy1 = H - 20, gStep = 36;
+    for (let gx = gx0; gx <= gx1; gx += gStep) {
+      for (let gy = gy0; gy < gy1; gy += gStep) {
+        // Fade grid tiles left of the sweep (they've been morphed already)
+        const behind = sweepX > 0 ? Math.max(0, 1 - Math.max(0, sweepX - gx) / 200) : 1;
+        ctx.globalAlpha = lattFade * behind * 0.25;
+        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + gStep, gy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + gStep); ctx.stroke();
       }
     }
     ctx.globalAlpha = 1;
   }
 
-  // Connection threads between nodes (pre-sweep only)
-  ctx.lineWidth = 0.7;
+  // ── Node connections — visible from the start, fade on morph ──────────────
+  ctx.lineWidth = 0.9;
   for (let a = 0; a < nodePositions.length; a++) {
-    if (nodePositions[a].x > sweepX) {
-      for (let b = a + 1; b < nodePositions.length; b++) {
-        if (nodePositions[b].x > sweepX) {
-          const dx = nodePositions[a].x - nodePositions[b].x;
-          const dy = nodePositions[a].y - nodePositions[b].y;
-          const d = Math.sqrt(dx * dx + dy * dy);
-          if (d < 140) {
-            ctx.globalAlpha = (1 - d / 140) * 0.28 * gridFade;
-            ctx.strokeStyle = "#00e5c0";
-            ctx.beginPath();
-            ctx.moveTo(nodePositions[a].x, nodePositions[a].y);
-            ctx.lineTo(nodePositions[b].x, nodePositions[b].y);
-            ctx.stroke();
-          }
-        }
+    if (nodePositions[a].x < sweepX) continue; // already swept
+    for (let b = a + 1; b < nodePositions.length; b++) {
+      if (nodePositions[b].x < sweepX) continue;
+      const dx = nodePositions[a].x - nodePositions[b].x;
+      const dy = nodePositions[a].y - nodePositions[b].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < 160) {
+        ctx.globalAlpha = (1 - d / 160) * 0.45 * lattFade;
+        ctx.strokeStyle = "#00e5c0";
+        ctx.beginPath();
+        ctx.moveTo(nodePositions[a].x, nodePositions[a].y);
+        ctx.lineTo(nodePositions[b].x, nodePositions[b].y);
+        ctx.stroke();
       }
     }
   }
   ctx.globalAlpha = 1;
 
-  // Node pulses — pre-sweep pulse, post-sweep dissolve into particle trails
+  // ── Node pulses / particle dissolution ─────────────────────────────────────
   nodePositions.forEach((pos, i) => {
     const col = i < 11 ? "#00e5c0" : i < 20 ? "#4db8ff" : "#b47ef8";
-    if (pos.x > sweepX) {
-      // Not yet swept — animated pulse
-      const amp = 5 + Math.sin(t * 2.5 + i * 0.7) * 2.5;
-      ctx.globalAlpha = 0.55 + 0.35 * Math.sin(t + i);
-      ctx.beginPath(); ctx.arc(pos.x, pos.y, amp, 0, Math.PI * 2);
+    if (pos.x >= sweepX) {
+      // Pre-sweep: bright animated node
+      const r = 7 + Math.sin(t * 2.2 + i * 0.8) * 3;
+      const alpha = 0.65 + 0.3 * Math.sin(t * 1.8 + i);
+      ctx.globalAlpha = alpha;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
       ctx.fillStyle = col;
-      ctx.shadowColor = col; ctx.shadowBlur = 10;
-      ctx.fill(); ctx.shadowBlur = 0;
+      ctx.shadowColor = col; ctx.shadowBlur = 16;
+      ctx.fill();
+      // Outer ring
+      ctx.globalAlpha = alpha * 0.3;
+      ctx.beginPath(); ctx.arc(pos.x, pos.y, r + 5 + Math.sin(t * 3 + i) * 3, 0, Math.PI * 2);
+      ctx.strokeStyle = col; ctx.lineWidth = 0.8;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
     } else {
-      // Swept — particles stream toward molecular center
-      const sweepAge = sweepX - pos.x;
-      const flyFrac = Math.min(1, sweepAge / 280);
-      const molCx = W * 0.70, molCy = H * 0.5;
-      // Target: spiral around DNA helix origin
-      const targetX = molCx + Math.cos(i * 0.93 + t * 0.3) * 72;
-      const targetY = molCy + Math.sin(i * 1.17 + t * 0.2) * 160;
-      for (let p = 0; p < 4; p++) {
-        const pf = Math.min(1, flyFrac * (1 - p * 0.08));
-        const px = pos.x + (targetX - pos.x) * pf;
-        const py = pos.y + (targetY - pos.y) * pf;
-        ctx.globalAlpha = Math.max(0, (1 - pf) * 0.6 * (1 - p * 0.2));
-        ctx.beginPath(); ctx.arc(px, py, 2.5 - p * 0.4, 0, Math.PI * 2);
-        ctx.fillStyle = col;
-        ctx.fill();
+      // Post-sweep: dissolve into particle trail toward molecular geometry
+      const age = sweepX - pos.x;
+      const frac = Math.min(1, age / 320);
+      const molCx = W * 0.68, molCy = H * 0.5;
+      const tgtX = molCx + Math.cos(i * 0.91 + t * 0.25) * 70;
+      const tgtY = molCy + Math.sin(i * 1.13 + t * 0.18) * 175;
+      for (let p = 0; p < 5; p++) {
+        const pf = Math.min(1, frac * (1 - p * 0.07));
+        const px = pos.x + (tgtX - pos.x) * pf;
+        const py = pos.y + (tgtY - pos.y) * pf;
+        ctx.globalAlpha = Math.max(0, (1 - pf) * 0.55 * (1 - p * 0.18));
+        ctx.beginPath(); ctx.arc(px, py, 3 - p * 0.45, 0, Math.PI * 2);
+        ctx.fillStyle = col; ctx.fill();
       }
     }
   });
   ctx.globalAlpha = 1;
 
-  // ── SWEEP LINE — gold luminous wave ───────────────────────────────────────
+  // ── "LATTICE · READY" watermark (pre-morph) ────────────────────────────────
+  if (morphProgress < 0.12) {
+    const wA = Math.max(0, 1 - morphProgress / 0.12) * 0.18;
+    ctx.globalAlpha = wA;
+    ctx.font = "bold 11px 'DM Mono',monospace";
+    ctx.fillStyle = "#00e5c0";
+    ctx.letterSpacing = "0.4em";
+    ctx.fillText("LATTICE · READY", 380, H - 28);
+    ctx.letterSpacing = "0";
+    ctx.globalAlpha = 1;
+  }
+
+  // ── SWEEP LINE — gold luminous wavefront ────────────────────────────────────
   if (morphProgress > 0 && morphProgress < 1) {
-    const gw = 36;
+    const gw = 40;
     const sg = ctx.createLinearGradient(sweepX - gw, 0, sweepX + gw, 0);
     sg.addColorStop(0, "rgba(201,162,39,0)");
-    sg.addColorStop(0.35, "rgba(240,190,50,0.35)");
-    sg.addColorStop(0.5, "rgba(255,225,80,0.95)");
-    sg.addColorStop(0.65, "rgba(240,190,50,0.35)");
+    sg.addColorStop(0.3, "rgba(240,190,50,0.4)");
+    sg.addColorStop(0.5, "rgba(255,230,80,1)");
+    sg.addColorStop(0.7, "rgba(240,190,50,0.4)");
     sg.addColorStop(1, "rgba(201,162,39,0)");
     ctx.fillStyle = sg;
     ctx.fillRect(sweepX - gw, 0, gw * 2, H);
-    // Deterministic particles along sweep front
-    for (let pi = 0; pi < 28; pi++) {
-      const phase = (pi * 7.43 + t * 90) % H;
-      const jitter = Math.sin(t * 4.7 + pi * 1.3) * 14;
-      ctx.globalAlpha = 0.3 + 0.5 * Math.abs(Math.sin(t * 3.1 + pi));
-      ctx.beginPath();
-      ctx.arc(sweepX + jitter, phase, 1.5 + Math.abs(Math.sin(t * 6 + pi)) * 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = "#ffe060";
-      ctx.fill();
+    // Deterministic sparkle particles along wavefront
+    for (let pi = 0; pi < 30; pi++) {
+      const py = (pi * 6.17 * H / 30 + t * 80) % H;
+      const jitter = Math.sin(t * 5.1 + pi * 1.4) * 15;
+      const sz = 1.5 + Math.abs(Math.sin(t * 7 + pi)) * 2;
+      ctx.globalAlpha = 0.35 + 0.5 * Math.abs(Math.sin(t * 3.3 + pi * 0.7));
+      ctx.beginPath(); ctx.arc(sweepX + jitter, py, sz, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffe060"; ctx.fill();
     }
     ctx.globalAlpha = 1;
   }
 
-  // ── MOLECULAR GEOMETRY (right, materialises as morph progresses) ──────────
-  if (morphProgress > 0.04) {
-    const mA = Math.min(1, (morphProgress - 0.04) / 0.55);
-    const cx = W * 0.70, cy = H * 0.5;
-    const helixH = 380, helixR = 68, nSeg = 80;
+  // ── MOLECULAR GEOMETRY (right side, materialises as sweep passes) ──────────
+  // starts fading in once morphProgress > 0.08
+  const mA = Math.min(1, Math.max(0, (morphProgress - 0.08) / 0.5));
+  if (mA > 0.01) {
+    const cx = W * 0.68, cy = H * 0.5; // canvas-x ≈ 816 → displayed ≈ 703 px
+    const helixH = 400, helixR = 62, nSeg = 90;
     const helixTop = cy - helixH / 2;
 
+    // Radial glow
+    ctx.globalAlpha = mA * 0.8;
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 240);
+    glow.addColorStop(0, "rgba(0,180,120,0.1)"); glow.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+    // Strand α — teal
     ctx.globalAlpha = mA;
-
-    // Radial glow behind helix
-    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 260);
-    glow.addColorStop(0, "rgba(0,200,140,0.07)");
-    glow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
-
-    // Strand α (teal)
-    ctx.strokeStyle = "#00e5c0";
-    ctx.lineWidth = 2.5;
-    ctx.shadowColor = "#00e5c0"; ctx.shadowBlur = 12;
+    ctx.strokeStyle = "#00e5c0"; ctx.lineWidth = 2.8;
+    ctx.shadowColor = "#00e5c0"; ctx.shadowBlur = 14;
     ctx.beginPath();
     for (let j = 0; j <= nSeg; j++) {
       const frac = j / nSeg;
       const y = helixTop + frac * helixH;
-      const angle = frac * Math.PI * 8 + t * 0.7;
+      const angle = frac * Math.PI * 8 + t * 0.65;
       const x = cx + Math.cos(angle) * helixR;
       j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.stroke();
 
-    // Strand β (violet)
-    ctx.strokeStyle = "#b47ef8";
-    ctx.shadowColor = "#b47ef8";
+    // Strand β — violet
+    ctx.strokeStyle = "#b47ef8"; ctx.shadowColor = "#b47ef8";
     ctx.beginPath();
     for (let j = 0; j <= nSeg; j++) {
       const frac = j / nSeg;
       const y = helixTop + frac * helixH;
-      const angle = frac * Math.PI * 8 + t * 0.7 + Math.PI;
+      const angle = frac * Math.PI * 8 + t * 0.65 + Math.PI;
       const x = cx + Math.cos(angle) * helixR;
       j === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // Base pair rungs + node dots
-    for (let j = 0; j < 22; j++) {
-      const frac = j / 22;
+    // Base pair rungs + endpoint dots
+    for (let j = 0; j < 24; j++) {
+      const frac = j / 24;
       const y = helixTop + frac * helixH;
-      const angle = frac * Math.PI * 8 + t * 0.7;
+      const angle = frac * Math.PI * 8 + t * 0.65;
       const x1 = cx + Math.cos(angle) * helixR;
       const x2 = cx + Math.cos(angle + Math.PI) * helixR;
       const rCol = j % 3 === 0 ? "#00e5c0" : j % 3 === 1 ? "#b47ef8" : "#4db8ff";
-      ctx.strokeStyle = rCol; ctx.lineWidth = 1.2;
-      ctx.globalAlpha = mA * 0.55;
+      ctx.strokeStyle = rCol; ctx.lineWidth = 1.1;
+      ctx.globalAlpha = mA * 0.5;
       ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
-      ctx.globalAlpha = mA * 0.9;
+      ctx.globalAlpha = mA;
       ctx.fillStyle = rCol;
-      ctx.beginPath(); ctx.arc(x1, y, 2.8, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(x2, y, 2.8, 0, Math.PI * 2); ctx.fill();
+      [x1, x2].forEach(x => { ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill(); });
     }
     ctx.globalAlpha = mA;
 
-    // Toroidal ring (CGLE phase governs curvature)
-    const tx = cx - 215, ty = cy;
-    const R2 = 72, r2 = 26 * Math.min(1, morphProgress * 2);
-    ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 2;
-    ctx.shadowColor = "#c9a227"; ctx.shadowBlur = 10;
+    // Toroidal ring — gold, CGLE-phase controlled curvature
+    const tx = cx - 190, ty = cy;
+    const R2 = 68, r2 = 24 * Math.min(1, morphProgress * 2);
+    ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 2.2;
+    ctx.shadowColor = "#c9a227"; ctx.shadowBlur = 12;
     ctx.beginPath();
-    for (let j = 0; j <= 120; j++) {
-      const theta = (j / 120) * Math.PI * 2;
-      const phi = theta * 5 + t * 1.1;
+    for (let j = 0; j <= 128; j++) {
+      const theta = (j / 128) * Math.PI * 2;
+      const phi = theta * 5 + t * 1.0;
       const px = tx + (R2 + r2 * Math.cos(phi)) * Math.cos(theta);
-      const py = ty + (R2 + r2 * Math.cos(phi)) * Math.sin(theta) * 0.46;
+      const py = ty + (R2 + r2 * Math.cos(phi)) * Math.sin(theta) * 0.45;
       j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.stroke();
@@ -465,32 +479,31 @@ function drawBridge(
     ctx.beginPath();
     for (let j = 0; j <= 100; j++) {
       const theta = (j / 100) * Math.PI * 2;
-      const phi = theta * 3 - t * 0.9;
-      const px = tx + (R2 * 0.48 + r2 * 0.38 * Math.cos(phi)) * Math.cos(theta);
-      const py = ty + (R2 * 0.48 + r2 * 0.38 * Math.cos(phi)) * Math.sin(theta) * 0.46;
+      const phi = theta * 3 - t * 0.85;
+      const px = tx + (R2 * 0.47 + r2 * 0.36 * Math.cos(phi)) * Math.cos(theta);
+      const py = ty + (R2 * 0.47 + r2 * 0.36 * Math.cos(phi)) * Math.sin(theta) * 0.45;
       j === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // CGLE phase dots on toroid surface
+    // CGLE phase-coloured dots orbiting toroid
     for (let j = 0; j < 16; j++) {
-      const theta = (j / 16) * Math.PI * 2 + t * 0.4;
-      const px = tx + R2 * Math.cos(theta);
-      const py = ty + R2 * Math.sin(theta) * 0.46;
-      const hue = (j * 22.5 + t * 25) % 360;
-      ctx.fillStyle = `hsl(${hue},100%,68%)`;
-      ctx.globalAlpha = mA * 0.75;
-      ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI * 2); ctx.fill();
+      const theta = (j / 16) * Math.PI * 2 + t * 0.38;
+      const hue = (j * 22.5 + t * 22) % 360;
+      ctx.fillStyle = `hsl(${hue},100%,65%)`;
+      ctx.globalAlpha = mA * 0.8;
+      ctx.beginPath();
+      ctx.arc(tx + R2 * Math.cos(theta), ty + R2 * Math.sin(theta) * 0.45, 3.5, 0, Math.PI * 2);
+      ctx.fill();
     }
     ctx.globalAlpha = mA;
 
-    // Dashed phase arrow: toroid → helix
-    if (morphProgress > 0.65) {
-      const arrowA = (morphProgress - 0.65) / 0.35;
-      ctx.globalAlpha = mA * arrowA * 0.55;
-      ctx.setLineDash([4, 5]);
-      ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 1.2;
+    // Phase arrow: toroid → helix (fades in near end)
+    if (morphProgress > 0.62) {
+      const arA = Math.min(1, (morphProgress - 0.62) / 0.38);
+      ctx.globalAlpha = mA * arA * 0.6;
+      ctx.setLineDash([4, 5]); ctx.strokeStyle = "#c9a227"; ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.moveTo(tx + R2, ty);
       ctx.bezierCurveTo(tx + R2 + 50, ty, cx - helixR - 50, cy, cx - helixR - 4, cy);
@@ -498,22 +511,22 @@ function drawBridge(
       ctx.setLineDash([]);
     }
 
-    // Labels (fade in near completion)
-    if (morphProgress > 0.72) {
-      const lA = Math.min(1, (morphProgress - 0.72) / 0.28);
+    // Labels — fade in near the end of the morph
+    if (morphProgress > 0.70) {
+      const lA = Math.min(1, (morphProgress - 0.70) / 0.30);
       ctx.globalAlpha = lA;
       ctx.font = "bold 10px 'DM Mono',monospace";
       ctx.fillStyle = "#00e5c0";
-      ctx.fillText("STRAND α · Immune", cx + helixR + 14, helixTop + helixH * 0.22);
+      ctx.fillText("STRAND α · Immune", cx + helixR + 12, helixTop + helixH * 0.20);
       ctx.fillStyle = "#b47ef8";
-      ctx.fillText("STRAND β · Neural", cx + helixR + 14, helixTop + helixH * 0.62);
+      ctx.fillText("STRAND β · Neural", cx + helixR + 12, helixTop + helixH * 0.64);
       ctx.fillStyle = "#c9a227";
-      ctx.fillText("TOROIDAL CURVATURE", tx - 52, ty - R2 - 14);
+      ctx.fillText("TOROIDAL CURVATURE", tx - 48, ty - R2 - 13);
       ctx.font = "9px 'DM Mono',monospace";
       ctx.fillStyle = "rgba(201,162,39,0.6)";
-      ctx.fillText("φ governed by CGLE phase", tx - 42, ty - R2);
+      ctx.fillText("φ governed by CGLE phase", tx - 38, ty - R2 + 1);
       ctx.fillStyle = "#4db8ff";
-      ctx.fillText("FLUID ↔ coupling", tx - 30, ty + R2 + 18);
+      ctx.fillText("FLUID ↔ coupling", tx - 22, ty + R2 + 17);
     }
     ctx.globalAlpha = 1;
   }
@@ -558,10 +571,13 @@ export default function LatticePage() {
   const [morphProgress, setMorphProgress] = useState(0);
   const morphRunningRef = useRef(false);
 
-  // Build deterministic node positions — left 35% of 1200px canvas so molecular geometry has room
+  // Node positions live in the VISIBLE canvas strip between the two overlay panels.
+  // Left panel ≈ 300 px wide, right panel ≈ 256 px wide.
+  // At a 1200-px canvas displayed at ~1030 px the visible strip is canvas-x 355–900.
+  // We place the lattice at canvas-x 365–530 and the molecular geometry at ~820.
   const NODE_POSITIONS = NODES.map((_, i) => ({
-    x: 36 + (i % 6) * 58 + Math.sin(i * 1.3) * 10,
-    y: 55 + Math.floor(i / 6) * 104 + Math.cos(i * 0.9) * 12,
+    x: 365 + (i % 4) * 52 + Math.sin(i * 1.3) * 8,
+    y:  44 + Math.floor(i / 4) * 80 + Math.cos(i * 0.9) * 8,
   }));
 
   // ── CGLE init ───────────────────────────────────────────────────────────────
@@ -707,16 +723,16 @@ export default function LatticePage() {
             </p>
           </div>
 
-          {/* View switcher */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* View switcher — compact so 5 buttons fit without overflow */}
+          <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
             {VIEW_BTNS.map(v => (
               <button key={v.key} onClick={() => setActiveView(v.key)}
-                className="font-mono text-[10px] tracking-widest uppercase px-4 py-2 rounded border transition-all"
+                className="font-mono text-[9px] tracking-wider uppercase px-3 py-1.5 rounded border transition-all whitespace-nowrap"
                 style={{
                   borderColor: activeView === v.key ? "#00e5c0" : "#0e1e2e",
                   color: activeView === v.key ? "#00e5c0" : "#6b8099",
                   background: activeView === v.key ? "rgba(0,229,192,0.08)" : "transparent",
-                  boxShadow: activeView === v.key ? "0 0 12px rgba(0,229,192,0.2)" : "none",
+                  boxShadow: activeView === v.key ? "0 0 10px rgba(0,229,192,0.2)" : "none",
                 }}>
                 {v.label}
               </button>
@@ -1456,21 +1472,12 @@ export default function LatticePage() {
               </div>
             </section>
 
-            {/* ── 4-Layer Architecture Table ── */}
+            {/* ── 4-Layer Architecture Cards ── */}
             <section>
               <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground/30 mb-4">
                 4-Layer Architecture — Formalized CLA Mapping
               </div>
-              <div className="rounded-xl border border-border/30 overflow-hidden">
-                {/* Header row */}
-                <div className="grid grid-cols-5 border-b border-border/30">
-                  {["Layer", "Symbolic Name", "Technical Role", "Key Function", "Real-World Analogy"].map(h => (
-                    <div key={h} className="px-4 py-3 font-mono text-[8px] uppercase tracking-widest text-muted-foreground/30 border-r border-border/20 last:border-r-0">
-                      {h}
-                    </div>
-                  ))}
-                </div>
-
+              <div className="grid grid-cols-2 gap-4">
                 {[
                   {
                     num: "1",
@@ -1521,37 +1528,38 @@ export default function LatticePage() {
                     metaphor: "Printing consciousness into the physical world",
                   },
                 ].map(row => (
-                  <div key={row.num} className="grid grid-cols-5 border-b border-border/15 last:border-b-0 hover:bg-white/[0.015] transition-colors">
-                    {/* Layer */}
-                    <div className="px-4 py-4 border-r border-border/15 flex items-center">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg border flex items-center justify-center font-mono text-sm shrink-0"
-                          style={{ borderColor:`${row.color}40`, color:row.color, background:`${row.color}10` }}>
-                          {row.glyph}
+                  <div key={row.num} className="rounded-xl border border-border/25 overflow-hidden hover:bg-white/[0.012] transition-colors">
+                    {/* Card header */}
+                    <div className="flex items-center gap-3 px-5 py-3 border-b border-border/20"
+                      style={{ background:`${row.color}08` }}>
+                      <div className="w-9 h-9 rounded-lg border flex items-center justify-center font-mono text-sm shrink-0"
+                        style={{ borderColor:`${row.color}50`, color:row.color, background:`${row.color}14` }}>
+                        {row.glyph}
+                      </div>
+                      <div>
+                        <div className="font-mono text-[11px] font-bold tracking-wider" style={{ color:row.color }}>
+                          {row.name}
+                          <span className="font-normal text-[8px] text-muted-foreground/30 ml-2">Layer {row.num}</span>
                         </div>
-                        <div>
-                          <div className="font-mono text-[9px] font-bold tracking-wider" style={{ color:row.color }}>{row.name}</div>
-                          <div className="font-mono text-[8px] text-muted-foreground/30">Layer {row.num}</div>
-                        </div>
+                        <div className="font-mono text-[9px] text-muted-foreground/50">{row.role}</div>
                       </div>
                     </div>
-                    {/* Role */}
-                    <div className="px-4 py-4 border-r border-border/15">
-                      <div className="font-mono text-[10px] text-foreground/60">{row.role}</div>
-                      <div className="font-mono text-[9px] text-muted-foreground/30 mt-0.5 leading-relaxed">{row.roleDesc}</div>
-                    </div>
-                    {/* Function */}
-                    <div className="px-4 py-4 border-r border-border/15">
-                      <div className="font-mono text-[9px] text-muted-foreground/50 leading-relaxed">{row.func}</div>
-                      <div className="font-mono text-[8px] text-primary/30 mt-1 italic">{row.cla}</div>
-                    </div>
-                    {/* Key function */}
-                    <div className="px-4 py-4 border-r border-border/15">
-                      <div className="font-mono text-[9px] text-muted-foreground/40 leading-relaxed">{row.analogy}</div>
-                    </div>
-                    {/* Analogy */}
-                    <div className="px-4 py-4">
-                      <div className="font-mono text-[9px] text-muted-foreground/30 leading-relaxed italic">{row.metaphor}</div>
+                    {/* Card body — 3-column detail grid */}
+                    <div className="grid grid-cols-3 divide-x divide-border/15">
+                      <div className="px-4 py-3">
+                        <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground/25 mb-1">Technical Role</div>
+                        <div className="font-mono text-[9px] text-muted-foreground/45 leading-relaxed">{row.roleDesc}</div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground/25 mb-1">Key Function</div>
+                        <div className="font-mono text-[9px] text-muted-foreground/45 leading-relaxed">{row.func}</div>
+                        <div className="font-mono text-[8px] text-primary/35 mt-1.5 italic leading-snug">{row.cla}</div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <div className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground/25 mb-1">Analogy</div>
+                        <div className="font-mono text-[9px] text-muted-foreground/35 leading-relaxed">{row.analogy}</div>
+                        <div className="font-mono text-[8px] text-muted-foreground/25 mt-1.5 italic leading-snug">{row.metaphor}</div>
+                      </div>
                     </div>
                   </div>
                 ))}
