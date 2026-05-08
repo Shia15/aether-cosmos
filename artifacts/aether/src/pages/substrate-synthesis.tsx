@@ -736,6 +736,16 @@ export default function SubstrateSynthesisPage() {
           <LinkedInGallery />
         </Section>
 
+        {/* GPT Image Archive */}
+        <Section
+          anchor="gpt-archive"
+          kicker="X · GPT Image Archive"
+          title="315 GPT Images"
+          lead="ChatGPT-generated image collection — 235 images available. Loads 40 per page. Click any image to open full-screen. Use the jump box to go directly to a specific image number."
+        >
+          <GptGallery />
+        </Section>
+
         <footer style={{ marginTop:"2rem", paddingTop:"1.4rem",
           borderTop:"1px solid rgba(255,255,255,0.08)",
           textAlign:"center", fontSize:"0.78rem", color:"#64748b",
@@ -754,7 +764,9 @@ const LI_URLS: string[] = Array.from({ length: LI_COUNT }, (_, i) => {
   return `${import.meta.env.BASE_URL}linkedin_imgs/li-${n}.jpg`;
 });
 
-function LazyImg({ src, index }: { src: string; index: number }) {
+function LazyImg({ src, index, total = LI_COUNT, accentColor = "#a78bfa" }: {
+  src: string; index: number; total?: number; accentColor?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -783,11 +795,11 @@ function LazyImg({ src, index }: { src: string; index: number }) {
           position: "relative",
           transition: "border-color 0.2s",
         }}
-        onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(167,139,250,0.4)")}
+        onMouseEnter={e => (e.currentTarget.style.borderColor = `${accentColor}66`)}
         onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}
       >
         {visible && (
-          <img src={src} alt={`LinkedIn post ${index + 1}`} loading="lazy"
+          <img src={src} alt={`Image ${index + 1}`} loading="lazy"
             onLoad={() => setLoaded(true)}
             style={{
               width: "100%", height: "100%", objectFit: "cover",
@@ -805,24 +817,24 @@ function LazyImg({ src, index }: { src: string; index: number }) {
           }}>
             <div style={{
               width: 28, height: 28, borderRadius: "50%",
-              border: "2px solid rgba(167,139,250,0.25)",
-              borderTopColor: "#a78bfa",
+              border: `2px solid ${accentColor}30`,
+              borderTopColor: accentColor,
               animation: "spin 0.9s linear infinite",
             }}/>
             <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 10,
-              color: "rgba(167,139,250,0.4)", letterSpacing: "0.2em" }}>
+              color: `${accentColor}66`, letterSpacing: "0.2em" }}>
               {String(index + 1).padStart(3, "0")}
             </div>
           </div>
         )}
-        {/* slide number badge */}
+        {/* image number badge */}
         <div style={{
           position: "absolute", bottom: 6, right: 7,
           fontFamily: "'DM Mono',monospace", fontSize: 9,
-          color: "rgba(167,139,250,0.5)", letterSpacing: "0.15em",
+          color: `${accentColor}80`, letterSpacing: "0.15em",
           pointerEvents: "none",
         }}>
-          {String(index + 1).padStart(3, "0")} / {LI_COUNT}
+          {String(index + 1).padStart(3, "0")} / {total}
         </div>
       </div>
 
@@ -930,6 +942,96 @@ function LinkedInGallery() {
                 border: `1px solid ${pi === page ? "#a78bfa" : "rgba(167,139,250,0.2)"}`,
                 fontFamily: "'DM Mono',monospace", fontSize: 10,
                 color: pi === page ? "#0f172a" : "#a78bfa",
+                cursor: "pointer",
+              }}>
+              {pi + 1}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── GPT Image Gallery — 235 images, lazy-loaded ──────────────────────────────
+const GPT_COUNT = 235;
+const GPT_URLS: string[] = Array.from({ length: GPT_COUNT }, (_, i) => {
+  const n = String(i + 1).padStart(3, "0");
+  return `${import.meta.env.BASE_URL}gpt_imgs/gpt-${n}.png`;
+});
+
+function GptGallery() {
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const PER_PAGE = 40;
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return GPT_URLS.map((url, i) => ({ url, i }));
+    const n = parseInt(query.trim(), 10);
+    if (!isNaN(n) && n >= 1 && n <= GPT_COUNT)
+      return [{ url: GPT_URLS[n - 1], i: n - 1 }];
+    return GPT_URLS.map((url, i) => ({ url, i }));
+  }, [query]);
+
+  const pages = Math.ceil(filtered.length / PER_PAGE);
+  const slice = filtered.slice(page * PER_PAGE, (page + 1) * PER_PAGE);
+
+  return (
+    <div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginBottom: "1.2rem" }}>
+        <input
+          placeholder="Jump to image # (1–235)"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setPage(0); }}
+          style={{
+            background: "rgba(15,23,42,0.7)", border: "1px solid rgba(0,229,192,0.25)",
+            borderRadius: 8, padding: "0.45rem 0.85rem",
+            fontFamily: "'DM Mono',monospace", fontSize: 12,
+            color: "#e2e8f0", outline: "none", width: 220,
+          }}
+        />
+        <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 11,
+          color: "rgba(0,229,192,0.5)", letterSpacing: "0.2em" }}>
+          {filtered.length} images · page {page + 1} / {pages}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
+          <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+            style={{
+              fontFamily: "'DM Mono',monospace", fontSize: 11, letterSpacing: "0.15em",
+              background: "rgba(15,23,42,0.7)", border: "1px solid rgba(0,229,192,0.25)",
+              borderRadius: 6, padding: "0.35rem 0.75rem", color: "#00e5c0",
+              cursor: page === 0 ? "not-allowed" : "pointer", opacity: page === 0 ? 0.4 : 1,
+            }}>← Prev</button>
+          <button onClick={() => setPage(p => Math.min(pages - 1, p + 1))} disabled={page >= pages - 1}
+            style={{
+              fontFamily: "'DM Mono',monospace", fontSize: 11, letterSpacing: "0.15em",
+              background: "rgba(15,23,42,0.7)", border: "1px solid rgba(0,229,192,0.25)",
+              borderRadius: 6, padding: "0.35rem 0.75rem", color: "#00e5c0",
+              cursor: page >= pages - 1 ? "not-allowed" : "pointer", opacity: page >= pages - 1 ? 0.4 : 1,
+            }}>Next →</button>
+        </div>
+      </div>
+
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 180px), 1fr))",
+        gap: "0.75rem",
+      }}>
+        {slice.map(({ url, i }) => (
+          <LazyImg key={`gpt-${i}`} src={url} index={i} total={GPT_COUNT} accentColor="#00e5c0" />
+        ))}
+      </div>
+
+      {pages > 1 && (
+        <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: "1.2rem", flexWrap: "wrap" }}>
+          {Array.from({ length: pages }, (_, pi) => (
+            <button key={pi} onClick={() => setPage(pi)}
+              style={{
+                width: 28, height: 28, borderRadius: "50%",
+                background: pi === page ? "#00e5c0" : "rgba(0,229,192,0.1)",
+                border: `1px solid ${pi === page ? "#00e5c0" : "rgba(0,229,192,0.2)"}`,
+                fontFamily: "'DM Mono',monospace", fontSize: 10,
+                color: pi === page ? "#0f172a" : "#00e5c0",
                 cursor: "pointer",
               }}>
               {pi + 1}
