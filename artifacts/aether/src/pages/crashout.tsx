@@ -229,6 +229,7 @@ export default function CrashoutPage() {
   const [hovered, setHovered] = useState<string | null>(null);
   const [justAdded, setJustAdded] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [openEntry, setOpenEntry] = useState<Entry | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -501,14 +502,32 @@ export default function CrashoutPage() {
                         </div>
                       </div>
 
-                      {/* Delete */}
+                      {/* Actions */}
                       {isHov && (
-                        <button
-                          onClick={() => deleteEntry(entry.id)}
-                          style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.2)", cursor: "pointer", fontSize: 10, padding: "2px 4px", flexShrink: 0, lineHeight: 1 }}
-                          title="Delete entry">
-                          ×
-                        </button>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
+                          <button
+                            onClick={() => setOpenEntry(entry)}
+                            style={{
+                              background: `${entry.color}15`, border: `1px solid ${entry.color}40`,
+                              color: entry.color, cursor: "pointer", fontSize: 7,
+                              padding: "2px 7px", borderRadius: 4, letterSpacing: 1.5,
+                              fontFamily: "'Courier New', monospace", lineHeight: 1.6,
+                            }}
+                            title="Open entry">
+                            OPEN
+                          </button>
+                          <button
+                            onClick={() => deleteEntry(entry.id)}
+                            style={{
+                              background: "rgba(255,60,60,0.08)", border: "1px solid rgba(255,60,60,0.25)",
+                              color: "rgba(255,100,100,0.7)", cursor: "pointer", fontSize: 7,
+                              padding: "2px 7px", borderRadius: 4, letterSpacing: 1.5,
+                              fontFamily: "'Courier New', monospace", lineHeight: 1.6,
+                            }}
+                            title="Remove entry">
+                            DEL
+                          </button>
+                        </div>
                       )}
                     </div>
                   );
@@ -521,6 +540,124 @@ export default function CrashoutPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Open Entry Modal ── */}
+      {openEntry && (
+        <div
+          onClick={() => setOpenEntry(null)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 9999,
+            background: "rgba(0,0,0,0.88)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "zoom-out",
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 620, width: "90vw",
+              background: "rgb(4,12,24)",
+              border: `1px solid ${openEntry.color}30`,
+              borderLeft: `4px solid ${openEntry.color}`,
+              borderRadius: 10,
+              padding: "24px 28px",
+              cursor: "default",
+              boxShadow: `0 0 60px ${openEntry.color}12`,
+              fontFamily: "'Courier New', monospace",
+            }}
+          >
+            {/* Modal header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+              <span style={{ fontSize: 18 }}>{openEntry.mood}</span>
+              <div>
+                <div style={{ fontSize: 7, color: openEntry.color, letterSpacing: 2 }}>{openEntry.category}</div>
+                <div style={{ fontSize: 7, color: "rgba(255,255,255,0.25)", letterSpacing: 1, marginTop: 2 }}>
+                  {fmtDate(openEntry.ts)} · {fmtTime(openEntry.ts)} · {openEntry.words} words
+                </div>
+              </div>
+              <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+                <button
+                  onClick={() => {
+                    deleteEntry(openEntry.id);
+                    setOpenEntry(null);
+                  }}
+                  style={{
+                    background: "rgba(255,60,60,0.08)", border: "1px solid rgba(255,60,60,0.25)",
+                    color: "rgba(255,100,100,0.7)", cursor: "pointer", fontSize: 7,
+                    padding: "3px 10px", borderRadius: 4, letterSpacing: 1.5,
+                    fontFamily: "'Courier New', monospace",
+                  }}>
+                  REMOVE
+                </button>
+                <button
+                  onClick={() => setOpenEntry(null)}
+                  style={{
+                    background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
+                    color: "rgba(255,255,255,0.3)", cursor: "pointer", fontSize: 10,
+                    padding: "3px 8px", borderRadius: 4,
+                    fontFamily: "'Courier New', monospace",
+                  }}>
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Entry text */}
+            <div style={{
+              fontSize: 15, lineHeight: 1.85,
+              color: "rgba(255,255,255,0.88)",
+              whiteSpace: "pre-wrap", wordBreak: "break-word",
+              fontFamily: "system-ui, -apple-system, sans-serif",
+              fontWeight: 400,
+              padding: "16px 0",
+              borderTop: `1px solid ${openEntry.color}15`,
+              borderBottom: `1px solid ${openEntry.color}15`,
+              maxHeight: "60vh", overflowY: "auto",
+            }}>
+              {openEntry.text}
+            </div>
+
+            {/* Nav between entries */}
+            {(() => {
+              const all = entries;
+              const idx = all.findIndex(e => e.id === openEntry.id);
+              const prev = all[idx + 1];
+              const next = all[idx - 1];
+              return (
+                <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+                  <button
+                    disabled={!prev}
+                    onClick={() => prev && setOpenEntry(prev)}
+                    style={{
+                      padding: "4px 12px", borderRadius: 4,
+                      border: `1px solid ${prev ? "rgba(0,255,136,0.2)" : "rgba(255,255,255,0.05)"}`,
+                      background: "transparent", cursor: prev ? "pointer" : "not-allowed",
+                      color: prev ? "rgba(0,255,136,0.6)" : "rgba(255,255,255,0.1)",
+                      fontSize: 7, letterSpacing: 1.5, fontFamily: "'Courier New', monospace",
+                    }}>
+                    ← OLDER
+                  </button>
+                  <div style={{ flex: 1, textAlign: "center", fontSize: 7, color: "rgba(255,255,255,0.15)", letterSpacing: 1, alignSelf: "center" }}>
+                    {idx + 1} / {all.length}
+                  </div>
+                  <button
+                    disabled={!next}
+                    onClick={() => next && setOpenEntry(next)}
+                    style={{
+                      padding: "4px 12px", borderRadius: 4,
+                      border: `1px solid ${next ? "rgba(0,255,136,0.2)" : "rgba(255,255,255,0.05)"}`,
+                      background: "transparent", cursor: next ? "pointer" : "not-allowed",
+                      color: next ? "rgba(0,255,136,0.6)" : "rgba(255,255,255,0.1)",
+                      fontSize: 7, letterSpacing: 1.5, fontFamily: "'Courier New', monospace",
+                    }}>
+                    NEWER →
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
