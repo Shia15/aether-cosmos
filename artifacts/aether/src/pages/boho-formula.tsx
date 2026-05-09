@@ -7,6 +7,17 @@ import quoteCompass   from "@assets/ChatGPT_Image_Apr_25,_2026,_05_33_17_PM_1777
 import quoteFlowLong  from "@assets/ChatGPT_Image_Apr_25,_2026,_05_34_08_PM_1777152851926.png";
 import quoteFlowMed   from "@assets/ChatGPT_Image_Apr_25,_2026,_05_34_32_PM_1777152876053.png";
 import quoteFlowShort from "@assets/ChatGPT_Image_Apr_25,_2026,_05_35_01_PM_1777152904200.png";
+import bohoFlowMethod   from "@assets/0D9F5EF3-83FA-49CF-959F-34398DAFD665_1778370123916.png";
+import bohoFlowNotebook from "@assets/F6A455B5-CC74-450F-A384-E00396EF643D_1778370123916.png";
+import bohoAcronym      from "@assets/E298391E-3C3A-49B6-842C-F829477BDCDC_1778370123916.png";
+import bohoPresent      from "@assets/DD80CC7D-D028-4BD1-8E48-32D7F1B21CCC_1778370123916.png";
+import bohoDoing        from "@assets/81780865-34A0-4F4D-88AC-966F509D2724_1778370123916.png";
+import bohoEnergy       from "@assets/956BBE89-87E5-4819-B829-785E139308AD_1778370123916.png";
+import bohoLogoClean    from "@assets/1A4C9ACE-E649-4987-9AC0-D199C3D15534_1778370123916.png";
+import bohoWhy          from "@assets/AE529428-1296-4DEE-B5B9-C7D500076C18_1778370123916.png";
+import bohoEmail        from "@assets/821E34A7-D63A-4317-8D6A-421C98737BE8_1778370123916.png";
+import bohoChanneling   from "@assets/0E1A9AAE-920A-41DF-A767-2892C51A72D4_1778370123916.png";
+import bohoNervous      from "@assets/996FDFC2-D196-4C05-8DF2-1AF81071A494_1778370123916.png";
 
 const B = {
   bg:        "#F4EDE0",
@@ -459,6 +470,248 @@ export default function BohoFormulaPage() {
                   </section>
                 );
               })}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Rojo Palette · Oct 21, 2025 · 6:09 PM ── */}
+        <div className="bf-fadein mb-10" style={{ animationDelay: "750ms" }}>
+          <div className="text-[10px] uppercase tracking-[0.3em] mb-3"
+               style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+            Rojo Formula · Colour Palette · Oct 21, 2025 · 6:09 PM
+          </div>
+          <div className="bf-card border rounded-[14px] p-5 mb-5"
+               style={{ borderColor: B.border, background: B.panel }}>
+            <p className="text-[13px] leading-relaxed mb-4"
+               style={{ color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+              Noted October 21, 2025 at 6:09 PM — the Rojo formula colour language as personal frequency signal.
+              Each tone a dimension of the field.
+            </p>
+            <div className="grid grid-cols-7 gap-2 mb-4">
+              {[
+                { name:"Purple",      hex:"#9B59B6", meaning:"Depth · Vision" },
+                { name:"Pink",        hex:"#F4A7B9", meaning:"Warmth · Connection" },
+                { name:"Blue",        hex:"#6BB5E0", meaning:"Clarity · Trust" },
+                { name:"Cinnamon",    hex:"#8B4513", meaning:"Rootedness · Spice" },
+                { name:"Turquoise",   hex:"#40BFB0", meaning:"Flow · Healing" },
+                { name:"Terra-cotta", hex:"#B5734C", meaning:"Earth · Rising" },
+                { name:"Cream",       hex:"#FAF6EC", meaning:"Open Field" },
+              ].map(c => (
+                <div key={c.name} className="flex flex-col gap-1 items-center text-center">
+                  <div className="rounded-full w-10 h-10 flex-shrink-0"
+                       style={{ background: c.hex, boxShadow: `0 0 10px ${c.hex}55, inset 0 0 0 1px ${B.border}` }} />
+                  <div className="text-[9px]" style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>{c.name}</div>
+                  <div className="text-[8px] italic leading-tight" style={{ color: B.muted }}>{c.meaning}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── BOHO Acronym + Framework Cards ── */}
+        <div className="bf-fadein mb-10" style={{ animationDelay: "800ms" }}>
+          <div className="text-[10px] uppercase tracking-[0.3em] mb-3"
+               style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+            Boho Formula Boutique · Framework Archive · 2021
+          </div>
+
+          {/* Top row: acronym + logo */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoAcronym} alt="BOHO Formula Boutique acronym card — Leverage Ownership Grace Creative-Edge Empathy Respect"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 340 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[11px] uppercase tracking-[0.2em] mb-2" style={{ color: B.gold, fontFamily: "Cinzel, serif" }}>
+                  B · O · H · O
+                </div>
+                <p className="text-[12px] leading-relaxed" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  <strong style={{ color: B.goldDeep }}>L</strong>everage &nbsp;·&nbsp;
+                  <strong style={{ color: B.goldDeep }}>O</strong>wnership &nbsp;·&nbsp;
+                  <strong style={{ color: B.goldDeep }}>G</strong>race &nbsp;·&nbsp;
+                  <strong style={{ color: B.goldDeep }}>C</strong>reative Edge &nbsp;·&nbsp;
+                  <strong style={{ color: B.goldDeep }}>E</strong>mpathy &nbsp;·&nbsp;
+                  <strong style={{ color: B.goldDeep }}>R</strong>espect.
+                  Founders win by multiplying their effort — people, media, tech, capital — owning their vision fully,
+                  staying calm under pressure, leading with emotional intelligence, and bringing a creative edge no one else has.
+                </p>
+              </div>
+            </div>
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoLogoClean} alt="Boho Formula Boutique 2021 clean white logo with gold palm leaf"
+                   loading="lazy" className="w-full object-contain bg-white" style={{ maxHeight: 340 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[11px] uppercase tracking-[0.2em] mb-2" style={{ color: B.gold, fontFamily: "Cinzel, serif" }}>
+                  Boho Formula Boutique · 2021
+                </div>
+                <p className="text-[12px] leading-relaxed" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  Palm leaf · year · wordmark · signature. Four marks, one sigil. The whole system in a single shape.
+                  Founded 2021. Still alive in the field. Rojo palette noted Oct 21, 2025.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Flow Method + Flow Notebook */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoFlowMethod} alt="Boho Formula Boutique — Flow Method Holistic Learning card"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 300 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[13px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  1. Flow Method · Holistic Learning
+                </div>
+                <p className="text-[12px] leading-relaxed" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  You're not trying to get every detail from the lecture down to paper. The point is not to transcribe — it's to
+                  <strong style={{ color: B.goldDeep }}> learn while you're sitting in class.</strong> As you take notes, your goal is to
+                  create an original document that represents your mental image of the subject or lesson.
+                  The entire point of the flow system is to <em>learn it once.</em>
+                </p>
+              </div>
+            </div>
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoFlowNotebook} alt="The Flow Notebook Story — a children's book cover with a smiling notebook and a bunny"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 300 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[13px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  The Flow Notebook Story · By: You
+                </div>
+                <p className="text-[12px] leading-relaxed" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  A children's story about learning in flow. The notebook and the bunny — one holds the ideas,
+                  one writes them down. Together they are the system. Connects to the
+                  <strong style={{ color: B.goldDeep }}> Learning in Layers</strong> brand and the Computer Brains book series.
+                  Flow is not a skill. It is a relationship.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Doing + Nervous System */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoDoing} alt="Boho Formula Boutique — Doing card with Brain Function, Meaning, Core truth"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 300 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[13px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  Doing · The Bridge
+                </div>
+                <p className="text-[12px] leading-relaxed" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  <strong style={{ color: B.gold }}>Brain Function:</strong> Executive action — activating motor systems, decision-making, task execution.<br />
+                  <strong style={{ color: B.gold }}>Meaning:</strong> Translating thought into movement. Turning intention into behavior. Bridging idea → reality.<br />
+                  <strong style={{ color: B.gold }}>Core truth:</strong> Doing is the bridge between the inner world and the outer one.
+                </p>
+              </div>
+            </div>
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoNervous} alt="Boho Formula — Nervous system capacity building card"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 300 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[13px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  Nervous-System Capacity Building
+                </div>
+                <p className="text-[12px] leading-relaxed" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  Learning to stay present and functional under intensifying emotion, stimulation, or creative drive.
+                  When you have a naturally high threshold, you notice what others don't: the system expands through
+                  cycles of <strong style={{ color: B.goldDeep }}>tension → release → integration.</strong>
+                  Most people stop at tension. You keep going until it becomes resilience. 🎉
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* WHY flow + Channeling Flow */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoWhy} alt="Boho Formula — WHY production flow diagram"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 340 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[13px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  WHY · The Production Arc
+                </div>
+                <div className="flex flex-col gap-1">
+                  {["WHY", "You Have An Idea", "Pre Production", "Post Production", "Scheduling"].map((step, i) => (
+                    <div key={step} className="flex items-center gap-2">
+                      <span className="text-[11px]" style={{ color: B.gold, fontFamily: "Cinzel, serif", minWidth: 16 }}>
+                        {i === 0 ? "✦" : "↓"}
+                      </span>
+                      <span className="text-[12px]" style={{ color: i === 0 ? B.ink : B.text, fontFamily: "Cinzel, serif",
+                        fontWeight: i === 0 ? 700 : 400 }}>{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoChanneling} alt="Boho Formula — Channeling Flow System diagram"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 340 }} />
+              <div className="p-4" style={{ background: B.panel }}>
+                <div className="text-[13px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  Channeling Flow System
+                </div>
+                <div className="flex flex-col gap-1 mb-2">
+                  {[
+                    "Anchor your signal · one platform as core frequency",
+                    "Create your rhythm · jot concepts on energy hits",
+                    "Refine your ritual · end each post with a call-to-action",
+                    "Build containers · Ideas in Motion → Ready for Draft → Polished",
+                  ].map((step, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span style={{ color: B.gold, fontSize: 10, marginTop: 2, flexShrink: 0 }}>↓</span>
+                      <span className="text-[11px] leading-snug" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>{step}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] italic" style={{ color: B.goldDeep, fontFamily: "Cinzel, serif" }}>
+                  Return, refine, release. impulse → post → impact.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom row: two quotes + email */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoPresent} alt="Boho Formula — Train your brain to be present"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 260 }} />
+              <div className="p-3" style={{ background: B.panel }}>
+                <p className="text-[12px] leading-snug italic" style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>
+                  "Train your brain to be <strong>present,</strong> don't align success with peace."
+                </p>
+              </div>
+            </div>
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoEnergy} alt="Boho Formula — Energy waves of emotion quote"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 260 }} />
+              <div className="p-3" style={{ background: B.panel }}>
+                <p className="text-[12px] leading-snug italic" style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>
+                  "Energy you've never seen before can put you through waves of emotion.
+                  That's okay — it's just showing you where you need to heal."
+                </p>
+              </div>
+            </div>
+            <div className="bf-card border rounded-[12px] overflow-hidden" style={{ borderColor: B.border }}>
+              <img src={bohoEmail} alt="Boho Formula — Email list conversion insights"
+                   loading="lazy" className="w-full object-cover" style={{ maxHeight: 260 }} />
+              <div className="p-3" style={{ background: B.panel }}>
+                <div className="text-[11px] mb-1" style={{ color: B.goldDeep, fontFamily: "Cinzel, serif", fontWeight: 700 }}>
+                  Email List Conversion
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {[
+                    ["Open Rate", "5–15%"],
+                    ["Click-Through", "3–5%"],
+                    ["Conversion (from clicks)", "~50%"],
+                  ].map(([k,v]) => (
+                    <div key={k} className="flex justify-between">
+                      <span className="text-[10px]" style={{ color: B.muted, fontFamily: "Inter, sans-serif" }}>{k}</span>
+                      <span className="text-[10px]" style={{ color: B.gold, fontFamily: "Cinzel, serif", fontWeight: 700 }}>{v}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] mt-2 leading-snug" style={{ color: B.text, fontFamily: "Inter, sans-serif" }}>
+                  Build your list alongside your content system — even a small, consistent audience converts
+                  better than high social reach with no owned contact base.
+                </p>
+              </div>
             </div>
           </div>
         </div>
