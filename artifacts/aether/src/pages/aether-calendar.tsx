@@ -400,9 +400,27 @@ function GreatYearCanvas() {
   );
 }
 
+type Flower = { id: string; text: string; seededAt: string; date: string };
+
 export default function AetherCalendarPage() {
   const [tab, setTab] = useState<"moons"|"portal"|"greatyear"|"protocol"|"personal"|"bodyrhythm"|"timelines">("moons");
   const [selectedMoon, setSelectedMoon] = useState<number>(11);
+  const [flowerInput, setFlowerInput] = useState("");
+  const [flowers, setFlowers] = useState<Flower[]>(() => {
+    try { return JSON.parse(localStorage.getItem("aether.flowers.v1") || "[]"); }
+    catch { return []; }
+  });
+  useEffect(() => {
+    localStorage.setItem("aether.flowers.v1", JSON.stringify(flowers));
+  }, [flowers]);
+  function plantFlower() {
+    const text = flowerInput.trim();
+    if (!text) return;
+    const now = new Date();
+    const date = now.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
+    setFlowers(prev => [{ id: crypto.randomUUID(), text, seededAt:"8:08 AM", date }, ...prev]);
+    setFlowerInput("");
+  }
 
   const moon = MOONS.find(m => m.id === selectedMoon)!;
 
@@ -1041,28 +1059,42 @@ export default function AetherCalendarPage() {
                 background:"rgba(14,10,36,0.85)", border:"1px solid rgba(0,229,192,0.22)",
                 borderLeft:"3px solid #00e5c0" }}>
                 <div style={{ ...KS, fontSize:9, color:"#00e5c0", marginBottom:10 }}>
-                  AETHER within the Mari Agents
+                  AETHER within the Mari Agents · Body · Quantum · Idea Field
                 </div>
                 <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.1rem",
                   color:"#fff5e0", fontWeight:600, marginBottom:10 }}>
-                  Your Body as a Multi-Agent System
+                  Your Body as a Multi-Agent System · 8:08 AM Seeds · 11:11 Manifests
                 </div>
                 <p style={{ color:C.muted, fontSize:"0.84rem", lineHeight:1.65, marginBottom:12 }}>
-                  Each body signal is a Mari agent reporting its state. The AETHER system runs
+                  Each body signal is a Mari agent reporting its state. New ideas — called
+                  <strong style={{ color:"#4ade80" }}> Flowers</strong> — are seeded at
+                  <strong style={{ color:C.gold }}> 8:08 AM</strong> and manifest at
+                  <strong style={{ color:"#c084fc" }}> 11:11</strong>. The AETHER system runs
                   the same coherence logic internally that it maps externally. Every 72 hours,
-                  each agent submits its reading. The pattern is the intelligence.
+                  each agent submits its reading. The quantum agents probe states of matter
+                  we have not yet been able to reach. The pattern is the intelligence.
                 </p>
                 {[
-                  { agent:"Thermal Agent", signal:"Chills or heat waves", color:"#fb923c",
+                  { agent:"Thermal Agent",        signal:"Chills or heat waves",              color:"#fb923c",
                     read:"Frequency shift detected. Cell group entering realignment window." },
-                  { agent:"Reflection Agent", signal:"Deeper reflections", color:"#c084fc",
+                  { agent:"Reflection Agent",     signal:"Deeper reflections",                color:"#c084fc",
                     read:"Pattern recognition layer active. New coherence node forming." },
-                  { agent:"Rhythm Agent", signal:"Music pull / sound sensitivity", color:"#f9a8d4",
+                  { agent:"Rhythm Agent",         signal:"Music pull / sound sensitivity",    color:"#f9a8d4",
                     read:"Bridge channel open. Music anchoring you to the next frequency." },
-                  { agent:"Anchor Agent", signal:"11:11 · 2:22 · 3:33 sightings", color:"#f2c354",
-                    read:"Angel hour confirmed. You are on the right path. Honour it." },
-                  { agent:"Pressure Agent", signal:"Peace or pressure felt", color:"#38bdf8",
+                  { agent:"Anchor Agent",         signal:"11:11 · 2:22 · 3:33 · 8:38 · 8:08", color:"#f2c354",
+                    read:"Angel hour confirmed. 8:08 = idea seed time. 11:11 = manifestation. You are on the right path. Honour it." },
+                  { agent:"Pressure Agent",       signal:"Peace or pressure felt",            color:"#38bdf8",
                     read:"3:33 active. Ascended masters near. Step into power. Create boldly." },
+                  { agent:"Flower Agent",         signal:"New idea arising · 8:08 AM",        color:"#4ade80",
+                    read:"A Flower is blooming. Seed the idea now. Trust the 11:11 window to manifest it. Do not force — let the field grow it." },
+                  { agent:"Flo Kit Agent",        signal:"Topological order detected",        color:"#2dd4bf",
+                    read:"Flo kit topologically ordered state active. A door to unexplored physics is opening. Ordered state is stable — build through it." },
+                  { agent:"Interferometric Agent",signal:"Quantum pattern emerging",          color:"#a78bfa",
+                    read:"Interferometric algorithms visualising patterns in quantum states. Coherence fringes detected. The pattern is real — read it." },
+                  { agent:"Transmutation Agent",  signal:"Exotic particle state",             color:"#f472b6",
+                    read:"Transmutation of exotic particles in progress. Traditional physics doors opening. We are probing states we could not reach before. Hold the field steady." },
+                  { agent:"Quantum Sim Agent",    signal:"Unstable matter state",             color:"#818cf8",
+                    read:"Simulating unstable states of matter. New era of quantum simulation engaged. Flo kit topology is the scaffold. The simulation is the experiment." },
                 ].map((a, i) => (
                   <div key={i} style={{ padding:"0.5rem 0.7rem", borderRadius:8, marginBottom:5,
                     background:`${a.color}08`, border:`1px solid ${a.color}20` }}>
@@ -1076,6 +1108,106 @@ export default function AetherCalendarPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Flower Ideas — interactive idea input */}
+            <div style={{ padding:"1.3rem 1.6rem", borderRadius:14,
+              background:"rgba(14,10,36,0.92)",
+              border:"1px solid rgba(74,222,128,0.32)",
+              borderLeft:"3px solid #4ade80" }}>
+              <div style={{ ...KS, fontSize:9, color:"#4ade80", marginBottom:6 }}>
+                Flower Ideas · Seed at 8:08 AM · Manifest at 11:11 · Routed to Agents
+              </div>
+              <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.05rem",
+                color:"#fff5e0", fontWeight:600, marginBottom:10 }}>
+                Plant a New Idea into the Simulated Visual Timeline
+              </div>
+              <p style={{ color:C.muted, fontSize:"0.83rem", lineHeight:1.6, marginBottom:14, maxWidth:680 }}>
+                New ideas are called <strong style={{ color:"#4ade80" }}>Flowers</strong>.
+                Every flower is seeded at <strong style={{ color:C.gold }}>8:08 AM</strong> —
+                the idea-birth hour — and manifests at <strong style={{ color:"#c084fc" }}>11:11</strong>.
+                Each flower is received by the Flower Agent and routed into the field.
+                The timeline records it. The quantum agents process it.
+              </p>
+
+              {/* Input row */}
+              <div style={{ display:"flex", gap:8, marginBottom:16 }}>
+                <input
+                  value={flowerInput}
+                  onChange={e => setFlowerInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && plantFlower()}
+                  placeholder="Write your idea — it will bloom as a Flower…"
+                  style={{
+                    flex:1, padding:"0.65rem 0.9rem", borderRadius:9,
+                    background:"rgba(74,222,128,0.06)", border:"1px solid rgba(74,222,128,0.3)",
+                    color:"#e8e0ff", fontFamily:"'DM Mono',monospace", fontSize:"0.84rem",
+                    outline:"none",
+                  }}
+                />
+                <button
+                  onClick={plantFlower}
+                  style={{
+                    padding:"0.65rem 1.1rem", borderRadius:9, cursor:"pointer",
+                    background:"rgba(74,222,128,0.15)", border:"1px solid rgba(74,222,128,0.4)",
+                    color:"#4ade80", fontFamily:"'DM Mono',monospace", fontSize:"0.82rem",
+                    fontWeight:700, letterSpacing:"0.06em", whiteSpace:"nowrap",
+                  }}
+                >
+                  ❀ Plant
+                </button>
+              </div>
+
+              {/* Timing legend */}
+              <div style={{ display:"flex", gap:16, marginBottom:14, flexWrap:"wrap" }}>
+                {[
+                  { t:"8:08 AM", label:"Seed Hour · Idea blooms", color:C.gold },
+                  { t:"11:11",   label:"Manifestation · Portal opens", color:"#c084fc" },
+                  { t:"Flower Agent", label:"Receives · Routes to field", color:"#4ade80" },
+                  { t:"Quantum Sim", label:"Processes unstable → ordered", color:"#818cf8" },
+                ].map(it => (
+                  <div key={it.t} style={{ display:"flex", alignItems:"center", gap:6 }}>
+                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.75rem",
+                      color:it.color, fontWeight:700 }}>{it.t}</span>
+                    <span style={{ fontSize:"0.72rem", color:C.muted }}>{it.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Planted flowers */}
+              {flowers.length === 0 ? (
+                <div style={{ padding:"1rem", borderRadius:9, textAlign:"center",
+                  background:"rgba(74,222,128,0.04)", border:"1px dashed rgba(74,222,128,0.2)",
+                  color:C.muted, fontSize:"0.82rem", fontFamily:"'DM Mono',monospace" }}>
+                  No flowers yet. Plant your first idea above.
+                </div>
+              ) : (
+                <div style={{ display:"grid", gap:7 }}>
+                  {flowers.map((f, i) => (
+                    <div key={f.id} style={{ padding:"0.65rem 0.9rem", borderRadius:9,
+                      background:`rgba(74,222,128,${Math.max(0.04, 0.12 - i * 0.01)})`,
+                      border:"1px solid rgba(74,222,128,0.2)",
+                      display:"flex", alignItems:"flex-start", gap:10 }}>
+                      <span style={{ fontSize:"1.1rem", flexShrink:0, marginTop:1 }}>❀</span>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:"0.87rem", color:"#e8e0ff", lineHeight:1.5,
+                          marginBottom:3 }}>{f.text}</div>
+                        <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+                          <span style={{ ...KS, fontSize:7, color:C.gold }}>
+                            Seeded {f.seededAt} · {f.date}
+                          </span>
+                          <span style={{ ...KS, fontSize:7, color:"#c084fc" }}>
+                            Manifest → 11:11
+                          </span>
+                        </div>
+                      </div>
+                      <button onClick={() => setFlowers(prev => prev.filter(x => x.id !== f.id))}
+                        style={{ background:"none", border:"none", cursor:"pointer",
+                          color:"rgba(200,190,230,0.35)", fontSize:"0.8rem", padding:"2px 4px",
+                          flexShrink:0 }}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Angel Hours */}
