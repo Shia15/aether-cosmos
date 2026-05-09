@@ -188,6 +188,7 @@ import DiamondNanothreadsPage from "@/pages/diamond-nanothreads";
 import ComputerBrainsPage from "@/pages/computer-brains";
 import LearningLayersPage from "@/pages/learning-layers";
 import ChaosToCodingPage from "@/pages/chaos-to-code";
+import AetherCalendarPage from "@/pages/aether-calendar";
 
 const queryClient = new QueryClient();
 
@@ -379,6 +380,7 @@ function Router() {
         <Route path="/quantum-substrate" component={QuantumSubstratePage} />
         <Route path="/neural-psychedelic" component={NeuralPsychedelicPage} />
         <Route path="/photo-timeline" component={PhotoTimelinePage} />
+        <Route path="/aether-calendar" component={AetherCalendarPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

@@ -134,6 +134,7 @@ const NAV_ITEMS = [
   { href: "/quaternions",      label: "Quaternions",      icon: Rotate3d },
   { href: "/biomimetic-symphony",    label: "Biomimetic Symphony",    icon: Leaf },
   { href: "/ecological-intelligence", label: "Ecological Intelligence", icon: Leaf },
+  { href: "/aether-calendar",       label: "AETHER Calendar · 13 Moons · 26k-Year Great Year", icon: Moon },
   { href: "/fibonacci-calendar",    label: "Fibonacci Calendar",     icon: Sigma },
   { href: "/unified-timeline",      label: "Unified Timeline",       icon: GitFork },
   { href: "/cerebral-organoids",   label: "Cerebral Organoids",    icon: Brain },
