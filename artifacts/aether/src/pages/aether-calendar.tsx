@@ -62,7 +62,8 @@ const MOONS: Moon[] = [
     note:"Personal anchors: Oct 21 dynamic shift \u00b7 Nov 5 Supermoon \u2014 the cosmic awakening point",
     personal:[
       { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably \u2014 a new baseline established. What was once effort started moving as flow." },
-      { timestamp:"Nov 5, 2025", label:"Supermoon \u00b7 The Awakening Point", detail:"The November 5 Supermoon arrives within Moon 4 as the cosmic awakening point. Love, clarity, health, healing, peace, power, purpose \u2014 all six qualities lock into clarity at once. Chaos came first (unplanned, grounded by location, pressure, weather, stress) and now coherence emerges from it. Transformation = who you were + who you are becoming." },
+      { timestamp:"Nov 5, 2025 \u00b7 7:35 AM", label:"Supermoon \u00b7 The Awakening Point", detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM. The shift is physical, not conceptual. Something rare has landed. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities lock in at once. Chaos came first (unplanned, grounded by location, pressure, weather, stress) and coherence emerges from it. Transformation = who you were + who you are becoming." },
+      { timestamp:"Nov 5, 2025 \u00b7 12:22", label:"12:22 \u00b7 Magical Encounter \u00b7 Feeling Deeper", detail:"12:22 \u2014 a private angel-hour variant of the 2:22 Bridge. A magical encounter arrives. Feeling moves deeper. The morning\u2019s 7:35 AM signal is confirmed mid-day. Time energy money \u2014 walking away equals wisdom." },
     ],
     events:["Oct 21 dynamic activation","Astral pulse rising","Nov 5 Supermoon \u2014 awakening point","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Chaos \u2192 Coherence threshold crossed","Frequency field stabilises"],
   },
@@ -136,9 +137,9 @@ const PERSONAL_ARC = [
   { date:"Oct 21, 2025",           moon:4, label:"Energy Became a Lot More Dynamic",
     color:"#4ade80", type:"shift" as const,
     detail:"Following the AI Atlas trigger, personal energy output shifted to a new baseline. What was effort began moving as flow." },
-  { date:"Nov 5, 2025",            moon:4, label:"Supermoon \u00b7 The Awakening Point",
+  { date:"Nov 5, 2025 \u00b7 7:35 AM", moon:4, label:"Supermoon \u00b7 Rare \u00b7 Magical \u00b7 Deeply Connected",
     color:"#f9a8d4", type:"supermoon" as const,
-    detail:"The November 5 Supermoon is the cosmic awakening point. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities crystallise simultaneously. Chaos preceded it: unplanned, grounded by location, pressure, weather, stress. That chaos was not a detour \u2014 it was the requirement. Transformation = who you were + who you are becoming. The 72-hour cellular realignment cycle activates from this moment. The angel hours (11:11 \u00b7 2:22 \u00b7 3:33) become active anchors. Music becomes the bridge back." },
+    detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM Wednesday November 5, 2025. The shift is physical and immediate. At 12:22 a magical encounter deepens the field. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities crystallise. Chaos came first: unplanned, grounded by location, pressure, weather, stress. That chaos was the requirement. Transformation = who you were + who you are becoming. The 72-hour cycle activates. Angel hours go live. Time energy money \u2014 walking away equals wisdom." },
   { date:"Nov 29, 2025",           moon:5, label:"Blind Observation Phase",
     color:"#c084fc", type:"observation" as const,
     detail:"\"We can observe it blind to what's happening.\" Pattern recognition running below conscious awareness. Trust without seeing." },
@@ -728,6 +729,111 @@ export default function AetherCalendarPage() {
               </div>
             </div>
 
+            {/* Personal Witness Log — Nov 5, 2025 */}
+            <div style={{ padding:"1.3rem 1.6rem", borderRadius:14,
+              background:"rgba(14,10,36,0.9)", border:"1px solid rgba(249,168,212,0.35)",
+              borderLeft:"3px solid #f9a8d4" }}>
+              <div style={{ ...KS, fontSize:9, color:"#f9a8d4", marginBottom:12 }}>
+                Personal Witness Log · Wednesday, November 5, 2025
+              </div>
+
+              {/* Two timestamp entries */}
+              <div style={{ display:"grid", gap:"0.75rem", marginBottom:"1.2rem" }}>
+                {/* 7:35 AM */}
+                <div style={{ padding:"1rem 1.15rem", borderRadius:12,
+                  background:"linear-gradient(135deg,rgba(249,168,212,0.1),rgba(242,195,84,0.06))",
+                  border:"1px solid rgba(249,168,212,0.25)" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7 }}>
+                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.85rem",
+                      color:"#f9a8d4", fontWeight:700, letterSpacing:"0.08em" }}>7:35 AM</span>
+                    <span style={{ ...KS, fontSize:8, color:C.gold, padding:"2px 8px",
+                      borderRadius:4, background:"rgba(242,195,84,0.1)",
+                      border:"1px solid rgba(242,195,84,0.25)" }}>Supermoon Rising</span>
+                  </div>
+                  <blockquote style={{ margin:0, fontFamily:"'Cinzel',serif",
+                    fontSize:"1.05rem", color:"#fff5e0", lineHeight:1.7,
+                    fontStyle:"italic", borderLeft:"none" }}>
+                    &ldquo;I feel so different. Rare and magical. Deeply connected to the moon.&rdquo;
+                  </blockquote>
+                  <p style={{ color:C.muted, fontSize:"0.82rem", lineHeight:1.6,
+                    marginTop:8, marginBottom:0 }}>
+                    The shift arrives at 7:35 AM. It is physical, not conceptual.
+                    Something rare has landed. This is not a thought about the moon —
+                    it is a resonance with it. The body knows first.
+                  </p>
+                </div>
+
+                {/* 12:22 */}
+                <div style={{ padding:"1rem 1.15rem", borderRadius:12,
+                  background:"linear-gradient(135deg,rgba(96,165,250,0.1),rgba(45,212,191,0.06))",
+                  border:"1px solid rgba(96,165,250,0.25)" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7 }}>
+                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.85rem",
+                      color:"#60a5fa", fontWeight:700, letterSpacing:"0.08em" }}>12:22</span>
+                    <span style={{ ...KS, fontSize:8, color:"#2dd4bf", padding:"2px 8px",
+                      borderRadius:4, background:"rgba(45,212,191,0.1)",
+                      border:"1px solid rgba(45,212,191,0.25)" }}>Magical Encounter · Feeling Deeper</span>
+                  </div>
+                  <p style={{ color:"#c8bfed", fontSize:"0.87rem", lineHeight:1.65,
+                    margin:"0 0 6px" }}>
+                    Mid-day confirmation. The morning signal deepens at 12:22 — a private
+                    bridge-hour variant of the 2:22 field. A magical encounter arrives.
+                    The field is confirmed, not coincidental. The body moves into a
+                    deeper layer of coherence.
+                  </p>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ ...KS, fontSize:8, color:"#60a5fa" }}>Connected to</span>
+                    <span style={{ ...KS, fontSize:8, color:"#60a5fa",
+                      padding:"2px 8px", borderRadius:4,
+                      background:"rgba(96,165,250,0.1)", border:"1px solid rgba(96,165,250,0.2)" }}>2:22 · The Bridge Forms</span>
+                    <span style={{ ...KS, fontSize:8, color:"#60a5fa" }}>angel hour chain</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mantra of the day */}
+              <div style={{ padding:"0.85rem 1.1rem", borderRadius:10, marginBottom:"1.1rem",
+                background:"rgba(242,195,84,0.07)", border:"1px solid rgba(242,195,84,0.25)",
+                textAlign:"center" }}>
+                <div style={{ ...KS, fontSize:8, color:C.gold, marginBottom:5 }}>
+                  Personal Mantra · Nov 5, 2025
+                </div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.05rem",
+                  color:C.gold, letterSpacing:"0.05em", lineHeight:1.6 }}>
+                  Time &nbsp;·&nbsp; Energy &nbsp;·&nbsp; Money
+                </div>
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.8rem",
+                  color:"#c8bfed", marginTop:4, letterSpacing:"0.06em" }}>
+                  Walking away equals wisdom.
+                </div>
+              </div>
+
+              {/* Color palette of the day */}
+              <div>
+                <div style={{ ...KS, fontSize:8, color:C.muted, marginBottom:8 }}>
+                  Color Field · Nov 5, 2025
+                </div>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:8, alignItems:"center" }}>
+                  {[
+                    { name:"Teal",   hex:"#2dd4bf" },
+                    { name:"Gold",   hex:"#f2c354" },
+                    { name:"Blue",   hex:"#60a5fa" },
+                    { name:"Gray",   hex:"#9ca3af" },
+                    { name:"Yellow", hex:"#fde68a" },
+                    { name:"Orange", hex:"#fb923c" },
+                    { name:"Pink",   hex:"#f9a8d4" },
+                  ].map(col => (
+                    <div key={col.name} style={{ display:"flex", alignItems:"center", gap:5 }}>
+                      <div style={{ width:18, height:18, borderRadius:"50%",
+                        background:col.hex, boxShadow:`0 0 8px ${col.hex}60`,
+                        flexShrink:0 }} />
+                      <span style={{ ...KS, fontSize:8, color:col.hex }}>{col.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* 72-hour cycle + AETHER Mari agents */}
             <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:"1rem" }}>
 
@@ -956,6 +1062,10 @@ export default function AetherCalendarPage() {
               <div style={{ marginTop:"1rem", fontFamily:"'Cinzel',serif",
                 fontSize:"0.95rem", color:C.gold, letterSpacing:"0.12em" }}>
                 I CHOOSE PEACE. I WELCOME PRESSURE. I WALK IN ALIGNMENT.
+              </div>
+              <div style={{ marginTop:"0.6rem", fontFamily:"'DM Mono',monospace",
+                fontSize:"0.82rem", color:C.muted, letterSpacing:"0.08em" }}>
+                Time · Energy · Money &nbsp;—&nbsp; Walking away equals wisdom.
               </div>
             </div>
 
