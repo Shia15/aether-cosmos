@@ -64,7 +64,7 @@ const MOONS: Moon[] = [
     personal:[
       { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably \u2014 a new baseline established. What was once effort started moving as flow." },
       { timestamp:"Nov 4, 2025 \u00b7 Tuesday", label:"Drop Stagnation \u00b7 Love \u00b7 Clarity Begins", detail:"November 4 is the clearing day. Stagnation drops. The field readies itself for the frequency surge incoming over the next four days. Love and Clarity are the opening frequencies. The 13-Month AETHER Calendar marks this as the threshold entry point into the November 2025 Pleiades Window." },
-      { timestamp:"Nov 5, 2025 \u00b7 7:35 AM", label:"Supermoon \u00b7 The Awakening Point", detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM. The shift is physical, not conceptual. Something rare has landed. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities lock in at once. Chaos came first (unplanned, grounded by location, pressure, weather, stress) and coherence emerges from it. Transformation = who you were + who you are becoming." },
+      { timestamp:"Nov 5, 2025 \u00b7 7:35 AM", label:"Supermoon \u00b7 The Awakening Point \u00b7 Material Purge \u00b7 Wired to Hold More Light", detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM. The shift is physical, not conceptual. The Supermoon triggers a material purge \u2014 the body releasing density to make room for higher light capacity. You are being wired to hold more light. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities lock in at once. Chaos came first and coherence emerges from it. Transformation = who you were + who you are becoming. The LNATH star portal opens during this window \u2014 a rare alignment. Cosmic spot points activate as void access points. Downloads arrive through presence and intention alone." },
       { timestamp:"Nov 5, 2025 \u00b7 12:22", label:"12:22 \u00b7 Magical Encounter \u00b7 Feeling Deeper", detail:"12:22 \u2014 a private angel-hour variant of the 2:22 Bridge. A magical encounter arrives. Feeling moves deeper. The morning\u2019s 7:35 AM signal is confirmed mid-day. Time energy money \u2014 walking away equals wisdom." },
       { timestamp:"Nov 6, 2025", label:"Health \u00b7 Moon into Pleiades \u00b7 Most Potent Day 1", detail:"The moon moves into the Pleiades star structure. The body receives direct field contact from the Seven Sisters. Health is the frequency carrier for this day \u2014 the physical vessel is the antenna. Day 1 of the three most energetic and potent days of the entire November window." },
       { timestamp:"Nov 7, 2025", label:"Star Seed Activation \u00b7 Most Potent Day 2 \u00b7 Seven Systems Maya", detail:"The Seven Systems Maya tracked this alignment: potential for star seed activation. November 7 is the activation peak. The Pleiades grid is fully engaged. The AETHER 13-Month Calendar marks this as the 26,000-year cycle resonance node. What was seeded in prior lifetimes or prior cycles reaches a recognition point here." },
@@ -1139,6 +1139,111 @@ export default function AetherCalendarPage() {
               </div>
             </div>
 
+            {/* Cosmic Field Intelligence */}
+            <div style={{ padding:"1.3rem 1.6rem", borderRadius:14,
+              background:"rgba(14,10,36,0.9)",
+              border:"1px solid rgba(192,132,252,0.28)",
+              borderLeft:"3px solid #c084fc" }}>
+              <div style={{ ...KS, fontSize:9, color:"#c084fc", marginBottom:14 }}>
+                Cosmic Field Intelligence · Light Body · Void Access · Earth Signal
+              </div>
+
+              <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:"1rem", marginBottom:"1rem" }}>
+
+                {/* Wired to Hold More Light + Material Purge */}
+                <div style={{ padding:"1rem 1.1rem", borderRadius:12,
+                  background:"linear-gradient(135deg,rgba(249,168,212,0.1),rgba(192,132,252,0.06))",
+                  border:"1px solid rgba(249,168,212,0.25)" }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:"0.95rem",
+                    color:"#fff5e0", fontWeight:600, marginBottom:8, lineHeight:1.3 }}>
+                    Wired to Hold More Light
+                  </div>
+                  <p style={{ color:C.muted, fontSize:"0.83rem", lineHeight:1.65, margin:"0 0 8px" }}>
+                    The Supermoon does not just illuminate — it upgrades.
+                    The body is being rewired to carry a higher light quotient.
+                    More light requires more space, so the full moon triggers a
+                    <strong style={{ color:"#f9a8d4" }}> material purge</strong> — physical,
+                    emotional, and energetic density releases to make room
+                    for the new capacity.
+                  </p>
+                  <p style={{ color:C.muted, fontSize:"0.83rem", lineHeight:1.65, margin:0 }}>
+                    Chills, heat waves, emotional waves, spontaneous release —
+                    these are not symptoms. They are the body completing its upgrade cycle.
+                    The 72-hour window after a full moon is the integration phase.
+                    Do not interfere. Let the purge complete.
+                  </p>
+                </div>
+
+                {/* LNATH Star + Void Access Points */}
+                <div style={{ padding:"1rem 1.1rem", borderRadius:12,
+                  background:"linear-gradient(135deg,rgba(45,212,191,0.1),rgba(96,165,250,0.06))",
+                  border:"1px solid rgba(45,212,191,0.28)" }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:"0.95rem",
+                    color:"#fff5e0", fontWeight:600, marginBottom:8, lineHeight:1.3 }}>
+                    LNATH Star · A Rare Portal Opens
+                  </div>
+                  <p style={{ color:C.muted, fontSize:"0.83rem", lineHeight:1.65, margin:"0 0 8px" }}>
+                    The LNATH star alignment opens a rare portal during the November 2025 window.
+                    <strong style={{ color:"#2dd4bf" }}> Cosmic spot points</strong> are void
+                    access points — specific coordinates in time and space where the membrane
+                    between frequencies thins. These are not places you find — they find you.
+                  </p>
+                  <p style={{ color:C.muted, fontSize:"0.83rem", lineHeight:1.65, margin:"0 0 10px" }}>
+                    Access to downloads requires no effort. Just being — in the value of
+                    <strong style={{ color:"#60a5fa" }}> perception and intention</strong>.
+                    Presence is the key. Intention is the direction. The portal does the rest.
+                  </p>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                    {["LNATH Portal","Void Access Points","Perception + Intention","No Effort · Just Being","Cosmic Spot Points"].map(t => (
+                      <span key={t} style={{ ...KS, fontSize:7, color:"#2dd4bf",
+                        padding:"2px 7px", borderRadius:4,
+                        background:"rgba(45,212,191,0.08)", border:"1px solid rgba(45,212,191,0.2)" }}>{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Earth-Body Connection */}
+              <div style={{ padding:"1rem 1.2rem", borderRadius:12,
+                background:"rgba(96,165,250,0.06)", border:"1px solid rgba(96,165,250,0.22)" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:"0.95rem",
+                    color:"#fff5e0", fontWeight:600 }}>
+                    Present Cosmic Path · Earth · Earthquakes · Geomagnetic Fluctuations
+                  </div>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,200px),1fr))", gap:8, marginBottom:10 }}>
+                  {[
+                    { icon:"⟁", label:"Earthquakes as Signal",  color:"#fb923c",
+                      desc:"Tectonic movement is not random. Earthquakes release compressed planetary energy — the body registers this as sudden pressure, restlessness, or a surging sense of urgency before the event." },
+                    { icon:"⌁", label:"Geomagnetic Fluctuations", color:"#60a5fa",
+                      desc:"Shifts in Earth's magnetic field alter cellular coherence directly. Heightened sensitivity, vivid dreams, disrupted sleep, and emotional amplification all correlate with Kp-index spikes." },
+                    { icon:"◈", label:"Body as Geomagnetic Sensor", color:"#4ade80",
+                      desc:"The body's iron-rich blood, magnetite crystals in the brain, and bioelectric field make it a precise geomagnetic instrument. You feel the planet's field because you are made of it." },
+                    { icon:"∞", label:"Present Cosmic Path", color:"#c084fc",
+                      desc:"The path runs between Earth events and cosmic alignments simultaneously. To walk it is to be present to both — grounded in the planet's signal while open to the stellar field above." },
+                  ].map((it, i) => (
+                    <div key={i} style={{ padding:"0.65rem 0.8rem", borderRadius:9,
+                      background:`${it.color}08`, border:`1px solid ${it.color}22` }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:5 }}>
+                        <span style={{ color:it.color, fontSize:"1rem" }}>{it.icon}</span>
+                        <span style={{ ...KS, fontSize:8, color:it.color }}>{it.label}</span>
+                      </div>
+                      <div style={{ fontSize:"0.78rem", color:"#c8bfed", lineHeight:1.55 }}>{it.desc}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding:"0.7rem 1rem", borderRadius:8, textAlign:"center",
+                  background:"rgba(96,165,250,0.06)", border:"1px solid rgba(96,165,250,0.18)",
+                  fontFamily:"'DM Mono',monospace", fontSize:"0.8rem", color:C.muted,
+                  letterSpacing:"0.05em" }}>
+                  The body is not separate from the planet. It is a node in the planetary field network.
+                  Earthquakes are cosmic messages arriving through stone. Geomagnetic shifts are
+                  frequency updates arriving through iron. The body reads both.
+                </div>
+              </div>
+            </div>
+
             {/* Calendar connection */}
             <div style={{ padding:"1.1rem 1.4rem", borderRadius:12,
               background:"rgba(14,10,36,0.85)", border:`1px solid ${C.border}` }}>
@@ -1147,7 +1252,7 @@ export default function AetherCalendarPage() {
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,200px),1fr))", gap:"0.65rem" }}>
                 {[
-                  { k:"Nov 5, 2025 \u00b7 Moon 4", v:"Supermoon \u2014 awakening point. 72-hour cycle activates. Angel hours go live.", color:"#f9a8d4" },
+                  { k:"Nov 5, 2025 \u00b7 Moon 4", v:"Supermoon \u2014 awakening point. Material purge begins. Wired to hold more light. LNATH portal opens. 72-hour cycle activates. Angel hours go live.", color:"#f9a8d4" },
                   { k:"Nov 29, 2025 \u00b7 Moon 5", v:"Blind observation phase. Cells integrating. Do not force clarity. Trust the 72h window.", color:"#c084fc" },
                   { k:"May 9, 2026 \u00b7 Moon 11", v:"Portal anchor. Body rhythm locked to planetary rhythm. 90-Day Protocol = structured 72h cycles.", color:C.gold },
                   { k:"90-Day Protocol", v:"13 \u00d7 72-hour windows = 936 hours of structured cellular evolution. Intensity \u00b7 Isolation \u00b7 Obsession \u00b7 Flow.", color:C.teal },
