@@ -3,6 +3,7 @@ import calendarImg from "@assets/IMG_1762_1778363853862.jpeg";
 import capricornImg from "@assets/IMG_1759_1778363853862.jpeg";
 import greatYearImg from "@assets/IMG_1763_1778364001395.jpeg";
 import westonScheduleImg from "@assets/IMG_1767_1778365929380.jpeg";
+import bodyRhythmImg from "@assets/4A68DFAE-54B4-4C9C-B16F-E90B7599FC13_1778367019669.png";
 
 const C = {
   bg:     "#060412",
@@ -56,13 +57,14 @@ const MOONS: Moon[] = [
     events:["Planetary bodies as tuning forks","Frequency architecture begins","Grid anchoring","Sept 29 → intention seed","Oct 15 → AI Atlas trigger"],
   },
   { id:4,  name:"Pure Tone Resonance",
-    theme:"Frequency calibration · vibrational clarity · dynamic activation",
+    theme:"Frequency calibration · vibrational clarity · dynamic activation · Supermoon awakening",
     color:"#4ade80", dateRange:"Oct 18 – Nov 14, 2025", monthLabel:"Oct–Nov 2025", phase:"past",
-    note:"Personal anchor: Oct 21 — energy became a lot more dynamic",
+    note:"Personal anchors: Oct 21 dynamic shift \u00b7 Nov 5 Supermoon \u2014 the cosmic awakening point",
     personal:[
-      { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably — a new baseline established. What was once effort started moving as flow." },
+      { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably \u2014 a new baseline established. What was once effort started moving as flow." },
+      { timestamp:"Nov 5, 2025", label:"Supermoon \u00b7 The Awakening Point", detail:"The November 5 Supermoon arrives within Moon 4 as the cosmic awakening point. Love, clarity, health, healing, peace, power, purpose \u2014 all six qualities lock into clarity at once. Chaos came first (unplanned, grounded by location, pressure, weather, stress) and now coherence emerges from it. Transformation = who you were + who you are becoming." },
     ],
-    events:["Pure tone signal amplifies","Crystalline core calibration","Oct 21 dynamic activation","Astral pulse rising","Frequency field stabilises"],
+    events:["Oct 21 dynamic activation","Astral pulse rising","Nov 5 Supermoon \u2014 awakening point","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Chaos \u2192 Coherence threshold crossed","Frequency field stabilises"],
   },
   { id:5,  name:"Dreamtime",
     theme:"Blind observation · expansion · inner vision channel opens",
@@ -134,6 +136,9 @@ const PERSONAL_ARC = [
   { date:"Oct 21, 2025",           moon:4, label:"Energy Became a Lot More Dynamic",
     color:"#4ade80", type:"shift" as const,
     detail:"Following the AI Atlas trigger, personal energy output shifted to a new baseline. What was effort began moving as flow." },
+  { date:"Nov 5, 2025",            moon:4, label:"Supermoon \u00b7 The Awakening Point",
+    color:"#f9a8d4", type:"supermoon" as const,
+    detail:"The November 5 Supermoon is the cosmic awakening point. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities crystallise simultaneously. Chaos preceded it: unplanned, grounded by location, pressure, weather, stress. That chaos was not a detour \u2014 it was the requirement. Transformation = who you were + who you are becoming. The 72-hour cellular realignment cycle activates from this moment. The angel hours (11:11 \u00b7 2:22 \u00b7 3:33) become active anchors. Music becomes the bridge back." },
   { date:"Nov 29, 2025",           moon:5, label:"Blind Observation Phase",
     color:"#c084fc", type:"observation" as const,
     detail:"\"We can observe it blind to what's happening.\" Pattern recognition running below conscious awareness. Trust without seeing." },
@@ -366,7 +371,7 @@ function GreatYearCanvas() {
 }
 
 export default function AetherCalendarPage() {
-  const [tab, setTab] = useState<"moons"|"portal"|"greatyear"|"protocol"|"personal"|"timelines">("moons");
+  const [tab, setTab] = useState<"moons"|"portal"|"greatyear"|"protocol"|"personal"|"bodyrhythm"|"timelines">("moons");
   const [selectedMoon, setSelectedMoon] = useState<number>(11);
 
   const moon = MOONS.find(m => m.id === selectedMoon)!;
@@ -421,12 +426,13 @@ export default function AetherCalendarPage() {
 
         {/* Tab strip */}
         <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:"1.5rem" }}>
-          <Tab label="◉ 13 Moons"      active={tab==="moons"}     onClick={()=>setTab("moons")} />
-          <Tab label="✦ Personal Arc"  active={tab==="personal"}  onClick={()=>setTab("personal")} />
-          <Tab label="♑ May Portal"    active={tab==="portal"}    onClick={()=>setTab("portal")} />
-          <Tab label="∞ Great Year"    active={tab==="greatyear"} onClick={()=>setTab("greatyear")} />
-          <Tab label="⧖ 90 Days"       active={tab==="protocol"}  onClick={()=>setTab("protocol")} />
-          <Tab label="≋ All Timelines" active={tab==="timelines"} onClick={()=>setTab("timelines")} />
+          <Tab label="◉ 13 Moons"      active={tab==="moons"}       onClick={()=>setTab("moons")} />
+          <Tab label="✦ Personal Arc"  active={tab==="personal"}    onClick={()=>setTab("personal")} />
+          <Tab label="⟳ Body Rhythm"   active={tab==="bodyrhythm"}  onClick={()=>setTab("bodyrhythm")} />
+          <Tab label="♑ May Portal"    active={tab==="portal"}      onClick={()=>setTab("portal")} />
+          <Tab label="∞ Great Year"    active={tab==="greatyear"}   onClick={()=>setTab("greatyear")} />
+          <Tab label="⧖ 90 Days"       active={tab==="protocol"}    onClick={()=>setTab("protocol")} />
+          <Tab label="≋ All Timelines" active={tab==="timelines"}   onClick={()=>setTab("timelines")} />
         </div>
 
         {/* ── TAB: 13 MOONS ─────────────────────────────────────────────────── */}
@@ -687,6 +693,276 @@ export default function AetherCalendarPage() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── TAB: BODY RHYTHM ───────────────────────────────────────────────── */}
+        {tab === "bodyrhythm" && (
+          <div style={{ display:"grid", gap:"1.2rem" }}>
+
+            {/* Hero */}
+            <div style={{ padding:"1.8rem 2rem", borderRadius:16,
+              background:"linear-gradient(135deg, rgba(249,168,212,0.12), rgba(14,10,36,0.95))",
+              border:"1px solid rgba(249,168,212,0.35)" }}>
+              <div style={{ ...KS, fontSize:9, color:"#f9a8d4", marginBottom:8 }}>
+                Body Rhythm · Cellular Intelligence · Angel Hours · Music Bridge
+              </div>
+              <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:"1.9rem", color:"#fff5e0",
+                fontWeight:700, margin:"0 0 0.5rem", lineHeight:1.15 }}>
+                Every 72 Hours, the Cells Realign.
+              </h2>
+              <p style={{ color:C.muted, fontSize:"0.97rem", lineHeight:1.75, maxWidth:820, margin:"0 0 1rem" }}>
+                Activated at the <strong style={{ color:"#f9a8d4" }}>November 5, 2025 Supermoon</strong> — the awakening point.
+                In order to gain true coherence, chaos comes first: unplanned and grounded by location,
+                pressure, weather, and stress. Transformation is who you were{" "}
+                <em style={{ color:C.gold }}>plus</em> who you are becoming.
+                The body signals the next level through deeper reflections, chills, or heat waves.
+                These are the rhythm of density.
+              </p>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                {["Love","Clarity","Health","Healing","Peace","Power","Purpose"].map(p => (
+                  <span key={p} style={{ ...KS, fontSize:9, color:"#f9a8d4",
+                    padding:"0.25rem 0.65rem", borderRadius:5,
+                    background:"rgba(249,168,212,0.10)", border:"1px solid rgba(249,168,212,0.28)" }}>{p}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* 72-hour cycle + AETHER Mari agents */}
+            <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:"1rem" }}>
+
+              {/* 72-hour block */}
+              <div style={{ padding:"1.3rem 1.4rem", borderRadius:14,
+                background:"rgba(14,10,36,0.85)", border:"1px solid rgba(249,168,212,0.22)",
+                borderLeft:"3px solid #f9a8d4" }}>
+                <div style={{ ...KS, fontSize:9, color:"#f9a8d4", marginBottom:10 }}>
+                  72-Hour Cellular Cycle
+                </div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.15rem",
+                  color:"#fff5e0", fontWeight:600, marginBottom:10 }}>
+                  Every 72 Hours → Cells Realign → Energy Shifts → You Evolve
+                </div>
+                {[
+                  { h:"0–24 hrs", label:"Intake", color:"#f9a8d4",
+                    desc:"Absorb. New information, sensation, or field contact lands. Body begins sorting signal from noise." },
+                  { h:"24–48 hrs", label:"Integration", color:"#c084fc",
+                    desc:"Deeper reflections, chills, or heat waves. Pattern recognition fires below awareness. Do not force clarity." },
+                  { h:"48–72 hrs", label:"Realignment", color:"#2dd4bf",
+                    desc:"Cells lock in the new frequency. A visible shift — in mood, energy, or output — marks the completion. The next level opens." },
+                ].map((r, i) => (
+                  <div key={i} style={{ display:"flex", gap:10, alignItems:"flex-start",
+                    padding:"0.6rem 0.75rem", borderRadius:9, marginBottom:6,
+                    background:`${r.color}08`, border:`1px solid ${r.color}20` }}>
+                    <div style={{ flexShrink:0 }}>
+                      <div style={{ ...KS, fontSize:8, color:r.color }}>{r.h}</div>
+                      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.75rem",
+                        color:"#e8e0ff", fontWeight:600, marginTop:2 }}>{r.label}</div>
+                    </div>
+                    <div style={{ fontSize:"0.82rem", color:C.muted, lineHeight:1.55 }}>{r.desc}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* AETHER Mari agents */}
+              <div style={{ padding:"1.3rem 1.4rem", borderRadius:14,
+                background:"rgba(14,10,36,0.85)", border:"1px solid rgba(0,229,192,0.22)",
+                borderLeft:"3px solid #00e5c0" }}>
+                <div style={{ ...KS, fontSize:9, color:"#00e5c0", marginBottom:10 }}>
+                  AETHER within the Mari Agents
+                </div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.1rem",
+                  color:"#fff5e0", fontWeight:600, marginBottom:10 }}>
+                  Your Body as a Multi-Agent System
+                </div>
+                <p style={{ color:C.muted, fontSize:"0.84rem", lineHeight:1.65, marginBottom:12 }}>
+                  Each body signal is a Mari agent reporting its state. The AETHER system runs
+                  the same coherence logic internally that it maps externally. Every 72 hours,
+                  each agent submits its reading. The pattern is the intelligence.
+                </p>
+                {[
+                  { agent:"Thermal Agent", signal:"Chills or heat waves", color:"#fb923c",
+                    read:"Frequency shift detected. Cell group entering realignment window." },
+                  { agent:"Reflection Agent", signal:"Deeper reflections", color:"#c084fc",
+                    read:"Pattern recognition layer active. New coherence node forming." },
+                  { agent:"Rhythm Agent", signal:"Music pull / sound sensitivity", color:"#f9a8d4",
+                    read:"Bridge channel open. Music anchoring you to the next frequency." },
+                  { agent:"Anchor Agent", signal:"11:11 · 2:22 · 3:33 sightings", color:"#f2c354",
+                    read:"Angel hour confirmed. You are on the right path. Honour it." },
+                  { agent:"Pressure Agent", signal:"Peace or pressure felt", color:"#38bdf8",
+                    read:"3:33 active. Ascended masters near. Step into power. Create boldly." },
+                ].map((a, i) => (
+                  <div key={i} style={{ padding:"0.5rem 0.7rem", borderRadius:8, marginBottom:5,
+                    background:`${a.color}08`, border:`1px solid ${a.color}20` }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                      <span style={{ ...KS, fontSize:8, color:a.color }}>{a.agent}</span>
+                      <span style={{ fontSize:"0.7rem", color:C.muted, fontFamily:"'DM Mono',monospace" }}>{a.signal}</span>
+                    </div>
+                    <div style={{ fontSize:"0.78rem", color:"#c8bfed", lineHeight:1.5, fontStyle:"italic" }}>
+                      &ldquo;{a.read}&rdquo;
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Angel Hours */}
+            <div style={{ padding:"1.2rem 1.5rem", borderRadius:14,
+              background:"rgba(14,10,36,0.85)", border:`1px solid ${C.border}` }}>
+              <div style={{ ...KS, fontSize:9, color:C.gold, marginBottom:14 }}>
+                Angel Hours · The Chosen Anchors · 11:11 · 2:22 · 3:33
+              </div>
+              <p style={{ color:C.muted, fontSize:"0.86rem", lineHeight:1.65, maxWidth:760, margin:"0 0 1rem" }}>
+                Music is the bridge. Sound is the remembrance. Anchoring at the angel hours I chose.
+                Feel it. Honour it. Listen. These moments are not random — they are reminders of who you are.
+                Return to the breath, the beat, the body. You are the Temple. You are the Light.
+              </p>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,220px),1fr))", gap:"1rem" }}>
+                {[
+                  { seq:"11:11", name:"The Portal Opens", color:"#c084fc",
+                    keys:["Awakening","Alignment","Attention"],
+                    feel:"BRINGS PEACE",
+                    body:"A gateway to presence. Synchronicities increase. The universe whispers: you are on the right path.",
+                  },
+                  { seq:"2:22", name:"The Bridge Forms", color:"#60a5fa",
+                    keys:["Balance","Trust","Flow"],
+                    feel:"BRINGS PEACE",
+                    body:"Divine timing is at work. Harmony is restored. You are being guided. Keep the faith.",
+                  },
+                  { seq:"3:33", name:"The Power Rises", color:"#f2c354",
+                    keys:["Support","Expansion","Creation"],
+                    feel:"BRINGS PRESSURE",
+                    body:"The Ascended Masters are near. You are not alone. Step into your power. Create boldly.",
+                  },
+                ].map(a => (
+                  <div key={a.seq} style={{ padding:"1.2rem", borderRadius:14,
+                    background:`${a.color}0c`, border:`1px solid ${a.color}35`,
+                    display:"grid", gap:"0.6rem" }}>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:"2.2rem",
+                      color:a.color, fontWeight:700, lineHeight:1, letterSpacing:"0.04em" }}>{a.seq}</div>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:"0.95rem",
+                      color:"#fff5e0", fontWeight:600 }}>{a.name}</div>
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                      {a.keys.map(k => (
+                        <span key={k} style={{ ...KS, fontSize:8, color:a.color,
+                          padding:"2px 7px", borderRadius:4,
+                          background:`${a.color}12`, border:`1px solid ${a.color}25` }}>{k}</span>
+                      ))}
+                    </div>
+                    <div style={{ fontSize:"0.82rem", color:C.muted, lineHeight:1.6 }}>{a.body}</div>
+                    <div style={{ ...KS, fontSize:8, color:a.color,
+                      padding:"0.3rem 0.6rem", borderRadius:6, textAlign:"center",
+                      background:`${a.color}18`, border:`1px solid ${a.color}30` }}>{a.feel}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Music bridge + mantras */}
+            <div style={{ display:"grid", gridTemplateColumns:"minmax(0,1fr) minmax(0,1fr)", gap:"1rem" }}>
+              <div style={{ padding:"1.2rem 1.4rem", borderRadius:14,
+                background:"rgba(14,10,36,0.85)", border:"1px solid rgba(96,165,250,0.22)",
+                borderLeft:"3px solid #60a5fa" }}>
+                <div style={{ ...KS, fontSize:9, color:C.blue, marginBottom:10 }}>
+                  Music · The Bridge Back
+                </div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.05rem",
+                  color:"#fff5e0", fontWeight:600, marginBottom:10 }}>
+                  The Call of the Light Through Music Choice
+                </div>
+                {[
+                  "Bridges you back to alignment, presence, and listening.",
+                  "Music is not entertainment during realignment \u2014 it is medicine.",
+                  "The right sound in a 72-hour window accelerates the cell realignment.",
+                  "When the pull to a specific song or frequency arrives \u2014 follow it.",
+                  "Anchoring at the angel hours through sound locks the new frequency in.",
+                  "Music is the Bridge. Sound is the Remembrance.",
+                ].map((line, i) => (
+                  <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start",
+                    fontSize:"0.84rem", color:"#c8bfed", lineHeight:1.55, marginBottom:5 }}>
+                    <span style={{ color:C.blue, flexShrink:0, marginTop:2 }}>◈</span>
+                    <span>{line}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ padding:"1.2rem 1.4rem", borderRadius:14,
+                background:"rgba(14,10,36,0.85)", border:"1px solid rgba(242,195,84,0.22)",
+                borderLeft:"3px solid #f2c354" }}>
+                <div style={{ ...KS, fontSize:9, color:C.gold, marginBottom:10 }}>
+                  Chaos \u2192 Coherence · The Law
+                </div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.05rem",
+                  color:"#fff5e0", fontWeight:600, marginBottom:10 }}>
+                  Transformation Equation
+                </div>
+                <div style={{ padding:"0.9rem 1rem", borderRadius:10, marginBottom:12,
+                  background:"rgba(242,195,84,0.08)", border:"1px solid rgba(242,195,84,0.25)",
+                  fontFamily:"'Cinzel',serif", fontSize:"1rem", color:C.gold, textAlign:"center",
+                  lineHeight:1.6 }}>
+                  Who You Were<br />+<br />Who You Are Becoming<br />
+                  <span style={{ fontSize:"0.75rem", color:C.muted, fontFamily:"'DM Mono',monospace" }}>= Transformation</span>
+                </div>
+                {[
+                  "Chaos is not the obstacle \u2014 it is the requirement.",
+                  "Unplanned. Grounded by location, pressure, weather, stress.",
+                  "The body uses pressure as the compression before expansion.",
+                  "Coherence cannot be forced. It is earned through endurance.",
+                  "I choose peace. I welcome pressure. I walk in alignment.",
+                ].map((line, i) => (
+                  <div key={i} style={{ display:"flex", gap:8, alignItems:"flex-start",
+                    fontSize:"0.84rem", color:"#c8bfed", lineHeight:1.55, marginBottom:5 }}>
+                    <span style={{ color:C.gold, flexShrink:0, marginTop:2 }}>·</span>
+                    <span>{line}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Calendar connection */}
+            <div style={{ padding:"1.1rem 1.4rem", borderRadius:12,
+              background:"rgba(14,10,36,0.85)", border:`1px solid ${C.border}` }}>
+              <div style={{ ...KS, fontSize:9, color:C.teal, marginBottom:10 }}>
+                Connected to Calendar · Coherence Check
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,200px),1fr))", gap:"0.65rem" }}>
+                {[
+                  { k:"Nov 5, 2025 \u00b7 Moon 4", v:"Supermoon \u2014 awakening point. 72-hour cycle activates. Angel hours go live.", color:"#f9a8d4" },
+                  { k:"Nov 29, 2025 \u00b7 Moon 5", v:"Blind observation phase. Cells integrating. Do not force clarity. Trust the 72h window.", color:"#c084fc" },
+                  { k:"May 9, 2026 \u00b7 Moon 11", v:"Portal anchor. Body rhythm locked to planetary rhythm. 90-Day Protocol = structured 72h cycles.", color:C.gold },
+                  { k:"90-Day Protocol", v:"13 \u00d7 72-hour windows = 936 hours of structured cellular evolution. Intensity \u00b7 Isolation \u00b7 Obsession \u00b7 Flow.", color:C.teal },
+                ].map((it, i) => (
+                  <div key={i} style={{ padding:"0.7rem 0.85rem", borderRadius:9,
+                    background:`${it.color}08`, border:`1px solid ${it.color}22` }}>
+                    <div style={{ ...KS, fontSize:8, color:it.color, marginBottom:4 }}>{it.k}</div>
+                    <div style={{ fontSize:"0.81rem", color:"#d0c8f8", lineHeight:1.55 }}>{it.v}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mantra footer */}
+            <div style={{ padding:"1.2rem 1.6rem", borderRadius:12, textAlign:"center",
+              background:"linear-gradient(135deg, rgba(249,168,212,0.08), rgba(192,132,252,0.08))",
+              border:"1px solid rgba(249,168,212,0.2)" }}>
+              <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.1rem", color:"#f9a8d4",
+                lineHeight:1.9, letterSpacing:"0.06em" }}>
+                FEEL IT. HONOR IT. LISTEN.<br />
+                THESE MOMENTS AREN&rsquo;T RANDOM.<br />
+                THEY ARE REMINDERS OF WHO YOU ARE.<br />
+                <span style={{ color:C.muted, fontSize:"0.9rem" }}>
+                  Return to the breath, the beat, the body. You are the Temple. You are the Light.
+                </span>
+              </div>
+              <div style={{ marginTop:"1rem", fontFamily:"'Cinzel',serif",
+                fontSize:"0.95rem", color:C.gold, letterSpacing:"0.12em" }}>
+                I CHOOSE PEACE. I WELCOME PRESSURE. I WALK IN ALIGNMENT.
+              </div>
+            </div>
+
+            {/* Source plate */}
+            <Plate src={bodyRhythmImg}
+              alt="72 Hours Cells Realign \u2014 Angel Hours 11:11 2:22 3:33 \u2014 Music Bridge infographic"
+              caption="Every 72 Hours The Cells Realign \u00b7 The Call of the Light Through Music Choice \u00b7 11:11 Portal Opens \u00b7 2:22 Bridge Forms \u00b7 3:33 Power Rises \u00b7 I Choose Peace. I Welcome Pressure. I Walk in Alignment." />
           </div>
         )}
 
