@@ -6,6 +6,9 @@ import printedSoftFruits from "@assets/image_1778074240886.jpg";
 import notebookFeeding from "@assets/image_1778074259010.jpg";
 import notebookWeek1 from "@assets/image_1778074274213.jpg";
 import notebookWeek2 from "@assets/image_1778074297296.jpg";
+import registryPage1 from "@assets/IMG_1747_1778363169114.jpeg";
+import registryPage2 from "@assets/IMG_1749_1778363169114.jpeg";
+import showerEvents from "@assets/IMG_1748_1778363169114.jpeg";
 
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#f9a8d4",
   fontFamily:"'DM Mono',monospace", textTransform:"uppercase", marginBottom:6 };
@@ -81,6 +84,210 @@ const FINGER_FOODS = [
   { name:"Carrot",          prep:"peeled · steamed or boiled",  color:"#fb923c", group:"veg"   },
   { name:"Tomato",          prep:"remove peel + seeds",         color:"#fb7185", group:"veg"   },
 ];
+
+// ── Baby Registry 2023 — Baby B ──────────────────────────────────────────────
+const REGISTRY: { cat: string; color: string; items: { name: string; note?: string; price?: string; struck?: boolean }[] }[] = [
+  { cat: "BIBS", color: "#f9a8d4", items: [
+    { name: "8-Pack Bandana Drool Bibs", note: "Teething + Drooling", price: "$24.99" },
+    { name: "7pc Cotton Waterproof Baby Bib", note: "Newborn eating · Leopard" },
+    { name: "Pandastar 10-Pack Muslin Baby Bib", note: "100% Cotton" },
+  ]},
+  { cat: "BOTTLES", color: "#a78bfa", items: [
+    { name: "Philips Avent Glass Natural Nipple 4oz 4-Pack", note: "4 & 8oz Gift Set", price: "$51.92" },
+    { name: "Philips Avent Natural Baby Bottle Blue", note: "4oz 4PK", price: "$31.99" },
+    { name: "Philips Avent Natural Baby Bottle", note: "9oz 4PK" },
+    { name: "Philips Avent Natural Bottle Nipples 4PK", note: "Flow 1–5 · $11.89 · Flow 4 · $13.89" },
+    { name: "Philips Avent Anti Colic Baby Bottle 4oz 2PK", price: "$17.94" },
+    { name: "Baby Bottle Waterproof Labels", price: "$8.99" },
+  ]},
+  { cat: "BURP CLOTHS", color: "#4ade80", items: [
+    { name: "Konssy Baby Burp Cloth Set — 6 Pack Large Cotton", note: "For newborn", price: "$16.99" },
+    { name: "Burt's Bees Baby Burp Cloths 5-Pack", note: "Extra Absorbent · 100% Organic Cotton Preclothes", price: "$26.95" },
+    { name: "Bamboo Queen 8-Pack SuperSoft Burp Cloth", note: "Ultra Absorbent", price: "$11.99" },
+  ]},
+  { cat: "HIGH CHAIR", color: "#facc15", items: [
+    { name: "Ingenuity SmartClean Trio Elite 3-in-1 Convertible", note: "Baby high chair · Toddler chair · Booster seat", price: "$189.99" },
+  ]},
+  { cat: "BOTTLE WARMER & STERILIZER", color: "#fb923c", items: [
+    { name: "Philips Avent Fast Baby Bottle Warmer", note: "Smart temp control + Auto shutoff", price: "$49.97" },
+    { name: "Philips Avent Premium Baby Bottle Sterilizer with Dryer", price: "$119.95" },
+  ]},
+  { cat: "DRYING & CLEANING", color: "#38bdf8", items: [
+    { name: "Philips Avent Drying Rack", note: "+ Drying", price: "$17.79" },
+    { name: "OXO Tot Bottle + Cup Cleaning Set", note: "Gray", price: "$36.95" },
+  ]},
+  { cat: "CUPS", color: "#00e5c0", items: [
+    { name: "Dr. Brown's 360 Training Sippy Cup 4 Babys", note: "10oz 2PK", price: "$9.06" },
+    { name: "Philips Avent My Easy Spout Sippy Cup", note: "Spill Proof · 9oz 2PK", price: "$10.05" },
+  ]},
+  { cat: "SLEEPING", color: "#818cf8", items: [
+    { name: "Owlet Dream Sock + Baby Monitor", price: "$399" },
+    { name: "Crib" },
+    { name: "Crib Mattress" },
+    { name: "Crib Sheets" },
+    { name: "Cottare Baby Muslin Swaddle Blanket 4PK", price: "$24.99" },
+  ]},
+  { cat: "DIAPERING", color: "#fb7185", items: [
+    { name: "Hatch Baby Grow Smart Changing Pad + Scale" },
+    { name: "Era Organics Baby Diaper Balm", note: "Cream", price: "$16.17" },
+    { name: "Diaper Rash Cream Spray", price: "$9.39" },
+    { name: "Aveeno Baby Welcome Little One Gift Basket", price: "$23.78" },
+    { name: "Aveeno Baby Daily Moisture Lotion" },
+    { name: "Itzy Ritzy Mini Diaper Bag", note: "Diaper bag" },
+    { name: "Backatoo Peanut Changer", note: "↩ Struck from list", struck: true },
+  ]},
+];
+
+// ── Baby Shower Events (Sunday 19th) ─────────────────────────────────────────
+const SHOWER_EVENTS: { cat: string; color: string; items: string[] }[] = [
+  { cat: "DECORATIONS", color: "#f9a8d4", items: [
+    "Welcome Sign 24×36",
+    "Due Date Calendar 24×18",
+    "Water Bottle Labels",
+    "Food Labels · Choc Bar Wrappers · Cup Toppers",
+    "Thank You Tags / Card",
+  ]},
+  { cat: "ACTIVITIES", color: "#facc15", items: [
+    "Diaper Raffle",
+    "Books for Baby",
+    "Take a Guess — How many candies are in the jar? (tag 3.5×2)",
+  ]},
+  { cat: "GAMES", color: "#4ade80", items: [
+    "The Price Is Right",
+    "Baby Mad Libs (5×7)",
+    "Baby Shower Feud",
+    "Would Mommy Rather?",
+    "Who Knows Mommy Best?",
+  ]},
+];
+
+// ── Interactive registry with acquired-toggle ─────────────────────────────────
+function RegistryList() {
+  const [acquired, setAcquired] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem("baby-rhythm.registry") ?? "{}"); }
+    catch { return {}; }
+  });
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; return; }
+    try { localStorage.setItem("baby-rhythm.registry", JSON.stringify(acquired)); } catch { /* ignore */ }
+  }, [acquired]);
+
+  const total = REGISTRY.reduce((s, c) => s + c.items.filter(i => !i.struck).length, 0);
+  const done  = Object.values(acquired).filter(Boolean).length;
+
+  return (
+    <div>
+      <div style={{ marginBottom:"1rem", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:8 }}>
+        <div style={{ fontFamily:"'DM Mono',monospace", fontSize:11, letterSpacing:"0.3em", color:"#f9a8d4" }}>
+          {done} / {total} acquired
+        </div>
+        <div style={{ display:"flex", gap:8 }}>
+          <div style={{ height:6, width:160, background:"rgba(255,255,255,0.08)", borderRadius:3, overflow:"hidden", alignSelf:"center" }}>
+            <div style={{ height:"100%", width:`${(done/total)*100}%`, background:"linear-gradient(90deg,#4ade80,#f9a8d4)", borderRadius:3, transition:"width 0.4s" }} />
+          </div>
+          <button onClick={() => setAcquired({})} style={{
+            padding:"0.3rem 0.7rem", borderRadius:6, background:"rgba(148,163,184,0.1)",
+            border:"1px solid rgba(148,163,184,0.35)", color:"#cbd5e1", fontSize:"0.75rem",
+            fontFamily:"'DM Mono',monospace", letterSpacing:1.2, textTransform:"uppercase", cursor:"pointer",
+          }}>↺ Reset</button>
+        </div>
+      </div>
+
+      {REGISTRY.map(cat => (
+        <div key={cat.cat} style={{ marginBottom:"1.1rem" }}>
+          <div style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:"0.3em",
+            color:cat.color, textTransform:"uppercase", marginBottom:8,
+            paddingBottom:6, borderBottom:`1px solid ${cat.color}30` }}>
+            {cat.cat}
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(min(100%, 320px), 1fr))", gap:"0.45rem" }}>
+            {cat.items.map(item => {
+              const key = cat.cat + "::" + item.name;
+              const isAcq = !!acquired[key];
+              return (
+                <label key={key} style={{
+                  display:"flex", gap:10, alignItems:"flex-start", cursor: item.struck ? "default" : "pointer",
+                  padding:"0.55rem 0.75rem", borderRadius:8,
+                  background: item.struck ? "rgba(255,255,255,0.02)" : isAcq ? "rgba(74,222,128,0.08)" : "rgba(15,23,42,0.65)",
+                  border:`1px solid ${item.struck ? "rgba(255,255,255,0.06)" : isAcq ? "rgba(74,222,128,0.3)" : cat.color + "22"}`,
+                  borderLeft:`3px solid ${item.struck ? "rgba(255,255,255,0.1)" : cat.color}`,
+                  opacity: item.struck ? 0.4 : 1,
+                  transition:"all 0.2s",
+                }}>
+                  {!item.struck && (
+                    <input type="checkbox" checked={isAcq}
+                      onChange={() => setAcquired(a => ({ ...a, [key]: !a[key] }))}
+                      style={{ marginTop:2, width:14, height:14, accentColor:"#4ade80", cursor:"pointer", flexShrink:0 }} />
+                  )}
+                  {item.struck && <span style={{ color:"rgba(255,255,255,0.2)", fontSize:"0.75rem", marginTop:2, flexShrink:0 }}>✕</span>}
+                  <div style={{ flex:1 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:6 }}>
+                      <span style={{ fontSize:"0.88rem", color: isAcq ? "#94a3b8" : "#fef3c7",
+                        textDecoration: isAcq || item.struck ? "line-through" : "none",
+                        lineHeight:1.4 }}>{item.name}</span>
+                      {item.price && (
+                        <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.75rem",
+                          color:cat.color, flexShrink:0, opacity: isAcq ? 0.4 : 0.75 }}>{item.price}</span>
+                      )}
+                    </div>
+                    {item.note && (
+                      <div style={{ fontSize:"0.72rem", color:"#94a3b8", marginTop:2, lineHeight:1.4 }}>{item.note}</div>
+                    )}
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Interactive baby shower events checklist ──────────────────────────────────
+function ShowerChecklist() {
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    try { return JSON.parse(localStorage.getItem("baby-rhythm.shower") ?? "{}"); }
+    catch { return {}; }
+  });
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; return; }
+    try { localStorage.setItem("baby-rhythm.shower", JSON.stringify(checked)); } catch { /* ignore */ }
+  }, [checked]);
+
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.85rem" }}>
+      {SHOWER_EVENTS.map(cat => (
+        <div key={cat.cat} style={{ padding:"1rem 1.1rem", borderRadius:12,
+          background:"rgba(15,23,42,0.65)", border:`1px solid ${cat.color}28` }}>
+          <div style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:"0.3em",
+            color:cat.color, textTransform:"uppercase", marginBottom:10, paddingBottom:6,
+            borderBottom:`1px solid ${cat.color}30` }}>{cat.cat}</div>
+          <div style={{ display:"grid", gap:"0.4rem" }}>
+            {cat.items.map(item => {
+              const key = cat.cat + "::" + item;
+              const isChecked = !!checked[key];
+              return (
+                <label key={key} style={{ display:"flex", gap:10, alignItems:"flex-start",
+                  cursor:"pointer", padding:"0.4rem 0.5rem", borderRadius:6,
+                  background: isChecked ? `${cat.color}10` : "transparent", transition:"background 0.15s" }}>
+                  <input type="checkbox" checked={isChecked}
+                    onChange={() => setChecked(c => ({ ...c, [key]: !c[key] }))}
+                    style={{ marginTop:3, width:14, height:14, accentColor:cat.color, cursor:"pointer" }} />
+                  <span style={{ fontSize:"0.86rem",
+                    color: isChecked ? "#94a3b8" : "#fef3c7",
+                    textDecoration: isChecked ? "line-through" : "none", lineHeight:1.5 }}>{item}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ── Diaper-bag / leaving-the-house checklist
 const DIAPER_BAG = [
@@ -392,10 +599,37 @@ export default function BabyRhythmPage() {
           </div>
         </Section>
 
+        {/* IX · Baby Registry 2023 */}
+        <Section kicker="IX · Baby Registry 2023 · Baby B"
+          title="Nine categories · every item from the notebook"
+          lead="Transcribed from the handwritten registry pages. Tap each item to mark it acquired — your progress is saved to this device. Struck-through items were removed from the list in the original notes.">
+          <RegistryList/>
+        </Section>
+
+        {/* X · Baby Shower Events */}
+        <Section kicker="X · Baby Shower Events · Sunday the 19th"
+          title="Decorations · activities · games"
+          lead="The full plan from the handwritten Baby Shower Events page. Tick each item as it's ready or done.">
+          <div style={{ marginBottom:"1.2rem", display:"inline-flex", alignItems:"center", gap:12,
+            padding:"0.7rem 1.2rem", borderRadius:12,
+            background:"linear-gradient(135deg, rgba(249,168,212,0.12), rgba(167,139,250,0.12))",
+            border:"1px solid rgba(249,168,212,0.3)" }}>
+            <span style={{ fontSize:"1.6rem" }}>🎀</span>
+            <div>
+              <div style={{ fontFamily:"'DM Mono',monospace", fontSize:9, letterSpacing:"0.35em",
+                color:"#f9a8d4", textTransform:"uppercase", marginBottom:3 }}>Date</div>
+              <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.1rem", color:"#fef3c7", fontWeight:700 }}>
+                Sunday · the 19th
+              </div>
+            </div>
+          </div>
+          <ShowerChecklist/>
+        </Section>
+
         {/* VIII · Source plates */}
         <Section kicker="VIII · Source plates · the actual notebook"
           title="Where this all came from"
-          lead="Seven pages — handwritten on Tuesday Feb 27 2024 and the days around it. The page above is the digital transcription; the originals are below.">
+          lead="Ten pages — handwritten on Tuesday Feb 27 2024 and the days around it, plus the 2023 Baby Registry and Baby Shower Events. The sections above are the digital transcription; the originals are below.">
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap:"0.9rem" }}>
             <Plate src={notebookSchedule}    alt="Weston Chase daily schedule notebook page · Feb 27 2024"
               caption="Daily schedule · Weston Chase · Tuesday Feb 27 2024 · 8:30 AM wakeup → 10 PM dream feed."/>
@@ -411,6 +645,12 @@ export default function BabyRhythmPage() {
               caption="Mon · Tue · Wed weekly plan — make lunch 3 days, feed West brunch, order swaddle, go shopping."/>
             <Plate src={notebookWeek2}       alt="Thu Fri Sat weekly plan notebook page"
               caption="Thu · Fri · Sat weekly plan — 10 AM wakeup, 11 breakfast, clean up, make milk, play with toys, sleep 12-."/>
+            <Plate src={registryPage1}       alt="Baby Registry 2023 page 1 — feeding section"
+              caption="Baby Registry 2023 · Baby B · Page 1 — Bibs, Bottles, Burp Cloths, High Chair, Bottle Warmer + Sterilizer."/>
+            <Plate src={registryPage2}       alt="Baby Registry 2023 page 2 — sleeping and diapering"
+              caption="Baby Registry 2023 · Baby B · Page 2 — Drying Rack, OXO Cleaning Set, Cups, Sleeping (Owlet, Crib), Diapering."/>
+            <Plate src={showerEvents}        alt="Baby Shower Events planning page"
+              caption="Baby Shower Events · Sunday the 19th — Welcome Sign, Diaper Raffle, Books for Baby, Candy Jar Guess, Games, Food Labels, Thank You Tags."/>
           </div>
         </Section>
 
