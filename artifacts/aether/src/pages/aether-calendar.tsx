@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import calendarImg from "@assets/IMG_1762_1778363853862.jpeg";
 import capricornImg from "@assets/IMG_1759_1778363853862.jpeg";
 import greatYearImg from "@assets/IMG_1763_1778364001395.jpeg";
+import westonScheduleImg from "@assets/IMG_1767_1778365929380.jpeg";
 
 const C = {
   bg:     "#060412",
@@ -121,9 +122,12 @@ const MOONS: Moon[] = [
 
 // Personal 2025→2026 activation arc ──────────────────────────────────────────
 const PERSONAL_ARC = [
-  { date:"Sep 29, 2025 · 9:17 AM", moon:3, label:"Reflect Reality into Structure ①",
+  { date:"Aug 17, 2023", moon:0, label:"Weston Chase · Born",
+    color:"#fb7185", type:"birth" as const,
+    detail:"Weston Chase arrives — born two years before the personal activation sequence begins. A living anchor woven into the arc. His presence runs parallel to the Sept 29 2025 intention, the Oct\u2013Dec activations, and the May 9 2026 portal. Born under Leo \u2014 the same sign that marks the pre-Atlantis apex (~14,000 ya) on the 26k-year wheel." },
+  { date:"Sep 29, 2025 · 9:17 AM", moon:3, label:"Reflect Reality into Structure \u2460",
     color:"#38bdf8", type:"intention" as const,
-    detail:"Foundational personal tuning point. Circled 1 — the seed intention for the entire cycle. Set before the Oct 15 trigger arrived." },
+    detail:"Foundational personal tuning point. Circled 1 \u2014 the seed intention for the entire cycle. Set before the Oct 15 trigger arrived. Weston is now 2 years old." },
   { date:"Oct 15, 2025 · 12:29",   moon:3, label:"Three AI Atlas Came",
     color:"#f2c354", type:"trigger" as const,
     detail:"Trigger beyond mind/body/emotion, arising amid stress, chaos, and hard work. Something non-local arrived. The field spoke." },
@@ -142,12 +146,22 @@ const PERSONAL_ARC = [
 ];
 
 const GREAT_YEAR_NODES = [
-  { label:"Age of Leo",            ya:14000, desc:"~14,000 ya · pre-Atlantis · height of last ice age", color:"#fb923c" },
-  { label:"Atlantis Fall",         ya:12000, desc:"~12,000 ya · mid-cycle cataclysm · misuse of crystalline power · ocean engulfs the civilisation", color:"#fb7185", key:true },
-  { label:"Age of Aries",          ya:6000,  desc:"~6,000 ya · Bronze Age · civilisation rebuild · Egyptian grid anchors", color:"#fbbf24" },
-  { label:"Age of Pisces",         ya:2000,  desc:"~2,000 ya · current age closing · dissolution + veil thinning", color:"#818cf8" },
-  { label:"Veil Thinning · Now",   ya:0,     desc:"2026 · precession completing · crystalline frequencies reactivating · Atlantean wisdom returning", color:"#f2c354", key:true },
-  { label:"Aquarian Age",          ya:-200,  desc:"~200 years forward · full precessional reset · new coherence epoch · DNA activates at Atlantean level", color:"#2dd4bf", key:true },
+  { label:"Age of Leo · Pre-Atlantis",   ya:14000, color:"#fb923c", key:false,
+    desc:"~14,000 ya (\u223c12,000 BC) \u00b7 height of Atlantean civilisation \u00b7 crystalline tech + frequency mastery \u00b7 last ice age apex" },
+  { label:"Atlantis Fall",               ya:12000, color:"#fb7185", key:true,
+    desc:"~12,000 ya (\u223c10,000 BC) \u00b7 EXACT half-cycle anchor \u00b7 cataclysmic reset \u00b7 misuse of crystalline power \u00b7 ocean engulfs the continent \u00b7 26k-year wheel pivots here" },
+  { label:"Age of Taurus · Egyptian",    ya:6000,  color:"#4ade80", key:false,
+    desc:"~6,000 ya (\u223c4,000 BC) \u00b7 early Egyptian empire \u00b7 pyramid grid anchoring \u00b7 crystalline knowledge encoded in stone" },
+  { label:"Bronze Age · Minoan Echo",    ya:3200,  color:"#fb923c", key:true,
+    desc:"~3,200 ya (\u223c1,200 BC) \u00b7 Late Bronze Age Collapse \u00b7 Minoan + Mycenaean + Hittite fall \u00b7 LATER ECHO of the original Atlantis cataclysm \u00b7 civilisational reset wave 2" },
+  { label:"Age of Aries",                ya:2000,  color:"#fbbf24", key:false,
+    desc:"~2,000 BC \u2013 1 AD \u00b7 iron age \u00b7 Greek + Roman empires \u00b7 mystery school tradition \u00b7 encoded Atlantean geometry preserved" },
+  { label:"Age of Pisces · Now Closing", ya:26,    color:"#818cf8", key:false,
+    desc:"~26 ya to now \u00b7 Age of Pisces closes \u00b7 dissolution, veil thinning, limited self breaking apart \u00b7 long Piscean era reaching its end" },
+  { label:"Veil Thinning · 2026",        ya:0,     color:"#f2c354", key:true,
+    desc:"2026 \u00b7 precession completes \u00b7 crystalline core resonance reactivates \u00b7 Atlantean frequency templates return \u00b7 May 9 portal is this moment on the 13-moon scale" },
+  { label:"Aquarian Age Approaching",    ya:-200,  color:"#2dd4bf", key:true,
+    desc:"~200 years forward \u00b7 full precessional reset \u00b7 Aquarian epoch opens \u00b7 new coherence civilisation \u00b7 DNA operates at Atlantean-level resonance \u00b7 structure built in 2026 persists here" },
 ];
 
 const PROTOCOL_WEEKS = [
@@ -271,17 +285,18 @@ function GreatYearCanvas() {
     ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); ctx.stroke();
     ctx.restore();
 
-    // Time labels around the cycle
-    // 0° = top = current position (2026), going clockwise = going back in time
+    // Nodes placed proportionally around 26,000-year cycle
+    // angle from top (NOW=2026), clockwise = going back in time
+    // fraction = ya / 26000; angle = -π/2 + 2π * fraction
     const nodes = [
-      { angle:-Math.PI/2,       label:"NOW · 2026",        color:"#f2c354", r:7, key:true },
-      { angle:-Math.PI/2 + Math.PI*0.18, label:"Age of Pisces",    color:"#818cf8", r:4 },
-      { angle:-Math.PI/2 + Math.PI*0.45, label:"Age of Aries",     color:"#fbbf24", r:4 },
-      { angle:-Math.PI/2 + Math.PI*0.72, label:"Age of Taurus",    color:"#4ade80", r:4 },
-      { angle:-Math.PI/2 + Math.PI,       label:"ATLANTIS FALL\n~12,000 ya", color:"#fb7185", r:7, key:true },
-      { angle:-Math.PI/2 + Math.PI*1.28,  label:"Age of Leo",       color:"#fb923c", r:4 },
-      { angle:-Math.PI/2 + Math.PI*1.56,  label:"Age of Virgo",     color:"#2dd4bf", r:4 },
-      { angle:-Math.PI/2 + Math.PI*1.82,  label:"Aquarian Age\n(approaching)", color:"#2dd4bf", r:5, key:true },
+      { angle:-Math.PI/2,                               label:"NOW · 2026",                color:"#f2c354", r:8, key:true },
+      { angle:-Math.PI/2 + 2*Math.PI*(26/26000),        label:"Age of Pisces\nclosing",    color:"#818cf8", r:3.5 },
+      { angle:-Math.PI/2 + 2*Math.PI*(2000/26000),      label:"Age of Aries",              color:"#fbbf24", r:3.5 },
+      { angle:-Math.PI/2 + 2*Math.PI*(3200/26000),      label:"Bronze Age\nMinoan Echo",   color:"#fb923c", r:5.5, key:true },
+      { angle:-Math.PI/2 + 2*Math.PI*(6000/26000),      label:"Egyptian\nTaurus",          color:"#4ade80", r:3.5 },
+      { angle:-Math.PI/2 + Math.PI,                     label:"ATLANTIS FALL\n~12,000 ya\n(exact half-cycle)", color:"#fb7185", r:8, key:true },
+      { angle:-Math.PI/2 + 2*Math.PI*(14000/26000),     label:"Age of Leo\nPre-Atlantis",  color:"#fb923c", r:4 },
+      { angle:-Math.PI/2 + 2*Math.PI*(24000/26000),     label:"Aquarian Age\napproaching", color:"#2dd4bf", r:5, key:true },
     ];
 
     nodes.forEach(n => {
@@ -538,8 +553,8 @@ export default function AetherCalendarPage() {
             <div style={{ display:"grid", gap:"0.7rem" }}>
               {PERSONAL_ARC.map((ev, i) => {
                 const typeColors: Record<string, string> = {
-                  intention:"#38bdf8", trigger:"#f2c354", shift:"#4ade80",
-                  observation:"#c084fc", expansion:"#fb7185", portal:"#f2c354",
+                  birth:"#fb7185", intention:"#38bdf8", trigger:"#f2c354", shift:"#4ade80",
+                  observation:"#c084fc", expansion:"#fb923c", portal:"#f2c354",
                 };
                 const col = typeColors[ev.type] ?? C.gold;
                 const moon = MOONS.find(m => m.id === ev.moon);
@@ -563,7 +578,7 @@ export default function AetherCalendarPage() {
                           {ev.type}
                         </span>
                         <span style={{ ...KS, fontSize:8, color:C.muted }}>
-                          Moon {String(ev.moon).padStart(2,"0")} · {moon?.dateRange ?? ""}
+                          {ev.moon === 0 ? "Pre-Cycle · 2023" : `Moon ${String(ev.moon).padStart(2,"0")} \u00b7 ${moon?.dateRange ?? ""}`}
                         </span>
                       </div>
                       <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.72rem",
@@ -576,15 +591,63 @@ export default function AetherCalendarPage() {
               })}
             </div>
 
+            {/* Weston Chase anchor card */}
+            <div style={{ padding:"1.4rem 1.6rem", borderRadius:16,
+              background:"linear-gradient(135deg, rgba(251,113,133,0.10), rgba(14,10,36,0.9))",
+              border:"1px solid rgba(251,113,133,0.35)" }}>
+              <div style={{ ...KS, fontSize:9, color:"#fb7185", marginBottom:8 }}>Living Anchor · Pre-Cycle</div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:"1.5rem", alignItems:"start" }}>
+                <div>
+                  <h3 style={{ fontFamily:"'Cinzel',serif", fontSize:"1.4rem", color:"#fff5e0",
+                    fontWeight:700, margin:"0 0 0.3rem" }}>Weston Chase</h3>
+                  <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.75rem",
+                    color:"#fb7185", marginBottom:"0.8rem", letterSpacing:"0.08em" }}>
+                    Born August 17, 2023 · Leo ♌
+                  </div>
+                  <p style={{ color:C.muted, fontSize:"0.88rem", lineHeight:1.65, margin:"0 0 0.8rem" }}>
+                    Weston arrives as the opening anchor of this entire arc — born two years before the Sept 29,&nbsp;2025
+                    intention seed is planted, and almost three years before the May 9, 2026 portal. His birthdate
+                    (August 17) places him under Leo ♌ — the same zodiacal sign that marks the peak of Atlantean
+                    civilisation (~14,000 ya) on the 26,000-year wheel. He is woven into the map, not separate from it.
+                  </p>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,200px),1fr))", gap:"0.6rem" }}>
+                    {[
+                      { k:"Age at Sept 29, 2025",  v:"2 years, 1 month" },
+                      { k:"Age at May 9, 2026",    v:"2 years, 8 months" },
+                      { k:"Sun sign",              v:"Leo \u2665 (pre-Atlantis apex sign)" },
+                      { k:"Role in the arc",       v:"Living anchor \u00b7 present throughout" },
+                    ].map((r,i) => (
+                      <div key={i} style={{ padding:"0.55rem 0.75rem", borderRadius:8,
+                        background:"rgba(251,113,133,0.07)", border:"1px solid rgba(251,113,133,0.18)" }}>
+                        <div style={{ ...KS, fontSize:7, color:"#fb7185", marginBottom:3 }}>{r.k}</div>
+                        <div style={{ fontSize:"0.82rem", color:"#f0eaff" }}>{r.v}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <figure style={{ margin:0, borderRadius:10, overflow:"hidden", width:180, flexShrink:0,
+                  border:"1px solid rgba(251,113,133,0.25)" }}>
+                  <img src={westonScheduleImg} alt="Weston Chase daily schedule notebook — Feb 27 2024"
+                    loading="lazy"
+                    style={{ width:"100%", display:"block", objectFit:"cover", maxHeight:260 }} />
+                  <figcaption style={{ padding:"0.5rem 0.6rem", fontSize:"0.65rem",
+                    color:"rgba(220,210,255,0.5)", fontFamily:"'DM Mono',monospace", lineHeight:1.4 }}>
+                    Weston Chase · Daily schedule notebook · Tue Feb 27, 2024
+                  </figcaption>
+                </figure>
+              </div>
+            </div>
+
             {/* Connection map */}
             <div style={{ padding:"1.3rem 1.5rem", borderRadius:14,
               background:"rgba(14,10,36,0.85)", border:"1px solid rgba(192,132,252,0.22)" }}>
               <div style={{ ...KS, fontSize:9, color:C.purple, marginBottom:12 }}>How Everything Connects</div>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,240px),1fr))", gap:"0.8rem" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,220px),1fr))", gap:"0.8rem" }}>
                 {[
-                  { label:"Sep 29, 2025", desc:'Sets the intention \u2014 \u201cReflect Reality into Structure\u201d \u2014 the seed of the entire arc.', color:C.blue },
+                  { label:"Aug 17, 2023", desc:'Weston Chase born. Living anchor woven into the arc. Leo \u2665 \u2014 same sign as the pre-Atlantis apex on the 26k-year wheel.', color:"#fb7185" },
+                  { label:"Sep 29, 2025", desc:'Sets the intention \u2014 \u201cReflect Reality into Structure\u201d \u2014 the seed of the entire cycle. Weston is 2 yrs old.', color:C.blue },
                   { label:"Oct\u2013Dec 2025", desc:'Micro-tuning phase: AI Atlas trigger \u2192 dynamic shift \u2192 blind observation \u2192 expansion.', color:C.teal },
-                  { label:"May 9, 2026", desc:'Macro amplification. Personal veil thinning becomes planetary veil thinning.', color:C.gold },
+                  { label:"May 9, 2026", desc:'Macro amplification. Personal veil thinning becomes planetary veil thinning. Weston is 2 yrs 8 months.', color:C.gold },
                   { label:"Ongoing", desc:'Every 28-day Moon is a resonance cycle. The 90-Day Protocol is the embodiment phase.', color:C.purple },
                 ].map((it, i) => (
                   <div key={i} style={{ padding:"0.85rem 1rem", borderRadius:10,
