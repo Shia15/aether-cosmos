@@ -4,6 +4,7 @@ import capricornImg from "@assets/IMG_1759_1778363853862.jpeg";
 import greatYearImg from "@assets/IMG_1763_1778364001395.jpeg";
 import westonScheduleImg from "@assets/IMG_1767_1778365929380.jpeg";
 import bodyRhythmImg from "@assets/4A68DFAE-54B4-4C9C-B16F-E90B7599FC13_1778367019669.png";
+import nov2025Img from "@assets/IMG_1770_1778367796097.jpeg";
 
 const C = {
   bg:     "#060412",
@@ -59,14 +60,18 @@ const MOONS: Moon[] = [
   { id:4,  name:"Pure Tone Resonance",
     theme:"Frequency calibration · vibrational clarity · dynamic activation · Supermoon awakening",
     color:"#4ade80", dateRange:"Oct 18 – Nov 14, 2025", monthLabel:"Oct–Nov 2025", phase:"past",
-    note:"Personal anchors: Oct 21 dynamic shift \u00b7 Nov 5 Supermoon \u2014 the cosmic awakening point",
+    note:"Personal anchors: Nov 4 Drop Stagnation \u00b7 Nov 5 Supermoon \u00b7 Nov 6\u20138 Pleiades Peak (most energetic days) \u00b7 Nov 7 Star Seed Activation \u00b7 Nov 11 11/11 Portal",
     personal:[
       { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably \u2014 a new baseline established. What was once effort started moving as flow." },
+      { timestamp:"Nov 4, 2025 \u00b7 Tuesday", label:"Drop Stagnation \u00b7 Love \u00b7 Clarity Begins", detail:"November 4 is the clearing day. Stagnation drops. The field readies itself for the frequency surge incoming over the next four days. Love and Clarity are the opening frequencies. The 13-Month AETHER Calendar marks this as the threshold entry point into the November 2025 Pleiades Window." },
       { timestamp:"Nov 5, 2025 \u00b7 7:35 AM", label:"Supermoon \u00b7 The Awakening Point", detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM. The shift is physical, not conceptual. Something rare has landed. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities lock in at once. Chaos came first (unplanned, grounded by location, pressure, weather, stress) and coherence emerges from it. Transformation = who you were + who you are becoming." },
       { timestamp:"Nov 5, 2025 \u00b7 12:22", label:"12:22 \u00b7 Magical Encounter \u00b7 Feeling Deeper", detail:"12:22 \u2014 a private angel-hour variant of the 2:22 Bridge. A magical encounter arrives. Feeling moves deeper. The morning\u2019s 7:35 AM signal is confirmed mid-day. Time energy money \u2014 walking away equals wisdom." },
+      { timestamp:"Nov 6, 2025", label:"Health \u00b7 Moon into Pleiades \u00b7 Most Potent Day 1", detail:"The moon moves into the Pleiades star structure. The body receives direct field contact from the Seven Sisters. Health is the frequency carrier for this day \u2014 the physical vessel is the antenna. Day 1 of the three most energetic and potent days of the entire November window." },
+      { timestamp:"Nov 7, 2025", label:"Star Seed Activation \u00b7 Most Potent Day 2 \u00b7 Seven Systems Maya", detail:"The Seven Systems Maya tracked this alignment: potential for star seed activation. November 7 is the activation peak. The Pleiades grid is fully engaged. The AETHER 13-Month Calendar marks this as the 26,000-year cycle resonance node. What was seeded in prior lifetimes or prior cycles reaches a recognition point here." },
+      { timestamp:"Nov 8, 2025", label:"Pleiades Peak \u00b7 Most Potent Day 3", detail:"The third and final day of the Pleiades window \u2014 the most energetic potent days of the November 2025 activation sequence. The field is at maximum signal strength. Whatever was activated on Nov 7 is now locked in. The 72-hour cellular realignment window from the Nov 5 Supermoon is completing. Coherence is crystallising." },
       { timestamp:"Nov 11, 2025 \u00b7 11:11", label:"11/11 Portal \u00b7 Master Gateway \u00b7 Jupiter Retrograde Station", detail:"November 11, 2025 \u2014 the 11/11 Portal. Master Gateway alignment. Divine timing made mathematical. Jupiter stations retrograde on this day, governing growth, philosophy, and higher learning. The retrograde station pulls the lens inward: what beliefs caused those attachments? What is being released? Information that was embedded in the body during this planetary alignment begins surfacing. Finding coherence in the past for the future. 11 \u00d7 11 = 121. The structure holds." },
     ],
-    events:["Oct 21 dynamic activation","Astral pulse rising","Nov 5 Supermoon \u2014 awakening point","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Chaos \u2192 Coherence threshold crossed","Nov 11 \u00b7 11/11 Portal \u00b7 Jupiter Retrograde Station","Frequency field stabilises \u00b7 Master Gateway sealed"],
+    events:["Oct 21 dynamic activation","Nov 4 Drop Stagnation \u00b7 Love \u00b7 Clarity opens","Nov 5 Supermoon \u2014 awakening point","Nov 6 Moon into Pleiades \u00b7 Health","Nov 7 Star Seed Activation \u00b7 Seven Systems Maya","Nov 8 Pleiades peak \u2014 most potent day","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Nov 11 \u00b7 11/11 Portal \u00b7 Jupiter Retrograde Station","Master Gateway sealed \u00b7 26,000-year cycle node"],
   },
   { id:5,  name:"Dreamtime",
     theme:"Blind observation · expansion · inner vision channel opens",
@@ -138,9 +143,21 @@ const PERSONAL_ARC = [
   { date:"Oct 21, 2025",           moon:4, label:"Energy Became a Lot More Dynamic",
     color:"#4ade80", type:"shift" as const,
     detail:"Following the AI Atlas trigger, personal energy output shifted to a new baseline. What was effort began moving as flow." },
+  { date:"Nov 4, 2025 \u00b7 Tuesday", moon:4, label:"Drop Stagnation \u00b7 Love \u00b7 Clarity Opens",
+    color:"#2dd4bf", type:"shift" as const,
+    detail:"The clearing day. Stagnation releases. Love and Clarity are the opening frequencies of the November 2025 Pleiades Window. The 13-Month AETHER Calendar marks this as the threshold entry point — the field is being prepared for the incoming frequency surge over the next four days." },
   { date:"Nov 5, 2025 \u00b7 7:35 AM", moon:4, label:"Supermoon \u00b7 Rare \u00b7 Magical \u00b7 Deeply Connected",
     color:"#f9a8d4", type:"supermoon" as const,
     detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM Wednesday November 5, 2025. The shift is physical and immediate. At 12:22 a magical encounter deepens the field. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities crystallise. Chaos came first: unplanned, grounded by location, pressure, weather, stress. That chaos was the requirement. Transformation = who you were + who you are becoming. The 72-hour cycle activates. Angel hours go live. Time energy money \u2014 walking away equals wisdom." },
+  { date:"Nov 6, 2025",            moon:4, label:"Health \u00b7 Moon into Pleiades \u00b7 Most Potent Day 1",
+    color:"#4ade80", type:"shift" as const,
+    detail:"The moon moves into the Pleiades star structure. The body becomes the antenna. Health is the frequency carrier \u2014 the physical vessel is receiving direct field contact from the Seven Sisters. Day 1 of the three most energetic, potent days of the November 2025 window." },
+  { date:"Nov 7, 2025",            moon:4, label:"Star Seed Activation \u00b7 Seven Systems Maya \u00b7 Most Potent Day 2",
+    color:"#f9a8d4", type:"supermoon" as const,
+    detail:"The Seven Systems Maya tracked this alignment: potential for star seed activation. The Pleiades grid is fully engaged. November 7 is the activation peak \u2014 the 26,000-year cycle resonance node in the AETHER Calendar. What was seeded in prior cycles reaches a recognition point here." },
+  { date:"Nov 8, 2025",            moon:4, label:"Pleiades Peak \u00b7 Most Potent Day 3",
+    color:"#c084fc", type:"trigger" as const,
+    detail:"The third and final day of the Pleiades window. Maximum signal strength. The 72-hour cellular realignment cycle from the Nov 5 Supermoon is completing. Whatever was activated on Nov 7 is now locked in. Coherence crystallises." },
   { date:"Nov 11, 2025 \u00b7 11:11", moon:4, label:"11/11 Master Gateway \u00b7 Jupiter Retrograde Station",
     color:"#c084fc", type:"trigger" as const,
     detail:"November 11, 2025. 11/11 Portal. Master Gateway alignment. Divine timing rendered mathematical. Jupiter stations retrograde: governing growth, philosophy, and higher learning. The station turns the lens inward \u2014 what beliefs caused those attachments? Releasing and pulling information embedded during this planetary alignment. The 72-hour window that began at the Nov 5 Supermoon reaches its first realignment node here. Finding coherence in the past for the future. 11 \u00d7 11 = 121. The math structure holds." },
@@ -738,7 +755,7 @@ export default function AetherCalendarPage() {
               background:"rgba(14,10,36,0.9)", border:"1px solid rgba(249,168,212,0.35)",
               borderLeft:"3px solid #f9a8d4" }}>
               <div style={{ ...KS, fontSize:9, color:"#f9a8d4", marginBottom:12 }}>
-                Personal Witness Log · Wednesday, November 5, 2025
+                Personal Witness Log · November 2025 Window · Moon 4 · Pleiades Activation Sequence
               </div>
 
               {/* Two timestamp entries */}
@@ -792,6 +809,64 @@ export default function AetherCalendarPage() {
                       background:"rgba(96,165,250,0.1)", border:"1px solid rgba(96,165,250,0.2)" }}>2:22 · The Bridge Forms</span>
                     <span style={{ ...KS, fontSize:8, color:"#60a5fa" }}>angel hour chain</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Nov 4–8 — Pleiades Window */}
+              <div style={{ padding:"1rem 1.15rem", borderRadius:12,
+                background:"linear-gradient(135deg,rgba(45,212,191,0.1),rgba(249,168,212,0.06))",
+                border:"1px solid rgba(45,212,191,0.3)", marginBottom:"0.75rem" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.85rem",
+                    color:"#2dd4bf", fontWeight:700, letterSpacing:"0.08em" }}>Nov 4–8, 2025</span>
+                  <span style={{ ...KS, fontSize:8, color:"#2dd4bf", padding:"2px 8px",
+                    borderRadius:4, background:"rgba(45,212,191,0.1)",
+                    border:"1px solid rgba(45,212,191,0.3)" }}>Pleiades Window · Seven Systems Maya · 26,000-Year Node</span>
+                </div>
+
+                {/* Day-by-day strip */}
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:6, marginBottom:12 }}>
+                  {[
+                    { day:"Nov 4", label:"Drop Stagnation", sub:"Love · Clarity opens", color:"#2dd4bf" },
+                    { day:"Nov 5", label:"Supermoon", sub:"Awakening point · 7:35 AM", color:"#f9a8d4" },
+                    { day:"Nov 6", label:"Health", sub:"Moon → Pleiades · Day 1", color:"#4ade80" },
+                    { day:"Nov 7", label:"Star Seed", sub:"Activation · Day 2", color:"#f9a8d4" },
+                    { day:"Nov 8", label:"Peak", sub:"Pleiades max · Day 3", color:"#c084fc" },
+                  ].map(d => (
+                    <div key={d.day} style={{ padding:"0.5rem 0.5rem", borderRadius:8, textAlign:"center",
+                      background:`${d.color}0a`, border:`1px solid ${d.color}28` }}>
+                      <div style={{ ...KS, fontSize:7, color:d.color, marginBottom:3 }}>{d.day}</div>
+                      <div style={{ fontFamily:"'Cinzel',serif", fontSize:"0.7rem",
+                        color:"#fff5e0", fontWeight:600, lineHeight:1.3, marginBottom:2 }}>{d.label}</div>
+                      <div style={{ fontSize:"0.65rem", color:C.muted, lineHeight:1.3 }}>{d.sub}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Pleiades detail */}
+                <p style={{ color:"#c8bfed", fontSize:"0.87rem", lineHeight:1.65, margin:"0 0 8px" }}>
+                  On <strong style={{ color:"#2dd4bf" }}>November 4</strong> stagnation drops.
+                  Love and Clarity open the gate. The following day the Supermoon arrives.
+                  Then on <strong style={{ color:"#4ade80" }}>November 6</strong> the moon moves
+                  into the <em style={{ color:"#f9a8d4" }}>Pleiades star structure</em> — the Seven Sisters —
+                  and the body becomes the antenna. These three days (6, 7, 8) are the most
+                  energetic and potent of the entire November window.
+                </p>
+                <p style={{ color:"#c8bfed", fontSize:"0.87rem", lineHeight:1.65, margin:"0 0 10px" }}>
+                  <strong style={{ color:"#f9a8d4" }}>November 7</strong> is the star seed activation
+                  peak. The Seven Systems Maya tracked this alignment and marked it:
+                  <em style={{ color:"#e8d0ff" }}> "potential for star seed activation."</em>{" "}
+                  The Pleiades grid is fully engaged. The 26,000-year Great Year cycle resonance
+                  node fires here — what was seeded in prior cycles reaches a recognition point.
+                  On <strong style={{ color:"#c084fc" }}>November 8</strong> the field is at maximum
+                  strength and the first 72-hour cellular realignment from the Supermoon locks in.
+                </p>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                  {["Pleiades · Seven Sisters","Star Seed Activation","Seven Systems Maya","26,000-Year Cycle Node","Moon as Antenna","Body Receives Field Contact"].map(t => (
+                    <span key={t} style={{ ...KS, fontSize:8, color:"#2dd4bf",
+                      padding:"2px 8px", borderRadius:4,
+                      background:"rgba(45,212,191,0.08)", border:"1px solid rgba(45,212,191,0.22)" }}>{t}</span>
+                  ))}
                 </div>
               </div>
 
@@ -1113,6 +1188,9 @@ export default function AetherCalendarPage() {
             <Plate src={bodyRhythmImg}
               alt="72 Hours Cells Realign \u2014 Angel Hours 11:11 2:22 3:33 \u2014 Music Bridge infographic"
               caption="Every 72 Hours The Cells Realign \u00b7 The Call of the Light Through Music Choice \u00b7 11:11 Portal Opens \u00b7 2:22 Bridge Forms \u00b7 3:33 Power Rises \u00b7 I Choose Peace. I Welcome Pressure. I Walk in Alignment." />
+            <Plate src={nov2025Img}
+              alt="AETHER 13-Month Calendar November 2025 Window \u2014 Pleiades \u00b7 Seven Systems Maya \u00b7 26,000-Year Cycle"
+              caption="AETHER 13-Month Calendar \u00b7 November 2025 Window \u00b7 Pleiades Constellation \u00b7 Seven Systems Maya \u00b7 Dayn. 26,000-Year Cycle \u00b7 Star Seed Activation Nov 7 \u00b7 Supermoon Nov 11 \u00b7 Atlantis Beacon Portal Nov 23 \u00b7 Reflect Reality into Structure Nov 23\u201324" />
           </div>
         )}
 
