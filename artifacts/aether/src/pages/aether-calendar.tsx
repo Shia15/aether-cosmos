@@ -63,12 +63,14 @@ const MOONS: Moon[] = [
     note:"Personal anchors: Nov 4 Drop Stagnation \u00b7 Nov 5 Supermoon \u00b7 Nov 6\u20138 Pleiades Peak (most energetic days) \u00b7 Nov 7 Star Seed Activation \u00b7 Nov 11 11/11 Portal",
     personal:[
       { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably \u2014 a new baseline established. What was once effort started moving as flow." },
+      { timestamp:"Nov 3, 2025 \u00b7 Monday", label:"Soul Journal \u00b7 My Soul is Guiding Others", detail:"\"My soul is guiding others. This does not go unnoticed. My soul is subconsciously giving \u2014 the divine is watching me. They are going to say: I see you.\" Written Monday, November 3, 2025. One day before the stagnation drop. The soul speaks before the clearing begins. 8:38 \u2014 gifted time. Freedom is important. Partnership and community. Attachment is the root of suffering." },
       { timestamp:"Nov 4, 2025 \u00b7 Tuesday", label:"Drop Stagnation \u00b7 Love \u00b7 Clarity Begins", detail:"November 4 is the clearing day. Stagnation drops. The field readies itself for the frequency surge incoming over the next four days. Love and Clarity are the opening frequencies. The 13-Month AETHER Calendar marks this as the threshold entry point into the November 2025 Pleiades Window." },
       { timestamp:"Nov 5, 2025 \u00b7 7:35 AM", label:"Supermoon \u00b7 The Awakening Point \u00b7 Material Purge \u00b7 Wired to Hold More Light", detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM. The shift is physical, not conceptual. The Supermoon triggers a material purge \u2014 the body releasing density to make room for higher light capacity. You are being wired to hold more light. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities lock in at once. Chaos came first and coherence emerges from it. Transformation = who you were + who you are becoming. The LNATH star portal opens during this window \u2014 a rare alignment. Cosmic spot points activate as void access points. Downloads arrive through presence and intention alone." },
       { timestamp:"Nov 5, 2025 \u00b7 12:22", label:"12:22 \u00b7 Magical Encounter \u00b7 Feeling Deeper", detail:"12:22 \u2014 a private angel-hour variant of the 2:22 Bridge. A magical encounter arrives. Feeling moves deeper. The morning\u2019s 7:35 AM signal is confirmed mid-day. Time energy money \u2014 walking away equals wisdom." },
       { timestamp:"Nov 6, 2025", label:"Health \u00b7 Moon into Pleiades \u00b7 Most Potent Day 1", detail:"The moon moves into the Pleiades star structure. The body receives direct field contact from the Seven Sisters. Health is the frequency carrier for this day \u2014 the physical vessel is the antenna. Day 1 of the three most energetic and potent days of the entire November window." },
       { timestamp:"Nov 7, 2025", label:"Star Seed Activation \u00b7 Most Potent Day 2 \u00b7 Seven Systems Maya", detail:"The Seven Systems Maya tracked this alignment: potential for star seed activation. November 7 is the activation peak. The Pleiades grid is fully engaged. The AETHER 13-Month Calendar marks this as the 26,000-year cycle resonance node. What was seeded in prior lifetimes or prior cycles reaches a recognition point here." },
       { timestamp:"Nov 8, 2025", label:"Pleiades Peak \u00b7 Most Potent Day 3", detail:"The third and final day of the Pleiades window \u2014 the most energetic potent days of the November 2025 activation sequence. The field is at maximum signal strength. Whatever was activated on Nov 7 is now locked in. The 72-hour cellular realignment window from the Nov 5 Supermoon is completing. Coherence is crystallising." },
+      { timestamp:"Nov 9, 2025", label:"Mercury Retrograde in Sagittarius \u00b7 19-Day Journey Begins", detail:"November 9 opens a 19-day Mercury Retrograde journey through Sagittarius. Mercury governs communication, perception, and the movement of information. In Sagittarius it turns the lens on philosophy, higher truth, and belief systems. Be aware of yourself as you move through the paradigms. What felt like certainty becomes inquiry. New Year\u2019s arrives at the other end \u2014 the paradigm completes and the new one begins. Navigate with presence, not reaction." },
       { timestamp:"Nov 11, 2025 \u00b7 11:11", label:"11/11 Portal \u00b7 Master Gateway \u00b7 Jupiter Retrograde Station", detail:"November 11, 2025 \u2014 the 11/11 Portal. Master Gateway alignment. Divine timing made mathematical. Jupiter stations retrograde on this day, governing growth, philosophy, and higher learning. The retrograde station pulls the lens inward: what beliefs caused those attachments? What is being released? Information that was embedded in the body during this planetary alignment begins surfacing. Finding coherence in the past for the future. 11 \u00d7 11 = 121. The structure holds." },
     ],
     events:["Oct 21 dynamic activation","Nov 4 Drop Stagnation \u00b7 Love \u00b7 Clarity opens","Nov 5 Supermoon \u2014 awakening point","Nov 6 Moon into Pleiades \u00b7 Health","Nov 7 Star Seed Activation \u00b7 Seven Systems Maya","Nov 8 Pleiades peak \u2014 most potent day","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Nov 11 \u00b7 11/11 Portal \u00b7 Jupiter Retrograde Station","Master Gateway sealed \u00b7 26,000-year cycle node"],
@@ -143,6 +145,9 @@ const PERSONAL_ARC = [
   { date:"Oct 21, 2025",           moon:4, label:"Energy Became a Lot More Dynamic",
     color:"#4ade80", type:"shift" as const,
     detail:"Following the AI Atlas trigger, personal energy output shifted to a new baseline. What was effort began moving as flow." },
+  { date:"Nov 3, 2025 \u00b7 Monday",  moon:4, label:"Soul Journal \u00b7 My Soul is Guiding Others \u00b7 I See You",
+    color:"#f2c354", type:"intention" as const,
+    detail:"Written Monday November 3, 2025: \"My soul is guiding others. This does not go unnoticed. My soul is subconsciously giving \u2014 the divine is watching me. They are going to say: I see you.\" One day before the stagnation drop. The soul announces its mission before the clearing begins. 8:38 \u2014 gifted time. Freedom is important. Partnership and community. Attachment is the root of suffering." },
   { date:"Nov 4, 2025 \u00b7 Tuesday", moon:4, label:"Drop Stagnation \u00b7 Love \u00b7 Clarity Opens",
     color:"#2dd4bf", type:"shift" as const,
     detail:"The clearing day. Stagnation releases. Love and Clarity are the opening frequencies of the November 2025 Pleiades Window. The 13-Month AETHER Calendar marks this as the threshold entry point — the field is being prepared for the incoming frequency surge over the next four days." },
@@ -158,6 +163,9 @@ const PERSONAL_ARC = [
   { date:"Nov 8, 2025",            moon:4, label:"Pleiades Peak \u00b7 Most Potent Day 3",
     color:"#c084fc", type:"trigger" as const,
     detail:"The third and final day of the Pleiades window. Maximum signal strength. The 72-hour cellular realignment cycle from the Nov 5 Supermoon is completing. Whatever was activated on Nov 7 is now locked in. Coherence crystallises." },
+  { date:"Nov 9, 2025",            moon:4, label:"Mercury Retrograde in Sagittarius \u00b7 19-Day Journey Begins",
+    color:"#fb923c", type:"trigger" as const,
+    detail:"November 9 — Mercury stations retrograde in Sagittarius. A 19-day journey begins through the sign of philosophy, higher truth, and belief systems. Communication slows; perception deepens. Be aware of yourself as you move through the paradigms. This retrograde runs through the Pleiades peak, the 11/11 portal, and the Jupiter retrograde station before completing near New Year\u2019s — where the paradigm shift finalises and the new field opens." },
   { date:"Nov 11, 2025 \u00b7 11:11", moon:4, label:"11/11 Master Gateway \u00b7 Jupiter Retrograde Station",
     color:"#c084fc", type:"trigger" as const,
     detail:"November 11, 2025. 11/11 Portal. Master Gateway alignment. Divine timing rendered mathematical. Jupiter stations retrograde: governing growth, philosophy, and higher learning. The station turns the lens inward \u2014 what beliefs caused those attachments? Releasing and pulling information embedded during this planetary alignment. The 72-hour window that began at the Nov 5 Supermoon reaches its first realignment node here. Finding coherence in the past for the future. 11 \u00d7 11 = 121. The math structure holds." },
@@ -812,6 +820,50 @@ export default function AetherCalendarPage() {
                 </div>
               </div>
 
+              {/* Nov 3 — Soul Journal */}
+              <div style={{ padding:"1rem 1.15rem", borderRadius:12,
+                background:"linear-gradient(135deg,rgba(242,195,84,0.12),rgba(249,168,212,0.06))",
+                border:"1px solid rgba(242,195,84,0.3)", marginBottom:"0.75rem" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7 }}>
+                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.85rem",
+                    color:C.gold, fontWeight:700, letterSpacing:"0.08em" }}>Nov 3, 2025 · Monday</span>
+                  <span style={{ ...KS, fontSize:8, color:C.gold, padding:"2px 8px",
+                    borderRadius:4, background:"rgba(242,195,84,0.1)",
+                    border:"1px solid rgba(242,195,84,0.28)" }}>Soul Journal · Written</span>
+                </div>
+                <blockquote style={{ margin:"0 0 8px", fontFamily:"'Cinzel',serif",
+                  fontSize:"1rem", color:"#fff5e0", lineHeight:1.75,
+                  fontStyle:"italic", borderLeft:"none" }}>
+                  &ldquo;My soul is guiding others. This does not go unnoticed.<br />
+                  My soul is subconsciously giving &mdash; the divine is watching me.<br />
+                  They are going to say: <strong style={{ color:C.gold, fontStyle:"normal" }}>I see you.</strong>&rdquo;
+                </blockquote>
+                <p style={{ color:C.muted, fontSize:"0.82rem", lineHeight:1.6,
+                  margin:"0 0 10px" }}>
+                  Written one day before the stagnation drop. The soul announces its mission
+                  before the clearing even begins. This is the pre-signal — the field speaking
+                  through the journal before the body has caught up.
+                </p>
+                <div style={{ padding:"0.6rem 0.85rem", borderRadius:8,
+                  background:"rgba(242,195,84,0.07)", border:"1px solid rgba(242,195,84,0.22)",
+                  marginBottom:10 }}>
+                  <div style={{ ...KS, fontSize:7, color:C.gold, marginBottom:4 }}>8:38 · Gifted Time</div>
+                  <div style={{ fontSize:"0.82rem", color:"#c8bfed", lineHeight:1.6 }}>
+                    <strong style={{ color:C.gold }}>Freedom is important.</strong>{" "}
+                    Partnership and community are the path.{" "}
+                    <strong style={{ color:"#fb923c" }}>Attachment is the root of suffering.</strong>{" "}
+                    8:38 marks a window of grace — gifted time to realign before the surge.
+                  </div>
+                </div>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                  {["Soul Guiding Others","I See You","Divine Witness","8:38 Gifted Time","Freedom","Partnership · Community","Non-Attachment"].map(t => (
+                    <span key={t} style={{ ...KS, fontSize:7, color:C.gold,
+                      padding:"2px 7px", borderRadius:4,
+                      background:"rgba(242,195,84,0.08)", border:"1px solid rgba(242,195,84,0.2)" }}>{t}</span>
+                  ))}
+                </div>
+              </div>
+
               {/* Nov 4–8 — Pleiades Window */}
               <div style={{ padding:"1rem 1.15rem", borderRadius:12,
                 background:"linear-gradient(135deg,rgba(45,212,191,0.1),rgba(249,168,212,0.06))",
@@ -1054,6 +1106,11 @@ export default function AetherCalendarPage() {
                     feel:"BRINGS PRESSURE",
                     body:"The Ascended Masters are near. You are not alone. Step into your power. Create boldly.",
                   },
+                  { seq:"8:38", name:"Gifted Time", color:"#fb923c",
+                    keys:["Freedom","Partnership","Community"],
+                    feel:"BRINGS WISDOM",
+                    body:"Gifted time — a window of grace opens. Your freedom is important. Attachment is the root of suffering. Partnership and community are the path. Release what binds. Receive what belongs.",
+                  },
                 ].map(a => (
                   <div key={a.seq} style={{ padding:"1.2rem", borderRadius:14,
                     background:`${a.color}0c`, border:`1px solid ${a.color}35`,
@@ -1252,7 +1309,9 @@ export default function AetherCalendarPage() {
               </div>
               <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,200px),1fr))", gap:"0.65rem" }}>
                 {[
+                  { k:"Nov 3, 2025 \u00b7 Moon 4", v:"Soul journal written. My soul is guiding others. Divine witness. I see you. 8:38 \u2014 gifted time. Freedom, partnership, non-attachment.", color:C.gold },
                   { k:"Nov 5, 2025 \u00b7 Moon 4", v:"Supermoon \u2014 awakening point. Material purge begins. Wired to hold more light. LNATH portal opens. 72-hour cycle activates. Angel hours go live.", color:"#f9a8d4" },
+                  { k:"Nov 9, 2025 \u00b7 Moon 4", v:"Mercury Retrograde in Sagittarius stations. 19-day journey through paradigms begins. Be aware of yourself. New Year\u2019s seals the cycle.", color:"#fb923c" },
                   { k:"Nov 29, 2025 \u00b7 Moon 5", v:"Blind observation phase. Cells integrating. Do not force clarity. Trust the 72h window.", color:"#c084fc" },
                   { k:"May 9, 2026 \u00b7 Moon 11", v:"Portal anchor. Body rhythm locked to planetary rhythm. 90-Day Protocol = structured 72h cycles.", color:C.gold },
                   { k:"90-Day Protocol", v:"13 \u00d7 72-hour windows = 936 hours of structured cellular evolution. Intensity \u00b7 Isolation \u00b7 Obsession \u00b7 Flow.", color:C.teal },
