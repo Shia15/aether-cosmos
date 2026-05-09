@@ -189,6 +189,7 @@ import ComputerBrainsPage from "@/pages/computer-brains";
 import LearningLayersPage from "@/pages/learning-layers";
 import ChaosToCodingPage from "@/pages/chaos-to-code";
 import AetherCalendarPage from "@/pages/aether-calendar";
+import AllBusinessIdeasPage from "@/pages/all-business-ideas";
 
 const queryClient = new QueryClient();
 
@@ -381,6 +382,7 @@ function Router() {
         <Route path="/neural-psychedelic" component={NeuralPsychedelicPage} />
         <Route path="/photo-timeline" component={PhotoTimelinePage} />
         <Route path="/aether-calendar" component={AetherCalendarPage} />
+        <Route path="/all-business-ideas" component={AllBusinessIdeasPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

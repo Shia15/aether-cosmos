@@ -269,6 +269,7 @@ const NAV_ITEMS = [
   { href: "/divine-timing",            label: "Divine Timing · Eris-in-Pisces · 11/11 Letter · Field of Numbers", icon: InfinityIcon },
   { href: "/glossary",                 label: "Glossary · A–Z Vocabulary of AETHER · Filterable", icon: BookA },
   { href: "/quantum-ammeter",          label: "Quantum Ammeter · Solar Prototype · Live Shot-Noise Sim", icon: SunMedium },
+  { href: "/all-business-ideas",       label: "All Business Ideas · 9 Ideas · Daily Schedule · Framework", icon: Sprout },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
