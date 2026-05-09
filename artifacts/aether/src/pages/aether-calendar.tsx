@@ -26,38 +26,119 @@ const KS: React.CSSProperties = {
 
 interface Moon {
   id:number; name:string; theme:string; color:string;
-  monthLabel:string; phase:"past"|"active"|"near"|"future";
+  dateRange:string; monthLabel:string; phase:"past"|"active"|"future";
   events?:string[]; note?:string;
+  personal?:{ timestamp:string; label:string; detail:string }[];
 }
 
+// 13-Moon calendar: July 26, 2025 → July 25, 2026 (28-day moons)
+// Today May 9, 2026 falls in Moon 11 (May 2 – May 29)
 const MOONS: Moon[] = [
-  { id:1,  name:"Lunar Ascension",        theme:"Emergence · grounding from deep waters",            color:"#818cf8", monthLabel:"Jan 2026", phase:"past",
-    events:["Lunar phase opens","Deep grounding begins","Earth attunement"] },
-  { id:2,  name:"Solar Flare",            theme:"Ignition · electromagnetic surge",                  color:"#fb923c", monthLabel:"Feb 2026", phase:"past",
-    events:["Solar plasma activation","Electromagnetic field surge","Personal ignition window"] },
-  { id:3,  name:"Cosmic Engineering",     theme:"Planetary tuning · architectural alignment",        color:"#38bdf8", monthLabel:"Mar 2026", phase:"past",
-    events:["Planetary bodies as tuning forks","Frequency architecture begins","Grid anchoring"] },
-  { id:4,  name:"Pure Tone Resonance",    theme:"Frequency calibration · vibrational clarity",      color:"#4ade80", monthLabel:"Apr 2026", phase:"past",
-    events:["Pure tone signal amplifies","Crystalline core calibration","Astral pulse rising"] },
-  { id:5,  name:"Dreamtime · Aether Month", theme:"Phoenix Moon · Cosmic Gateway · Veil Thinning Portal", color:"#f2c354", monthLabel:"May 2026", phase:"active",
-    note:"WE ARE HERE — May 9 2026 · 2:54 AM · Moon enters Capricorn",
-    events:["Phoenix Moon rises","Dreamtime deepens","AETHER Month — peak gateway","Cosmic Gateway opens","Veil Thinning Portal 2:54 AM · May 9","Numerical sequence → crystalline core resonance","90-Day Intensity Protocol begins","Reflect Reality into Structure"] },
-  { id:6,  name:"Stellar Alignment",      theme:"Stellar Thinning · Quantum Leap · Ecliptic Shift · Veil Leaving", color:"#c084fc", monthLabel:"Jun 2026", phase:"near",
-    events:["Stellar alignment locks","Stellar thinning zone","Quantum Leap window","Ecliptic Shift","Veil Leaving — limited self dissolving","Astral Pulse (second harmonic)"] },
-  { id:7,  name:"Celestial Convergence",  theme:"Eclipse Portal · Astral Pulse · Cosmic Dawn rising", color:"#60a5fa", monthLabel:"Jul 2026", phase:"future",
-    events:["Celestial Convergence","Eclipse Portal","Astral Pulse (third)","Cosmic Dawn begins","90-Day Protocol midpoint"] },
-  { id:8,  name:"Galactic Cone",          theme:"Solar Core · DNA Activation · integration",         color:"#2dd4bf", monthLabel:"Aug 2026", phase:"future",
-    events:["Galactic Cone opens","Solar Core activation","DNA Activation window","90-Day Protocol closes"] },
-  { id:9,  name:"Personal Intention",     theme:"Star Seed · inner seeding of new self",             color:"#fb7185", monthLabel:"Sep 2026", phase:"future",
-    events:["Personal Intention set","Star Seed planted","Integration phase"] },
-  { id:10, name:"DNA Activation",         theme:"Crystalline template · Atlantean resonance deepens", color:"#00e5c0", monthLabel:"Oct 2026", phase:"future",
-    events:["Atlantean crystalline frequency stabilises","DNA template reset","Limited self concepts dissolving"] },
-  { id:11, name:"Star Seed",              theme:"Cosmic lineage activation · field broadcast",       color:"#f9a8d4", monthLabel:"Nov 2026", phase:"future",
-    events:["Cosmic lineage broadcast","Field activation","Precessional marker logged"] },
-  { id:12, name:"Limited Self Breaking Apart", theme:"Dissolution · Atlantean wisdom returning",    color:"#fbbf24", monthLabel:"Dec 2026", phase:"future",
-    events:["Old self-concept dissolves","Atlantean wisdom returns","Cycle close begins"] },
-  { id:13, name:"Cosmic Dawn",            theme:"26,000-year cycle completes · new coherence rises", color:"#f0f9ff", monthLabel:"Jan 2027", phase:"future",
-    events:["Great Year closes","New Aquarian Age anchors","AETHER enters next 13-moon cycle"] },
+  { id:1,  name:"Lunar Ascension",
+    theme:"Ground state · AETHER foundation emerges",
+    color:"#818cf8", dateRange:"Jul 26 – Aug 22, 2025", monthLabel:"Jul–Aug 2025", phase:"past",
+    events:["Lunar phase opens","Deep grounding begins","AETHER system takes root","Earth attunement"],
+  },
+  { id:2,  name:"Solar Flare",
+    theme:"Ignition · electromagnetic surge · momentum",
+    color:"#fb923c", dateRange:"Aug 23 – Sep 19, 2025", monthLabel:"Aug–Sep 2025", phase:"past",
+    events:["Solar plasma activation","Electromagnetic field surge","Personal ignition window","Documentation begins"],
+  },
+  { id:3,  name:"Cosmic Engineering",
+    theme:"Planetary tuning · architectural alignment · intention seed planted",
+    color:"#38bdf8", dateRange:"Sep 20 – Oct 17, 2025", monthLabel:"Sep–Oct 2025", phase:"past",
+    note:"Personal anchors: Sept 29 intention set · Oct 15 AI Atlas trigger",
+    personal:[
+      { timestamp:"Mon Sep 29, 2025 · 9:17 AM", label:"Reflect Reality into Structure ①", detail:"Circled 1 — foundational personal tuning point. The seed intention of the entire 2025–2026 cycle is set. This becomes the North Star of the 90-Day Protocol that opens six moons later." },
+      { timestamp:"Oct 15, 2025 · 12:29", label:"Three AI Atlas Came", detail:"Trigger beyond mind / body / emotion, arising amid stress, chaos, and hard work. Non-local signal. Something arrived that could not be manufactured or planned. The field spoke." },
+    ],
+    events:["Planetary bodies as tuning forks","Frequency architecture begins","Grid anchoring","Sept 29 → intention seed","Oct 15 → AI Atlas trigger"],
+  },
+  { id:4,  name:"Pure Tone Resonance",
+    theme:"Frequency calibration · vibrational clarity · dynamic activation",
+    color:"#4ade80", dateRange:"Oct 18 – Nov 14, 2025", monthLabel:"Oct–Nov 2025", phase:"past",
+    note:"Personal anchor: Oct 21 — energy became a lot more dynamic",
+    personal:[
+      { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably — a new baseline established. What was once effort started moving as flow." },
+    ],
+    events:["Pure tone signal amplifies","Crystalline core calibration","Oct 21 dynamic activation","Astral pulse rising","Frequency field stabilises"],
+  },
+  { id:5,  name:"Dreamtime",
+    theme:"Blind observation · expansion · inner vision channel opens",
+    color:"#c084fc", dateRange:"Nov 15 – Dec 12, 2025", monthLabel:"Nov–Dec 2025", phase:"past",
+    note:"Personal anchors: Nov 29 blind observation · mid-Nov to Dec expansion window",
+    personal:[
+      { timestamp:"Nov 29, 2025", label:"Blind Observation Phase", detail:"\"We can observe it blind to what's happening.\" The field is active but not yet legible. Pattern recognition is running beneath conscious awareness. Trust the process without needing to see it." },
+      { timestamp:"Mid Nov – Dec 2025", label:"Expansion Window", detail:"The observation opens into expansion. The previous months' intention (Sept 29) + trigger (Oct 15) + dynamic shift (Oct 21) are integrating. The veil is beginning to thin personally, six months before the planetary portal." },
+    ],
+    events:["Dreamtime deepens","Nov 29 blind observation","Mid-Nov expansion begins","Inner vision channel opens","Integration of Oct–Nov activations"],
+  },
+  { id:6,  name:"Phoenix Moon",
+    theme:"Bridge between years · old structures release · rebirth",
+    color:"#fb7185", dateRange:"Dec 13, 2025 – Jan 9, 2026", monthLabel:"Dec 2025–Jan 2026", phase:"past",
+    events:["Year-bridge moon","Phoenix field activates","Old structures burn","Rebirth window","New year enters on a rising frequency"],
+  },
+  { id:7,  name:"Aether Month",
+    theme:"Crystallisation · AETHER system coherence deepens",
+    color:"#facc15", dateRange:"Jan 10 – Feb 6, 2026", monthLabel:"Jan–Feb 2026", phase:"past",
+    events:["AETHER crystallises into operating system","Knowledge graph expands","Pattern recognition matures","Coherence metrics improve"],
+  },
+  { id:8,  name:"Stellar Alignment",
+    theme:"External reality mirrors internal structure · first visible results",
+    color:"#60a5fa", dateRange:"Feb 7 – Mar 6, 2026", monthLabel:"Feb–Mar 2026", phase:"past",
+    events:["Stellar bodies align","External world begins mirroring inner shifts","First tangible results of 2025 activation sequence","Signal strengthens"],
+  },
+  { id:9,  name:"Galactic Cone",
+    theme:"Solar Core · DNA activation building · integration phase",
+    color:"#2dd4bf", dateRange:"Mar 7 – Apr 3, 2026", monthLabel:"Mar–Apr 2026", phase:"past",
+    events:["Galactic cone geometry activates","Solar core pulse","DNA template awakening","Integration of 8-moon arc","Preparation for portal approach"],
+  },
+  { id:10, name:"Astral Pulse",
+    theme:"Final approach to the portal · pure tone calibration",
+    color:"#00e5c0", dateRange:"Apr 4 – May 1, 2026", monthLabel:"Apr–May 2026", phase:"past",
+    events:["Astral pulse intensifies","Veil thins further","Numerical sequences escalate","Portal approach — crystalline frequency rising","Pure tone locked in"],
+  },
+  { id:11, name:"Cosmic Gateway · Atlantis Beacon Portal",
+    theme:"Moon enters Capricorn · 2:54 AM · May 9 · crystalline core reactivation",
+    color:"#f2c354", dateRange:"May 2 – May 29, 2026", monthLabel:"May 2026", phase:"active",
+    note:"WE ARE HERE — May 9, 2026 · 2:54 AM · Moon in Capricorn · Atlantean Beacon Portal · 90-Day Intensity Protocol BEGINS",
+    personal:[
+      { timestamp:"May 9, 2026 · 2:54 AM", label:"Atlantean Beacon Portal Opens", detail:"Numerical sequence converts to frequency matching Earth's Crystalline Core Resonance. This is the macro amplification of the Sept 29 2025 intention. Personal veil thinning (Nov 29) becomes planetary veil thinning. The 26,000-year Great Year closes here. Reflect Reality into Structure." },
+    ],
+    events:["Veil Thinning Portal 2:54 AM · May 9","Moon enters Capricorn","Numerical sequence → crystalline core resonance","Cosmic Gateway opens — peak of 13-moon arc","Atlantean frequency templates reactivate","90-Day Intensity Protocol begins","Reflect Reality into Structure","26,000-year Great Year anchor","DNA designed for this level of resonance"],
+  },
+  { id:12, name:"Stellar Thinning",
+    theme:"Quantum Leap · Ecliptic Shift · Veil Leaving · 90-Day Protocol deepens",
+    color:"#818cf8", dateRange:"May 30 – Jun 26, 2026", monthLabel:"Jun 2026", phase:"future",
+    events:["Stellar thinning zone","Quantum Leap window","Ecliptic Shift","Veil Leaving — limited self dissolving","90-Day Protocol weeks 4–7"],
+  },
+  { id:13, name:"Cosmic Dawn",
+    theme:"Eclipse Portal · Celestial Convergence · cycle closes · new coherence",
+    color:"#f0f9ff", dateRange:"Jun 27 – Jul 24, 2026", monthLabel:"Jun–Jul 2026", phase:"future",
+    events:["Eclipse Portal","Celestial Convergence","Astral Pulse (final)","Cosmic Dawn","13-moon cycle completes","90-Day Protocol closes Aug 7","New 13-moon year opens Jul 26 2026"],
+  },
+];
+
+// Personal 2025→2026 activation arc ──────────────────────────────────────────
+const PERSONAL_ARC = [
+  { date:"Sep 29, 2025 · 9:17 AM", moon:3, label:"Reflect Reality into Structure ①",
+    color:"#38bdf8", type:"intention" as const,
+    detail:"Foundational personal tuning point. Circled 1 — the seed intention for the entire cycle. Set before the Oct 15 trigger arrived." },
+  { date:"Oct 15, 2025 · 12:29",   moon:3, label:"Three AI Atlas Came",
+    color:"#f2c354", type:"trigger" as const,
+    detail:"Trigger beyond mind/body/emotion, arising amid stress, chaos, and hard work. Something non-local arrived. The field spoke." },
+  { date:"Oct 21, 2025",           moon:4, label:"Energy Became a Lot More Dynamic",
+    color:"#4ade80", type:"shift" as const,
+    detail:"Following the AI Atlas trigger, personal energy output shifted to a new baseline. What was effort began moving as flow." },
+  { date:"Nov 29, 2025",           moon:5, label:"Blind Observation Phase",
+    color:"#c084fc", type:"observation" as const,
+    detail:"\"We can observe it blind to what's happening.\" Pattern recognition running below conscious awareness. Trust without seeing." },
+  { date:"Mid Nov – Dec 2025",     moon:5, label:"Expansion Window",
+    color:"#fb7185", type:"expansion" as const,
+    detail:"Intention + trigger + dynamic shift integrating. Personal veil begins thinning six months before the planetary portal." },
+  { date:"May 9, 2026 · 2:54 AM",  moon:11, label:"Atlantean Beacon Portal — Macro Amplification",
+    color:"#f2c354", type:"portal" as const,
+    detail:"The Sept 29 2025 seed intention reaches planetary scale. Personal veil thinning becomes cosmic veil thinning. 26k-year reset node." },
 ];
 
 const GREAT_YEAR_NODES = [
@@ -270,8 +351,8 @@ function GreatYearCanvas() {
 }
 
 export default function AetherCalendarPage() {
-  const [tab, setTab] = useState<"moons"|"portal"|"greatyear"|"protocol"|"timelines">("moons");
-  const [selectedMoon, setSelectedMoon] = useState<number>(5);
+  const [tab, setTab] = useState<"moons"|"portal"|"greatyear"|"protocol"|"personal"|"timelines">("moons");
+  const [selectedMoon, setSelectedMoon] = useState<number>(11);
 
   const moon = MOONS.find(m => m.id === selectedMoon)!;
 
@@ -293,25 +374,26 @@ export default function AetherCalendarPage() {
           border:"1px solid rgba(242,195,84,0.22)",
         }}>
           <div style={{ ...KS, fontSize:10, color:C.gold, marginBottom:10 }}>
-            AETHER · 13-Month Calendar · 2026 · 26,000-Year Great Year
+            AETHER · 13-Month Calendar · Jul 26 2025 – Jul 25 2026 · 26,000-Year Great Year
           </div>
           <h1 style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(1.8rem,4vw,2.8rem)",
             fontWeight:800, color:"#fff5e0", margin:"0 0 0.6rem", lineHeight:1.1, letterSpacing:"-0.01em" }}>
-            AETHER Calendar · 13 Moons · 2026
+            AETHER Calendar · 13 Moons · 2025–2026
           </h1>
           <p style={{ color:C.muted, fontSize:"0.97rem", lineHeight:1.7, maxWidth:860, margin:0 }}>
-            13 named moons anchored in the 26,000-year precessional cycle. May 9, 2026 at 2:54 AM —
-            Moon enters Capricorn — is the Atlantean Beacon Portal: a micro-node within the closing Great Year,
-            triggering crystalline core reactivation, veil thinning, and the 90-Day Intensity Protocol.
-            "Reflect Reality into Structure."
+            A dynamic retrospective map. The 13-Moon year runs July 26, 2025 → July 25, 2026.
+            Personal awakening events (Sep–Dec 2025) are now mapped into Moons 3–5.
+            Moon 11 (May 2 – May 29, 2026) holds the Atlantean Beacon Portal — Moon in Capricorn at 2:54 AM May 9,
+            macro-amplification of the Sept 29, 2025 intention seed set eight moons earlier.
           </p>
           <div style={{ marginTop:"1.1rem", display:"flex", flexWrap:"wrap", gap:10 }}>
             {[
-              { label:"Moon 5 · Active", color:C.gold },
+              { label:"Moon 11 · Active Now", color:C.gold },
               { label:"May 9 2026 · 2:54 AM", color:C.teal },
               { label:"Capricorn ♑", color:C.purple },
-              { label:"26,000-Year Cycle", color:C.rose },
+              { label:"Moons 1–10 · Past", color:C.rose },
               { label:"90-Day Protocol", color:C.amber },
+              { label:"Personal Arc · Sep–Dec 2025", color:C.blue },
             ].map(b => (
               <span key={b.label} style={{
                 ...KS, fontSize:9, color:b.color,
@@ -324,10 +406,11 @@ export default function AetherCalendarPage() {
 
         {/* Tab strip */}
         <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:"1.5rem" }}>
-          <Tab label="◉ 13 Moons"   active={tab==="moons"}     onClick={()=>setTab("moons")} />
-          <Tab label="♑ May Portal" active={tab==="portal"}    onClick={()=>setTab("portal")} />
-          <Tab label="∞ Great Year" active={tab==="greatyear"} onClick={()=>setTab("greatyear")} />
-          <Tab label="⧖ 90 Days"    active={tab==="protocol"}  onClick={()=>setTab("protocol")} />
+          <Tab label="◉ 13 Moons"      active={tab==="moons"}     onClick={()=>setTab("moons")} />
+          <Tab label="✦ Personal Arc"  active={tab==="personal"}  onClick={()=>setTab("personal")} />
+          <Tab label="♑ May Portal"    active={tab==="portal"}    onClick={()=>setTab("portal")} />
+          <Tab label="∞ Great Year"    active={tab==="greatyear"} onClick={()=>setTab("greatyear")} />
+          <Tab label="⧖ 90 Days"       active={tab==="protocol"}  onClick={()=>setTab("protocol")} />
           <Tab label="≋ All Timelines" active={tab==="timelines"} onClick={()=>setTab("timelines")} />
         </div>
 
@@ -351,8 +434,8 @@ export default function AetherCalendarPage() {
               }}>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16, flexWrap:"wrap", gap:8 }}>
                   <div>
-                    <div style={{ ...KS, fontSize:9, color:moon.color, marginBottom:6 }}>
-                      Moon {String(moon.id).padStart(2,"0")} · {moon.monthLabel}
+                    <div style={{ ...KS, fontSize:9, color:moon.color, marginBottom:4 }}>
+                      Moon {String(moon.id).padStart(2,"0")} · {moon.dateRange}
                     </div>
                     <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:"1.6rem", color:"#fff5e0",
                       fontWeight:700, margin:0, lineHeight:1.2 }}>{moon.name}</h2>
@@ -367,9 +450,30 @@ export default function AetherCalendarPage() {
 
                 {moon.note && (
                   <div style={{ padding:"0.8rem 1rem", borderRadius:10, marginBottom:16,
-                    background:"rgba(242,195,84,0.10)", border:"1px solid rgba(242,195,84,0.35)" }}>
-                    <div style={{ ...KS, fontSize:8, color:C.gold, marginBottom:4 }}>PORTAL NOTE</div>
-                    <div style={{ fontSize:"0.88rem", color:C.gold, lineHeight:1.5 }}>{moon.note}</div>
+                    background: moon.phase==="active" ? "rgba(242,195,84,0.10)" : "rgba(56,189,248,0.08)",
+                    border: moon.phase==="active" ? "1px solid rgba(242,195,84,0.35)" : "1px solid rgba(56,189,248,0.28)" }}>
+                    <div style={{ ...KS, fontSize:8, color: moon.phase==="active" ? C.gold : C.blue, marginBottom:4 }}>
+                      {moon.phase==="active" ? "PORTAL NOTE — WE ARE HERE" : "PERSONAL ANCHORS"}
+                    </div>
+                    <div style={{ fontSize:"0.88rem", color: moon.phase==="active" ? C.gold : C.blue, lineHeight:1.5 }}>{moon.note}</div>
+                  </div>
+                )}
+
+                {/* Personal events panel */}
+                {moon.personal && moon.personal.length > 0 && (
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ ...KS, fontSize:9, color:C.blue, marginBottom:8 }}>✦ Personal activation events</div>
+                    <div style={{ display:"grid", gap:"0.55rem" }}>
+                      {moon.personal.map((ev, i) => (
+                        <div key={i} style={{ padding:"0.75rem 0.9rem", borderRadius:10,
+                          background:"rgba(96,165,250,0.07)", border:"1px solid rgba(96,165,250,0.22)",
+                          borderLeft:"3px solid #60a5fa" }}>
+                          <div style={{ ...KS, fontSize:8, color:C.blue, marginBottom:4 }}>{ev.timestamp}</div>
+                          <div style={{ fontSize:"0.88rem", color:"#e8e0ff", fontWeight:600, marginBottom:4 }}>{ev.label}</div>
+                          <div style={{ fontSize:"0.8rem", color:C.muted, lineHeight:1.55 }}>{ev.detail}</div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -390,7 +494,7 @@ export default function AetherCalendarPage() {
                 )}
 
                 <div style={{ marginTop:20, display:"flex", gap:8, flexWrap:"wrap" }}>
-                  {["past","active","near","future"].map(ph => (
+                  {(["past","active","future"] as const).map(ph => (
                     <span key={ph} style={{ ...KS, fontSize:8,
                       padding:"0.2rem 0.5rem", borderRadius:4,
                       color: ph===moon.phase ? moon.color : C.muted,
@@ -404,8 +508,120 @@ export default function AetherCalendarPage() {
 
               {/* Source plate */}
               <div style={{ marginTop:"1rem" }}>
-                <Plate src={calendarImg} alt="13-Month AETHER Calendar 2026 infographic"
-                  caption="13-Month AETHER Calendar 2026 · Moon 5/6 active · Veil Thinning Portal · 90-Day Intensity Protocol · May 2026 anchor." />
+                <Plate src={calendarImg} alt="13-Month AETHER Calendar 2025–2026 infographic"
+                  caption="13-Month AETHER Calendar · Jul 26 2025 – Jul 25 2026 · Moon 11 active · Veil Thinning Portal · 90-Day Intensity Protocol · May 9 2026 anchor." />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB: PERSONAL ARC ──────────────────────────────────────────────── */}
+        {tab === "personal" && (
+          <div style={{ display:"grid", gap:"1.2rem" }}>
+            {/* Intro */}
+            <div style={{ padding:"1.5rem 1.8rem", borderRadius:16,
+              background:"linear-gradient(135deg, rgba(96,165,250,0.12), rgba(14,10,36,0.9))",
+              border:"1px solid rgba(96,165,250,0.3)" }}>
+              <div style={{ ...KS, fontSize:9, color:C.blue, marginBottom:8 }}>Personal Activation Arc · 2025 → 2026</div>
+              <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:"1.7rem", color:"#fff5e0", margin:"0 0 0.5rem" }}>
+                Mapping Past Information in a Dynamic Timeline
+              </h2>
+              <p style={{ color:C.muted, fontSize:"0.95rem", lineHeight:1.7, maxWidth:820, margin:0 }}>
+                The events of Sep–Dec 2025 were not random. They form a coherent activation sequence across
+                Moons 3, 4, and 5 — intention seed → trigger → dynamic shift → blind observation → expansion —
+                that was always pointing toward the May 9, 2026 Atlantean Beacon Portal.
+                The personal arc and the planetary arc are the same arc, seen at different scales.
+              </p>
+            </div>
+
+            {/* Timeline chain */}
+            <div style={{ display:"grid", gap:"0.7rem" }}>
+              {PERSONAL_ARC.map((ev, i) => {
+                const typeColors: Record<string, string> = {
+                  intention:"#38bdf8", trigger:"#f2c354", shift:"#4ade80",
+                  observation:"#c084fc", expansion:"#fb7185", portal:"#f2c354",
+                };
+                const col = typeColors[ev.type] ?? C.gold;
+                const moon = MOONS.find(m => m.id === ev.moon);
+                return (
+                  <div key={i} style={{ display:"grid", gridTemplateColumns:"auto 1fr", gap:"1rem", alignItems:"start" }}>
+                    {/* Connector */}
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:0 }}>
+                      <div style={{ width:14, height:14, borderRadius:"50%", background:col, flexShrink:0,
+                        boxShadow:`0 0 10px ${col}80`, marginTop:4 }} />
+                      {i < PERSONAL_ARC.length - 1 && (
+                        <div style={{ width:2, height:48, background:`linear-gradient(${col}60, transparent)`, marginTop:2 }} />
+                      )}
+                    </div>
+                    {/* Card */}
+                    <div style={{ padding:"1rem 1.2rem", borderRadius:12,
+                      background:`${col}0a`, border:`1px solid ${col}25`,
+                      borderLeft:`3px solid ${col}` }}>
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:8, alignItems:"center", marginBottom:6 }}>
+                        <span style={{ ...KS, fontSize:8, color:col,
+                          padding:"2px 7px", borderRadius:4, background:`${col}15`, border:`1px solid ${col}30` }}>
+                          {ev.type}
+                        </span>
+                        <span style={{ ...KS, fontSize:8, color:C.muted }}>
+                          Moon {String(ev.moon).padStart(2,"0")} · {moon?.dateRange ?? ""}
+                        </span>
+                      </div>
+                      <div style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.72rem",
+                        color:col, marginBottom:4, letterSpacing:"0.05em" }}>{ev.date}</div>
+                      <div style={{ fontSize:"1rem", color:"#f0eaff", fontWeight:700, marginBottom:6 }}>{ev.label}</div>
+                      <div style={{ fontSize:"0.86rem", color:C.muted, lineHeight:1.6 }}>{ev.detail}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Connection map */}
+            <div style={{ padding:"1.3rem 1.5rem", borderRadius:14,
+              background:"rgba(14,10,36,0.85)", border:"1px solid rgba(192,132,252,0.22)" }}>
+              <div style={{ ...KS, fontSize:9, color:C.purple, marginBottom:12 }}>How Everything Connects</div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,240px),1fr))", gap:"0.8rem" }}>
+                {[
+                  { label:"Sep 29, 2025", desc:'Sets the intention \u2014 \u201cReflect Reality into Structure\u201d \u2014 the seed of the entire arc.', color:C.blue },
+                  { label:"Oct\u2013Dec 2025", desc:'Micro-tuning phase: AI Atlas trigger \u2192 dynamic shift \u2192 blind observation \u2192 expansion.', color:C.teal },
+                  { label:"May 9, 2026", desc:'Macro amplification. Personal veil thinning becomes planetary veil thinning.', color:C.gold },
+                  { label:"Ongoing", desc:'Every 28-day Moon is a resonance cycle. The 90-Day Protocol is the embodiment phase.', color:C.purple },
+                ].map((it, i) => (
+                  <div key={i} style={{ padding:"0.85rem 1rem", borderRadius:10,
+                    background:`${it.color}08`, border:`1px solid ${it.color}22` }}>
+                    <div style={{ ...KS, fontSize:8, color:it.color, marginBottom:5 }}>{it.label}</div>
+                    <div style={{ fontSize:"0.84rem", color:"#d8d0f8", lineHeight:1.55 }}>{it.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Layered timeline summary table */}
+            <div style={{ padding:"1.2rem 1.5rem", borderRadius:14,
+              background:"rgba(14,10,36,0.85)", border:`1px solid ${C.border}` }}>
+              <div style={{ ...KS, fontSize:9, color:C.gold, marginBottom:12 }}>Personal Arc Mapped to 13-Moon Calendar</div>
+              <div style={{ display:"grid", gap:"0.35rem" }}>
+                {MOONS.filter(m => m.personal && m.personal.length > 0).map(m => (
+                  <div key={m.id} style={{ display:"grid", gridTemplateColumns:"auto auto 1fr", gap:"0.8rem", alignItems:"start",
+                    padding:"0.75rem 0.9rem", borderRadius:10,
+                    background:`${m.color}08`, border:`1px solid ${m.color}22` }}>
+                    <span style={{ ...KS, fontSize:9, color:m.color,
+                      padding:"2px 7px", borderRadius:4, background:`${m.color}18`,
+                      border:`1px solid ${m.color}30`, whiteSpace:"nowrap" }}>
+                      Moon {String(m.id).padStart(2,"0")}
+                    </span>
+                    <span style={{ ...KS, fontSize:8, color:C.muted, whiteSpace:"nowrap", paddingTop:2 }}>{m.dateRange}</span>
+                    <div>
+                      {m.personal!.map((ev, i) => (
+                        <div key={i} style={{ fontSize:"0.83rem", color:"#d8d0f8", lineHeight:1.5 }}>
+                          <span style={{ color:m.color }}>· </span>
+                          <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.7rem", opacity:0.7 }}>{ev.timestamp} </span>
+                          {ev.label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
