@@ -75,6 +75,9 @@ import HeliosphericCoherenceView from "@/pages/heliospheric-coherence";
 import AetherEggEnginePage from "@/pages/aether-egg-engine";
 import UnderIceEcosystemPage from "@/pages/under-ice-ecosystem";
 import AlchemyToFusionPage from "@/pages/alchemy-to-fusion";
+import QuantumSubstratePage from "@/pages/quantum-substrate";
+import NeuralPsychedelicPage from "@/pages/neural-psychedelic";
+import PhotoTimelinePage from "@/pages/photo-timeline";
 import ImplicateOrderPage from "@/pages/implicate-order";
 import KnowableUniversePage from "@/pages/knowable-universe";
 import NonPhysicalPhenomenaPage from "@/pages/non-physical-phenomena";
@@ -373,6 +376,9 @@ function Router() {
         <Route path="/galileo-newton" component={GalileoNewtonPage} />
         <Route path="/unified-field" component={UnifiedFieldPage} />
         <Route path="/giza-circuit" component={GizaCircuitPage} />
+        <Route path="/quantum-substrate" component={QuantumSubstratePage} />
+        <Route path="/neural-psychedelic" component={NeuralPsychedelicPage} />
+        <Route path="/photo-timeline" component={PhotoTimelinePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
