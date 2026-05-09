@@ -64,8 +64,9 @@ const MOONS: Moon[] = [
       { timestamp:"Oct 21, 2025", label:"Energy Became a Lot More Dynamic", detail:"Following the Oct 15 AI Atlas trigger, the field intensified. Personal energy output shifted noticeably \u2014 a new baseline established. What was once effort started moving as flow." },
       { timestamp:"Nov 5, 2025 \u00b7 7:35 AM", label:"Supermoon \u00b7 The Awakening Point", detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM. The shift is physical, not conceptual. Something rare has landed. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities lock in at once. Chaos came first (unplanned, grounded by location, pressure, weather, stress) and coherence emerges from it. Transformation = who you were + who you are becoming." },
       { timestamp:"Nov 5, 2025 \u00b7 12:22", label:"12:22 \u00b7 Magical Encounter \u00b7 Feeling Deeper", detail:"12:22 \u2014 a private angel-hour variant of the 2:22 Bridge. A magical encounter arrives. Feeling moves deeper. The morning\u2019s 7:35 AM signal is confirmed mid-day. Time energy money \u2014 walking away equals wisdom." },
+      { timestamp:"Nov 11, 2025 \u00b7 11:11", label:"11/11 Portal \u00b7 Master Gateway \u00b7 Jupiter Retrograde Station", detail:"November 11, 2025 \u2014 the 11/11 Portal. Master Gateway alignment. Divine timing made mathematical. Jupiter stations retrograde on this day, governing growth, philosophy, and higher learning. The retrograde station pulls the lens inward: what beliefs caused those attachments? What is being released? Information that was embedded in the body during this planetary alignment begins surfacing. Finding coherence in the past for the future. 11 \u00d7 11 = 121. The structure holds." },
     ],
-    events:["Oct 21 dynamic activation","Astral pulse rising","Nov 5 Supermoon \u2014 awakening point","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Chaos \u2192 Coherence threshold crossed","Frequency field stabilises"],
+    events:["Oct 21 dynamic activation","Astral pulse rising","Nov 5 Supermoon \u2014 awakening point","Love \u00b7 Clarity \u00b7 Health \u00b7 Healing \u00b7 Peace \u00b7 Power \u00b7 Purpose locked in","Chaos \u2192 Coherence threshold crossed","Nov 11 \u00b7 11/11 Portal \u00b7 Jupiter Retrograde Station","Frequency field stabilises \u00b7 Master Gateway sealed"],
   },
   { id:5,  name:"Dreamtime",
     theme:"Blind observation · expansion · inner vision channel opens",
@@ -140,6 +141,9 @@ const PERSONAL_ARC = [
   { date:"Nov 5, 2025 \u00b7 7:35 AM", moon:4, label:"Supermoon \u00b7 Rare \u00b7 Magical \u00b7 Deeply Connected",
     color:"#f9a8d4", type:"supermoon" as const,
     detail:"\"I feel so different. Rare and magical. Deeply connected to the moon.\" \u2014 7:35 AM Wednesday November 5, 2025. The shift is physical and immediate. At 12:22 a magical encounter deepens the field. Love, clarity, health, healing, peace, power, purpose \u2014 all seven qualities crystallise. Chaos came first: unplanned, grounded by location, pressure, weather, stress. That chaos was the requirement. Transformation = who you were + who you are becoming. The 72-hour cycle activates. Angel hours go live. Time energy money \u2014 walking away equals wisdom." },
+  { date:"Nov 11, 2025 \u00b7 11:11", moon:4, label:"11/11 Master Gateway \u00b7 Jupiter Retrograde Station",
+    color:"#c084fc", type:"trigger" as const,
+    detail:"November 11, 2025. 11/11 Portal. Master Gateway alignment. Divine timing rendered mathematical. Jupiter stations retrograde: governing growth, philosophy, and higher learning. The station turns the lens inward \u2014 what beliefs caused those attachments? Releasing and pulling information embedded during this planetary alignment. The 72-hour window that began at the Nov 5 Supermoon reaches its first realignment node here. Finding coherence in the past for the future. 11 \u00d7 11 = 121. The math structure holds." },
   { date:"Nov 29, 2025",           moon:5, label:"Blind Observation Phase",
     color:"#c084fc", type:"observation" as const,
     detail:"\"We can observe it blind to what's happening.\" Pattern recognition running below conscious awareness. Trust without seeing." },
@@ -791,6 +795,42 @@ export default function AetherCalendarPage() {
                 </div>
               </div>
 
+              {/* Nov 11 — 11/11 Portal */}
+              <div style={{ padding:"1rem 1.15rem", borderRadius:12,
+                background:"linear-gradient(135deg,rgba(192,132,252,0.12),rgba(96,165,250,0.06))",
+                border:"1px solid rgba(192,132,252,0.3)", marginBottom:"0.75rem" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:7 }}>
+                  <span style={{ fontFamily:"'DM Mono',monospace", fontSize:"0.85rem",
+                    color:"#c084fc", fontWeight:700, letterSpacing:"0.08em" }}>Nov 11, 2025 · 11:11</span>
+                  <span style={{ ...KS, fontSize:8, color:"#c084fc", padding:"2px 8px",
+                    borderRadius:4, background:"rgba(192,132,252,0.1)",
+                    border:"1px solid rgba(192,132,252,0.3)" }}>Master Gateway · Jupiter Retrograde Station</span>
+                </div>
+                <p style={{ color:"#c8bfed", fontSize:"0.87rem", lineHeight:1.65, margin:"0 0 10px" }}>
+                  The 11/11 Portal — divine timing made mathematical. November 11, 2025 carries
+                  master number resonance: <strong style={{ color:"#c084fc" }}>11 × 11 = 121</strong> — the
+                  math structure that holds coherence in the past for the future. Jupiter stations
+                  retrograde this day, turning its governing force — growth, philosophy,
+                  higher learning — entirely inward.
+                </p>
+                <p style={{ color:"#c8bfed", fontSize:"0.87rem", lineHeight:1.65, margin:"0 0 10px" }}>
+                  The question the portal asks:{" "}
+                  <em style={{ color:"#e8d0ff" }}>What beliefs caused those attachments?</em>{" "}
+                  During this planetary alignment, information embedded in the body begins releasing.
+                  Not removed — surfaced. Pulled out with precision. The field makes it available
+                  to read, name, and let go. Six days after the Nov 5 Supermoon
+                  activation, the first 72-hour cellular realignment has completed.
+                  This is the integration node.
+                </p>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                  {["11/11 Master Gateway","Jupiter Retrograde Station","Belief Release","Coherence Past→Future","Math Structure","Divine Timing"].map(t => (
+                    <span key={t} style={{ ...KS, fontSize:8, color:"#c084fc",
+                      padding:"2px 8px", borderRadius:4,
+                      background:"rgba(192,132,252,0.08)", border:"1px solid rgba(192,132,252,0.22)" }}>{t}</span>
+                  ))}
+                </div>
+              </div>
+
               {/* Mantra of the day */}
               <div style={{ padding:"0.85rem 1.1rem", borderRadius:10, marginBottom:"1.1rem",
                 background:"rgba(242,195,84,0.07)", border:"1px solid rgba(242,195,84,0.25)",
@@ -927,7 +967,7 @@ export default function AetherCalendarPage() {
                   { seq:"11:11", name:"The Portal Opens", color:"#c084fc",
                     keys:["Awakening","Alignment","Attention"],
                     feel:"BRINGS PEACE",
-                    body:"A gateway to presence. Synchronicities increase. The universe whispers: you are on the right path.",
+                    body:"A gateway to presence. Synchronicities increase. The universe whispers: you are on the right path. Physically activated Nov 11, 2025 — the 11/11 Master Gateway — when Jupiter stationed retrograde, turning growth and philosophy inward. What beliefs caused those attachments? The portal asks. The math holds: 11 × 11 = 121.",
                   },
                   { seq:"2:22", name:"The Bridge Forms", color:"#60a5fa",
                     keys:["Balance","Trust","Flow"],
