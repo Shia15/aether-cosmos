@@ -9,6 +9,7 @@ interface Entry {
   category: string;
   words: number;
   mood: string;
+  done?: boolean;
 }
 
 // ── Auto-classify by keyword ─────────────────────────────────────────────────
@@ -269,6 +270,10 @@ export default function CrashoutPage() {
     }, 300);
   }, []);
 
+  const toggleDone = useCallback((id: string) => {
+    setEntries(prev => prev.map(e => e.id === id ? { ...e, done: !e.done } : e));
+  }, []);
+
   const onKeyDown = (e: React.KeyboardEvent) => {
     if ((e.key === "Enter" && (e.metaKey || e.ctrlKey)) || (e.key === "Enter" && !e.shiftKey && text.trim().length > 0 && !e.shiftKey)) {
       if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
@@ -290,7 +295,22 @@ export default function CrashoutPage() {
   // Stats
   const totalWords = entries.reduce((s, e) => s + e.words, 0);
   const todayCount = entries.filter(e => fmtDay(e.ts) === "TODAY").length;
-  const catCounts = CATS.map(c => ({ ...c, count: entries.filter(e => e.category === c.label).length }));
+  const doneCount  = entries.filter(e => e.done).length;
+  const catCounts  = CATS.map(c => ({ ...c, count: entries.filter(e => e.category === c.label).length }));
+
+  // Coherence % — HHI-based concentration score (100% = all same category, 0% = perfectly spread)
+  const coherencePct = (() => {
+    const n = entries.length;
+    if (n === 0) return 0;
+    const nCats = CATS.length + 1; // +1 for NOTE
+    const hhi = catCounts.reduce((s, c) => s + Math.pow(c.count / n, 2), 0);
+    const minHHI = 1 / nCats;
+    const pct = ((hhi - minHHI) / (1 - minHHI)) * 100;
+    return Math.max(0, Math.min(100, pct));
+  })();
+
+  // Coherence colour: low=rose, mid=gold, high=teal
+  const coherenceColor = coherencePct >= 66 ? "#00e5c0" : coherencePct >= 33 ? "#fbbf24" : "#fb7185";
 
   const mono: React.CSSProperties = { fontFamily: "'Courier New', monospace" };
   const G = "#00ff88";
@@ -303,10 +323,38 @@ export default function CrashoutPage() {
       <div style={{ padding: "6px 16px", borderBottom: `1px solid ${BRD}`, display: "flex", alignItems: "center", gap: 14, flexShrink: 0, flexWrap: "wrap" }}>
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 4 }}>CRASHOUT</span>
         <span style={{ fontSize: 8, opacity: 0.3, letterSpacing: 2 }}>BRAIN DUMP · IDEA GARBAGE · REAL-TIME MAP</span>
-        <div style={{ marginLeft: "auto", display: "flex", gap: 16 }}>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 16, alignItems: "center" }}>
+          {/* Coherence ring indicator */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <svg width={36} height={36} viewBox="0 0 36 36">
+              <circle cx={18} cy={18} r={14} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={3} />
+              <circle cx={18} cy={18} r={14} fill="none"
+                stroke={coherenceColor}
+                strokeWidth={3}
+                strokeDasharray={`${coherencePct * 0.879} 100`}
+                strokeLinecap="round"
+                transform="rotate(-90 18 18)"
+                style={{ transition: "stroke-dasharray 0.6s ease, stroke 0.6s ease" }}
+              />
+              <text x={18} y={21} textAnchor="middle" fill={coherenceColor}
+                fontSize={7} fontFamily="'Courier New',monospace" fontWeight={700}>
+                {Math.round(coherencePct)}%
+              </text>
+            </svg>
+            <div style={{ fontSize: 5, color: "rgba(255,255,255,0.25)", letterSpacing: 1 }}>COHERENCE</div>
+          </div>
+
+          <div style={{ width: 1, height: 28, background: "rgba(255,255,255,0.07)" }} />
+
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: G }}>{entries.length}</div>
             <div style={{ fontSize: 6, opacity: 0.4, letterSpacing: 1 }}>ENTRIES</div>
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#00ff88" }}>
+              {doneCount}<span style={{ fontSize: 9, opacity: 0.5 }}>/{entries.length}</span>
+            </div>
+            <div style={{ fontSize: 6, opacity: 0.4, letterSpacing: 1 }}>✓ DONE</div>
           </div>
           <div style={{ textAlign: "center" }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#fbbf24" }}>{todayCount}</div>
@@ -316,6 +364,40 @@ export default function CrashoutPage() {
             <div style={{ fontSize: 14, fontWeight: 700, color: "#c084fc" }}>{totalWords}</div>
             <div style={{ fontSize: 6, opacity: 0.4, letterSpacing: 1 }}>WORDS</div>
           </div>
+        </div>
+      </div>
+
+      {/* Coherence + done progress bar above tabs */}
+      <div style={{ display: "flex", alignItems: "center", gap: 0, borderBottom: `1px solid ${BRD}`, flexShrink: 0, background: "rgba(0,0,0,0.2)" }}>
+        {/* Coherence bar segment */}
+        <div style={{ flex: 1, padding: "4px 14px 4px", display: "flex", alignItems: "center", gap: 8, borderRight: `1px solid ${BRD}` }}>
+          <span style={{ fontSize: 6, color: "rgba(255,255,255,0.2)", letterSpacing: 2, flexShrink: 0 }}>COHERENCE</span>
+          <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", borderRadius: 2,
+              width: `${coherencePct}%`,
+              background: `linear-gradient(90deg, ${coherenceColor}88, ${coherenceColor})`,
+              transition: "width 0.6s ease, background 0.6s ease",
+            }} />
+          </div>
+          <span style={{ fontSize: 7, color: coherenceColor, letterSpacing: 1, flexShrink: 0, minWidth: 28, textAlign: "right" }}>
+            {Math.round(coherencePct)}%
+          </span>
+        </div>
+        {/* Done checkmark bar segment */}
+        <div style={{ flex: 1, padding: "4px 14px 4px", display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 6, color: "rgba(255,255,255,0.2)", letterSpacing: 2, flexShrink: 0 }}>✓ RESOLVED</span>
+          <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{
+              height: "100%", borderRadius: 2,
+              width: entries.length ? `${(doneCount / entries.length) * 100}%` : "0%",
+              background: "linear-gradient(90deg, #00ff8860, #00ff88)",
+              transition: "width 0.4s ease",
+            }} />
+          </div>
+          <span style={{ fontSize: 7, color: "#00ff88", letterSpacing: 1, flexShrink: 0, minWidth: 36, textAlign: "right" }}>
+            {doneCount}/{entries.length}
+          </span>
         </div>
       </div>
 
@@ -464,10 +546,10 @@ export default function CrashoutPage() {
                       style={{
                         padding: "10px 16px",
                         borderBottom: `1px solid rgba(255,255,255,0.04)`,
-                        borderLeft: `3px solid ${isHov ? entry.color : `${entry.color}30`}`,
-                        background: isNew ? `${entry.color}10` : isHov ? "rgba(255,255,255,0.02)" : "transparent",
+                        borderLeft: `3px solid ${isHov ? entry.color : entry.done ? `${entry.color}50` : `${entry.color}30`}`,
+                        background: isNew ? `${entry.color}10` : entry.done ? "rgba(0,255,136,0.03)" : isHov ? "rgba(255,255,255,0.02)" : "transparent",
                         transition: "all 0.25s",
-                        opacity: isDel ? 0 : 1,
+                        opacity: isDel ? 0 : entry.done ? 0.5 : 1,
                         transform: isDel ? "translateX(-20px)" : isNew ? "translateX(0)" : "none",
                         display: "flex",
                         gap: 12,
@@ -491,20 +573,40 @@ export default function CrashoutPage() {
                         </div>
                         <div style={{
                           fontSize: 12,
-                          color: "rgba(255,255,255,0.78)",
+                          color: entry.done ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.78)",
                           lineHeight: 1.7,
                           whiteSpace: "pre-wrap",
                           wordBreak: "break-word",
                           fontFamily: "system-ui, -apple-system, sans-serif",
                           fontWeight: 400,
+                          textDecoration: entry.done ? "line-through" : "none",
+                          textDecorationColor: "rgba(0,255,136,0.3)",
                         }}>
                           {entry.text}
                         </div>
+                        {entry.done && (
+                          <div style={{ fontSize: 7, color: "rgba(0,255,136,0.45)", letterSpacing: 2, marginTop: 4 }}>
+                            ✓ RESOLVED
+                          </div>
+                        )}
                       </div>
 
                       {/* Actions */}
                       {isHov && (
                         <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
+                          <button
+                            onClick={() => toggleDone(entry.id)}
+                            style={{
+                              background: entry.done ? "rgba(0,255,136,0.18)" : "rgba(0,255,136,0.06)",
+                              border: `1px solid ${entry.done ? "rgba(0,255,136,0.6)" : "rgba(0,255,136,0.25)"}`,
+                              color: entry.done ? "#00ff88" : "rgba(0,255,136,0.5)",
+                              cursor: "pointer", fontSize: 9,
+                              padding: "2px 7px", borderRadius: 4, letterSpacing: 1,
+                              fontFamily: "'Courier New', monospace", lineHeight: 1.6,
+                            }}
+                            title={entry.done ? "Mark undone" : "Mark done"}>
+                            {entry.done ? "✓" : "○"}
+                          </button>
                           <button
                             onClick={() => setOpenEntry(entry)}
                             style={{
