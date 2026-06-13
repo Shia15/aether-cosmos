@@ -186,6 +186,7 @@ const NAV_ITEMS = [
   { href: "/boho-formula",          label: "Boho Formula · Alchemy",     icon: Leaf },
   { href: "/posting-architecture",  label: "Posting Architecture · Angel Hours", icon: Clock },
   { href: "/atlas-3i",              label: "3I/ATLAS · Panspermia",       icon: Orbit },
+  { href: "/guf-engine",             label: "GUF Master Engine · 7D Field · Collider", icon: Atom },
   { href: "/engines",               label: "Mastered Engines",            icon: Cpu },
   { href: "/galileo-newton",        label: "Galileo + Newton",            icon: Compass },
   { href: "/unified-field",         label: "Unified Field · Ψ·ΔG·e^iπ",   icon: Combine },

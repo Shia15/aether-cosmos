@@ -190,6 +190,7 @@ import LearningLayersPage from "@/pages/learning-layers";
 import ChaosToCodingPage from "@/pages/chaos-to-code";
 import AetherCalendarPage from "@/pages/aether-calendar";
 import AllBusinessIdeasPage from "@/pages/all-business-ideas";
+import GufEnginePage from "@/pages/guf-engine";
 
 const queryClient = new QueryClient();
 
@@ -383,6 +384,7 @@ function Router() {
         <Route path="/photo-timeline" component={PhotoTimelinePage} />
         <Route path="/aether-calendar" component={AetherCalendarPage} />
         <Route path="/all-business-ideas" component={AllBusinessIdeasPage} />
+        <Route path="/guf-engine" component={GufEnginePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

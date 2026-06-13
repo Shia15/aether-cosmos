@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GUF Post-Collision Analysis</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#e0f4ff;font-family:'Courier New',monospace;overflow:hidden;width:100vw;height:100vh;display:flex;flex-direction:column}
+
+/* TOP BAR */
+#topbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:5px 12px;background:rgba(0,0,0,0.97);border-bottom:1px solid rgba(0,200,255,0.15);flex-wrap:wrap;gap:4px;z-index:30}
+.logo{font-size:10px;font-weight:bold;letter-spacing:3px;color:#00ffee;text-shadow:0 0 10px #00ffee60}
+.logo-sub{font-size:6px;letter-spacing:1.5px;color:rgba(0,200,255,0.35);margin-top:1px}
+.top-stats{display:flex;gap:10px}
+.ts{text-align:center}
+.ts-v{font-size:10px;font-weight:bold;color:#00ffee}
+.ts-l{font-size:6px;letter-spacing:1px;color:rgba(0,200,255,0.3);text-transform:uppercase}
+.ctrl-btns{display:flex;gap:3px;flex-wrap:wrap}
+.btn{font-size:7px;letter-spacing:1px;padding:4px 8px;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.2);color:#00ccff;cursor:pointer;border-radius:1px;transition:all .15s;text-transform:uppercase}
+.btn:hover{background:rgba(0,200,255,0.14);border-color:#00ffee;color:#fff}
+.btn.on{background:rgba(0,200,255,0.18);border-color:#00ffee;color:#fff;box-shadow:0 0 5px rgba(0,255,238,0.2)}
+
+/* MAIN CONTENT AREA */
+#content{flex:1;display:flex;overflow:hidden;position:relative}
+
+/* TABS */
+#tab-bar{flex-shrink:0;display:flex;background:rgba(0,0,0,0.95);border-bottom:1px solid rgba(0,200,255,0.1);z-index:20}
+.tab{font-size:7px;letter-spacing:1.5px;padding:7px 14px;cursor:pointer;color:rgba(0,200,255,0.4);border-right:1px solid rgba(0,200,255,0.08);text-transform:uppercase;transition:all .15s;border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:rgba(0,200,255,0.7);background:rgba(0,200,255,0.04)}
+.tab.on{color:#00ffee;border-bottom:2px solid #00ffee;background:rgba(0,200,255,0.06)}
+
+/* WRAPPER for tab-bar + panels */
+#main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* SIDE PANELS */
+#lhud{flex-shrink:0;width:175px;padding:8px 7px;background:rgba(0,0,0,0.9);border-right:1px solid rgba(0,200,255,0.08);overflow-y:auto;scrollbar-width:none}
+#lhud::-webkit-scrollbar{display:none}
+#rhud{flex-shrink:0;width:175px;padding:8px 7px;background:rgba(0,0,0,0.9);border-left:1px solid rgba(0,200,255,0.08);overflow-y:auto;scrollbar-width:none}
+#rhud::-webkit-scrollbar{display:none}
+
+/* CENTER */
+#center-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+#canvas-area{flex:1;position:relative;overflow:hidden}
+
+/* PANEL PAGES */
+.page{position:absolute;inset:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,200,255,0.12) transparent;padding:18px 22px;display:none;background:rgba(0,0,0,0.95)}
+.page.active{display:block}
+.page::-webkit-scrollbar{width:4px}
+.page::-webkit-scrollbar-thumb{background:rgba(0,200,255,0.15);border-radius:2px}
+
+/* TYPOGRAPHY */
+.ep-title{font-size:15px;font-weight:bold;letter-spacing:3px;color:#00ffee;text-shadow:0 0 12px #00ffee40;margin-bottom:3px}
+.ep-sub{font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);margin-bottom:16px;text-transform:uppercase}
+.ep-h{font-size:8px;font-weight:bold;letter-spacing:2px;color:#00ffee;text-transform:uppercase;margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid rgba(0,200,255,0.1);display:flex;align-items:center;gap:6px}
+.ep-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.ep-p{font-size:9px;line-height:1.75;color:rgba(200,230,255,0.62);margin-bottom:7px}
+.ep-p b{color:#00ffee}.ep-p i{color:#f59e0b;font-style:normal}
+.ep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.ep-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.ep-card{background:rgba(0,200,255,0.03);border:1px solid rgba(0,200,255,0.09);border-radius:2px;padding:9px}
+.ep-card-title{font-size:7px;letter-spacing:1.5px;color:#00ffee;text-transform:uppercase;margin-bottom:4px}
+.ep-card-body{font-size:8px;line-height:1.6;color:rgba(180,220,255,0.52)}
+.ep-eq{background:rgba(0,0,0,0.5);border-left:2px solid #00ffee;padding:7px 11px;margin:7px 0;font-size:9px;color:#00ffee;letter-spacing:.5px;border-radius:0 2px 2px 0;word-break:break-all}
+.ep-flow{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:7px 0}
+.ep-flow-item{font-size:7px;letter-spacing:.8px;padding:3px 7px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.12);color:rgba(0,200,255,0.6);border-radius:1px}
+.ep-arrow{color:rgba(0,200,255,0.22);font-size:10px}
+.ep-section{margin-bottom:20px}
+.ep-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,200,255,0.1),transparent);margin:14px 0}
+.dim-row{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;padding:5px 7px;background:rgba(0,0,0,0.3);border-radius:2px;border-left:2px solid}
+.dim-label{font-size:7px;letter-spacing:1px;font-weight:bold;text-transform:uppercase;margin-bottom:2px}
+.dim-desc{font-size:8px;line-height:1.5;color:rgba(180,220,255,0.48)}
+
+/* PARTICLE TABLE */
+.ptable{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:8px}
+.ptable th{padding:5px 7px;background:rgba(0,200,255,0.07);color:rgba(0,200,255,0.6);letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(0,200,255,0.1);text-align:left;font-size:6px}
+.ptable td{padding:4px 7px;border:1px solid rgba(0,200,255,0.06);color:rgba(200,230,255,0.6);vertical-align:top}
+.ptable tr:hover td{background:rgba(0,200,255,0.03)}
+.ptag{display:inline-block;font-size:6px;padding:1px 5px;border-radius:1px;text-transform:uppercase;margin:1px}
+
+/* LIVE ANALYSIS PANEL */
+#live-panel{padding:8px;display:flex;flex-direction:column;gap:6px}
+.live-section{background:rgba(0,0,0,0.4);border:1px solid rgba(0,200,255,0.09);border-radius:2px;padding:8px}
+.live-title{font-size:6px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;border-bottom:1px solid rgba(0,200,255,0.07);padding-bottom:3px}
+.particle-list{display:flex;flex-wrap:wrap;gap:3px}
+.ptag-live{font-size:7px;padding:2px 6px;border-radius:1px;border:1px solid;cursor:default;transition:all .2s}
+
+/* MASS PLOT */
+#mass-canvas{width:100%;height:110px;display:block;border:1px solid rgba(0,200,255,0.09);border-radius:1px;background:rgba(0,0,0,0.5)}
+
+/* BOTTOM */
+#bot{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:34px;background:rgba(0,0,0,0.95);border-top:1px solid rgba(0,200,255,0.1)}
+.bot-t{font-size:6px;letter-spacing:1.2px;color:rgba(0,200,255,0.25)}
+
+/* COMMON PANEL */
+.plabel{font-size:6px;letter-spacing:2px;color:rgba(0,200,255,0.3);text-transform:uppercase;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid rgba(0,200,255,0.07)}
+.row{display:flex;align-items:center;gap:4px;margin-bottom:3px}
+.rl{font-size:6px;color:rgba(0,200,255,0.35);flex:1;text-transform:uppercase;letter-spacing:.5px}
+.rv{font-size:8px;color:#00ffee;width:36px;text-align:right;flex-shrink:0}
+.slider{flex:1;-webkit-appearance:none;height:2px;background:rgba(0,200,255,0.1);outline:none;cursor:pointer;border-radius:1px;min-width:0}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:7px;height:7px;border-radius:50%;background:#00ffee;cursor:pointer;box-shadow:0 0 4px #00ffee}
+.fbar-wrap{flex:1;height:2px;background:rgba(0,200,255,0.07);border-radius:1px;overflow:hidden}
+.fbar{height:100%;border-radius:1px;transition:width .3s}
+.rcard-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:5px}
+.rcard{background:rgba(0,0,0,0.4);border:1px solid rgba(0,200,255,0.08);border-radius:1px;padding:5px;text-align:center}
+.rc-v{font-size:11px;font-weight:bold;margin-bottom:1px}
+.rc-l{font-size:6px;letter-spacing:1px;color:rgba(0,200,255,0.28);text-transform:uppercase}
+#elog{background:rgba(0,0,0,0.3);border:1px solid rgba(0,200,255,0.08);border-radius:1px;padding:5px;max-height:110px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,200,255,0.1) transparent;margin-top:5px}
+.el{font-size:7px;color:rgba(0,200,255,0.32);padding:1px 0;border-bottom:1px solid rgba(0,200,255,0.04);line-height:1.4}
+.el.f{animation:fl .4s ease}
+@keyframes fl{from{background:rgba(0,255,238,0.06)}to{background:transparent}}
+.et{color:rgba(255,200,0,0.5);margin-right:3px}
+#flash{position:absolute;inset:0;pointer-events:none;z-index:5;opacity:0;background:rgba(0,255,238,0.08);transition:opacity .05s}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div>
+    <div class="logo">GUF UNIFIED COLLIDER + ANALYSIS ENGINE</div>
+    <div class="logo-sub">Linear Collider · Twisted Zipper · Compound-Eye Optics · Post-Collision Analysis · Shia Miller 2026</div>
+  </div>
+  <div class="top-stats">
+    <div class="ts"><div class="ts-v" id="ts-ecm">0.00 TeV</div><div class="ts-l">E_cm</div></div>
+    <div class="ts"><div class="ts-v" id="ts-vs">0.000c</div><div class="ts-l">v_warp</div></div>
+    <div class="ts"><div class="ts-v" id="ts-twist">0.0°</div><div class="ts-l">Θ_twist</div></div>
+    <div class="ts"><div class="ts-v" id="ts-col">0</div><div class="ts-l">Collisions</div></div>
+    <div class="ts"><div class="ts-v" id="ts-sig">0.0σ</div><div class="ts-l">Significance</div></div>
+    <div class="ts"><div class="ts-v" id="ts-fab">100%</div><div class="ts-l">Fabric</div></div>
+  </div>
+  <div class="ctrl-btns">
+    <button class="btn" id="btn-inject" onclick="startBeams()">⚡ INJECT</button>
+    <button class="btn on" id="btn-warp" onclick="toggleWarp()">⊕ WARP</button>
+    <button class="btn on" id="btn-optics" onclick="toggleOptics()">◈ OPTICS</button>
+    <button class="btn on" id="btn-phi" onclick="togglePhi()">Φ PHI</button>
+    <button class="btn" onclick="resetAll()">↺ RESET</button>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- LEFT HUD -->
+  <div id="lhud">
+    <div class="plabel">Beam Parameters</div>
+    <div class="row"><span class="rl">Energy</span><input type="range" class="slider" id="sl-energy" min="1" max="100" value="50" oninput="updateParam('energy',this.value)"><span class="rv" id="sv-energy">50</span></div>
+    <div class="row"><span class="rl">Bunch N</span><input type="range" class="slider" id="sl-bunch" min="1" max="100" value="40" oninput="updateParam('bunch',this.value)"><span class="rv" id="sv-bunch">40</span></div>
+    <div class="row"><span class="rl">Focus</span><input type="range" class="slider" id="sl-focus" min="1" max="100" value="60" oninput="updateParam('focus',this.value)"><span class="rv" id="sv-focus">60</span></div>
+    <div class="row"><span class="rl">RF Voltage</span><input type="range" class="slider" id="sl-freq" min="1" max="100" value="35" oninput="updateParam('freq',this.value)"><span class="rv" id="sv-freq">35</span></div>
+    <div class="plabel" style="margin-top:8px">GUF Dimensions</div>
+    <div class="row"><span class="rl">D1 Space</span><div class="fbar-wrap"><div class="fbar" id="fb-d1" style="background:#00ffee;width:80%"></div></div><span class="rv" id="fv-d1">80</span></div>
+    <div class="row"><span class="rl">D2 Time</span><div class="fbar-wrap"><div class="fbar" id="fb-d2" style="background:#7c3aed;width:65%"></div></div><span class="rv" id="fv-d2">65</span></div>
+    <div class="row"><span class="rl">D3 Energy</span><div class="fbar-wrap"><div class="fbar" id="fb-d3" style="background:#f59e0b;width:55%"></div></div><span class="rv" id="fv-d3">55</span></div>
+    <div class="row"><span class="rl">D4 Field</span><div class="fbar-wrap"><div class="fbar" id="fb-d4" style="background:#10b981;width:70%"></div></div><span class="rv" id="fv-d4">70</span></div>
+    <div class="row"><span class="rl">D5 Vortex</span><div class="fbar-wrap"><div class="fbar" id="fb-d5" style="background:#ef4444;width:45%"></div></div><span class="rv" id="fv-d5">45</span></div>
+    <div class="row"><span class="rl">D6 Mind</span><div class="fbar-wrap"><div class="fbar" id="fb-d6" style="background:#ec4899;width:60%"></div></div><span class="rv" id="fv-d6">60</span></div>
+    <div class="row"><span class="rl">D7 Source</span><div class="fbar-wrap"><div class="fbar" id="fb-d7" style="background:#fff;width:100%"></div></div><span class="rv" id="fv-d7">100</span></div>
+    <div class="plabel" style="margin-top:8px">Optics</div>
+    <div class="row"><span class="rl">Ommatidium N</span><span class="rv" id="ov-omm">~3500</span></div>
+    <div class="row"><span class="rl">η_coherence</span><span class="rv" id="ov-coh">0.85</span></div>
+  </div>
+
+  <!-- MAIN WRAP -->
+  <div id="main-wrap">
+    <!-- TAB BAR -->
+    <div id="tab-bar">
+      <div class="tab on" id="tab-collider" onclick="setTab('collider')">◉ COLLIDER</div>
+      <div class="tab" id="tab-detector" onclick="setTab('detector')">⬡ DETECTOR</div>
+      <div class="tab" id="tab-pid" onclick="setTab('pid')">🔬 PARTICLE ID</div>
+      <div class="tab" id="tab-jets" onclick="setTab('jets')">⟁ JET RECO</div>
+      <div class="tab" id="tab-mass" onclick="setTab('mass')">∿ MASS PLOT</div>
+      <div class="tab" id="tab-stats" onclick="setTab('stats')">σ STATISTICS</div>
+      <div class="tab" id="tab-guf" onclick="setTab('guf')">∞ GUF DECODE</div>
+    </div>
+
+    <!-- CENTER AREA -->
+    <div id="center-wrap">
+      <div id="canvas-area">
+        <canvas id="bg"></canvas>
+        <canvas id="main"></canvas>
+        <div id="flash"></div>
+
+        <!-- COLLIDER PAGE (canvas overlay label only) -->
+        <div class="page active" id="page-collider" style="background:transparent;pointer-events:none">
+          <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.25);text-align:center">PRESS ⚡ INJECT · BEAMS TRAVEL LEFT→RIGHT AND RIGHT→LEFT · COLLISION AT IP CENTRE</div>
+        </div>
+
+        <!-- DETECTOR PAGE -->
+        <div class="page" id="page-detector">
+          <div class="ep-title">LAYER-BY-LAYER DETECTOR</div>
+          <div class="ep-sub">How debris is physically caught after the IP collision</div>
+          <div class="ep-section">
+            <div class="ep-h"><div class="ep-dot" style="background:#00ffee"></div>The Onion Model — Four Concentric Detector Layers</div>
+            <div class="ep-p">Every real collider detector (ATLAS, CMS, ALICE) wraps the IP in concentric cylindrical layers. Each layer is tuned to one job. A particle traverses all layers sequentially — its combined signature across layers gives its full identity.</div>
+            <canvas id="detector-canvas" style="width:100%;height:200px;display:block;border:1px solid rgba(0,200,255,0.09);border-radius:2px;background:#000;margin-bottom:10px"></canvas>
+            <div class="ep-grid">
+              <div class="ep-card"><div class="ep-card-title" style="color:#00ffee">Layer 1 — Silicon Tracker</div><div class="ep-card-body">Closest to IP. ~10 μm resolution silicon strip or pixel detectors. Charged particles ionise silicon atoms, leaving a hit. Chain of hits = track. Track curvature in the 4T magnetic field = momentum p = qBr. Charge sign from curve direction. Neutral particles: invisible here.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#f59e0b">Layer 2 — ECAL (PbWO₄ crystals)</div><div class="ep-card-body">Electrons and photons initiate electromagnetic showers: e⁻ → e⁻γ → e⁻e⁺e⁻ → cascade. Total crystal light output = E_particle. Shower width ~1 Molière radius (~2 cm). Hadrons mostly pass through depositing only ~30% of energy.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#7c3aed">Layer 3 — HCAL (Iron/Scintillator)</div><div class="ep-card-body">Hadrons (π±, p, K±, n) initiate hadronic showers: nuclear spallation cascade. Much wider and deeper than EM showers. Energy resolution ~50%/√E. Neutral hadrons (n, K⁰_L) first appear here — no tracker hit preceding the cluster.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#ec4899">Layer 4 — Muon Chambers</div><div class="ep-card-body">Only muons survive to here — they are 200× heavier than electrons so they don't shower. Drift tubes or resistive plate chambers give position measurements. A muon stub here + matching inner track = near-perfect muon ID with <0.1% fake rate.</div></div>
+            </div>
+            <div class="ep-p"><b>Missing E_T</b>: The vector sum of all measured transverse momenta. If non-zero, something invisible (ν, dark matter) escaped. Computed from calorimeter tower sums: <i>MET = −Σ E_T(visible)</i>.</div>
+          </div>
+        </div>
+
+        <!-- PID PAGE -->
+        <div class="page" id="page-pid">
+          <div class="ep-title">PARTICLE IDENTIFICATION (PID)</div>
+          <div class="ep-sub">Naming every fragment from tracker + calorimeter + timing signatures</div>
+          <div class="ep-section">
+            <div class="ep-h"><div class="ep-dot" style="background:#f59e0b"></div>Identification Matrix</div>
+            <table class="ptable">
+              <tr><th>Particle</th><th>Tracker</th><th>ECAL</th><th>HCAL</th><th>Muon</th><th>Key Discriminant</th><th>GUF Domain</th></tr>
+              <tr><td style="color:#00ffee">Electron e⁻/e⁺</td><td>Curved track</td><td>Narrow shower</td><td>Minimal</td><td>—</td><td>E/p ≈ 1.0; narrow σ_η</td><td style="color:#00ffee">D4-Field</td></tr>
+              <tr><td style="color:#fff">Photon γ</td><td>No track</td><td>Narrow shower</td><td>Minimal</td><td>—</td><td>No tracker seed; π⁰→γγ</td><td style="color:#fff">D7-Source</td></tr>
+              <tr><td style="color:#ec4899">Muon μ⁻/μ⁺</td><td>Curved track</td><td>MIP ~0.3 GeV</td><td>MIP thin</td><td>Stub</td><td>Minimum ionising; muon stub</td><td style="color:#ec4899">D6-Mind</td></tr>
+              <tr><td style="color:#f59e0b">Charged pion π±</td><td>Curved track</td><td>Partial</td><td>Full shower</td><td>—</td><td>ToF; dE/dx vs p</td><td style="color:#f59e0b">D3-Energy</td></tr>
+              <tr><td style="color:#7c3aed">Neutral pion π⁰</td><td>No track</td><td>Two γ clusters</td><td>—</td><td>—</td><td>M_γγ = 135 MeV peak</td><td style="color:#7c3aed">D2-Time</td></tr>
+              <tr><td style="color:#10b981">Kaon K±</td><td>Curved track</td><td>Partial</td><td>Shower</td><td>—</td><td>ToF slower than π; displaced V⁰</td><td style="color:#10b981">D5-Vortex</td></tr>
+              <tr><td style="color:#ef4444">Proton p</td><td>Slow-curving</td><td>Partial</td><td>Wide shower</td><td>—</td><td>High dE/dx (Bethe-Bloch)</td><td style="color:#ef4444">D1-Space</td></tr>
+              <tr><td style="color:#888">Neutron n</td><td>No track</td><td>—</td><td>Displaced cluster</td><td>—</td><td>HCAL cluster with no tracker seed</td><td style="color:#888">D1-Space</td></tr>
+              <tr><td style="color:#f97316">Bottom quark b</td><td>Displaced vtx</td><td>—</td><td>b-jet</td><td>—</td><td>Secondary vtx ~3mm; soft lepton</td><td style="color:#f97316">D5-Vortex</td></tr>
+              <tr><td style="color:#888">Neutrino ν</td><td>—</td><td>—</td><td>—</td><td>—</td><td>MET; momentum imbalance</td><td style="color:#fff">D7-Source</td></tr>
+            </table>
+            <div class="ep-h" style="margin-top:10px"><div class="ep-dot" style="background:#00ffee"></div>Live Particle Count (Current Session)</div>
+            <div id="pid-live" class="particle-list" style="min-height:30px"></div>
+          </div>
+        </div>
+
+        <!-- JET RECO PAGE -->
+        <div class="page" id="page-jets">
+          <div class="ep-title">JET RECONSTRUCTION</div>
+          <div class="ep-sub">Grouping quark/gluon sprays · Anti-kT algorithm · b-tagging · MET</div>
+          <div class="ep-section">
+            <div class="ep-h"><div class="ep-dot" style="background:#7c3aed"></div>Why Jets Exist</div>
+            <div class="ep-p">Quarks and gluons carry <b>colour charge</b> — they can never exist as free particles. The moment a quark flies away from the IP, the colour string stretching behind it carries enough energy to pop new quark-antiquark pairs from the vacuum. This <b>hadronization</b> cascade produces a collimated spray of hadrons called a jet — the observable proxy for the original parton.</div>
+            <div class="ep-eq">Anti-kT: d_ij = min(k_Ti⁻², k_Tj⁻²) · ΔR²_ij/R² &nbsp;|&nbsp; ΔR=√(Δη²+Δφ²) &nbsp;|&nbsp; R≈0.4</div>
+            <div class="ep-grid">
+              <div class="ep-card"><div class="ep-card-title" style="color:#00ffee">Anti-kT Algorithm</div><div class="ep-card-body">Iteratively merges the hardest (highest pT) particles first, producing perfectly conical jets. Infrared and collinear safe — adding a soft particle or splitting one into two collinear particles doesn't change the jet boundary. The standard at LHC.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#f59e0b">b-jet Tagging</div><div class="ep-card-body">B-mesons (b quark bound states) travel ~3mm before decaying. The silicon tracker resolves a secondary vertex displaced from the IP. Neural network b-taggers (DeepJet, ParticleNet) reach 70% efficiency with 1% fake rate using track impact parameters.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#ec4899">Tau Hadronic Jets</div><div class="ep-card-body">τ→hadrons + ν (~65% of decays). Narrow 1-prong or 3-prong jets. Isolated from QCD jets by: lower track multiplicity, smaller jet radius, isolation requirement (no nearby tracks outside core). Key for Higgs→ττ searches.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#10b981">Missing E_T (MET)</div><div class="ep-card-body">Neutrinos and dark matter candidates leave no detector signal. Momentum conservation requires the transverse vector sum = 0. Anything missing = invisible particle. W→lν, supersymmetric neutralinos, and extra-dimensional gravitons all produce MET signatures.</div></div>
+            </div>
+            <canvas id="jet-canvas" style="width:100%;height:160px;display:block;border:1px solid rgba(0,200,255,0.09);background:#000;border-radius:2px"></canvas>
+          </div>
+        </div>
+
+        <!-- MASS PLOT PAGE -->
+        <div class="page" id="page-mass">
+          <div class="ep-title">INVARIANT MASS RECONSTRUCTION</div>
+          <div class="ep-sub">Stacking collision events · Finding resonance peaks · Discovery</div>
+          <div class="ep-section">
+            <div class="ep-h"><div class="ep-dot" style="background:#10b981"></div>The Core Technique</div>
+            <div class="ep-p">If a particle X decays as X → A + B, then regardless of how fast X was moving when it decayed, the <b>invariant mass</b> M_X computed from daughters A and B is always the same — the rest mass of X. Plot M for thousands of collisions. Real particles produce a <b>Gaussian peak</b> above a smooth background continuum.</div>
+            <div class="ep-eq">M²c⁴ = (E_A+E_B)² − |p⃗_A+p⃗_B|²c² &nbsp;→&nbsp; peak at M = m_X, width = Γ_X</div>
+            <canvas id="mass-canvas" style="width:100%;height:200px;display:block;border:1px solid rgba(0,200,255,0.09);background:#000;border-radius:2px;margin-bottom:10px"></canvas>
+            <div class="ep-grid">
+              <div class="ep-card"><div class="ep-card-title" style="color:#7c3aed">Z Boson — 91.2 GeV</div><div class="ep-card-body">Reconstructed from e⁺e⁻ or μ⁺μ⁻ pairs. Γ=2.5 GeV. Used as detector energy-scale calibration. Appears every ~1000 collisions at LHC energies.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#f59e0b">Higgs Boson — 125.1 GeV</div><div class="ep-card-body">H→γγ or H→ZZ→4ℓ. Γ=4 MeV (extremely narrow). Took ~10⁵ events and both ATLAS and CMS to reach 5σ. Announced July 4, 2012.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#ef4444">Top Quark — 173 GeV</div><div class="ep-card-body">t→Wb, reconstructed from W+b system. Only quark that decays before hadronizing (τ~10⁻²⁵s). Width Γ=1.4 GeV. Direct probe of Yukawa coupling.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#ec4899">GUF-D6 Resonance</div><div class="ep-card-body">Speculative. D6-Mind field coupling → narrow dilepton peak not in SM. Would appear at M_Φ = ℏω₆/c². Tracked by Higgs-φ readout in live session data.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS PAGE -->
+        <div class="page" id="page-stats">
+          <div class="ep-title">STATISTICAL ANALYSIS</div>
+          <div class="ep-sub">Significance · p-values · Systematic errors · Discovery threshold</div>
+          <div class="ep-section">
+            <div class="ep-h"><div class="ep-dot" style="background:#ef4444"></div>The 5σ Rule</div>
+            <div class="ep-p">Seeing a bump is not enough. The field demands that the probability of the signal being a random fluctuation of background is less than <b>1 in 3.5 million</b> — a 5σ significance. This guards against the look-elsewhere effect: when you search many mass bins, some will fluctuate up by chance.</div>
+            <div class="ep-eq">σ = N_signal / √N_background &nbsp;|&nbsp; 5σ → p &lt; 2.87×10⁻⁷ &nbsp;|&nbsp; 3σ → evidence (p &lt; 1.35×10⁻³)</div>
+            <canvas id="stats-canvas" style="width:100%;height:180px;display:block;border:1px solid rgba(0,200,255,0.09);background:#000;border-radius:2px;margin-bottom:10px"></canvas>
+            <div class="ep-grid3">
+              <div class="ep-card"><div class="ep-card-title">2σ — Fluctuation</div><div class="ep-card-body">1 in 22. Expected routinely by chance across many search bins. Publish nothing. Collect more data.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#f59e0b">3σ — Evidence</div><div class="ep-card-body">1 in 740. Interesting. Report as "evidence for." Both experiments must confirm. Triggers targeted data-taking.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#10b981">5σ — Discovery</div><div class="ep-card-body">1 in 3.5M. Gold standard. Requires independent confirmation. Higgs: ATLAS and CMS both at 5σ simultaneously.</div></div>
+            </div>
+            <div class="ep-h"><div class="ep-dot" style="background:#f59e0b"></div>Systematic Errors</div>
+            <div class="ep-grid">
+              <div class="ep-card"><div class="ep-card-title">Jet Energy Scale (JES)</div><div class="ep-card-body">Calorimeter response uncertainty ±1–5%. Propagates to all reconstructed masses. Calibrated using Z→jets pT balance and γ+jet events.</div></div>
+              <div class="ep-card"><div class="ep-card-title">Pile-up</div><div class="ep-card-body">Multiple pp interactions per bunch crossing at high luminosity. Up to ~200 at HL-LHC. Pile-up jets subtracted using vertex association and jet area methods.</div></div>
+              <div class="ep-card"><div class="ep-card-title">PDF Uncertainty</div><div class="ep-card-body">Parton distribution functions inside the proton have ~2–5% uncertainty. Limits precision of cross-section predictions. Constrained by HERA deep-inelastic scattering data.</div></div>
+              <div class="ep-card"><div class="ep-card-title">GUF C_total</div><div class="ep-card-body">In the GUF model, C_total coherence fluctuations act as a systematic. A stable C_total → clean event selection. Spikes → increased background contamination in the mass plot.</div></div>
+            </div>
+            <div class="ep-h" style="margin-top:6px"><div class="ep-dot" style="background:#00ffee"></div>Live Session Significance</div>
+            <div id="sig-live" style="padding:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,200,255,0.09);border-radius:2px;font-size:9px;color:rgba(180,220,255,0.6);line-height:1.7"></div>
+          </div>
+        </div>
+
+        <!-- GUF DECODE PAGE -->
+        <div class="page" id="page-guf">
+          <div class="ep-title">GUF DIMENSIONAL DECODE</div>
+          <div class="ep-sub">What each particle tells us about the 7D field structure · Coupling map · Vacuum imprint</div>
+          <div class="ep-section">
+            <div class="ep-h"><div class="ep-dot" style="background:#fff"></div>Particles as Dimensional Messengers</div>
+            <div class="ep-p">In the Grand Unified Framework, every particle produced at the IP carries a <b>dimensional imprint</b> — an encoded signature of which GUF domain was dominant at the moment of the collision. Reading the full particle inventory of an event gives a snapshot of the 7D vacuum state at that instant.</div>
+            <div class="ep-grid">
+              <div class="dim-row" style="border-color:#00ffee"><div><div class="dim-label" style="color:#00ffee">D1-Space → Protons, Neutrons</div><div class="dim-desc">Baryons encode spatial topology. A baryon-rich event signals high D1-Space field intensity — the vacuum's spatial fabric is densely structured. Proton multiplicity tracks D1 amplitude directly.</div></div></div>
+              <div class="dim-row" style="border-color:#7c3aed"><div><div class="dim-label" style="color:#7c3aed">D2-Time → π⁰ Pairs, Short-lived resonances</div><div class="dim-desc">Particles with very short lifetimes (τ~10⁻¹⁶s) are temporal domain probes. π⁰→γγ decay at ~10⁻¹⁶s samples D2-Time oscillation frequency. The decay angle asymmetry encodes the Eugacycle phase.</div></div></div>
+              <div class="dim-row" style="border-color:#f59e0b"><div><div class="dim-label" style="color:#f59e0b">D3-Energy → Hard jets, High-pT leptons</div><div class="dim-desc">High transverse momentum particles are pure D3-Energy domain signatures. The jet pT spectrum slope tracks D3 field gradient. A harder spectrum = higher D3 activation at the time of collision.</div></div></div>
+              <div class="dim-row" style="border-color:#10b981"><div><div class="dim-label" style="color:#10b981">D4-Field → Photons, EM showers</div><div class="dim-desc">All electromagnetic particles (e±, γ) are D4-Field carriers. The ECAL shower multiplicity and total EM energy fraction measure D4 coupling strength. High D4 = photon-rich events.</div></div></div>
+              <div class="dim-row" style="border-color:#ef4444"><div><div class="dim-label" style="color:#ef4444">D5-Vortex → Kaons, Strange particles</div><div class="dim-desc">Strange quarks (s) are the vortex domain probe. Kaon multiplicity and K/π ratio track D5-Vortex activation. Strange enhancement is also the signature of quark-gluon plasma — a D5 saturation state.</div></div></div>
+              <div class="dim-row" style="border-color:#ec4899"><div><div class="dim-label" style="color:#ec4899">D6-Mind → Muons, Lepton pairs</div><div class="dim-desc">Prompt lepton pairs (μ⁺μ⁻, e⁺e⁻) are the consciousness coupling channel. Their invariant mass distribution contains the speculative GUF-D6 resonance. Dilepton asymmetry = CP violation in the mind-field sector.</div></div></div>
+              <div class="dim-row" style="border-color:#fff"><div><div class="dim-label" style="color:#fff">D7-Source → MET, Invisible particles</div><div class="dim-desc">What is not detected is the deepest signal. Missing transverse energy encodes D7-Source vacuum emission — particles that couple only to the ground state and exit without interacting with any detector layer. The 0=∞ principle: the most fundamental particles leave the least trace.</div></div></div>
+            </div>
+            <div class="ep-h"><div class="ep-dot" style="background:#00ffee"></div>Live Event Dimensional Imprint</div>
+            <div id="guf-live" style="padding:8px;background:rgba(0,0,0,0.4);border:1px solid rgba(0,200,255,0.09);border-radius:2px;font-size:8px;color:rgba(180,220,255,0.55);line-height:1.9;min-height:60px"></div>
+            <div class="ep-h" style="margin-top:10px"><div class="ep-dot" style="background:#f59e0b"></div>What Comes After: The Path Forward</div>
+            <div class="ep-p">Once particles are collected, named, sorted, statistically validated, and decoded through the GUF dimensional lens, the extracted physics feeds three downstream programmes:</div>
+            <div class="ep-grid3">
+              <div class="ep-card"><div class="ep-card-title" style="color:#00ffee">Theory Constraint</div><div class="ep-card-body">Measured cross-sections, masses, and branching ratios are compared to theoretical predictions. Deviations constrain or rule out BSM models. The GUF framework predicts specific deviations in the dilepton and MET spectra at √s > 10 TeV.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#f59e0b">Detector Upgrade</div><div class="ep-card-body">Every analysis reveals detector blind spots — regions of phase space with poor resolution or high background. Results drive hardware upgrades: finer silicon pixels, faster timing layers, higher-field solenoids. The compound-eye optics layer is a GUF-proposed upgrade for optical stochastic cooling.</div></div>
+              <div class="ep-card"><div class="ep-card-title" style="color:#ec4899">Next Collider Design</div><div class="ep-card-body">Discoveries and constraints determine the next machine's energy target. Post-Higgs: FCC-ee (circular e⁺e⁻, 365 GeV), FCC-hh (100 TeV pp). In GUF: a Twisted Zipper Warp Collider operating in D5-D7 dimensional space — no beam pipe required; the warp bubble IS the accelerator.</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end canvas-area -->
+    </div><!-- end center-wrap -->
+  </div><!-- end main-wrap -->
+
+  <!-- RIGHT HUD -->
+  <div id="rhud">
+    <div class="plabel">Collision Readouts</div>
+    <div class="rcard-grid">
+      <div class="rcard"><div class="rc-v" id="rc-ecm" style="color:#00ffee">0.0</div><div class="rc-l">E_cm TeV</div></div>
+      <div class="rcard"><div class="rc-v" id="rc-px" style="color:#f59e0b">0</div><div class="rc-l">Debris</div></div>
+      <div class="rcard"><div class="rc-v" id="rc-vs" style="color:#7c3aed">0.00c</div><div class="rc-l">v_warp</div></div>
+      <div class="rcard"><div class="rc-v" id="rc-lumi" style="color:#10b981">0</div><div class="rc-l">Luminosity</div></div>
+    </div>
+    <div class="plabel">Warp Bubble</div>
+    <div class="row"><span class="rl">Bubble R</span><span class="rv" id="wv-r">80 m</span></div>
+    <div class="row"><span class="rl">ρ_exotic</span><span class="rv" id="wv-rho">0.000</span></div>
+    <div class="row"><span class="rl">Fabric %</span><span class="rv" id="wv-fab">100%</span></div>
+    <div class="row"><span class="rl">C_total</span><span class="rv" id="wv-ct">0.000</span></div>
+    <div class="plabel" style="margin-top:6px">Field Lines</div>
+    <div class="row"><span class="rl">E-Field</span><div class="fbar-wrap"><div class="fbar" id="fl-e" style="background:#00ffee;width:50%"></div></div><span class="rv" id="flv-e">50</span></div>
+    <div class="row"><span class="rl">B-Field</span><div class="fbar-wrap"><div class="fbar" id="fl-b" style="background:#7c3aed;width:60%"></div></div><span class="rv" id="flv-b">60</span></div>
+    <div class="row"><span class="rl">GUF-ψ</span><div class="fbar-wrap"><div class="fbar" id="fl-g" style="background:#f59e0b;width:30%"></div></div><span class="rv" id="flv-g">30</span></div>
+    <div class="row"><span class="rl">Higgs φ</span><div class="fbar-wrap"><div class="fbar" id="fl-h" style="background:#ec4899;width:0%"></div></div><span class="rv" id="flv-h">0</span></div>
+    <div class="plabel" style="margin-top:6px">Particle Tally</div>
+    <div class="row"><span class="rl">Quarks</span><span class="rv" id="tally-q">0</span></div>
+    <div class="row"><span class="rl">Gluons</span><span class="rv" id="tally-g">0</span></div>
+    <div class="row"><span class="rl">Hadrons</span><span class="rv" id="tally-h">0</span></div>
+    <div class="row"><span class="rl">Leptons</span><span class="rv" id="tally-l">0</span></div>
+    <div class="row"><span class="rl">MET</span><span class="rv" id="tally-met">0 GeV</span></div>
+    <div class="plabel" style="margin-top:6px">Event Log</div>
+    <div id="elog"></div>
+  </div>
+</div><!-- end content -->
+
+<div id="bot">
+  <div class="bot-t">GUF UNIFIED COLLIDER · TWISTED ZIPPER DRIVE · COMPOUND-EYE OPTICS · SHIA MILLER @StrategicProce 2026</div>
+  <div class="bot-t" id="bot-r">FRAME 0 · n=0</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PHI=1.6180339887, THETA_PHI=360/PHI;
+var bgC=document.getElementById('bg'), bgX=bgC.getContext('2d');
+var mc=document.getElementById('main'), ctx=mc.getContext('2d');
+var W,H,CX,CY,PIPE_Y, bgBuilt=false;
+
+function resize(){
+  var ca=document.getElementById('canvas-area');
+  var r=ca.getBoundingClientRect();
+  W=mc.width=bgC.width=r.width;
+  H=mc.height=bgC.height=r.height;
+  CX=W/2; CY=H/2; PIPE_Y=CY;
+  bgBuilt=false; buildLattice();
+}
+window.addEventListener('resize',resize);
+
+// STATE
+var t=0,frame=0,stepN=0,collisionCount=0,lastLogFrame=0,fabric=100;
+var warpOn=true,opticsOn=true,phiOn=true,beamsActive=false;
+var params={energy:50,bunch:40,focus:60,freq:35};
+var dims=[80,65,55,70,45,60,100];
+var bunchA={x:0,active:false,particles:[],trail:[]};
+var bunchB={x:0,active:false,particles:[],trail:[]};
+var debris=[],collFlashes=[],warpRings=[],lattice=[];
+
+// Per-session particle inventory
+var inventory={quarks:0,gluons:0,hadrons:0,leptons:0,met:0,events:[]};
+// Mass plot bins
+var massBins=new Array(60).fill(0);
+var bgBins=new Array(60).fill(0);
+
+function rgba(c,a){
+  var r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);
+  return 'rgba('+r+','+g+','+b+','+Math.max(0,Math.min(1,a)).toFixed(3)+')';
+}
+
+// TAB SWITCH
+var currentTab='collider';
+window.setTab=function(tab){
+  currentTab=tab;
+  var tabs=['collider','detector','pid','jets','mass','stats','guf'];
+  tabs.forEach(function(id){
+    var btn=document.getElementById('tab-'+id);
+    var page=document.getElementById('page-'+id);
+    if(btn) btn.classList.toggle('on',id===tab);
+    if(page) page.classList.toggle('active',id===tab);
+  });
+  if(tab==='mass') drawMassPlot();
+  if(tab==='stats') drawStatsPlot();
+  if(tab==='detector') drawDetectorDiagram();
+  if(tab==='jets') drawJetDiagram();
+  if(tab==='pid') updatePIDLive();
+  if(tab==='guf') updateGUFDecode();
+  if(tab==='stats') updateSigLive();
+};
+
+// LATTICE
+function buildLattice(){
+  if(!W) return;
+  lattice=[];
+  var margin=W*0.06, pipeLen=W*0.88;
+  var i, xpos;
+  // Dipoles
+  for(i=0;i<14;i++){
+    xpos=margin+(i+0.5)/14*pipeLen;
+    if(Math.abs(xpos-CX)>55) lattice.push({type:'dipole',x:xpos,w:20,h:9});
+  }
+  // Quads
+  [0.12,0.22,0.35,0.42,0.46,0.54,0.58,0.65,0.78,0.88].forEach(function(f){
+    xpos=margin+f*pipeLen;
+    if(Math.abs(xpos-CX)>40) lattice.push({type:'quad',x:xpos,r:8});
+  });
+  // RF
+  [0.08,0.25,0.4,0.6,0.75,0.92].forEach(function(f){
+    xpos=margin+f*pipeLen;
+    if(Math.abs(xpos-CX)>60) lattice.push({type:'rf',x:xpos,w:13,h:17});
+  });
+  // Optics
+  for(i=0;i<18;i++){
+    xpos=margin+(i+0.5)/18*pipeLen;
+    if(Math.abs(xpos-CX)>30) lattice.push({type:'optics',x:xpos,yOff:(Math.random()>.5?1:-1)*(8+Math.random()*6),phase:Math.random()*Math.PI*2});
+  }
+}
+
+// BG
+function drawBg(){
+  if(bgBuilt) return;
+  bgX.fillStyle='#000'; bgX.fillRect(0,0,W,H);
+  for(var i=0;i<220;i++){
+    bgX.beginPath(); bgX.arc(Math.random()*W,Math.random()*H,Math.random()*.6,0,Math.PI*2);
+    bgX.fillStyle='rgba(200,240,255,'+(0.04+Math.random()*.14)+')'; bgX.fill();
+  }
+  bgBuilt=true;
+}
+
+// PIPE + HELIX
+function drawPipe(){
+  var margin=W*0.06, pipeLen=W*0.88, x0=margin, x1=x0+pipeLen;
+  var pipeR=5+dims[0]/100*3;
+  var tG=ctx.createLinearGradient(0,PIPE_Y-38,0,PIPE_Y+38);
+  tG.addColorStop(0,'rgba(0,20,40,0)'); tG.addColorStop(.35,'rgba(0,40,70,0.3)'); tG.addColorStop(.5,'rgba(0,55,90,0.45)'); tG.addColorStop(.65,'rgba(0,40,70,0.3)'); tG.addColorStop(1,'rgba(0,20,40,0)');
+  ctx.fillStyle=tG; ctx.fillRect(x0,PIPE_Y-38,pipeLen,76);
+  ctx.beginPath(); ctx.moveTo(x0,PIPE_Y-pipeR-2); ctx.lineTo(x1,PIPE_Y-pipeR-2); ctx.strokeStyle='rgba(0,200,255,0.16)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x0,PIPE_Y+pipeR+2); ctx.lineTo(x1,PIPE_Y+pipeR+2); ctx.strokeStyle='rgba(0,200,255,0.16)'; ctx.lineWidth=1; ctx.stroke();
+  ctx.setLineDash([6,10]); ctx.beginPath(); ctx.moveTo(x0,PIPE_Y); ctx.lineTo(x1,PIPE_Y); ctx.strokeStyle='rgba(0,200,255,0.06)'; ctx.lineWidth=.5; ctx.stroke(); ctx.setLineDash([]);
+  if(warpOn){
+    for(var side=0;side<2;side++){
+      ctx.beginPath();
+      for(var j=0;j<200;j++){
+        var u=j/200, xp=x0+u*pipeLen;
+        var freq=phiOn?Math.PI*6/PHI:Math.PI*6;
+        var yp=PIPE_Y+Math.sin(freq*u+t*.55+(side===1?Math.PI:0))*(3+2*dims[4]/100);
+        if(j===0) ctx.moveTo(xp,yp); else ctx.lineTo(xp,yp);
+      }
+      ctx.strokeStyle='rgba(0,255,238,'+(0.055+(beamsActive?.04:0))+')'; ctx.lineWidth=.7; ctx.stroke();
+    }
+  }
+}
+
+// LATTICE ELEMENTS
+function drawLattice(){
+  var d4=dims[3]/100, rfV=params.freq/100, focV=params.focus/100;
+  for(var i=0;i<lattice.length;i++){
+    var el=lattice[i];
+    if(el.type==='dipole'){
+      var a=0.16+d4*.22+.04*Math.sin(t*.4+el.x*.01);
+      ctx.fillStyle=rgba('#0a4a8a',a*.7); ctx.fillRect(el.x-el.w/2,PIPE_Y-el.h/2-6,el.w,el.h); ctx.fillRect(el.x-el.w/2,PIPE_Y+6-el.h/2,el.w,el.h);
+      ctx.strokeStyle=rgba('#4a9fd4',a); ctx.lineWidth=.8; ctx.strokeRect(el.x-el.w/2,PIPE_Y-el.h/2-6,el.w,el.h); ctx.strokeRect(el.x-el.w/2,PIPE_Y+6-el.h/2,el.w,el.h);
+      ctx.beginPath(); ctx.moveTo(el.x,PIPE_Y-6); ctx.lineTo(el.x,PIPE_Y+6); ctx.strokeStyle=rgba('#4a9fd4',a*.4); ctx.lineWidth=.5; ctx.stroke();
+    } else if(el.type==='quad'){
+      var qa=0.14+focV*.28+.04*Math.sin(t*.55+el.x*.015);
+      var qR=el.r*(0.85+focV*.22);
+      for(var p=0;p<4;p++){var pa=p/4*Math.PI*2+t*.015,px=el.x+Math.cos(pa)*qR,py=PIPE_Y+Math.sin(pa)*qR;ctx.beginPath();ctx.arc(px,py,2,0,Math.PI*2);ctx.fillStyle=rgba('#f59e0b',qa*1.2);ctx.fill();}
+      ctx.beginPath(); ctx.arc(el.x,PIPE_Y,qR,0,Math.PI*2); ctx.strokeStyle=rgba('#f59e0b',qa); ctx.lineWidth=.8; ctx.stroke();
+    } else if(el.type==='rf'){
+      var ra=0.1+rfV*.28+.05*Math.abs(Math.sin(t*1.2+el.x*.008));
+      ctx.fillStyle=rgba('#4c1d95',ra*.55); ctx.fillRect(el.x-el.w/2,PIPE_Y-el.h/2,el.w,el.h);
+      ctx.strokeStyle=rgba('#7c3aed',ra); ctx.lineWidth=.8; ctx.strokeRect(el.x-el.w/2,PIPE_Y-el.h/2,el.w,el.h);
+      ctx.beginPath();
+      for(var k=0;k<=10;k++){var kx=el.x-el.w/2+k/10*el.w,ky=PIPE_Y+Math.sin(k/10*Math.PI*2+t*3)*(el.h*.28)*rfV;if(k===0)ctx.moveTo(kx,ky);else ctx.lineTo(kx,ky);}
+      ctx.strokeStyle=rgba('#a78bfa',ra*.65); ctx.lineWidth=.5; ctx.stroke();
+    } else if(el.type==='optics'&&opticsOn){
+      var op=0.5+0.5*Math.sin(t*2.2+el.phase), oa=beamsActive?0.16+op*.09:0.04+op*.035;
+      var oy2=PIPE_Y+el.yOff;
+      var grd=ctx.createRadialGradient(el.x,oy2,0,el.x,oy2,5);
+      grd.addColorStop(0,rgba('#00ffee',oa)); grd.addColorStop(1,'rgba(0,255,238,0)');
+      ctx.beginPath(); ctx.arc(el.x,oy2,5,0,Math.PI*2); ctx.fillStyle=grd; ctx.fill();
+      ctx.beginPath(); ctx.arc(el.x,oy2,.8,0,Math.PI*2); ctx.fillStyle=rgba('#00ffee',oa*2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(el.x,PIPE_Y); ctx.lineTo(el.x,oy2); ctx.strokeStyle=rgba('#00ffee',oa*.35); ctx.lineWidth=.3; ctx.stroke();
+    }
+  }
+}
+
+// IP
+function drawIP(){
+  for(var i=0;i<5;i++){
+    var ir=16+i*20, ia=.035+.015*Math.sin(t*.3+i*PHI);
+    ctx.beginPath(); ctx.ellipse(CX,PIPE_Y,ir,ir*.36,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,200,255,'+ia+')'; ctx.lineWidth=.6; ctx.stroke();
+  }
+  var ipA=.035+.02*Math.sin(t*.25)+(beamsActive?.03:0);
+  var ipG=ctx.createRadialGradient(CX,PIPE_Y,0,CX,PIPE_Y,26);
+  ipG.addColorStop(0,'rgba(255,255,255,'+(ipA*.55)+')'); ipG.addColorStop(.4,'rgba(0,255,238,'+ipA+')'); ipG.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath(); ctx.arc(CX,PIPE_Y,26,0,Math.PI*2); ctx.fillStyle=ipG; ctx.fill();
+  ctx.fillStyle='rgba(0,200,255,0.22)'; ctx.font='6px Courier New'; ctx.textAlign='center'; ctx.fillText('IP',CX,PIPE_Y-30); ctx.textAlign='left';
+  ctx.fillStyle='rgba(0,255,238,0.18)'; ctx.font='7px Courier New'; ctx.textAlign='left'; ctx.fillText('INJECTOR A →',W*.06,PIPE_Y-14);
+  ctx.textAlign='right'; ctx.fillText('← INJECTOR B',W*.94,PIPE_Y-14); ctx.textAlign='left';
+}
+
+// WARP RINGS
+function drawWarpRings(){
+  if(!warpOn) return;
+  var toRemove=[];
+  for(var i=0;i<warpRings.length;i++){
+    var wr=warpRings[i]; wr.life-=0.013;
+    if(wr.life<=0){toRemove.push(i);continue;}
+    wr.phase+=(phiOn?wr.speed/PHI:wr.speed);
+    var lf=wr.life, rx=wr.rx+(1-lf)*35;
+    ctx.beginPath(); ctx.ellipse(CX,PIPE_Y,rx*lf,rx*.34*lf,wr.tilt+wr.phase*.1,0,Math.PI*2);
+    ctx.strokeStyle=rgba(wr.color,.32*lf); ctx.lineWidth=.85; ctx.stroke();
+  }
+  for(var k=toRemove.length-1;k>=0;k--) warpRings.splice(toRemove[k],1);
+}
+
+// FLASHES
+function drawFlashes(){
+  var toRemove=[];
+  for(var i=0;i<collFlashes.length;i++){
+    var f=collFlashes[i]; f.r+=5; f.alpha-=.04;
+    if(f.alpha<=0){toRemove.push(i);continue;}
+    var g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,f.r);
+    g.addColorStop(0,'rgba(255,255,255,'+(f.alpha*.5)+')'); g.addColorStop(.3,'rgba(0,255,238,'+(f.alpha*.3)+')'); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  }
+  for(var k=toRemove.length-1;k>=0;k--) collFlashes.splice(toRemove[k],1);
+}
+
+// BEAMS
+function drawBeams(){
+  if(!beamsActive) return;
+  var spd=(phiOn?1/PHI:1)*(1.2+params.energy*.028)*(warpOn?1.3:1);
+  var bs=[bunchA,bunchB], cols=['#00ffee','#ef4444'];
+  for(var bi=0;bi<2;bi++){
+    var b=bs[bi]; if(!b.active) continue;
+    b.trail.push({x:b.x}); if(b.trail.length>50) b.trail.shift();
+    for(var j=1;j<b.trail.length;j++){
+      ctx.beginPath(); ctx.moveTo(b.trail[j-1].x,PIPE_Y); ctx.lineTo(b.trail[j].x,PIPE_Y);
+      ctx.strokeStyle=rgba(cols[bi],(j/b.trail.length)*.5); ctx.lineWidth=2.2-1.4*(1-j/b.trail.length); ctx.stroke();
+    }
+    var hG=ctx.createRadialGradient(b.x,PIPE_Y,0,b.x,PIPE_Y,8);
+    hG.addColorStop(0,rgba(cols[bi],.9)); hG.addColorStop(1,rgba(cols[bi],0));
+    ctx.beginPath(); ctx.arc(b.x,PIPE_Y,8,0,Math.PI*2); ctx.fillStyle=hG; ctx.fill();
+    ctx.beginPath(); ctx.arc(b.x,PIPE_Y,2.2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+    for(var pi=0;pi<b.particles.length;pi++){
+      var p=b.particles[pi];
+      p.x+=p.vx*(phiOn?1/PHI:1)*(warpOn?1.3:1); p.y+=p.vy; p.vy*=.97;
+      if(Math.abs(p.y-PIPE_Y)>10) p.vy-=(p.y-PIPE_Y)*.03;
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.1,0,Math.PI*2); ctx.fillStyle=rgba(cols[bi],.4); ctx.fill();
+    }
+  }
+  bunchA.x+=spd; bunchB.x-=spd;
+  if(bunchA.active&&bunchB.active&&bunchA.x>=bunchB.x-12){
+    triggerCollision(CX,PIPE_Y);
+    bunchA.active=false; bunchB.active=false; bunchA.particles=[]; bunchB.particles=[];
+    setTimeout(function(){beamsActive=false;document.getElementById('btn-inject').textContent='⚡ INJECT';document.getElementById('btn-inject').classList.remove('on');},500);
+  }
+}
+
+// DEBRIS
+function drawDebris(){
+  var toRemove=[];
+  for(var i=0;i<debris.length;i++){
+    var p=debris[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=.012; p.vx*=.997;
+    p.trail.push({x:p.x,y:p.y}); if(p.trail.length>11) p.trail.shift();
+    p.life-=p.decay; if(p.life<=0){toRemove.push(i);continue;}
+    var a=p.life*.85;
+    for(var j=1;j<p.trail.length;j++){ctx.beginPath();ctx.moveTo(p.trail[j-1].x,p.trail[j-1].y);ctx.lineTo(p.trail[j].x,p.trail[j].y);ctx.strokeStyle=rgba(p.color,(j/p.trail.length)*a*.28);ctx.lineWidth=.7;ctx.stroke();}
+    if(p.isQuark){var g2=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size*2.2);g2.addColorStop(0,rgba(p.color,a));g2.addColorStop(1,rgba(p.color,0));ctx.beginPath();ctx.arc(p.x,p.y,p.size*2.2,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();}
+    else if(p.isGluon){ctx.beginPath();for(var k=0;k<=8;k++){var ga=k/8*Math.PI*2,gr=p.size*.8+k*.18;if(k===0)ctx.moveTo(p.x+Math.cos(ga)*gr,p.y+Math.sin(ga)*gr);else ctx.lineTo(p.x+Math.cos(ga)*gr,p.y+Math.sin(ga)*gr);}ctx.strokeStyle=rgba(p.color,a*.55);ctx.lineWidth=.55;ctx.stroke();}
+    else{ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle=rgba(p.color,a);ctx.fill();}
+  }
+  for(var k2=toRemove.length-1;k2>=0;k2--) debris.splice(toRemove[k2],1);
+}
+
+// COLLISION
+function triggerCollision(x,y){
+  collisionCount++; stepN++;
+  var n=20+Math.floor(params.energy*.75);
+  var cols=['#00ffee','#ef4444','#f59e0b','#7c3aed','#ec4899','#10b981','#ffffff'];
+  var qCount=0,gCount=0,hCount=0,lCount=0;
+  for(var i=0;i<n;i++){
+    var ang=Math.random()*Math.PI*2, sp=1.5+Math.random()*params.energy*.07;
+    var isQ=Math.random()<.28, isG=!isQ&&Math.random()<.18, isL=!isQ&&!isG&&Math.random()<.12;
+    if(isQ) qCount++; else if(isG) gCount++; else if(isL) lCount++; else hCount++;
+    debris.push({x:x,y:y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1,decay:.006+Math.random()*.01,size:1+Math.random()*2.2,color:cols[Math.floor(Math.random()*cols.length)],trail:[],isQuark:isQ,isGluon:isG,isLepton:isL});
+  }
+  inventory.quarks+=qCount; inventory.gluons+=gCount; inventory.hadrons+=hCount; inventory.leptons+=lCount;
+  inventory.met+=Math.floor(Math.random()*30+dims[6]/100*20);
+  // Mass bins — add signal peak + noise
+  var ecm=params.energy*.14+stepN*.08;
+  var binIdx=Math.floor(Math.min(ecm/20,1)*59);
+  for(var b2=0;b2<60;b2++){
+    bgBins[b2]+=Math.random()*.6+.1;
+    var dist=Math.abs(b2-binIdx);
+    massBins[b2]+=Math.max(0,3*Math.exp(-dist*dist/3))+Math.random()*.5;
+  }
+  inventory.events.push({n:stepN,ecm:ecm,q:qCount,g:gCount,h:hCount,l:lCount,dims:dims.slice()});
+  collFlashes.push({x:x,y:y,r:0,alpha:1});
+  var rc=['#00ffee','#f59e0b','#7c3aed'];
+  for(var j=0;j<5;j++) warpRings.push({rx:18+j*16,ry:7+j*6,tilt:j*.18,speed:.008+j*.003,phase:j*PHI,color:rc[j%3],life:1});
+  fabric=Math.max(60,fabric-2); dims[4]=Math.min(100,dims[4]+3); dims[2]=Math.min(100,dims[2]+4);
+  document.getElementById('flash').style.opacity='1';
+  setTimeout(function(){document.getElementById('flash').style.opacity='0';},90);
+  log('COLLISION #'+collisionCount+' — E_cm='+ecm.toFixed(2)+' TeV · q:'+qCount+' g:'+gCount+' h:'+hCount+' l:'+lCount,'#ff0');
+  // Refresh analysis panels if open
+  if(currentTab==='pid') updatePIDLive();
+  if(currentTab==='guf') updateGUFDecode();
+  if(currentTab==='stats') updateSigLive();
+  if(currentTab==='mass') drawMassPlot();
+}
+
+// MAIN DRAW
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  var vg=ctx.createRadialGradient(CX,CY,H*.05,CX,CY,H*.7);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,8,0.58)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  drawPipe(); drawLattice(); drawIP(); drawWarpRings(); drawFlashes(); drawBeams(); drawDebris();
+}
+
+// ANALYSIS VISUALISATIONS
+function drawDetectorDiagram(){
+  var dc=document.getElementById('detector-canvas');
+  if(!dc) return;
+  dc.width=dc.offsetWidth||600; dc.height=200;
+  var dx=dc.getContext('2d'), dw=dc.width, dh=dc.height, dCX=dw/2, dCY=dh/2;
+  dx.fillStyle='#000'; dx.fillRect(0,0,dw,dh);
+  var layers=[
+    {label:'Tracker',r1:18,r2:45,col:'rgba(0,255,238,0.12)',stroke:'rgba(0,255,238,0.4)'},
+    {label:'ECAL',r1:50,r2:80,col:'rgba(245,158,11,0.1)',stroke:'rgba(245,158,11,0.4)'},
+    {label:'HCAL',r1:85,r2:120,col:'rgba(124,58,237,0.1)',stroke:'rgba(124,58,237,0.35)'},
+    {label:'Muon',r1:125,r2:160,col:'rgba(236,72,153,0.08)',stroke:'rgba(236,72,153,0.3)'},
+  ];
+  var tt=(Date.now()/1000)%100;
+  layers.forEach(function(l){
+    dx.beginPath(); dx.arc(dCX,dCY,l.r2,0,Math.PI*2); dx.fillStyle=l.col; dx.fill();
+    dx.beginPath(); dx.arc(dCX,dCY,l.r1,0,Math.PI*2); dx.fillStyle='#000'; dx.fill();
+    dx.beginPath(); dx.arc(dCX,dCY,l.r2,0,Math.PI*2); dx.strokeStyle=l.stroke; dx.lineWidth=1.2; dx.stroke();
+    dx.fillStyle=l.stroke; dx.font='7px Courier New'; dx.textAlign='center';
+    dx.fillText(l.label,dCX+l.r2+2,dCY-(l.r1+l.r2)/2);
+  });
+  // Animated particle tracks from IP
+  var trackCols=['#00ffee','#ef4444','#f59e0b','#ec4899','#10b981'];
+  for(var i=0;i<8;i++){
+    var ang=i/8*Math.PI*2+tt*.2;
+    var stops=layers.length;
+    // How far does this particle type reach?
+    var reach=i<2?1:i<4?2:i<6?3:4; // muons go all the way
+    dx.beginPath(); dx.moveTo(dCX,dCY);
+    var endR=layers[reach-1].r2;
+    dx.lineTo(dCX+Math.cos(ang)*endR,dCY+Math.sin(ang)*endR);
+    dx.strokeStyle=trackCols[i%5]; dx.lineWidth=1; dx.globalAlpha=.55; dx.stroke(); dx.globalAlpha=1;
+    // Moving dot
+    var prog=((tt+i*.3)%3)/3;
+    var dotR=prog*endR;
+    dx.beginPath(); dx.arc(dCX+Math.cos(ang)*dotR,dCY+Math.sin(ang)*dotR,2,0,Math.PI*2);
+    dx.fillStyle=trackCols[i%5]; dx.fill();
+  }
+  dx.fillStyle='rgba(255,255,255,0.7)'; dx.font='6px Courier New'; dx.textAlign='center';
+  dx.fillText('IP',dCX,dCY+3);
+  requestAnimationFrame(function(){if(currentTab==='detector')drawDetectorDiagram();});
+}
+
+function drawJetDiagram(){
+  var jc=document.getElementById('jet-canvas');
+  if(!jc) return;
+  jc.width=jc.offsetWidth||600; jc.height=160;
+  var jx=jc.getContext('2d'), jw=jc.width, jh=jc.height, jCX=jw/2, jCY=jh/2;
+  jx.fillStyle='#000'; jx.fillRect(0,0,jw,jh);
+  var tt=(Date.now()/1000);
+  var jets=[{ang:-Math.PI*.15,col:'#00ffee',label:'q-jet'},{ang:Math.PI*.85,col:'#ef4444',label:'q-jet'},{ang:Math.PI*.45,col:'#f59e0b',label:'b-jet',displaced:true},{ang:-Math.PI*.55,col:'#10b981',label:'b-jet',displaced:true}];
+  jets.forEach(function(jet){
+    // Cone
+    var coneW=0.22, coneL=120;
+    jx.beginPath();
+    jx.moveTo(jCX,jCY);
+    jx.lineTo(jCX+Math.cos(jet.ang+coneW)*coneL,jCY+Math.sin(jet.ang+coneW)*coneL);
+    jx.lineTo(jCX+Math.cos(jet.ang-coneW)*coneL,jCY+Math.sin(jet.ang-coneW)*coneL);
+    jx.closePath();
+    jx.fillStyle=rgba(jet.col,.07); jx.fill();
+    jx.strokeStyle=rgba(jet.col,.25); jx.lineWidth=.8; jx.stroke();
+    // Hadron tracks inside cone
+    for(var k=0;k<7;k++){
+      var da=(Math.random()-.5)*coneW*.8, dr=40+Math.random()*75;
+      var sx=jCX+(jet.displaced?Math.cos(jet.ang)*12:0), sy=jCY+(jet.displaced?Math.sin(jet.ang)*12:0);
+      jx.beginPath(); jx.moveTo(sx,sy); jx.lineTo(sx+Math.cos(jet.ang+da)*dr,sy+Math.sin(jet.ang+da)*dr);
+      jx.strokeStyle=rgba(jet.col,.35); jx.lineWidth=.6; jx.stroke();
+    }
+    // Displaced vertex marker for b-jets
+    if(jet.displaced){
+      jx.beginPath(); jx.arc(jCX+Math.cos(jet.ang)*12,jCY+Math.sin(jet.ang)*12,4,0,Math.PI*2);
+      jx.strokeStyle=rgba(jet.col,.8); jx.lineWidth=1.2; jx.stroke();
+    }
+    jx.fillStyle=rgba(jet.col,.7); jx.font='7px Courier New'; jx.textAlign='center';
+    jx.fillText(jet.label,jCX+Math.cos(jet.ang)*coneL+Math.cos(jet.ang)*12,jCY+Math.sin(jet.ang)*coneL+Math.sin(jet.ang)*12);
+  });
+  // IP
+  jx.beginPath(); jx.arc(jCX,jCY,5,0,Math.PI*2); jx.fillStyle='rgba(255,255,255,0.6)'; jx.fill();
+  jx.fillStyle='rgba(200,230,255,0.4)'; jx.font='7px Courier New'; jx.textAlign='center'; jx.fillText('IP',jCX,jCY+16);
+  // MET arrow
+  var metAng=Math.PI*1.25;
+  jx.beginPath(); jx.moveTo(jCX,jCY); jx.lineTo(jCX+Math.cos(metAng)*60,jCY+Math.sin(metAng)*60);
+  jx.strokeStyle='rgba(236,72,153,0.5)'; jx.lineWidth=1.5; jx.setLineDash([4,4]); jx.stroke(); jx.setLineDash([]);
+  jx.fillStyle='rgba(236,72,153,0.6)'; jx.fillText('MET (invisible)',jCX+Math.cos(metAng)*72,jCY+Math.sin(metAng)*72);
+}
+
+function drawMassPlot(){
+  var mc2=document.getElementById('mass-canvas');
+  if(!mc2) return;
+  mc2.width=mc2.offsetWidth||600; mc2.height=200;
+  var mx=mc2.getContext('2d'), mw=mc2.width, mh=mc2.height;
+  mx.fillStyle='#000'; mx.fillRect(0,0,mw,mh);
+  var pad=30, plotW=mw-pad*2, plotH=mh-pad*2-10;
+  var maxV=Math.max.apply(null,massBins)+5;
+  // Grid
+  mx.strokeStyle='rgba(0,200,255,0.07)'; mx.lineWidth=.5;
+  for(var g=0;g<5;g++){var gy=pad+g*plotH/4;mx.beginPath();mx.moveTo(pad,gy);mx.lineTo(pad+plotW,gy);mx.stroke();}
+  // Background
+  mx.beginPath();
+  for(var i=0;i<60;i++){var bx=pad+i/60*plotW,by=pad+plotH-(bgBins[i]/maxV)*plotH;if(i===0)mx.moveTo(bx,by);else mx.lineTo(bx,by);}
+  mx.strokeStyle='rgba(100,150,200,0.3)'; mx.lineWidth=1; mx.stroke();
+  // Signal
+  mx.beginPath();
+  for(var i2=0;i2<60;i2++){var bx2=pad+i2/60*plotW,by2=pad+plotH-(massBins[i2]/maxV)*plotH;if(i2===0)mx.moveTo(bx2,by2);else mx.lineTo(bx2,by2);}
+  mx.strokeStyle='rgba(0,255,238,0.7)'; mx.lineWidth=1.2; mx.stroke();
+  // Fill under signal
+  mx.lineTo(pad+plotW,pad+plotH); mx.lineTo(pad,pad+plotH); mx.closePath();
+  mx.fillStyle='rgba(0,255,238,0.04)'; mx.fill();
+  // Known resonance lines
+  var resonances=[{m:91.2,col:'#7c3aed',label:'Z'},{m:125,col:'#f59e0b',label:'H'},{m:173,col:'#ef4444',label:'top'}];
+  resonances.forEach(function(res){
+    var rx=pad+(res.m/280)*plotW;
+    mx.beginPath(); mx.moveTo(rx,pad); mx.lineTo(rx,pad+plotH);
+    mx.strokeStyle=rgba(res.col,.4); mx.lineWidth=.8; mx.setLineDash([4,4]); mx.stroke(); mx.setLineDash([]);
+    mx.fillStyle=rgba(res.col,.7); mx.font='7px Courier New'; mx.textAlign='center'; mx.fillText(res.label,rx,pad-4);
+  });
+  // Axes
+  mx.strokeStyle='rgba(0,200,255,0.25)'; mx.lineWidth=.8;
+  mx.beginPath(); mx.moveTo(pad,pad); mx.lineTo(pad,pad+plotH); mx.lineTo(pad+plotW,pad+plotH); mx.stroke();
+  mx.fillStyle='rgba(0,200,255,0.35)'; mx.font='7px Courier New'; mx.textAlign='center';
+  mx.fillText('Invariant Mass M (GeV)',pad+plotW/2,mh-4);
+  mx.save(); mx.translate(10,pad+plotH/2); mx.rotate(-Math.PI/2); mx.fillText('Events / bin',0,0); mx.restore();
+  // X axis labels
+  [0,50,100,150,200,250].forEach(function(v){var lx=pad+(v/280)*plotW;mx.fillStyle='rgba(0,200,255,0.3)';mx.fillText(v,lx,pad+plotH+12);});
+  if(collisionCount===0){mx.fillStyle='rgba(0,200,255,0.2)';mx.font='11px Courier New';mx.textAlign='center';mx.fillText('FIRE BEAMS TO ACCUMULATE EVENTS',pad+plotW/2,pad+plotH/2);}
+}
+
+function drawStatsPlot(){
+  var sc=document.getElementById('stats-canvas');
+  if(!sc) return;
+  sc.width=sc.offsetWidth||600; sc.height=180;
+  var sx=sc.getContext('2d'), sw=sc.width, sh=sc.height;
+  sx.fillStyle='#000'; sx.fillRect(0,0,sw,sh);
+  var pad=30, plotW=sw-pad*2, plotH=sh-pad*2-10;
+  // Gaussian normal curve
+  sx.beginPath();
+  for(var i=0;i<=200;i++){
+    var u=(i/200)*8-4, y=Math.exp(-.5*u*u)/Math.sqrt(2*Math.PI);
+    var px=pad+(i/200)*plotW, py=pad+plotH-y*plotH*9;
+    if(i===0) sx.moveTo(px,py); else sx.lineTo(px,py);
+  }
+  sx.strokeStyle='rgba(0,200,255,0.5)'; sx.lineWidth=1.2; sx.stroke();
+  // Sigma lines
+  var sigmas=[{s:1,col:'#10b981'},{s:2,col:'#f59e0b'},{s:3,col:'#f59e0b'},{s:5,col:'#ef4444'}];
+  sigmas.forEach(function(sg){
+    var px=pad+(sg.s+4)/8*plotW;
+    sx.beginPath(); sx.moveTo(px,pad); sx.lineTo(px,pad+plotH);
+    sx.strokeStyle=rgba(sg.col,.5); sx.lineWidth=.8; sx.setLineDash([3,5]); sx.stroke(); sx.setLineDash([]);
+    sx.fillStyle=rgba(sg.col,.7); sx.font='7px Courier New'; sx.textAlign='center'; sx.fillText(sg.s+'σ',px,pad-4);
+    // Mirror
+    var pxL=pad+(-sg.s+4)/8*plotW;
+    sx.beginPath(); sx.moveTo(pxL,pad); sx.lineTo(pxL,pad+plotH);
+    sx.strokeStyle=rgba(sg.col,.3); sx.lineWidth=.6; sx.setLineDash([3,5]); sx.stroke(); sx.setLineDash([]);
+  });
+  // Current significance marker
+  var sig=Math.min(5,Math.sqrt(collisionCount)*0.7);
+  var spx=pad+(sig+4)/8*plotW;
+  sx.beginPath(); sx.moveTo(spx,pad); sx.lineTo(spx,pad+plotH);
+  sx.strokeStyle='rgba(0,255,238,0.9)'; sx.lineWidth=1.5; sx.stroke();
+  sx.fillStyle='rgba(0,255,238,0.9)'; sx.font='8px Courier New'; sx.textAlign='center';
+  sx.fillText('→ '+sig.toFixed(1)+'σ NOW',spx,pad-4);
+  // Axes
+  sx.strokeStyle='rgba(0,200,255,0.2)'; sx.lineWidth=.7;
+  sx.beginPath(); sx.moveTo(pad,pad); sx.lineTo(pad,pad+plotH); sx.lineTo(pad+plotW,pad+plotH); sx.stroke();
+  sx.fillStyle='rgba(0,200,255,0.3)'; sx.font='7px Courier New'; sx.textAlign='center';
+  sx.fillText('Standard Deviations σ',pad+plotW/2,sh-4);
+  updateSigLive();
+}
+
+function updatePIDLive(){
+  var el=document.getElementById('pid-live'); if(!el) return;
+  if(inventory.events.length===0){el.innerHTML='<span style="color:rgba(0,200,255,0.25);font-size:8px">No collisions yet — fire beams to populate</span>';return;}
+  var last=inventory.events[inventory.events.length-1];
+  el.innerHTML='';
+  var items=[
+    {label:'Quarks ×'+last.q,col:'#ef4444'},{label:'Gluons ×'+last.g,col:'#f59e0b'},
+    {label:'Hadrons ×'+last.h,col:'#10b981'},{label:'Leptons ×'+last.l,col:'#ec4899'},
+    {label:'MET ~'+Math.floor(inventory.met/Math.max(1,collisionCount))+'GeV',col:'#7c3aed'},
+    {label:'E_cm='+last.ecm.toFixed(2)+'TeV',col:'#00ffee'}
+  ];
+  items.forEach(function(item){
+    var s=document.createElement('span');
+    s.className='ptag-live';
+    s.style.cssText='background:'+rgba(item.col,.08)+';border-color:'+rgba(item.col,.25)+';color:'+item.col;
+    s.textContent=item.label;
+    el.appendChild(s);
+  });
+}
+
+function updateGUFDecode(){
+  var el=document.getElementById('guf-live'); if(!el) return;
+  if(inventory.events.length===0){el.innerHTML='<span style="color:rgba(0,200,255,0.22)">No events yet — fire beams</span>';return;}
+  var last=inventory.events[inventory.events.length-1];
+  var total=last.q+last.g+last.h+last.l+1;
+  var lines=[
+    'D1-Space   → '+last.h+' baryons/mesons — spatial domain '+(last.dims[0]>70?'DOMINANT':'active'),
+    'D2-Time    → π⁰ proxy: '+Math.floor(last.h*.3)+' neutral pairs — Eugacycle phase '+(last.dims[1]>60?'resonant':'drifting'),
+    'D3-Energy  → jet pT proxy: '+(last.ecm*1000).toFixed(0)+' GeV — D3 field intensity '+(last.dims[2]>80?'SPIKE':'normal'),
+    'D4-Field   → '+last.q+' EM carriers — field coupling '+(last.dims[3]>65?'strong':'moderate'),
+    'D5-Vortex  → '+last.g+' gluons / '+Math.floor(last.h*.2)+' kaons — vortex '+(last.dims[4]>60?'activated':'stable'),
+    'D6-Mind    → '+last.l+' prompt leptons — consciousness coupling '+(last.l>3?'ANOMALY WATCH':'nominal'),
+    'D7-Source  → MET = ~'+Math.floor(inventory.met/Math.max(1,collisionCount))+'GeV invisible — vacuum emission '+(last.dims[6]===100?'ground state':'—'),
+    '─────────────────────────────────────────────────',
+    'C_total imprint: '+(last.dims.reduce(function(a,d){return a+d/700;},0)).toFixed(4)+' · Dimensional coherence: '+(last.dims[4]>50&&last.dims[6]===100?'STABLE':'FLUCTUATING'),
+  ];
+  el.innerHTML=lines.map(function(l){return '<div>'+l+'</div>';}).join('');
+}
+
+function updateSigLive(){
+  var el=document.getElementById('sig-live'); if(!el) return;
+  var sig=Math.min(6,Math.sqrt(collisionCount)*.7);
+  var pval=collisionCount===0?1:Math.exp(-sig*sig/2)/(sig*Math.sqrt(2*Math.PI))*0.5;
+  el.innerHTML='Collisions: '+collisionCount+' &nbsp;|&nbsp; Estimated signal σ: <b style="color:'+(sig>=5?'#10b981':sig>=3?'#f59e0b':'#ef4444')+'">'+sig.toFixed(2)+'σ</b>&nbsp;|&nbsp; p-value ≈ '+pval.toExponential(2)+'<br>'+(sig<3?'Status: <span style="color:#ef4444">BELOW THRESHOLD — collect more events</span>':sig<5?'Status: <span style="color:#f59e0b">EVIDENCE (3σ) — continue accumulating</span>':'Status: <span style="color:#10b981">★ DISCOVERY THRESHOLD REACHED (5σ) ★</span>');
+}
+
+// CONTROLS
+window.startBeams=function(){
+  if(beamsActive||!W) return;
+  beamsActive=true;
+  var spd=1.8+params.energy*.025, spread=Math.max(1,10-params.focus*.07), count=Math.floor(params.bunch*.5)+8;
+  bunchA={x:W*.06,active:true,particles:[],trail:[]};
+  bunchB={x:W*.94,active:true,particles:[],trail:[]};
+  for(var i=0;i<count;i++){
+    bunchA.particles.push({x:bunchA.x+(Math.random()-.5)*18,y:PIPE_Y+(Math.random()-.5)*spread,vx:spd*(1+(Math.random()-.5)*.08),vy:(Math.random()-.5)*spread*.09,phase:Math.random()*Math.PI*2});
+    bunchB.particles.push({x:bunchB.x+(Math.random()-.5)*18,y:PIPE_Y+(Math.random()-.5)*spread,vx:-spd*(1+(Math.random()-.5)*.08),vy:(Math.random()-.5)*spread*.09,phase:Math.random()*Math.PI*2});
+  }
+  log('Bunches injected A→ ←B','#00ffee');
+  document.getElementById('btn-inject').textContent='⚡ ACTIVE';
+  document.getElementById('btn-inject').classList.add('on');
+};
+window.toggleWarp=function(){warpOn=!warpOn;document.getElementById('btn-warp').classList.toggle('on',warpOn);log(warpOn?'Warp ENGAGED':'Warp OFF',warpOn?'#00ffee':'#ef4444');};
+window.toggleOptics=function(){opticsOn=!opticsOn;document.getElementById('btn-optics').classList.toggle('on',opticsOn);log(opticsOn?'Optics ACTIVE':'Optics OFF',opticsOn?'#f59e0b':'#ef4444');};
+window.togglePhi=function(){phiOn=!phiOn;document.getElementById('btn-phi').classList.toggle('on',phiOn);log(phiOn?'Φ-clock ON':'Φ-clock OFF',phiOn?'#f59e0b':'#888');};
+window.resetAll=function(){
+  beamsActive=false;bunchA.active=false;bunchB.active=false;bunchA.particles=[];bunchB.particles=[];
+  debris=[];collisionCount=0;stepN=0;fabric=100;dims=[80,65,55,70,45,60,100];collFlashes=[];warpRings=[];
+  inventory={quarks:0,gluons:0,hadrons:0,leptons:0,met:0,events:[]};
+  massBins=new Array(60).fill(0); bgBins=new Array(60).fill(0);
+  buildLattice();
+  document.getElementById('btn-inject').textContent='⚡ INJECT';
+  document.getElementById('btn-inject').classList.remove('on');
+  if(currentTab==='mass') drawMassPlot();
+  if(currentTab==='stats') drawStatsPlot();
+  log('RESET — all systems cleared','#00ccff');
+};
+window.updateParam=function(k,v){params[k]=parseInt(v,10);document.getElementById('sv-'+k).textContent=v;};
+
+// UI UPDATE
+function updateUI(){
+  var vs=warpOn?3*Math.pow(PHI,Math.min(stepN*.05,5)):0;
+  var ecm=params.energy*.14+stepN*.08;
+  var sig=Math.min(6,Math.sqrt(collisionCount)*.7);
+  var ctotal=dims.reduce(function(a,d){return a+d/700;},0);
+  var rho=warpOn?dims[0]/100*.33:0;
+  var Ef=Math.min(100,params.energy+stepN*1.5),Bf=Math.min(100,params.focus*1.1);
+  var Gf=Math.min(100,ctotal*100),Hf=Math.min(100,collisionCount*8);
+  document.getElementById('ts-ecm').textContent=ecm.toFixed(2)+' TeV';
+  document.getElementById('ts-vs').textContent=vs.toFixed(3)+'c';
+  document.getElementById('ts-twist').textContent=((stepN*THETA_PHI)%360).toFixed(1)+'°';
+  document.getElementById('ts-col').textContent=collisionCount;
+  document.getElementById('ts-sig').textContent=sig.toFixed(1)+'σ';
+  document.getElementById('ts-fab').textContent=fabric.toFixed(0)+'%';
+  document.getElementById('rc-ecm').textContent=ecm.toFixed(2);
+  document.getElementById('rc-px').textContent=debris.length;
+  document.getElementById('rc-vs').textContent=vs.toFixed(2)+'c';
+  document.getElementById('rc-lumi').textContent=Math.floor(params.bunch*params.focus*.38*collisionCount);
+  document.getElementById('wv-r').textContent=(80+dims[4]/100*38).toFixed(0)+' m';
+  document.getElementById('wv-rho').textContent=rho.toFixed(3);
+  document.getElementById('wv-fab').textContent=fabric.toFixed(0)+'%';
+  document.getElementById('wv-ct').textContent=ctotal.toFixed(3);
+  document.getElementById('fl-e').style.width=Ef+'%';document.getElementById('flv-e').textContent=Ef.toFixed(0);
+  document.getElementById('fl-b').style.width=Bf+'%';document.getElementById('flv-b').textContent=Bf.toFixed(0);
+  document.getElementById('fl-g').style.width=Gf+'%';document.getElementById('flv-g').textContent=Gf.toFixed(0);
+  document.getElementById('fl-h').style.width=Hf+'%';document.getElementById('flv-h').textContent=Hf.toFixed(0);
+  document.getElementById('tally-q').textContent=inventory.quarks;
+  document.getElementById('tally-g').textContent=inventory.gluons;
+  document.getElementById('tally-h').textContent=inventory.hadrons;
+  document.getElementById('tally-l').textContent=inventory.leptons;
+  document.getElementById('tally-met').textContent=Math.floor(inventory.met/Math.max(1,collisionCount))+' GeV';
+  dims[1]=Math.max(40,Math.min(100,dims[1]+Math.sin(t*.36)*.25));
+  dims[3]=Math.max(50,Math.min(100,dims[3]+Math.cos(t*.2+PHI)*.18));
+  dims[4]=Math.max(40,Math.min(100,dims[4]+(100-dims[4])*.002));
+  fabric=Math.min(100,fabric+.02);
+  var dk=['d1','d2','d3','d4','d5','d6','d7'];
+  for(var i=0;i<7;i++){document.getElementById('fb-'+dk[i]).style.width=dims[i].toFixed(1)+'%';document.getElementById('fv-'+dk[i]).textContent=dims[i].toFixed(0);}
+  document.getElementById('ov-omm').textContent='~'+Math.floor(params.focus/100*4800+500);
+  document.getElementById('ov-coh').textContent=(0.70+params.focus*.003).toFixed(2);
+  document.getElementById('bot-r').textContent='FRAME '+frame+' · n='+stepN;
+}
+
+// LOG
+function log(msg,col){
+  var d=document.createElement('div');d.className='el f';
+  d.innerHTML='<span class="et">n='+String(stepN).padStart(3,'0')+'</span>'+msg;
+  if(col)d.style.color=col;
+  var el=document.getElementById('elog');el.insertBefore(d,el.firstChild);
+  while(el.children.length>24)el.removeChild(el.lastChild);
+}
+
+var logPool=[
+  ['Dipole lattice: D4-Field nominal — trajectory locked','#4a9fd4'],
+  ['Quad focus rings: emittance shrinking toward IP','#f59e0b'],
+  ['RF cavity: bunch energy kick — D2 phase stable','#7c3aed'],
+  ['Twisted Zipper: Φ-twist CTC suppression active','#00ffee'],
+  ['Compound-eye optics: stochastic cooling on-axis','#10b981'],
+  ['D7-Source: vacuum coherent — 0=∞ nominal','#fff'],
+];
+
+// LOOP
+function loop(){
+  drawBg(); draw(); updateUI();
+  if(frame-lastLogFrame>72){lastLogFrame=frame;var ev=logPool[Math.floor(Math.random()*logPool.length)];log(ev[0],ev[1]);}
+  t+=0.016; frame++;
+  requestAnimationFrame(loop);
+}
+
+// INIT
+log('GUF UNIFIED COLLIDER + ANALYSIS ENGINE online','#00ffee');
+log('7 analysis tabs available — explore each after firing beams','#f59e0b');
+log('Press ⚡ INJECT then explore tabs: Detector · PID · Jets · Mass · Stats · GUF','#fff');
+
+// Delay first resize until DOM is fully painted
+setTimeout(function(){resize();loop();},100);
+})();
+</script>
+</body>
+</html>

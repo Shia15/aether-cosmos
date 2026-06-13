@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GUF Master Engine — Shia Miller</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#010408; --deep:#030912; --panel:#060f1e; --ring1:#0a1628; --ring2:#0d1f3c;
+  --border:rgba(46,109,164,0.18); --border2:rgba(46,109,164,0.38);
+  --acc:#2e6da4; --bright:#4a9fd4; --teal:#1fd4c8; --gold:#c9a84c;
+  --violet:#8b5cf6; --red:#ef4444; --green:#22c55e; --orange:#f97316; --pink:#ec4899;
+  --text:#d4e8f7; --dim:#3a5a7a; --phi:1.6180339887;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:var(--text);font-family:'Rajdhani',sans-serif}
+
+/* LAYOUT */
+#shell{display:grid;grid-template-rows:52px 1fr 40px;grid-template-columns:200px 1fr 200px;width:100%;height:100%;position:relative;z-index:1}
+
+/* TOP BAR */
+#top{grid-column:1/-1;grid-row:1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(1,4,8,.97);border-bottom:1px solid var(--border)}
+.logo{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:3px;color:var(--bright);text-shadow:0 0 16px var(--teal)}
+.logo-sub{font-size:8px;letter-spacing:2px;color:var(--dim);margin-top:2px}
+.top-stats{display:flex;gap:18px}
+.tstat{text-align:center}
+.tstat-v{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:var(--bright);text-shadow:0 0 8px var(--teal)}
+.tstat-l{font-size:7px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+.tbtn{font-family:'Share Tech Mono',monospace;font-size:9px;padding:5px 10px;background:rgba(46,109,164,.08);border:1px solid var(--border2);color:var(--bright);cursor:pointer;letter-spacing:1px;border-radius:2px;transition:all .2s;text-transform:uppercase}
+.tbtn:hover{background:rgba(46,109,164,.18);border-color:var(--bright)}
+.tbtn.on{background:rgba(46,109,164,.22);border-color:var(--teal);color:#fff}
+
+/* LEFT PANEL */
+#left{grid-column:1;grid-row:2;padding:12px 10px;background:linear-gradient(90deg,rgba(1,4,8,.95) 0%,transparent 100%);border-right:1px solid var(--border);overflow-y:auto;scrollbar-width:none}
+#left::-webkit-scrollbar{display:none}
+
+/* CENTER — THREE CANVASES */
+#center{grid-column:2;grid-row:2;position:relative;overflow:hidden;display:grid;grid-template-rows:1fr 1fr;grid-template-columns:1fr 1fr}
+#center.mode-full{grid-template-rows:1fr;grid-template-columns:1fr}
+.canvas-pane{position:relative;overflow:hidden;border:1px solid rgba(46,109,164,0.12);cursor:crosshair}
+.canvas-pane:hover{border-color:rgba(46,109,164,0.3)}
+.pane-label{position:absolute;top:8px;left:10px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;pointer-events:none;z-index:2}
+.pane-label .active-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--teal);margin-right:5px;box-shadow:0 0 6px var(--teal);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.pane-label .inactive-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--dim);margin-right:5px}
+canvas.sim{position:absolute;inset:0;width:100%;height:100%}
+#pane-rings{grid-column:1;grid-row:1}
+#pane-7d{grid-column:2;grid-row:1}
+#pane-warp{grid-column:1/-1;grid-row:2}
+
+/* RIGHT PANEL */
+#right{grid-column:3;grid-row:2;padding:12px 10px;background:linear-gradient(270deg,rgba(1,4,8,.95) 0%,transparent 100%);border-left:1px solid var(--border);overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:8px}
+#right::-webkit-scrollbar{display:none}
+
+/* BOTTOM BAR */
+#bot{grid-column:1/-1;grid-row:3;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:rgba(1,4,8,.97);border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1.5px;color:var(--dim)}
+
+/* PANEL COMPONENTS */
+.plabel{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2.5px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.dim-card{margin-bottom:8px;padding:8px;background:rgba(0,0,0,.35);border-radius:2px;border:1px solid transparent;transition:border-color .25s;cursor:pointer}
+.dim-card:hover{border-color:var(--border2)}
+.dim-card.active{border-color:var(--dc,var(--teal));box-shadow:0 0 12px color-mix(in srgb,var(--dc,var(--teal)) 12%,transparent)}
+.dc-hdr{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.dc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dc-name{font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px}
+.dc-desc{font-size:10px;color:var(--dim);line-height:1.4;margin-bottom:6px}
+.dc-sw{display:flex;align-items:center;gap:5px}
+.dc-sl{flex:1;-webkit-appearance:none;height:2px;border-radius:1px;background:var(--border);outline:none;cursor:pointer}
+.dc-sl::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:9px;border-radius:50%;cursor:pointer;border:1.5px solid var(--void);box-shadow:0 0 5px currentColor}
+.dc-v{font-family:'Orbitron',monospace;font-size:8px;color:var(--dim);width:24px;text-align:right}
+
+/* Field cards */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.fc{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:2px;padding:6px;text-align:center}
+.fc-v{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;margin-bottom:1px}
+.fc-l{font-size:7px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase}
+
+/* Event log */
+#elog{flex:1;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:2px;padding:8px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;min-height:80px;max-height:160px}
+.el{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--dim);padding:2px 0;border-bottom:1px solid var(--border);line-height:1.4}
+.el.fresh{color:var(--teal);animation:fadeLog .6s ease forwards}
+@keyframes fadeLog{from{background:rgba(31,212,200,0.08)}to{background:transparent}}
+.el .et{color:var(--gold);margin-right:5px}
+
+/* Connection indicator */
+.conn-indicator{display:flex;align-items:center;gap:6px;padding:6px 8px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:2px;margin-bottom:6px}
+.conn-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.conn-dot.live{animation:connPulse 1.5s ease-in-out infinite}
+@keyframes connPulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.conn-txt{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px}
+
+/* Phi spiral mini canvas */
+#phiC{width:100%;display:block;border-radius:2px;border:1px solid var(--border)}
+
+/* Domain status bars */
+.dsrow{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.dslabel{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--dim);width:20px;flex-shrink:0}
+.dsbwrap{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.dsb{height:100%;border-radius:2px;transition:width .4s}
+.dsv{font-family:'Orbitron',monospace;font-size:8px;color:var(--dim);width:22px;text-align:right;flex-shrink:0}
+
+/* Splash */
+#splash{position:fixed;inset:0;z-index:200;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;animation:spOut .5s ease 3.8s forwards}
+@keyframes spOut{to{opacity:0;pointer-events:none}}
+.sp-t{font-family:'Orbitron',sans-serif;font-size:clamp(20px,5vw,42px);font-weight:900;letter-spacing:3px;background:linear-gradient(135deg,var(--teal),var(--bright),var(--gold),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:spIn .7s ease both}
+.sp-s{font-size:14px;color:rgba(255,255,255,.3);letter-spacing:4px;animation:spIn .7s ease .5s both}
+.sp-a{font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;animation:spIn .7s ease 1s both}
+@keyframes spIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="sp-t">GUF MASTER ENGINE</div>
+  <div class="sp-s">Grand Unified Framework — All Systems Online</div>
+  <div class="sp-a">Stacked Rings · 7D Field · Twisted Zipper · Shia Miller 2026</div>
+</div>
+
+<div id="shell">
+
+  <!-- TOP BAR -->
+  <div id="top">
+    <div><div class="logo">GUF MASTER ENGINE</div><div class="logo-sub">Stacked Rings · 7D Framework · Twisted Zipper Drive · All Systems Connected</div></div>
+    <div class="top-stats">
+      <div class="tstat"><div class="tstat-v" id="ts-phi">φ=1.618</div><div class="tstat-l">Φ-Clock</div></div>
+      <div class="tstat"><div class="tstat-v" id="ts-n">0</div><div class="tstat-l">Step n</div></div>
+      <div class="tstat"><div class="tstat-v" id="ts-vs">0.000c</div><div class="tstat-l">Warp v_s</div></div>
+      <div class="tstat"><div class="tstat-v" id="ts-twist">0.0°</div><div class="tstat-l">Twist Θ_n</div></div>
+      <div class="tstat"><div class="tstat-v" id="ts-ctotal">0.000</div><div class="tstat-l">C_total</div></div>
+      <div class="tstat"><div class="tstat-v" id="ts-rings">0</div><div class="tstat-l">Active Rings</div></div>
+      <div class="tstat"><div class="tstat-v" id="ts-vortex">0</div><div class="tstat-l">Vortices</div></div>
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;max-width:280px">
+      <button class="tbtn" id="btn-warp" onclick="toggleWarp()">⚡ WARP</button>
+      <button class="tbtn on" id="btn-phi" onclick="togglePhi()">Φ PHI</button>
+      <button class="tbtn on" id="btn-twist" onclick="toggleTwist()">⟳ TWIST</button>
+      <button class="tbtn" id="btn-vortex" onclick="injectVortex()">⊕ VORTEX</button>
+      <button class="tbtn" id="btn-reset" onclick="resetAll()">↺ RESET</button>
+      <button class="tbtn" id="btn-connect" onclick="toggleConnect()">◎ SYNC</button>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL — DIMENSIONS + DOMAINS -->
+  <div id="left">
+    <div class="plabel">7 Dimensions</div>
+    <div id="dim-cards"></div>
+    <div class="plabel" style="margin-top:10px">5-Domain Event Bus</div>
+    <div id="domain-cards"></div>
+  </div>
+
+  <!-- CENTER — THREE SIMULATION PANES -->
+  <div id="center">
+    <div class="canvas-pane" id="pane-rings" onclick="clickPane('rings',event)">
+      <canvas class="sim" id="cRings"></canvas>
+      <div class="pane-label"><span class="active-dot"></span>STACKED RINGS · Click to inject vortex</div>
+    </div>
+    <div class="canvas-pane" id="pane-7d" onclick="clickPane('7d',event)">
+      <canvas class="sim" id="c7d"></canvas>
+      <div class="pane-label"><span class="active-dot"></span>7D FRAMEWORK · Click to focus dimension</div>
+    </div>
+    <div class="canvas-pane" id="pane-warp" onclick="clickPane('warp',event)">
+      <canvas class="sim" id="cWarp"></canvas>
+      <div class="pane-label"><span class="inactive-dot" id="warp-dot"></span><span id="warp-status">TWISTED ZIPPER · Standby — Engage warp to activate</span></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right">
+    <div class="plabel">System Connections</div>
+
+    <div class="conn-indicator">
+      <div class="conn-dot live" style="background:var(--teal)"></div>
+      <span class="conn-txt" style="color:var(--teal)">RINGS → 7D: Ring layer feeds 7D field</span>
+    </div>
+    <div class="conn-indicator">
+      <div class="conn-dot live" style="background:var(--gold)"></div>
+      <span class="conn-txt" style="color:var(--gold)">7D → WARP: D5 Vortex feeds bubble</span>
+    </div>
+    <div class="conn-indicator">
+      <div class="conn-dot live" style="background:var(--violet)"></div>
+      <span class="conn-txt" style="color:var(--violet)">WARP → RINGS: Bubble topology feeds ring field</span>
+    </div>
+
+    <div class="plabel">Field Readouts</div>
+    <div class="fgrid">
+      <div class="fc"><div class="fc-v" id="fr-rho" style="color:var(--bright)">1.000</div><div class="fc-l">ρ_info</div></div>
+      <div class="fc"><div class="fc-v" id="fr-hn" style="color:var(--gold)">1.000</div><div class="fc-l">Ring Hₙ</div></div>
+      <div class="fc"><div class="fc-v" id="fr-causal" style="color:var(--green)">SAFE</div><div class="fc-l">Causal</div></div>
+      <div class="fc"><div class="fc-v" id="fr-fabric" style="color:var(--teal)">100%</div><div class="fc-l">Fabric</div></div>
+    </div>
+
+    <div class="plabel">Domain Status</div>
+    <div id="domain-bars"></div>
+
+    <div class="plabel">Φ-Phase Map</div>
+    <canvas id="phiC" width="180" height="180"></canvas>
+
+    <div class="plabel">Event Log</div>
+    <div id="elog"></div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bot">
+    <div style="display:flex;gap:14px" id="bot-ticker"></div>
+    <div>GUF MASTER ENGINE · 0=∞ · SHIA MILLER @StrategicProce 2026</div>
+    <div id="bot-frame">FRAME 0</div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONSTANTS
+const PHI = 1.6180339887;
+const THETA = 360 / PHI; // 222.492°
+const DIM_COLS  = ['#00ffff','#7c3aed','#f59e0b','#10b981','#ef4444','#ec4899','#ffffff'];
+const DIM_NAMES = ['Space','Time','Energy','Field','Vortex','Conscious','Source'];
+const DOM_COLS  = ['#1fd4c8','#c9a84c','#8b5cf6','#ec4899','#22c55e'];
+const DOM_NAMES = ['Physical','Oscillatory','Informational','Conscious','Regenerative'];
+
+// ── STATE ──────────────────────────────────────────
+let dims    = [80,65,55,70,45,60,100];
+let domains = [80,75,65,90,70];
+let warpOn=false, phiOn=true, twistOn=true, syncOn=true;
+let focusDim=-1, focusDom=-1;
+let step_n=0, xpos=0, fabric=100;
+let vortices=[], rings7d=[], ringParticles=[];
+let t=0, frame=0;
+let lastLog=0, interactionCount=0;
+
+// ── CANVAS REFS ────────────────────────────────────
+const cR=document.getElementById('cRings'), ctxR=cR.getContext('2d');
+const c7=document.getElementById('c7d'),    ctx7=c7.getContext('2d');
+const cW=document.getElementById('cWarp'),  ctxW=cW.getContext('2d');
+const cP=document.getElementById('phiC'),   ctxP=cP.getContext('2d');
+let RW,RH,SW,SH,WW,WH;
+
+function resize(){
+  [['pane-rings',cR],['pane-7d',c7],['pane-warp',cW]].forEach(([id,cv])=>{
+    const r=document.getElementById(id).getBoundingClientRect();
+    cv.width=r.width; cv.height=r.height;
+  });
+  RW=cR.width; RH=cR.height;
+  SW=c7.width; SH=c7.height;
+  WW=cW.width; WH=cW.height;
+}
+resize();
+window.addEventListener('resize',resize);
+
+// ══════════════════════════════════════════════════════
+// BUILD LEFT PANEL
+function buildLeft(){
+  const dc=document.getElementById('dim-cards');
+  dims.forEach((d,i)=>{
+    const div=document.createElement('div');
+    div.className='dim-card';
+    div.id='dc-dim'+i;
+    div.style.setProperty('--dc',DIM_COLS[i]);
+    div.innerHTML=`
+      <div class="dc-hdr"><div class="dc-dot" style="background:${DIM_COLS[i]}"></div>
+      <div class="dc-name" style="color:${DIM_COLS[i]}">D${i+1}·${DIM_NAMES[i].toUpperCase()}</div></div>
+      <div class="dc-sw">
+        <input type="range" class="dc-sl" id="ds-dim${i}" min="0" max="100" value="${d}"
+          style="accent-color:${DIM_COLS[i]}" oninput="updateDim(${i},this.value)">
+        <div class="dc-v" id="dv-dim${i}" style="color:${DIM_COLS[i]}">${d}</div>
+      </div>`;
+    div.addEventListener('click',()=>setFocusDim(i));
+    dc.appendChild(div);
+  });
+  const domc=document.getElementById('domain-cards');
+  domains.forEach((d,i)=>{
+    const div=document.createElement('div');
+    div.className='dim-card';
+    div.id='dc-dom'+i;
+    div.style.setProperty('--dc',DOM_COLS[i]);
+    div.innerHTML=`
+      <div class="dc-hdr"><div class="dc-dot" style="background:${DOM_COLS[i]}"></div>
+      <div class="dc-name" style="color:${DOM_COLS[i]}">D${i+1}·${DOM_NAMES[i].toUpperCase()}</div></div>
+      <div class="dc-sw">
+        <input type="range" class="dc-sl" id="ds-dom${i}" min="0" max="100" value="${d}"
+          style="accent-color:${DOM_COLS[i]}" oninput="updateDomain(${i},this.value)">
+        <div class="dc-v" id="dv-dom${i}" style="color:${DOM_COLS[i]}">${d}</div>
+      </div>`;
+    div.addEventListener('click',e=>{e.stopPropagation();setFocusDom(i);});
+    domc.appendChild(div);
+  });
+  // Domain status bars
+  const db=document.getElementById('domain-bars');
+  DOM_COLS.forEach((c,i)=>{
+    db.innerHTML+=`<div class="dsrow">
+      <span class="dslabel" style="color:${c}">D${i+1}</span>
+      <div class="dsbwrap"><div class="dsb" id="dsb${i}" style="background:${c};width:${domains[i]}%"></div></div>
+      <span class="dsv" id="dsv${i}">${domains[i]}</span>
+    </div>`;
+  });
+  // Bottom ticker
+  const bt=document.getElementById('bot-ticker');
+  dims.forEach((d,i)=>{
+    bt.innerHTML+=`<span style="display:flex;align-items:center;gap:4px">
+      <span style="width:4px;height:4px;border-radius:50%;background:${DIM_COLS[i]};display:inline-block"></span>
+      <span style="font-size:8px">D${i+1}</span>
+      <span style="color:var(--text);font-family:'Orbitron',monospace;font-size:8px" id="bt${i}">${d}</span>
+    </span>`;
+  });
+}
+buildLeft();
+
+// ══════════════════════════════════════════════════════
+// INIT RING PARTICLES (stacked rings engine)
+function initRingParticles(){
+  ringParticles=[];
+  for(let i=0;i<60;i++){
+    const dim=i%7, ang=Math.random()*Math.PI*2, r=50+dim*38+Math.random()*20;
+    ringParticles.push({dim,ang,r,speed:(0.004+Math.random()*0.006)*(Math.random()<.5?1:-1),size:1+Math.random()*2});
+  }
+}
+initRingParticles();
+
+function injectVortex(cx3d,cy3d,cz3d){
+  const dim=focusDim>=0?focusDim:Math.floor(Math.random()*7);
+  vortices.push({
+    x:cx3d??( Math.random()-.5)*200, y:cy3d??( Math.random()-.5)*200, z:cz3d??( Math.random()-.5)*100,
+    vx:(Math.random()-.5)*1.2, vy:(Math.random()-.5)*1.2, vz:(Math.random()-.5)*0.8,
+    dim, color:DIM_COLS[dim], size:3+Math.random()*5, age:0, trail:[], spin:(Math.random()-.5)*.07
+  });
+  log(`Vortex injected → D${dim+1}·${DIM_NAMES[dim]}`,DIM_COLS[dim]);
+}
+
+// ══════════════════════════════════════════════════════
+// INIT 7D RINGS
+function init7DRings(){
+  rings7d=[];
+  for(let i=0;i<7;i++){
+    const n=3+i*2;
+    for(let j=0;j<n;j++){
+      rings7d.push({
+        dim:i, layer:j, radius:36+i*44+j*10,
+        tX:(i*23+j*17)*Math.PI/180, tY:(i*37+j*11)*Math.PI/180,
+        speed:(0.002+i*.0007)*(j%2?-1:1), phase:(i*THETA/57+j*.618)*Math.PI/180,
+        opacity:.1+(7-i)*.04, color:DIM_COLS[i], thick:.4+(7-i)*.25
+      });
+    }
+  }
+}
+init7DRings();
+
+// ══════════════════════════════════════════════════════
+// DRAW — STACKED RINGS ENGINE
+let rotX=0.3, rotY=0, draggingR=false, lmx=0, lmy=0;
+document.getElementById('cRings').addEventListener('mousedown',e=>{draggingR=true;lmx=e.clientX;lmy=e.clientY});
+document.addEventListener('mousemove',e=>{if(draggingR){rotY+=(e.clientX-lmx)*.006;rotX+=(e.clientY-lmy)*.004;rotX=Math.max(-.8,Math.min(.8,rotX));lmx=e.clientX;lmy=e.clientY}});
+document.addEventListener('mouseup',()=>{draggingR=false});
+
+function project3(x,y,z,W,H){
+  const cosY=Math.cos(rotY),sinY=Math.sin(rotY);
+  const x1=x*cosY-z*sinY, z1=x*sinY+z*cosY;
+  const cosX=Math.cos(rotX),sinX=Math.sin(rotX);
+  const y1=y*cosX-z1*sinX, z2=y*sinX+z1*cosX;
+  const fov=500, sc=fov/(fov+z2+300);
+  return {sx:W/2+x1*sc, sy:H/2+y1*sc, sc, z:z2};
+}
+
+function drawRings(){
+  ctxR.clearRect(0,0,RW,RH);
+  const bg=ctxR.createRadialGradient(RW/2,RH/2,0,RW/2,RH/2,Math.max(RW,RH)*.7);
+  bg.addColorStop(0,'#030e20'); bg.addColorStop(1,'#010406');
+  ctxR.fillStyle=bg; ctxR.fillRect(0,0,RW,RH);
+  // Draw ring particles (simple orbit)
+  ringParticles.forEach(p=>{
+    const scale=dims[p.dim]/100;
+    if(scale<.05) return;
+    p.ang+=(phiOn?p.speed/PHI:p.speed);
+    const r=p.r*scale;
+    const px=RW/2+Math.cos(p.ang)*r;
+    const py=RH/2+Math.sin(p.ang)*r*.38;
+    const alpha=.3+.4*Math.sin(t*2+p.ang)*scale*(focusDim===p.dim?2:1);
+    ctxR.beginPath(); ctxR.arc(px,py,p.size*(focusDim===p.dim?1.8:1),0,Math.PI*2);
+    ctxR.fillStyle=DIM_COLS[p.dim]+Math.floor(Math.abs(alpha)*255).toString(16).padStart(2,'0');
+    ctxR.fill();
+  });
+  // Draw ring outlines
+  for(let i=0;i<7;i++){
+    const r=50+i*38, scale=dims[i]/100;
+    const alpha=(.05+.04*Math.sin(t*.4+i))*(focusDim===i?2.5:1)*scale;
+    ctxR.beginPath();
+    ctxR.ellipse(RW/2,RH/2,r*scale,r*.35*scale,rotY*.3,0,Math.PI*2);
+    ctxR.strokeStyle=DIM_COLS[i]+Math.floor(alpha*255).toString(16).padStart(2,'0');
+    ctxR.lineWidth=(focusDim===i?2:0.8);
+    ctxR.stroke();
+    // Label
+    if(scale>.2){
+      ctxR.fillStyle=DIM_COLS[i]+Math.floor(.3*scale*255).toString(16).padStart(2,'0');
+      ctxR.font='8px Share Tech Mono';
+      ctxR.fillText(`R${i+1}`,RW/2+r*scale+4,RH/2+4);
+    }
+  }
+  // Draw vortices
+  vortices.forEach((v,idx)=>{
+    v.age++;
+    v.x+=v.vx*(dims[v.dim]/100); v.y+=v.vy*(dims[v.dim]/100); v.z+=v.vz*(dims[v.dim]/100);
+    v.vx*=.96; v.vy*=.96; v.vz*=.96;
+    // Orbital pull
+    const r=Math.sqrt(v.x*v.x+v.z*v.z), tr=60+v.dim*38;
+    if(r>.1){v.vx+=(v.x/r)*(tr-r)*.0008; v.vz+=(v.z/r)*(tr-r)*.0008; v.vx+=(-v.z/r)*.6; v.vz+=(v.x/r)*.6;}
+    const pr=project3(v.x,v.y,v.z,RW,RH);
+    v.trail.push({sx:pr.sx,sy:pr.sy,s:pr.sc});
+    if(v.trail.length>30) v.trail.shift();
+    for(let i=1;i<v.trail.length;i++){
+      const a=(i/v.trail.length)*.4;
+      ctxR.beginPath(); ctxR.moveTo(v.trail[i-1].sx,v.trail[i-1].sy); ctxR.lineTo(v.trail[i].sx,v.trail[i].sy);
+      ctxR.strokeStyle=v.color+Math.floor(a*255).toString(16).padStart(2,'0'); ctxR.lineWidth=1.2*v.trail[i].s; ctxR.stroke();
+    }
+    const grd=ctxR.createRadialGradient(pr.sx,pr.sy,0,pr.sx,pr.sy,v.size*pr.sc*3);
+    grd.addColorStop(0,v.color+'ff'); grd.addColorStop(1,v.color+'00');
+    ctxR.beginPath(); ctxR.arc(pr.sx,pr.sy,v.size*pr.sc*3,0,Math.PI*2); ctxR.fillStyle=grd; ctxR.fill();
+    ctxR.beginPath(); ctxR.arc(pr.sx,pr.sy,v.size*pr.sc*.4,0,Math.PI*2); ctxR.fillStyle='#fff'; ctxR.fill();
+    if(v.age>600) vortices.splice(idx,1);
+  });
+  // Center source glow
+  const srcA=dims[6]/100*.8;
+  const sg=ctxR.createRadialGradient(RW/2,RH/2,0,RW/2,RH/2,50);
+  sg.addColorStop(0,`rgba(255,255,255,${.18*srcA})`); sg.addColorStop(1,'rgba(255,255,255,0)');
+  ctxR.beginPath(); ctxR.arc(RW/2,RH/2,50,0,Math.PI*2); ctxR.fillStyle=sg; ctxR.fill();
+  const pulse=.5+.5*Math.sin(t*.06);
+  ctxR.beginPath(); ctxR.arc(RW/2,RH/2,2+pulse*3,0,Math.PI*2); ctxR.fillStyle=`rgba(255,255,255,${.7*srcA})`; ctxR.fill();
+}
+
+// ══════════════════════════════════════════════════════
+// DRAW — 7D FRAMEWORK
+function draw7D(){
+  ctx7.clearRect(0,0,SW,SH);
+  const bg=ctx7.createRadialGradient(SW/2,SH/2,0,SW/2,SH/2,Math.max(SW,SH)*.7);
+  bg.addColorStop(0,'#030e20'); bg.addColorStop(1,'#010406');
+  ctx7.fillStyle=bg; ctx7.fillRect(0,0,SW,SH);
+  // Draw rings in 3D
+  rings7d.sort((a,b)=>{
+    const pa=project3(0,0,a.radius*Math.sin(a.tY),SW,SH);
+    const pb=project3(0,0,b.radius*Math.sin(b.tY),SW,SH);
+    return pb.z-pa.z;
+  });
+  rings7d.forEach(ring=>{
+    ring.phase+=ring.speed*(phiOn?1/PHI:1)*(dims[ring.dim]/100);
+    const r=ring.radius*(dims[ring.dim]/100);
+    if(r<4) return;
+    const cosX=Math.cos(ring.tX+ring.phase*.3), sinX=Math.sin(ring.tX+ring.phase*.3);
+    const cosY=Math.cos(ring.tY+ring.phase*.2), sinY=Math.sin(ring.tY+ring.phase*.2);
+    const pts=80, projected=[];
+    for(let i=0;i<=pts;i++){
+      const ang=(i/pts)*Math.PI*2;
+      let lx=Math.cos(ang)*r, ly=Math.sin(ang)*r, lz=0;
+      const y2=ly*cosX-lz*sinX, z2=ly*sinX+lz*cosX;
+      const x3=lx*cosY-z2*sinY, z3=lx*sinY+z2*cosY;
+      projected.push(project3(x3,y2,z3,SW,SH));
+    }
+    const alpha=ring.opacity*(dims[ring.dim]/100)*(focusDim===ring.dim?2.5:1);
+    if(alpha<.01) return;
+    ctx7.beginPath();
+    projected.forEach((p,i)=>{i===0?ctx7.moveTo(p.sx,p.sy):ctx7.lineTo(p.sx,p.sy)});
+    ctx7.strokeStyle=ring.color+Math.floor(alpha*255).toString(16).padStart(2,'0');
+    ctx7.lineWidth=ring.thick*(focusDim===ring.dim?2.2:1)*(projected[0]?.sc||1)*.8;
+    ctx7.stroke();
+    if(focusDim===ring.dim&&ring.layer===0){
+      ctx7.strokeStyle=ring.color+'33'; ctx7.lineWidth=ring.thick*7; ctx7.stroke();
+    }
+  });
+  // D7 source
+  const s7=dims[6]/100;
+  if(s7>.05){
+    const sg=ctx7.createRadialGradient(SW/2,SH/2,0,SW/2,SH/2,60*s7);
+    sg.addColorStop(0,`rgba(255,255,255,${.2*s7})`); sg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx7.beginPath(); ctx7.arc(SW/2,SH/2,60,0,Math.PI*2); ctx7.fillStyle=sg; ctx7.fill();
+    ctx7.beginPath(); ctx7.arc(SW/2,SH/2,2+2*Math.sin(t*.05),0,Math.PI*2);
+    ctx7.fillStyle=`rgba(255,255,255,${.6*s7})`; ctx7.fill();
+  }
+  // Auto-rotate
+  rotY+=.002*(phiOn?1/PHI:1);
+}
+
+// ══════════════════════════════════════════════════════
+// DRAW — WARP BUBBLE (with sync from other engines)
+function drawWarp(){
+  ctxW.clearRect(0,0,WW,WH);
+  const bg=ctxW.createRadialGradient(WW/2,WH/2,0,WW/2,WH/2,Math.max(WW,WH)*.7);
+  bg.addColorStop(0,'#030e20'); bg.addColorStop(1,'#010406');
+  ctxW.fillStyle=bg; ctxW.fillRect(0,0,WW,WH);
+  const cx=WW/2, cy=WH/2;
+  const vs=warpOn?3*Math.pow(PHI,Math.min(step_n*.06,6)):0;
+  const spF=Math.min(vs/10,1);
+  // D5 Vortex dimension feeds bubble radius
+  const bubR=80+dims[4]/100*40;
+  const wallS=12+domains[1]/100*10;
+  const twistA=step_n*THETA*Math.PI/180;
+
+  // Grid fabric
+  for(let gx=-WW;gx<WW*2;gx+=36){
+    ctxW.beginPath();
+    for(let gy=0;gy<=WH;gy+=4){
+      const dx=gx-cx,dy=gy-cy, r=Math.sqrt(dx*dx+dy*dy);
+      const f=.5*(1-Math.tanh((r-bubR)/wallS));
+      const wx=warpOn?-f*spF*60*(dx/(r+1)):0;
+      gy===0?ctxW.moveTo(gx+wx,gy):ctxW.lineTo(gx+wx,gy);
+    }
+    ctxW.strokeStyle=`rgba(46,109,164,${.05+spF*.04})`; ctxW.lineWidth=.5; ctxW.stroke();
+  }
+  for(let gy=0;gy<WH;gy+=36){
+    ctxW.beginPath();
+    for(let gx=0;gx<=WW;gx+=4){
+      const dx=gx-cx,dy=gy-cy, r=Math.sqrt(dx*dx+dy*dy);
+      const f=.5*(1-Math.tanh((r-bubR)/wallS));
+      const wy=warpOn?-f*spF*30*(dy/(r+1)):0;
+      gx===0?ctxW.moveTo(gx,gy+wy):ctxW.lineTo(gx,gy+wy);
+    }
+    ctxW.strokeStyle=`rgba(46,109,164,${.05+spF*.04})`; ctxW.lineWidth=.5; ctxW.stroke();
+  }
+
+  if(warpOn){
+    // Space contraction ahead
+    const cg=ctxW.createRadialGradient(cx-bubR*1.4,cy,0,cx-bubR*1.4,cy,bubR*1.2);
+    cg.addColorStop(0,`rgba(0,0,0,${.65*spF})`); cg.addColorStop(1,'rgba(0,0,0,0)');
+    ctxW.beginPath(); ctxW.ellipse(cx-bubR*1.4,cy,bubR*1.2,bubR*.65,0,0,Math.PI*2);
+    ctxW.fillStyle=cg; ctxW.fill();
+    // Space expansion behind
+    const eg=ctxW.createRadialGradient(cx+bubR*1.4,cy,0,cx+bubR*1.4,cy,bubR*1.5);
+    eg.addColorStop(0,`rgba(201,168,76,${.07*spF})`); eg.addColorStop(0.4,`rgba(31,212,200,${.04*spF})`); eg.addColorStop(1,'rgba(0,0,0,0)');
+    ctxW.beginPath(); ctxW.ellipse(cx+bubR*1.4,cy,bubR*1.5,bubR*.85,0,0,Math.PI*2);
+    ctxW.fillStyle=eg; ctxW.fill();
+    // Bubble wall rings — D1 domain feeds exotic matter
+    const d1=domains[0]/100;
+    for(let ri=0;ri<7;ri++){
+      const frac=ri/6;
+      const rr=bubR*(.72+frac*.56);
+      const wA=Math.exp(-Math.pow((rr-bubR)/wallS,2))*.75;
+      if(wA<.02) continue;
+      const ringTwist=twistOn?twistA+ri*.3:twistA;
+      const pts=100;
+      ctxW.beginPath();
+      for(let j=0;j<=pts;j++){
+        const ang=(j/pts)*Math.PI*2;
+        const px2=cx+Math.cos(ang)*rr;
+        const py2=cy+Math.sin(ang)*rr*.32;
+        const tx=cx+(px2-cx)*Math.cos(ringTwist*frac*.18)-(py2-cy)*Math.sin(ringTwist*frac*.09);
+        const ty=cy+(px2-cx)*Math.sin(ringTwist*frac*.09)+(py2-cy)*Math.cos(ringTwist*frac*.18);
+        j===0?ctxW.moveTo(tx,ty):ctxW.lineTo(tx,ty);
+      }
+      const wc=frac<.5?`rgba(31,212,200,${wA*d1})`:`rgba(201,168,76,${wA*d1})`;
+      ctxW.strokeStyle=wc; ctxW.lineWidth=1+wA; ctxW.stroke();
+    }
+    // Interior bubble
+    const bi=ctxW.createRadialGradient(cx,cy,0,cx,cy,bubR*.82);
+    bi.addColorStop(0,`rgba(20,40,80,${.35*spF})`); bi.addColorStop(1,'rgba(0,0,0,0)');
+    ctxW.beginPath(); ctxW.ellipse(cx,cy,bubR*.82,bubR*.27,0,0,Math.PI*2); ctxW.fillStyle=bi; ctxW.fill();
+    // D6 Conscious → passenger aura
+    const d4=domains[3]/100;
+    for(let ri=0;ri<4;ri++){
+      const rr2=12+ri*8+3*Math.sin(t*.7+ri*PHI);
+      ctxW.beginPath(); ctxW.arc(cx,cy,rr2,0,Math.PI*2);
+      ctxW.strokeStyle=`rgba(236,72,153,${.07*d4*(4-ri)/4})`; ctxW.lineWidth=1.2; ctxW.stroke();
+    }
+    // D2 oscillatory twist lines
+    const d2=domains[1]/100;
+    for(let ti=0;ti<8;ti++){
+      const ang0=ti*THETA*Math.PI/180+t*.12;
+      ctxW.beginPath();
+      ctxW.moveTo(cx+Math.cos(ang0)*bubR*.5, cy+Math.sin(ang0)*bubR*.18);
+      ctxW.lineTo(cx+Math.cos(ang0+.38)*bubR*1.3, cy+Math.sin(ang0+.38)*bubR*.42);
+      ctxW.strokeStyle=`rgba(201,168,76,${.12*d2})`; ctxW.lineWidth=.7; ctxW.stroke();
+    }
+    // D3 destination beam
+    const d3=domains[2]/100;
+    const bG=ctxW.createLinearGradient(cx,cy,cx-WW*.42,cy);
+    bG.addColorStop(0,`rgba(139,92,246,${.28*d3})`); bG.addColorStop(1,'rgba(139,92,246,0)');
+    ctxW.beginPath();
+    ctxW.moveTo(cx-bubR,cy-7); ctxW.lineTo(cx-WW*.42,cy-18); ctxW.lineTo(cx-WW*.42,cy+18); ctxW.lineTo(cx-bubR,cy+7);
+    ctxW.fillStyle=bG; ctxW.fill();
+    // D5 regenerative particles in wake
+    const d5=domains[4]/100;
+    for(let ri=0;ri<Math.floor(d5*14);ri++){
+      const rx=cx+bubR*1.2+Math.random()*WW*.28;
+      const ry=cy+(Math.random()-.5)*70;
+      ctxW.beginPath(); ctxW.arc(rx,ry,.9,0,Math.PI*2);
+      ctxW.fillStyle=`rgba(34,197,94,${.15+.2*Math.sin(t*3+ri)})`; ctxW.fill();
+    }
+    // Phi-twist indicator lines
+    if(twistOn){
+      for(let li=0;li<10;li++){
+        const ang2=li*THETA*Math.PI/180+t*.04;
+        ctxW.beginPath();
+        ctxW.moveTo(cx+Math.cos(ang2)*bubR*.25,cy+Math.sin(ang2)*bubR*.1);
+        ctxW.lineTo(cx+Math.cos(ang2)*bubR*1.18,cy+Math.sin(ang2)*bubR*.38);
+        ctxW.strokeStyle=`rgba(74,159,212,${.07+.05*Math.sin(t+li)})`; ctxW.lineWidth=.55;
+        ctxW.setLineDash([3,6]); ctxW.stroke(); ctxW.setLineDash([]);
+      }
+    }
+    // Ship dot
+    ctxW.beginPath(); ctxW.arc(cx,cy,6,0,Math.PI*2);
+    const sg2=ctxW.createRadialGradient(cx,cy,0,cx,cy,6);
+    sg2.addColorStop(0,'rgba(255,255,255,0.9)'); sg2.addColorStop(1,'rgba(74,159,212,0)');
+    ctxW.fillStyle=sg2; ctxW.fill();
+    ctxW.beginPath(); ctxW.arc(cx,cy,2,0,Math.PI*2); ctxW.fillStyle='#fff'; ctxW.fill();
+    // Wake trail
+    const wt=ctxW.createLinearGradient(cx+bubR,cy,cx+WW*.48,cy);
+    wt.addColorStop(0,`rgba(201,168,76,${.12*spF})`); wt.addColorStop(1,'rgba(0,0,0,0)');
+    ctxW.beginPath(); ctxW.ellipse(cx+bubR*1.25,cy,WW*.28,bubR*.22,0,0,Math.PI*2); ctxW.fillStyle=wt; ctxW.fill();
+  } else {
+    // Standby rings
+    for(let ri=0;ri<5;ri++){
+      const rr=55+ri*38, alpha=.03+.015*Math.sin(t*.5+ri);
+      ctxW.beginPath(); ctxW.ellipse(cx,cy,rr,rr*.35,twistA*.2,0,Math.PI*2);
+      ctxW.strokeStyle=`rgba(46,109,164,${alpha})`; ctxW.lineWidth=.8; ctxW.stroke();
+    }
+    ctxW.fillStyle='rgba(58,90,122,0.4)';
+    ctxW.font='11px Share Tech Mono';
+    ctxW.textAlign='center';
+    ctxW.fillText('ENGAGE WARP TO ACTIVATE TWISTED ZIPPER DRIVE',cx,cy+10);
+    ctxW.textAlign='left';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// DRAW — PHI SPIRAL
+function drawPhiSpiral(){
+  const pw=180,ph=180;
+  cP.width=pw; cP.height=ph;
+  ctxP.fillStyle='rgba(2,8,16,0.85)'; ctxP.fillRect(0,0,pw,ph);
+  for(let r=24;r<=80;r+=24){
+    ctxP.beginPath(); ctxP.arc(pw/2,ph/2,r,0,Math.PI*2);
+    ctxP.strokeStyle='rgba(46,109,164,0.1)'; ctxP.lineWidth=.5; ctxP.stroke();
+  }
+  const maxDots=60+step_n;
+  for(let i=0;i<Math.min(maxDots,180);i++){
+    const ang=i*THETA*Math.PI/180, r2=4+i*.4;
+    if(r2>82) break;
+    const px=pw/2+Math.cos(ang)*r2, py=ph/2+Math.sin(ang)*r2;
+    const hue=(i*7)%360, alpha=warpOn?.85:.4;
+    ctxP.beginPath(); ctxP.arc(px,py,1.5+Math.sin(t+i*.3)*.4,0,Math.PI*2);
+    ctxP.fillStyle=`hsla(${hue},80%,65%,${alpha})`; ctxP.fill();
+  }
+  const ca=step_n*THETA*Math.PI/180, cr=Math.min(4+step_n*.28,82);
+  const cpx=pw/2+Math.cos(ca)*cr, cpy=ph/2+Math.sin(ca)*cr;
+  const cg=ctxP.createRadialGradient(cpx,cpy,0,cpx,cpy,6);
+  cg.addColorStop(0,'rgba(255,255,255,1)'); cg.addColorStop(1,'rgba(31,212,200,0)');
+  ctxP.beginPath(); ctxP.arc(cpx,cpy,5,0,Math.PI*2); ctxP.fillStyle=cg; ctxP.fill();
+  ctxP.fillStyle='rgba(201,168,76,0.75)';
+  ctxP.font='8px Share Tech Mono';
+  ctxP.fillText(`n=${step_n}`,3,ph-10);
+  ctxP.fillText(`θ=${((step_n*THETA)%360).toFixed(1)}°`,3,ph-2);
+}
+
+// ══════════════════════════════════════════════════════
+// UPDATE STATS
+function updateStats(){
+  const vs=warpOn?3*Math.pow(PHI,Math.min(step_n*.06,6)):0;
+  const tDeg=((step_n*THETA)%360).toFixed(1);
+  const ctotal=domains.reduce((a,d,i)=>a+d/100*[.25,.2,.2,.2,.15][i],0);
+  const rho=1+(warpOn?0.3*(domains[0]/100):0);
+  const hn=Math.abs(Math.sin(t*.025))*(dims[3]/100);
+  fabric=Math.max(60,Math.min(100,fabric+(domains[4]/100)*.4-(warpOn?.18:0)));
+
+  document.getElementById('ts-phi').textContent='φ='+PHI.toFixed(4);
+  document.getElementById('ts-n').textContent=step_n;
+  document.getElementById('ts-vs').textContent=vs.toFixed(3)+'c';
+  document.getElementById('ts-twist').textContent=tDeg+'°';
+  document.getElementById('ts-ctotal').textContent=ctotal.toFixed(3);
+  document.getElementById('ts-rings').textContent=rings7d.filter(r=>dims[r.dim]/100>.1).length;
+  document.getElementById('ts-vortex').textContent=vortices.length;
+
+  document.getElementById('fr-rho').textContent=rho.toFixed(3);
+  document.getElementById('fr-hn').textContent=hn.toFixed(3);
+  document.getElementById('fr-causal').textContent=twistOn?'SAFE':'RISK';
+  document.getElementById('fr-causal').style.color=twistOn?'var(--green)':'var(--red)';
+  document.getElementById('fr-fabric').textContent=fabric.toFixed(0)+'%';
+
+  // Sync dimensions to sliders/labels
+  dims.forEach((d,i)=>{
+    document.getElementById('dv-dim'+i).textContent=d;
+    document.getElementById('bt'+i).textContent=d;
+  });
+  // Domain status bars
+  domains.forEach((d,i)=>{
+    document.getElementById('dsb'+i).style.width=d+'%';
+    document.getElementById('dsv'+i).textContent=d;
+    document.getElementById('dv-dom'+i).textContent=d;
+  });
+
+  document.getElementById('bot-frame').textContent='FRAME '+frame;
+}
+
+// ══════════════════════════════════════════════════════
+// SYNC — When systems are connected, feed data between them
+function syncSystems(){
+  if(!syncOn) return;
+  // Rings → 7D: focused dimension amplifies 7D ring opacity
+  if(focusDim>=0) rings7d.filter(r=>r.dim===focusDim).forEach(r=>{ r.opacity=Math.min(.6,r.opacity*1.002); });
+  // 7D D5 Vortex → Warp: vortex count influences bubble wall density
+  const vortexInfluence=Math.min(vortices.length/10,1);
+  if(warpOn) domains[0]=Math.max(50,Math.min(100,domains[0]+vortexInfluence*.5-0.3));
+  // Warp step_n → Ring rotation: warp drive step modulates ring speeds
+  if(warpOn) rings7d.forEach(r=>{ r.speed*=1+(Math.sin(step_n*THETA*Math.PI/180)*.0001); });
+  // Warp fabric → D5: fabric integrity feeds regenerative domain
+  if(warpOn) domains[4]=Math.max(40,Math.min(100,fabric));
+}
+
+// ══════════════════════════════════════════════════════
+// EVENT LOG
+const elogEl=document.getElementById('elog');
+function log(msg,col=''){
+  const div=document.createElement('div');
+  div.className='el fresh';
+  div.innerHTML=`<span class="et">n=${String(step_n).padStart(4,'0')}</span>${msg}`;
+  if(col) div.style.color=col;
+  elogEl.prepend(div);
+  if(elogEl.children.length>25) elogEl.removeChild(elogEl.lastChild);
+}
+
+// ══════════════════════════════════════════════════════
+// MAIN LOOP
+function loop(){
+  drawRings();
+  draw7D();
+  drawWarp();
+  drawPhiSpiral();
+  updateStats();
+  syncSystems();
+
+  if(warpOn){
+    const phi_step=phiOn?1/PHI:1;
+    xpos+=3*Math.pow(PHI,Math.min(step_n*.06,6))*.008*phi_step;
+    if(frame%7===0) step_n++;
+  }
+
+  if(frame-lastLog>45){
+    lastLog=frame;
+    if(warpOn){
+      const pool=[
+        [`D2: twist Θ_n=${((step_n*THETA)%360).toFixed(1)}° — resonance suppressed`,'var(--gold)'],
+        [`D1: exotic matter ρ_em=${(domains[0]/100*.4).toFixed(3)} — bubble wall stable`,'var(--teal)'],
+        [`D5: fabric integrity ${fabric.toFixed(0)}% — repair active`,'var(--green)'],
+        [`D4: passenger phase-lock — Φ-clock synchronized`,'var(--pink)'],
+        [`D3: ring-field attractor locked — destination encoded`,'var(--violet)'],
+        [`Ring sync: ${rings7d.filter(r=>dims[r.dim]/100>.5).length} active ring layers feeding warp`,'var(--bright)'],
+      ];
+      const ev=pool[Math.floor(Math.random()*pool.length)];
+      log(ev[0],ev[1]);
+    } else if(vortices.length>0){
+      log(`Vortex interaction — ${vortices.length} active vortices in ring field`,'var(--teal)');
+    }
+  }
+
+  t+=.016; frame++;
+  requestAnimationFrame(loop);
+}
+loop();
+
+// ══════════════════════════════════════════════════════
+// CONTROLS
+function toggleWarp(){
+  warpOn=!warpOn;
+  const btn=document.getElementById('btn-warp');
+  btn.classList.toggle('on',warpOn);
+  btn.textContent=warpOn?'⚡ DISENGAGE':'⚡ WARP';
+  const dot=document.getElementById('warp-dot');
+  dot.className='conn-dot '+(warpOn?'live':'inactive-dot');
+  dot.style.background=warpOn?'var(--teal)':'var(--dim)';
+  document.getElementById('warp-status').textContent=warpOn?'TWISTED ZIPPER ACTIVE — Φ-MODULATED WARP BUBBLE ONLINE':'TWISTED ZIPPER · Standby — Engage warp to activate';
+  log(warpOn?'WARP ENGAGED — all 5 domains synchronized':'WARP DISENGAGED — bubble dissolved',warpOn?'var(--teal)':'var(--red)');
+}
+function togglePhi(){
+  phiOn=!phiOn;
+  document.getElementById('btn-phi').classList.toggle('on',phiOn);
+  log(phiOn?'Φ-Time ACTIVE — golden angle scheduling 222.5°':'Φ-Time DISABLED — periodic mode engaged',phiOn?'var(--gold)':'var(--red)');
+}
+function toggleTwist(){
+  twistOn=!twistOn;
+  document.getElementById('btn-twist').classList.toggle('on',twistOn);
+  log(twistOn?'Helical twist ENABLED — causal protection active':'WARNING: twist DISABLED — CTC risk elevated',twistOn?'var(--green)':'var(--red)');
+}
+function toggleConnect(){
+  syncOn=!syncOn;
+  document.getElementById('btn-connect').classList.toggle('on',syncOn);
+  log(syncOn?'SYSTEM SYNC ENABLED — all three engines connected':'SYSTEM SYNC DISABLED — engines running independently',syncOn?'var(--bright)':'var(--dim)');
+}
+function resetAll(){
+  warpOn=false;step_n=0;xpos=0;fabric=100;
+  dims=[80,65,55,70,45,60,100]; domains=[80,75,65,90,70];
+  vortices=[]; initRingParticles(); init7DRings();
+  dims.forEach((d,i)=>{document.getElementById('ds-dim'+i).value=d;document.getElementById('dv-dim'+i).textContent=d;});
+  domains.forEach((d,i)=>{document.getElementById('ds-dom'+i).value=d;});
+  document.getElementById('btn-warp').classList.remove('on');
+  document.getElementById('btn-warp').textContent='⚡ WARP';
+  log('SYSTEM RESET — all parameters restored to default','var(--bright)');
+}
+function updateDim(i,v){dims[i]=parseInt(v);document.getElementById('dv-dim'+i).textContent=v;}
+function updateDomain(i,v){domains[i]=parseInt(v);document.getElementById('dv-dom'+i).textContent=v;}
+
+function setFocusDim(i){
+  focusDim=focusDim===i?-1:i;
+  document.querySelectorAll('.dim-card[id^="dc-dim"]').forEach((el,j)=>el.classList.toggle('active',j===focusDim));
+  if(focusDim>=0) log(`D${focusDim+1}·${DIM_NAMES[focusDim]} focused — ring layer amplified`,DIM_COLS[focusDim]);
+}
+function setFocusDom(i){
+  focusDom=focusDom===i?-1:i;
+  document.querySelectorAll('.dim-card[id^="dc-dom"]').forEach((el,j)=>el.classList.toggle('active',j===focusDom));
+}
+
+function clickPane(pane,e){
+  if(pane==='rings'){
+    const rect=document.getElementById('cRings').getBoundingClientRect();
+    const cx=(e.clientX-rect.left-RW/2)*.7, cy=(e.clientY-rect.top-RH/2)*.7;
+    injectVortex(cx,cy,(Math.random()-.5)*120);
+  } else if(pane==='7d'){
+    setFocusDim((focusDim+2)%7);
+  } else if(pane==='warp'){
+    if(!warpOn) toggleWarp();
+  }
+}
+
+// Splash remove
+setTimeout(()=>{const s=document.getElementById('splash');if(s)s.remove();},4500);
+
+// Initial logs
+log('GUF MASTER ENGINE initialized — all three simulations online','var(--bright)');
+log('STACKED RINGS ENGINE: 7 ring layers + vortex dynamics active','var(--teal)');
+log('7D FRAMEWORK ENGINE: 7 dimensional field simulation active','var(--gold)');
+log('TWISTED ZIPPER ENGINE: Alcubierre+Φ-twist metric standby','var(--violet)');
+log('5-Domain Event Bus: C_total minimization running','var(--green)');
+log('System sync ENABLED — all three engines share state','var(--bright)');
+</script>
+</body>
+</html>
