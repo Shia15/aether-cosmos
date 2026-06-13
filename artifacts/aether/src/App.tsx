@@ -192,6 +192,7 @@ import AetherCalendarPage from "@/pages/aether-calendar";
 import AllBusinessIdeasPage from "@/pages/all-business-ideas";
 import GufEnginePage from "@/pages/guf-engine";
 import PropulsionEnginePage from "@/pages/propulsion-engine";
+import StringNanobotPage from "@/pages/string-nanobot";
 
 const queryClient = new QueryClient();
 
@@ -387,6 +388,7 @@ function Router() {
         <Route path="/all-business-ideas" component={AllBusinessIdeasPage} />
         <Route path="/guf-engine" component={GufEnginePage} />
         <Route path="/propulsion-engine" component={PropulsionEnginePage} />
+        <Route path="/string-nanobot" component={StringNanobotPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
