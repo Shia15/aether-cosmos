@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twisted Zipper Warp Bubble Engine — Shia Miller</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:    #010408;
+  --deep:    #030c18;
+  --panel:   #060f1e;
+  --ring1:   #0a1628;
+  --ring2:   #0d1f3c;
+  --border:  rgba(46,109,164,0.18);
+  --border2: rgba(46,109,164,0.35);
+  --acc:     #2e6da4;
+  --bright:  #4a9fd4;
+  --teal:    #1fd4c8;
+  --gold:    #c9a84c;
+  --violet:  #8b5cf6;
+  --red:     #ef4444;
+  --green:   #22c55e;
+  --orange:  #f97316;
+  --pink:    #ec4899;
+  --text:    #d4e8f7;
+  --dim:     #3a5a7a;
+  --phi:     1.6180339887;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--void);color:var(--text);font-family:'Rajdhani',sans-serif}
+
+/* ── BG RINGS ── */
+.bg-rings{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0;opacity:.04}
+.bg-ring{position:absolute;border-radius:50%;border:1px solid var(--bright);top:50%;left:50%;transform:translate(-50%,-50%);animation:bgSpin linear infinite}
+.bg-ring:nth-child(1){width:300px;height:300px;animation-duration:25s;border-color:var(--teal)}
+.bg-ring:nth-child(2){width:550px;height:550px;animation-duration:38s;animation-direction:reverse}
+.bg-ring:nth-child(3){width:800px;height:800px;animation-duration:55s;border-color:var(--gold)}
+.bg-ring:nth-child(4){width:1100px;height:1100px;animation-duration:80s;animation-direction:reverse;border-color:var(--violet)}
+@keyframes bgSpin{from{transform:translate(-50%,-50%) rotate(0deg) scaleX(1.8)}to{transform:translate(-50%,-50%) rotate(360deg) scaleX(1.8)}}
+
+/* ── LAYOUT ── */
+#app{position:relative;z-index:1;display:grid;grid-template-rows:56px 1fr 48px;grid-template-columns:220px 1fr 240px;width:100%;height:100%}
+
+/* ── TOPBAR ── */
+#topbar{grid-column:1/-1;grid-row:1;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:linear-gradient(180deg,rgba(1,4,8,.97) 0%,transparent 100%);border-bottom:1px solid var(--border)}
+.logo-title{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:900;letter-spacing:3px;color:var(--bright);text-shadow:0 0 20px var(--teal)}
+.logo-sub{font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-top:2px}
+.top-stats{display:flex;gap:24px;align-items:center}
+.stat-box{text-align:center}
+.stat-val{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:var(--bright);text-shadow:0 0 10px var(--teal)}
+.stat-lbl{font-size:8px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.top-btns{display:flex;gap:6px}
+.tbtn{font-family:'Share Tech Mono',monospace;font-size:10px;padding:6px 12px;background:rgba(46,109,164,.07);border:1px solid var(--border2);color:var(--bright);cursor:pointer;letter-spacing:1px;border-radius:2px;transition:all .2s;text-transform:uppercase}
+.tbtn:hover{background:rgba(46,109,164,.18);border-color:var(--bright);box-shadow:0 0 12px rgba(74,159,212,.2)}
+.tbtn.on{background:rgba(46,109,164,.25);border-color:var(--teal);color:#fff}
+
+/* ── LEFT PANEL — DOMAIN CONTROLS ── */
+#left{grid-column:1;grid-row:2;padding:16px 12px;background:linear-gradient(90deg,rgba(1,4,8,.92) 0%,transparent 100%);border-right:1px solid var(--border);overflow-y:auto;scrollbar-width:none}
+#left::-webkit-scrollbar{display:none}
+.panel-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+.domain-card{margin-bottom:10px;padding:10px;background:rgba(0,0,0,.35);border-radius:3px;border:1px solid transparent;transition:border-color .3s;cursor:pointer}
+.domain-card:hover{border-color:var(--border2)}
+.domain-card.active{border-color:var(--dc,var(--bright));box-shadow:0 0 16px color-mix(in srgb, var(--dc,var(--bright)) 15%, transparent)}
+.dc-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dc-name{font-family:'Orbitron',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px}
+.dc-desc{font-size:11px;color:var(--dim);line-height:1.45;margin-bottom:7px}
+.dc-slider-wrap{display:flex;align-items:center;gap:6px}
+.dc-slider{flex:1;-webkit-appearance:none;height:2px;border-radius:1px;background:var(--border);outline:none;cursor:pointer}
+.dc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;border-radius:50%;cursor:pointer;border:2px solid var(--void);box-shadow:0 0 6px currentColor}
+.dc-val{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--dim);width:28px;text-align:right}
+
+/* ── CENTER CANVAS ── */
+#center{grid-column:2;grid-row:2;position:relative;overflow:hidden}
+#warpCanvas{position:absolute;inset:0;width:100%;height:100%}
+#center-overlay{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none}
+.co-label{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:3px;color:rgba(74,159,212,.5);text-transform:uppercase}
+.co-eq{font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,.12);letter-spacing:1px;margin-top:4px}
+
+/* ── RIGHT PANEL ── */
+#right{grid-column:3;grid-row:2;padding:16px 12px;background:linear-gradient(270deg,rgba(1,4,8,.92) 0%,transparent 100%);border-left:1px solid var(--border);overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:10px}
+#right::-webkit-scrollbar{display:none}
+
+/* Field readouts */
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.field-card{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:2px;padding:7px;text-align:center}
+.fc-val{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;margin-bottom:2px}
+.fc-lbl{font-size:8px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+
+/* Phi spiral display */
+#phi-spiral-container{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:3px;padding:8px}
+#phiCanvas{width:100%;display:block}
+.phi-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim);text-align:center;margin-bottom:6px}
+
+/* Event log */
+#event-log{flex:1;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:3px;padding:10px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;min-height:120px;max-height:200px}
+.log-entry{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);padding:3px 0;border-bottom:1px solid var(--border);line-height:1.4}
+.log-entry.new{color:var(--teal)}
+.log-entry .log-t{color:var(--gold);margin-right:6px}
+
+/* Domain status bars */
+.domain-status{display:flex;flex-direction:column;gap:4px}
+.ds-row{display:flex;align-items:center;gap:6px}
+.ds-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--dim);width:24px;flex-shrink:0}
+.ds-bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.ds-bar{height:100%;border-radius:2px;transition:width .3s}
+.ds-val{font-family:'Orbitron',sans-serif;font-size:9px;color:var(--dim);width:28px;text-align:right;flex-shrink:0}
+
+/* ── BOTTOM BAR ── */
+#bottombar{grid-column:1/-1;grid-row:3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:linear-gradient(0deg,rgba(1,4,8,.97) 0%,transparent 100%);border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--dim)}
+.ticker{display:flex;gap:20px}
+.tick-item{display:flex;align-items:center;gap:5px}
+.tick-dot{width:4px;height:4px;border-radius:50%}
+
+/* Splash */
+#splash{position:fixed;inset:0;z-index:200;background:var(--void);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;animation:splashFade .5s ease 3.5s forwards}
+@keyframes splashFade{to{opacity:0;pointer-events:none}}
+.sp-title{font-family:'Orbitron',sans-serif;font-size:clamp(28px,6vw,56px);font-weight:900;letter-spacing:3px;background:linear-gradient(135deg,var(--teal),var(--bright),var(--gold),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:spIn .8s ease both}
+.sp-sub{font-family:'Rajdhani',sans-serif;font-size:18px;color:rgba(255,255,255,.35);letter-spacing:4px;animation:spIn .8s ease .6s both}
+.sp-attr{font-size:11px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;animation:spIn .8s ease 1.2s both}
+@keyframes spIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="bg-rings" aria-hidden="true">
+  <div class="bg-ring"></div><div class="bg-ring"></div>
+  <div class="bg-ring"></div><div class="bg-ring"></div>
+</div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="sp-title">TWISTED ZIPPER DRIVE</div>
+  <div class="sp-sub">Warp Bubble Simulation Engine</div>
+  <div class="sp-attr">Shia Miller · @StrategicProce · 2026</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div>
+      <div class="logo-title">TWISTED ZIPPER SPACETIME DRIVE</div>
+      <div class="logo-sub">Alcubierre Metric · Φ-Time Modulation · 5-Domain Event Bus · Ring-Field Navigation</div>
+    </div>
+    <div class="top-stats">
+      <div class="stat-box"><div class="stat-val" id="sv-vs">0.000c</div><div class="stat-lbl">Bubble v_s</div></div>
+      <div class="stat-box"><div class="stat-val" id="sv-twist">0.0°</div><div class="stat-lbl">Twist Θ_n</div></div>
+      <div class="stat-box"><div class="stat-val" id="sv-phi">φ=1.618</div><div class="stat-lbl">Φ-Clock</div></div>
+      <div class="stat-box"><div class="stat-val" id="sv-ctotal">0.000</div><div class="stat-lbl">C_total</div></div>
+      <div class="stat-box"><div class="stat-val" id="sv-n">0</div><div class="stat-lbl">Φ-Step n</div></div>
+      <div class="stat-box"><div class="stat-val" id="sv-xpos">0.0</div><div class="stat-lbl">x_pos (ly)</div></div>
+    </div>
+    <div class="top-btns">
+      <button class="tbtn" id="btn-warp" onclick="toggleWarp()">⚡ ENGAGE WARP</button>
+      <button class="tbtn on" id="btn-phi" onclick="togglePhi()">Φ PHI-TIME</button>
+      <button class="tbtn" id="btn-twist" onclick="toggleTwist()">⟳ TWIST</button>
+      <button class="tbtn" id="btn-domains" onclick="toggleDomains()">◎ DOMAINS</button>
+      <button class="tbtn" id="btn-reset" onclick="resetAll()">↺ RESET</button>
+    </div>
+  </div>
+
+  <!-- LEFT — DOMAIN CONTROLS -->
+  <div id="left">
+    <div class="panel-label">5-Domain Event Bus</div>
+
+    <div class="domain-card" id="dc1" style="--dc:var(--teal)" onclick="focusDomain(1)">
+      <div class="dc-header">
+        <div class="dc-dot" style="background:var(--teal)"></div>
+        <div class="dc-name" style="color:var(--teal)">D1 · PHYSICAL</div>
+      </div>
+      <div class="dc-desc">Exotic matter supply to bubble wall. Negative-energy density distributed across Φ-intervals.</div>
+      <div class="dc-slider-wrap">
+        <input type="range" class="dc-slider" id="ds1" min="0" max="100" value="80" style="accent-color:var(--teal)" oninput="updateDomain(1,this.value)">
+        <div class="dc-val" id="dv1" style="color:var(--teal)">80</div>
+      </div>
+    </div>
+
+    <div class="domain-card" id="dc2" style="--dc:var(--gold)" onclick="focusDomain(2)">
+      <div class="dc-header">
+        <div class="dc-dot" style="background:var(--gold)"></div>
+        <div class="dc-name" style="color:var(--gold)">D2 · OSCILLATORY</div>
+      </div>
+      <div class="dc-desc">Φ-Time twist rate adjustment. Resonance suppression. Bubble wall stability governor.</div>
+      <div class="dc-slider-wrap">
+        <input type="range" class="dc-slider" id="ds2" min="0" max="100" value="75" style="accent-color:var(--gold)" oninput="updateDomain(2,this.value)">
+        <div class="dc-val" id="dv2" style="color:var(--gold)">75</div>
+      </div>
+    </div>
+
+    <div class="domain-card" id="dc3" style="--dc:var(--violet)" onclick="focusDomain(3)">
+      <div class="dc-header">
+        <div class="dc-dot" style="background:var(--violet)"></div>
+        <div class="dc-name" style="color:var(--violet)">D3 · INFORMATIONAL</div>
+      </div>
+      <div class="dc-desc">500D destination vector. Ring-field attractor lock. Navigation pin encoding.</div>
+      <div class="dc-slider-wrap">
+        <input type="range" class="dc-slider" id="ds3" min="0" max="100" value="65" style="accent-color:var(--violet)" oninput="updateDomain(3,this.value)">
+        <div class="dc-val" id="dv3" style="color:var(--violet)">65</div>
+      </div>
+    </div>
+
+    <div class="domain-card" id="dc4" style="--dc:var(--pink)" onclick="focusDomain(4)">
+      <div class="dc-header">
+        <div class="dc-dot" style="background:var(--pink)"></div>
+        <div class="dc-name" style="color:var(--pink)">D4 · CONSCIOUS</div>
+      </div>
+      <div class="dc-desc">Passenger neural sync to Φ-clock. Biological oscillator phase-lock. Coherent flow state.</div>
+      <div class="dc-slider-wrap">
+        <input type="range" class="dc-slider" id="ds4" min="0" max="100" value="90" style="accent-color:var(--pink)" oninput="updateDomain(4,this.value)">
+        <div class="dc-val" id="dv4" style="color:var(--pink)">90</div>
+      </div>
+    </div>
+
+    <div class="domain-card" id="dc5" style="--dc:var(--green)" onclick="focusDomain(5)">
+      <div class="dc-header">
+        <div class="dc-dot" style="background:var(--green)"></div>
+        <div class="dc-name" style="color:var(--green)">D5 · REGENERATIVE</div>
+      </div>
+      <div class="dc-desc">Spacetime fabric repair. Micro-tear healing in bubble wake. Metric re-stitching.</div>
+      <div class="dc-slider-wrap">
+        <input type="range" class="dc-slider" id="ds5" min="0" max="100" value="70" style="accent-color:var(--green)" oninput="updateDomain(5,this.value)">
+        <div class="dc-val" id="dv5" style="color:var(--green)">70</div>
+      </div>
+    </div>
+
+    <div class="panel-label" style="margin-top:12px">Warp Parameters</div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="dc-slider-wrap">
+        <span style="font-size:10px;color:var(--dim);width:60px;font-family:'Share Tech Mono',monospace">v₀ base</span>
+        <input type="range" class="dc-slider" id="v0slider" min="1" max="10" value="3" step="0.1" style="accent-color:var(--bright)" oninput="updateV0(this.value)">
+        <div class="dc-val" id="v0val" style="color:var(--bright)">3.0</div>
+      </div>
+      <div class="dc-slider-wrap">
+        <span style="font-size:10px;color:var(--dim);width:60px;font-family:'Share Tech Mono',monospace">bubble R</span>
+        <input type="range" class="dc-slider" id="bradius" min="20" max="120" value="60" style="accent-color:var(--bright)" oninput="updateBR(this.value)">
+        <div class="dc-val" id="brval" style="color:var(--bright)">60</div>
+      </div>
+      <div class="dc-slider-wrap">
+        <span style="font-size:10px;color:var(--dim);width:60px;font-family:'Share Tech Mono',monospace">σ wall</span>
+        <input type="range" class="dc-slider" id="bwall" min="5" max="40" value="15" style="accent-color:var(--bright)" oninput="updateWall(this.value)">
+        <div class="dc-val" id="bwval" style="color:var(--bright)">15</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER CANVAS -->
+  <div id="center">
+    <canvas id="warpCanvas"></canvas>
+    <div id="center-overlay">
+      <div class="co-label" id="co-label">DRIVE STANDBY — ENGAGE WARP TO ACTIVATE</div>
+      <div class="co-eq">ds² = -dt² + [dx - v₀·φⁿ·f(r)·e^(in·222.5°)·dt]² + dy² + dz²</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right">
+    <div class="panel-label">Field Readouts</div>
+    <div class="field-grid">
+      <div class="field-card"><div class="fc-val" id="fr-rho" style="color:var(--bright)">1.000</div><div class="fc-lbl">ρ_info</div></div>
+      <div class="field-card"><div class="fc-val" id="fr-exotic" style="color:var(--red)">0.000</div><div class="fc-lbl">ρ_exotic</div></div>
+      <div class="field-card"><div class="fc-val" id="fr-grad" style="color:var(--gold)">0.000</div><div class="fc-lbl">∇ρ peak</div></div>
+      <div class="field-card"><div class="fc-val" id="fr-causal" style="color:var(--green)">SAFE</div><div class="fc-lbl">Causal</div></div>
+      <div class="field-card"><div class="fc-val" id="fr-fabric" style="color:var(--teal)">100%</div><div class="fc-lbl">Fabric</div></div>
+      <div class="field-card"><div class="fc-val" id="fr-phase" style="color:var(--pink)">0.0°</div><div class="fc-lbl">Obs Phase</div></div>
+    </div>
+
+    <div class="panel-label">Domain Status</div>
+    <div class="domain-status">
+      <div class="ds-row"><span class="ds-label" style="color:var(--teal)">D1</span><div class="ds-bar-wrap"><div class="ds-bar" id="dsb1" style="background:var(--teal);width:80%"></div></div><span class="ds-val" id="dsv1">80</span></div>
+      <div class="ds-row"><span class="ds-label" style="color:var(--gold)">D2</span><div class="ds-bar-wrap"><div class="ds-bar" id="dsb2" style="background:var(--gold);width:75%"></div></div><span class="ds-val" id="dsv2">75</span></div>
+      <div class="ds-row"><span class="ds-label" style="color:var(--violet)">D3</span><div class="ds-bar-wrap"><div class="ds-bar" id="dsb3" style="background:var(--violet);width:65%"></div></div><span class="ds-val" id="dsv3">65</span></div>
+      <div class="ds-row"><span class="ds-label" style="color:var(--pink)">D4</span><div class="ds-bar-wrap"><div class="ds-bar" id="dsb4" style="background:var(--pink);width:90%"></div></div><span class="ds-val" id="dsv4">90</span></div>
+      <div class="ds-row"><span class="ds-label" style="color:var(--green)">D5</span><div class="ds-bar-wrap"><div class="ds-bar" id="dsb5" style="background:var(--green);width:70%"></div></div><span class="ds-val" id="dsv5">70</span></div>
+    </div>
+
+    <div class="panel-label">Φ-Spiral Phase Map</div>
+    <div id="phi-spiral-container">
+      <div class="phi-title">GOLDEN ANGLE DISTRIBUTION · 222.5°</div>
+      <canvas id="phiCanvas" width="200" height="200"></canvas>
+    </div>
+
+    <div class="panel-label">Event Log</div>
+    <div id="event-log"></div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bottombar">
+    <div class="ticker">
+      <div class="tick-item"><div class="tick-dot" style="background:var(--teal)"></div><span>D1</span><span style="color:var(--text);margin-left:4px;font-family:'Orbitron',monospace;font-size:9px" id="bt1">80</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--gold)"></div><span>D2</span><span style="color:var(--text);margin-left:4px;font-family:'Orbitron',monospace;font-size:9px" id="bt2">75</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--violet)"></div><span>D3</span><span style="color:var(--text);margin-left:4px;font-family:'Orbitron',monospace;font-size:9px" id="bt3">65</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--pink)"></div><span>D4</span><span style="color:var(--text);margin-left:4px;font-family:'Orbitron',monospace;font-size:9px" id="bt4">90</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--green)"></div><span>D5</span><span style="color:var(--text);margin-left:4px;font-family:'Orbitron',monospace;font-size:9px" id="bt5">70</span></div>
+    </div>
+    <div>TWISTED ZIPPER SPACETIME DRIVE · Φ-COHERENCE · SHIA MILLER @StrategicProce 2026</div>
+    <div id="framecount" style="color:var(--dim)">FRAME 0</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ══════════════════════════════════════════════════════
+const PHI   = 1.6180339887;
+const THETA = 360 / PHI; // 222.492...°
+const D_COLS = ['1fd4c8','c9a84c','8b5cf6','ec4899','22c55e'];
+
+let domains = [80,75,65,90,70];
+let warpOn  = false;
+let phiOn   = true;
+let twistOn = true;
+let domainsOn = true;
+let focusedDomain = -1;
+let v0      = 3.0;
+let bubbleR = 60;
+let wallSig = 15;
+let frame   = 0;
+let t       = 0;
+let step_n  = 0;
+let xpos    = 0;
+let warpPhase = 0;
+let fabricIntegrity = 100;
+let interactionCount = 0;
+
+// ══════════════════════════════════════════════════════
+// CANVAS SETUP
+// ══════════════════════════════════════════════════════
+const wc  = document.getElementById('warpCanvas');
+const ctx = wc.getContext('2d');
+const pc  = document.getElementById('phiCanvas');
+const pctx = pc.getContext('2d');
+let W, H;
+
+function resize() {
+  const rect = document.getElementById('center').getBoundingClientRect();
+  W = wc.width  = rect.width;
+  H = wc.height = rect.height;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ══════════════════════════════════════════════════════
+// SHAPE FUNCTION f(r)
+// ══════════════════════════════════════════════════════
+function shapeFunc(r) {
+  const tanh_val = Math.tanh((r - bubbleR) / wallSig);
+  return 0.5 * (1 - tanh_val);
+}
+
+// ══════════════════════════════════════════════════════
+// INFORMATIONAL DENSITY FIELD
+// ══════════════════════════════════════════════════════
+function rhoInfo(r, n) {
+  const bg = 1.0;
+  const twist_mod = twistOn ? Math.cos(n * THETA * Math.PI / 180) : 1;
+  const delta = (domains[0]/100) * 0.6 * shapeFunc(r) * twist_mod;
+  return bg + delta;
+}
+
+function gradRho(r, n) {
+  const dr = 2;
+  return Math.abs((rhoInfo(r+dr,n) - rhoInfo(r-dr,n)) / (2*dr));
+}
+
+// ══════════════════════════════════════════════════════
+// DRAW WARP BUBBLE
+// ══════════════════════════════════════════════════════
+function drawWarpBubble() {
+  const cx = W/2, cy = H/2;
+  const d1 = domains[0]/100, d2 = domains[1]/100;
+  const twistAngle = step_n * THETA * Math.PI / 180;
+  const vs = warpOn ? v0 * Math.pow(PHI, Math.min(step_n*0.05, 8)) : 0;
+  const speedFactor = Math.min(vs/10, 1);
+
+  // ── BACKGROUND FIELD ──
+  const bgGrad = ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*0.7);
+  bgGrad.addColorStop(0, '#030e20');
+  bgGrad.addColorStop(0.5, '#020810');
+  bgGrad.addColorStop(1, '#010406');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0,0,W,H);
+
+  // ── GRID LINES (space fabric) ──
+  if (domainsOn) {
+    const gridSpacing = 40;
+    const warpStrength = warpOn ? speedFactor * 0.6 : 0;
+    ctx.save();
+    for (let gx = -W; gx < W*2; gx += gridSpacing) {
+      ctx.beginPath();
+      for (let gy = 0; gy <= H; gy += 4) {
+        const dx = gx - cx, dy = gy - cy;
+        const r = Math.sqrt(dx*dx + dy*dy);
+        const f = shapeFunc(r);
+        const warpX = warpOn ? -f * warpStrength * 80 * (dx/(r+1)) : 0;
+        const px = gx + warpX;
+        if (gy === 0) ctx.moveTo(px, gy);
+        else ctx.lineTo(px, gy);
+      }
+      ctx.strokeStyle = `rgba(46,109,164,${0.06 + warpStrength*0.04})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    for (let gy = 0; gy < H; gy += gridSpacing) {
+      ctx.beginPath();
+      for (let gx = 0; gx <= W; gx += 4) {
+        const dx = gx - cx, dy = gy - cy;
+        const r = Math.sqrt(dx*dx + dy*dy);
+        const f = shapeFunc(r);
+        const warpY = warpOn ? -f * warpStrength * 40 * (dy/(r+1)) : 0;
+        const py = gy + warpY;
+        if (gx === 0) ctx.moveTo(gx, py);
+        else ctx.lineTo(gx, py);
+      }
+      ctx.strokeStyle = `rgba(46,109,164,${0.06 + warpStrength*0.04})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  if (!warpOn) {
+    // standby: just show rings
+    for (let i = 0; i < 5; i++) {
+      const r = 60 + i*40;
+      const alpha = 0.04 + 0.02*Math.sin(t*0.5+i);
+      ctx.beginPath();
+      ctx.ellipse(cx,cy,r,r*0.35,twistAngle,0,Math.PI*2);
+      ctx.strokeStyle = `rgba(46,109,164,${alpha})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    return;
+  }
+
+  // ── SPACE CONTRACTION AHEAD ──
+  const contractionGrad = ctx.createRadialGradient(cx-bubbleR*1.5,cy,0,cx-bubbleR*1.5,cy,bubbleR*1.2);
+  contractionGrad.addColorStop(0,`rgba(0,0,0,${0.7*speedFactor})`);
+  contractionGrad.addColorStop(0.5,`rgba(100,50,200,${0.12*speedFactor})`);
+  contractionGrad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = contractionGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx-bubbleR*1.5,cy,bubbleR*1.3,bubbleR*0.7,0,0,Math.PI*2);
+  ctx.fill();
+
+  // ── SPACE EXPANSION BEHIND ──
+  const expansionGrad = ctx.createRadialGradient(cx+bubbleR*1.5,cy,0,cx+bubbleR*1.5,cy,bubbleR*1.6);
+  expansionGrad.addColorStop(0,`rgba(201,168,76,${0.08*speedFactor})`);
+  expansionGrad.addColorStop(0.4,`rgba(31,212,200,${0.05*speedFactor})`);
+  expansionGrad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = expansionGrad;
+  ctx.beginPath();
+  ctx.ellipse(cx+bubbleR*1.5,cy,bubbleR*1.6,bubbleR*0.9,0,0,Math.PI*2);
+  ctx.fill();
+
+  // ── BUBBLE WALL (Phi-twisted rings) ──
+  const numRings = 7;
+  for (let i = 0; i < numRings; i++) {
+    const frac = i/(numRings-1);
+    const r_ring = bubbleR * (0.7 + frac*0.6);
+    const wallAlpha = Math.exp(-Math.pow((r_ring-bubbleR)/wallSig,2)) * 0.8;
+    if (wallAlpha < 0.02) continue;
+
+    // twist offset per ring
+    const ringTwist = twistOn ? twistAngle + i*0.3 : twistAngle;
+    const pts = 120;
+    ctx.beginPath();
+    for (let j = 0; j <= pts; j++) {
+      const ang = (j/pts)*Math.PI*2;
+      const rx = r_ring;
+      const ry = r_ring * (0.3 + 0.1*speedFactor);
+      const px = cx + Math.cos(ang)*rx;
+      const py = cy + Math.sin(ang)*ry;
+      // twist distortion
+      const twistedX = cx + (px-cx)*Math.cos(ringTwist*frac*0.2) - (py-cy)*Math.sin(ringTwist*frac*0.1);
+      const twistedY = cy + (px-cx)*Math.sin(ringTwist*frac*0.1) + (py-cy)*Math.cos(ringTwist*frac*0.2);
+      j===0 ? ctx.moveTo(twistedX,twistedY) : ctx.lineTo(twistedX,twistedY);
+    }
+    const wallColor = frac < 0.5 ? `rgba(31,212,200,${wallAlpha*d1})` : `rgba(201,168,76,${wallAlpha*d1})`;
+    ctx.strokeStyle = wallColor;
+    ctx.lineWidth = 1 + wallAlpha;
+    ctx.stroke();
+  }
+
+  // ── BUBBLE INTERIOR ──
+  const bubbleInterior = ctx.createRadialGradient(cx,cy,0,cx,cy,bubbleR*0.85);
+  bubbleInterior.addColorStop(0, `rgba(20,40,80,${0.4*speedFactor})`);
+  bubbleInterior.addColorStop(0.7,`rgba(10,22,50,${0.2*speedFactor})`);
+  bubbleInterior.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = bubbleInterior;
+  ctx.beginPath();
+  ctx.ellipse(cx,cy,bubbleR*0.85,bubbleR*0.28,0,0,Math.PI*2);
+  ctx.fill();
+
+  // ── PASSENGER INDICATOR (flat spacetime inside) ──
+  ctx.beginPath();
+  ctx.arc(cx,cy,8,0,Math.PI*2);
+  const shipGrad = ctx.createRadialGradient(cx,cy,0,cx,cy,8);
+  shipGrad.addColorStop(0,'rgba(255,255,255,0.9)');
+  shipGrad.addColorStop(0.5,'rgba(74,159,212,0.6)');
+  shipGrad.addColorStop(1,'rgba(74,159,212,0)');
+  ctx.fillStyle = shipGrad;
+  ctx.fill();
+  // Ship dot
+  ctx.beginPath();
+  ctx.arc(cx,cy,2.5,0,Math.PI*2);
+  ctx.fillStyle='#fff';
+  ctx.fill();
+
+  // ── DOMAIN VISUALIZATIONS ──
+  if (domainsOn) {
+    // D1: exotic matter particles at bubble wall
+    const numParticles = Math.floor(d1 * 24);
+    for (let i = 0; i < numParticles; i++) {
+      const ang = (i/numParticles)*Math.PI*2 + t*0.3;
+      const r_p = bubbleR + (Math.random()-0.5)*wallSig*2;
+      const px = cx + Math.cos(ang)*r_p;
+      const py = cy + Math.sin(ang)*r_p*(0.3+0.1*speedFactor);
+      ctx.beginPath();
+      ctx.arc(px,py,1.5,0,Math.PI*2);
+      ctx.fillStyle=`rgba(31,212,200,${0.4+0.4*Math.sin(t*2+i)})`;
+      ctx.fill();
+    }
+
+    // D2: oscillatory twist lines
+    const d2a = domains[1]/100;
+    for (let i = 0; i < 8; i++) {
+      const ang0 = (i/8)*Math.PI*2 + t*0.15;
+      const twistOffset = twistOn ? i * THETA * Math.PI/180 : 0;
+      const r1 = bubbleR*0.6, r2 = bubbleR*1.4;
+      const p1x = cx + Math.cos(ang0+twistOffset)*r1;
+      const p1y = cy + Math.sin(ang0+twistOffset)*r1*0.32;
+      const p2x = cx + Math.cos(ang0+twistOffset+0.4)*r2;
+      const p2y = cy + Math.sin(ang0+twistOffset+0.4)*r2*0.32;
+      ctx.beginPath();
+      ctx.moveTo(p1x,p1y);
+      ctx.lineTo(p2x,p2y);
+      ctx.strokeStyle=`rgba(201,168,76,${0.15*d2a})`;
+      ctx.lineWidth=0.8;
+      ctx.stroke();
+    }
+
+    // D3: destination lock beam (forward)
+    const d3a = domains[2]/100;
+    const beamGrad = ctx.createLinearGradient(cx,cy,cx-W*0.45,cy);
+    beamGrad.addColorStop(0,`rgba(139,92,246,${0.3*d3a})`);
+    beamGrad.addColorStop(1,'rgba(139,92,246,0)');
+    ctx.beginPath();
+    ctx.moveTo(cx-bubbleR,cy-8); ctx.lineTo(cx-W*0.45,cy-20);
+    ctx.lineTo(cx-W*0.45,cy+20); ctx.lineTo(cx-bubbleR,cy+8);
+    ctx.fillStyle=beamGrad;
+    ctx.fill();
+
+    // D4: consciousness aura around ship
+    const d4a = domains[3]/100;
+    for (let ring = 0; ring < 4; ring++) {
+      const rr = 14 + ring*8 + 4*Math.sin(t*0.8+ring*PHI);
+      ctx.beginPath();
+      ctx.arc(cx,cy,rr,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(236,72,153,${0.08*d4a*(4-ring)/4})`;
+      ctx.lineWidth=1.5;
+      ctx.stroke();
+    }
+
+    // D5: repair particles in wake
+    const d5a = domains[4]/100;
+    const numRepair = Math.floor(d5a*16);
+    for (let i = 0; i < numRepair; i++) {
+      const repX = cx + bubbleR*1.2 + Math.random()*W*0.3;
+      const repY = cy + (Math.random()-0.5)*80;
+      const repAlpha = 0.15+0.2*Math.sin(t*3+i);
+      ctx.beginPath();
+      ctx.arc(repX,repY,1,0,Math.PI*2);
+      ctx.fillStyle=`rgba(34,197,94,${repAlpha})`;
+      ctx.fill();
+    }
+  }
+
+  // ── PHI-TWIST INDICATOR LINES ──
+  if (twistOn) {
+    const numLines = 12;
+    for (let i = 0; i < numLines; i++) {
+      const ang = i * THETA * Math.PI / 180 + t*0.05;
+      const innerR = bubbleR*0.3;
+      const outerR = bubbleR*1.2;
+      const iy = 0.32;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(ang)*innerR, cy+Math.sin(ang)*innerR*iy);
+      ctx.lineTo(cx+Math.cos(ang)*outerR, cy+Math.sin(ang)*outerR*iy);
+      ctx.strokeStyle=`rgba(74,159,212,${0.08+0.06*Math.sin(t+i)})`;
+      ctx.lineWidth=0.6;
+      ctx.setLineDash([3,6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // ── WAKE TRAIL ──
+  const trailGrad = ctx.createLinearGradient(cx+bubbleR,cy,cx+W*0.5,cy);
+  trailGrad.addColorStop(0,`rgba(201,168,76,${0.15*speedFactor})`);
+  trailGrad.addColorStop(0.3,`rgba(31,212,200,${0.06*speedFactor})`);
+  trailGrad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.ellipse(cx+bubbleR*1.3,cy,W*0.3,bubbleR*0.25,0,0,Math.PI*2);
+  ctx.fillStyle=trailGrad;
+  ctx.fill();
+}
+
+// ══════════════════════════════════════════════════════
+// PHI SPIRAL CANVAS
+// ══════════════════════════════════════════════════════
+function drawPhiSpiral() {
+  const pw = 200, ph = 200;
+  pc.width=pw; pc.height=ph;
+  const pcx=pw/2, pcy=ph/2;
+  pctx.clearRect(0,0,pw,ph);
+  pctx.fillStyle='rgba(2,8,16,0.8)';
+  pctx.fillRect(0,0,pw,ph);
+
+  // Reference circles
+  for (let r=20;r<=90;r+=20) {
+    pctx.beginPath();
+    pctx.arc(pcx,pcy,r,0,Math.PI*2);
+    pctx.strokeStyle='rgba(46,109,164,0.12)';
+    pctx.lineWidth=0.5;
+    pctx.stroke();
+  }
+
+  // Phi-angle dots
+  const maxDots = 80 + step_n;
+  for (let i=0;i<Math.min(maxDots,200);i++) {
+    const angle = i * THETA * Math.PI/180;
+    const r = 4 + i*0.42;
+    if (r>92) break;
+    const px = pcx + Math.cos(angle)*r;
+    const py = pcy + Math.sin(angle)*r;
+    const hue = (i*7)%360;
+    const alpha = warpOn ? 0.8 : 0.4;
+    pctx.beginPath();
+    pctx.arc(px,py,1.5+Math.sin(t+i*0.3)*0.5,0,Math.PI*2);
+    pctx.fillStyle=`hsla(${hue},80%,65%,${alpha})`;
+    pctx.fill();
+  }
+
+  // Current step indicator
+  const curAngle = step_n * THETA * Math.PI/180;
+  const curR = Math.min(4+step_n*0.3, 88);
+  const cpx=pcx+Math.cos(curAngle)*curR, cpy=pcy+Math.sin(curAngle)*curR;
+  const cg=pctx.createRadialGradient(cpx,cpy,0,cpx,cpy,6);
+  cg.addColorStop(0,'rgba(255,255,255,1)');
+  cg.addColorStop(1,'rgba(31,212,200,0)');
+  pctx.beginPath();
+  pctx.arc(cpx,cpy,6,0,Math.PI*2);
+  pctx.fillStyle=cg;
+  pctx.fill();
+
+  // Angle label
+  const dispAngle = ((step_n * THETA) % 360).toFixed(1);
+  pctx.fillStyle='rgba(201,168,76,0.8)';
+  pctx.font='9px Share Tech Mono';
+  pctx.fillText(`n=${step_n}`, 4, ph-12);
+  pctx.fillText(`θ=${dispAngle}°`, 4, ph-3);
+}
+
+// ══════════════════════════════════════════════════════
+// EVENT LOG
+// ══════════════════════════════════════════════════════
+const logEl = document.getElementById('event-log');
+const events = [];
+
+function logEvent(msg, col='') {
+  events.unshift({ t: step_n, msg, col });
+  if (events.length > 50) events.pop();
+  const div = document.createElement('div');
+  div.className = 'log-entry new';
+  div.innerHTML = `<span class="log-t">n=${step_n.toString().padStart(4,'0')}</span>${msg}`;
+  if (col) div.style.color = col;
+  logEl.prepend(div);
+  if (logEl.children.length > 30) logEl.removeChild(logEl.lastChild);
+  setTimeout(()=>div.classList.remove('new'),800);
+}
+
+// ══════════════════════════════════════════════════════
+// UPDATE STATS
+// ══════════════════════════════════════════════════════
+function updateStats() {
+  const vs = warpOn ? v0 * Math.pow(PHI, Math.min(step_n*0.05, 8)) : 0;
+  const twistDeg = ((step_n * THETA) % 360).toFixed(1);
+  const ctotal = domains.reduce((a,d,i)=>{
+    const w=[0.25,0.2,0.2,0.2,0.15];
+    return a + w[i]*(d/100);
+  },0);
+  const rhoVal = 1 + (warpOn ? 0.3*(domains[0]/100) : 0);
+  const exoticVal = warpOn ? 0.4*(domains[0]/100)*Math.abs(Math.cos(step_n*THETA*Math.PI/180)) : 0;
+  const gradVal = warpOn ? gradRho(bubbleR, step_n) : 0;
+  const obsPhase = ((step_n*THETA)%360).toFixed(1);
+  fabricIntegrity = Math.max(60, Math.min(100, fabricIntegrity + (domains[4]/100)*0.5 - (warpOn?0.2:0)));
+
+  document.getElementById('sv-vs').textContent     = vs.toFixed(3)+'c';
+  document.getElementById('sv-twist').textContent  = twistDeg+'°';
+  document.getElementById('sv-phi').textContent    = 'φ='+PHI.toFixed(4);
+  document.getElementById('sv-ctotal').textContent = ctotal.toFixed(3);
+  document.getElementById('sv-n').textContent      = step_n;
+  document.getElementById('sv-xpos').textContent   = xpos.toFixed(2);
+
+  document.getElementById('fr-rho').textContent    = rhoVal.toFixed(3);
+  document.getElementById('fr-exotic').textContent = (-exoticVal).toFixed(3);
+  document.getElementById('fr-grad').textContent   = gradVal.toFixed(3);
+  document.getElementById('fr-causal').textContent = twistOn ? 'SAFE' : 'RISK';
+  document.getElementById('fr-causal').style.color = twistOn ? 'var(--green)' : 'var(--red)';
+  document.getElementById('fr-fabric').textContent = fabricIntegrity.toFixed(0)+'%';
+  document.getElementById('fr-phase').textContent  = obsPhase+'°';
+
+  // Domain bars
+  domains.forEach((d,i)=>{
+    const n=i+1;
+    document.getElementById('dsb'+n).style.width=d+'%';
+    document.getElementById('dsv'+n).textContent=d;
+    document.getElementById('bt'+n).textContent=d;
+  });
+
+  document.getElementById('framecount').textContent='FRAME '+frame;
+}
+
+// ══════════════════════════════════════════════════════
+// MAIN LOOP
+// ══════════════════════════════════════════════════════
+let lastLog = 0;
+function loop() {
+  ctx.clearRect(0,0,W,H);
+  drawWarpBubble();
+  drawPhiSpiral();
+  updateStats();
+
+  if (warpOn) {
+    const phi_step = phiOn ? 1/PHI : 1;
+    const vs = v0 * Math.pow(PHI, Math.min(step_n*0.05, 8));
+    xpos += vs * 0.01 * phi_step;
+    if (frame % 8 === 0) step_n++;
+    warpPhase += 0.02;
+  }
+
+  // Event logging
+  if (warpOn && frame - lastLog > 40) {
+    lastLog = frame;
+    const events_pool = [
+      [`D2: twist rate adjusted → Θ_n=${((step_n*THETA)%360).toFixed(1)}°`, 'var(--gold)'],
+      [`D1: exotic matter distributed irrationally`, 'var(--teal)'],
+      [`D5: fabric integrity ${fabricIntegrity.toFixed(0)}% — repair active`, 'var(--green)'],
+      [`D4: passenger phase-lock maintained`, 'var(--pink)'],
+      [`D3: ring-field attractor locked`, 'var(--violet)'],
+      [`C_total minimized — all domains coherent`, 'var(--bright)'],
+    ];
+    const ev = events_pool[Math.floor(Math.random()*events_pool.length)];
+    logEvent(ev[0], ev[1]);
+  }
+
+  t += 0.016;
+  frame++;
+  requestAnimationFrame(loop);
+}
+loop();
+
+// ══════════════════════════════════════════════════════
+// CONTROLS
+// ══════════════════════════════════════════════════════
+function toggleWarp() {
+  warpOn = !warpOn;
+  const btn = document.getElementById('btn-warp');
+  btn.classList.toggle('on', warpOn);
+  btn.textContent = warpOn ? '⚡ DISENGAGE' : '⚡ ENGAGE WARP';
+  document.getElementById('co-label').textContent = warpOn
+    ? '⚡ TWISTED ZIPPER ACTIVE — Φ-MODULATED WARP BUBBLE ONLINE'
+    : 'DRIVE STANDBY — ENGAGE WARP TO ACTIVATE';
+  if (warpOn) logEvent('WARP ENGAGED — Phi-Time clock synchronized', 'var(--teal)');
+  else        logEvent('WARP DISENGAGED — bubble dissolved', 'var(--red)');
+}
+function togglePhi() {
+  phiOn = !phiOn;
+  document.getElementById('btn-phi').classList.toggle('on', phiOn);
+  logEvent(phiOn ? 'Phi-Time ACTIVE — golden angle scheduling' : 'Phi-Time DISABLED — periodic mode', phiOn?'var(--gold)':'var(--red)');
+}
+function toggleTwist() {
+  twistOn = !twistOn;
+  document.getElementById('btn-twist').classList.toggle('on', twistOn);
+  logEvent(twistOn ? 'Helical twist ENABLED — causal protection active' : 'WARNING: twist DISABLED — CTC risk elevated', twistOn?'var(--green)':'var(--red)');
+}
+function toggleDomains() {
+  domainsOn = !domainsOn;
+  document.getElementById('btn-domains').classList.toggle('on', domainsOn);
+}
+function resetAll() {
+  warpOn=false; step_n=0; xpos=0; warpPhase=0; fabricIntegrity=100;
+  domains=[80,75,65,90,70];
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById('ds'+i).value=domains[i-1];
+    document.getElementById('dv'+i).textContent=domains[i-1];
+  });
+  document.getElementById('btn-warp').classList.remove('on');
+  document.getElementById('btn-warp').textContent='⚡ ENGAGE WARP';
+  document.getElementById('co-label').textContent='DRIVE STANDBY — ENGAGE WARP TO ACTIVATE';
+  logEvent('SYSTEM RESET — all parameters restored', 'var(--bright)');
+}
+function updateDomain(n,v) {
+  domains[n-1]=parseInt(v);
+  document.getElementById('dv'+n).textContent=v;
+}
+function updateV0(v) {
+  v0=parseFloat(v);
+  document.getElementById('v0val').textContent=parseFloat(v).toFixed(1);
+}
+function updateBR(v) {
+  bubbleR=parseInt(v);
+  document.getElementById('brval').textContent=v;
+}
+function updateWall(v) {
+  wallSig=parseInt(v);
+  document.getElementById('bwval').textContent=v;
+}
+function focusDomain(n) {
+  focusedDomain = focusedDomain===n ? -1 : n;
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById('dc'+i).classList.toggle('active', i===focusedDomain);
+  });
+}
+
+// Remove splash
+setTimeout(()=>{
+  const s=document.getElementById('splash');
+  if(s) s.remove();
+}, 4200);
+
+// Initial log
+logEvent('TWISTED ZIPPER DRIVE initialized — all systems nominal', 'var(--bright)');
+logEvent('5-Domain Event Bus active — C_total minimization running', 'var(--teal)');
+logEvent('Phi-Time clock: t_n = T₀·φⁿ — golden angle 222.5° active', 'var(--gold)');
+</script>
+</body>
+</html>

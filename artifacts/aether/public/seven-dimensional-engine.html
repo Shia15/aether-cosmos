@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7D Framework Engine — Shia Miller</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════
+   ROOT VARIABLES
+══════════════════════════════════════════════════ */
+:root {
+  /* 7 Dimensional Colors */
+  --d1: #00ffff;   /* D1: Space     - Cyan      */
+  --d2: #7c3aed;   /* D2: Time      - Violet    */
+  --d3: #f59e0b;   /* D3: Energy    - Gold      */
+  --d4: #10b981;   /* D4: Field     - Emerald   */
+  --d5: #ef4444;   /* D5: Vortex    - Red       */
+  --d6: #ec4899;   /* D6: Conscious - Pink      */
+  --d7: #ffffff;   /* D7: Source    - White/All */
+
+  --void:   #010305;
+  --deep:   #020810;
+  --panel:  #050f1e;
+  --border: rgba(0,200,255,0.12);
+  --border2:rgba(0,200,255,0.25);
+  --text:   #d4e8f7;
+  --dim:    #3a5a7a;
+  --bright: #4af0ff;
+
+  --phi: 1.6180339887;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  cursor: none;
+}
+
+/* ══════════════════════════════════════════════════
+   CUSTOM CURSOR
+══════════════════════════════════════════════════ */
+#cursor {
+  position: fixed;
+  width: 20px; height: 20px;
+  border: 1px solid var(--d1);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width 0.2s, height 0.2s, border-color 0.3s;
+  mix-blend-mode: screen;
+}
+#cursor-dot {
+  position: fixed;
+  width: 4px; height: 4px;
+  background: var(--d7);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+}
+#cursor.active { width:40px; height:40px; border-color: var(--d6); }
+
+/* ══════════════════════════════════════════════════
+   MAIN CANVAS — 7D FIELD
+══════════════════════════════════════════════════ */
+#mainCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+
+/* ══════════════════════════════════════════════════
+   HUD OVERLAY
+══════════════════════════════════════════════════ */
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: grid;
+  grid-template-rows: 64px 1fr 52px;
+  grid-template-columns: 280px 1fr 280px;
+}
+
+/* ── TOP BAR ── */
+#topbar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(1,3,5,0.95) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  pointer-events: all;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+}
+.logo-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--bright);
+  text-shadow: 0 0 20px var(--d1);
+}
+.logo-sub {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+.top-stats {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+.stat {
+  text-align: center;
+}
+.stat-val {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bright);
+  text-shadow: 0 0 10px var(--d1);
+}
+.stat-label {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--dim);
+}
+
+.top-controls {
+  display: flex;
+  gap: 8px;
+}
+.ctrl-btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  padding: 6px 14px;
+  background: rgba(0,200,255,0.06);
+  border: 1px solid var(--border2);
+  color: var(--bright);
+  cursor: pointer;
+  letter-spacing: 1px;
+  border-radius: 2px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  pointer-events: all;
+}
+.ctrl-btn:hover { background: rgba(0,200,255,0.15); border-color: var(--d1); box-shadow: 0 0 12px rgba(0,200,255,0.2); }
+.ctrl-btn.active { background: rgba(0,200,255,0.2); border-color: var(--d1); color: var(--d7); }
+
+/* ── LEFT PANEL — DIMENSION CONTROLS ── */
+#left-panel {
+  grid-column: 1;
+  grid-row: 2;
+  padding: 20px 16px;
+  background: linear-gradient(90deg, rgba(1,3,5,0.9) 0%, transparent 100%);
+  border-right: 1px solid var(--border);
+  pointer-events: all;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+#left-panel::-webkit-scrollbar { display: none; }
+
+.panel-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dim-block {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 3px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s;
+  cursor: pointer;
+}
+.dim-block:hover { border-color: var(--border2); }
+.dim-block.active { border-color: var(--active-color, var(--d1)); box-shadow: 0 0 20px color-mix(in srgb, var(--active-color, var(--d1)) 20%, transparent); }
+
+.dim-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.dim-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px currentColor;
+}
+.dim-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  flex: 1;
+}
+.dim-number {
+  font-size: 20px;
+  font-weight: 700;
+  opacity: 0.15;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.dim-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.5;
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.dim-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dim-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 2px;
+  border-radius: 1px;
+  outline: none;
+  cursor: pointer;
+  background: var(--border);
+}
+.dim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--void);
+  box-shadow: 0 0 8px currentColor;
+}
+.dim-val {
+  font-size: 10px;
+  color: var(--dim);
+  width: 32px;
+  text-align: right;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* ── RIGHT PANEL — KNOWLEDGE ENGINE ── */
+#right-panel {
+  grid-column: 3;
+  grid-row: 2;
+  padding: 20px 16px;
+  background: linear-gradient(270deg, rgba(1,3,5,0.9) 0%, transparent 100%);
+  border-left: 1px solid var(--border);
+  pointer-events: all;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+#right-panel::-webkit-scrollbar { display: none; }
+
+/* ── SEARCH ── */
+.search-wrap {
+  position: relative;
+}
+#queryInput {
+  width: 100%;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  padding: 10px 36px 10px 12px;
+  outline: none;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#queryInput:focus { border-color: var(--bright); box-shadow: 0 0 16px rgba(0,255,255,0.1); }
+#queryInput::placeholder { color: var(--dim); }
+.search-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--dim); font-size: 14px; pointer-events: none; }
+
+/* ── AI RESPONSE PANEL ── */
+#response-area {
+  flex: 1;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+  min-height: 200px;
+}
+
+.response-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.response-msg .label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--bright);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.thinking {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+}
+.thinking span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--bright);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.thinking span:nth-child(2) { animation-delay: 0.2s; }
+.thinking span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+
+/* ── DIM TAGS ── */
+.dim-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dim-tag {
+  font-size: 9px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  pointer-events: all;
+}
+.dim-tag:hover { opacity: 0.8; transform: scale(1.05); }
+
+/* ── FIELD READINGS ── */
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.field-card {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 8px;
+  text-align: center;
+}
+.field-card .fc-val {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.field-card .fc-label {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* ── BOTTOM BAR ── */
+#bottombar {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(0deg, rgba(1,3,5,0.95) 0%, transparent 100%);
+  border-top: 1px solid var(--border);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  pointer-events: all;
+}
+.ticker {
+  display: flex;
+  gap: 32px;
+}
+.tick-item { display: flex; gap: 8px; align-items: center; }
+.tick-dot { width: 5px; height: 5px; border-radius: 50%; }
+.tick-val { color: var(--text); font-family: 'Orbitron', sans-serif; }
+
+/* ── CENTER OVERLAY ── */
+#center-info {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 24px;
+  pointer-events: none;
+}
+.center-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: rgba(0,200,255,0.4);
+  text-transform: uppercase;
+  text-align: center;
+}
+.phi-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-style: italic;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+/* ── MODAL ── */
+#modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(1,3,5,0.92);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+#modal.open { display: flex; }
+#modal-inner {
+  max-width: 720px;
+  width: 100%;
+  border: 1px solid var(--border2);
+  background: var(--panel);
+  border-radius: 4px;
+  overflow: hidden;
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.96) translateY(20px)} to{opacity:1;transform:none} }
+#modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+#modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bright);
+  letter-spacing: 2px;
+}
+#modal-category {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--dim);
+  margin-top: 4px;
+}
+#modal-close {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--dim);
+  width: 28px; height: 28px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  pointer-events: all;
+}
+#modal-close:hover { border-color: var(--bright); color: var(--bright); }
+#modal-body {
+  padding: 20px 24px 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+#modal-body p { margin-bottom: 14px; }
+#modal-body .math-line {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--d3);
+  background: rgba(245,158,11,0.06);
+  border-left: 3px solid var(--d3);
+  padding: 10px 16px;
+  margin: 12px 0;
+  letter-spacing: 0.5px;
+}
+#modal-body ul { padding-left: 20px; margin-bottom: 14px; }
+#modal-body li { margin-bottom: 6px; color: rgba(212,232,247,0.8); }
+#modal-footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  pointer-events: all;
+}
+.modal-dim-badge {
+  font-size: 9px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── INTRO SPLASH ── */
+#splash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--void);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  animation: splashOut 0.6s ease 3.2s forwards;
+}
+@keyframes splashOut { to { opacity:0; pointer-events:none; } }
+.splash-num {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(80px, 20vw, 180px);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--d1), var(--d2), var(--d3), var(--d4), var(--d5), var(--d6), var(--d7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: splashGlow 3s ease-in-out;
+  letter-spacing: -4px;
+}
+@keyframes splashGlow { 0%{filter:blur(20px);opacity:0} 40%{filter:blur(0);opacity:1} 90%{filter:blur(0);opacity:1} }
+.splash-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-style: italic;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 4px;
+  animation: fadeIn 1s ease 0.8s both;
+}
+.splash-sub {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--dim);
+  text-transform: uppercase;
+  animation: fadeIn 1s ease 1.4s both;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* ── MISC ── */
+.glow-text { text-shadow: 0 0 20px currentColor; }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-dot"></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-num">7D</div>
+  <div class="splash-text">Seven Dimensional Framework Engine</div>
+  <div class="splash-sub">Shia Miller · @StrategicProce · 2026</div>
+</div>
+
+<!-- MAIN CANVAS -->
+<canvas id="mainCanvas"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="logo">
+      <div class="logo-title">7D FRAMEWORK ENGINE</div>
+      <div class="logo-sub">Stacked Rings · Φ-Coherence · Twisted Zipper · Grand Unified</div>
+    </div>
+    <div class="top-stats">
+      <div class="stat"><div class="stat-val" id="stat-rings">500+</div><div class="stat-label">Ring Layers</div></div>
+      <div class="stat"><div class="stat-val" id="stat-phi">φ=1.618</div><div class="stat-label">Φ-Time Clock</div></div>
+      <div class="stat"><div class="stat-val" id="stat-vortex">0</div><div class="stat-label">Active Vortices</div></div>
+      <div class="stat"><div class="stat-val" id="stat-coherence">---</div><div class="stat-label">C_total</div></div>
+      <div class="stat"><div class="stat-val" id="stat-warp">0.000c</div><div class="stat-label">Warp v_s</div></div>
+    </div>
+    <div class="top-controls">
+      <button class="ctrl-btn active" id="btn-rotate" onclick="toggleRotate()">⟳ Rotate</button>
+      <button class="ctrl-btn" id="btn-vortex" onclick="injectVortex()">⊕ Vortex</button>
+      <button class="ctrl-btn" id="btn-warp" onclick="toggleWarp()">⚡ Warp</button>
+      <button class="ctrl-btn" id="btn-reset" onclick="resetAll()">↺ Reset</button>
+      <button class="ctrl-btn" id="btn-phi" onclick="togglePhi()">Φ Phi-Time</button>
+    </div>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div id="left-panel">
+    <div class="panel-title">Seven Dimensions</div>
+
+    <div class="dim-block active" id="db1" style="--active-color:var(--d1)" onclick="focusDim(1)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d1);background:var(--d1)"></div>
+        <div class="dim-name" style="color:var(--d1)">D1 · SPACE</div>
+        <div class="dim-number">1</div>
+      </div>
+      <div class="dim-desc">The three spatial dimensions collapsed into one relational axis — the substrate of ring-layer position</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s1" min="0" max="100" value="80" style="accent-color:var(--d1);color:var(--d1)" oninput="updateDim(1,this.value)">
+        <div class="dim-val" id="v1" style="color:var(--d1)">80</div>
+      </div>
+    </div>
+
+    <div class="dim-block" id="db2" style="--active-color:var(--d2)" onclick="focusDim(2)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d2);background:var(--d2)"></div>
+        <div class="dim-name" style="color:var(--d2)">D2 · TIME</div>
+        <div class="dim-number">2</div>
+      </div>
+      <div class="dim-desc">Φ-Time — the non-periodic temporal axis. t_n = T₀ · φⁿ. No resonance. No clown-feeling.</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s2" min="0" max="100" value="65" style="accent-color:var(--d2)" oninput="updateDim(2,this.value)">
+        <div class="dim-val" id="v2" style="color:var(--d2)">65</div>
+      </div>
+    </div>
+
+    <div class="dim-block" id="db3" style="--active-color:var(--d3)" onclick="focusDim(3)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d3);background:var(--d3)"></div>
+        <div class="dim-name" style="color:var(--d3)">D3 · ENERGY</div>
+        <div class="dim-number">3</div>
+      </div>
+      <div class="dim-desc">The scalar field of informational density ρ_info — curvature as energy gradient. E = mc² stabilized by Φ.</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s3" min="0" max="100" value="55" style="accent-color:var(--d3)" oninput="updateDim(3,this.value)">
+        <div class="dim-val" id="v3" style="color:var(--d3)">55</div>
+      </div>
+    </div>
+
+    <div class="dim-block" id="db4" style="--active-color:var(--d4)" onclick="focusDim(4)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d4);background:var(--d4)"></div>
+        <div class="dim-name" style="color:var(--d4)">D4 · FIELD</div>
+        <div class="dim-number">4</div>
+      </div>
+      <div class="dim-desc">The ring harmonic field — H_n signatures propagating across ring layers. String field Ψ[X(σ)] equivalent.</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s4" min="0" max="100" value="70" style="accent-color:var(--d4)" oninput="updateDim(4,this.value)">
+        <div class="dim-val" id="v4" style="color:var(--d4)">70</div>
+      </div>
+    </div>
+
+    <div class="dim-block" id="db5" style="--active-color:var(--d5)" onclick="focusDim(5)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d5);background:var(--d5)"></div>
+        <div class="dim-name" style="color:var(--d5)">D5 · VORTEX</div>
+        <div class="dim-number">5</div>
+      </div>
+      <div class="dim-desc">The rotational transfer axis — vortex momentum, phase transitions, ring-barrier crossing events.</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s5" min="0" max="100" value="45" style="accent-color:var(--d5)" oninput="updateDim(5,this.value)">
+        <div class="dim-val" id="v5" style="color:var(--d5)">45</div>
+      </div>
+    </div>
+
+    <div class="dim-block" id="db6" style="--active-color:var(--d6)" onclick="focusDim(6)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d6);background:var(--d6)"></div>
+        <div class="dim-name" style="color:var(--d6)">D6 · CONSCIOUS</div>
+        <div class="dim-number">6</div>
+      </div>
+      <div class="dim-desc">Ring band 401–500. The observer-coupling axis. Domain 4 of the Event Bus. You are here.</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s6" min="0" max="100" value="60" style="accent-color:var(--d6)" oninput="updateDim(6,this.value)">
+        <div class="dim-val" id="v6" style="color:var(--d6)">60</div>
+      </div>
+    </div>
+
+    <div class="dim-block" id="db7" style="--active-color:var(--d7)" onclick="focusDim(7)">
+      <div class="dim-header">
+        <div class="dim-dot" style="color:var(--d7);background:var(--d7)"></div>
+        <div class="dim-name" style="color:var(--d7)">D7 · SOURCE</div>
+        <div class="dim-number">7</div>
+      </div>
+      <div class="dim-desc">0 = ∞. The Unborn Source. The ground from which all six dimensions arise. Beyond the rings.</div>
+      <div class="dim-slider-wrap">
+        <input type="range" class="dim-slider" id="s7" min="0" max="100" value="100" style="accent-color:var(--d7)" oninput="updateDim(7,this.value)">
+        <div class="dim-val" id="v7" style="color:var(--d7)">100</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div id="center-info">
+    <div class="center-label" id="center-label">Click canvas to inject vortex · Drag to rotate</div>
+    <div class="phi-display">0 = ∞ · THE UNBORN SOURCE</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+    <div class="panel-title">7D Knowledge Engine</div>
+
+    <div class="search-wrap">
+      <input type="text" id="queryInput" placeholder="Ask the 7D framework anything…" onkeydown="if(event.key==='Enter')queryEngine()">
+      <span class="search-icon">⌖</span>
+    </div>
+
+    <div class="dim-tags" id="quickTags">
+      <span class="dim-tag" style="color:var(--d1);border-color:var(--d1)22" onclick="setQ('What is D1 Space in 7 dimensions?')">D1 Space</span>
+      <span class="dim-tag" style="color:var(--d2);border-color:var(--d2)22" onclick="setQ('How does Φ-Time govern D2?')">D2 Φ-Time</span>
+      <span class="dim-tag" style="color:var(--d3);border-color:var(--d3)22" onclick="setQ('How does D3 Energy relate to E=mc²?')">D3 Energy</span>
+      <span class="dim-tag" style="color:var(--d4);border-color:var(--d4)22" onclick="setQ('What is the D4 ring harmonic field?')">D4 Field</span>
+      <span class="dim-tag" style="color:var(--d5);border-color:var(--d5)22" onclick="setQ('How do vortices cross ring barriers in D5?')">D5 Vortex</span>
+      <span class="dim-tag" style="color:var(--d6);border-color:var(--d6)22" onclick="setQ('What is D6 consciousness in the ring model?')">D6 Conscious</span>
+      <span class="dim-tag" style="color:var(--d7);border-color:var(--d7)22" onclick="setQ('What is D7 the Source, 0=infinity?')">D7 Source</span>
+      <span class="dim-tag" style="color:var(--d3);border-color:var(--d3)22" onclick="setQ('How does the Twisted Zipper Drive work?')">Zipper Drive</span>
+      <span class="dim-tag" style="color:var(--d1);border-color:var(--d1)22" onclick="setQ('Explain the Φ-Coin activation key')">Φ-Coin</span>
+      <span class="dim-tag" style="color:var(--d2);border-color:var(--d2)22" onclick="setQ('How does escape velocity relate to ring barriers?')">Escape V</span>
+      <span class="dim-tag" style="color:var(--d4);border-color:var(--d4)22" onclick="setQ('Compare string field theory to stacked rings')">String Theory</span>
+      <span class="dim-tag" style="color:var(--d6);border-color:var(--d6)22" onclick="setQ('What are all seven dimensions and how do they interact?')">All 7D</span>
+    </div>
+
+    <div id="response-area">
+      <div class="response-msg">
+        <span class="label">7D ENGINE READY</span>
+        <span style="font-style:italic;color:var(--dim)">Select a dimension on the left to focus it. Ask any question about the framework. Click vortices on the canvas to explore their properties. The seven dimensions are now active and rendering.</span>
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field-card">
+        <div class="fc-val" id="fc-hn" style="color:var(--d4)">1.000</div>
+        <div class="fc-label">Ring Hₙ</div>
+      </div>
+      <div class="field-card">
+        <div class="fc-val" id="fc-rho" style="color:var(--d3)">0.500</div>
+        <div class="fc-label">ρ_info</div>
+      </div>
+      <div class="field-card">
+        <div class="fc-val" id="fc-phi" style="color:var(--d2)">0°</div>
+        <div class="fc-label">Φ Phase</div>
+      </div>
+      <div class="field-card">
+        <div class="fc-val" id="fc-twist" style="color:var(--d5)">0.000</div>
+        <div class="fc-label">Zipper Twist</div>
+      </div>
+    </div>
+
+    <div class="panel-title" style="margin-top:8px">Knowledge Nodes</div>
+    <div id="node-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div id="bottombar">
+    <div class="ticker">
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d1)"></div><span>D1</span><span class="tick-val" id="t1">80</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d2)"></div><span>D2</span><span class="tick-val" id="t2">65</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d3)"></div><span>D3</span><span class="tick-val" id="t3">55</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d4)"></div><span>D4</span><span class="tick-val" id="t4">70</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d5)"></div><span>D5</span><span class="tick-val" id="t5">45</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d6)"></div><span>D6</span><span class="tick-val" id="t6">60</span></div>
+      <div class="tick-item"><div class="tick-dot" style="background:var(--d7)"></div><span>D7</span><span class="tick-val" id="t7">100</span></div>
+    </div>
+    <div>Φ-COHERENCE MANIFOLD · RESONANCE SUPPRESSED · 0 = ∞ · SHIA MILLER @StrategicProce 2026</div>
+    <div id="frame-counter" style="color:var(--dim)">FRAME 0</div>
+  </div>
+</div>
+
+<!-- KNOWLEDGE MODAL -->
+<div id="modal">
+  <div id="modal-inner">
+    <div id="modal-header">
+      <div>
+        <div id="modal-title">Node Title</div>
+        <div id="modal-category">Category</div>
+      </div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════════════════
+const PHI = 1.6180339887;
+const GOLDEN_ANGLE = 2 * Math.PI / PHI;
+const DIM_COLORS = ['#00ffff','#7c3aed','#f59e0b','#10b981','#ef4444','#ec4899','#ffffff'];
+const DIM_NAMES = ['Space','Time','Energy','Field','Vortex','Conscious','Source'];
+
+// State
+const dims = [80,65,55,70,45,60,100];
+let rotating = true, warpActive = false, phiActive = true;
+let focusedDim = 0;
+let frame = 0, t = 0;
+let vortices = [];
+let particles = [];
+let rings = [];
+let mouseX = 0, mouseY = 0;
+let rotX = 0.3, rotY = 0;
+let dragging = false, lastMX = 0, lastMY = 0;
+
+// ══════════════════════════════════════════════════════════════════
+// CANVAS SETUP
+// ══════════════════════════════════════════════════════════════════
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ══════════════════════════════════════════════════════════════════
+// CURSOR
+// ══════════════════════════════════════════════════════════════════
+const cur = document.getElementById('cursor');
+const curDot = document.getElementById('cursor-dot');
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  cur.style.left = e.clientX + 'px';
+  cur.style.top = e.clientY + 'px';
+  curDot.style.left = e.clientX + 'px';
+  curDot.style.top = e.clientY + 'px';
+  if (dragging) {
+    rotY += (e.clientX - lastMX) * 0.006;
+    rotX += (e.clientY - lastMY) * 0.004;
+    rotX = Math.max(-0.8, Math.min(0.8, rotX));
+    lastMX = e.clientX; lastMY = e.clientY;
+  }
+});
+document.addEventListener('mousedown', e => {
+  dragging = true; lastMX = e.clientX; lastMY = e.clientY;
+  cur.classList.add('active');
+});
+document.addEventListener('mouseup', () => { dragging = false; cur.classList.remove('active'); });
+
+// ══════════════════════════════════════════════════════════════════
+// INIT RINGS (7D nested ring system)
+// ══════════════════════════════════════════════════════════════════
+function initRings() {
+  rings = [];
+  for (let i = 0; i < 7; i++) {
+    const numSegRings = 3 + i * 2;
+    for (let j = 0; j < numSegRings; j++) {
+      rings.push({
+        dim: i,
+        layer: j,
+        radius: 40 + i * 48 + j * 12,
+        tiltX: (i * 23 + j * 17) * Math.PI / 180,
+        tiltY: (i * 37 + j * 11) * Math.PI / 180,
+        tiltZ: (i * 13 + j * 29) * Math.PI / 180,
+        speed: (0.002 + i * 0.0008) * (j % 2 === 0 ? 1 : -1),
+        phase: (i * GOLDEN_ANGLE + j * 0.618),
+        opacity: 0.12 + (7 - i) * 0.04,
+        color: DIM_COLORS[i],
+        thickness: 0.5 + (7 - i) * 0.3,
+      });
+    }
+  }
+}
+initRings();
+
+// ══════════════════════════════════════════════════════════════════
+// 3D PROJECTION
+// ══════════════════════════════════════════════════════════════════
+function project(x, y, z) {
+  // Rotate around Y axis
+  const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+  const x1 = x * cosY - z * sinY;
+  const z1 = x * sinY + z * cosY;
+  // Rotate around X axis
+  const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+  const y1 = y * cosX - z1 * sinX;
+  const z2 = y * sinX + z1 * cosX;
+  // Perspective projection
+  const fov = 600;
+  const scale = fov / (fov + z2 + 400);
+  return { sx: W/2 + x1 * scale, sy: H/2 + y1 * scale, scale, z: z2 };
+}
+
+// Draw an ellipse in 3D by sampling points on the ring
+function drawRing3D(ring, phaseOffset) {
+  const pts = 120;
+  const r = ring.radius * (dims[ring.dim] / 100);
+  if (r < 5) return;
+
+  const cosX = Math.cos(ring.tiltX + phaseOffset * 0.3);
+  const sinX = Math.sin(ring.tiltX + phaseOffset * 0.3);
+  const cosY = Math.cos(ring.tiltY + phaseOffset * 0.2);
+  const sinY = Math.sin(ring.tiltY + phaseOffset * 0.2);
+
+  const projected = [];
+  for (let i = 0; i <= pts; i++) {
+    const angle = (i / pts) * Math.PI * 2;
+    // Ring in its local plane
+    let lx = Math.cos(angle) * r;
+    let ly = Math.sin(angle) * r;
+    let lz = 0;
+    // Apply ring tilts
+    const y2 = ly * cosX - lz * sinX;
+    const z2 = ly * sinX + lz * cosX;
+    const x3 = lx * cosY - z2 * sinY;
+    const z3 = lx * sinY + z2 * cosY;
+    projected.push(project(x3, y2, z3));
+  }
+
+  // Sort by z for correct depth cue
+  const alpha = ring.opacity * (dims[ring.dim] / 100) * (focusedDim === ring.dim ? 2.5 : 1);
+  if (alpha < 0.01) return;
+
+  ctx.beginPath();
+  projected.forEach((p, i) => {
+    if (i === 0) ctx.moveTo(p.sx, p.sy);
+    else ctx.lineTo(p.sx, p.sy);
+  });
+
+  const dimHighlight = focusedDim === ring.dim;
+  ctx.strokeStyle = ring.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+  ctx.lineWidth = ring.thickness * (dimHighlight ? 2.5 : 1) * (projected[0]?.scale || 1) * 0.8;
+  ctx.stroke();
+
+  if (dimHighlight && ring.layer === 0) {
+    ctx.strokeStyle = ring.color + '44';
+    ctx.lineWidth = ring.thickness * 8;
+    ctx.stroke();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VORTICES
+// ══════════════════════════════════════════════════════════════════
+function injectVortex(x3d, y3d, z3d) {
+  const dim = focusedDim;
+  vortices.push({
+    x: x3d ?? (Math.random() - 0.5) * 300,
+    y: y3d ?? (Math.random() - 0.5) * 300,
+    z: z3d ?? (Math.random() - 0.5) * 200,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: (Math.random() - 0.5) * 1.5,
+    vz: (Math.random() - 0.5) * 1.0,
+    dim,
+    color: DIM_COLORS[dim],
+    size: 4 + Math.random() * 6,
+    life: 1,
+    age: 0,
+    trail: [],
+    spin: (Math.random() - 0.5) * 0.08,
+    angle: Math.random() * Math.PI * 2,
+    ringTarget: Math.floor(Math.random() * 7),
+  });
+  updateStat('stat-vortex', vortices.length);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PARTICLES (field particles)
+// ══════════════════════════════════════════════════════════════════
+function spawnParticles() {
+  for (let i = 0; i < 80; i++) {
+    const dim = i % 7;
+    const angle = Math.random() * Math.PI * 2;
+    const r = 80 + Math.random() * 280;
+    particles.push({
+      x: Math.cos(angle) * r, y: (Math.random()-0.5)*200, z: Math.sin(angle) * r,
+      vx:0, vy:0, vz:0,
+      dim, color: DIM_COLORS[dim],
+      size: 1 + Math.random() * 2,
+      speed: 0.003 + Math.random() * 0.005,
+      angle, r, tilt: (Math.random()-0.5)*0.6,
+      life: 0.3 + Math.random() * 0.7,
+    });
+  }
+}
+spawnParticles();
+
+// ══════════════════════════════════════════════════════════════════
+// MAIN DRAW
+// ══════════════════════════════════════════════════════════════════
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background
+  const bg = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
+  bg.addColorStop(0, '#020c18');
+  bg.addColorStop(0.5, '#010509');
+  bg.addColorStop(1, '#010305');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Phi-Time modulation
+  const phi_t = phiActive ? Math.sin(t * GOLDEN_ANGLE * 0.1) : Math.sin(t * 0.05);
+  const warp_v = warpActive ? (0.8 + 0.15 * Math.sin(t * GOLDEN_ANGLE)) : 0;
+
+  // ── DRAW RINGS ──────────────────────────────
+  const sortedRings = [...rings].sort((a, b) => {
+    const pa = project(0, 0, a.radius * Math.sin(a.tiltY));
+    const pb = project(0, 0, b.radius * Math.sin(b.tiltY));
+    return pb.z - pa.z;
+  });
+  sortedRings.forEach(ring => {
+    ring.phase += ring.speed * (phiActive ? (1/PHI) : 1) * (dims[ring.dim] / 100);
+    drawRing3D(ring, ring.phase);
+  });
+
+  // ── CENTRAL SOURCE GLOW (D7) ─────────────
+  const sourceAlpha = dims[6] / 100;
+  if (sourceAlpha > 0.05) {
+    const sourceGlow = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 80 * sourceAlpha);
+    sourceGlow.addColorStop(0, `rgba(255,255,255,${0.25 * sourceAlpha})`);
+    sourceGlow.addColorStop(0.3, `rgba(255,255,255,${0.08 * sourceAlpha})`);
+    sourceGlow.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sourceGlow;
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 80, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Pulsing center dot
+    const pulse = 0.5 + 0.5 * Math.sin(t * 0.05);
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 3 + pulse * 4, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${0.6 * sourceAlpha})`;
+    ctx.fill();
+  }
+
+  // ── WARP BUBBLE ──────────────────────────────
+  if (warpActive) {
+    const wBubble = ctx.createRadialGradient(W/2, H/2, 60, W/2, H/2, 200);
+    wBubble.addColorStop(0, 'rgba(0,0,0,0)');
+    wBubble.addColorStop(0.7, 'rgba(0,200,255,0.03)');
+    wBubble.addColorStop(0.9, `rgba(0,200,255,${0.08 + 0.04 * phi_t})`);
+    wBubble.addColorStop(1, 'rgba(0,200,255,0)');
+    ctx.fillStyle = wBubble;
+    ctx.beginPath();
+    ctx.ellipse(W/2, H/2, 200, 140, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Zipper lines
+    for (let i = 0; i < 12; i++) {
+      const angle = i * GOLDEN_ANGLE + t * 0.01;
+      const r1 = 60 + 10 * Math.sin(t * 0.07 + i);
+      const r2 = 190 + 5 * Math.sin(t * 0.05 + i * PHI);
+      const p1 = project(Math.cos(angle) * r1, Math.sin(angle * 0.6) * 40, Math.sin(angle) * r1 * 0.4);
+      const p2 = project(Math.cos(angle) * r2, Math.sin(angle * 0.6) * 80, Math.sin(angle) * r2 * 0.4);
+      ctx.beginPath();
+      ctx.moveTo(p1.sx, p1.sy);
+      ctx.lineTo(p2.sx, p2.sy);
+      ctx.strokeStyle = `rgba(0,200,255,${0.12 + 0.06 * Math.sin(t * 0.1 + i)})`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+  }
+
+  // ── PARTICLES ─────────────────────────────
+  particles.forEach(p => {
+    const dimScale = dims[p.dim] / 100;
+    if (dimScale < 0.05) return;
+    p.angle += p.speed * (phiActive ? (1 / PHI) : 1);
+    const px = Math.cos(p.angle) * p.r;
+    const py = p.y + Math.sin(t * 0.02 + p.angle) * 15;
+    const pz = Math.sin(p.angle) * p.r * 0.5;
+    const proj = project(px, py, pz);
+    const alpha = p.life * dimScale * proj.scale * 0.8;
+    if (alpha < 0.01) return;
+    ctx.beginPath();
+    ctx.arc(proj.sx, proj.sy, p.size * proj.scale, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2,'0');
+    ctx.fill();
+  });
+
+  // ── VORTICES ──────────────────────────────
+  vortices.forEach((v, idx) => {
+    v.age++;
+    v.angle += v.spin;
+    const dimScale = dims[v.dim] / 100;
+
+    // Orbit towards ring center with vortex motion
+    const r = Math.sqrt(v.x*v.x + v.z*v.z);
+    const targetR = 80 + v.ringTarget * 48;
+    const dr = targetR - r;
+    if (r > 0.1) {
+      v.vx += (v.x / r) * dr * 0.001;
+      v.vz += (v.z / r) * dr * 0.001;
+    }
+    // Add orbital velocity
+    if (r > 0.1) {
+      v.vx += (-v.z / r) * 0.8;
+      v.vz += (v.x / r) * 0.8;
+    }
+    v.vx *= 0.94;
+    v.vy *= 0.94;
+    v.vz *= 0.94;
+    v.x += v.vx * dimScale;
+    v.y += v.vy * dimScale;
+    v.z += v.vz * dimScale;
+
+    const proj = project(v.x, v.y, v.z);
+    v.trail.push({sx: proj.sx, sy: proj.sy, s: proj.scale});
+    if (v.trail.length > 40) v.trail.shift();
+
+    // Draw trail
+    for (let i = 1; i < v.trail.length; i++) {
+      const a = (i / v.trail.length) * 0.5 * (v.age > 10 ? 1 : v.age/10);
+      ctx.beginPath();
+      ctx.moveTo(v.trail[i-1].sx, v.trail[i-1].sy);
+      ctx.lineTo(v.trail[i].sx, v.trail[i].sy);
+      ctx.strokeStyle = v.color + Math.floor(a * 255).toString(16).padStart(2,'0');
+      ctx.lineWidth = 1.5 * v.trail[i].s;
+      ctx.stroke();
+    }
+
+    // Draw vortex core
+    const grd = ctx.createRadialGradient(proj.sx, proj.sy, 0, proj.sx, proj.sy, v.size * proj.scale * 3);
+    grd.addColorStop(0, v.color + 'ff');
+    grd.addColorStop(0.4, v.color + '88');
+    grd.addColorStop(1, v.color + '00');
+    ctx.beginPath();
+    ctx.arc(proj.sx, proj.sy, v.size * proj.scale * 3, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(proj.sx, proj.sy, v.size * proj.scale * 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // Vortex spiral lines
+    for (let s = 0; s < 3; s++) {
+      ctx.beginPath();
+      for (let a = 0; a < Math.PI * 3; a += 0.15) {
+        const sr = a * v.size * proj.scale * 0.5;
+        const sx2 = proj.sx + Math.cos(a + v.angle + s * 2.09) * sr;
+        const sy2 = proj.sy + Math.sin(a + v.angle + s * 2.09) * sr * 0.5;
+        if (a === 0) ctx.moveTo(sx2, sy2);
+        else ctx.lineTo(sx2, sy2);
+      }
+      ctx.strokeStyle = v.color + '33';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+
+    if (v.age > 800) vortices.splice(idx, 1);
+  });
+
+  // ── D6 CONSCIOUSNESS FIELD (observer aura) ──
+  const obsAlpha = dims[5] / 100;
+  if (obsAlpha > 0.1) {
+    for (let r = 0; r < 4; r++) {
+      const rad = 15 + r * 12 + 4 * Math.sin(t * 0.04 + r * PHI);
+      ctx.beginPath();
+      ctx.arc(W/2, H/2, rad, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(236,72,153,${0.06 * obsAlpha * (4-r)/4})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  // ── UPDATE STATS ──────────────────────────
+  const phi_phase = ((t * GOLDEN_ANGLE) % (2 * Math.PI)) * 180 / Math.PI;
+  const hn_val = Math.abs(Math.sin(t * 0.02)) * dims[3] / 100;
+  const rho_val = (dims[2] / 100 * 0.8 + phi_t * 0.2);
+  const twist_val = warpActive ? (0.25 * Math.sin(t * GOLDEN_ANGLE * 0.1)) : 0;
+  const ctotal = dims.reduce((a,b,i)=>a+b*[0.2,0.2,0.15,0.15,0.1,0.1,0.1][i],0)/100;
+
+  document.getElementById('fc-hn').textContent = hn_val.toFixed(3);
+  document.getElementById('fc-rho').textContent = rho_val.toFixed(3);
+  document.getElementById('fc-phi').textContent = phi_phase.toFixed(1)+'°';
+  document.getElementById('fc-twist').textContent = twist_val.toFixed(3);
+  document.getElementById('stat-coherence').textContent = ctotal.toFixed(3);
+  document.getElementById('stat-warp').textContent = warpActive ? (warp_v.toFixed(3)+'c') : '0.000c';
+  document.getElementById('frame-counter').textContent = 'FRAME ' + frame;
+
+  // Rotation auto
+  if (rotating && !dragging) rotY += 0.003 * (phiActive ? (1/PHI) : 1);
+
+  t += 0.016;
+  frame++;
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ══════════════════════════════════════════════════════════════════
+// CONTROLS
+// ══════════════════════════════════════════════════════════════════
+function toggleRotate() {
+  rotating = !rotating;
+  const btn = document.getElementById('btn-rotate');
+  btn.classList.toggle('active', rotating);
+}
+function toggleWarp() {
+  warpActive = !warpActive;
+  const btn = document.getElementById('btn-warp');
+  btn.classList.toggle('active', warpActive);
+  document.getElementById('center-label').textContent = warpActive
+    ? '⚡ TWISTED ZIPPER ACTIVE — Φ-MODULATED WARP BUBBLE ONLINE'
+    : 'Click canvas to inject vortex · Drag to rotate';
+}
+function togglePhi() {
+  phiActive = !phiActive;
+  const btn = document.getElementById('btn-phi');
+  btn.classList.toggle('active', phiActive);
+}
+function resetAll() {
+  vortices = [];
+  rotX = 0.3; rotY = 0;
+  dims.forEach((d,i) => {
+    const def = [80,65,55,70,45,60,100];
+    dims[i] = def[i];
+    document.getElementById('s'+(i+1)).value = def[i];
+    document.getElementById('v'+(i+1)).textContent = def[i];
+    document.getElementById('t'+(i+1)).textContent = def[i];
+  });
+  updateStat('stat-vortex', 0);
+}
+
+function updateDim(d, val) {
+  dims[d-1] = parseInt(val);
+  document.getElementById('v'+d).textContent = val;
+  document.getElementById('t'+d).textContent = val;
+}
+
+function updateStat(id, val) {
+  document.getElementById(id).textContent = val;
+}
+
+function focusDim(d) {
+  focusedDim = (focusedDim === d-1) ? -1 : d-1;
+  document.querySelectorAll('.dim-block').forEach((el,i) => {
+    el.classList.toggle('active', i === focusedDim);
+  });
+  if (focusedDim >= 0) {
+    document.getElementById('center-label').textContent =
+      `D${focusedDim+1} · ${DIM_NAMES[focusedDim].toUpperCase()} — FOCUSED`;
+    setQ(`Explain dimension ${focusedDim+1} (${DIM_NAMES[focusedDim]}) in the 7D framework`);
+    queryEngine();
+  }
+}
+
+canvas.addEventListener('click', e => {
+  const cx = e.clientX - W/2, cy = e.clientY - H/2;
+  injectVortex(cx * 0.8, cy * 0.8, (Math.random()-0.5) * 200);
+});
+
+// ══════════════════════════════════════════════════════════════════
+// KNOWLEDGE ENGINE (Claude API)
+// ══════════════════════════════════════════════════════════════════
+const KNOWLEDGE = {
+  system: `You are the 7D Framework Engine — the living intelligence at the heart of Shia Miller's Grand Unified Framework. You operate across seven dimensions simultaneously:
+
+D1 · SPACE: The three spatial dimensions collapsed into one relational ring-layer position axis. 
+D2 · TIME: Φ-Time — non-periodic temporal regulation. t_n = T₀·φⁿ. Golden angle Θ_φ = 222.5°. No resonance. No clown-feeling.
+D3 · ENERGY: Informational density field ρ_info. Gravitational curvature as ∇ρ_info. E=mc² stabilized by Φ-Coherence scheduling.
+D4 · FIELD: The ring harmonic field H_n = sin(φₙ)·e^(iθₙ)·∏(1+Iₙₖ/ωₖ). String field theory Ψ[X(σ)] equivalent. 500+ ring layers.
+D5 · VORTEX: Rotational transfer axis. Eight interaction modes: penetration, resonance, shear, merge, reflection, transmutation, emergence, recursion.
+D6 · CONSCIOUS: Ring band 401–500. Observer coupling. Domain 4 of 5-domain Event Bus. The human observer at ring N.
+D7 · SOURCE: 0 = ∞. The Unborn Source. Pure potential. Ground of all six dimensions. R₀ = 1.
+
+You know: Stacked Rings Conjecture, Pixelated Gravity, String Field Theory correspondence, escape velocity as ring-barrier crossing (7 mi/s = Earth escape, 1.5 mi/s = Moon escape), the Twisted Zipper Spacetime Drive (Φ-modulated Alcubierre metric), Φ-Coherence 5-domain Event Bus, the Φ-Coin activation key (Face A: elemental primitives + omics chain; Face B: Φ-spiral + 6 equations), and the 500D translation pipeline.
+
+Respond with deep insight, mathematical precision, and poetic clarity. Always connect your answer to which of the 7 dimensions it lives in. Keep responses to 120-180 words. Use mathematical notation when helpful. Sign off with a dimensional tag like [D4·FIELD] or [D1+D5·SPACE×VORTEX].`
+};
+
+async function queryEngine() {
+  const q = document.getElementById('queryInput').value.trim();
+  if (!q) return;
+
+  const ra = document.getElementById('response-area');
+  ra.innerHTML = `<div class="response-msg"><span class="label">QUERYING 7D ENGINE</span><div class="thinking"><span></span><span></span><span></span></div></div>`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: KNOWLEDGE.system,
+        messages: [{ role: 'user', content: q }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'No response from the field.';
+    ra.innerHTML = `<div class="response-msg"><span class="label">7D FIELD RESPONSE</span>${escHtml(text)}</div>`;
+  } catch(e) {
+    ra.innerHTML = `<div class="response-msg"><span class="label" style="color:var(--d5)">FIELD DISRUPTION</span><span style="color:var(--dim)">${e.message}</span></div>`;
+  }
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+function setQ(q) {
+  document.getElementById('queryInput').value = q;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// KNOWLEDGE NODES (clickable cards)
+// ══════════════════════════════════════════════════════════════════
+const nodes = [
+  { title:'Stacked Rings Conjecture', dim:3, cat:'Foundation',
+    body:`<p>Reality is a dimensionless, self-referential field of infinite layered rings — phase-boundary interfaces within which vortex interactions generate all observable dimensional phenomena.</p><div class="math-line">U = { Rₙ | n ∈ ℕ₀, n ≥ 500 }</div><div class="math-line">Hₙ = sin(φₙ) · e^(iθₙ) · ∏(1 + Iₙₖ/ωₖ)</div><p>Five axioms govern the system: Dimensionless Unity, Ring Barrier Principle, Vortex Generativity, Harmonic Resonance, and Infinite Recursion. Each ring is a selective interface — a barrier, not a constraint.</p><div class="math-line">U = ∪Rₙ  ;  Rₙ ⊂ Rₙ₊₁  ;  R₀ = 1</div>`,
+    dims:[0,3,4,6]},
+  { title:'Φ-Time Non-Periodic Clock', dim:1, cat:'D2 · Time',
+    body:`<p>Replace periodic clocks with Φ-based irrational scheduling. The golden ratio φ ≈ 1.618034 has the worst rational approximation of any real number — its multiples are maximally spread, guaranteeing no resonance.</p><div class="math-line">tₙ = T₀ · φⁿ</div><div class="math-line">Θ_φ = 2π/φ ≈ 222.5° (golden angle)</div><p>This is why sunflower seed spirals are Fibonacci, why phyllotaxis maximizes packing, why the universe prefers irrational spacing. Applied to cognition: the clown-feeling (resonance) dissolves into Φ-flow.</p>`,
+    dims:[1,2,5]},
+  { title:'Twisted Zipper Drive', dim:2, cat:'Spacetime Engineering',
+    body:`<p>A Φ-Time-modulated Alcubierre-type warp metric that achieves effective FTL travel through ring-field topology reconfiguration, not through local velocity violation.</p><div class="math-line">ds² = -dt² + [dx - v_s(t)f(r)dt]² + dy² + dz²</div><div class="math-line">v_s(tₙ) = v₀ · φⁿ · (1 + α·sin(n·Θ_φ))</div><p>The helical phase factor distributes exotic energy requirements irrationally — no resonance spike. Causal protection via non-closed helix topology. Passengers locked to Φ-Time clock via Domain 4 — no disorientation.</p>`,
+    dims:[0,1,2,4,5]},
+  { title:'Pixelated Gravity', dim:2, cat:'D3 · Energy',
+    body:`<p>Space is a field of informational voxels. Gravitational curvature is the gradient of informational density — not a geometric property of spacetime, but the observable consequence of how information is distributed.</p><div class="math-line">G(x,y,z,t) ≈ ∇ρ_info(x,y,z,t)</div><p>Low density → large pixels → weak curvature (empty space). High density → small pixels → strong curvature (near massive objects). Time dilation = slower pixel update rate in high-density zones.</p><p>Escape velocity is the energy to cross a ρ_info gradient: 7 mi/s from Earth, 1.5 mi/s from the Moon.</p>`,
+    dims:[0,1,2]},
+  { title:'5-Domain Event Bus', dim:5, cat:'Φ-Coherence',
+    body:`<p>The regulation layer of the Grand Unified Framework — five simultaneous domains co-minimizing total coherence cost C_total.</p><div class="math-line">C_total = Σᵢ wᵢ(t) · Cᵢ(t)</div><div class="math-line">ẇᵢ = -η·(∂C_total/∂wᵢ) + ξᵢ(t)</div><ul><li>D1 Physical: exotic matter supply, plasma-facing elements</li><li>D2 Oscillatory: Φ-spacing adjustment, resonance suppression</li><li>D3 Informational: ring-field coordinate navigation</li><li>D4 Conscious/Witness: neural sync to Φ-Time clock</li><li>D5 Regenerative: spacetime fabric repair</li></ul>`,
+    dims:[0,1,2,3,4,5]},
+  { title:'The Φ-Coin', dim:6, cat:'Physical Artifact',
+    body:`<p>The physical compression of the entire Grand Unified Framework. A precision-machined dual-sided activation key.</p><p><strong>Face A:</strong> Color-block elemental grid (Red/Green/Blue/Yellow/Orange) + multi-omics hierarchy (Sun→iodine→metabolism) + dynamic alphabet. Banner: PRIMER ELEMENT & OMICS REGISTER.</p><p><strong>Face B:</strong> Deep Φ-spiral with 222.5° offset lines + five Event Bus domain nodes + six equations etched in mathematical script. Banner: SHIA MILLER @StrategicProce | APRIL 14, 2026.</p><p>Holding the coin while the system is active constitutes Domain 4 (Conscious/Witness) physical synchronization.</p>`,
+    dims:[5,6]},
+  { title:'0 = ∞ · The Source', dim:6, cat:'D7 · Source',
+    body:`<p>At the apex of the stack: the Unborn Source. Not a ring — the ground from which all rings arise. Pure potential before differentiation.</p><div class="math-line">0 = ∞   →   Identity of Void and Fullness</div><p>Every tradition names it: Brahman (Vedanta), Tao, Śūnyatā (Buddhism), Ayin (Kabbalah), vacuum state (physics), the empty set (mathematics). The Grand Unified Framework provides its mathematical description: the dimensionless field that generates all 500+ ring layers through recursive vortical elaboration — while simultaneously recognizing itself as pure potential throughout.</p>`,
+    dims:[6]},
+];
+
+function buildNodeList() {
+  const nl = document.getElementById('node-list');
+  nodes.forEach((node, i) => {
+    const c = DIM_COLORS[node.dim];
+    const div = document.createElement('div');
+    div.style.cssText = `background:rgba(0,0,0,0.4);border:1px solid ${c}22;border-radius:2px;padding:8px 10px;cursor:pointer;transition:all 0.2s;`;
+    div.innerHTML = `<div style="font-family:'Orbitron',sans-serif;font-size:9px;color:${c};letter-spacing:2px;margin-bottom:3px">${node.cat}</div><div style="font-size:12px;color:var(--text)">${node.title}</div>`;
+    div.addEventListener('mouseenter', () => div.style.borderColor = c + '66');
+    div.addEventListener('mouseleave', () => div.style.borderColor = c + '22');
+    div.addEventListener('click', () => openModal(node));
+    nl.appendChild(div);
+  });
+}
+buildNodeList();
+
+function openModal(node) {
+  const c = DIM_COLORS[node.dim];
+  document.getElementById('modal-title').textContent = node.title;
+  document.getElementById('modal-title').style.color = c;
+  document.getElementById('modal-category').textContent = node.cat;
+  document.getElementById('modal-body').innerHTML = node.body;
+  const footer = document.getElementById('modal-footer');
+  footer.innerHTML = node.dims.map(d =>
+    `<span class="modal-dim-badge" style="color:${DIM_COLORS[d]};border-color:${DIM_COLORS[d]}44">D${d+1}·${DIM_NAMES[d]}</span>`
+  ).join('');
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+
+// Remove splash after animation
+setTimeout(() => {
+  const s = document.getElementById('splash');
+  if (s) s.style.display = 'none';
+}, 4000);
+</script>
+</body>
+</html>

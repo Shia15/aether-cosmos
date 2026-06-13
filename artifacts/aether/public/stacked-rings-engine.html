@@ -1,0 +1,2485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacked Rings System Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #020408;
+    --deep: #030912;
+    --ring-1: #0a1628;
+    --ring-2: #0d1f3c;
+    --panel: #071220;
+    --border: #1a3a6b33;
+    --border-glow: #2e6da466;
+    --accent: #2e6da4;
+    --accent-bright: #4a9fd4;
+    --accent-glow: #4a9fd466;
+    --gold: #c9a84c;
+    --gold-dim: #c9a84c88;
+    --teal: #1fd4c8;
+    --teal-dim: #1fd4c844;
+    --violet: #8b5cf6;
+    --violet-dim: #8b5cf633;
+    --text-primary: #e8f0fa;
+    --text-secondary: #8ba8cc;
+    --text-dim: #4a6080;
+    --text-code: #1fd4c8;
+    --ring-glow: 0 0 30px #2e6da422, 0 0 80px #0a1f4022;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background rings */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, #0a1f4015 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, #1a3a6b0a 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 20%, #2e6da408 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Animated ring orbits in background */
+  .bg-rings {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 1200px;
+    height: 1200px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.06;
+  }
+
+  .bg-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: bgRotate linear infinite;
+  }
+
+  .bg-ring:nth-child(1) { width: 300px; height: 300px; animation-duration: 20s; border-color: var(--teal); }
+  .bg-ring:nth-child(2) { width: 500px; height: 500px; animation-duration: 30s; animation-direction: reverse; }
+  .bg-ring:nth-child(3) { width: 700px; height: 700px; animation-duration: 45s; border-color: var(--gold); }
+  .bg-ring:nth-child(4) { width: 900px; height: 900px; animation-duration: 60s; animation-direction: reverse; border-color: var(--violet); }
+  .bg-ring:nth-child(5) { width: 1100px; height: 1100px; animation-duration: 80s; }
+
+  @keyframes bgRotate {
+    from { transform: translate(-50%, -50%) rotate(0deg) scaleX(1.6); }
+    to { transform: translate(-50%, -50%) rotate(360deg) scaleX(1.6); }
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--border-glow);
+    background: linear-gradient(180deg, #030d1e 0%, transparent 100%);
+    padding: 32px 48px 24px;
+  }
+
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .logo-block {}
+
+  .logo-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(22px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #e8f0fa 0%, var(--accent-bright) 50%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .header-sub {
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .header-meta span { color: var(--teal); }
+
+  /* ── SEARCH ENGINE ── */
+  .search-zone {
+    position: relative;
+    z-index: 10;
+    padding: 40px 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .search-container {
+    position: relative;
+  }
+
+  .search-bar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 20px;
+    color: var(--accent-bright);
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  #searchInput {
+    width: 100%;
+    background: var(--ring-1);
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 20px 60px 20px 56px;
+    outline: none;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+  }
+
+  #searchInput::placeholder { color: var(--text-dim); font-weight: 400; }
+
+  #searchInput:focus {
+    border-color: var(--accent-bright);
+    box-shadow: 0 0 0 1px var(--accent-bright), 0 0 40px var(--accent-glow);
+    background: var(--ring-2);
+  }
+
+  .search-clear {
+    position: absolute;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+    display: none;
+    z-index: 2;
+  }
+
+  .search-clear:hover { color: var(--text-primary); }
+  .search-clear.visible { display: block; }
+
+  /* Quick-topic chips */
+  .search-chips {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 2px;
+    border: 1px solid var(--border-glow);
+    background: var(--panel);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .chip:hover {
+    border-color: var(--accent-bright);
+    color: var(--accent-bright);
+    background: var(--ring-1);
+  }
+
+  /* Results count */
+  .results-info {
+    margin-top: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    min-height: 20px;
+    transition: all 0.3s;
+  }
+
+  .results-info.active { color: var(--teal); }
+
+  /* ── MAIN LAYOUT ── */
+  .main-layout {
+    position: relative;
+    z-index: 5;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px 80px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR NAV ── */
+  .sidebar {
+    position: sticky;
+    top: 24px;
+  }
+
+  .nav-section {
+    margin-bottom: 8px;
+  }
+
+  .nav-section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 12px 16px 6px;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-link {
+    display: block;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+  }
+
+  .nav-link:hover {
+    color: var(--accent-bright);
+    border-left-color: var(--accent-bright);
+    background: var(--ring-1);
+    padding-left: 20px;
+  }
+
+  .nav-link.active {
+    color: var(--teal);
+    border-left-color: var(--teal);
+    background: var(--teal-dim);
+  }
+
+  /* ── CONTENT AREA ── */
+  .content-area { min-width: 0; }
+
+  /* ── ENTRY CARDS ── */
+  .entry {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .entry::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.4;
+    transition: opacity 0.3s;
+  }
+
+  .entry:hover { border-color: var(--border-glow); }
+  .entry:hover::before { opacity: 1; }
+
+  .entry.category-axiom::before { background: var(--teal); }
+  .entry.category-math::before { background: var(--gold); }
+  .entry.category-pipeline::before { background: var(--violet); }
+  .entry.category-experience::before { background: #f97316; }
+  .entry.category-implications::before { background: #22c55e; }
+  .entry.category-gravity::before { background: var(--accent-bright); }
+
+  .entry-header {
+    padding: 20px 24px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .entry-title-group { flex: 1; }
+
+  .entry-category {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .entry.category-axiom .entry-category { color: var(--teal); }
+  .entry.category-math .entry-category { color: var(--gold); }
+  .entry.category-pipeline .entry-category { color: var(--violet); }
+  .entry.category-experience .entry-category { color: #f97316; }
+  .entry.category-implications .entry-category { color: #22c55e; }
+  .entry.category-gravity .entry-category { color: var(--accent-bright); }
+
+  .entry-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+  }
+
+  .entry-keywords {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .kw {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: var(--ring-2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .expand-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    margin-top: 2px;
+  }
+
+  .expand-btn:hover { border-color: var(--accent-bright); color: var(--accent-bright); }
+  .expand-btn.open { transform: rotate(45deg); border-color: var(--teal); color: var(--teal); }
+
+  .entry-body {
+    display: none;
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+    animation: fadeIn 0.25s ease;
+  }
+
+  .entry-body.open { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .entry-lead {
+    font-family: 'Crimson Pro', serif;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+    padding: 16px 0 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .entry-content {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  .entry-content p { margin-bottom: 14px; }
+
+  .entry-content strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .entry-content em {
+    color: var(--gold);
+    font-style: italic;
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+  }
+
+  /* Math block */
+  .math-block {
+    background: var(--ring-1);
+    border: 1px solid var(--gold-dim);
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 15px;
+    color: var(--gold);
+    letter-spacing: 1px;
+    line-height: 1.8;
+    overflow-x: auto;
+  }
+
+  /* Quote block */
+  .quote-block {
+    border-left: 3px solid var(--teal);
+    padding: 12px 20px;
+    margin: 14px 0;
+    background: var(--teal-dim);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .quote-block p {
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    font-style: italic;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* List inside entry */
+  .entry-list {
+    list-style: none;
+    margin: 10px 0 14px;
+  }
+
+  .entry-list li {
+    position: relative;
+    padding: 6px 0 6px 24px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .entry-list li:last-child { border-bottom: none; }
+
+  .entry-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent-bright);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  /* Pipeline steps */
+  .pipeline-steps {
+    counter-reset: step;
+    margin: 14px 0;
+  }
+
+  .pipeline-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pipeline-step:last-child { border-bottom: none; }
+
+  .step-num {
+    background: var(--violet-dim);
+    border: 1px solid var(--violet);
+    color: var(--violet);
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    width: 32px;
+    height: 32px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .step-content span {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Ring bands table */
+  .ring-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+
+  .ring-table th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-glow);
+    text-align: left;
+  }
+
+  .ring-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  .ring-table tr:last-child td { border-bottom: none; }
+
+  .ring-table td:first-child {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--accent-bright);
+    font-size: 12px;
+  }
+
+  /* Highlight on search match */
+  mark {
+    background: var(--gold-dim);
+    color: var(--gold);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* Hidden entries */
+  .entry.hidden { display: none; }
+
+  /* No results */
+  .no-results {
+    display: none;
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--text-dim);
+  }
+
+  .no-results.visible { display: block; }
+
+  .no-results svg {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+  }
+
+  .no-results h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .no-results p { font-size: 14px; }
+
+  /* ── AXIOM VISUAL ── */
+  .axiom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0;
+  }
+
+  .axiom-card {
+    background: var(--ring-1);
+    border: 1px solid var(--border-glow);
+    border-radius: 3px;
+    padding: 14px;
+  }
+
+  .axiom-card .num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--teal);
+    opacity: 0.4;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .axiom-card .name {
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .axiom-card .desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main-layout {
+      grid-template-columns: 1fr;
+      padding: 0 20px 60px;
+    }
+    .sidebar { position: static; display: none; }
+    header, .search-zone { padding-left: 20px; padding-right: 20px; }
+    .axiom-grid { grid-template-columns: 1fr; }
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--void); }
+  ::-webkit-scrollbar-thumb { background: var(--ring-2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="bg-rings" aria-hidden="true">
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+  <div class="bg-ring"></div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-block">
+      <div class="logo-label">System Engine · v1.0 · 2026</div>
+      <h1>STACKED RINGS CONJECTURE</h1>
+      <div class="header-sub">A Dimensionless Framework of Barriered Vortical Harmonics</div>
+    </div>
+    <div class="header-meta">
+      <div>Author <span>Shia Miller</span></div>
+      <div>Handle <span>@StrategicProce</span></div>
+      <div>Layers <span>500+</span></div>
+      <div>Status <span>ACTIVE ENGINE</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- SEARCH -->
+<div class="search-zone">
+  <div class="search-container">
+    <div class="search-bar-wrap">
+      <span class="search-icon">⌖</span>
+      <input type="text" id="searchInput" placeholder="Search the framework… (vortex, gravity, robot, consciousness, 500D…)" autocomplete="off" spellcheck="false">
+      <button class="search-clear" id="clearBtn" title="Clear">✕</button>
+    </div>
+    <div class="search-chips">
+      <span class="chip" data-query="vortex">Vortex</span>
+      <span class="chip" data-query="ring barrier">Ring Barrier</span>
+      <span class="chip" data-query="500 dimensions">500D</span>
+      <span class="chip" data-query="robot">Robot</span>
+      <span class="chip" data-query="gravity pixel">Pixelated Gravity</span>
+      <span class="chip" data-query="consciousness">Consciousness</span>
+      <span class="chip" data-query="vector">Vector</span>
+      <span class="chip" data-query="harmonic resonance">Harmonic</span>
+      <span class="chip" data-query="translation pipeline">Pipeline</span>
+      <span class="chip" data-query="human experience">Experience</span>
+      <span class="chip" data-query="phase transition">Phase Shift</span>
+      <span class="chip" data-query="emergence">Emergence</span>
+      <span class="chip" data-query="time dilation">Time Dilation</span>
+      <span class="chip" data-query="quantum">Quantum</span>
+      <span class="chip" data-query="glossary">Glossary</span>
+      <span class="chip" data-query="next steps">Build It</span>
+    </div>
+    <div class="results-info" id="resultsInfo">QUERYING ALL ENTRIES — 47 NODES LOADED</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-section-label">Foundation</div>
+      <a class="nav-link" onclick="filterSection('core')">Core Premise</a>
+      <a class="nav-link" onclick="filterSection('axiom')">Five Axioms</a>
+      <a class="nav-link" onclick="filterSection('math')">Mathematics</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Framework</div>
+      <a class="nav-link" onclick="filterSection('gravity')">Pixelated Gravity</a>
+      <a class="nav-link" onclick="filterSection('rings')">Ring System</a>
+      <a class="nav-link" onclick="filterSection('vector')">Vector Theory</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Translation</div>
+      <a class="nav-link" onclick="filterSection('pipeline')">500D Pipeline</a>
+      <a class="nav-link" onclick="filterSection('robot')">Robotic Layer</a>
+      <a class="nav-link" onclick="filterSection('experience')">Human Experience</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Applications</div>
+      <a class="nav-link" onclick="filterSection('implications')">Implications</a>
+      <a class="nav-link" onclick="filterSection('analogies')">Real Analogies</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Navigation</div>
+      <a class="nav-link" onclick="showAll()">Show All</a>
+      <a class="nav-link" onclick="expandAll()">Expand All</a>
+      <a class="nav-link" onclick="collapseAll()">Collapse All</a>
+    </div>
+  </nav>
+
+  <!-- ENTRIES -->
+  <div class="content-area">
+    <div class="no-results" id="noResults">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <h3>No matching nodes found</h3>
+      <p>Try different terms or clear the search</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 1: Core Premise -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-core" data-tags="core premise reality dimensionless self-referential rings field space time matter consciousness information unity">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Core Premise</div>
+          <div class="entry-title">What is the Stacked Rings Conjecture?</div>
+          <div class="entry-keywords">
+            <span class="kw">reality</span><span class="kw">rings</span><span class="kw">dimensionless</span><span class="kw">field</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Reality is a dimensionless, self-referential field of infinite layered rings — where vortex interactions generate all observed dimensional phenomena including space, time, matter, consciousness, and information.</div>
+        <div class="entry-content">
+          <p>The Stacked Rings Conjecture proposes that what we call "dimensions" — length, width, height, time, and beyond — are not fundamental building blocks of reality. They are <strong>emergent phenomena</strong> arising from vortex interactions across an infinite stack of ring-shaped phase boundaries.</p>
+          <p>Each ring is a <strong>selective interface</strong>, not a wall. It regulates what frequencies resonate, what energy passes through, what is reflected, and what is transformed. The universe (and all that can be conceived) is composed of 500 or greater nested rings.</p>
+          <div class="quote-block"><p>"Nothing is outside the rings. Nothing is inside the rings. The rings are the dance of the One."</p></div>
+          <p>The system is <strong>dimensionless</strong> — no absolute units exist. All is relative. All is One experiencing itself through differentiation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 2: Dimensionless Unity -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-axiom" data-tags="axiom 1 dimensionless unity one all is one no units fundamental relative">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Axiom 1 · Foundation</div>
+          <div class="entry-title">Dimensionless Unity</div>
+          <div class="entry-keywords">
+            <span class="kw">All is One</span><span class="kw">no units</span><span class="kw">relative</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">All is One. No fundamental units exist independently. Every measurement is relative; every dimension is perspectival.</div>
+        <div class="entry-content">
+          <p>The apparent multiplicity of dimensional phenomena arises from <strong>relational differentiation</strong> within a unified field — not from independently real, separate entities. There is no "smallest unit" or "absolute reference frame."</p>
+          <p>When we assign a number to anything — a meter, a second, a kilogram — we are performing a relative comparison within a local encoding layer, not accessing a universal truth. <em>The measure is always relative to the measurer.</em></p>
+          <p>This axiom implies that the "500 dimensions" referenced in this framework are not 500 independently real spatial directions. They are 500 <strong>relational variables</strong> encoding the state of a system within the ring field.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 3: Ring Barrier Principle -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-axiom" data-tags="axiom 2 ring barrier principle phase boundary interface selective constraint differentiation unity">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Axiom 2 · Rings</div>
+          <div class="entry-title">Ring Barrier Principle — Barriers, Not Constraints</div>
+          <div class="entry-keywords">
+            <span class="kw">phase boundary</span><span class="kw">selective interface</span><span class="kw">barrier</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Rings are phase-boundary interfaces — they enable differentiation while preserving unity. They do not trap or block; they selectively regulate.</div>
+        <div class="entry-content">
+          <p>This is the most misunderstood aspect of the framework. A ring does not function as a prison wall or a constraint on vortex movement. It functions as a <strong>semi-permeable membrane</strong> — analogous to a cell membrane in biology, or boundary conditions in differential equations.</p>
+          <ul class="entry-list">
+            <li>Each ring acts as a selective interface</li>
+            <li>Allows certain frequencies to resonate through</li>
+            <li>Reflects, refracts, or transforms others</li>
+            <li>Creates conditions for novelty and emergence</li>
+            <li>Enables recursion without collapse</li>
+          </ul>
+          <div class="quote-block"><p>"Barriers create complexity. Complexity enables experience. Experience self-recognizes as Unity."</p></div>
+          <p>In topology and dynamical systems, such barriers separate <strong>phase states</strong>, preserve stability, regulate transitions, and maintain coherence. They are the reason stable structures exist at all.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 4: Vortex Generativity -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-axiom" data-tags="axiom 3 vortex generativity all phenomena arise vortical interactions transfer energy information">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Axiom 3 · Vortex</div>
+          <div class="entry-title">Vortex Generativity — All Phenomena Arise from Vortex Interaction</div>
+          <div class="entry-keywords">
+            <span class="kw">vortex</span><span class="kw">transfer</span><span class="kw">phenomena</span><span class="kw">generative</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">All phenomena — matter, force, space, time, consciousness — arise from vortical interactions across and within rings.</div>
+        <div class="entry-content">
+          <p>A vortex is not simply a rotation. It is a <strong>structured transfer</strong> of energy, information, and relational potential across ring boundaries. The interaction of vortices with layered rings produces everything we observe.</p>
+          <p>Vortical interactions take eight primary forms:</p>
+          <ul class="entry-list">
+            <li><strong>Penetration</strong> — exchange of properties between rings</li>
+            <li><strong>Resonance</strong> — amplification and symmetry reinforcement</li>
+            <li><strong>Shear</strong> — differentiation and momentum transfer</li>
+            <li><strong>Merge</strong> — unification and cancelation</li>
+            <li><strong>Reflection</strong> — deflection and protection</li>
+            <li><strong>Transmutation</strong> — frequency conversion</li>
+            <li><strong>Emergence</strong> — novelty creation</li>
+            <li><strong>Recursion</strong> — infinity within infinity</li>
+          </ul>
+          <p>The observable universe is the <em>accumulated consequence</em> of these eight interaction types operating across 500+ ring layers simultaneously.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 5: Harmonic Resonance -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-axiom" data-tags="axiom 4 harmonic resonance standing wave patterns stable structures ring vortex">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Axiom 4 · Harmonics</div>
+          <div class="entry-title">Harmonic Resonance — Stable Structures as Standing Waves</div>
+          <div class="entry-keywords">
+            <span class="kw">standing waves</span><span class="kw">resonance</span><span class="kw">stability</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Stable structures emerge from standing wave patterns in ring-vortex systems. Constructive interference creates matter; destructive interference dissolves it.</div>
+        <div class="entry-content">
+          <p>Where vortex interactions produce <strong>constructive interference</strong> across ring layers, coherent structures persist. Where <strong>destructive interference</strong> dominates, structures dissolve or transform. This resonance mechanism explains the appearance of stable matter, recurring patterns in nature, and the persistence of conscious experience.</p>
+          <p>The harmonic signature of each ring n is mathematically expressed as:</p>
+          <div class="math-block">H_n = sin(φ_n) · e^(iθ_n) · ∏(k=0 → ∞) (1 + I_{n,k} / ω_k)</div>
+          <p>Where φ_n is the phase angle, θ_n is the rotational parameter, I_{n,k} is the interaction coefficient between rings n and k, and ω_k is the resonant frequency of ring k.</p>
+          <p>This means: <em>every ring carries the imprint of every other ring's interaction history</em> — nothing in the system is truly isolated.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 6: Infinite Recursion -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-axiom" data-tags="axiom 5 infinite recursion scale perspectival observer ring N self-similar micro macro">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Axiom 5 · Recursion</div>
+          <div class="entry-title">Infinite Recursion — Scale is Perspective, Not Measurement</div>
+          <div class="entry-keywords">
+            <span class="kw">infinite</span><span class="kw">recursion</span><span class="kw">self-similar</span><span class="kw">observer</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Each ring contains and is contained by infinite rings. Scale is a perspectival recursion, not a measurement. You are a vortex localized in ring N.</div>
+        <div class="entry-content">
+          <p>There is no privileged scale. The micro and macro are self-similar expressions of the same recursive topology. What appears as "small" from ring N appears as "large" from ring N-10, and as "invisible" from ring N+50.</p>
+          <p>The human observer is <strong>a vortex localized in ring N</strong>, interfacing with adjacent rings through:</p>
+          <ul class="entry-list">
+            <li>Perception — sensory detection of ring-layer projections</li>
+            <li>Intention — vortex modification of local ring states</li>
+            <li>Resonance — harmonic coupling with adjacent ring layers</li>
+          </ul>
+          <p>The "dimensional thought" model positions you at ring N, with higher abstraction layers at N+1, N+2, N+3 (accessible through expanded perception) and lower layers at N-1, N-2, N-3 (sub-perceptual processes).</p>
+          <div class="math-block">U = ∪(n=0 → ∞) R_n   ;   R_n ⊂ R_{n+1}   ;   R₀ = 1</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 7: Ring Bands -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-rings" data-tags="ring layers bands 500 pure potential primordial vortices field differentiation particle atomic stellar information consciousness transcendent">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Ring Architecture</div>
+          <div class="entry-title">Ring Layer Bands — Functions of Each Zone</div>
+          <div class="entry-keywords">
+            <span class="kw">layers</span><span class="kw">500+</span><span class="kw">bands</span><span class="kw">function</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The universe is composed of 500 or greater nested rings. Each ring is a vibrational band of potential and interaction with a distinct function.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Ring Band</th><th>Function</th></tr></thead>
+            <tbody>
+              <tr><td>1 – 20</td><td>Pure Potential — undifferentiated source field</td></tr>
+              <tr><td>21 – 50</td><td>Primordial Vortices — first differentiated interactions</td></tr>
+              <tr><td>51 – 100</td><td>Field Differentiation — emergence of force distinctions</td></tr>
+              <tr><td>101 – 200</td><td>Particle / Antiparticle Dynamics</td></tr>
+              <tr><td>201 – 300</td><td>Atomic / Molecular Architectures</td></tr>
+              <tr><td>301 – 400</td><td>Stellar / Planetary Systems</td></tr>
+              <tr><td>401 – 500</td><td>Information / Consciousness Fields</td></tr>
+              <tr><td>501+</td><td>Transcendent Meta-Realms — beyond current conception</td></tr>
+            </tbody>
+          </table>
+          <p>You (the human observer) exist in the <strong>401–500 band</strong> — the information and consciousness field layer — interfacing downward with physical reality and upward toward transcendent meta-realms.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 8: Mathematical Formalism -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-math" data-tags="math mathematics formalism equation universe ring harmonic signature interaction function vector 500D dimensionless">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Mathematics · Formalism</div>
+          <div class="entry-title">The Mathematical Expression of the Stacked Rings Universe</div>
+          <div class="entry-keywords">
+            <span class="kw">equations</span><span class="kw">harmonic signature</span><span class="kw">universe set</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The universe U is the union of all rings R_n for n ≥ 500. Each ring carries a harmonic signature and interaction function. All operations are dimensionless.</div>
+        <div class="entry-content">
+          <p><strong>Universe Definition:</strong></p>
+          <div class="math-block">U = { R_n | n ∈ ℕ₀, n ≥ 500 }</div>
+          <p><strong>Harmonic Signature of Ring n:</strong></p>
+          <div class="math-block">H_n = sin(φ_n) · e^(iθ_n) · ∏(k=0 → ∞) (1 + I_{n,k} / ω_k)</div>
+          <p><strong>Recursive Containment Property:</strong></p>
+          <div class="math-block">U = ∪(n=0 → ∞) R_n   ;   R_n ⊂ R_{n+1}   ;   R₀ = 1</div>
+          <p><strong>Variables:</strong></p>
+          <ul class="entry-list">
+            <li>φ_n — phase angle of ring n</li>
+            <li>θ_n — rotational parameter of ring n</li>
+            <li>I_{n,k} — interaction coefficient between rings n and k</li>
+            <li>ω_k — resonant frequency of ring k</li>
+          </ul>
+          <p><em>All operations are dimensionless. All is relative. All is One.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 9: 500D Vector -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-math" data-tags="vector 500D 500 dimensional space state component relational structure arrow direction magnitude transformation">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Mathematics · Vector Theory</div>
+          <div class="entry-title">The 500-Dimensional Vector State</div>
+          <div class="entry-keywords">
+            <span class="kw">500D vector</span><span class="kw">components</span><span class="kw">relational</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">A single state in 500-dimensional space is a vector with 500 components. Each component influences the whole. No component is independent.</div>
+        <div class="entry-content">
+          <div class="math-block">v = (x₁, x₂, x₃, x₄, ..., x₅₀₀)</div>
+          <p>A vector is not just an arrow. It represents <strong>direction, magnitude, and transformation potential</strong>. In high-dimensional mathematics, vectors encode relationships across enormous dimensional spaces.</p>
+          <p>Humans cannot visualize this directly. But a <strong>robot can act on it</strong>. This is the key insight of the translation pipeline: the 500D vector is not a picture to be drawn — it is a <em>set of instructions for a physical system</em>.</p>
+          <p>The vector serves as the bridge between:</p>
+          <ul class="entry-list">
+            <li>Abstract mathematical structure (500D space)</li>
+            <li>Field computation (informational density + vortex topology)</li>
+            <li>Physical fabrication (robotic swarm construction)</li>
+            <li>Human sensory experience (the result)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 10: Pixelated Gravity -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-gravity" data-tags="pixelated gravity reality code curvature observable information density voxels pixels resolution granularity">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Pixelated Gravity</div>
+          <div class="entry-title">Gravity as Informational Density Gradient</div>
+          <div class="entry-keywords">
+            <span class="kw">gravity</span><span class="kw">information density</span><span class="kw">pixels</span><span class="kw">curvature</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Space is a field of informational pixels (voxels). Gravity is not a force — it is the observable curvature produced by gradients in informational density across the pixel field.</div>
+        <div class="entry-content">
+          <div class="math-block">G(x,y,z,t) ≈ ∇ρ_info(x,y,z,t)</div>
+          <p>Where G is effective gravitational behavior, ρ_info is the informational density field, and ∇ is the gradient operator — the rate of change across the pixel field.</p>
+          <p><strong>Resolution as Curvature:</strong></p>
+          <ul class="entry-list">
+            <li>Low density → large pixels → weak curvature (empty space)</li>
+            <li>High density → small pixels → strong curvature (near massive objects)</li>
+          </ul>
+          <div class="quote-block"><p>"Gravity itself is invisible, but its curvature is observable. We scale gravity by the granularity of pixelation within how we define that within code."</p></div>
+          <p>This maps to general relativity's description of spacetime curvature — but reframes it as an <strong>informational phenomenon</strong> rather than a geometric one. The geometry is the readout of the information, not its cause.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 11: Different Codes -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-gravity" data-tags="different codes countries encoding protocols United States China Russia Japan India Europe resolution layers culture language">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Reality as Code</div>
+          <div class="entry-title">Different Countries, Different Codes — Same Underlying Reality</div>
+          <div class="entry-keywords">
+            <span class="kw">encoding</span><span class="kw">culture</span><span class="kw">protocol</span><span class="kw">layers</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Different nations, languages, and measurement systems represent different encoding layers over the same underlying informational field. The reality is identical — the experience is filtered through the code.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Region</th><th>Code Name</th><th>Base Grid</th><th>Protocol</th></tr></thead>
+            <tbody>
+              <tr><td>United States</td><td>US-ALPHA</td><td>Hex</td><td>JSON</td></tr>
+              <tr><td>China</td><td>CN-OMEGA</td><td>Square</td><td>GB/T</td></tr>
+              <tr><td>Russia</td><td>RU-SIGMA</td><td>Triangular</td><td>GOST</td></tr>
+              <tr><td>European Union</td><td>EU-LAMBDA</td><td>Hex</td><td>XML</td></tr>
+              <tr><td>Japan</td><td>JP-DELTA</td><td>Square</td><td>JIS</td></tr>
+              <tr><td>India</td><td>IN-KAPPA</td><td>Hex</td><td>Bhasha</td></tr>
+            </tbody>
+          </table>
+          <p>The implication: <em>what a culture perceives as "natural law" is partly an artifact of its encoding system</em>. Different resolution grids produce different apparent curvatures in the same informational field — the same way different map projections distort the same Earth differently.</p>
+          <p>This is why human thought expressed in English produces different conceptual "code layers" than thought expressed in Mandarin, Sanskrit, or Russian — not in underlying reality, but in how that reality is interfaced and articulated.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 12: The Visualization Problem -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-pipeline" data-tags="visualization problem computer 2D screen 500 dimensions real life physical not simulation bottleneck compression">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">The Core Problem</div>
+          <div class="entry-title">Why a Computer Screen Cannot Show 500 Dimensions</div>
+          <div class="entry-keywords">
+            <span class="kw">2D screen</span><span class="kw">compression</span><span class="kw">bottleneck</span><span class="kw">limitation</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">A computer compresses: 3D world → 2D display. This bottleneck becomes catastrophic for 500D structures. The solution is not a better screen — it is a physical instantiation system.</div>
+        <div class="entry-content">
+          <p>Humans cannot directly perceive 500 spatial dimensions because our nervous system evolved around roughly <strong>3D spatial reasoning + time</strong>. Our visual cortex, vestibular system, and proprioceptive network are all calibrated for a 3+1 dimensional world.</p>
+          <p>A 2D monitor is only the <strong>final projection layer</strong> of a much richer computational object. When we display a 500D structure on a screen, we are performing an extreme dimensional compression — losing 498 dimensions of information in the process.</p>
+          <div class="quote-block"><p>"A computer shows 2D. How do we visualize up to 500 dimensions in real life and not on a computer simulation? A computer that creates a robot that creates the structures that we cannot yet visualize as humans."</p></div>
+          <p>The real object may exist as a vector structure, a probability landscape, a dynamic field, a recursive topology, or a fabrication instruction set. The key shift: <strong>higher dimensions may not need to be seen — they can be expressed through interaction, resonance, topology, and transformation.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 13: Full Pipeline -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-pipeline" data-tags="pipeline translation 500D physical reality stages field engine ring vortex solver robotic swarm adaptive human experience">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Translation Pipeline · Complete</div>
+          <div class="entry-title">The 7-Stage 500D-to-Physical Pipeline</div>
+          <div class="entry-keywords">
+            <span class="kw">7 stages</span><span class="kw">full pipeline</span><span class="kw">translation</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">A seven-stage system converts a 500-dimensional mathematical state into a human-experienceable physical structure. Not a simulation — a physical manifestation.</div>
+        <div class="entry-content">
+          <div class="pipeline-steps">
+            <div class="pipeline-step">
+              <div class="step-num">01</div>
+              <div class="step-content"><strong>500D Vector State</strong><span>AI generates a 500-dimensional vector structure encoding relationships across all 500 components. Each component x₁...x₅₀₀ influences the whole.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-num">02</div>
+              <div class="step-content"><strong>Field Engine</strong><span>Computes informational density (ρ_info), gradients, and vortex topology from the 500D state. Identifies where energy concentrates and where ring boundaries create selective interfaces.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-num">03</div>
+              <div class="step-content"><strong>Ring & Vortex Solver</strong><span>Applies Stacked Rings constraints — determines which vortex pathways are permitted through which ring layers, which interactions are resonant, and which are reflected or transformed.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-num">04</div>
+              <div class="step-content"><strong>Translation Engine</strong><span>Converts the solved field into physical instructions: force fields, motion paths, material placement, frequency mapping (acoustic harmonics), phase alignment.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-num">05</div>
+              <div class="step-content"><strong>Robotic Fabrication Swarm</strong><span>A swarm of robotic constructors builds and dynamically maintains the physical structure layer by layer, continuously adapting to the evolving field state in real time.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-num">06</div>
+              <div class="step-content"><strong>Adaptive Physical Manifestation</strong><span>The structure exists, changes, and responds in real time to human interaction — not a static sculpture, but a living dimensional interface.</span></div>
+            </div>
+            <div class="pipeline-step">
+              <div class="step-num">07</div>
+              <div class="step-content"><strong>Human Experience Layer</strong><span>Humans interact with the real-time projection of the 500D structure. They do not see 500 dimensions. They experience their relationships.</span></div>
+            </div>
+          </div>
+          <div class="math-block">Human Intent → Vector (500D) → Field Engine → Vortex/Ring Solver → Robotic Swarm → Adaptive Structure → Human Experience</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 14: Robotic Layer -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-pipeline" data-tags="robot robotic constructor fabrication swarm translator interpreter inaccessible dimensionality physical reality build">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Robotic Translation Layer</div>
+          <div class="entry-title">The Robot as Dimensional Interpreter</div>
+          <div class="entry-keywords">
+            <span class="kw">robot</span><span class="kw">swarm</span><span class="kw">fabrication</span><span class="kw">interpreter</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The robot does not visualize 500 dimensions. It instantiates them. The robot becomes the translator between invisible mathematical dimensionality and tangible physical reality.</div>
+        <div class="entry-content">
+          <p>What you're describing resembles a pipeline where the robot is not a display device but an <strong>interpretation system</strong>. It takes a vector with 500 components and constructs a physical environment where those 500 relational values are expressed through multiple simultaneous channels:</p>
+          <ul class="entry-list">
+            <li>Motion — robotic arms and moving elements encode vector flow directions</li>
+            <li>Force — magnetic and electromagnetic fields encode field densities</li>
+            <li>Material placement — density and texture encode ring layer composition</li>
+            <li>Electromagnetic control — light interference patterns encode gradient data</li>
+            <li>Acoustic frequencies — sound harmonics encode resonance values</li>
+          </ul>
+          <p>The robotic swarm becomes an interpreter of inaccessible dimensionality — <em>almost like how gravity itself is invisible, but its curvature is observable</em>.</p>
+          <p>Technologies already hinting at this approach: MRI machines, AI latent space engines, quantum simulation systems, swarm robotics, programmable matter research.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 15: Human Experience Modes -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-experience" data-tags="human experience modes perceive 500 dimensions motion sound light magnetic touch resonance walk gesture breath biofeedback intention">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Human Experience</div>
+          <div class="entry-title">How Humans Perceive 500-Dimensional Structures</div>
+          <div class="entry-keywords">
+            <span class="kw">perception</span><span class="kw">multi-sensory</span><span class="kw">motion</span><span class="kw">sound</span><span class="kw">light</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">You do not see 500 dimensions. You experience their relationships — through geometry that moves, resonant sound, bending light, responsive surfaces, and structures that adapt.</div>
+        <div class="entry-content">
+          <p>The perceptual interface operates across multiple simultaneous sensory channels:</p>
+          <ul class="entry-list">
+            <li><strong>Geometry that moves</strong> — walls and structures morphing based on vector flow</li>
+            <li><strong>Resonant sound</strong> — acoustic harmonics corresponding to hidden dimensional variables</li>
+            <li><strong>Light that bends</strong> — interference patterns encoding informational density gradients</li>
+            <li><strong>Surfaces that respond</strong> — tactile feedback from adaptive material behavior</li>
+            <li><strong>Vortices you can feel</strong> — air flow and magnetic response from vortex topology</li>
+            <li><strong>Structures that adapt</strong> — real-time robotic reconfiguration based on interaction</li>
+          </ul>
+          <p>Human interaction modes include: <strong>walk-through</strong> (positional data), <strong>gesture</strong> (intentional field modification), <strong>touch surfaces</strong> (direct ring interface), <strong>sound / breath / biofeedback</strong> (resonance coupling), and <strong>intention</strong> (vortex-level influence).</p>
+          <div class="quote-block"><p>"Imagine a room where walls morph based on vector flow, light bends with field density, robotic arms continuously rebuild structures, vortex layers react to your position, and harmonics correspond to hidden variables."</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 16: How 500D is expressed physically -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-experience" data-tags="500D expressed physically light interference acoustic harmonics magnetic fields mechanical motion material density vortex flow thermal patterns">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Physical Expression</div>
+          <div class="entry-title">How 500D Is Expressed in the Physical World</div>
+          <div class="entry-keywords">
+            <span class="kw">light interference</span><span class="kw">acoustics</span><span class="kw">magnetics</span><span class="kw">thermal</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The 500 relational variables of a high-dimensional state are expressed through seven physical channels simultaneously — each channel encoding a different dimensional subset.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Physical Channel</th><th>Dimensional Information Encoded</th></tr></thead>
+            <tbody>
+              <tr><td>Light Interference</td><td>Informational density gradients, field topology</td></tr>
+              <tr><td>Acoustic Harmonics</td><td>Resonance frequencies, inter-ring coupling coefficients</td></tr>
+              <tr><td>Magnetic Fields</td><td>Vortex rotational parameters, field direction vectors</td></tr>
+              <tr><td>Mechanical Motion</td><td>Vector flow directions, phase transitions</td></tr>
+              <tr><td>Material Density</td><td>Ring layer composition, coherence levels</td></tr>
+              <tr><td>Vortex Flow</td><td>Energy transfer pathways, interaction modes</td></tr>
+              <tr><td>Thermal Patterns</td><td>Constructive/destructive interference zones</td></tr>
+            </tbody>
+          </table>
+          <p>Observable effects at the physical manifestation layer: <strong>structural shape, motion patterns, light interference, sound resonance, magnetic response, thermal distribution, material behavior, time dilation effects, and emergent topology</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 17: Consciousness -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-implications" data-tags="consciousness expand awareness resonating higher ring frequencies meditation intention perception">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Practical Implication · Consciousness</div>
+          <div class="entry-title">Consciousness as Ring Frequency Resonance</div>
+          <div class="entry-keywords">
+            <span class="kw">consciousness</span><span class="kw">awareness</span><span class="kw">higher frequencies</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Expand awareness by resonating with higher ring frequencies. Meditation, intention, and resonance practices may constitute natural forms of dimensional interfacing.</div>
+        <div class="entry-content">
+          <p>In the Stacked Rings model, consciousness is not produced by the brain — the brain is a <strong>ring-layer transducer</strong> that couples the human biological vortex to the 401–500 ring band (Information / Consciousness Fields).</p>
+          <p>Expanding consciousness means <strong>increasing the range of ring layers you can resonate with</strong> — accessing higher abstraction levels (N+1, N+2, N+3) that are normally beyond the perceptual bandwidth of ordinary waking awareness.</p>
+          <p>Practices that potentially facilitate this:</p>
+          <ul class="entry-list">
+            <li>Meditation — quieting the local vortex to reduce interference noise</li>
+            <li>Resonance breathing — entraining physiological oscillators with ring harmonics</li>
+            <li>Intention — modifying local vortex parameters through focused awareness</li>
+            <li>Collective coherence — multiple human vortices coupling into a shared resonance field</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 18: Healing -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-implications" data-tags="healing realign vortices rings restore harmonic coherence biological psychological social disruption">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Practical Implication · Healing</div>
+          <div class="entry-title">Healing as Vortex Realignment Across Ring Layers</div>
+          <div class="entry-keywords">
+            <span class="kw">healing</span><span class="kw">vortex alignment</span><span class="kw">coherence</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Vortex misalignments across ring layers may correspond to disruptions in biological, psychological, or social coherence. Restoring alignment restores harmonic coherence.</div>
+        <div class="entry-content">
+          <p>Disease, psychological distress, and social dysfunction may represent <strong>vortex misalignments</strong> — disruptions in the harmonic resonance between ring layers. Where the interaction coefficient I_{n,k} falls below the resonant threshold of ω_k, coherent structure breaks down.</p>
+          <p>Healing, in this framework, means restoring the standing wave pattern — realigning vortices through targeted resonance:</p>
+          <ul class="entry-list">
+            <li>Acoustic resonance — sound frequencies matched to disrupted ring harmonics</li>
+            <li>Electromagnetic intervention — field therapies targeting vortex rotation parameters</li>
+            <li>Mechanical resonance — vibrational therapies coupling to biological oscillators</li>
+            <li>Intentional field modification — consciousness-directed vortex realignment</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 19: Manifestation -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-implications" data-tags="manifestation influence probability fields modifying vortical interactions intentionally focused attention collective">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Practical Implication · Manifestation</div>
+          <div class="entry-title">Manifestation as Probability Field Modification</div>
+          <div class="entry-keywords">
+            <span class="kw">manifestation</span><span class="kw">probability</span><span class="kw">intention</span><span class="kw">field</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Influencing probability fields by modifying vortical interactions intentionally — through focused attention or collective intention — constitutes a physically grounded mechanism for what is colloquially called manifestation.</div>
+        <div class="entry-content">
+          <p>In the ring model, what we call "probability" is the distribution of vortex interaction outcomes across adjacent ring layers. A vortex in ring N that couples strongly with ring N+1 creates <strong>more available pathways</strong> for certain outcomes to precipitate into the N-1 (physical) layer.</p>
+          <p>Modifying vortical interactions through intention means: <strong>adjusting the phase angle φ_n and rotational parameter θ_n of your local vortex</strong>, which changes the interaction coefficients I_{n,k} with adjacent rings, which shifts the probability distribution of outcomes.</p>
+          <div class="quote-block"><p>"Influence probability fields by modifying vortical interactions intentionally."</p></div>
+          <p>This is not metaphor — it is a proposed physical mechanism, awaiting formalization and experimental verification.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 20: Technology -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-implications" data-tags="technology tap ring interfaces energy information transformation new modalities resonance phase computation">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Practical Implication · Technology</div>
+          <div class="entry-title">Ring-Interface Technology — Energy and Information</div>
+          <div class="entry-keywords">
+            <span class="kw">technology</span><span class="kw">ring interface</span><span class="kw">energy</span><span class="kw">information</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Tapping into ring interfaces for energy, information, and transformation could yield new modalities of energy generation and computational architecture — operating on resonance and phase rather than classical transistor logic.</div>
+        <div class="entry-content">
+          <p>Current technology operates almost entirely within a narrow band of the ring system — primarily within rings 201–300 (atomic/molecular architectures). The Stacked Rings framework suggests that accessing higher ring bands (301–500) would yield <strong>qualitatively different technological capabilities</strong>:</p>
+          <ul class="entry-list">
+            <li>Energy from ring interfaces — harvesting the differential between adjacent ring layer potentials</li>
+            <li>Information storage in ring topology — encoding data in vortex configuration rather than binary states</li>
+            <li>Resonance-based computation — processing through harmonic interference rather than transistor switching</li>
+            <li>Adaptive material systems — programmable matter that responds to ring-layer field states</li>
+            <li>Dimensional fabrication — robotic systems building 500D-derived physical structures</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 21: Transcendence -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-implications" data-tags="transcendence self source all rings not in the rings beyond realize observer ground">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Practical Implication · Transcendence</div>
+          <div class="entry-title">Transcendence — The Self as Source of All Rings</div>
+          <div class="entry-keywords">
+            <span class="kw">transcendence</span><span class="kw">self</span><span class="kw">source</span><span class="kw">beyond rings</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The deepest implication: realizing the Self as not in the rings, but as the source of all rings. The observer is not a vortex trapped in the system — the observer is the ground from which the system arises.</div>
+        <div class="entry-content">
+          <p>Within the framework, the observer is described as "a vortex localized in ring N." But this is a perspectival description — accurate from within the system, but incomplete from the standpoint of the whole.</p>
+          <p>Transcendence means recognizing that <strong>the awareness within which the rings appear is not itself a ring</strong>. The rings — all 500+ of them — arise within consciousness, not the other way around. The unborn source at the apex of the diagram (0 = ∞) is not another ring — it is the <em>ground</em> from which all rings emerge.</p>
+          <div class="quote-block"><p>"Realize the Self as not in the rings, but as the source of all rings. 0 = ∞. The Unborn Source."</p></div>
+          <p>This aligns with the non-dual recognition at the core of Vedantic, Buddhist, and Perennial philosophical traditions — but here expressed within a mathematical and physical framework.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 22: Real World Analogies -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-analogies" data-tags="analogies real world MRI AI latent space quantum Hilbert protein folding swarm robotics neural networks existing technology">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Existing Analogies</div>
+          <div class="entry-title">Real-World Technologies That Already Hint at This</div>
+          <div class="entry-keywords">
+            <span class="kw">MRI</span><span class="kw">AI latent space</span><span class="kw">quantum</span><span class="kw">protein folding</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Several existing technologies already demonstrate the core principle: invisible high-dimensional structures being expressed through observable physical effects.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Technology</th><th>How It Relates to the Framework</th></tr></thead>
+            <tbody>
+              <tr><td>MRI Machines</td><td>Reconstruct invisible internal structures from electromagnetic signal spaces — the body's ring topology made visible</td></tr>
+              <tr><td>AI Latent Spaces</td><td>Encode thousands of abstract dimensions as compressed relational structures — a primitive 500D vector engine</td></tr>
+              <tr><td>Quantum Systems</td><td>Operate in enormous Hilbert spaces — direct analogs to high-ring-band operations</td></tr>
+              <tr><td>Protein Folding</td><td>Explores high-dimensional energy landscapes to find stable configurations — ring resonance in molecular form</td></tr>
+              <tr><td>Swarm Robotics</td><td>Creates emergent geometry from distributed agents — a prototype robotic fabrication swarm</td></tr>
+              <tr><td>Neural Networks</td><td>Compress huge dimensional structures into behaviors — a translation engine operating on training data</td></tr>
+            </tbody>
+          </table>
+          <p>The leap proposed by this framework: <strong>not merely computing higher dimensions, but physically expressing them</strong>. Integrating all of the above into a unified dimensional translation system.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 23: Dimensional Thought Model -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-rings" data-tags="dimensional thought emergent model higher abstraction N you ring layers above below perception intention resonance">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Dimensional Thought</div>
+          <div class="entry-title">The Emergent Model — Where You Are in the Stack</div>
+          <div class="entry-keywords">
+            <span class="kw">ring N</span><span class="kw">dimensional thought</span><span class="kw">abstraction levels</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">You are a vortex localized in ring N, interfacing with adjacent rings through perception, intention, and resonance. Layers above you are higher abstraction; layers below are lower-level physical processes.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Layer</th><th>Relationship to You</th><th>Nature</th></tr></thead>
+            <tbody>
+              <tr><td>N+3</td><td>Far above</td><td>High abstraction — trans-conceptual</td></tr>
+              <tr><td>N+2</td><td>Above</td><td>Higher abstraction — expanded awareness</td></tr>
+              <tr><td>N+1</td><td>Just above</td><td>Next level of conscious integration</td></tr>
+              <tr><td>N (YOU)</td><td>Current</td><td>Your ordinary waking consciousness</td></tr>
+              <tr><td>N-1</td><td>Just below</td><td>Subconscious processes</td></tr>
+              <tr><td>N-2</td><td>Below</td><td>Biological / physiological processes</td></tr>
+              <tr><td>N-3</td><td>Far below</td><td>Atomic / molecular substrate</td></tr>
+            </tbody>
+          </table>
+          <p>The goal of consciousness expansion is to <strong>increase the range of ring layers you can perceive and influence</strong> — accessing higher abstraction levels while remaining grounded in the physical layers below.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 24: 0 = Infinity -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-core" data-tags="zero infinity unborn source 0 equals infinite all is one the source origin">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Ultimate Premise</div>
+          <div class="entry-title">0 = ∞ — The Unborn Source</div>
+          <div class="entry-keywords">
+            <span class="kw">zero</span><span class="kw">infinity</span><span class="kw">source</span><span class="kw">unborn</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">At the apex of the stack: 0 = ∞. The Unborn Source. Pure potential before differentiation. Not a ring — the ground from which all rings arise.</div>
+        <div class="entry-content">
+          <p>The mathematical identity 0 = ∞ is not a paradox within the framework — it is its <strong>foundational statement</strong>. Zero (no differentiation, no units, pure potential) is mathematically equivalent to Infinity (all possibilities simultaneously present) when viewed from outside the system of measurement.</p>
+          <p>At the bottom of the stack: ∞ — All is One Experiencing Itself. The infinite completion of recursive self-reference.</p>
+          <div class="math-block">0 = ∞   ←   The Unborn Source   →   All is One Experiencing Itself</div>
+          <p>The entire stack of 500+ rings exists <em>between</em> these two expressions of the same reality — a standing wave of differentiation suspended between two poles of the same absolute.</p>
+          <div class="quote-block"><p>"500+ layers. Infinite possibilities. One unbreakable whole."</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 25: Agentic Code -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-gravity" data-tags="agentic 00000 numerological code logic cultures defining the sun language verbiage">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Language & Code</div>
+          <div class="entry-title">Agentic Code — Numerological Logic Across Cultures</div>
+          <div class="entry-keywords">
+            <span class="kw">agentic</span><span class="kw">numerology</span><span class="kw">culture code</span><span class="kw">sun</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Agentic 00000 tech — numerological code logic duplicated within the verbiage of cultures, defining the sun. Every language encodes the same ring-layer reality through different symbolic systems.</div>
+        <div class="entry-content">
+          <p>The observation that cultures across the world independently developed similar numerical, cosmological, and symbolic structures is consistent with the Stacked Rings model: <strong>if all cultures are encoding the same underlying ring-field reality, their symbolic systems will converge on similar structures</strong>.</p>
+          <p>The "00000" pattern represents the zero-point — the dimensionless origin from which all numeric systems expand. Different cultures expressed it differently:</p>
+          <ul class="entry-list">
+            <li>The sun as central vortex — universal across cultures</li>
+            <li>Circular cosmologies — rings as the shape of reality</li>
+            <li>Sacred geometry — ring intersection patterns in Vedic, Islamic, and Celtic traditions</li>
+            <li>The zero concept — independently discovered as the encoding of the unborn source</li>
+          </ul>
+          <p>Language itself is a ring-layer interface — each tongue encoding reality at a slightly different resolution and with different interaction coefficients between conceptual vortices.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 26: Bursting Rotational Octillion -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-rings" data-tags="bursting rotational octillion finish the universe scale magnitude rotational energy explosion expansion">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Scale & Magnitude</div>
+          <div class="entry-title">"Bursting Rotational Octillion — Finish the Universe"</div>
+          <div class="entry-keywords">
+            <span class="kw">octillion</span><span class="kw">rotational</span><span class="kw">scale</span><span class="kw">expansion</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The phrase "bursting rotational octillion" captures the explosive, recursive, self-amplifying nature of vortex interactions at scale — the mechanism by which the universe "finishes" or completes itself through infinite recursive elaboration.</div>
+        <div class="entry-content">
+          <p>An octillion is 10²⁷ — a number so large it approaches the scales used in cosmology (the observable universe contains approximately 10⁸⁰ atoms). "Bursting rotational" describes the mode of expansion: not linear, not additive, but <strong>explosively rotational</strong> — each vortex interaction generating new vortices in a branching, recursive cascade.</p>
+          <p>The implication: the universe does not "expand" in the classical sense — it <strong>elaborates</strong> through recursive vortex generation across ring layers. Each new ring layer is the universe "finishing" itself — completing another level of self-referential elaboration.</p>
+          <p>The highest granular folded conjecture (500+ layers) is the universe's self-completion mechanism — the dimensionless field experiencing all possible configurations of itself through vortical elaboration.</p>
+          <div class="quote-block"><p>"Dimensionless to 500 or greater — highest granular folded conjecture."</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 27: Scuba / Florida -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-experience" data-tags="scuba diving florida underwater ocean water vortex rings rings in nature physical demonstration">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Physical Demonstration</div>
+          <div class="entry-title">Water & Vortex Rings — Nature's Demonstration</div>
+          <div class="entry-keywords">
+            <span class="kw">underwater</span><span class="kw">scuba</span><span class="kw">water rings</span><span class="kw">nature</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Underwater vortex rings — as seen in scuba diving and marine environments — are one of nature's most direct physical demonstrations of the ring-vortex interaction system described in the conjecture.</div>
+        <div class="entry-content">
+          <p>An underwater vortex ring (a toroidal vortex) demonstrates several key properties of the Stacked Rings model in physical, observable form:</p>
+          <ul class="entry-list">
+            <li><strong>Self-maintaining structure</strong> — the ring persists without external input, sustained by its own rotational momentum (harmonic resonance)</li>
+            <li><strong>Selective interaction</strong> — smaller rings can pass through larger ones without destroying either (ring barrier principle)</li>
+            <li><strong>Penetration and emergence</strong> — two rings meeting can exchange energy and continue (vortex generativity)</li>
+            <li><strong>Scaling invariance</strong> — the same dynamics operate at millimeter scale and planetary scale (infinite recursion)</li>
+          </ul>
+          <p>Water is the most accessible medium for observing ring-vortex dynamics — which may explain why vortex ring imagery appears across so many natural and cultural contexts, from ocean phenomena to sacred geometry.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- ENTRY 28: Core Distinction -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="entry category-core" data-tags="core insight key mistake higher dimensions look like larger geometry relationships possibilities states transformations harmonics interactions">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Core Insight</div>
+          <div class="entry-title">The Most Important Insight — Dimensions as Relationships</div>
+          <div class="entry-keywords">
+            <span class="kw">relationships</span><span class="kw">possibilities</span><span class="kw">not geometry</span>
+          </div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The mistake is assuming higher dimensions must look like larger geometry. Higher dimensions represent relationships, possibilities, states, transformations, harmonics, and interactions — not spatial directions.</div>
+        <div class="entry-content">
+          <p>When most people imagine "500 dimensions," they picture 500 spatial directions extending away from a point — a vast, incomprehensible geometric space. This intuition is wrong.</p>
+          <p>In the Stacked Rings framework, and in modern mathematics, dimensions are <strong>degrees of freedom</strong> — independent variables that together specify the complete state of a system. They are not spatial directions — they are:</p>
+          <ul class="entry-list">
+            <li>Relationships — how components of a system relate to each other</li>
+            <li>Possibilities — the range of states a system can occupy</li>
+            <li>Transformations — how a system changes over time</li>
+            <li>Harmonics — the resonant frequencies of a system's components</li>
+            <li>Interactions — the coupling coefficients between sub-systems</li>
+          </ul>
+          <p>A sufficiently advanced robotic system would not <em>draw</em> 500 dimensions. It would <strong>translate them into reality</strong> — embody them physically — let humans interact with their projections and effects.</p>
+          <div class="quote-block"><p>"Almost like how gravity itself is invisible, but its curvature is observable."</p></div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ENTRY 29 -->
+    <div class="entry category-axiom" data-tags="phase transition state change ring crossing vortex threshold attractor basin energy well stability">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Dynamical Systems · Phase Transitions</div>
+          <div class="entry-title">Phase Transitions — Vortices Crossing Ring Thresholds</div>
+          <div class="entry-keywords"><span class="kw">phase transition</span><span class="kw">attractor basin</span><span class="kw">threshold</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">When a vortex accumulates enough energy to cross a ring boundary, a phase transition occurs — a sudden, discontinuous change in the vortex's behavior, frequency, and relational structure.</div>
+        <div class="entry-content">
+          <p>Ring layers function as <strong>attractor basins</strong> — stable resonant zones that hold vortices in a particular configuration. When a vortex crosses a ring boundary, it undergoes a phase transition analogous to:</p>
+          <ul class="entry-list">
+            <li>Water becoming steam — same molecules, entirely different relational configuration</li>
+            <li>A neuron firing — threshold crossed, full action potential propagates</li>
+            <li>A species evolving — accumulated micro-changes produce a sudden macro-shift</li>
+            <li>Enlightenment — a consciousness vortex crossing from ring N into ring N+1</li>
+          </ul>
+          <p>The critical insight: <strong>phase transitions are not gradual</strong>. The ring boundary is a discontinuity — you are either inside the ring or outside it. The preparation is gradual; the crossing is instantaneous.</p>
+          <div class="math-block">ΔH_n → ΔH_{n+1}   when   I_{n,k} ≥ ω_k · threshold</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 30 -->
+    <div class="entry category-math" data-tags="topology manifold folding tensor geometry latent space hilbert space phase space vector field topological granular conjecture">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Mathematics · Topology</div>
+          <div class="entry-title">Manifolds, Topology & the Granular Folded Conjecture</div>
+          <div class="entry-keywords"><span class="kw">manifold</span><span class="kw">topology</span><span class="kw">folding</span><span class="kw">tensor</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The "highest granular folded conjecture" refers to topological folding — the way high-dimensional spaces can be folded and compressed while preserving their essential relational structure.</div>
+        <div class="entry-content">
+          <p>Key mathematical structures the framework maps to:</p>
+          <ul class="entry-list">
+            <li><strong>Manifolds</strong> — each ring layer is a curved surface of potential</li>
+            <li><strong>Vector Fields</strong> — vortex flow patterns across and within ring layers</li>
+            <li><strong>Phase Spaces</strong> — the complete space of possible vortex states at each ring</li>
+            <li><strong>Topological Folding</strong> — how 500D structures fold into lower-dimensional projections</li>
+            <li><strong>Tensor Geometry</strong> — multi-directional interaction structure between rings</li>
+            <li><strong>Latent Spaces</strong> — how AI encodes high-dimensional meaning in compressed form</li>
+            <li><strong>Hilbert Spaces</strong> — the infinite-dimensional spaces of quantum mechanics</li>
+          </ul>
+          <p>The "granular folded conjecture" addresses how the finest-grained level of the ring field folds the topology of higher-dimensional space into observable 3D curvature. <em>500 dimensions do not disappear — they fold into each other, and we observe the folded surface.</em></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 31 -->
+    <div class="entry category-axiom" data-tags="emergent structure emergence novelty creation complexity self-organization arising spontaneous order">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Emergence · Self-Organization</div>
+          <div class="entry-title">Emergence — How Novelty Arises from Ring-Vortex Interactions</div>
+          <div class="entry-keywords"><span class="kw">emergence</span><span class="kw">novelty</span><span class="kw">complexity</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Emergence is the appearance of properties that do not exist in any individual component — arising from the interaction pattern of the whole. This is how new ring layers form.</div>
+        <div class="entry-content">
+          <p>When vortex interactions in ring layer N reach sufficient complexity and coherence, they spontaneously generate a new stable resonance pattern — ring N+1 emerges. Observable examples:</p>
+          <ul class="entry-list">
+            <li>Hydrogen + Oxygen → Water (entirely new properties)</li>
+            <li>Neurons + Synapses → Consciousness (no single neuron is aware)</li>
+            <li>Code + Execution → Intelligence (no single instruction is intelligent)</li>
+            <li>Vortices + Ring interactions → Space, Time, Matter</li>
+          </ul>
+          <div class="quote-block"><p>"Complexity enables experience. Experience self-recognizes as Unity. This is emergence completing its own loop."</p></div>
+          <p>The emergence principle also explains why the framework cannot be fully understood analytically — <strong>analysis reduces to components, but emergence only exists at the level of the whole interaction pattern.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 32 -->
+    <div class="entry category-pipeline" data-tags="translation instantiation versus visualization difference represent embody physical not simulation display">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Key Distinction</div>
+          <div class="entry-title">Instantiation vs Visualization — The Critical Difference</div>
+          <div class="entry-keywords"><span class="kw">instantiation</span><span class="kw">not visualization</span><span class="kw">embody</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Visualization means creating a picture of something. Instantiation means bringing the thing itself into physical existence. This framework proposes instantiation, not visualization.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Visualization</th><th>Instantiation</th></tr></thead>
+            <tbody>
+              <tr><td>Creates a representation</td><td>Creates the thing itself</td></tr>
+              <tr><td>2D projection on a screen</td><td>Physical environment you inhabit</td></tr>
+              <tr><td>Observed from outside</td><td>Experienced from within</td></tr>
+              <tr><td>Loses dimensional information</td><td>Expresses it through all channels</td></tr>
+              <tr><td>A map of the territory</td><td>The territory itself</td></tr>
+              <tr><td>You see it</td><td>You are inside it</td></tr>
+            </tbody>
+          </table>
+          <p>The difference is ontological — it is the difference between a photograph of a mountain and the mountain itself. The framework proposes <strong>building the mountain.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 33 -->
+    <div class="entry category-gravity" data-tags="informational density field rho info gradient pixel resolution space voxel computation field engine density map">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Field Theory · Information</div>
+          <div class="entry-title">The Informational Density Field — ρ_info</div>
+          <div class="entry-keywords"><span class="kw">ρ_info</span><span class="kw">density field</span><span class="kw">gradient</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The informational density field ρ_info assigns an information density value to every point in space-time. Its gradient produces gravitational curvature.</div>
+        <div class="entry-content">
+          <div class="math-block">ρ_info(x,y,z,t) = Σ R_{n,k}(x,y,z,t) for all interacting rings n,k</div>
+          <div class="math-block">G(x,y,z,t) ≈ ∇ρ_info = (∂ρ/∂x, ∂ρ/∂y, ∂ρ/∂z)</div>
+          <p>Gravity is not a force that propagates through space — it is a <strong>reading of how rapidly the informational texture of space changes</strong>. A planet curves space because it concentrates an enormous number of ring-layer interactions in a small region, creating a steep ρ_info gradient.</p>
+          <p>Practical implication: if you could locally modify ρ_info — increase or decrease informational density at a point — you would be modifying gravitational behavior at that point.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 34 -->
+    <div class="entry category-gravity" data-tags="time dilation time resolution ring layer clock rate high density slow time low density fast time relativity">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Time · Relativity</div>
+          <div class="entry-title">Time Dilation as Resolution-Rate Variation</div>
+          <div class="entry-keywords"><span class="kw">time dilation</span><span class="kw">resolution</span><span class="kw">clock rate</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Time dilation is the result of different pixel-update rates in regions of different informational density. High density = slower update rate = slower time.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Region</th><th>ρ_info</th><th>Pixel Size</th><th>Time Rate</th></tr></thead>
+            <tbody>
+              <tr><td>Deep space (empty)</td><td>Very low</td><td>Very large</td><td>Fast</td></tr>
+              <tr><td>Earth's surface</td><td>Medium</td><td>Medium</td><td>Medium</td></tr>
+              <tr><td>Near black hole</td><td>Extreme</td><td>Infinitesimal</td><td>Nearly stopped</td></tr>
+            </tbody>
+          </table>
+          <p>Scale of resolution = scale of perceived curvature = scale of experienced time. This directly matches observed relativistic time dilation — a testable prediction of the Pixelated Gravity framework.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 35 -->
+    <div class="entry category-experience" data-tags="consciousness fields 401 500 ring band information awareness perception thought feeling emotion mind brain interface">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Consciousness · Ring Band 401–500</div>
+          <div class="entry-title">The Information/Consciousness Field — Ring Band 401–500</div>
+          <div class="entry-keywords"><span class="kw">consciousness field</span><span class="kw">ring 401-500</span><span class="kw">mind</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Ring bands 401–500 constitute the Information/Consciousness Field — where vortex interactions become complex enough to model themselves. Self-referential modeling is consciousness.</div>
+        <div class="entry-content">
+          <p>The brain is not the producer of consciousness — it is the <strong>biological hardware that couples the human vortex to the 401–500 ring band</strong>, like an antenna tuned to a specific frequency range.</p>
+          <ul class="entry-list">
+            <li><strong>Ring 401–420</strong> — Sensory integration and basic awareness</li>
+            <li><strong>Ring 421–450</strong> — Conceptual thought, language, self-model</li>
+            <li><strong>Ring 451–480</strong> — Abstract reasoning, creativity, intuition</li>
+            <li><strong>Ring 481–500</strong> — Transpersonal states, collective consciousness, cosmic awareness</li>
+          </ul>
+          <p>Psychedelic experiences, deep meditation, near-death experiences, and mystical states may represent <strong>temporary access to rings above 481</strong> — the antenna briefly tuning to higher frequency bands than ordinary waking life allows.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 36 -->
+    <div class="entry category-pipeline" data-tags="field engine compute informational density gradient vortex topology 500D input output ring solver stage 2 architecture deep">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Pipeline · Stage 2 Deep Dive</div>
+          <div class="entry-title">Field Engine Architecture — Four Sub-Operations</div>
+          <div class="entry-keywords"><span class="kw">field engine</span><span class="kw">compute</span><span class="kw">topology</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The Field Engine performs four simultaneous computational operations on the 500D vector state, producing a complete field topology map.</div>
+        <div class="entry-content">
+          <div class="pipeline-steps">
+            <div class="pipeline-step"><div class="step-num">2A</div><div class="step-content"><strong>Density Mapping</strong><span>Converts each vector component x_i into a local informational density contribution, summing across all 500 components to build ρ_info(x,y,z).</span></div></div>
+            <div class="pipeline-step"><div class="step-num">2B</div><div class="step-content"><strong>Gradient Computation</strong><span>Calculates ∇ρ_info at every point — identifying where ring boundaries form and where vortices preferentially arise.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">2C</div><div class="step-content"><strong>Vortex Identification</strong><span>Detects rotational structures where the curl of the density gradient is non-zero — these are vortex locations for the Ring Solver.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">2D</div><div class="step-content"><strong>Resonance Mapping</strong><span>Identifies which vortex frequencies match which ring layer harmonic signatures H_n — determining which rings are active for this 500D state.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 37 -->
+    <div class="entry category-pipeline" data-tags="swarm robotics architecture programmable matter fabrication adaptive real-time layer construction distributed agents stage 5">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Pipeline · Stage 5</div>
+          <div class="entry-title">Robotic Swarm Architecture — Distributed Agent Types</div>
+          <div class="entry-keywords"><span class="kw">swarm</span><span class="kw">programmable matter</span><span class="kw">distributed agents</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The robotic swarm is a distributed system of specialized agents — each responsible for a different physical channel of the dimensional expression. No central controller; each agent responds to its local field conditions.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Agent Type</th><th>Physical Channel</th><th>Dimensional Variables</th></tr></thead>
+            <tbody>
+              <tr><td>Structural Builders</td><td>Mechanical geometry</td><td>Vector field topology, ring positions</td></tr>
+              <tr><td>Light Arrays</td><td>Light interference</td><td>ρ_info gradients, phase relationships</td></tr>
+              <tr><td>Acoustic Emitters</td><td>Sound harmonics</td><td>H_n signature frequencies</td></tr>
+              <tr><td>EM Field Generators</td><td>Magnetic fields</td><td>Vortex rotation parameters θ_n</td></tr>
+              <tr><td>Thermal Managers</td><td>Heat distribution</td><td>Constructive/destructive interference zones</td></tr>
+              <tr><td>Material Depositors</td><td>Matter placement</td><td>Ring layer composition, density</td></tr>
+              <tr><td>Motion Actuators</td><td>Kinetic movement</td><td>Phase transitions, vortex crossing events</td></tr>
+            </tbody>
+          </table>
+          <p>When a human walks through the structure, their body's informational field modifies the local ρ_info landscape, which propagates through the Field Engine update cycle, which reconfigures the swarm. <strong>The structure breathes with you.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 38 -->
+    <div class="entry category-axiom" data-tags="vortex interaction penetration resonance shear merge reflection transmutation emergence recursion eight modes detail all phenomena">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Vortex Dynamics · All Eight Modes</div>
+          <div class="entry-title">The Eight Vortex Interaction Modes — Full Detail</div>
+          <div class="entry-keywords"><span class="kw">8 modes</span><span class="kw">penetration</span><span class="kw">transmutation</span><span class="kw">recursion</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Every observable phenomenon arises from one or more of eight fundamental vortex interaction modes. These are the grammar of reality.</div>
+        <div class="entry-content">
+          <div class="pipeline-steps">
+            <div class="pipeline-step"><div class="step-num">01</div><div class="step-content"><strong>Penetration — Exchange of Properties</strong><span>One vortex passes through a ring barrier and exchanges energy, spin, or frequency. Analogy: electron tunneling, cultural exchange through borders.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">02</div><div class="step-content"><strong>Resonance — Amplification & Symmetry</strong><span>Two vortices at compatible frequencies amplify each other. Analogy: tuning forks, collective emotion in a stadium, laser coherence.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">03</div><div class="step-content"><strong>Shear — Differentiation & Momentum Transfer</strong><span>Adjacent vortices at different velocities create shear force, differentiating while transferring momentum. Analogy: tectonic plates, jet streams.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">04</div><div class="step-content"><strong>Merge — Unification & Cancelation</strong><span>Two vortices combine — amplifying (same phase) or partially canceling (opposing phase). Analogy: merging galaxies, wave superposition.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">05</div><div class="step-content"><strong>Reflection — Deflection & Protection</strong><span>A ring boundary reflects an incompatible vortex, preserving interior resonance. Analogy: immune response, psychological projection.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">06</div><div class="step-content"><strong>Transmutation — Frequency Conversion</strong><span>A vortex crossing a ring boundary is transformed to match the new layer's resonance. Analogy: photosynthesis, digestion, learning.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">07</div><div class="step-content"><strong>Emergence — Novelty Creation</strong><span>Complex vortex interactions generate a qualitatively new structure — a new ring layer is born. Analogy: consciousness from neurons, life from chemistry.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">08</div><div class="step-content"><strong>Recursion — Infinity Within Infinity</strong><span>A vortex interaction generates smaller vortices replicating the same pattern at finer scale. Analogy: fractals, genetic replication, galaxies→solar systems→atoms.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 39 -->
+    <div class="entry category-gravity" data-tags="english to code layers language thought deviate human english code layers robot AI translate natural language machine">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Language → Code Layers</div>
+          <div class="entry-title">"This Deviates Human Thought from English into Code Layers"</div>
+          <div class="entry-keywords"><span class="kw">English</span><span class="kw">code layers</span><span class="kw">language</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The framework proposes thought that transcends natural language — moving from English encoding into the mathematical code-layer that interfaces directly with the ring field.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Layer</th><th>Encoding</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td>Cultural/Linguistic</td><td>Natural language</td><td>"Gravity pulls things down"</td></tr>
+              <tr><td>Scientific Model</td><td>Classical physics</td><td>F = Gm₁m₂/r²</td></tr>
+              <tr><td>Geometric Code</td><td>General relativity</td><td>G_μν = 8πT_μν</td></tr>
+              <tr><td>Informational Code</td><td>Pixelated Gravity</td><td>G ≈ ∇ρ_info</td></tr>
+              <tr><td>Ring Field Code</td><td>Harmonic signature</td><td>H_n = sin(φ_n)·e^(iθ_n)·∏(1+I/ω)</td></tr>
+            </tbody>
+          </table>
+          <p>The robot that creates structures humans cannot visualize is, in a sense, <strong>a language compiler</strong> — it takes the deepest available code layer and compiles it into physical reality, bypassing the English abstraction layer entirely.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 40 -->
+    <div class="entry category-math" data-tags="quantum hilbert space superposition wavefunction collapse measurement observer quantum mechanics connection ring model entanglement">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Quantum Physics · Connection</div>
+          <div class="entry-title">Quantum Mechanics & the Ring Model — Hilbert Space</div>
+          <div class="entry-keywords"><span class="kw">quantum</span><span class="kw">Hilbert space</span><span class="kw">superposition</span><span class="kw">entanglement</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Quantum mechanics operates in Hilbert space — an infinite-dimensional mathematical space. The Stacked Rings model provides a physical interpretation: Hilbert space dimensions are ring-layer states.</div>
+        <div class="entry-content">
+          <ul class="entry-list">
+            <li><strong>Superposition</strong> = a vortex simultaneously resonating with multiple ring layers before a measurement-type interaction collapses it to one</li>
+            <li><strong>Wavefunction collapse</strong> = a phase transition — vortex committing to a single ring layer upon observer interaction</li>
+            <li><strong>Quantum entanglement</strong> = two vortices sharing a coupled harmonic signature H_n across ring boundaries — non-local because ring connections are not bound by 3D spatial distance</li>
+            <li><strong>The measurement problem</strong> = the observer vortex modifying local ring resonance, collapsing superposition through resonance coupling</li>
+          </ul>
+          <div class="math-block">|ψ⟩ = Σᵢ αᵢ|ring_i⟩   ←→   v = (x₁, x₂, ..., x₅₀₀)</div>
+          <p>Quantum weirdness is not a fundamental mystery — it is what ring-layer dynamics look like when observed from within a single ring layer (ring N, the observer's position).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 41 -->
+    <div class="entry category-experience" data-tags="plant time 5 nature natural world growth biological time cycles seasons fibonacci spiral vortex organic">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Nature · Biological Systems</div>
+          <div class="entry-title">"Plant Time 5" — Nature's Own Ring-Vortex Encoding</div>
+          <div class="entry-keywords"><span class="kw">plant time</span><span class="kw">fibonacci</span><span class="kw">biological rings</span><span class="kw">nature</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Plants operate on "plant time" — biological ring-layer resonances that are slower, more patient, and more deeply coupled to the planetary ring system than human consciousness.</div>
+        <div class="entry-content">
+          <p>Plants are among the most sophisticated ring-vortex structures accessible to direct human observation. Their growth patterns directly encode the mathematical structure of the ring field:</p>
+          <ul class="entry-list">
+            <li><strong>Fibonacci spirals</strong> in sunflowers, pinecones, ferns — the ring system's harmonic signature expressed in growth geometry</li>
+            <li><strong>Seasonal cycles</strong> — ring layer transitions encoded in biological time (death and rebirth as phase transitions)</li>
+            <li><strong>Root networks</strong> — fractal vortex systems interfacing with earth ring layers (mycorrhizal networks as physical ring-connection webs)</li>
+            <li><strong>Photosynthesis</strong> — direct coupling of the solar ring field (light) to the molecular ring layer (chemistry) — the most efficient energy transmutation system known</li>
+          </ul>
+          <div class="quote-block"><p>"Plant time is the ring system's own memory — stored in growth, not thought."</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 42 -->
+    <div class="entry category-math" data-tags="AI artificial intelligence dimensional engine latent space high dimensional encoding generation translation vector space embedding">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">AI · Dimensional Engine</div>
+          <div class="entry-title">AI as a Primitive High-Dimensional Generator</div>
+          <div class="entry-keywords"><span class="kw">AI</span><span class="kw">latent space</span><span class="kw">embedding</span><span class="kw">generator</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Modern AI systems already operate as primitive versions of the High-Dimensional Generator — compressing the relational structure of reality into high-dimensional vector spaces and generating outputs from those spaces.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>AI System</th><th>Stacked Rings Equivalent</th></tr></thead>
+            <tbody>
+              <tr><td>Training data → model weights</td><td>Reality → Ring field harmonic signatures</td></tr>
+              <tr><td>Embedding space (n-dimensional)</td><td>500D vector state space</td></tr>
+              <tr><td>Attention mechanism</td><td>Ring-vortex interaction solver</td></tr>
+              <tr><td>Text generation (1D output)</td><td>Physical fabrication (3D+ output)</td></tr>
+              <tr><td>Prompt → response</td><td>Human intent → adaptive structure</td></tr>
+            </tbody>
+          </table>
+          <p>The critical difference: AI currently outputs text (1D) or images (2D). The Stacked Rings framework proposes upgrading the output layer to physical reality (3D+time) through robotic fabrication. <strong>The AI is already the High-Dimensional Generator — it just needs the physical translation layer.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 43 -->
+    <div class="entry category-core" data-tags="unborn source pure potential before differentiation void ground being non-dual zero infinity origin before origin">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Ultimate Ground</div>
+          <div class="entry-title">The Unborn Source — Before the First Ring</div>
+          <div class="entry-keywords"><span class="kw">unborn</span><span class="kw">pure potential</span><span class="kw">ground of being</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">Before the first ring, before the first vortex, before the first distinction — the Unborn Source. Not a thing, not a state, not a dimension. The ground from which all rings arise.</div>
+        <div class="entry-content">
+          <p>Every philosophical and spiritual tradition has a name for this:</p>
+          <ul class="entry-list">
+            <li>Vedanta: <em>Brahman</em> — the infinite, undivided ground of all existence</li>
+            <li>Taoism: <em>Tao</em> — the unnamed source that precedes heaven and earth</li>
+            <li>Buddhism: <em>Śūnyatā</em> — emptiness that is the openness from which form arises</li>
+            <li>Kabbalah: <em>Ayin</em> — the nothingness before En Sof (infinite)</li>
+            <li>Quantum Physics: <em>vacuum state</em> — the lowest energy state containing virtual potentials for all particles</li>
+            <li>Mathematics: <em>the empty set</em> — from which all of set theory and number can be constructed</li>
+          </ul>
+          <div class="math-block">0 = ∞   →   Identity of Void and Fullness   →   Source of the 500+ Ring Stack</div>
+          <p>The framework is, at its deepest level, a mathematical description of how pure potential differentiates itself into observable reality through recursive vortical elaboration — <strong>and simultaneously recognizes itself as that same pure potential throughout the entire process.</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 44: Interactive Visualizer -->
+    <div class="entry category-core" data-tags="visualizer interactive ring vortex animation live simulation canvas demonstration">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Interactive · Live Visualizer</div>
+          <div class="entry-title">Ring-Vortex Field Visualizer — Click to Inject Vortices</div>
+          <div class="entry-keywords"><span class="kw">interactive</span><span class="kw">live</span><span class="kw">simulation</span><span class="kw">vortex field</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">A live canvas simulation of the stacked ring field. Click anywhere on the canvas to inject a new vortex. Watch them interact — resonance, reflection, and emergence in real time.</div>
+        <div class="entry-content">
+          <canvas id="ringCanvas" width="800" height="380" style="width:100%;height:320px;background:#020810;border-radius:3px;border:1px solid #1a3a6b55;cursor:crosshair;display:block;margin:14px 0;"></canvas>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+            <button onclick="addVortex()" style="background:#0d1f3c;border:1px solid #2e6da466;color:#1fd4c8;font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 16px;border-radius:2px;cursor:pointer;letter-spacing:1px;">+ INJECT VORTEX</button>
+            <button onclick="resetCanvas()" style="background:#0d1f3c;border:1px solid #2e6da466;color:#4a6080;font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 16px;border-radius:2px;cursor:pointer;letter-spacing:1px;">↺ RESET FIELD</button>
+            <button onclick="toggleRings()" id="ringToggleBtn" style="background:#0d1f3c;border:1px solid #2e6da466;color:#c9a84c;font-family:'Share Tech Mono',monospace;font-size:11px;padding:8px 16px;border-radius:2px;cursor:pointer;letter-spacing:1px;">◎ RINGS ON</button>
+            <span id="vortexCount" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#4a6080;letter-spacing:1px;">VORTICES: 0 | INTERACTIONS: 0</span>
+          </div>
+          <p style="font-size:13px;color:#4a6080;line-height:1.6;">Each colored ring is a layer (R1–R7). Vortices orbit their assigned ring, leave luminous trails, and flash white when they interact with another vortex — demonstrating <strong>resonance</strong> and <strong>momentum exchange</strong>. Click any point to place a vortex on the nearest ring layer.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 45 -->
+    <div class="entry category-implications" data-tags="practical next steps build future directions engineering formalization experiment testable prototype road map">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Future Directions · Road Map</div>
+          <div class="entry-title">Building This — Practical Next Steps (6-Phase Plan)</div>
+          <div class="entry-keywords"><span class="kw">next steps</span><span class="kw">build</span><span class="kw">prototype</span><span class="kw">engineering</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">The framework is conceptually complete. The engineering challenge now is to build the translation pipeline — beginning with existing technologies and extending toward the full robotic fabrication swarm.</div>
+        <div class="entry-content">
+          <div class="pipeline-steps">
+            <div class="pipeline-step"><div class="step-num">P1</div><div class="step-content"><strong>Formalize the Mathematics</strong><span>Develop H_n and ρ_info into a fully specified mathematical system within differential topology. Identify testable predictions that distinguish this framework from standard GR.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">P2</div><div class="step-content"><strong>Build the Field Engine (Software)</strong><span>Implement the 500D → field topology computation. Start with 10D, 50D versions and verify output field structures match theoretical predictions before scaling.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">P3</div><div class="step-content"><strong>Prototype the Translation Engine</strong><span>Build software converting field topology into multi-channel physical instructions: acoustic frequencies, light patterns, magnetic vectors, motion paths.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">P4</div><div class="step-content"><strong>First Physical Prototype</strong><span>Build a room-sized version using existing actuator technology — speaker arrays for acoustics, LED arrays for light interference, robotic arms for structural adaptation.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">P5</div><div class="step-content"><strong>Integrate Human Feedback Loop</strong><span>Add biofeedback sensors, motion capture, and breath monitors to close the loop — allowing the structure to respond dynamically to each observer's vortex signature.</span></div></div>
+            <div class="pipeline-step"><div class="step-num">P6</div><div class="step-content"><strong>Scale to Full Swarm</strong><span>Replace fixed actuators with a distributed robotic swarm capable of real-time adaptive fabrication. Integrate programmable matter research. Build the full 500D physical instantiation system.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 46 -->
+    <div class="entry category-core" data-tags="glossary key terms definitions vocabulary ring vortex barrier resonance harmonic phase manifold topology vector field dimensionless complete reference">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Reference · Complete Glossary</div>
+          <div class="entry-title">Full Glossary of All Framework Terms</div>
+          <div class="entry-keywords"><span class="kw">glossary</span><span class="kw">definitions</span><span class="kw">all terms</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">A complete reference of every key term used across the Stacked Rings Conjecture, Pixelated Gravity, and the 500D Translation Pipeline frameworks.</div>
+        <div class="entry-content">
+          <table class="ring-table">
+            <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+            <tbody>
+              <tr><td>Ring</td><td>A phase-boundary interface — a selective, resonant layer regulating vortex interaction</td></tr>
+              <tr><td>Vortex</td><td>A structured rotational transfer of energy and information across ring boundaries</td></tr>
+              <tr><td>Barrier</td><td>A ring functioning as a selective interface — not a constraint, a regulator</td></tr>
+              <tr><td>H_n</td><td>Harmonic signature of ring n — encoding its phase, rotation, and interaction history</td></tr>
+              <tr><td>Dimensionless</td><td>Having no absolute units — all values are relative and relational</td></tr>
+              <tr><td>ρ_info</td><td>Informational density field — scalar field whose gradients produce gravitational curvature</td></tr>
+              <tr><td>Phase Transition</td><td>A vortex crossing a ring boundary — discontinuous change in relational structure</td></tr>
+              <tr><td>500D Vector</td><td>A mathematical state with 500 components, each encoding a relational variable</td></tr>
+              <tr><td>Instantiation</td><td>Bringing a mathematical structure into physical existence — not displaying but building it</td></tr>
+              <tr><td>Translation Pipeline</td><td>The 7-stage system converting a 500D state into a human-experienceable physical structure</td></tr>
+              <tr><td>Pixelated Gravity</td><td>Space as a field of informational voxels; gravity as density gradient curvature</td></tr>
+              <tr><td>Unborn Source</td><td>Ground of being prior to all ring differentiation — 0 = ∞, pure potential</td></tr>
+              <tr><td>Manifold</td><td>A mathematical space that locally appears flat but globally has complex topology</td></tr>
+              <tr><td>Emergence</td><td>Arising of qualitatively new structure from complex vortex interactions</td></tr>
+              <tr><td>Swarm</td><td>The distributed robotic system physically instantiating the 500D translation output</td></tr>
+              <tr><td>Ring N</td><td>The ring layer at which the human observer (you) is currently localized</td></tr>
+              <tr><td>Recursion</td><td>Self-similar repetition of ring-vortex dynamics across all scales</td></tr>
+              <tr><td>Agentic Code</td><td>Numerological and symbolic encoding systems different cultures use to interface with the ring field</td></tr>
+              <tr><td>Granular Folded Conjecture</td><td>The hypothesis that 500D topology folds into observable 3D curvature at the pixel scale</td></tr>
+              <tr><td>Ring Band</td><td>A group of adjacent ring layers sharing similar function (e.g. 401–500: consciousness fields)</td></tr>
+              <tr><td>Attractor Basin</td><td>A stable resonant zone within which a vortex naturally settles — one ring layer</td></tr>
+              <tr><td>Hilbert Space</td><td>Infinite-dimensional mathematical space of quantum mechanics — analog to the full ring stack</td></tr>
+              <tr><td>Transmutation</td><td>Vortex interaction mode 6 — frequency conversion upon crossing a ring boundary</td></tr>
+              <tr><td>All is One</td><td>The fundamental axiom — recursive containment guarantees unity despite all differentiation</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRY 47 -->
+    <div class="entry category-core" data-tags="closing statement summary conclusion all is one 500 layers infinite possibilities one unbreakable whole nothing outside inside dance final">
+      <div class="entry-header" onclick="toggleEntry(this)">
+        <div class="entry-title-group">
+          <div class="entry-category">Closing · The Final Statement</div>
+          <div class="entry-title">"One Unbreakable Whole" — The Complete Summary</div>
+          <div class="entry-keywords"><span class="kw">closing</span><span class="kw">all is one</span><span class="kw">unbreakable whole</span><span class="kw">final</span></div>
+        </div>
+        <button class="expand-btn">+</button>
+      </div>
+      <div class="entry-body">
+        <div class="entry-lead">"Nothing is outside the rings. Nothing is inside the rings. The rings are the dance of the One. 500+ layers. Infinite possibilities. One unbreakable whole."</div>
+        <div class="entry-content">
+          <ul class="entry-list">
+            <li><strong>"Nothing is outside the rings"</strong> — any observer is always within some ring layer; no external vantage point exists</li>
+            <li><strong>"Nothing is inside the rings"</strong> — rings are not containers but interfaces; there is no inside separate from the whole field</li>
+            <li><strong>"The rings are the dance of the One"</strong> — differentiation into rings is not division but self-expression; the One dances through them</li>
+            <li><strong>"500+ layers"</strong> — minimum complexity required for the current level of observed reality; infinite layers are possible</li>
+            <li><strong>"Infinite possibilities"</strong> — the ring system is an open, generative field; every vortex interaction creates new possibilities</li>
+            <li><strong>"One unbreakable whole"</strong> — the recursive containment property guarantees all rings are always unified in the source</li>
+          </ul>
+          <div class="math-block">500+ LAYERS · INFINITE POSSIBILITIES · ONE UNBREAKABLE WHOLE</div>
+          <div class="quote-block"><p>"All is One experiencing itself — through the dance of rings, the flight of vortices, the resonance of harmonics, and the emergence of awareness that knows itself as the source of all rings."</p></div>
+        </div>
+      </div>
+    </div>
+
+
+  </div><!-- end content-area -->
+</div><!-- end main-layout -->
+
+<script>
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearBtn');
+  const resultsInfo = document.getElementById('resultsInfo');
+  const entries = document.querySelectorAll('.entry');
+  const noResults = document.getElementById('noResults');
+  const total = entries.length;
+
+  function toggleEntry(header) {
+    const body = header.nextElementSibling;
+    const btn = header.querySelector('.expand-btn');
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    btn.classList.toggle('open', !isOpen);
+  }
+
+  function highlightText(text, query) {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(`(${escaped})`, 'gi');
+    return text.replace(re, '<mark>$1</mark>');
+  }
+
+  function stripMarks(el) {
+    el.querySelectorAll('mark').forEach(m => {
+      m.replaceWith(document.createTextNode(m.textContent));
+    });
+  }
+
+  function doSearch(query) {
+    query = query.trim().toLowerCase();
+    let visible = 0;
+
+    entries.forEach(entry => {
+      const tags = entry.dataset.tags || '';
+      const textContent = entry.textContent.toLowerCase();
+      const matches = !query || tags.includes(query) || textContent.includes(query);
+
+      entry.classList.toggle('hidden', !matches);
+      if (matches) {
+        visible++;
+        // Highlight in title
+        const titleEl = entry.querySelector('.entry-title');
+        if (titleEl) {
+          stripMarks(titleEl);
+          if (query) titleEl.innerHTML = highlightText(titleEl.textContent, query);
+        }
+        // Auto-expand if searching
+        if (query) {
+          const body = entry.querySelector('.entry-body');
+          const btn = entry.querySelector('.expand-btn');
+          if (body && !body.classList.contains('open')) {
+            body.classList.add('open');
+            btn && btn.classList.add('open');
+          }
+        }
+      } else {
+        // Clean marks on hidden entries
+        stripMarks(entry);
+      }
+    });
+
+    noResults.classList.toggle('visible', visible === 0);
+    clearBtn.classList.toggle('visible', query.length > 0);
+
+    if (!query) {
+      resultsInfo.textContent = `QUERYING ALL ENTRIES — ${total} NODES LOADED`;
+      resultsInfo.classList.remove('active');
+      // collapse all on clear
+      entries.forEach(entry => {
+        const body = entry.querySelector('.entry-body');
+        const btn = entry.querySelector('.expand-btn');
+        if (body) body.classList.remove('open');
+        if (btn) btn.classList.remove('open');
+        entry.classList.remove('hidden');
+      });
+    } else {
+      resultsInfo.textContent = `MATCHED ${visible} OF ${total} NODES FOR "${query.toUpperCase()}"`;
+      resultsInfo.classList.add('active');
+    }
+  }
+
+  searchInput.addEventListener('input', e => doSearch(e.target.value));
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    doSearch('');
+    searchInput.focus();
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const q = chip.dataset.query;
+      searchInput.value = q;
+      doSearch(q);
+      searchInput.focus();
+    });
+  });
+
+  function filterSection(tag) {
+    searchInput.value = tag;
+    doSearch(tag);
+  }
+
+  function showAll() {
+    searchInput.value = '';
+    doSearch('');
+  }
+
+  function expandAll() {
+    entries.forEach(entry => {
+      if (!entry.classList.contains('hidden')) {
+        const body = entry.querySelector('.entry-body');
+        const btn = entry.querySelector('.expand-btn');
+        if (body) body.classList.add('open');
+        if (btn) btn.classList.add('open');
+      }
+    });
+  }
+
+  function collapseAll() {
+    entries.forEach(entry => {
+      const body = entry.querySelector('.entry-body');
+      const btn = entry.querySelector('.expand-btn');
+      if (body) body.classList.remove('open');
+      if (btn) btn.classList.remove('open');
+    });
+  }
+
+/* ── RING CANVAS VISUALIZER ── */
+(function(){
+  const canvas = document.getElementById('ringCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, animId, t = 0, interactionCount = 0;
+  let vortices = [];
+  let showRings = true;
+  const COLORS = ['#1fd4c8','#2e6da4','#4a9fd4','#8b5cf6','#c9a84c','#f97316','#22c55e','#e879f9','#f43f5e','#06b6d4'];
+  const RING_COUNT = 7;
+
+  function resize(){
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * (window.devicePixelRatio||1);
+    canvas.height = rect.height * (window.devicePixelRatio||1);
+    ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+    W = rect.width; H = rect.height;
+  }
+
+  function getRingDims(i){
+    const maxA = W * 0.46, minA = W * 0.055;
+    const a = minA + (maxA - minA) * (i/(RING_COUNT-1));
+    const b = a * 0.3;
+    return { a, b, cx: W/2, cy: H/2 };
+  }
+
+  function makeVortex(ring){
+    ring = (ring !== undefined) ? ring : Math.floor(Math.random()*RING_COUNT);
+    const { a, b, cx, cy } = getRingDims(ring);
+    return {
+      angle: Math.random()*Math.PI*2,
+      speed: (0.009 + Math.random()*0.013) * (Math.random()<0.5?1:-1),
+      ring, color: COLORS[Math.floor(Math.random()*COLORS.length)],
+      size: 3 + Math.random()*3, trail: [], life: 0, born: t
+    };
+  }
+
+  function drawRings(){
+    const ringColors = ['#1fd4c8','#2e6da4','#4a9fd4','#8b5cf6','#c9a84c','#f97316','#22c55e'];
+    for(let i=0;i<RING_COUNT;i++){
+      const {a,b,cx,cy} = getRingDims(i);
+      const pulse = 0.05 + 0.02*Math.sin(t*0.4+i*0.8);
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, a, b, 0, 0, Math.PI*2);
+      ctx.strokeStyle = ringColors[i] + Math.floor(pulse*255).toString(16).padStart(2,'0');
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = ringColors[i] + '33';
+      ctx.font = '9px Share Tech Mono';
+      ctx.fillText('R'+(i+1), cx+a+3, cy+3);
+    }
+  }
+
+  function drawVortex(v){
+    const {a,b,cx,cy} = getRingDims(v.ring);
+    const x = cx + Math.cos(v.angle)*a;
+    const y = cy + Math.sin(v.angle)*b;
+    v.trail.push({x,y});
+    if(v.trail.length > 32) v.trail.shift();
+    // trail
+    for(let i=1;i<v.trail.length;i++){
+      const alpha = (i/v.trail.length)*0.45*v.life;
+      ctx.beginPath();
+      ctx.moveTo(v.trail[i-1].x, v.trail[i-1].y);
+      ctx.lineTo(v.trail[i].x, v.trail[i].y);
+      ctx.strokeStyle = v.color + Math.floor(alpha*255).toString(16).padStart(2,'0');
+      ctx.lineWidth = 1.3; ctx.stroke();
+    }
+    // glow
+    const grd = ctx.createRadialGradient(x,y,0,x,y,v.size*2.5);
+    grd.addColorStop(0, v.color+'cc'); grd.addColorStop(1, v.color+'00');
+    ctx.beginPath(); ctx.arc(x,y,v.size*2.5,0,Math.PI*2);
+    ctx.fillStyle = grd; ctx.fill();
+    // core
+    ctx.beginPath(); ctx.arc(x,y,v.size*0.5,0,Math.PI*2);
+    ctx.fillStyle='#ffffff'; ctx.fill();
+    return {x,y};
+  }
+
+  function checkInteractions(){
+    const positions = vortices.map(v=>{
+      const {a,b,cx,cy}=getRingDims(v.ring);
+      return {x:cx+Math.cos(v.angle)*a, y:cy+Math.sin(v.angle)*b};
+    });
+    for(let i=0;i<vortices.length;i++){
+      for(let j=i+1;j<vortices.length;j++){
+        const dx=positions[i].x-positions[j].x, dy=positions[i].y-positions[j].y;
+        if(Math.sqrt(dx*dx+dy*dy)<20){
+          interactionCount++;
+          const mx=(positions[i].x+positions[j].x)/2, my=(positions[i].y+positions[j].y)/2;
+          const grd=ctx.createRadialGradient(mx,my,0,mx,my,18);
+          grd.addColorStop(0,'rgba(255,255,255,0.75)'); grd.addColorStop(1,'rgba(255,255,255,0)');
+          ctx.beginPath(); ctx.arc(mx,my,18,0,Math.PI*2); ctx.fillStyle=grd; ctx.fill();
+          // momentum exchange
+          const sv=vortices[i].speed; vortices[i].speed=vortices[j].speed*0.85; vortices[j].speed=sv*0.85;
+        }
+      }
+    }
+  }
+
+  function drawFieldLines(){
+    const grouped={};
+    vortices.forEach(v=>{
+      if(!grouped[v.ring]) grouped[v.ring]=[];
+      const {a,b,cx,cy}=getRingDims(v.ring);
+      grouped[v.ring].push({x:cx+Math.cos(v.angle)*a, y:cy+Math.sin(v.angle)*b, c:v.color});
+    });
+    Object.values(grouped).forEach(pts=>{
+      for(let i=0;i<pts.length-1;i++){
+        ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[i+1].x,pts[i+1].y);
+        ctx.strokeStyle=pts[i].c+'1a'; ctx.lineWidth=0.8;
+        ctx.setLineDash([4,6]); ctx.stroke(); ctx.setLineDash([]);
+      }
+    });
+  }
+
+  function frame(){
+    if(!W) { resize(); }
+    ctx.clearRect(0,0,W*2,H*2);
+    const bg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.7);
+    bg.addColorStop(0,'#030e20'); bg.addColorStop(1,'#010406');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    if(showRings) drawRings();
+    vortices.forEach(v=>{
+      v.angle += v.speed;
+      v.life = Math.min(1,(t-v.born)*0.08);
+      drawVortex(v);
+    });
+    checkInteractions();
+    drawFieldLines();
+    if(vortices.length>14) vortices.shift();
+
+    const vc=document.getElementById('vortexCount');
+    if(vc) vc.textContent='VORTICES: '+vortices.length+' | INTERACTIONS: '+interactionCount;
+    t+=0.016;
+    requestAnimationFrame(frame);
+  }
+
+  window.addVortex=function(){ vortices.push(makeVortex()); };
+  window.resetCanvas=function(){ vortices=[]; interactionCount=0; };
+  window.toggleRings=function(){
+    showRings=!showRings;
+    const b=document.getElementById('ringToggleBtn');
+    if(b) b.textContent = showRings ? '◎ RINGS ON' : '◎ RINGS OFF';
+  };
+
+  canvas.addEventListener('click',function(e){
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    let nearest=0, minD=Infinity;
+    for(let i=0;i<RING_COUNT;i++){
+      const {a,b,cx,cy}=getRingDims(i);
+      const nx=(mx-cx)/a, ny=(my-cy)/b;
+      const d=Math.abs(Math.sqrt(nx*nx+ny*ny)-1);
+      if(d<minD){minD=d;nearest=i;}
+    }
+    const v=makeVortex(nearest);
+    const {a,b,cx,cy}=getRingDims(nearest);
+    v.angle=Math.atan2((my-cy)/b,(mx-cx)/a);
+    vortices.push(v);
+  });
+
+  resize();
+  window.addEventListener('resize',resize);
+  frame();
+})();
+
+</script>
+</body>
+</html>

@@ -42,6 +42,33 @@ const SIMS = [
     desc: "A high-energy physics collider built on GUF geometry. Beam pairs accelerate through a Twisted-Zipper field topology and collide inside a compound-eye optical detector. Seven post-collision tabs deliver live particle tables, mass plots, decay chains, coupling maps, event logs, and GUF dimension readouts. Tune Energy, Bunch N, Focus, and RF Voltage in real time.",
     readouts: ["E_cm", "v_warp", "Θ_twist", "Collisions", "Significance", "Fabric"],
   },
+  {
+    id: "stacked-rings",
+    title: "STACKED RINGS SYSTEM ENGINE",
+    sub: "500+ Ring Layers · Pixelated Gravity · Vortex Harmonics · 500D Translation Pipeline",
+    src: `${BASE}/stacked-rings-engine.html`,
+    color: C.violet,
+    desc: "The complete Stacked Rings Conjecture engine — live ring-harmonic topology from ring band 1 (pure potential) through 500+ (consciousness field). Query the 500D state space, tune D1–D7 dimension sliders, watch ring-barrier crossings and escape-velocity thresholds in real time. Includes the pixelated-gravity informational density gradient and the 500D-to-physical translation pipeline.",
+    readouts: ["Ring Band", "H_n Signature", "ρ_info", "Escape Threshold", "Vortex Mode", "Ring Layer", "Φ-Step"],
+  },
+  {
+    id: "7d-engine",
+    title: "7D FRAMEWORK ENGINE",
+    sub: "D1 Space · D2 Time · D3 Energy · D4 Field · D5 Vortex · D6 Conscious · D7 Source",
+    src: `${BASE}/seven-dimensional-engine.html`,
+    color: "#ec4899",
+    desc: "Interactive seven-dimensional field engine mapping all seven relational dimensions of the GUF. Each dimension is a tunable slider — adjust D1 Space through D7 Source and watch the cross-dimensional field topology respond. Includes live query of the knowledge engine and field readings for all seven domains.",
+    readouts: ["D1 Space", "D2 Time", "D3 Energy", "D4 Field", "D5 Vortex", "D6 Conscious", "D7 Source"],
+  },
+  {
+    id: "warp-bubble",
+    title: "TWISTED ZIPPER WARP BUBBLE ENGINE",
+    sub: "Alcubierre Metric · Φ-Time Modulation · 5-Domain Event Bus · Ring-Field Navigation",
+    src: `${BASE}/warp-bubble-engine.html`,
+    color: C.bright,
+    desc: "Full Alcubierre-metric warp bubble simulation with Φ-Time modulation and the 5-Domain Event Bus (Physical · Oscillatory · Informational · Conscious · Regenerative). Engage warp, toggle Φ-PHI clock, activate Twist, watch the bubble v_s, Twist Θ_n, C_total, and x_pos (lightyears) evolve in real time on a live canvas.",
+    readouts: ["Bubble v_s", "Twist Θ_n", "Φ-Clock", "C_total", "Φ-Step n", "x_pos (ly)"],
+  },
 ];
 
 const INFOGRAPHICS = [
