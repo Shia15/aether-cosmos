@@ -2,6 +2,10 @@ import { useState } from "react";
 import opticalHull from "@assets/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781373384314.png";
 import bioPropulsion2 from "@assets/4be3c722-8597-4582-a959-2b041a230c54_(2)_1781373387026.png";
 import bioPropulsion1 from "@assets/4be3c722-8597-4582-a959-2b041a230c54_(1)_1781373390083.png";
+import scaleHierarchy from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
+import ferroSilicon from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_46_PM_1781373535656.png";
+import crystallization from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
+import geoFormation from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -57,6 +61,38 @@ const INFOGRAPHICS = [
     tags: ["Compound-Eye Receiver", "Metasurface Layer", "Moth-Eye Nanostructure", "Adaptive Thermal Control", "Distributed AI Beam Tracking", "Integrated Sail / Thruster"],
     color: C.violet,
   },
+  {
+    src: scaleHierarchy,
+    title: "Optical Scale Hierarchy",
+    sub: "Atomic → Interplanetary · 0.2 nm to 1,000 km",
+    body: "A 12-rung scale ladder from silicon lattice spacing (0.2 nm) up through moth-eye nanostructure pillars (100–300 nm), metasurface phase elements (0.5–5 µm), ommatidium microlenses (10–50 µm), waveguide cores (5–20 µm), artificial ommatidia (20–100 µm), compound-eye clusters (1–10 mm), full curved compound-eye optics (1–20 cm), laser aperture arrays (10 cm–10 m), directed energy platforms (1–100 m), orbital laser arrays (100 m–10 km), and interplanetary beam infrastructure (10–1,000 km). Every rung in the GUF collider's compound-eye optic maps directly onto this hierarchy.",
+    tags: ["Atomic", "Nanostructure", "Metasurface", "Ommatidium Lens", "Waveguide Core", "Compound-Eye Cluster", "Laser Aperture Array", "Orbital Laser Array", "Interplanetary Beamer"],
+    color: "#4ade80",
+  },
+  {
+    src: ferroSilicon,
+    title: "Ferrofluid vs Silicon · Cross-Scale Comparison",
+    sub: "Atomic / Nanometer → Terascale · Dual-Material Architecture",
+    body: "Side-by-side scale comparison of ferrofluid (Fe₃O₄ nanoparticles, 5–20 nm diameter) and silicon (diamond-cubic lattice, 0.2 nm) from atomic through terascale (100–1,000 km). Ferrofluid: iron atoms in magnetic domains → nanoparticles → chain/spike/domain patterns → field-shaped interfaces → bulk fluid behavior → industrial seals/dampers → conceptual energy-damping gigasystems → magnetically controlled space structures. Silicon: lattice constant → nanowires/quantum dots → microelectronic features → MEMS/die layout → wafers/chips → fab tools → fab facilities/data centers → space electronics/satellite systems. GUF uses both substrates as complementary field architectures.",
+    tags: ["Ferrofluid · Atomic", "Ferrofluid · Nanostructure", "Ferrofluid · Mesoscale", "Silicon · Atomic", "Silicon · Nanostructure", "Silicon · Gigascale", "Silicon · Terascale"],
+    color: C.gold,
+  },
+  {
+    src: crystallization,
+    title: "Layered Optical + Noise-Driven Crystallization Control",
+    sub: "Indirect Modulation · Warm · Wet · Non-Equilibrium Systems",
+    body: "A physical analog computation system using layered violet (~405 nm) and blue (~450 nm) light plus controlled noise to steer CaCO₃ crystallization in warm, wet, non-equilibrium solutions. Violet acts as the Trigger Layer (strong surface interaction, rapid fluctuations, localized nucleation bursts); blue as Growth Stabilizer (deeper penetration, smooth distribution, lattice organization). Noise — thermal jitter, flickering light, fluid turbulence — explores state space by creating transient supersaturation pockets and momentary ion alignment. The 4-stage dynamic: Fluctuating Field → Violet Pulse Interaction → Blue Field Stabilization → Feedback Loop. Nucleation rate: J = J₀ exp[−ΔG*/kT_eff] where T_eff = T + α_violet·I_violet + α_blue·I_blue + σ_noise.",
+    tags: ["Violet ~405 nm · Trigger", "Blue ~450 nm · Stabilizer", "Noise · Explorer", "Warm + Wet · Enabler", "CaCO₃ Nucleation", "Feedback Loop", "Analog Computation"],
+    color: C.teal,
+  },
+  {
+    src: geoFormation,
+    title: "Accelerated Geological Formation",
+    sub: "Chemical Layers · Rapid Light Pulses · Thermal Dynamics · Hours to Days",
+    body: "Natural geological formation (weathering → transport → deposition → compaction → cementation → transformation) compressed from thousands–millions of years to hours–days via a 5-step accelerated process: (1) Chemical Layering — introduce Ca²⁺, silicates, carbonates, and ions in controlled layers; (2) Rapid Light Pulses — high-intensity photochemical stimulation drives nucleation; (3) Thermal Cycling — rapid cooling + heating creates stress and encourages crystal formation; (4) Pressure & Flow — fluid movement simulates natural burial environments; (5) Repeat & Build — cycles produce banded, crystalline structures. Results: banded layers, crystalline growth, mineral precipitation, compacted structure, natural-looking rock formation. Applications: construction materials, mineral synthesis, fossil & gem creation, planetary research & simulation, sustainable manufacturing.",
+    tags: ["Chemical Layering", "Rapid Light Pulses", "Thermal Cycling", "Pressure & Flow", "Banded Layers", "Crystalline Growth", "Mineral Synthesis", "Planetary Research"],
+    color: "#f97316",
+  },
 ];
 
 export default function GufEnginePage() {
@@ -111,6 +147,10 @@ export default function GufEnginePage() {
               { label: "Compound-Eye Collider", color: C.violet },
               { label: "Plate-Switching Hull", color: "#4ade80" },
               { label: "Bio-Inspired Propulsion", color: "#f472b6" },
+              { label: "Optical Scale Hierarchy", color: "#4ade80" },
+              { label: "Ferrofluid vs Silicon", color: C.gold },
+              { label: "Crystallization Control", color: C.teal },
+              { label: "Accelerated Geo Formation", color: "#f97316" },
             ].map(b => (
               <span
                 key={b.label}
