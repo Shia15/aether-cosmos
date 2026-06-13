@@ -134,8 +134,7 @@ export default function GufEnginePage() {
             GUF MASTER ENGINE
           </h1>
           <p className="text-[13px] leading-relaxed max-w-3xl mb-4" style={{ color: C.text, opacity: 0.75 }}>
-            Grand Unified Framework — all systems online. Two live physics simulators (Stacked-Rings 7D Field + Twisted-Zipper Collider) 
-            alongside two spacecraft-optics infographics. Each canvas is fully interactive.
+            Grand Unified Framework — all systems online. Two live interactive physics simulators (Stacked-Rings 7D Field + Twisted-Zipper Collider) and six reference infographics: Plate-Switching Optical Hull · Bio-Inspired Propulsion · Optical Scale Hierarchy (0.2 nm→1,000 km) · Ferrofluid vs Silicon · Layered Crystallization Control · Accelerated Geological Formation.
           </p>
 
           {/* badge strip */}

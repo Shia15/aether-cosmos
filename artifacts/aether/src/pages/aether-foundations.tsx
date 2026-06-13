@@ -18,6 +18,9 @@ import polarizationGhzQU from "@assets/IMG_1620_1778070592522.jpeg";
 import precipitationAnalogQuote from "@assets/IMG_1609_1778070592522.jpeg";
 import precipitationLongPost from "@assets/IMG_1608_1778070592522.png";
 import caco3Lab from "@assets/IMG_1607_1778070592522.png";
+import gufCrystallization from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
+import gufGeoFormation from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
+import gufScaleHierarchy from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
 
 // ─────────────────────────────────────────────────────────────────────────────
 function Section({ kicker, title, lead, anchor, children }: {
@@ -277,11 +280,32 @@ export default function AetherFoundationsPage() {
           ]}/>
         </Section>
 
+        {/* VII · GUF Crystallization + Scale */}
+        <Section anchor="guf-crystallization" kicker="VII · GUF Engine · Cross-Framework Reference"
+          title="Layered Crystallization Control & Scale Architecture"
+          lead="Three infographics from the GUF Master Engine that directly ground AETHER's Crystallization Model of Intelligence: (1) Layered Optical + Noise-Driven Control of Crystallization — the same 11-section framework that inspired AETHER's L1→L5 coherence stack; (2) Accelerated Geological Formation — the 5-stage dynamic cycle showing crystalline order emerging on compressed timescales; (3) Optical Scale Hierarchy from 0.2 nm (atomic bond) to 1,000 km (planetary arc) — the substrate ladder the coherence engine climbs.">
+          <PlateGrid minWidth={400} plates={[
+            { src: gufCrystallization, aspect:"auto", meta:"GUF Engine · Crystallization Framework", caption:"Layered Optical + Noise-Driven Control of Crystallization — 11-section framework. Nucleation barrier → seed crystal → optical modulation → noise exploitation → layered growth. This is the physical analogue of AETHER's Crystallization Model: raw signal → coherence kernel → structured knowledge." },
+            { src: gufGeoFormation,    aspect:"auto", meta:"GUF Engine · Geo Formation", caption:"Accelerated Geological Formation — 5-stage dynamic cycle (seeding, supersaturation pulse, thermal gradient, pressure release, crystalline lock). Time compressed from millennia to hours; mirrors AETHER's batch-intake pipeline from raw document to crystallised knowledge node." },
+            { src: gufScaleHierarchy, aspect:"auto", span:2, meta:"GUF Engine · Scale Hierarchy · 0.2 nm → 1,000 km", caption:"Optical Scale Hierarchy spanning 12 orders of magnitude — from covalent bond (0.2 nm) through cell (10 μm), organism (1 m), city (10 km), to planetary arc (1,000 km). AETHER's coherence stack maps each layer to an L-level: L1 (atomic/signal) → L5 (field/planetary)." },
+          ]}/>
+          <Aphorism attribution="Bridge → /guf-engine · AETHER Crystallization Model">
+            Every scale of matter crystallises by the same logic: seed, amplify, lock. Intelligence is no different.
+          </Aphorism>
+          <div style={{ marginTop:"1rem" }}>
+            <Link href="/guf-engine" style={{ display:"inline-flex", alignItems:"center", gap:6,
+              fontSize:"0.82rem", color:"#38bdf8", fontFamily:"'DM Mono',monospace",
+              letterSpacing:"0.12em", textDecoration:"none", textTransform:"uppercase" }}>
+              ⚡ Open GUF Master Engine → Live Simulators + All 6 Infographics
+            </Link>
+          </div>
+        </Section>
+
         <footer style={{ marginTop:"2.5rem", paddingTop:"1.5rem",
           borderTop:"1px solid rgba(255,255,255,0.08)",
           textAlign:"center", fontSize:"0.78rem", color:"#64748b",
           fontFamily:"'DM Mono',monospace", letterSpacing:"0.2em", textTransform:"uppercase" }}>
-          Foundations · 6 clusters · 19 plates · One crystallization model
+          Foundations · 7 clusters · 23 plates · One crystallization model
         </footer>
       </div>
     </div>

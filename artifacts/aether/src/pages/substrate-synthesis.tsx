@@ -8,6 +8,10 @@ import layeredOpticalFramework from "@assets/5CF0BA96-40F7-436B-878A-8D93871C36B
 import blueVioletPaper from "@assets/1FCF6888-89B7-4E22-B40A-2DB7BCE6E11D_1778070646724.png";
 import geologicalAccelerator from "@assets/C4A9F181-C71B-4042-96B3-91D5C4AF73A3_1778070646724.png";
 import treeOfLife from "@assets/IMG_1588_1778070646724.jpeg";
+import gufScaleHierarchy from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
+import gufFerroSilicon from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_46_PM_1781373535656.png";
+import gufCrystallization from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
+import gufGeoFormation from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
 import shiaLifeFormula from "@assets/IMG_1577_1778070646724.jpeg";
 
 // ── Synthesis conditions, rates from 1FCF6888 (mg/L precipitated after 180 min)
@@ -725,10 +729,32 @@ export default function SubstrateSynthesisPage() {
           </div>
         </Section>
 
+        {/* GUF Cross-Reference */}
+        <Section
+          anchor="guf-cross-reference"
+          kicker="IX · GUF Engine · Cross-Framework Infographics"
+          title="Scale Architecture, Ferrofluid Substrates & Crystallization Control"
+          lead="Four infographics from the GUF Master Engine that extend this substrate framework — Optical Scale Hierarchy (0.2 nm→1,000 km), Ferrofluid vs Silicon cross-scale comparison, Layered Optical Crystallization Control, and Accelerated Geological Formation. These are the physical blueprints AETHER's coherence stack is modelled on."
+        >
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.9rem" }}>
+            <Plate src={gufScaleHierarchy}   caption="Optical Scale Hierarchy · 0.2 nm (atomic bond) → 1,000 km (planetary arc) — 12 orders of magnitude mapped to substrate layers." aspect="auto"/>
+            <Plate src={gufFerroSilicon}     caption="Ferrofluid vs Silicon Cross-Scale · magnetic domain topology vs silicon crystal lattice — two routes to organised substrate response." aspect="auto"/>
+            <Plate src={gufCrystallization}  caption="Layered Optical + Noise-Driven Control of Crystallization · 11-section framework grounding AETHER's L1→L5 coherence stack." aspect="auto"/>
+            <Plate src={gufGeoFormation}     caption="Accelerated Geological Formation · 5-stage dynamic cycle — seeding → supersaturation → thermal gradient → pressure release → crystalline lock." aspect="16/10"/>
+          </div>
+          <div style={{ marginTop:"1rem" }}>
+            <a href="/guf-engine" style={{ display:"inline-flex", alignItems:"center", gap:6,
+              fontSize:"0.82rem", color:"#38bdf8", fontFamily:"'DM Mono',monospace",
+              letterSpacing:"0.12em", textDecoration:"none", textTransform:"uppercase" }}>
+              ⚡ Open GUF Master Engine → Live Simulators + Full Infographic Set
+            </a>
+          </div>
+        </Section>
+
         {/* LinkedIn Image Archive */}
         <Section
           anchor="linkedin-archive"
-          kicker="IX · LinkedIn Archive"
+          kicker="X · LinkedIn Archive"
           title="Friday April 24th — 227 Slides"
           lead="Full image archive extracted from the LinkedIn post collection. Slides load on demand — 40 per page. Click any slide to open it full-screen. Use the jump box to go directly to a slide number."
         >
