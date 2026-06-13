@@ -398,7 +398,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search pages…"
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-md pl-8 pr-7 py-1.5 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 outline-none focus:border-primary/40 focus:bg-primary/[0.04] transition-all"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-md pl-8 pr-7 py-1.5 text-xs font-mono text-foreground text-left placeholder:text-muted-foreground/40 outline-none focus:border-primary/40 focus:bg-primary/[0.04] transition-all"
             />
             {isSearching && (
               <button
