@@ -280,6 +280,8 @@ const NAV_ITEMS = [
   { href: "/aether-cla",             label: "AETHER–CLA · Coherent Phase Lattice · Planetary Resonance", icon: Atom },
   { href: "/guf-analysis",           label: "GUF Analysis · Collider v3 · Twisted Zipper · Compound-Eye", icon: Atom },
   { href: "/plate-switching",        label: "Plate Switching · Optical Hull · CaCO₃ · Scale Hierarchy", icon: Atom },
+  { href: "/sea-intelligence",       label: "Sea Intelligence · Coral Restoration · Sea Milk Camera · Bioluminescence", icon: Atom },
+  { href: "/aether-propulsion",      label: "AETHER Propulsion · Vortex-Ring Engine · Spacetime · Quantum", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

@@ -200,6 +200,8 @@ import ObserverDimensionsPage from "@/pages/observer-dimensions";
 import AetherClaPage from "@/pages/aether-cla";
 import GufAnalysisPage from "@/pages/guf-analysis";
 import PlateSwitchingPage from "@/pages/plate-switching";
+import SeaIntelligencePage from "@/pages/sea-intelligence";
+import AetherPropulsionPage from "@/pages/aether-propulsion";
 
 const queryClient = new QueryClient();
 
@@ -403,6 +405,8 @@ function Router() {
         <Route path="/aether-cla" component={AetherClaPage} />
         <Route path="/guf-analysis" component={GufAnalysisPage} />
         <Route path="/plate-switching" component={PlateSwitchingPage} />
+        <Route path="/sea-intelligence" component={SeaIntelligencePage} />
+        <Route path="/aether-propulsion" component={AetherPropulsionPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
