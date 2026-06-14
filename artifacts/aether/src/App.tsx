@@ -199,11 +199,12 @@ import WarpGravityPage from "@/pages/warp-gravity";
 import ObserverDimensionsPage from "@/pages/observer-dimensions";
 import AetherClaPage from "@/pages/aether-cla";
 import GufAnalysisPage from "@/pages/guf-analysis";
-import PlateSwitchingPage from "@/pages/plate-switching";
 import SeaIntelligencePage from "@/pages/sea-intelligence";
 import AetherPropulsionPage from "@/pages/aether-propulsion";
 import MotionLanguagePage from "@/pages/motion-language";
 import CarrierDimensionsPage from "@/pages/carrier-dimensions";
+import CoherenceDecoherencePage from "@/pages/coherence-decoherence";
+import EarthAtmospherePage from "@/pages/earth-atmosphere";
 
 const queryClient = new QueryClient();
 
@@ -406,11 +407,12 @@ function Router() {
         <Route path="/observer-dimensions" component={ObserverDimensionsPage} />
         <Route path="/aether-cla" component={AetherClaPage} />
         <Route path="/guf-analysis" component={GufAnalysisPage} />
-        <Route path="/plate-switching" component={PlateSwitchingPage} />
         <Route path="/sea-intelligence" component={SeaIntelligencePage} />
         <Route path="/aether-propulsion" component={AetherPropulsionPage} />
         <Route path="/motion-language" component={MotionLanguagePage} />
         <Route path="/carrier-dimensions" component={CarrierDimensionsPage} />
+        <Route path="/coherence-decoherence" component={CoherenceDecoherencePage} />
+        <Route path="/earth-atmosphere" component={EarthAtmospherePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

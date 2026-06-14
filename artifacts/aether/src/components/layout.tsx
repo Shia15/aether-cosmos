@@ -279,11 +279,12 @@ const NAV_ITEMS = [
   { href: "/observer-dimensions",    label: "Observer Dimensions · L8 Fusion · AETHER Field", icon: Atom },
   { href: "/aether-cla",             label: "AETHER–CLA · Coherent Phase Lattice · Planetary Resonance", icon: Atom },
   { href: "/guf-analysis",           label: "GUF Analysis · Collider v3 · Twisted Zipper · Compound-Eye", icon: Atom },
-  { href: "/plate-switching",        label: "Plate Switching · Optical Hull · CaCO₃ · Scale Hierarchy", icon: Atom },
   { href: "/sea-intelligence",       label: "Sea Intelligence · Coral Restoration · Sea Milk Camera · Bioluminescence", icon: Atom },
   { href: "/aether-propulsion",      label: "AETHER Propulsion · Vortex-Ring Engine · Spacetime · Quantum", icon: Atom },
   { href: "/motion-language",        label: "Motion Language · Calligraphy Alphabet · MagLev · Nessie Engine", icon: Atom },
   { href: "/carrier-dimensions",     label: "Carrier Dimensions · D9–D26 · AETHER Ring Memory · Scaling Warp", icon: Atom },
+  { href: "/coherence-decoherence",  label: "Coherence & Decoherence · Healing · Fractal Light · Solar-Neural", icon: Atom },
+  { href: "/earth-atmosphere",       label: "Earth & Atmosphere · Resonance · Climate Archives · Atmospheric Matrix", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
