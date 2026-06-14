@@ -199,6 +199,7 @@ import WarpGravityPage from "@/pages/warp-gravity";
 import ObserverDimensionsPage from "@/pages/observer-dimensions";
 import AetherClaPage from "@/pages/aether-cla";
 import GufAnalysisPage from "@/pages/guf-analysis";
+import PlateSwitchingPage from "@/pages/plate-switching";
 
 const queryClient = new QueryClient();
 
@@ -401,6 +402,7 @@ function Router() {
         <Route path="/observer-dimensions" component={ObserverDimensionsPage} />
         <Route path="/aether-cla" component={AetherClaPage} />
         <Route path="/guf-analysis" component={GufAnalysisPage} />
+        <Route path="/plate-switching" component={PlateSwitchingPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

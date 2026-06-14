@@ -279,6 +279,7 @@ const NAV_ITEMS = [
   { href: "/observer-dimensions",    label: "Observer Dimensions · L8 Fusion · AETHER Field", icon: Atom },
   { href: "/aether-cla",             label: "AETHER–CLA · Coherent Phase Lattice · Planetary Resonance", icon: Atom },
   { href: "/guf-analysis",           label: "GUF Analysis · Collider v3 · Twisted Zipper · Compound-Eye", icon: Atom },
+  { href: "/plate-switching",        label: "Plate Switching · Optical Hull · CaCO₃ · Scale Hierarchy", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
