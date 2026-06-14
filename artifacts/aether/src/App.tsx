@@ -202,6 +202,8 @@ import GufAnalysisPage from "@/pages/guf-analysis";
 import PlateSwitchingPage from "@/pages/plate-switching";
 import SeaIntelligencePage from "@/pages/sea-intelligence";
 import AetherPropulsionPage from "@/pages/aether-propulsion";
+import MotionLanguagePage from "@/pages/motion-language";
+import CarrierDimensionsPage from "@/pages/carrier-dimensions";
 
 const queryClient = new QueryClient();
 
@@ -407,6 +409,8 @@ function Router() {
         <Route path="/plate-switching" component={PlateSwitchingPage} />
         <Route path="/sea-intelligence" component={SeaIntelligencePage} />
         <Route path="/aether-propulsion" component={AetherPropulsionPage} />
+        <Route path="/motion-language" component={MotionLanguagePage} />
+        <Route path="/carrier-dimensions" component={CarrierDimensionsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

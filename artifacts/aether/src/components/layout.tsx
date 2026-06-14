@@ -282,6 +282,8 @@ const NAV_ITEMS = [
   { href: "/plate-switching",        label: "Plate Switching · Optical Hull · CaCO₃ · Scale Hierarchy", icon: Atom },
   { href: "/sea-intelligence",       label: "Sea Intelligence · Coral Restoration · Sea Milk Camera · Bioluminescence", icon: Atom },
   { href: "/aether-propulsion",      label: "AETHER Propulsion · Vortex-Ring Engine · Spacetime · Quantum", icon: Atom },
+  { href: "/motion-language",        label: "Motion Language · Calligraphy Alphabet · MagLev · Nessie Engine", icon: Atom },
+  { href: "/carrier-dimensions",     label: "Carrier Dimensions · D9–D26 · AETHER Ring Memory · Scaling Warp", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
