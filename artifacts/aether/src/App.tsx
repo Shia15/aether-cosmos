@@ -212,6 +212,7 @@ import NeuralBrainSystemsPage from "@/pages/neural-brain-systems";
 import WavePoolSynthesisPage from "@/pages/wave-pool-synthesis";
 import SacredGeometryMathPage from "@/pages/sacred-geometry-math";
 import ResonantSystemsPage from "@/pages/resonant-systems";
+import SymbolSifterPage from "@/pages/symbol-sifter";
 
 const queryClient = new QueryClient();
 
@@ -427,6 +428,7 @@ function Router() {
         <Route path="/wave-pool-synthesis" component={WavePoolSynthesisPage} />
         <Route path="/sacred-geometry-math" component={SacredGeometryMathPage} />
         <Route path="/resonant-systems" component={ResonantSystemsPage} />
+        <Route path="/symbol-sifter" component={SymbolSifterPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
