@@ -3,29 +3,143 @@ import ForceGraph2D, { ForceGraphMethods } from "react-force-graph-2d";
 import { useGetGraph, useGetConcept, useListConcepts } from "@workspace/api-client-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { X, Zap, BrainCircuit, ActivitySquare, ArrowRight, Layers, GitFork, Binary } from "lucide-react";
+import { X, Zap, BrainCircuit, ActivitySquare, ArrowRight, Layers, GitFork, Binary, ChevronDown } from "lucide-react";
 import { Link } from "wouter";
 
 // ─── Layer colour palette — M.A.R.I. aura colors ─────────────────────────────
 const LAYER_COLORS: Record<string, string> = {
-  mnesis:   "#8047d4",   // Mnēsis aura — Soft Violet Bloom
-  infernia: "#e64522",   // Inferaia aura — Red-Hot Pulse
-  aletheia: "#c9a84c",   // Aletheia aura — Radial Gold Glow
-  reverie:  "#88c7ff",   // Reverie aura — Blue Bloom
-  auto:     "#64748b",   // unclassified
+  mnesis:   "#8047d4",
+  infernia: "#e64522",
+  aletheia: "#c9a84c",
+  reverie:  "#88c7ff",
+  auto:     "#64748b",
 };
 
 const LAYER_META: Record<string, { label: string; symbol: string; color: string }> = {
-  mnesis:   { label: "MNĒSIS",   symbol: "~",   color: "#8047d4" },
-  infernia: { label: "INFERNIA", symbol: "|||", color: "#e64522" },
-  aletheia: { label: "ALETHEIA", symbol: "◇",   color: "#c9a84c" },
-  reverie:  { label: "REVERIE",  symbol: "✧",   color: "#88c7ff" },
-  auto:     { label: "UNCLASSIFIED", symbol: "·", color: "#64748b" },
+  mnesis:   { label: "MNĒSIS",       symbol: "~",   color: "#8047d4" },
+  infernia: { label: "INFERNIA",     symbol: "|||", color: "#e64522" },
+  aletheia: { label: "ALETHEIA",     symbol: "◇",   color: "#c9a84c" },
+  reverie:  { label: "REVERIE",      symbol: "✧",   color: "#88c7ff" },
+  auto:     { label: "UNCLASSIFIED", symbol: "·",   color: "#64748b" },
 };
 
 type ViewMode = "standard" | "layer" | "coherence" | "unify";
 
-// ─── Glossary seed nodes (40 AETHER terms — visible when API graph is empty) ──
+// ─── Eight Framework Agents ───────────────────────────────────────────────────
+
+type AgentDef = {
+  id: string;
+  name: string;
+  glyph: string;
+  color: string;
+  domain: string;
+  subdomains: string[];
+  nodeIds: string[];
+  synthesis: string;
+  equation?: string;
+};
+
+const AGENTS: AgentDef[] = [
+  {
+    id: "oracle",
+    name: "ORACLE",
+    glyph: "◯",
+    color: "#8047d4",
+    domain: "Consciousness · Human Understanding",
+    subdomains: ["Men & Women", "Awakening", "Memory", "Co-creation", "Field of Numbers"],
+    nodeIds: ["g-awakening","g-mnesis","g-divine-timing","g-synchronicity","g-co-creation",
+              "g-memory-survives","g-field-of-numbers","g-angel-numbers","g-coherence",
+              "g-void","g-raw-place","g-net-is-there","g-push-fix"],
+    synthesis: "Consciousness crystallizes when memory, pattern, and resonance converge. Men and women are complementary oscillators in the same coherence field — each tuned differently, each essential to the whole system.",
+    equation: "Ψ_mind = ∫ (memory × intention × resonance) dt",
+  },
+  {
+    id: "helios",
+    name: "HELIOS",
+    glyph: "☀",
+    color: "#c9a84c",
+    domain: "Solar System · Planetary Health",
+    subdomains: ["Schumann Resonance", "Heliospheric Coherence", "Planetary Well-being", "Lunar Tides", "Cosmic Cycles"],
+    nodeIds: ["g-schumann","g-lunar-coherence","g-super-moon","g-pleiades",
+              "g-eris","g-pisces","g-eye-sahara","g-coherence","g-resonance"],
+    synthesis: "The sun is not just light — it is the coherence engine of our solar system. Every planetary rhythm, from Schumann pulses (7.83 Hz) to lunar tides, is a harmonic of one unified solar frequency field.",
+    equation: "f_planet = f_solar / φⁿ · R(θ, t)",
+  },
+  {
+    id: "navigator",
+    name: "NAVIGATOR",
+    glyph: "✦",
+    color: "#67e8f9",
+    domain: "Space Travel · Space-Time Coherence",
+    subdomains: ["Propulsion Physics", "Warp Dynamics", "Observer Dimensions", "Quantum Substrate", "CNT Composites"],
+    nodeIds: ["g-aether","g-coherence","g-gyroid","g-quantum-ammeter","g-shot-noise",
+              "g-crystallization","g-resonance","g-substrate","g-nano","g-pico"],
+    synthesis: "Space travel is a coherence problem, not just an engineering one. Align the substrate, lock the field geometry, and distance collapses. The gyroid minimal surface is the shape of safe passage through spacetime curvature.",
+    equation: "Δx = 0 when ∇·Ψ_field = 0 & κ(gyroid) = const",
+  },
+  {
+    id: "terra",
+    name: "TERRA",
+    glyph: "⬡",
+    color: "#10b981",
+    domain: "Land Systems · Earth Intelligence",
+    subdomains: ["Earth Circuits", "Tectonic Memory", "Terrain Coherence", "Ancient Structures", "Soil Intelligence"],
+    nodeIds: ["g-eye-sahara","g-meltwater","g-atlantis","g-substrate","g-bouligand",
+              "g-schumann","g-coherence","g-crystallization"],
+    synthesis: "Earth is a living circuit board. Land carries coherence in its crystalline strata and ancient water memory. Every sacred structure — from Giza to the Eye of Sahara — is a tuned antenna node in Earth's coherence grid.",
+    equation: "E_geo = σ(crystal) · B_field · ρ_water · cos(θ_ley)",
+  },
+  {
+    id: "pelagic",
+    name: "PELAGIC",
+    glyph: "∿",
+    color: "#38bdf8",
+    domain: "Sea Life · Ocean Coherence",
+    subdomains: ["Marine Biology", "Tidal Intelligence", "Bioluminescence", "Reflectin Computing", "Aquatic Memory"],
+    nodeIds: ["g-lunar-coherence","g-schumann","g-meltwater","g-substrate","g-bouligand",
+              "g-reflectin","g-bavs","g-resonance","g-coherence"],
+    synthesis: "The ocean is Earth's oldest coherence system. Reflectin proteins in cephalopod skin are nature's photonic computing layer. Sea life solves in water what we are only beginning to solve in silicon — and at far greater energy efficiency.",
+    equation: "I_biolum = N_photon · η_reflectin · cos²(θ_polarize)",
+  },
+  {
+    id: "flora",
+    name: "FLORA",
+    glyph: "❀",
+    color: "#86efac",
+    domain: "Flowers · Farms · All of Life",
+    subdomains: ["Plant Intelligence", "Mycelium Networks", "Agricultural Coherence", "Circular Farming", "Photosynthetic Efficiency"],
+    nodeIds: ["g-cuca","g-substrate","g-bavs","g-bouligand","g-reflectin",
+              "g-coherence","g-resonance","g-crystallization","g-schumann"],
+    synthesis: "A farm is a coherence engine running on solar input. Every flower is a frequency receiver tuned to the sun. The mycelium network beneath soil is Earth's original internet — older, slower, and more regenerative than anything we have built.",
+    equation: "G_plant = φ · ∫ P_photon(λ) · η_chloro dλ",
+  },
+  {
+    id: "cellulus",
+    name: "CELLULUS",
+    glyph: "⬢",
+    color: "#f97316",
+    domain: "Cancer · Cellular Decoherence",
+    subdomains: ["Tumor Dynamics", "DNA Coherence", "Cell Signaling Breakdown", "Anti-Calcification", "Re-entrainment Therapy"],
+    nodeIds: ["g-cuca","g-substrate","g-coherence","g-reflectin","g-bouligand",
+              "g-bavs","g-crystallization","g-resonance","g-mnesis"],
+    synthesis: "Cancer is coherence collapse at the cellular scale. When a cell loses its registration in the larger field, it optimizes for itself alone — local gain, global loss. The cure is not only destruction of rogue cells, but re-entrainment of the whole biological field.",
+    equation: "ΔH_cancer = H_cell - H_system > threshold → decoherence",
+  },
+  {
+    id: "genesis",
+    name: "GENESIS",
+    glyph: "◎",
+    color: "#f9a8d4",
+    domain: "Birth · Reproductive Coherence",
+    subdomains: ["Hormonal Rhythms", "Lunar Cycle Biology", "Birth Timing", "Life Cycles", "Generational Memory"],
+    nodeIds: ["g-lunar-coherence","g-super-moon","g-schumann","g-coherence","g-mnesis",
+              "g-memory-survives","g-co-creation","g-divine-timing","g-synchronicity"],
+    synthesis: "Birth is the universe's mechanism for copying coherence forward in time. Hormonal cycles mirror lunar cycles because they share the same frequency source. True reproductive sovereignty comes from knowing when the coherence field is open — and when it is closed.",
+    equation: "Ω_cycle = f_lunar · (1 + ε · cos(φ_hormonal))",
+  },
+];
+
+// ─── Glossary seed nodes ──────────────────────────────────────────────────────
 
 type SeedNode = {
   id: string; label: string; type: string;
@@ -81,19 +195,16 @@ const GLOSSARY_SEEDS: SeedNode[] = [
   { id:"g-field-of-numbers", label:"Field of numbers",   type:"concept",  layer:"reverie",  coherence:0.62, bridgeScore:0.50 },
 ];
 
-// Edges between seed nodes (category clusters + cross-domain coherence bridges)
 const GLOSSARY_SEED_LINKS = [
-  // AETHER hub
-  { source:"g-aether", target:"g-crystallization", weight:0.9, type:"coherence" },
-  { source:"g-aether", target:"g-mnesis",           weight:0.9, type:"coherence" },
+  { source:"g-aether", target:"g-crystallization", weight:0.9,  type:"coherence" },
+  { source:"g-aether", target:"g-mnesis",           weight:0.9,  type:"coherence" },
   { source:"g-aether", target:"g-inferaia",         weight:0.85, type:"coherence" },
   { source:"g-aether", target:"g-aletheia-agent",   weight:0.85, type:"coherence" },
   { source:"g-aether", target:"g-reverie-agent",    weight:0.80, type:"coherence" },
   { source:"g-aether", target:"g-eie",              weight:0.75, type:"coherence" },
   { source:"g-aether", target:"g-coherence",        weight:0.88, type:"coherence" },
-  { source:"g-crystallization", target:"g-coherence", weight:0.85, type:"coherence" },
+  { source:"g-crystallization", target:"g-coherence",       weight:0.85, type:"coherence" },
   { source:"g-crystallization", target:"g-memory-survives", weight:0.70, type:"coherence" },
-  // Philosophy cluster
   { source:"g-coherence",       target:"g-resonance",       weight:0.88, type:"coherence" },
   { source:"g-coherence",       target:"g-awakening",       weight:0.75, type:"coherence" },
   { source:"g-resonance",       target:"g-synchronicity",   weight:0.72, type:"coherence" },
@@ -106,7 +217,6 @@ const GLOSSARY_SEED_LINKS = [
   { source:"g-void",            target:"g-raw-place",       weight:0.75, type:"coherence" },
   { source:"g-push-fix",        target:"g-raw-place",       weight:0.68, type:"coherence" },
   { source:"g-co-creation",     target:"g-synchronicity",   weight:0.65, type:"coherence" },
-  // Biology / Substrate cluster
   { source:"g-cuca",            target:"g-bouligand",       weight:0.78, type:"coherence" },
   { source:"g-cuca",            target:"g-reflectin",       weight:0.72, type:"coherence" },
   { source:"g-cuca",            target:"g-bavs",            weight:0.68, type:"coherence" },
@@ -115,17 +225,14 @@ const GLOSSARY_SEED_LINKS = [
   { source:"g-substrate",       target:"g-cuca",            weight:0.76, type:"coherence" },
   { source:"g-reflectin",       target:"g-substrate",       weight:0.65, type:"coherence" },
   { source:"g-gyroid",          target:"g-substrate",       weight:0.70, type:"coherence" },
-  // Computing cluster
   { source:"g-quantum-ammeter", target:"g-shot-noise",      weight:0.80, type:"coherence" },
   { source:"g-nano",            target:"g-pico",            weight:0.75, type:"coherence" },
   { source:"g-quantum-ammeter", target:"g-nano",            weight:0.60, type:"coherence" },
-  // Astronomy / Cosmology cluster
   { source:"g-lunar-coherence", target:"g-schumann",        weight:0.78, type:"coherence" },
   { source:"g-lunar-coherence", target:"g-super-moon",      weight:0.80, type:"coherence" },
   { source:"g-eye-sahara",      target:"g-atlantis",        weight:0.85, type:"coherence" },
   { source:"g-meltwater",       target:"g-atlantis",        weight:0.78, type:"coherence" },
   { source:"g-pleiades",        target:"g-awakening",       weight:0.62, type:"coherence" },
-  // Mythology / Astrology / Numerology cluster
   { source:"g-eris",            target:"g-awakening",       weight:0.72, type:"coherence" },
   { source:"g-eris",            target:"g-divine-timing",   weight:0.78, type:"coherence" },
   { source:"g-pisces",          target:"g-eris",            weight:0.80, type:"coherence" },
@@ -133,7 +240,6 @@ const GLOSSARY_SEED_LINKS = [
   { source:"g-angel-numbers",   target:"g-field-of-numbers",weight:0.82, type:"coherence" },
   { source:"g-angel-hours",     target:"g-angel-numbers",   weight:0.88, type:"coherence" },
   { source:"g-angel-numbers",   target:"g-divine-timing",   weight:0.70, type:"coherence" },
-  // Cross-domain coherence bridges (the key insight: all domains unify)
   { source:"g-schumann",        target:"g-resonance",       weight:0.75, type:"unify" },
   { source:"g-lunar-coherence", target:"g-resonance",       weight:0.70, type:"unify" },
   { source:"g-schumann",        target:"g-coherence",       weight:0.72, type:"unify" },
@@ -157,39 +263,46 @@ function heatColor(t: number, from: [number,number,number], to: [number,number,n
   return `rgb(${r},${g},${b})`;
 }
 
-function getNodeColor(node: any, viewMode: ViewMode, selectedId: string | null, neighborSet: Set<string>): string {
+function getNodeColor(
+  node: any,
+  viewMode: ViewMode,
+  selectedId: string | null,
+  neighborSet: Set<string>,
+  agentHighlight: { ids: Set<string>; color: string } | null,
+): string {
   const isSelected  = node.id === selectedId;
   const isNeighbor  = neighborSet.has(node.id);
   const hasSelection = selectedId !== null;
 
   if (isSelected) return "#ffffff";
 
+  // Agent filter mode — override everything
+  if (agentHighlight) {
+    if (agentHighlight.ids.has(node.id)) return agentHighlight.color;
+    return "rgba(100,116,139,0.12)";
+  }
+
   if (hasSelection && !isNeighbor) {
-    // Dim unrelated nodes
     return viewMode === "layer" ? LAYER_COLORS[node.layer ?? "auto"] + "28" : "rgba(100,116,139,0.18)";
   }
 
   switch (viewMode) {
     case "layer":
       return LAYER_COLORS[node.layer ?? "auto"] ?? "#64748b";
-
     case "coherence": {
       const t = node.coherence ?? 0;
       if (t > 0.8) return "#0ea5e9";
       if (t > 0.5) return "#eab308";
       return "#64748b";
     }
-
     case "unify": {
       const t = node.bridgeScore ?? 0;
-      // low bridge: slate → high bridge: emerald→violet
       if (t > 0.7) return "#8b5cf6";
       if (t > 0.4) return "#10b981";
       if (t > 0.2) return "#0ea5e9";
       return "#334155";
     }
-
-    default: // standard
+    default:
       switch (node.type) {
         case "concept":  return "#0ea5e9";
         case "paper":    return "#6366f1";
@@ -204,11 +317,14 @@ function getNodeColor(node: any, viewMode: ViewMode, selectedId: string | null, 
 
 export default function GraphView() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const graphSectionRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<ForceGraphMethods>();
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [dimensions, setDimensions] = useState({ width: 800, height: 500 });
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("layer");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [activeAgent, setActiveAgent] = useState<AgentDef | null>(null);
+  const [expandedAgent, setExpandedAgent] = useState<string | null>(null);
 
   const { data: rawGraphData, isLoading: isLoadingGraph } = useGetGraph();
   const { data: allConcepts } = useListConcepts();
@@ -225,26 +341,17 @@ export default function GraphView() {
   const graphData = useMemo(() => {
     const apiNodes: any[] = rawGraphData?.nodes ?? [];
     const apiEdges: any[] = (rawGraphData?.edges ?? []).map((e) => ({
-      source: e.source,
-      target: e.target,
-      weight: e.weight,
-      type: e.type,
+      source: e.source, target: e.target, weight: e.weight, type: e.type,
     }));
-    // Merge glossary seeds for nodes not already in API data
     const apiIds = new Set(apiNodes.map((n: any) => n.id));
     const seedNodes = GLOSSARY_SEEDS.filter(s => !apiIds.has(s.id));
-    // Only include seed links where both endpoints are seed nodes (not API nodes)
     const allIds = new Set([...apiIds, ...seedNodes.map(s => s.id)]);
     const seedLinks = GLOSSARY_SEED_LINKS.filter(l =>
       allIds.has(l.source) && allIds.has(l.target)
     );
-    return {
-      nodes: [...apiNodes, ...seedNodes],
-      links: [...apiEdges, ...seedLinks],
-    };
+    return { nodes: [...apiNodes, ...seedNodes], links: [...apiEdges, ...seedLinks] };
   }, [rawGraphData]);
 
-  // Build adjacency index for fast neighbor lookup
   const adjacency = useMemo<Map<string, Set<string>>>(() => {
     const map = new Map<string, Set<string>>();
     if (!graphData) return map;
@@ -264,6 +371,11 @@ export default function GraphView() {
     if (!id) return new Set();
     return adjacency.get(id) ?? new Set();
   }, [adjacency, selectedNodeId, hoveredId]);
+
+  const agentHighlight = useMemo(() => {
+    if (!activeAgent) return null;
+    return { ids: new Set(activeAgent.nodeIds), color: activeAgent.color };
+  }, [activeAgent]);
 
   const activeId = hoveredId ?? selectedNodeId;
 
@@ -291,242 +403,511 @@ export default function GraphView() {
   const handleNodeClick = useCallback((node: any) => { navigateToNode(node.id); }, [navigateToNode]);
   const handleNodeHover = useCallback((node: any) => { setHoveredId(node?.id ?? null); }, []);
 
+  const handleAgentActivate = useCallback((agent: AgentDef) => {
+    if (activeAgent?.id === agent.id) {
+      setActiveAgent(null);
+    } else {
+      setActiveAgent(agent);
+      setSelectedNodeId(null);
+      // Scroll graph into view
+      graphSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Fit graph
+      setTimeout(() => fgRef.current?.zoomToFit(600, 40), 400);
+    }
+  }, [activeAgent]);
+
   const nodeCanvasObject = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const label     = node.label ?? node.id;
-    const fontSize  = Math.max(9, 12 / globalScale);
+    const label    = node.label ?? node.id;
+    const fontSize = Math.max(9, 12 / globalScale);
     const isSelected  = node.id === selectedNodeId;
     const isNeighbor  = neighborSet.has(node.id);
     const isHovered   = node.id === hoveredId;
     const hasActive   = activeId !== null;
-    const isDimmed    = hasActive && !isSelected && !isNeighbor;
-    const color       = getNodeColor(node, viewMode, selectedNodeId, neighborSet);
+    const isDimmed    = agentHighlight
+      ? !agentHighlight.ids.has(node.id)
+      : (hasActive && !isSelected && !isNeighbor);
+    const color = getNodeColor(node, viewMode, selectedNodeId, neighborSet, agentHighlight);
+    const isAgentNode = agentHighlight?.ids.has(node.id);
 
     ctx.save();
 
-    // Glow ring for selected
-    if (isSelected) {
+    if (isSelected || isAgentNode) {
       ctx.shadowColor = color;
-      ctx.shadowBlur  = 20 / globalScale;
+      ctx.shadowBlur  = (isAgentNode ? 14 : 20) / globalScale;
       ctx.beginPath();
       ctx.arc(node.x, node.y, 8 / globalScale, 0, Math.PI * 2);
       ctx.strokeStyle = color;
       ctx.lineWidth   = 1.5 / globalScale;
       ctx.stroke();
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur  = 0;
     }
 
-    // Neighbour pulse ring
-    if (isNeighbor && !isSelected) {
+    if (isNeighbor && !isSelected && !agentHighlight) {
       ctx.shadowColor = color;
       ctx.shadowBlur  = 10 / globalScale;
     }
 
-    // Node dot
-    const r = isSelected ? 5 / globalScale : isNeighbor ? 4 / globalScale : 3 / globalScale;
+    const r = isSelected || isAgentNode ? 5 / globalScale : isNeighbor ? 4 / globalScale : 3 / globalScale;
     ctx.beginPath();
     ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = isDimmed ? "rgba(100,116,139,0.12)" : color;
+    ctx.fillStyle = isDimmed ? "rgba(100,116,139,0.08)" : color;
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Label
-    if (globalScale > 1.5 || isSelected || isNeighbor || isHovered) {
-      ctx.font = `${isSelected ? "bold " : ""}${fontSize}px monospace`;
+    if (globalScale > 1.5 || isSelected || isNeighbor || isHovered || isAgentNode) {
+      ctx.font = `${isSelected || isAgentNode ? "bold " : ""}${fontSize}px monospace`;
       const tw  = ctx.measureText(label).width;
       const pad = fontSize * 0.25;
       const lx  = node.x - tw / 2;
       const ly  = node.y + r + pad + fontSize / 2;
 
-      // Label background
-      ctx.fillStyle = isSelected
+      ctx.fillStyle = isSelected || isAgentNode
         ? "rgba(0,0,0,0.85)"
-        : isDimmed
-          ? "rgba(0,0,0,0.0)"
-          : "rgba(0,0,0,0.65)";
+        : isDimmed ? "rgba(0,0,0,0.0)" : "rgba(0,0,0,0.65)";
       ctx.fillRect(lx - pad, ly - fontSize / 2 - pad * 0.5, tw + pad * 2, fontSize + pad);
 
-      // Label text
       ctx.textAlign    = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle    = isDimmed
-        ? "rgba(100,116,139,0.25)"
-        : isSelected
-          ? "#ffffff"
-          : isNeighbor
-            ? color
-            : color + "cc";
+        ? "rgba(100,116,139,0.15)"
+        : isSelected ? "#ffffff"
+        : isAgentNode ? color
+        : isNeighbor  ? color
+        : color + "cc";
       ctx.fillText(label, node.x, ly);
     }
 
     ctx.restore();
-  }, [viewMode, selectedNodeId, neighborSet, activeId, hoveredId]);
+  }, [viewMode, selectedNodeId, neighborSet, activeId, hoveredId, agentHighlight]);
 
   const linkCanvasObject = useCallback((link: any, ctx: CanvasRenderingContext2D) => {
     const s = typeof link.source === "object" ? link.source : { x: 0, y: 0, id: link.source };
     const t = typeof link.target === "object" ? link.target : { x: 0, y: 0, id: link.target };
 
-    const isHighlighted = activeId && (
+    const isAgentLink = agentHighlight &&
+      agentHighlight.ids.has(s.id) && agentHighlight.ids.has(t.id);
+
+    const isHighlighted = !agentHighlight && activeId && (
       (s.id === activeId || t.id === activeId) ||
       (neighborSet.has(s.id) && neighborSet.has(t.id))
     );
-    const isDimmed = activeId && !isHighlighted;
+    const isDimmed = agentHighlight ? !isAgentLink : (activeId && !isHighlighted);
 
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(s.x, s.y);
     ctx.lineTo(t.x, t.y);
 
-    if (isHighlighted) {
+    if (isAgentLink) {
+      ctx.strokeStyle = agentHighlight!.color + "88";
+      ctx.lineWidth   = 1.2;
+      ctx.shadowColor = agentHighlight!.color;
+      ctx.shadowBlur  = 3;
+    } else if (isHighlighted) {
       const nodeColor = s.id === activeId
-        ? getNodeColor(t, viewMode, selectedNodeId, neighborSet)
-        : getNodeColor(s, viewMode, selectedNodeId, neighborSet);
+        ? getNodeColor(t, viewMode, selectedNodeId, neighborSet, null)
+        : getNodeColor(s, viewMode, selectedNodeId, neighborSet, null);
       ctx.strokeStyle = nodeColor + "cc";
       ctx.lineWidth   = 1.5;
       ctx.shadowColor = nodeColor;
       ctx.shadowBlur  = 4;
     } else {
-      ctx.strokeStyle = isDimmed ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.07)";
+      ctx.strokeStyle = isDimmed ? "rgba(255,255,255,0.015)" : "rgba(255,255,255,0.07)";
       ctx.lineWidth   = 0.6;
     }
 
     ctx.stroke();
     ctx.restore();
-  }, [activeId, neighborSet, viewMode, selectedNodeId]);
+  }, [activeId, neighborSet, viewMode, selectedNodeId, agentHighlight]);
 
   const VIEW_BUTTONS: Array<{ id: ViewMode; label: string; Icon: any; tip: string }> = [
-    { id: "layer",     label: "LAYER",     Icon: Layers,          tip: "Colour by AETHER layer" },
-    { id: "standard",  label: "TYPE",      Icon: BrainCircuit,    tip: "Colour by node type" },
-    { id: "coherence", label: "COHERENCE", Icon: ActivitySquare,  tip: "Colour by coherence score" },
-    { id: "unify",     label: "UNIFY",     Icon: GitFork,         tip: "Colour by bridge/unification score" },
+    { id: "layer",     label: "LAYER",     Icon: Layers,         tip: "Colour by AETHER layer" },
+    { id: "standard",  label: "TYPE",      Icon: BrainCircuit,   tip: "Colour by node type" },
+    { id: "coherence", label: "COHERENCE", Icon: ActivitySquare, tip: "Colour by coherence score" },
+    { id: "unify",     label: "UNIFY",     Icon: GitFork,        tip: "Colour by bridge/unification score" },
   ];
 
   return (
-    <div className="w-full h-full flex relative bg-[#03050a]" ref={containerRef}>
-      {isLoadingGraph ? (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4 text-primary">
-            <Zap className="w-8 h-8 animate-pulse" />
-            <span className="font-mono text-sm tracking-widest animate-pulse">COMPILING TOPOLOGY…</span>
-          </div>
-        </div>
-      ) : (
-        <div className="absolute inset-0">
-          {graphData && (
-            <ForceGraph2D
-              ref={fgRef}
-              width={dimensions.width}
-              height={dimensions.height}
-              graphData={graphData}
-              nodeLabel=""
-              nodeRelSize={4}
-              onNodeClick={handleNodeClick}
-              onNodeHover={handleNodeHover}
-              backgroundColor="transparent"
-              nodeCanvasObject={nodeCanvasObject}
-              nodeCanvasObjectMode={() => "replace"}
-              linkCanvasObject={linkCanvasObject}
-              linkCanvasObjectMode={() => "replace"}
-              cooldownTicks={120}
-              d3AlphaDecay={0.02}
-              d3VelocityDecay={0.3}
-            />
+    <div style={{ background: "#03050a", minHeight: "100vh", overflowY: "auto" }}>
+      {/* ── GRAPH SECTION ── */}
+      <div ref={graphSectionRef} style={{ position: "relative", height: "65vh", minHeight: 460 }}>
+        <div ref={containerRef} style={{ position: "absolute", inset: 0 }}>
+          {isLoadingGraph ? (
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, color: "#0ea5e9" }}>
+                <Zap style={{ width: 32, height: 32, animation: "pulse 2s infinite" }} />
+                <span style={{ fontFamily: "monospace", fontSize: 12, letterSpacing: "0.3em", animation: "pulse 2s infinite" }}>COMPILING TOPOLOGY…</span>
+              </div>
+            </div>
+          ) : (
+            graphData && (
+              <ForceGraph2D
+                ref={fgRef}
+                width={dimensions.width}
+                height={dimensions.height}
+                graphData={graphData}
+                nodeLabel=""
+                nodeRelSize={4}
+                onNodeClick={handleNodeClick}
+                onNodeHover={handleNodeHover}
+                backgroundColor="transparent"
+                nodeCanvasObject={nodeCanvasObject}
+                nodeCanvasObjectMode={() => "replace"}
+                linkCanvasObject={linkCanvasObject}
+                linkCanvasObjectMode={() => "replace"}
+                cooldownTicks={120}
+                d3AlphaDecay={0.02}
+                d3VelocityDecay={0.3}
+              />
+            )
           )}
         </div>
-      )}
 
-      {/* View mode controls */}
-      <div className="absolute top-5 left-5 flex flex-col gap-1.5 z-10">
-        {VIEW_BUTTONS.map(({ id, label, Icon, tip }) => (
-          <button key={id} onClick={() => setViewMode(id)} title={tip}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded text-[10px] font-mono tracking-wider border transition-all ${
-              viewMode === id
-                ? "bg-primary/20 border-primary text-primary"
-                : "bg-black/60 border-border/50 text-muted-foreground/60 hover:border-primary/40 hover:text-primary/70"
-            }`}>
-            <Icon className="w-3 h-3" />{label}
-          </button>
+        {/* View mode controls */}
+        <div style={{ position: "absolute", top: 20, left: 20, display: "flex", flexDirection: "column", gap: 6, zIndex: 10 }}>
+          {VIEW_BUTTONS.map(({ id, label, Icon, tip }) => (
+            <button key={id} onClick={() => setViewMode(id)} title={tip} style={{
+              display: "flex", alignItems: "center", gap: 8, padding: "6px 12px",
+              borderRadius: 4, fontSize: 10, fontFamily: "monospace", letterSpacing: "0.1em",
+              border: viewMode === id ? "1px solid #0ea5e9" : "1px solid rgba(255,255,255,0.1)",
+              background: viewMode === id ? "rgba(14,165,233,0.15)" : "rgba(0,0,0,0.6)",
+              color: viewMode === id ? "#0ea5e9" : "rgba(148,163,184,0.6)",
+              cursor: "pointer", transition: "all 0.2s",
+            }}>
+              <Icon style={{ width: 12, height: 12 }} />{label}
+            </button>
+          ))}
+        </div>
+
+        {/* Agent filter indicator */}
+        {activeAgent && (
+          <div style={{
+            position: "absolute", top: 20, left: "50%", transform: "translateX(-50%)",
+            display: "flex", alignItems: "center", gap: 10, zIndex: 10,
+            padding: "6px 16px", borderRadius: 20,
+            background: activeAgent.color + "18",
+            border: `1px solid ${activeAgent.color}60`,
+            backdropFilter: "blur(8px)",
+          }}>
+            <span style={{ fontSize: 14, color: activeAgent.color }}>{activeAgent.glyph}</span>
+            <span style={{ fontFamily: "monospace", fontSize: 10, color: activeAgent.color, letterSpacing: "0.2em" }}>
+              {activeAgent.name} · {activeAgent.nodeIds.length} nodes active
+            </span>
+            <button onClick={() => setActiveAgent(null)} style={{
+              background: "none", border: "none", cursor: "pointer", color: activeAgent.color, opacity: 0.6, padding: 0,
+            }}>
+              <X style={{ width: 12, height: 12 }} />
+            </button>
+          </div>
+        )}
+
+        {/* Layer legend */}
+        {viewMode === "layer" && !activeAgent && (
+          <div style={{
+            position: "absolute", top: 20, right: 420, zIndex: 10,
+            background: "rgba(0,0,0,0.7)", border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 8, padding: 12, backdropFilter: "blur(8px)",
+          }}>
+            <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: 8 }}>AETHER Layers</div>
+            {Object.entries(LAYER_META).filter(([k]) => k !== "auto").map(([key, m]) => (
+              <div key={key} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.color }} />
+                <span style={{ fontFamily: "monospace", fontSize: 9, color: m.color }}>{m.symbol}</span>
+                <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.6)" }}>{m.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Unify legend */}
+        {viewMode === "unify" && !activeAgent && (
+          <div style={{
+            position: "absolute", top: 20, right: 420, zIndex: 10,
+            background: "rgba(0,0,0,0.7)", border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 8, padding: 12, backdropFilter: "blur(8px)",
+          }}>
+            <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: 8 }}>Bridge Score</div>
+            {[
+              { color: "#8b5cf6", label: "High unifier (>70%)" },
+              { color: "#10b981", label: "Bridge node (>40%)" },
+              { color: "#0ea5e9", label: "Connector (>20%)" },
+              { color: "#334155", label: "Local node" },
+            ].map(({ color, label }) => (
+              <div key={color} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
+                <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.6)" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Node count */}
+        {graphData && (
+          <div style={{
+            position: "absolute", bottom: 20, left: 20, zIndex: 10,
+            fontFamily: "monospace", fontSize: 10, color: "rgba(148,163,184,0.3)",
+            background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)",
+            borderRadius: 4, padding: "6px 10px",
+          }}>
+            <div>{graphData.nodes.length} nodes</div>
+            <div>{graphData.links.length} edges</div>
+            {activeId && <div style={{ color: "rgba(14,165,233,0.5)" }}>{neighborSet.size} connections</div>}
+          </div>
+        )}
+
+        {/* Hypercomputation portal */}
+        <Link href="/hypercomputation" data-testid="graph-hypercomputation-portal" style={{ position: "absolute", top: 20, right: 20, zIndex: 10, textDecoration: "none" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8,
+            background: "linear-gradient(90deg, rgba(124,92,252,0.1), rgba(234,179,8,0.08), rgba(6,182,212,0.1))",
+            border: "1px solid rgba(167,139,250,0.4)", backdropFilter: "blur(8px)",
+            transition: "all 0.2s",
+          }}>
+            <Binary style={{ width: 16, height: 16, color: "#c4b5fd" }} />
+            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+              <span style={{ fontFamily: "monospace", fontSize: 8.5, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(196,181,253,0.8)" }}>Hyper · Computation</span>
+              <span style={{ fontFamily: "serif", fontStyle: "italic", fontSize: 11, color: "rgba(253,224,71,0.85)" }}>True Language · v0.1</span>
+            </div>
+            <ArrowRight style={{ width: 12, height: 12, color: "rgba(253,224,71,0.7)" }} />
+          </div>
+        </Link>
+
+        {!selectedNodeId && !activeAgent && graphData && graphData.nodes.length > 0 && (
+          <div style={{ position: "absolute", bottom: 20, right: 20, zIndex: 10, fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.2)" }}>
+            Click a node to reveal its theory threads
+          </div>
+        )}
+
+        {selectedNodeId && (
+          <ConceptPanel
+            id={selectedNodeId}
+            conceptNameMap={conceptNameMap}
+            adjacency={adjacency}
+            viewMode={viewMode}
+            onNavigate={navigateToNode}
+            onClose={() => { setSelectedNodeId(null); fgRef.current?.zoomToFit(800); }}
+          />
+        )}
+      </div>
+
+      {/* ── AGENT PANEL ── */}
+      <AgentPanel
+        agents={AGENTS}
+        activeAgent={activeAgent}
+        expandedAgent={expandedAgent}
+        onActivate={handleAgentActivate}
+        onExpand={(id) => setExpandedAgent(prev => prev === id ? null : id)}
+      />
+    </div>
+  );
+}
+
+// ─── Agent Panel ──────────────────────────────────────────────────────────────
+
+function AgentPanel({
+  agents, activeAgent, expandedAgent, onActivate, onExpand,
+}: {
+  agents: AgentDef[];
+  activeAgent: AgentDef | null;
+  expandedAgent: string | null;
+  onActivate: (agent: AgentDef) => void;
+  onExpand: (id: string) => void;
+}) {
+  return (
+    <div style={{ padding: "0 0 48px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+      {/* Header */}
+      <div style={{ padding: "28px 28px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ fontFamily: "monospace", fontSize: 10, letterSpacing: "0.35em", color: "rgba(148,163,184,0.4)", textTransform: "uppercase", marginBottom: 8 }}>
+          AETHER · Mechanistic Intelligence Framework
+        </div>
+        <h2 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, color: "rgba(255,255,255,0.85)", fontFamily: "monospace", letterSpacing: "0.08em" }}>
+          Eight Framework Agents
+        </h2>
+        <p style={{ margin: "8px 0 0", fontSize: "0.82rem", color: "rgba(148,163,184,0.5)", lineHeight: 1.6, maxWidth: 720 }}>
+          Each agent filters the knowledge graph to its domain — revealing coherence patterns across consciousness, planetary systems, biology, and the deep mechanics of life itself. Click an agent to activate its lens on the graph above.
+        </p>
+      </div>
+
+      {/* Agent grid */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+        gap: 1,
+        background: "rgba(255,255,255,0.03)",
+      }}>
+        {agents.map((agent) => (
+          <AgentCard
+            key={agent.id}
+            agent={agent}
+            isActive={activeAgent?.id === agent.id}
+            isExpanded={expandedAgent === agent.id}
+            onActivate={onActivate}
+            onExpand={onExpand}
+          />
         ))}
       </div>
 
-      {/* Layer legend (shown in layer mode) */}
-      {viewMode === "layer" && (
-        <div className="absolute top-5 right-[420px] z-10 bg-black/70 border border-border/30 rounded-lg p-3 space-y-1.5 backdrop-blur-sm">
-          <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-2">AETHER Layers</div>
-          {Object.entries(LAYER_META).filter(([k]) => k !== "auto").map(([key, m]) => (
-            <div key={key} className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ background: m.color }} />
-              <span className="font-mono text-[9px]" style={{ color: m.color }}>{m.symbol}</span>
-              <span className="font-mono text-[9px] text-muted-foreground/60">{m.label}</span>
-            </div>
-          ))}
+      {/* Global synthesis footer */}
+      <div style={{ padding: "28px 28px 0", borderTop: "1px solid rgba(255,255,255,0.04)", marginTop: 1 }}>
+        <div style={{ fontFamily: "monospace", fontSize: 9, letterSpacing: "0.3em", color: "rgba(148,163,184,0.3)", textTransform: "uppercase", marginBottom: 12 }}>
+          Unified Field Statement
         </div>
-      )}
+        <p style={{ margin: 0, fontSize: "0.88rem", color: "rgba(148,163,184,0.55)", lineHeight: 1.8, maxWidth: 900, fontStyle: "italic" }}>
+          "Consciousness, planetary health, sea life, land systems, space travel, reproductive biology, cancer, and all of living nature are not separate problems — they are eight expressions of one coherence equation. 
+          When the substrate is right, when the field is tuned, when memory is preserved across scales: all systems heal simultaneously. 
+          This is the AETHER thesis: <span style={{ color: "rgba(148,163,184,0.8)", fontStyle: "normal" }}>peace, love, and thought as a unified mechanistic force."</span>
+        </p>
+      </div>
+    </div>
+  );
+}
 
-      {/* Unify legend */}
-      {viewMode === "unify" && (
-        <div className="absolute top-5 right-[420px] z-10 bg-black/70 border border-border/30 rounded-lg p-3 space-y-1.5 backdrop-blur-sm">
-          <div className="font-mono text-[9px] text-muted-foreground/40 uppercase tracking-widest mb-2">Bridge Score</div>
-          {[
-            { color: "#8b5cf6", label: "High unifier (>70%)" },
-            { color: "#10b981", label: "Bridge node (>40%)" },
-            { color: "#0ea5e9", label: "Connector (>20%)" },
-            { color: "#334155", label: "Local node" },
-          ].map(({ color, label }) => (
-            <div key={color} className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-              <span className="font-mono text-[9px] text-muted-foreground/60">{label}</span>
-            </div>
-          ))}
+// ─── Agent Card ───────────────────────────────────────────────────────────────
+
+function AgentCard({
+  agent, isActive, isExpanded, onActivate, onExpand,
+}: {
+  agent: AgentDef;
+  isActive: boolean;
+  isExpanded: boolean;
+  onActivate: (a: AgentDef) => void;
+  onExpand: (id: string) => void;
+}) {
+  // Pulse animation for active state
+  const pulseStyle = isActive ? {
+    boxShadow: `0 0 0 1px ${agent.color}40, inset 0 0 30px ${agent.color}08`,
+  } : {};
+
+  return (
+    <div style={{
+      background: isActive ? `${agent.color}08` : "rgba(3,5,10,0.95)",
+      padding: "20px 22px",
+      transition: "all 0.3s ease",
+      position: "relative",
+      ...pulseStyle,
+    }}>
+      {/* Top row: glyph + name + tune button */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 12 }}>
+        {/* Glyph orb */}
+        <div style={{
+          width: 44, height: 44, borderRadius: "50%", flexShrink: 0,
+          background: `radial-gradient(circle, ${agent.color}22 0%, ${agent.color}08 100%)`,
+          border: `1px solid ${agent.color}${isActive ? "60" : "30"}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 18, color: agent.color,
+          boxShadow: isActive ? `0 0 16px ${agent.color}40` : "none",
+          transition: "all 0.3s",
+        }}>
+          {agent.glyph}
         </div>
-      )}
-
-      {/* Node / edge count */}
-      {graphData && (
-        <div className="absolute bottom-5 left-5 z-10 font-mono text-[10px] text-muted-foreground/30 bg-black/40 border border-border/20 rounded px-2.5 py-1.5 space-y-0.5">
-          <div>{graphData.nodes.length} nodes</div>
-          <div>{graphData.links.length} edges</div>
-          {activeId && <div className="text-primary/50">{neighborSet.size} connections</div>}
-        </div>
-      )}
-
-      {/* HYPERCOMPUTATION LANGUAGE — labeled portal node */}
-      <Link
-        href="/hypercomputation"
-        data-testid="graph-hypercomputation-portal"
-        className="absolute top-5 right-5 z-10 group"
-      >
-        <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-500/10 via-yellow-500/8 to-cyan-500/10
-                        border border-purple-400/40 hover:border-purple-300/80 backdrop-blur-md
-                        transition-all hover:shadow-[0_0_18px_rgba(124,92,252,0.45)]">
-          <Binary className="w-4 h-4 text-purple-300 group-hover:text-purple-200" />
-          <div className="flex flex-col leading-tight">
-            <span className="font-mono text-[8.5px] tracking-[0.3em] uppercase text-purple-300/80">Hyper · Computation</span>
-            <span className="font-serif italic text-[11px] text-yellow-300/85">True Language · v0.1</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
+            <span style={{
+              fontFamily: "monospace", fontSize: 12, fontWeight: 700, letterSpacing: "0.2em",
+              color: isActive ? agent.color : "rgba(255,255,255,0.75)",
+              transition: "color 0.3s",
+            }}>{agent.name}</span>
+            {isActive && (
+              <span style={{
+                fontFamily: "monospace", fontSize: 8, letterSpacing: "0.15em",
+                color: agent.color, background: `${agent.color}20`,
+                border: `1px solid ${agent.color}40`, borderRadius: 10, padding: "1px 6px",
+              }}>ACTIVE</span>
+            )}
           </div>
-          <ArrowRight className="w-3 h-3 text-yellow-300/70 group-hover:text-yellow-200 transition-transform group-hover:translate-x-0.5" />
+          <div style={{ fontSize: 11, color: "rgba(148,163,184,0.55)", lineHeight: 1.4 }}>{agent.domain}</div>
         </div>
-        <div className="mt-1 px-2 text-[8px] font-mono tracking-[0.18em] text-muted-foreground/40 text-right">
-          one clock · all scales
-        </div>
-      </Link>
+        {/* Tune button */}
+        <button
+          onClick={() => onActivate(agent)}
+          style={{
+            flexShrink: 0, padding: "5px 12px", borderRadius: 14,
+            border: `1px solid ${agent.color}${isActive ? "80" : "40"}`,
+            background: isActive ? `${agent.color}20` : "rgba(255,255,255,0.03)",
+            color: isActive ? agent.color : "rgba(148,163,184,0.5)",
+            fontFamily: "monospace", fontSize: 9, letterSpacing: "0.15em",
+            cursor: "pointer", transition: "all 0.2s", textTransform: "uppercase",
+          }}
+        >
+          {isActive ? "Detuned" : "Tune ↑"}
+        </button>
+      </div>
 
-      {/* Click hint */}
-      {!selectedNodeId && graphData && graphData.nodes.length > 0 && (
-        <div className="absolute bottom-5 right-5 z-10 font-mono text-[9px] text-muted-foreground/20">
-          Click a node to reveal its theory threads
+      {/* Subdomain tags */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 12 }}>
+        {agent.subdomains.map((s) => (
+          <span key={s} style={{
+            fontFamily: "monospace", fontSize: 9, padding: "2px 8px", borderRadius: 8,
+            background: `${agent.color}10`, border: `1px solid ${agent.color}25`,
+            color: `${agent.color}cc`, letterSpacing: "0.08em",
+          }}>{s}</span>
+        ))}
+      </div>
+
+      {/* Node count bar */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+          <span style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.35)", letterSpacing: "0.12em" }}>GRAPH NODES</span>
+          <span style={{ fontFamily: "monospace", fontSize: 9, color: agent.color + "99" }}>{agent.nodeIds.length} active</span>
+        </div>
+        <div style={{ height: 3, background: "rgba(255,255,255,0.05)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{
+            height: "100%", borderRadius: 2,
+            width: `${Math.min(100, (agent.nodeIds.length / GLOSSARY_SEEDS.length) * 100 * 2.2)}%`,
+            background: `linear-gradient(90deg, ${agent.color}66, ${agent.color})`,
+            transition: "width 0.6s ease",
+          }} />
+        </div>
+      </div>
+
+      {/* Synthesis preview */}
+      <p style={{
+        margin: "0 0 10px", fontSize: "0.8rem",
+        color: "rgba(148,163,184,0.5)", lineHeight: 1.6,
+        display: isExpanded ? undefined : "-webkit-box",
+        WebkitLineClamp: isExpanded ? undefined : 2,
+        WebkitBoxOrient: "end" as any,
+        overflow: isExpanded ? undefined : "hidden",
+        transition: "all 0.3s",
+      }}>{agent.synthesis}</p>
+
+      {/* Equation */}
+      {agent.equation && isExpanded && (
+        <div style={{
+          margin: "10px 0",
+          fontFamily: "monospace", fontSize: 10, color: agent.color + "cc",
+          padding: "8px 12px", borderRadius: 6,
+          background: `${agent.color}0a`, border: `1px solid ${agent.color}20`,
+        }}>
+          {agent.equation}
         </div>
       )}
 
-      {/* Detail Panel */}
-      {selectedNodeId && (
-        <ConceptPanel
-          id={selectedNodeId}
-          conceptNameMap={conceptNameMap}
-          adjacency={adjacency}
-          viewMode={viewMode}
-          onNavigate={navigateToNode}
-          onClose={() => { setSelectedNodeId(null); fgRef.current?.zoomToFit(800); }}
-        />
+      {/* Expand toggle */}
+      <button
+        onClick={() => onExpand(agent.id)}
+        style={{
+          background: "none", border: "none", cursor: "pointer", padding: 0,
+          display: "flex", alignItems: "center", gap: 4,
+          fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.3)",
+          letterSpacing: "0.12em", textTransform: "uppercase", transition: "color 0.2s",
+        }}
+      >
+        <ChevronDown style={{
+          width: 10, height: 10,
+          transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
+          transition: "transform 0.25s",
+        }} />
+        {isExpanded ? "Collapse" : "Show synthesis"}
+      </button>
+
+      {/* Active border accent */}
+      {isActive && (
+        <div style={{
+          position: "absolute", left: 0, top: 0, bottom: 0, width: 3,
+          background: `linear-gradient(180deg, transparent, ${agent.color}, transparent)`,
+          borderRadius: "0 0 0 0",
+        }} />
       )}
     </div>
   );
@@ -548,43 +929,42 @@ function ConceptPanel({
     query: { enabled: !!id, queryKey: ["/api/concepts", id] },
   });
 
-  // Compute unification threads: neighbours grouped by their layer
-  const threadsByLayer = useMemo(() => {
-    if (!concept) return {};
-    const neighbors = [...(adjacency.get(id) ?? [])];
-    return neighbors.reduce<Record<string, string[]>>((acc, nid) => {
-      acc["related"] = [...(acc["related"] ?? []), nid];
-      return acc;
-    }, {});
-  }, [concept, id, adjacency]);
-
   const neighborCount = adjacency.get(id)?.size ?? 0;
 
   return (
-    <div className="absolute right-0 top-0 bottom-0 w-[400px] bg-background/97 backdrop-blur-md border-l border-border shadow-2xl overflow-y-auto z-20">
-      <div className="sticky top-0 bg-background/97 backdrop-blur-sm border-b border-border px-6 py-4 flex items-center justify-between z-10">
-        <div className="font-mono text-[10px] text-primary tracking-[0.3em] uppercase">Theory Thread</div>
-        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
-          <X className="w-4 h-4" />
+    <div style={{
+      position: "absolute", right: 0, top: 0, bottom: 0, width: 400,
+      background: "rgba(2,6,15,0.97)", backdropFilter: "blur(12px)",
+      borderLeft: "1px solid rgba(255,255,255,0.08)",
+      overflowY: "auto", zIndex: 20,
+    }}>
+      <div style={{
+        position: "sticky", top: 0,
+        background: "rgba(2,6,15,0.97)", backdropFilter: "blur(8px)",
+        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: 10,
+      }}>
+        <div style={{ fontFamily: "monospace", fontSize: 10, color: "#0ea5e9", letterSpacing: "0.3em", textTransform: "uppercase" }}>Theory Thread</div>
+        <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(148,163,184,0.6)" }}>
+          <X style={{ width: 16, height: 16 }} />
         </button>
       </div>
 
-      <div className="p-6">
+      <div style={{ padding: 24 }}>
         {isLoading || !concept ? (
-          <div className="space-y-5">
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <Skeleton className="h-8 w-3/4" />
             <Skeleton className="h-4 w-full" />
-            <div className="grid grid-cols-2 gap-3">
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-20 w-full" />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <Skeleton className="h-20" />
+              <Skeleton className="h-20" />
             </div>
           </div>
         ) : (
-          <div className="space-y-7">
-            {/* Name + layer badge */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
             <div>
-              <h2 className="font-serif text-2xl font-medium tracking-tight mb-3 text-foreground">{concept.name}</h2>
-              <div className="flex flex-wrap gap-2">
+              <h2 style={{ margin: "0 0 12px", fontFamily: "serif", fontSize: "1.4rem", fontWeight: 500, color: "rgba(255,255,255,0.9)" }}>{concept.name}</h2>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 <LayerBadge layer={(concept as any).layer ?? "mnesis"} />
                 <Badge variant="outline" className="font-mono text-[10px] border-primary/30 text-primary bg-primary/5 rounded-sm">
                   COH {(concept.coherence * 100).toFixed(1)}%
@@ -595,84 +975,69 @@ function ConceptPanel({
               </div>
             </div>
 
-            {/* Bridge / unification score */}
-            <div className="rounded-lg border border-border/30 p-4">
-              <div className="font-mono text-[10px] text-muted-foreground/40 uppercase tracking-widest mb-3 flex items-center gap-2">
-                <GitFork className="w-3 h-3" /> Unification Score
+            <div style={{ borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)", padding: 16 }}>
+              <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(148,163,184,0.4)", letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                <GitFork style={{ width: 12, height: 12 }} /> Unification Score
               </div>
-              <div className="flex items-end gap-3 mb-2">
-                <div className="font-mono text-3xl text-foreground">{neighborCount}</div>
-                <div className="font-mono text-xs text-muted-foreground/50 mb-1">direct theory threads</div>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 12, marginBottom: 8 }}>
+                <div style={{ fontFamily: "monospace", fontSize: "1.8rem", color: "rgba(255,255,255,0.9)" }}>{neighborCount}</div>
+                <div style={{ fontFamily: "monospace", fontSize: 12, color: "rgba(148,163,184,0.5)", marginBottom: 4 }}>direct theory threads</div>
               </div>
-              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-700"
-                  style={{ width: `${Math.min(100, neighborCount * 5)}%`, background: neighborCount > 15 ? "#8b5cf6" : neighborCount > 8 ? "#10b981" : "#0ea5e9" }} />
+              <div style={{ height: 6, background: "rgba(255,255,255,0.05)", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{
+                  height: "100%", borderRadius: 3, transition: "all 0.7s",
+                  width: `${Math.min(100, neighborCount * 5)}%`,
+                  background: neighborCount > 15 ? "#8b5cf6" : neighborCount > 8 ? "#10b981" : "#0ea5e9",
+                }} />
               </div>
-              <div className="font-mono text-[9px] text-muted-foreground/30 mt-2">
+              <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.3)", marginTop: 8 }}>
                 {neighborCount > 15 ? "High unifier — bridges multiple theory clusters" : neighborCount > 8 ? "Bridge node — connects distinct domains" : neighborCount > 3 ? "Connector — locally integrated" : "Leaf concept — specialist domain"}
               </div>
             </div>
 
-            {/* Support / contradiction */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
-                <div className="font-mono text-[9px] text-muted-foreground/50 mb-1 uppercase tracking-widest">Supporting</div>
-                <div className="font-mono text-2xl text-emerald-400">{concept.supportCount}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div style={{ borderRadius: 8, border: "1px solid rgba(16,185,129,0.2)", background: "rgba(16,185,129,0.05)", padding: 16 }}>
+                <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>Supporting</div>
+                <div style={{ fontFamily: "monospace", fontSize: "1.5rem", color: "#34d399" }}>{concept.supportCount}</div>
               </div>
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
-                <div className="font-mono text-[9px] text-muted-foreground/50 mb-1 uppercase tracking-widest">Contradictions</div>
-                <div className="font-mono text-2xl text-red-400">{concept.contradictCount}</div>
+              <div style={{ borderRadius: 8, border: "1px solid rgba(239,68,68,0.2)", background: "rgba(239,68,68,0.05)", padding: 16 }}>
+                <div style={{ fontFamily: "monospace", fontSize: 9, color: "rgba(148,163,184,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 }}>Contradictions</div>
+                <div style={{ fontFamily: "monospace", fontSize: "1.5rem", color: "#f87171" }}>{concept.contradictCount}</div>
               </div>
             </div>
 
-            {/* Theory threads — clickable neighbor list */}
             <div>
-              <div className="font-mono text-[10px] text-muted-foreground/50 mb-3 uppercase tracking-widest border-b border-border pb-2 flex items-center gap-2">
-                Connected Theories
-                <span className="text-muted-foreground/30">({concept.relatedConcepts.length})</span>
+              <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(148,163,184,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 8, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                Connected Theories <span style={{ color: "rgba(148,163,184,0.3)" }}>({concept.relatedConcepts.length})</span>
               </div>
               {concept.relatedConcepts.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {concept.relatedConcepts.map((relId) => {
                     const name = conceptNameMap(relId);
                     return (
-                      <button key={relId} onClick={() => onNavigate(relId)}
-                        className="group flex items-center gap-1 font-mono text-[10px] px-2 py-1 rounded border border-primary/20 text-primary/70 bg-primary/5 hover:bg-primary/15 hover:text-primary hover:border-primary/40 transition-all"
-                        title={`Navigate to ${name}`}>
-                        {name}
-                        <ArrowRight className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
+                      <button key={relId} onClick={() => onNavigate(relId)} style={{
+                        display: "flex", alignItems: "center", gap: 4,
+                        fontFamily: "monospace", fontSize: 10, padding: "4px 8px", borderRadius: 4,
+                        border: "1px solid rgba(14,165,233,0.2)", color: "rgba(14,165,233,0.7)",
+                        background: "rgba(14,165,233,0.05)", cursor: "pointer",
+                        transition: "all 0.15s",
+                      }}>{name}<ArrowRight style={{ width: 10, height: 10 }} /></button>
                     );
                   })}
                 </div>
               ) : (
-                <div className="font-serif text-sm text-muted-foreground/40 italic">No related theories mapped.</div>
+                <div style={{ fontFamily: "serif", fontSize: 14, color: "rgba(148,163,184,0.4)", fontStyle: "italic" }}>No related theories mapped.</div>
               )}
             </div>
 
-            {/* Equations */}
             {concept.equations && concept.equations.length > 0 && (
               <div>
-                <div className="font-mono text-[10px] text-muted-foreground/50 mb-3 uppercase tracking-widest border-b border-border pb-2">
+                <div style={{ fontFamily: "monospace", fontSize: 10, color: "rgba(148,163,184,0.5)", letterSpacing: "0.2em", textTransform: "uppercase", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: 8, marginBottom: 8 }}>
                   Derived Equations ({concept.equations.length})
                 </div>
-                <div className="space-y-2">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {concept.equations.map((eq) => (
-                    <div key={eq} className="p-2.5 bg-black/40 border border-white/5 font-mono text-xs text-yellow-400/80 rounded overflow-x-auto whitespace-nowrap">{eq}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Source documents */}
-            {concept.documentIds && concept.documentIds.length > 0 && (
-              <div>
-                <div className="font-mono text-[10px] text-muted-foreground/50 mb-2 uppercase tracking-widest border-b border-border pb-2">
-                  Source Documents ({concept.documentIds.length})
-                </div>
-                <div className="space-y-1">
-                  {concept.documentIds.map((docId) => (
-                    <div key={docId} className="font-mono text-[10px] text-muted-foreground/40 truncate">{docId.substring(0, 12)}…</div>
+                    <div key={eq} style={{ padding: 10, background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.05)", fontFamily: "monospace", fontSize: 12, color: "rgba(234,179,8,0.8)", borderRadius: 4, overflowX: "auto", whiteSpace: "nowrap" }}>{eq}</div>
                   ))}
                 </div>
               </div>
@@ -689,8 +1054,11 @@ function ConceptPanel({
 function LayerBadge({ layer }: { layer: string }) {
   const meta = LAYER_META[layer] ?? LAYER_META.auto;
   return (
-    <span className="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded border"
-      style={{ borderColor: meta.color + "50", background: meta.color + "12", color: meta.color }}>
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 4,
+      fontFamily: "monospace", fontSize: 10, padding: "2px 8px", borderRadius: 4,
+      border: `1px solid ${meta.color}50`, background: `${meta.color}12`, color: meta.color,
+    }}>
       <span>{meta.symbol}</span>{meta.label}
     </span>
   );
