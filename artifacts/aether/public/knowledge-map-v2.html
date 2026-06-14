@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AETHER · Knowledge Map</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#040D1A;--s1:#071220;--s2:#0c1d36;--s3:#112040;
+  --border:rgba(0,212,255,0.1);--border2:rgba(0,212,255,0.2);
+  --teal:#00FFCC;--blue:#00D4FF;--gold:#FFD050;--coral:#FF6644;
+  --purple:#C87BFF;--pink:#FF8FB3;--orange:#FF9632;--green:#44FF88;
+  --muted:rgba(160,200,240,0.4);--text:#c8e0f8;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* grain */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.5}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:300;
+  background:rgba(4,13,26,0.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:1rem;
+  padding:0 1.25rem;height:54px;
+}
+.logo{font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;
+  letter-spacing:0.18em;color:var(--teal);flex-shrink:0;
+  text-shadow:0 0 18px rgba(0,255,204,0.35)}
+.logo em{color:var(--blue);font-style:normal}
+
+.filters{display:flex;gap:5px;flex-wrap:wrap}
+.pill{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:0.08em;
+  padding:3px 9px;border-radius:20px;border:1px solid;cursor:pointer;
+  background:transparent;transition:all 0.15s;white-space:nowrap}
+.pill.active,.pill:hover{filter:brightness(1.4);font-weight:700}
+.pill[data-f="all"]          {border-color:var(--blue);  color:var(--blue)}
+.pill[data-f="aether"]       {border-color:var(--blue);  color:var(--blue)}
+.pill[data-f="cosmic"]       {border-color:var(--purple);color:var(--purple)}
+.pill[data-f="hardware"]     {border-color:var(--orange);color:var(--orange)}
+.pill[data-f="science"]      {border-color:var(--teal);  color:var(--teal)}
+.pill[data-f="narrative"]    {border-color:var(--gold);  color:var(--gold)}
+.pill[data-f="emotional"]    {border-color:var(--pink);  color:var(--pink)}
+.pill[data-f="visual"]       {border-color:var(--coral); color:var(--coral)}
+.pill[data-f="video"]        {border-color:var(--green); color:var(--green)}
+.pill[data-f="uncategorized"]{border-color:var(--muted); color:var(--muted)}
+
+.search-wrap{flex:1;max-width:240px;margin-left:auto;position:relative}
+.search-wrap input{width:100%;background:var(--s2);border:1px solid var(--border);
+  border-radius:5px;padding:5px 10px 5px 26px;color:var(--text);
+  font-family:'Space Mono',monospace;font-size:0.62rem;outline:none;transition:border-color 0.2s}
+.search-wrap input:focus{border-color:var(--teal)}
+.si{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:0.85rem;pointer-events:none}
+
+.hdr-stats{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);flex-shrink:0;line-height:1.5;text-align:right}
+
+/* scroll prog */
+#sprog{position:fixed;top:54px;left:0;right:0;height:2px;z-index:299;background:var(--s1)}
+#spfill{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--purple));transition:width 0.08s}
+
+/* ── DROP ZONE ── */
+#dropzone{
+  position:relative;z-index:1;margin:1.25rem 1.25rem 0;
+  border:2px dashed rgba(0,212,255,0.2);border-radius:14px;
+  padding:2rem 1.5rem;text-align:center;cursor:pointer;
+  transition:all 0.2s;
+  background:radial-gradient(ellipse at 50% 100%,rgba(0,212,255,0.04) 0%,transparent 70%);
+}
+#dropzone.over{
+  border-color:var(--teal);border-style:solid;
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,255,204,0.07) 0%,transparent 70%);
+  box-shadow:0 0 40px rgba(0,255,204,0.08),inset 0 0 40px rgba(0,255,204,0.03);
+}
+#dropzone.compact{padding:0.75rem 1.5rem}
+.dz-icon{font-size:2.2rem;margin-bottom:0.5rem;display:block;opacity:0.7;
+  animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.5}50%{opacity:0.85}}
+.dz-title{font-family:'Space Mono',monospace;font-size:0.85rem;font-weight:700;
+  color:var(--teal);margin-bottom:0.35rem;letter-spacing:0.06em}
+.dz-sub{font-size:0.7rem;color:var(--muted);line-height:1.7}
+.dz-sub strong{color:var(--text)}
+.dz-types{display:flex;gap:0.5rem;justify-content:center;margin-top:0.75rem;flex-wrap:wrap}
+.dz-type{font-family:'Space Mono',monospace;font-size:0.55rem;padding:2px 8px;
+  border-radius:3px;border:1px solid}
+.dz-type.img{border-color:rgba(0,212,255,0.3);color:var(--blue);background:rgba(0,212,255,0.06)}
+.dz-type.vid{border-color:rgba(68,255,136,0.3);color:var(--green);background:rgba(68,255,136,0.06)}
+
+/* grok panel */
+.grok-row{display:flex;align-items:center;gap:0.75rem;justify-content:center;
+  margin-top:1rem;flex-wrap:wrap}
+.grok-btn{font-family:'Space Mono',monospace;font-size:0.6rem;font-weight:700;
+  padding:6px 14px;border-radius:6px;border:1px solid var(--green);
+  color:var(--green);background:rgba(68,255,136,0.06);cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.06em;display:flex;align-items:center;gap:6px}
+.grok-btn:hover{background:rgba(68,255,136,0.12);box-shadow:0 0 16px rgba(68,255,136,0.12)}
+.grok-btn svg{width:14px;height:14px}
+
+/* progress */
+#proc-wrap{display:none;margin-top:1rem}
+#proc-bar-bg{background:var(--s2);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+#proc-bar{height:5px;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue),var(--purple));
+  background-size:200%;animation:shim 1.5s linear infinite;transition:width 0.25s}
+@keyframes shim{0%{background-position:100%}100%{background-position:-100%}}
+#proc-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);
+  padding:0.35rem 0.5rem;display:flex;justify-content:space-between}
+
+/* ai toggle row */
+.ai-row{display:flex;align-items:center;gap:0.6rem;justify-content:center;margin-top:0.75rem;flex-wrap:wrap}
+.tgl{position:relative;display:inline-block;width:34px;height:18px}
+.tgl input{opacity:0;width:0;height:0}
+.tslider{position:absolute;inset:0;background:var(--s2);border:1px solid var(--border);
+  border-radius:18px;cursor:pointer;transition:0.2s}
+.tslider::before{content:'';position:absolute;width:12px;height:12px;border-radius:50%;
+  background:var(--muted);left:2px;top:2px;transition:0.2s}
+input:checked+.tslider{background:rgba(0,255,204,0.12);border-color:var(--teal)}
+input:checked+.tslider::before{transform:translateX(16px);background:var(--teal)}
+.tgl-lbl{font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted)}
+.tgl-lbl .on{color:var(--teal);display:none}
+input:checked~.on{display:inline}
+input:checked~.off{display:none}
+
+/* ── GROK PANEL ── */
+#grok-panel{
+  display:none;position:relative;z-index:1;
+  margin:0.75rem 1.25rem 0;
+  background:var(--s1);border:1px solid rgba(68,255,136,0.2);border-radius:12px;
+  padding:1.25rem 1.5rem;
+}
+#grok-panel.open{display:block}
+.gp-title{font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;
+  color:var(--green);margin-bottom:0.5rem;letter-spacing:0.08em;display:flex;align-items:center;gap:0.5rem}
+.gp-sub{font-size:0.68rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.gp-sub a{color:var(--green);text-decoration:none}
+.gp-sub a:hover{text-decoration:underline}
+.gp-input-row{display:flex;gap:0.5rem;align-items:flex-start;flex-wrap:wrap}
+.gp-input-row textarea{
+  flex:1;min-width:220px;background:var(--s2);border:1px solid var(--border);
+  border-radius:6px;padding:8px 10px;color:var(--text);
+  font-family:'Space Mono',monospace;font-size:0.65rem;outline:none;
+  resize:vertical;min-height:60px;line-height:1.5;
+  transition:border-color 0.2s}
+.gp-input-row textarea:focus{border-color:var(--green)}
+.gp-controls{display:flex;flex-direction:column;gap:0.5rem}
+.gp-type-row{display:flex;gap:0.4rem}
+.gp-type{font-family:'Space Mono',monospace;font-size:0.55rem;padding:4px 10px;
+  border-radius:4px;border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;background:transparent;transition:all 0.15s}
+.gp-type.sel{border-color:var(--green);color:var(--green);background:rgba(68,255,136,0.06)}
+.gp-gen-btn{font-family:'Space Mono',monospace;font-size:0.62rem;font-weight:700;
+  padding:7px 16px;border-radius:5px;border:1px solid var(--green);
+  color:var(--green);background:rgba(68,255,136,0.08);cursor:pointer;
+  transition:all 0.15s;white-space:nowrap}
+.gp-gen-btn:hover{background:rgba(68,255,136,0.16)}
+.gp-gen-btn:disabled{opacity:0.4;cursor:not-allowed}
+.gp-note{font-family:'Space Mono',monospace;font-size:0.55rem;color:var(--muted);
+  margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);line-height:1.6}
+.gp-note a{color:var(--teal)}
+#gp-status{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:0.5rem}
+#gp-result-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:0.75rem}
+.gp-result-item{
+  width:120px;height:120px;border-radius:6px;overflow:hidden;
+  border:1px solid rgba(68,255,136,0.2);cursor:pointer;position:relative;
+  transition:transform 0.15s,border-color 0.15s;background:var(--s2)
+}
+.gp-result-item:hover{transform:scale(1.04);border-color:var(--green)}
+.gp-result-item img,.gp-result-item video{width:100%;height:100%;object-fit:cover}
+.gp-result-item .add-badge{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(4,13,26,0.85);text-align:center;
+  font-family:'Space Mono',monospace;font-size:0.5rem;color:var(--green);
+  padding:3px;opacity:0;transition:opacity 0.15s}
+.gp-result-item:hover .add-badge{opacity:1}
+
+/* ── MAIN ── */
+#main{position:relative;z-index:1;padding:1.25rem 1.25rem 4rem}
+
+/* ── NODE SECTIONS ── */
+.node-section{margin-bottom:2.5rem;opacity:0;animation:fadeUp 0.4s ease forwards}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+.node-hdr{display:flex;align-items:baseline;gap:0.6rem;
+  padding-bottom:0.6rem;margin-bottom:0.85rem;border-bottom:1px solid var(--border)}
+.ndot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-bottom:1px}
+.nname{font-size:0.95rem;font-weight:800;letter-spacing:0.03em}
+.ndesc{font-size:0.62rem;color:var(--muted);font-family:'Space Mono',monospace;margin-left:0.2rem}
+.nct{margin-left:auto;font-family:'Space Mono',monospace;font-size:0.58rem;color:var(--muted);white-space:nowrap}
+
+/* ── GRID ── */
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px}
+
+/* ── CARD ── */
+.card{
+  position:relative;border-radius:7px;overflow:hidden;
+  background:var(--s1);border:1px solid var(--border);
+  cursor:pointer;aspect-ratio:1/1;
+  transition:transform 0.16s,border-color 0.16s,box-shadow 0.16s;
+}
+.card:hover{
+  transform:translateY(-3px) scale(1.025);
+  border-color:rgba(0,212,255,0.3);
+  box-shadow:0 6px 20px rgba(0,0,0,0.45),0 0 0 1px rgba(0,212,255,0.08);
+  z-index:2;
+}
+.card img{width:100%;height:100%;object-fit:cover;display:block}
+.card video{width:100%;height:100%;object-fit:cover;display:block}
+.card .vid-overlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.card .vid-overlay::after{
+  content:'▶';font-size:1.6rem;color:rgba(255,255,255,0.85);
+  background:rgba(4,13,26,0.55);border-radius:50%;
+  width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(4px);text-shadow:none;line-height:1;padding-left:3px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.5);
+}
+.card .cbadge{
+  position:absolute;top:5px;left:5px;
+  font-family:'Space Mono',monospace;font-size:0.48rem;letter-spacing:0.06em;
+  padding:2px 5px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)
+}
+.badge-img{background:rgba(0,212,255,0.15);color:var(--blue);border:1px solid rgba(0,212,255,0.25)}
+.badge-vid{background:rgba(68,255,136,0.15);color:var(--green);border:1px solid rgba(68,255,136,0.25)}
+.badge-grok{background:rgba(68,255,136,0.2);color:var(--green);border:1px solid rgba(68,255,136,0.35)}
+.card .clabel{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(4,13,26,0.92));
+  padding:14px 6px 5px;font-size:0.5rem;color:rgba(255,255,255,0.65);
+  font-family:'Space Mono',monospace;opacity:0;transition:opacity 0.14s;
+  pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.card:hover .clabel{opacity:1}
+.card.hidden{display:none}
+
+/* ── LIGHTBOX ── */
+#lb{
+  display:none;position:fixed;inset:0;z-index:900;
+  background:rgba(2,7,16,0.97);backdrop-filter:blur(14px);
+  flex-direction:column;align-items:center;justify-content:center;gap:0.85rem
+}
+#lb.open{display:flex}
+#lb-media-wrap{
+  max-width:88vw;max-height:78vh;display:flex;align-items:center;justify-content:center;
+  position:relative
+}
+#lb-img{max-width:88vw;max-height:78vh;object-fit:contain;border-radius:6px;border:1px solid var(--border);display:block}
+#lb-vid{max-width:88vw;max-height:78vh;border-radius:6px;border:1px solid var(--border);display:none;outline:none}
+#lb-close{position:absolute;top:1rem;right:1.25rem;background:none;border:none;
+  color:var(--muted);font-size:1.8rem;cursor:pointer;line-height:1;z-index:10}
+#lb-close:hover{color:var(--text)}
+#lb-info{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);text-align:center;line-height:1.8}
+#lb-nav{display:flex;gap:0.75rem;align-items:center}
+#lb-nav button{background:var(--s2);border:1px solid var(--border);color:var(--text);
+  padding:5px 14px;border-radius:4px;cursor:pointer;
+  font-family:'Space Mono',monospace;font-size:0.62rem;transition:border-color 0.15s}
+#lb-nav button:hover{border-color:var(--teal);color:var(--teal)}
+#lb-pos{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--muted);min-width:55px;text-align:center}
+
+/* ── EMPTY ── */
+#empty{display:none;text-align:center;padding:4rem 2rem;
+  font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted)}
+#empty.show{display:block}
+
+/* ── API MODAL ── */
+#api-modal{
+  display:none;position:fixed;inset:0;z-index:999;
+  background:rgba(2,7,16,0.96);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center
+}
+#api-modal.open{display:flex}
+.abox{background:var(--s2);border:1px solid var(--border);border-radius:12px;
+  padding:1.75rem;width:90%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.abox h2{font-size:0.95rem;font-weight:800;color:var(--teal);margin-bottom:0.4rem}
+.abox p{font-size:0.68rem;color:var(--muted);line-height:1.7;margin-bottom:1rem;font-family:'Space Mono',monospace}
+.abox input{width:100%;background:var(--s1);border:1px solid var(--border);
+  border-radius:5px;padding:7px 10px;color:var(--text);
+  font-family:'Space Mono',monospace;font-size:0.68rem;outline:none;margin-bottom:0.85rem}
+.abox input:focus{border-color:var(--teal)}
+.abox-btns{display:flex;gap:0.6rem}
+.btn-p{background:rgba(0,255,204,0.08);border:1px solid var(--teal);color:var(--teal);
+  padding:6px 18px;border-radius:5px;font-family:'Space Mono',monospace;font-size:0.62rem;
+  cursor:pointer;font-weight:700}
+.btn-p:hover{background:rgba(0,255,204,0.14)}
+.btn-s{background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:6px 18px;border-radius:5px;font-family:'Space Mono',monospace;font-size:0.62rem;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">AETHER <em>·</em> KNOWLEDGE MAP</div>
+  <div class="filters" id="filters">
+    <button class="pill active" data-f="all">ALL</button>
+    <button class="pill" data-f="aether">AETHER</button>
+    <button class="pill" data-f="cosmic">COSMIC</button>
+    <button class="pill" data-f="hardware">HARDWARE</button>
+    <button class="pill" data-f="science">SCIENCE</button>
+    <button class="pill" data-f="narrative">NARRATIVE</button>
+    <button class="pill" data-f="emotional">EMOTIONAL</button>
+    <button class="pill" data-f="visual">VISUAL</button>
+    <button class="pill" data-f="video">VIDEO ▶</button>
+    <button class="pill" data-f="uncategorized">UNCAT.</button>
+  </div>
+  <div class="search-wrap">
+    <span class="si">⌕</span>
+    <input type="text" id="search" placeholder="search labels, filenames..." autocomplete="off">
+  </div>
+  <div class="hdr-stats" id="hdr-stats">0 items</div>
+</header>
+
+<div id="sprog"><div id="spfill"></div></div>
+
+<!-- DROP ZONE -->
+<div id="dropzone">
+  <div id="dz-inner">
+    <span class="dz-icon">⬇</span>
+    <div class="dz-title">Drop images &amp; videos here</div>
+    <div class="dz-sub">
+      Drag any folder, batch of files, or click to browse<br>
+      <strong>All processing is local — nothing leaves your machine</strong>
+    </div>
+    <div class="dz-types">
+      <span class="dz-type img">PNG</span>
+      <span class="dz-type img">JPG</span>
+      <span class="dz-type img">WEBP</span>
+      <span class="dz-type img">GIF</span>
+      <span class="dz-type vid">MP4</span>
+      <span class="dz-type vid">MOV</span>
+      <span class="dz-type vid">WEBM</span>
+    </div>
+
+    <!-- Grok generate button -->
+    <div class="grok-row">
+      <button class="grok-btn" id="grok-toggle-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Generate with Grok Imagine
+      </button>
+    </div>
+
+    <!-- AI toggle -->
+    <div class="ai-row">
+      <label class="tgl">
+        <input type="checkbox" id="ai-toggle">
+        <span class="tslider"></span>
+      </label>
+      <span class="tgl-lbl">
+        <span class="off">AI categorization OFF (filename rules)</span>
+        <span class="on">AI categorization ON (Claude vision)</span>
+      </span>
+    </div>
+
+    <!-- Progress -->
+    <div id="proc-wrap">
+      <div id="proc-bar-bg">
+        <div id="proc-lbl"><span id="proc-text">Processing...</span><span id="proc-pct">0%</span></div>
+        <div id="proc-bar"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="file" id="file-input" multiple accept="image/*,video/mp4,video/quicktime,video/webm">
+
+<!-- GROK PANEL -->
+<div id="grok-panel">
+  <div class="gp-title">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Grok Imagine — Generate &amp; Import
+  </div>
+  <div class="gp-sub">
+    Generate images or video clips via <a href="https://x.com/i/grok" target="_blank">Grok Imagine on X.com</a>,
+    then drag them directly into this map. Or paste a prompt below to open Grok with it pre-filled.<br>
+    Grok-generated clips are automatically tagged <strong style="color:var(--green)">GROK</strong> and routed to the correct node.
+  </div>
+  <div class="gp-input-row">
+    <textarea id="gp-prompt" placeholder="Describe what you want Grok to generate — e.g. 'AETHER photonic crystal gyroid structure, deep blue, biophotonic glow'"></textarea>
+    <div class="gp-controls">
+      <div class="gp-type-row">
+        <button class="gp-type sel" data-t="image">Image</button>
+        <button class="gp-type" data-t="video">Video</button>
+      </div>
+      <button class="gp-gen-btn" id="gp-open-btn">Open in Grok →</button>
+    </div>
+  </div>
+  <div class="gp-note">
+    <strong>Workflow:</strong> 1) Type prompt → 2) Click "Open in Grok" → 3) Generate on X.com →
+    4) Download the image/video → 5) Drop it back into this map above.<br>
+    Grok-generated files are auto-tagged. Files named with grok_ prefix are detected automatically.
+  </div>
+  <div id="gp-status"></div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="node-container"></div>
+  <div id="empty">drop some images or videos above to get started</div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <button id="lb-close">×</button>
+  <div id="lb-media-wrap">
+    <img id="lb-img" src="" alt="">
+    <video id="lb-vid" controls loop></video>
+  </div>
+  <div id="lb-nav">
+    <button id="lb-prev">← prev</button>
+    <span id="lb-pos"></span>
+    <button id="lb-next">next →</button>
+  </div>
+  <div id="lb-info"></div>
+</div>
+
+<!-- API MODAL -->
+<div id="api-modal">
+  <div class="abox">
+    <h2>Claude API Key — AI Vision</h2>
+    <p>AI categorization sends each image to Claude for visual analysis.<br>
+    Key is memory-only — never saved or sent anywhere else.<br>
+    Get a key at <strong>console.anthropic.com</strong></p>
+    <input type="password" id="api-key-input" placeholder="sk-ant-...">
+    <div class="abox-btns">
+      <button class="btn-p" id="api-save">Save &amp; Enable</button>
+      <button class="btn-s" id="api-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+const S = {
+  items: [],
+  apiKey: null,
+  aiOn: false,
+  filter: 'all',
+  q: '',
+  busy: false,
+  grokType: 'image',
+};
+
+// ═══════════════════════════════════════════════════
+// CATEGORIES
+// ═══════════════════════════════════════════════════
+const CATS = {
+  aether:    { label:'AETHER System Architecture', color:'#00D4FF', desc:'agents · coherence · blueprints · dashboards · sigils', kw:['aether','coherent','agent','mnesis','aletheia','reverie','inferaia','sigil','cuca','clcs','dashboard','blueprint'] },
+  cosmic:    { label:'Cosmic & Planetary Cycles',  color:'#C87BFF', desc:'planetary cycles · solar · Schumann · astronomical', kw:['cosmic','planet','solar','pluto','neptune','schumann','cycle','orbital','galactic','248','star','celestial','astro'] },
+  hardware:  { label:'Hardware & Prototypes',       color:'#FF9632', desc:'robots · Arduino · engineering · firmware · circuits', kw:['robot','prototype','arduino','raspberry','firmware','circuit','hardware','sensor','motor','rc','snow','solder','esp32'] },
+  science:   { label:'Science & Engineering',       color:'#00FFCC', desc:'spectra · immune · photonics · biology · schematics', kw:['spectrum','immune','hydrogen','photon','bio','cell','dna','rna','mycelium','emission','physics','chemistry','diagram'] },
+  narrative: { label:'Narrative Sequencing',        color:'#FFD050', desc:'story · pattern emergence · identity · loops', kw:['narrative','story','pattern','loop','sequence','identity','genesis','constraint','adaptation','cards'] },
+  emotional: { label:'Emotional & Personal',        color:'#FF8FB3', desc:'journal · affirmations · personal · art · creative', kw:['journal','affirmation','change','internal','personal','grace','chaos','feeling','art','paint','emotion','accept'] },
+  visual:    { label:'AI Generative & Visual',      color:'#FF6644', desc:'AI art · renders · symbolic · concept · atmospheric', kw:['render','concept','visual','symbolic','generative','illustration','atmospheric','fractal','wave','glow'] },
+  video:     { label:'Video Clips',                 color:'#44FF88', desc:'MP4 · MOV · WEBM · Grok-generated clips · motion', kw:[] },
+};
+const ORDER = ['aether','cosmic','hardware','science','narrative','emotional','visual','video','uncategorized'];
+
+function catByFilename(name, isVideo, isGrok) {
+  if (isVideo) return 'video';
+  const l = name.toLowerCase();
+  for (const [k, c] of Object.entries(CATS)) {
+    if (k === 'video') continue;
+    if (c.kw.some(w => l.includes(w))) return k;
+  }
+  return 'uncategorized';
+}
+
+// ═══════════════════════════════════════════════════
+// DROP / INPUT
+// ═══════════════════════════════════════════════════
+const dz = document.getElementById('dropzone');
+const fi = document.getElementById('file-input');
+
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+['dragleave','dragend'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('over')));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('over');
+  const files = Array.from(e.dataTransfer.files).filter(isAccepted);
+  if (files.length) handleFiles(files);
+});
+dz.addEventListener('click', e => {
+  if (e.target.closest('.grok-btn') || e.target.closest('#grok-panel')) return;
+  fi.click();
+});
+fi.addEventListener('change', e => {
+  const files = Array.from(e.target.files).filter(isAccepted);
+  if (files.length) handleFiles(files);
+  e.target.value = '';
+});
+
+function isAccepted(f) {
+  return f.type.startsWith('image/') || f.type.startsWith('video/mp4') ||
+    f.type === 'video/quicktime' || f.type === 'video/webm' || f.type.startsWith('video/');
+}
+
+async function handleFiles(files) {
+  if (S.busy) return;
+  if (S.aiOn && !S.apiKey) { openApiModal(() => processFiles(files)); return; }
+  await processFiles(files);
+}
+
+async function processFiles(files) {
+  S.busy = true;
+  showProc(true);
+  dz.classList.add('compact');
+
+  const total = files.length;
+  for (let i = 0; i < total; i++) {
+    const f = files[i];
+    setProc(i / total, `${f.name}`, i, total);
+
+    const isVideo = f.type.startsWith('video/');
+    const isGrok = f.name.toLowerCase().includes('grok') || f.name.toLowerCase().startsWith('gx_');
+    const src = await readURL(f);
+
+    let category = catByFilename(f.name, isVideo, isGrok);
+    let label = f.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+
+    if (S.aiOn && S.apiKey && !isVideo) {
+      try { const r = await aiCat(src, f.name); category = r.category; label = r.label; }
+      catch(e) {}
+    }
+
+    const item = { id: Date.now() + Math.random(), src, filename: f.name, category, label, isVideo, isGrok, size: f.size };
+    S.items.push(item);
+    addCard(item);
+    updateCounts();
+    if (i % 25 === 0) await sleep(0);
+  }
+
+  showProc(false);
+  S.busy = false;
+  applyFilters();
+  updateStats();
+}
+
+function readURL(f) {
+  return new Promise((res, rej) => {
+    const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f);
+  });
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══════════════════════════════════════════════════
+// AI CATEGORIZE
+// ═══════════════════════════════════════════════════
+async function aiCat(dataUrl, filename) {
+  const b64 = dataUrl.split(',')[1];
+  const mime = dataUrl.split(';')[0].split(':')[1];
+  const prompt = `Categorize this image for the AETHER knowledge system. Reply ONLY with JSON, no markdown:
+{"category":"<aether|cosmic|hardware|science|narrative|emotional|visual|uncategorized>","label":"<3-6 word description>"}
+Categories: aether=system diagrams/agents, cosmic=planetary/astronomical, hardware=robots/circuits, science=biology/spectra, narrative=story/patterns/text, emotional=journal/art/personal, visual=AI renders/symbolic`;
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:100,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:mime,data:b64}},
+        {type:'text',text:prompt}
+      ]}]
+    })
+  });
+  if (!resp.ok) throw new Error('api');
+  const d = await resp.json();
+  return JSON.parse(d.content?.[0]?.text.replace(/```json|```/g,'').trim() || '{}');
+}
+
+// ═══════════════════════════════════════════════════
+// DOM — CARDS
+// ═══════════════════════════════════════════════════
+function getOrMakeSec(cat) {
+  let sec = document.getElementById(`sec-${cat}`);
+  if (sec) return sec;
+  const c = CATS[cat] || { label:'Uncategorized', color:'rgba(160,200,240,0.4)', desc:'unclassified' };
+  sec = document.createElement('section');
+  sec.id = `sec-${cat}`;
+  sec.className = 'node-section';
+  sec.dataset.cat = cat;
+  sec.style.animationDelay = (ORDER.indexOf(cat) * 0.04) + 's';
+  sec.innerHTML = `
+    <div class="node-hdr">
+      <div class="ndot" style="background:${c.color}"></div>
+      <div>
+        <div class="nname" style="color:${c.color}">${c.label}</div>
+        <div class="ndesc">${c.desc}</div>
+      </div>
+      <div class="nct" id="nct-${cat}">0</div>
+    </div>
+    <div class="img-grid" id="grid-${cat}"></div>`;
+  const container = document.getElementById('node-container');
+  const all = [...container.querySelectorAll('.node-section')];
+  const myI = ORDER.indexOf(cat);
+  let placed = false;
+  for (const ex of all) {
+    if (ORDER.indexOf(ex.dataset.cat) > myI) { container.insertBefore(sec, ex); placed = true; break; }
+  }
+  if (!placed) container.appendChild(sec);
+  return sec;
+}
+
+function addCard(item) {
+  getOrMakeSec(item.category);
+  const grid = document.getElementById(`grid-${item.category}`);
+  if (!grid) return;
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = item.id;
+  card.dataset.cat = item.category;
+  card.dataset.fn = item.filename.toLowerCase();
+  card.dataset.lbl = item.label.toLowerCase();
+
+  const badgeCls = item.isGrok ? 'badge-grok' : item.isVideo ? 'badge-vid' : 'badge-img';
+  const badgeTxt = item.isGrok ? 'GROK' : item.isVideo ? 'VIDEO' : 'IMG';
+
+  if (item.isVideo) {
+    card.innerHTML = `
+      <video src="${item.src}" muted preload="metadata" loop></video>
+      <div class="vid-overlay"></div>
+      <span class="cbadge ${badgeCls}">${badgeTxt}</span>
+      <div class="clabel">${item.label}</div>`;
+    // play on hover
+    const vid = card.querySelector('video');
+    card.addEventListener('mouseenter', () => vid.play().catch(()=>{}));
+    card.addEventListener('mouseleave', () => { vid.pause(); vid.currentTime = 0; });
+  } else {
+    card.innerHTML = `
+      <img src="${item.src}" loading="lazy" alt="${item.filename}">
+      <span class="cbadge ${badgeCls}">${badgeTxt}</span>
+      <div class="clabel">${item.label}</div>`;
+  }
+  card.addEventListener('click', () => openLB(item.id));
+  grid.appendChild(card);
+}
+
+function updateCounts() {
+  for (const cat of ORDER) {
+    const el = document.getElementById(`nct-${cat}`);
+    if (!el) continue;
+    const g = document.getElementById(`grid-${cat}`);
+    el.textContent = g ? g.querySelectorAll('.card').length + ' items' : '0';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// FILTER / SEARCH
+// ═══════════════════════════════════════════════════
+function applyFilters() {
+  const f = S.filter, q = S.q;
+  let vis = 0;
+  document.querySelectorAll('.card').forEach(c => {
+    const ok = (f === 'all' || c.dataset.cat === f) &&
+               (!q || c.dataset.fn.includes(q) || c.dataset.lbl.includes(q));
+    c.classList.toggle('hidden', !ok);
+    if (ok) vis++;
+  });
+  document.querySelectorAll('.node-section').forEach(s => {
+    s.style.display = s.querySelectorAll('.card:not(.hidden)').length === 0 ? 'none' : '';
+  });
+  const emp = document.getElementById('empty');
+  emp.classList.toggle('show', vis === 0);
+  updateStats();
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  const p = e.target.closest('.pill'); if (!p) return;
+  document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+  p.classList.add('active'); S.filter = p.dataset.f; applyFilters();
+});
+document.getElementById('search').addEventListener('input', e => {
+  S.q = e.target.value.toLowerCase().trim(); applyFilters();
+});
+
+function updateStats() {
+  const vis = document.querySelectorAll('.card:not(.hidden)').length;
+  const imgs = S.items.filter(i => !i.isVideo).length;
+  const vids = S.items.filter(i => i.isVideo).length;
+  document.getElementById('hdr-stats').innerHTML = `${vis} / ${S.items.length}<br><span style="font-size:0.5rem">${imgs} img · ${vids} vid</span>`;
+}
+
+// ═══════════════════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════════════════
+function showProc(on) {
+  document.getElementById('proc-wrap').style.display = on ? 'block' : 'none';
+  if (!on) { document.getElementById('proc-bar').style.width = '0%'; }
+}
+function setProc(pct, name, i, total) {
+  document.getElementById('proc-bar').style.width = (pct*100)+'%';
+  document.getElementById('proc-text').textContent = name.length > 40 ? name.slice(0,38)+'…' : name;
+  document.getElementById('proc-pct').textContent = `${i}/${total}`;
+}
+
+// ═══════════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════════
+let lbId = null;
+const lbImg = document.getElementById('lb-img');
+const lbVid = document.getElementById('lb-vid');
+
+function openLB(id) { lbId = id; renderLB(); document.getElementById('lb').classList.add('open'); }
+
+function renderLB() {
+  const vis = S.items.filter(i => {
+    const c = document.querySelector(`.card[data-id="${i.id}"]`);
+    return c && !c.classList.contains('hidden');
+  });
+  const idx = vis.findIndex(i => i.id == lbId);
+  const item = vis[idx]; if (!item) return;
+
+  if (item.isVideo) {
+    lbImg.style.display = 'none'; lbVid.style.display = 'block';
+    lbVid.src = item.src; lbVid.load();
+  } else {
+    lbVid.style.display = 'none'; lbVid.pause(); lbVid.src = '';
+    lbImg.style.display = 'block'; lbImg.src = item.src;
+  }
+
+  const cat = CATS[item.category];
+  document.getElementById('lb-info').innerHTML =
+    `<span style="color:var(--muted)">${item.filename}</span> &nbsp;·&nbsp; ` +
+    `<span style="color:${cat?.color||'var(--muted)'}; font-weight:700">${cat?.label||'Uncategorized'}</span>` +
+    (item.isGrok ? ' &nbsp;·&nbsp; <span style="color:var(--green)">GROK</span>' : '');
+  document.getElementById('lb-pos').textContent = `${idx+1} / ${vis.length}`;
+
+  document.getElementById('lb-prev').onclick = () => {
+    if (idx > 0) { lbId = vis[idx-1].id; renderLB(); }
+  };
+  document.getElementById('lb-next').onclick = () => {
+    if (idx < vis.length-1) { lbId = vis[idx+1].id; renderLB(); }
+  };
+}
+
+document.getElementById('lb-close').onclick = closeLB;
+document.getElementById('lb').addEventListener('click', e => { if (e.target === document.getElementById('lb')) closeLB(); });
+function closeLB() { lbVid.pause(); document.getElementById('lb').classList.remove('open'); }
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lb').classList.contains('open')) return;
+  if (e.key==='Escape') closeLB();
+  if (e.key==='ArrowRight') document.getElementById('lb-next').click();
+  if (e.key==='ArrowLeft') document.getElementById('lb-prev').click();
+});
+
+// ═══════════════════════════════════════════════════
+// GROK PANEL
+// ═══════════════════════════════════════════════════
+document.getElementById('grok-toggle-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  const p = document.getElementById('grok-panel');
+  p.classList.toggle('open');
+});
+
+document.querySelectorAll('.gp-type').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.gp-type').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel'); S.grokType = btn.dataset.t;
+  });
+});
+
+document.getElementById('gp-open-btn').addEventListener('click', () => {
+  const prompt = document.getElementById('gp-prompt').value.trim();
+  const type = S.grokType;
+  // Build Grok URL — Grok on X accepts query params for pre-filled prompts
+  const base = 'https://x.com/i/grok';
+  const q = encodeURIComponent(prompt || 'generate an image');
+  // For image: open grok with text pre-filled
+  // Note: Grok doesn't have a direct URL API for generation, so we open their page
+  // and include instructions
+  let url = base;
+  if (prompt) {
+    // Copy prompt to clipboard and open grok
+    navigator.clipboard?.writeText(
+      type === 'video'
+        ? `[Generate a video clip]: ${prompt}`
+        : `[Generate an image]: ${prompt}`
+    ).catch(()=>{});
+    document.getElementById('gp-status').textContent =
+      '✓ Prompt copied to clipboard — paste it into Grok Imagine on X.com';
+    setTimeout(() => { document.getElementById('gp-status').textContent = ''; }, 4000);
+  }
+  window.open(url, '_blank');
+});
+
+// ═══════════════════════════════════════════════════
+// AI TOGGLE
+// ═══════════════════════════════════════════════════
+document.getElementById('ai-toggle').addEventListener('change', e => {
+  S.aiOn = e.target.checked;
+  if (S.aiOn && !S.apiKey) openApiModal(()=>{});
+});
+
+// ═══════════════════════════════════════════════════
+// API MODAL
+// ═══════════════════════════════════════════════════
+let _cb = null;
+function openApiModal(cb) { _cb = cb; document.getElementById('api-modal').classList.add('open'); }
+document.getElementById('api-save').onclick = () => {
+  const v = document.getElementById('api-key-input').value.trim();
+  if (v) S.apiKey = v;
+  document.getElementById('api-modal').classList.remove('open');
+  if (_cb) _cb();
+};
+document.getElementById('api-cancel').onclick = () => {
+  document.getElementById('api-modal').classList.remove('open');
+  document.getElementById('ai-toggle').checked = false; S.aiOn = false;
+};
+
+// ═══════════════════════════════════════════════════
+// SCROLL PROGRESS
+// ═══════════════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  const d = document.documentElement;
+  document.getElementById('spfill').style.width =
+    (d.scrollTop / (d.scrollHeight - d.clientHeight) * 100) + '%';
+}, {passive:true});
+</script>
+</body>
+</html>

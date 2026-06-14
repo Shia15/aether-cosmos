@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import imgInfernia from "@assets/1_1781441110829.jpeg";
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const PHI = 1.6180339887;
@@ -588,6 +590,65 @@ export default function PhiAetherView() {
       </div>
 
       <style>{`@keyframes pulse-rune{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}`}</style>
+
+      {/* ── INFERNIA + Animal Neural Sim appendix ───────────────────────────── */}
+      <div style={{ padding: "2rem 2rem 3.5rem", borderTop: "1px solid rgba(58,80,128,0.25)", background: "#020617" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto" }}>
+
+          {/* INFERNIA image + AETHER-Core pipeline */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "2.5rem", alignItems: "start" }}>
+            <div>
+              <div style={{ fontSize: "0.62rem", letterSpacing: "0.2em", color: "rgba(255,152,96,0.7)", textTransform: "uppercase", marginBottom: "0.5rem" }}>Infernia · Intensity Analysis</div>
+              <img src={imgInfernia} alt="INFERNIA — Intensity Analysis / Emotional Spectrum" style={{ width: "100%", borderRadius: 6, border: "1px solid rgba(58,80,128,0.3)" }} />
+              <div style={{ marginTop: "0.5rem", fontSize: "0.6rem", color: "rgba(100,116,139,0.8)", textAlign: "center", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                INFERNIA · Emotional Input → Emotional Spectrum
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: "0.62rem", letterSpacing: "0.2em", color: "rgba(196,181,253,0.7)", textTransform: "uppercase", marginBottom: "0.5rem" }}>AETHER-Core Pipeline</div>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#e2e8f0", margin: "0 0 0.75rem", lineHeight: 1.3 }}>Mnêsis → Infernia → Aletheia → Reverie</h3>
+              <p style={{ color: "rgba(148,163,184,0.8)", fontSize: "0.8rem", lineHeight: 1.75, marginBottom: "0.75rem" }}>
+                Intelligence is not generated — it is <em style={{ color: "#f59e0b", fontStyle: "normal", fontWeight: 600 }}>crystallized</em>. Raw Al₂O₃ under extreme pressure and trace-element doping forms a stable, optically coherent sapphire. This maps directly to the AETHER intelligence process.
+              </p>
+              {[
+                { g: "Μ", n: "Mnêsis", c: "#00ffee", s: "Memory Substrate — 128×128 real-valued field, random noise + holographic seed. The primordial ocean." },
+                { g: "Ι", n: "Infernia", c: "#f97316", s: "Transformation Forge — Laplacian + Gray-Scott + CGLE. Titanium τ drives the Blue Shift." },
+                { g: "Α", n: "Aletheia", c: "#a78bfa", s: "Truth Stabilizer — phase-coherence Ψ = 1−σ/μ. Declares Stable Attractor when threshold crossed." },
+                { g: "Ρ", n: "Reverie", c: "#ec4899", s: "Radiant Output — live plasma-colormap. Bloom → waves → maze → locked hexagonal attractors." },
+              ].map((stage, i) => (
+                <div key={stage.n} style={{ display: "flex", gap: "0.7rem", marginBottom: "0.6rem", background: `${stage.c}08`, border: `1px solid ${stage.c}20`, borderLeft: `2px solid ${stage.c}`, borderRadius: 4, padding: "0.55rem 0.7rem", alignItems: "start" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: "50%", background: `${stage.c}15`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "0.9rem", color: stage.c, flexShrink: 0, fontFamily: "serif" }}>{stage.g}</div>
+                  <div>
+                    <span style={{ fontWeight: 700, color: stage.c, fontSize: "0.82rem" }}>{stage.n}</span>
+                    <span style={{ color: "rgba(100,116,139,0.8)", fontSize: "0.72rem", marginLeft: "0.4rem" }}>— {stage.s}</span>
+                  </div>
+                </div>
+              ))}
+              <div style={{ marginTop: "0.75rem", padding: "0.55rem 0.8rem", background: "rgba(0,0,0,0.35)", borderLeft: "2px solid rgba(245,158,11,0.5)", fontFamily: "monospace", fontSize: "0.75rem", color: "rgba(245,158,11,0.85)" }}>
+                ∂A/∂t = μA + (1+iα)∇²A − (1+iβ)|A|²A + F_holo
+              </div>
+            </div>
+          </div>
+
+          {/* Animal Neural Plasmoid Simulator */}
+          <div style={{ marginBottom: "0.4rem", fontSize: "0.62rem", letterSpacing: "0.2em", color: "rgba(100,116,139,0.7)", textTransform: "uppercase" }}>Live Interactive Simulator</div>
+          <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#e2e8f0", margin: "0 0 0.4rem" }}>AETHER · Animal Neural Plasmoid Simulator v2</h3>
+          <p style={{ color: "rgba(148,163,184,0.8)", fontSize: "0.82rem", lineHeight: 1.65, marginBottom: "0.9rem" }}>
+            Type an animal name and explore its neural oscillation signature across Alpha, Beta, Theta, Delta, and Gamma brainwave bands. Signal pipeline: <em style={{ color: "rgba(0,255,238,0.75)", fontStyle: "normal" }}>Receptor → Encoding → Neural Processing → Integration → Cognition</em>. Each animal generates a unique plasmoid geometry in the φ-AETHER field.
+          </p>
+          <div style={{ border: "1px solid rgba(58,80,128,0.3)", borderRadius: 8, overflow: "hidden", height: 580 }}>
+            <iframe
+              src={`${BASE}/animal-neural-sim.html`}
+              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+              title="AETHER Animal Neural Plasmoid Simulator v2"
+            />
+          </div>
+          <div style={{ marginTop: "0.75rem", padding: "0.6rem 0.9rem", background: "rgba(200,168,76,0.06)", border: "1px solid rgba(200,168,76,0.15)", borderRadius: 5 }}>
+            <span style={{ fontSize: "0.62rem", letterSpacing: "0.1em", color: "rgba(200,168,76,0.8)", textTransform: "uppercase", marginRight: "0.5rem" }}>Try:</span>
+            <span style={{ fontSize: "0.75rem", color: "rgba(148,163,184,0.8)" }}>dolphin · octopus · elephant · crow · mantis shrimp · jellyfish</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

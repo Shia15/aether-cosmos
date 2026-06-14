@@ -196,6 +196,8 @@ import StringNanobotPage from "@/pages/string-nanobot";
 import SpinTransportPage from "@/pages/spin-transport";
 import WarpGravityPage from "@/pages/warp-gravity";
 import ObserverDimensionsPage from "@/pages/observer-dimensions";
+import AetherClaPage from "@/pages/aether-cla";
+import GufAnalysisPage from "@/pages/guf-analysis";
 
 const queryClient = new QueryClient();
 
@@ -395,6 +397,8 @@ function Router() {
         <Route path="/spin-transport" component={SpinTransportPage} />
         <Route path="/warp-gravity" component={WarpGravityPage} />
         <Route path="/observer-dimensions" component={ObserverDimensionsPage} />
+        <Route path="/aether-cla" component={AetherClaPage} />
+        <Route path="/guf-analysis" component={GufAnalysisPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

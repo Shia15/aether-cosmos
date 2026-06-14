@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AETHER · Animal Neural Plasmoid Simulator v2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Crimson+Pro:ital,wght@0,200;0,300;0,400;1,200&display=swap');
+
+:root {
+  --bg: #02020b;
+  --panel: #05050e;
+  --panel2: #08081a;
+  --border: #0f0f28;
+  --border2: #1a1a3a;
+  --gold: #c8a84c;
+  --gold2: #f0d46a;
+  --gold3: #ffe89a;
+  --cyan: #2ef0d8;
+  --violet: #7744ee;
+  --ember: #ff5522;
+  --rose: #ff2266;
+  --green: #44ffaa;
+  --text: #b8b8d0;
+  --dim: #3a3a5a;
+  --vdim: #12122a;
+  --wire: rgba(200,168,76,0.12);
+  --wire-bright: rgba(200,168,76,0.35);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; cursor:crosshair; }
+
+/* ── GRID BACKGROUND ── */
+#grid-bg {
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity:0.4;
+}
+#grid-bg::after {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, var(--bg) 90%);
+}
+
+/* ── LAYOUT ── */
+#app { position:relative; z-index:1; display:grid; grid-template-rows:52px 1fr 90px; height:100vh; }
+
+/* ── HEADER ── */
+#hdr {
+  display:flex; align-items:center; gap:1.2rem;
+  padding:0 1.5rem;
+  border-bottom:1px solid var(--border2);
+  background:rgba(5,5,14,0.95);
+  backdrop-filter:blur(12px);
+  position:relative; z-index:30;
+}
+/* 3D wireframe accent on header */
+#hdr::before {
+  content:'';
+  position:absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--cyan), var(--gold), transparent);
+  opacity:0.4;
+}
+
+.logo {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.3rem; letter-spacing:0.2em;
+  color:var(--gold2);
+  white-space:nowrap;
+}
+.logo-sub { font-size:0.38rem; letter-spacing:0.25em; color:var(--dim); text-transform:uppercase; }
+.hdr-div { width:1px; height:28px; background:var(--border2); flex-shrink:0; }
+
+/* SEARCH BAR — 3D wireframe style */
+#search-outer {
+  flex:1; max-width:420px; position:relative;
+}
+#search-frame {
+  position:relative;
+  border:1px solid var(--border2);
+  background:rgba(8,8,26,0.9);
+  display:flex; align-items:center;
+  transition:border-color 0.3s, box-shadow 0.3s;
+}
+#search-frame:focus-within {
+  border-color:var(--gold);
+  box-shadow: 0 0 0 1px rgba(200,168,76,0.15), inset 0 0 20px rgba(200,168,76,0.03);
+}
+/* Wireframe corner accents */
+#search-frame::before,#search-frame::after {
+  content:''; position:absolute;
+  width:8px; height:8px;
+  border-color:var(--gold);
+  border-style:solid;
+  opacity:0.6;
+}
+#search-frame::before { top:-1px; left:-1px; border-width:1px 0 0 1px; }
+#search-frame::after  { bottom:-1px; right:-1px; border-width:0 1px 1px 0; }
+
+#animal-input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.1em;
+  color:var(--text); padding:0.55rem 0.9rem;
+}
+#animal-input::placeholder { color:var(--dim); }
+
+#search-btn {
+  background:transparent; border:none; border-left:1px solid var(--border2);
+  color:var(--gold); font-family:'Bebas Neue',sans-serif;
+  font-size:0.8rem; letter-spacing:0.15em;
+  padding:0 1rem; height:100%; cursor:pointer;
+  transition:all 0.2s; white-space:nowrap;
+}
+#search-btn:hover:not(:disabled) { background:rgba(200,168,76,0.1); color:var(--gold2); }
+#search-btn:disabled { opacity:0.3; cursor:default; }
+
+/* STATUS */
+#status-row { display:flex; align-items:center; gap:0.5rem; white-space:nowrap; }
+.sdot { width:5px; height:5px; border-radius:50%; background:var(--dim); transition:all 0.3s; }
+.sdot.loading { background:var(--gold); animation:sdotPulse 0.5s infinite; }
+.sdot.live { background:var(--cyan); box-shadow:0 0 6px var(--cyan); }
+.sdot.error { background:var(--rose); }
+@keyframes sdotPulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+#status-txt { font-size:0.46rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); }
+
+/* HDR METRICS */
+.hdr-metrics { margin-left:auto; display:flex; gap:1.2rem; align-items:center; }
+.hm { text-align:center; }
+.hm-k { font-size:0.38rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); display:block; }
+.hm-v { font-family:'Bebas Neue',sans-serif; font-size:1rem; color:var(--gold2); letter-spacing:0.05em; }
+
+/* TOUR BUTTON */
+#tour-btn {
+  background:rgba(46,240,216,0.06); border:1px solid rgba(46,240,216,0.2);
+  color:var(--cyan); font-family:'DM Mono',monospace;
+  font-size:0.46rem; letter-spacing:0.15em; text-transform:uppercase;
+  padding:4px 10px; cursor:pointer; transition:all 0.2s;
+  white-space:nowrap;
+}
+#tour-btn:hover { background:rgba(46,240,216,0.12); border-color:var(--cyan); }
+
+/* ── STAGE ── */
+#stage { position:relative; overflow:hidden; }
+canvas { position:absolute; inset:0; width:100%; height:100%; }
+
+/* ── TOUR OVERLAY ── */
+#tour-overlay {
+  position:absolute; inset:0; z-index:40;
+  pointer-events:none;
+  opacity:0; transition:opacity 0.4s;
+}
+#tour-overlay.show { opacity:1; pointer-events:all; }
+#tour-spotlight {
+  position:absolute;
+  border:1px solid var(--cyan);
+  box-shadow: 0 0 0 2000px rgba(2,2,11,0.82), 0 0 30px rgba(46,240,216,0.4);
+  border-radius:3px;
+  transition:all 0.6s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none;
+}
+#tour-card {
+  position:absolute;
+  background:rgba(5,5,14,0.97);
+  border:1px solid var(--border2);
+  padding:1.2rem 1.4rem;
+  max-width:320px;
+  transition:all 0.4s;
+}
+#tour-card::before {
+  content:''; position:absolute; top:-1px; left:-1px;
+  width:12px; height:12px;
+  border-top:1px solid var(--cyan); border-left:1px solid var(--cyan);
+}
+#tour-card::after {
+  content:''; position:absolute; bottom:-1px; right:-1px;
+  width:12px; height:12px;
+  border-bottom:1px solid var(--cyan); border-right:1px solid var(--cyan);
+}
+.tc-step { font-size:0.4rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--cyan); margin-bottom:0.4rem; }
+.tc-title { font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:0.1em; color:var(--gold2); margin-bottom:0.5rem; line-height:1; }
+.tc-body { font-size:0.52rem; line-height:1.8; color:var(--text); margin-bottom:0.9rem; }
+.tc-body em { color:var(--cyan); font-style:normal; }
+.tc-body strong { color:var(--gold2); font-weight:400; }
+.tc-nav { display:flex; justify-content:space-between; align-items:center; }
+.tc-prog { font-size:0.4rem; letter-spacing:0.1em; color:var(--dim); }
+.tc-btns { display:flex; gap:0.5rem; }
+.tc-btn {
+  background:transparent; border:1px solid var(--border2);
+  color:var(--text); font-family:'DM Mono',monospace;
+  font-size:0.44rem; letter-spacing:0.1em; text-transform:uppercase;
+  padding:4px 10px; cursor:pointer; transition:all 0.2s;
+}
+.tc-btn:hover { border-color:var(--gold); color:var(--gold2); }
+.tc-btn.primary { border-color:var(--cyan); color:var(--cyan); }
+.tc-btn.primary:hover { background:rgba(46,240,216,0.1); }
+
+/* ── SIDE PANELS ── */
+#panel-left {
+  position:absolute; top:1rem; left:1rem; z-index:10;
+  width:210px;
+  opacity:0; transform:translateX(-10px);
+  transition:all 0.5s;
+}
+#panel-left.show { opacity:1; transform:translateX(0); }
+
+.panel-box {
+  background:rgba(5,5,14,0.92);
+  border:1px solid var(--border2);
+  padding:0.8rem 0.9rem;
+  margin-bottom:0.5rem;
+  position:relative;
+}
+.panel-box::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, var(--gold), transparent);
+  opacity:0.3;
+}
+.pb-title { font-size:0.4rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--dim); margin-bottom:0.6rem; }
+.pb-animal { font-family:'Crimson Pro',serif; font-size:1.5rem; font-weight:200; color:var(--gold2); letter-spacing:0.05em; line-height:1; }
+.pb-sci { font-size:0.42rem; color:var(--dim); letter-spacing:0.08em; font-style:italic; margin-top:2px; margin-bottom:0.7rem; }
+.pb-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; }
+.pb-key { font-size:0.42rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--dim); }
+.pb-val { font-size:0.52rem; color:var(--text); }
+.pb-val.c1 { color:var(--cyan); }
+.pb-val.c2 { color:var(--gold); }
+.pb-val.c3 { color:var(--ember); }
+.pb-div { height:1px; background:var(--border2); margin:0.5rem 0; }
+.pb-desc { font-family:'Crimson Pro',serif; font-size:0.6rem; color:var(--dim); line-height:1.7; font-style:italic; }
+
+/* SIGNAL PIPELINE */
+#pipeline-box { margin-bottom:0; }
+.pipe-step {
+  display:flex; align-items:flex-start; gap:0.5rem;
+  padding:4px 0;
+  border-left:2px solid var(--border2);
+  padding-left:0.6rem; margin-left:0.3rem;
+  transition:border-color 0.3s;
+}
+.pipe-step.active { border-left-color:var(--gold); }
+.pipe-step.done { border-left-color:var(--cyan); }
+.pipe-num { font-family:'Bebas Neue',sans-serif; font-size:0.75rem; color:var(--dim); flex-shrink:0; line-height:1.2; }
+.pipe-step.active .pipe-num { color:var(--gold2); }
+.pipe-step.done .pipe-num { color:var(--cyan); }
+.pipe-content {}
+.pipe-name { font-size:0.46rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--dim); }
+.pipe-step.active .pipe-name { color:var(--text); }
+.pipe-step.done .pipe-name { color:var(--cyan); }
+.pipe-sub { font-size:0.4rem; color:var(--vdim); margin-top:1px; }
+
+/* ── PANEL RIGHT — Wave legend ── */
+#panel-right {
+  position:absolute; top:1rem; right:1rem; z-index:10;
+  width:185px;
+  opacity:0; transform:translateX(10px);
+  transition:all 0.5s;
+}
+#panel-right.show { opacity:1; transform:translateX(0); }
+
+.wave-row { display:flex; align-items:center; gap:0.5rem; margin-bottom:5px; }
+.wave-icon { width:32px; height:16px; flex-shrink:0; }
+.wave-info {}
+.wave-name { font-size:0.44rem; letter-spacing:0.1em; text-transform:uppercase; }
+.wave-hz { font-family:'Bebas Neue',sans-serif; font-size:0.8rem; letter-spacing:0.05em; }
+.wave-role { font-size:0.38rem; color:var(--dim); }
+
+/* NODE LEGEND */
+.node-row { display:flex; align-items:center; gap:0.5rem; margin-bottom:4px; }
+.node-icon { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.node-label { font-size:0.42rem; letter-spacing:0.06em; }
+.node-sub { font-size:0.38rem; color:var(--dim); }
+
+/* ── SIGNAL PROPAGATION CALLOUT ── */
+#prop-callout {
+  position:absolute; bottom:100px; left:50%; transform:translateX(-50%);
+  background:rgba(5,5,14,0.96);
+  border:1px solid var(--border2);
+  padding:0.5rem 1.2rem;
+  display:flex; align-items:center; gap:1.5rem;
+  z-index:15; opacity:0; transition:opacity 0.3s;
+  white-space:nowrap;
+}
+#prop-callout.show { opacity:1; }
+#prop-callout::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:0.5;
+}
+.pc-item { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.pc-key { font-size:0.38rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); }
+.pc-val { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; color:var(--gold2); letter-spacing:0.05em; }
+.pc-sep { width:1px; height:30px; background:var(--border2); }
+
+/* ── EMPTY STATE ── */
+#empty {
+  position:absolute; inset:0; z-index:5;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.8rem;
+  pointer-events:none;
+}
+.es-big { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:0.15em; color:var(--dim); line-height:1; }
+.es-sub { font-size:0.48rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--vdim); }
+.es-chips { display:flex; gap:0.5rem; margin-top:0.5rem; flex-wrap:wrap; justify-content:center; pointer-events:all; }
+.ec {
+  font-size:0.44rem; letter-spacing:0.1em; text-transform:uppercase;
+  border:1px solid var(--border2); padding:4px 10px; color:var(--dim);
+  cursor:pointer; transition:all 0.2s; position:relative;
+}
+.ec::before,.ec::after { content:''; position:absolute; width:5px; height:5px; border-color:var(--gold); border-style:solid; opacity:0; transition:opacity 0.2s; }
+.ec::before { top:-1px; left:-1px; border-width:1px 0 0 1px; }
+.ec::after  { bottom:-1px; right:-1px; border-width:0 1px 1px 0; }
+.ec:hover { border-color:var(--gold); color:var(--gold2); }
+.ec:hover::before,.ec:hover::after { opacity:0.8; }
+
+/* ── LOADING OVERLAY ── */
+#loader {
+  position:absolute; inset:0; z-index:50;
+  background:rgba(2,2,11,0.92);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.2rem;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+#loader.show { opacity:1; pointer-events:all; }
+.loader-ring {
+  width:52px; height:52px; position:relative;
+}
+.loader-ring::before {
+  content:''; position:absolute; inset:0;
+  border:1px solid var(--border2); border-radius:50%;
+}
+.loader-ring::after {
+  content:''; position:absolute; inset:0;
+  border:1px solid transparent; border-top-color:var(--gold);
+  border-right-color:rgba(200,168,76,0.3);
+  border-radius:50%; animation:spin 1s linear infinite;
+}
+.loader-inner {
+  position:absolute; inset:10px;
+  border:1px solid transparent; border-bottom-color:var(--cyan);
+  border-radius:50%; animation:spin 0.7s linear infinite reverse;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.loader-txt { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.2em; color:var(--gold); }
+.loader-sub { font-size:0.44rem; letter-spacing:0.12em; color:var(--dim); max-width:280px; text-align:center; line-height:1.7; }
+.loader-steps { display:flex; flex-direction:column; gap:4px; min-width:220px; }
+.ls { font-size:0.44rem; letter-spacing:0.08em; color:var(--dim); padding:3px 0; border-left:2px solid var(--border2); padding-left:8px; transition:all 0.2s; }
+.ls.done { border-left-color:var(--cyan); color:var(--cyan); }
+.ls.active { border-left-color:var(--gold); color:var(--gold2); }
+
+/* ── BOTTOM STRIP ── */
+#bottom {
+  display:grid; grid-template-columns:repeat(5,1fr);
+  border-top:1px solid var(--border2);
+  background:rgba(5,5,14,0.97);
+  position:relative; z-index:5;
+}
+#bottom::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold), var(--cyan), var(--gold), transparent);
+  opacity:0.25;
+}
+.bc { padding:0.5rem 0.8rem; border-right:1px solid var(--border2); display:flex; flex-direction:column; gap:3px; }
+.bc:last-child { border-right:none; }
+.bc-label { font-size:0.38rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); }
+.bc-canvas { flex:1; display:block; width:100%; min-height:32px; }
+.bc-row { display:flex; justify-content:space-between; align-items:baseline; }
+.bc-val { font-family:'Bebas Neue',sans-serif; font-size:0.9rem; color:var(--gold2); letter-spacing:0.05em; }
+.bc-unit { font-size:0.36rem; letter-spacing:0.1em; color:var(--dim); }
+
+/* WIREFRAME DECORATION CORNERS */
+.wf-corner {
+  position:absolute; width:16px; height:16px;
+  pointer-events:none; z-index:2;
+}
+.wf-tl { top:0; left:0; border-top:1px solid var(--wire-bright); border-left:1px solid var(--wire-bright); }
+.wf-tr { top:0; right:0; border-top:1px solid var(--wire-bright); border-right:1px solid var(--wire-bright); }
+.wf-bl { bottom:0; left:0; border-bottom:1px solid var(--wire-bright); border-left:1px solid var(--wire-bright); }
+.wf-br { bottom:0; right:0; border-bottom:1px solid var(--wire-bright); border-right:1px solid var(--wire-bright); }
+</style>
+</head>
+<body>
+<div id="grid-bg"></div>
+<div id="app">
+
+<!-- HEADER -->
+<div id="hdr">
+  <div>
+    <div class="logo">AETHER · PLASMOID</div>
+    <div class="logo-sub">Animal Neural Simulator · v2.0</div>
+  </div>
+  <div class="hdr-div"></div>
+
+  <div id="search-outer">
+    <div id="search-frame">
+      <input id="animal-input" type="text" placeholder="Enter any animal — octopus, wolf, manta ray, hummingbird…" autocomplete="off" />
+      <button id="search-btn" onclick="runSearch()">⬡ Simulate</button>
+    </div>
+  </div>
+
+  <div id="status-row">
+    <div class="sdot" id="sdot"></div>
+    <span id="status-txt">Awaiting input</span>
+  </div>
+
+  <div class="hdr-metrics">
+    <div class="hm"><span class="hm-k">Nodes</span><span class="hm-v" id="hm-nodes">—</span></div>
+    <div class="hm"><span class="hm-k">Synapses</span><span class="hm-v" id="hm-syn">—</span></div>
+    <div class="hm"><span class="hm-k">Neural IQ</span><span class="hm-v" id="hm-iq">—</span></div>
+    <div class="hm"><span class="hm-k">Coherence</span><span class="hm-v" id="hm-coh">—</span></div>
+  </div>
+
+  <button id="tour-btn" onclick="startTour()">▶ Take Tour</button>
+</div>
+
+<!-- STAGE -->
+<div id="stage">
+  <div class="wf-corner wf-tl"></div>
+  <div class="wf-corner wf-tr"></div>
+  <div class="wf-corner wf-bl"></div>
+  <div class="wf-corner wf-br"></div>
+
+  <canvas id="cv-grid"></canvas>
+  <canvas id="cv-field"></canvas>
+  <canvas id="cv-main"></canvas>
+  <canvas id="cv-ui"></canvas>
+
+  <!-- PANEL LEFT -->
+  <div id="panel-left">
+    <div class="panel-box" id="animal-box">
+      <div class="pb-title">Active organism</div>
+      <div class="pb-animal" id="pb-name">—</div>
+      <div class="pb-sci" id="pb-sci">—</div>
+      <div class="pb-row"><span class="pb-key">Class</span><span class="pb-val" id="pb-class">—</span></div>
+      <div class="pb-row"><span class="pb-key">Locomotion</span><span class="pb-val c1" id="pb-loco">—</span></div>
+      <div class="pb-row"><span class="pb-key">Neural IQ</span><span class="pb-val c2" id="pb-iq">—</span></div>
+      <div class="pb-row"><span class="pb-key">Medium</span><span class="pb-val" id="pb-med">—</span></div>
+      <div class="pb-row"><span class="pb-key">Dom. Freq</span><span class="pb-val c3" id="pb-freq">—</span></div>
+      <div class="pb-div"></div>
+      <div class="pb-desc" id="pb-desc">—</div>
+    </div>
+
+    <div class="panel-box" id="pipeline-box">
+      <div class="pb-title">Signal pipeline</div>
+      <div id="pipe-steps"></div>
+    </div>
+  </div>
+
+  <!-- PANEL RIGHT -->
+  <div id="panel-right">
+    <div class="panel-box">
+      <div class="pb-title">Wave bands</div>
+      <div class="wave-row">
+        <svg class="wave-icon" id="wv-g"></svg>
+        <div class="wave-info">
+          <div class="wave-name" style="color:var(--gold)">γ Gamma</div>
+          <div class="wave-hz" style="color:var(--gold2)" id="wv-ghz">—</div>
+          <div class="wave-role">Motor command</div>
+        </div>
+      </div>
+      <div class="wave-row">
+        <svg class="wave-icon" id="wv-t"></svg>
+        <div class="wave-info">
+          <div class="wave-name" style="color:var(--cyan)">θ Theta</div>
+          <div class="wave-hz" style="color:var(--cyan)" id="wv-thz">—</div>
+          <div class="wave-role">Memory / learning</div>
+        </div>
+      </div>
+      <div class="wave-row">
+        <svg class="wave-icon" id="wv-a"></svg>
+        <div class="wave-info">
+          <div class="wave-name" style="color:var(--violet)">α Alpha</div>
+          <div class="wave-hz" style="color:var(--violet)" id="wv-ahz">—</div>
+          <div class="wave-role">Inhibitory gate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="pb-title">Node types</div>
+      <div class="node-row">
+        <div class="node-icon" style="background:var(--gold);box-shadow:0 0 6px var(--gold)"></div>
+        <div><div class="node-label" style="color:var(--gold)">Motor nodes</div><div class="node-sub">Phalange / joint output</div></div>
+      </div>
+      <div class="node-row">
+        <div class="node-icon" style="background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></div>
+        <div><div class="node-label" style="color:var(--cyan)">Sensory nodes</div><div class="node-sub">Environment input</div></div>
+      </div>
+      <div class="node-row">
+        <div class="node-icon" style="background:var(--violet);box-shadow:0 0 6px var(--violet)"></div>
+        <div><div class="node-label" style="color:var(--violet)">Interneurons</div><div class="node-sub">Relay / processing</div></div>
+      </div>
+      <div class="node-row">
+        <div class="node-icon" style="background:var(--ember);box-shadow:0 0 6px var(--ember)"></div>
+        <div><div class="node-label" style="color:var(--ember)">Motor output</div><div class="node-sub">Phalange tendon fire</div></div>
+      </div>
+    </div>
+
+    <div class="panel-box">
+      <div class="pb-title">Plasticity</div>
+      <div class="pb-row"><span class="pb-key">LTP rate</span><span class="pb-val" id="pr-ltp">—</span></div>
+      <div class="pb-row"><span class="pb-key">LTD rate</span><span class="pb-val" id="pr-ltd">—</span></div>
+      <div class="pb-row"><span class="pb-key">Avg weight</span><span class="pb-val" id="pr-wt">—</span></div>
+      <div class="pb-row"><span class="pb-key">Active pulses</span><span class="pb-val c1" id="pr-pulses">—</span></div>
+    </div>
+  </div>
+
+  <!-- SIGNAL PROPAGATION CALLOUT -->
+  <div id="prop-callout">
+    <div class="pc-item"><div class="pc-key">Current step</div><div class="pc-val" id="pc-step">—</div></div>
+    <div class="pc-sep"></div>
+    <div class="pc-item"><div class="pc-key">Signal type</div><div class="pc-val" id="pc-type">—</div></div>
+    <div class="pc-sep"></div>
+    <div class="pc-item"><div class="pc-key">Firing rate</div><div class="pc-val" id="pc-rate">—</div></div>
+    <div class="pc-sep"></div>
+    <div class="pc-item"><div class="pc-key">Wave pattern</div><div class="pc-val" id="pc-wave">—</div></div>
+    <div class="pc-sep"></div>
+    <div class="pc-item"><div class="pc-key">Coherence</div><div class="pc-val" id="pc-coh">—</div></div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty">
+    <div class="es-big">SEARCH<br>AN ANIMAL</div>
+    <div class="es-sub">Neural plasmoid network generates from biological profile</div>
+    <div class="es-chips">
+      <div class="ec" onclick="quickLoad('octopus')">Octopus</div>
+      <div class="ec" onclick="quickLoad('wolf')">Wolf</div>
+      <div class="ec" onclick="quickLoad('manta ray')">Manta Ray</div>
+      <div class="ec" onclick="quickLoad('hummingbird')">Hummingbird</div>
+      <div class="ec" onclick="quickLoad('jellyfish')">Jellyfish</div>
+      <div class="ec" onclick="quickLoad('eagle')">Eagle</div>
+      <div class="ec" onclick="quickLoad('cheetah')">Cheetah</div>
+      <div class="ec" onclick="quickLoad('mantis shrimp')">Mantis Shrimp</div>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-ring"><div class="loader-inner"></div></div>
+    <div class="loader-txt">Querying AETHER</div>
+    <div class="loader-sub" id="loader-sub">Building neural plasmoid profile…</div>
+    <div class="loader-steps">
+      <div class="ls" id="ls0">01 · Fetching biological taxonomy</div>
+      <div class="ls" id="ls1">02 · Mapping neural complexity</div>
+      <div class="ls" id="ls2">03 · Calibrating wave frequencies</div>
+      <div class="ls" id="ls3">04 · Building plasmoid topology</div>
+      <div class="ls" id="ls4">05 · Initializing signal simulation</div>
+    </div>
+  </div>
+
+  <!-- TOUR OVERLAY -->
+  <div id="tour-overlay">
+    <div id="tour-spotlight"></div>
+    <div id="tour-card">
+      <div class="tc-step" id="tc-step">Step 1 of 8</div>
+      <div class="tc-title" id="tc-title">Welcome to AETHER</div>
+      <div class="tc-body" id="tc-body"></div>
+      <div class="tc-nav">
+        <span class="tc-prog" id="tc-prog"></span>
+        <div class="tc-btns">
+          <button class="tc-btn" onclick="tourPrev()">← Prev</button>
+          <button class="tc-btn primary" id="tc-next-btn" onclick="tourNext()">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM -->
+<div id="bottom">
+  <div class="bc"><div class="bc-label">γ Motor Command</div><canvas class="bc-canvas" id="bc0"></canvas><div class="bc-row"><span class="bc-val" id="bv0">—</span><span class="bc-unit" id="bu0">Hz</span></div></div>
+  <div class="bc"><div class="bc-label">θ Memory Trace</div><canvas class="bc-canvas" id="bc1"></canvas><div class="bc-row"><span class="bc-val" id="bv1">—</span><span class="bc-unit" id="bu1">Hz</span></div></div>
+  <div class="bc"><div class="bc-label">Plasmoid Coherence</div><canvas class="bc-canvas" id="bc2"></canvas><div class="bc-row"><span class="bc-val" id="bv2">—</span><span class="bc-unit">%</span></div></div>
+  <div class="bc"><div class="bc-label">Synaptic Plasticity</div><canvas class="bc-canvas" id="bc3"></canvas><div class="bc-row"><span class="bc-val" id="bv3">—</span><span class="bc-unit">avg wt</span></div></div>
+  <div class="bc"><div class="bc-label">Emergent Field</div><canvas class="bc-canvas" id="bc4"></canvas><div class="bc-row"><span class="bc-val" id="bv4">—</span><span class="bc-unit">%</span></div></div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DEEP ANIMAL DATABASE — scientifically grounded fallback
+// ═══════════════════════════════════════════════════════
+const ANIMAL_DB = {
+  octopus: {
+    name:"Octopus",scientificName:"Octopus vulgaris",class:"Cephalopoda",
+    locomotion:"swimming",neuralComplexity:9,nodeCount:32,primaryMedium:"fluid",
+    dominantFreqHz:38,gammaHz:42,thetaHz:6,alphaHz:10,
+    bodyColor:[40,120,180],accentColor:[80,200,160],haloColor:[20,80,140],
+    wavePattern:"burst",movementStyle:"erratic",synapticDensity:0.85,
+    motorNodeRatio:0.45,sensoryNodeRatio:0.3,inertia:0.4,
+    description:"Nine brains: one central, one per arm. Each arm processes signals semi-autonomously.",
+    plasmoidNote:"Dense synaptic burst topology — chaotic surface, deeply ordered beneath.",
+    pipelineSteps:["Retinal photoreceptors","Optic lobes (visual processing)","Central brain (integration)","Arm ganglia (local processing)","Chromatophore motors","Mantle jet propulsion"],
+    ltp:0.82,ltd:0.45,movementNote:"Jet-propelled undulation + 8-arm manipulation"
+  },
+  jellyfish: {
+    name:"Jellyfish",scientificName:"Aurelia aurita",class:"Scyphozoa",
+    locomotion:"undulating",neuralComplexity:1,nodeCount:14,primaryMedium:"diffusion",
+    dominantFreqHz:1.2,gammaHz:2,thetaHz:0.8,alphaHz:1,
+    bodyColor:[180,220,240],accentColor:[200,240,255],haloColor:[100,180,220],
+    wavePattern:"ripple",movementStyle:"smooth",synapticDensity:0.2,
+    motorNodeRatio:0.5,sensoryNodeRatio:0.4,inertia:0.9,
+    description:"No brain — a nerve net. Radially symmetric, decentralized signal propagation.",
+    plasmoidNote:"Pure diffusion medium. Ripple waves emanating from central ring canal.",
+    pipelineSteps:["Rhopalia (sensory organs)","Nerve ring (circular)","Subumbrella nerve net","Coronal muscle fibers","Bell margin","Pulsed propulsion"],
+    ltp:0.1,ltd:0.05,movementNote:"Rhythmic bell pulsation — purely hydraulic"
+  },
+  wolf: {
+    name:"Wolf",scientificName:"Canis lupus",class:"Mammalia",
+    locomotion:"walking",neuralComplexity:8,nodeCount:28,primaryMedium:"granular",
+    dominantFreqHz:25,gammaHz:40,thetaHz:7,alphaHz:10,
+    bodyColor:[160,130,90],accentColor:[220,180,100],haloColor:[120,100,70],
+    wavePattern:"sinusoidal",movementStyle:"rhythmic",synapticDensity:0.7,
+    motorNodeRatio:0.4,sensoryNodeRatio:0.25,inertia:0.6,
+    description:"Pack-hunting predator with highly developed prefrontal cortex for social coordination.",
+    plasmoidNote:"Rhythmic theta-gamma coupling — memory-driven motor patterns for coordinated pursuit.",
+    pipelineSteps:["Olfactory bulb (primary)","Limbic system","Motor cortex (Layer V)","Corticospinal tract","Spinal interneurons","Limb phalanges (4-limb)"],
+    ltp:0.7,ltd:0.55,movementNote:"Quadrupedal gait — diagonal limb coordination"
+  },
+  hummingbird: {
+    name:"Hummingbird",scientificName:"Archilochus colubris",class:"Aves",
+    locomotion:"flying",neuralComplexity:7,nodeCount:24,primaryMedium:"light",
+    dominantFreqHz:55,gammaHz:70,thetaHz:8,alphaHz:12,
+    bodyColor:[80,200,120],accentColor:[240,200,60],haloColor:[60,180,100],
+    wavePattern:"pulse",movementStyle:"erratic",synapticDensity:0.65,
+    motorNodeRatio:0.35,sensoryNodeRatio:0.3,inertia:0.15,
+    description:"Highest metabolic rate of any bird. Wing beats 50–80/sec require extreme gamma synchrony.",
+    plasmoidNote:"Light-medium emission nodes — high-freq pulse pattern drives rapid motor cycling.",
+    pipelineSteps:["Visual cortex (UV-sensitive)","Cerebellum (balance/timing)","Premotor cortex","Thoracic motor neurons","Flight muscle actuation","Wing phalanges (rapid)"],
+    ltp:0.6,ltd:0.7,movementNote:"Figure-8 wing stroke — hover + reverse flight"
+  },
+  "manta ray": {
+    name:"Manta Ray",scientificName:"Mobula birostris",class:"Chondrichthyes",
+    locomotion:"gliding",neuralComplexity:7,nodeCount:22,primaryMedium:"fluid",
+    dominantFreqHz:14,gammaHz:20,thetaHz:5,alphaHz:9,
+    bodyColor:[40,60,120],accentColor:[80,120,200],haloColor:[20,40,100],
+    wavePattern:"sinusoidal",movementStyle:"smooth",synapticDensity:0.55,
+    motorNodeRatio:0.3,sensoryNodeRatio:0.35,inertia:0.8,
+    description:"Largest brain-to-body ratio of any fish. Self-aware — passes mirror test.",
+    plasmoidNote:"Fluid sinusoidal waves — wide pectoral fin nodes act as distributed lift surfaces.",
+    pipelineSteps:["Ampullae of Lorenzini (EMF sense)","Lateral line (flow sense)","Telencephalon","Spinal cord","Pectoral fin rays","Undulatory propulsion"],
+    ltp:0.65,ltd:0.4,movementNote:"Pectoral fin undulation — efficient glide + bank"
+  },
+  eagle: {
+    name:"Eagle",scientificName:"Aquila chrysaetos",class:"Aves",
+    locomotion:"flying",neuralComplexity:7,nodeCount:22,primaryMedium:"light",
+    dominantFreqHz:40,gammaHz:55,thetaHz:7,alphaHz:11,
+    bodyColor:[180,140,60],accentColor:[240,200,80],haloColor:[140,100,40],
+    wavePattern:"sinusoidal",movementStyle:"smooth",synapticDensity:0.6,
+    motorNodeRatio:0.35,sensoryNodeRatio:0.4,inertia:0.5,
+    description:"Visual acuity 4–8× human. Five types of photoreceptors; fovea resolves prey at 3km.",
+    plasmoidNote:"Dual fovea vision nodes dominate — sensory-first architecture drives motor outputs.",
+    pipelineSteps:["Dual fovea (hyperacuity)","Visual Wulst (avian visual cortex)","Nidopallium (integration)","Motor nidopallium","Wing musculature","Talon phalanges"],
+    ltp:0.6,ltd:0.5,movementNote:"Soaring + dive — wing fold for 300km/h stoop"
+  },
+  cheetah: {
+    name:"Cheetah",scientificName:"Acinonyx jubatus",class:"Mammalia",
+    locomotion:"walking",neuralComplexity:7,nodeCount:26,primaryMedium:"solid",
+    dominantFreqHz:32,gammaHz:45,thetaHz:6,alphaHz:10,
+    bodyColor:[220,180,80],accentColor:[240,200,100],haloColor:[160,130,50],
+    wavePattern:"burst",movementStyle:"rhythmic",synapticDensity:0.72,
+    motorNodeRatio:0.5,sensoryNodeRatio:0.25,inertia:0.3,
+    description:"Fastest land animal. Spine acts as a spring — full extension/contraction doubles stride.",
+    plasmoidNote:"Solid-core high-inertia nodes with gamma burst motor commands — max-speed locomotion.",
+    pipelineSteps:["Visual cortex (motion detection)","Motor cortex","Reticulospinal tract","Spinal pattern generator","Limb extensor/flexor","Phalange grip (retractable)"],
+    ltp:0.75,ltd:0.65,movementNote:"Gallop — spine spring mechanism; 120km/h peak"
+  },
+  "mantis shrimp": {
+    name:"Mantis Shrimp",scientificName:"Odontodactylus scyllarus",class:"Malacostraca",
+    locomotion:"swimming",neuralComplexity:8,nodeCount:30,primaryMedium:"light",
+    dominantFreqHz:50,gammaHz:65,thetaHz:9,alphaHz:13,
+    bodyColor:[200,80,120],accentColor:[100,200,240],haloColor:[160,60,180],
+    wavePattern:"pulse",movementStyle:"erratic",synapticDensity:0.78,
+    motorNodeRatio:0.42,sensoryNodeRatio:0.38,inertia:0.25,
+    description:"16 types of photoreceptors. Strike speed 23m/s — acceleration of 10,400g. Fastest predatory strike known.",
+    plasmoidNote:"Light-spectrum maximum nodes — 16-channel color processing drives pulse-burst motor output.",
+    pipelineSteps:["Hexnocular vision (16 channels)","Medulla terminalis","Supraesophageal ganglion","Ventral nerve cord","Raptorial appendage","Strike club — cavitation wave"],
+    ltp:0.8,ltd:0.6,movementNote:"Raptorial strike — cavitation bubble shockwave"
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// PIPELINE DEFINITIONS (used for all animals from Claude)
+// ═══════════════════════════════════════════════════════
+const DEFAULT_PIPELINE = ["Sensory input","Signal integration","Motor cortex","Spinal cord","Motor neurons","Limb/body output"];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let t=0, W, H, DPR;
+let profile=null;
+let bubbles=[], synapses=[], pulses=[], motorPaths=[];
+let simActive=false;
+let pipelineStep=0, pipelineT=0;
+let bwHist=[[],[],[],[],[]];
+const BW_LEN=120;
+let ltpAccum=0, ltdAccum=0;
+
+// ═══════════════════════════════════════════════════════
+// CANVAS
+// ═══════════════════════════════════════════════════════
+const stage=document.getElementById('stage');
+const cvGrid=document.getElementById('cv-grid');
+const cvField=document.getElementById('cv-field');
+const cvMain=document.getElementById('cv-main');
+const cvUI=document.getElementById('cv-ui');
+const ctxGrid=cvGrid.getContext('2d');
+const ctxF=cvField.getContext('2d');
+const ctxM=cvMain.getContext('2d');
+const ctxUI=cvUI.getContext('2d');
+
+function resize(){
+  DPR=window.devicePixelRatio||1;
+  W=stage.offsetWidth; H=stage.offsetHeight;
+  [cvGrid,cvField,cvMain,cvUI].forEach(cv=>{
+    cv.width=W*DPR; cv.height=H*DPR;
+  });
+  [ctxGrid,ctxF,ctxM,ctxUI].forEach(ctx=>ctx.setTransform(DPR,0,0,DPR,0,0));
+  if(profile) buildSim(profile);
+}
+
+// ═══════════════════════════════════════════════════════
+// CLAUDE API
+// ═══════════════════════════════════════════════════════
+async function fetchAnimalProfile(name){
+  const lname = name.toLowerCase().trim();
+
+  // Check local DB first
+  for(const key of Object.keys(ANIMAL_DB)){
+    if(lname.includes(key) || key.includes(lname)) return ANIMAL_DB[key];
+  }
+
+  // Query Claude for unknown animals
+  const sys = `You are the AETHER neural plasmoid simulation engine. Return ONLY valid JSON (no markdown, no explanation):
+{
+  "name":"string","scientificName":"string","class":"string",
+  "locomotion":"swimming|walking|flying|crawling|undulating|gliding",
+  "neuralComplexity":1-10,"nodeCount":12-40,"primaryMedium":"solid|granular|fluid|diffusion|light",
+  "dominantFreqHz":number,"gammaHz":number,"thetaHz":number,"alphaHz":number,
+  "bodyColor":[r,g,b],"accentColor":[r,g,b],"haloColor":[r,g,b],
+  "wavePattern":"sinusoidal|burst|ripple|pulse|spiral",
+  "movementStyle":"undulating|rhythmic|erratic|smooth|flocking",
+  "synapticDensity":0.1-1.0,"motorNodeRatio":0.2-0.6,"sensoryNodeRatio":0.1-0.4,"inertia":0.1-1.0,
+  "description":"One sentence about neural/movement signature.",
+  "plasmoidNote":"One sentence about AETHER plasmoid mapping.",
+  "pipelineSteps":["step1","step2","step3","step4","step5","step6"],
+  "ltp":0.0-1.0,"ltd":0.0-1.0,
+  "movementNote":"Brief locomotion mechanics note"
+}
+Be scientifically accurate. Use real neuroscience values.`;
+
+  const res=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      model:"claude-sonnet-4-20250514",max_tokens:1000,
+      system:sys,
+      messages:[{role:"user",content:`Animal: ${name}`}]
+    })
+  });
+  const data=await res.json();
+  const txt=data.content?.filter(b=>b.type==='text').map(b=>b.text).join('')||'';
+  return JSON.parse(txt.replace(/```json|```/g,'').trim());
+}
+
+// ═══════════════════════════════════════════════════════
+// SEARCH / LOAD
+// ═══════════════════════════════════════════════════════
+function setStatus(state,txt){
+  document.getElementById('sdot').className='sdot '+state;
+  document.getElementById('status-txt').textContent=txt;
+}
+
+function setLoaderStep(idx){
+  for(let i=0;i<5;i++){
+    const el=document.getElementById('ls'+i);
+    if(i<idx) el.className='ls done';
+    else if(i===idx) el.className='ls active';
+    else el.className='ls';
+  }
+}
+
+async function runSearch(){
+  const v=document.getElementById('animal-input').value.trim();
+  if(!v) return;
+  await loadAnimal(v);
+}
+async function quickLoad(n){
+  document.getElementById('animal-input').value=n;
+  await loadAnimal(n);
+}
+
+async function loadAnimal(name){
+  document.getElementById('search-btn').disabled=true;
+  setStatus('loading','Loading…');
+  document.getElementById('loader').classList.add('show');
+  document.getElementById('empty').style.display='none';
+  document.getElementById('loader-sub').textContent=`Building neural profile for "${name}"…`;
+
+  const steps=[0,1,2,3,4];
+  for(const s of steps){
+    setLoaderStep(s);
+    await new Promise(r=>setTimeout(r,320));
+  }
+
+  try{
+    const p=await fetchAnimalProfile(name);
+    profile=p;
+    applyProfile(p);
+    buildSim(p);
+    simActive=true;
+    setStatus('live','Live simulation');
+    document.getElementById('panel-left').classList.add('show');
+    document.getElementById('panel-right').classList.add('show');
+    document.getElementById('prop-callout').classList.add('show');
+    setLoaderStep(5);
+    await new Promise(r=>setTimeout(r,300));
+  }catch(e){
+    setStatus('error','Error — retry');
+    document.getElementById('empty').style.display='flex';
+    console.error(e);
+  }
+
+  document.getElementById('loader').classList.remove('show');
+  document.getElementById('search-btn').disabled=false;
+}
+
+function applyProfile(p){
+  document.getElementById('pb-name').textContent=p.name;
+  document.getElementById('pb-sci').textContent=p.scientificName;
+  document.getElementById('pb-class').textContent=p.class;
+  document.getElementById('pb-loco').textContent=p.locomotion;
+  document.getElementById('pb-iq').textContent=p.neuralComplexity+' / 10';
+  document.getElementById('pb-med').textContent=p.primaryMedium;
+  document.getElementById('pb-freq').textContent=p.dominantFreqHz+' Hz';
+  document.getElementById('pb-desc').textContent=p.description+' '+p.plasmoidNote;
+  document.getElementById('wv-ghz').textContent=p.gammaHz+' Hz';
+  document.getElementById('wv-thz').textContent=p.thetaHz+' Hz';
+  document.getElementById('wv-ahz').textContent=p.alphaHz+' Hz';
+  document.getElementById('hm-nodes').textContent=p.nodeCount;
+  document.getElementById('hm-iq').textContent=p.neuralComplexity+'/10';
+
+  // Pipeline
+  const steps=p.pipelineSteps||DEFAULT_PIPELINE;
+  const cont=document.getElementById('pipe-steps');
+  cont.innerHTML='';
+  steps.forEach((s,i)=>{
+    const d=document.createElement('div');
+    d.className='pipe-step'; d.id='ps'+i;
+    d.innerHTML=`<div class="pipe-num">${String(i+1).padStart(2,'0')}</div><div class="pipe-content"><div class="pipe-name">${s}</div></div>`;
+    cont.appendChild(d);
+  });
+
+  // Wave mini SVGs
+  drawMinWave('wv-g',p.gammaHz,70,40,'#c8a84c','burst');
+  drawMinWave('wv-t',p.thetaHz,70,16,'#2ef0d8','smooth');
+  drawMinWave('wv-a',p.alphaHz,70,11,'#7744ee','sine');
+
+  // Live callout
+  document.getElementById('pc-type').textContent=p.wavePattern.toUpperCase();
+  document.getElementById('pc-wave').textContent=p.movementStyle.toUpperCase();
+}
+
+function drawMinWave(id,freq,speed,hz,color,type){
+  const svg=document.getElementById(id);
+  if(!svg) return;
+  svg.setAttribute('viewBox','0 0 32 16');
+  const pts=[];
+  for(let x=0;x<=32;x+=2){
+    let y;
+    if(type==='burst') y=8+6*Math.sin(x*0.5)*Math.pow(Math.abs(Math.sin(x*0.15)),0.5);
+    else if(type==='smooth') y=8+5*Math.sin(x*0.35);
+    else y=8+5*Math.sin(x*0.45);
+    pts.push(`${x},${y}`);
+  }
+  svg.innerHTML=`<polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1" opacity="0.8"/>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// BUILD SIMULATION
+// ═══════════════════════════════════════════════════════
+function buildSim(p){
+  bubbles=[]; synapses=[]; pulses=[]; motorPaths=[];
+  bwHist=[[],[],[],[],[]];
+  pipelineStep=0; pipelineT=0;
+  ltpAccum=0; ltdAccum=0;
+
+  const N=p.nodeCount;
+  const motorN=Math.round(N*p.motorNodeRatio);
+  const sensoryN=Math.round(N*p.sensoryNodeRatio);
+  const interN=N-motorN-sensoryN;
+
+  const positions=getLayout(p.locomotion,p.movementStyle,N);
+
+  positions.forEach((pos,i)=>{
+    const isMotor=i<motorN;
+    const isSensory=i>=N-sensoryN;
+    const isInter=!isMotor&&!isSensory;
+    let color;
+    if(isMotor) color=p.accentColor;
+    else if(isSensory) color=p.haloColor;
+    else color=p.bodyColor;
+
+    bubbles.push({
+      x:pos.x, y:pos.y,
+      r:9+(1-i/N)*9+Math.random()*5,
+      phase:Math.random()*Math.PI*2,
+      freq:p.dominantFreqHz*(0.4+Math.random()*1.2)*0.06,
+      signal:Math.random(),
+      weight:0.3+Math.random()*0.7,
+      vx:(Math.random()-0.5)*p.inertia*0.2,
+      vy:(Math.random()-0.5)*p.inertia*0.2,
+      isMotor,isSensory,isInter,
+      color,
+      haloColor:p.haloColor,
+      medIdx:['solid','granular','fluid','diffusion','light'].indexOf(p.primaryMedium),
+      wavePattern:p.wavePattern,
+      movementStyle:p.movementStyle,
+      nodeType:isMotor?'motor':isSensory?'sensory':'inter',
+    });
+  });
+
+  // Synapses
+  bubbles.forEach((b,i)=>{
+    bubbles.forEach((c,j)=>{
+      if(i>=j) return;
+      const d=Math.hypot(b.x-c.x,b.y-c.y);
+      const thresh=150+p.synapticDensity*100;
+      if(d<thresh && Math.random()<p.synapticDensity*0.45){
+        synapses.push({a:i,b:j,weight:0.2+Math.random()*0.8,flash:0,active:false});
+      }
+    });
+  });
+
+  // Motor paths
+  bubbles.filter(b=>b.isMotor).forEach(b=>{
+    const angle=Math.random()*Math.PI*2;
+    motorPaths.push({
+      bx:b.x,by:b.y,ex:b.x+Math.cos(angle)*50,ey:b.y+Math.sin(angle)*50,
+      phase:Math.random()*Math.PI*2,active:0
+    });
+  });
+
+  document.getElementById('hm-syn').textContent=synapses.length;
+}
+
+function getLayout(loco,style,N){
+  const pos=[], cx=W/2, cy=H/2;
+  if(loco==='swimming'||loco==='undulating'){
+    for(let i=0;i<N;i++){
+      const prog=i/N;
+      pos.push({
+        x:W*0.12+prog*W*0.76+(Math.random()-0.5)*18,
+        y:cy+Math.sin(prog*Math.PI*2.8)*H*0.24+(Math.random()-0.5)*18
+      });
+    }
+  }else if(loco==='flying'||loco==='gliding'){
+    for(let i=0;i<N;i++){
+      const s=i<N/2?-1:1, j=i<N/2?i:i-Math.floor(N/2), prog=j/(N/2);
+      pos.push({
+        x:cx+s*(35+prog*W*0.3),
+        y:cy-Math.sin(prog*Math.PI)*H*0.22+(Math.random()-0.5)*18
+      });
+    }
+  }else if(loco==='walking'||loco==='crawling'){
+    const cols=4, rows=Math.ceil(N/cols);
+    for(let i=0;i<N;i++){
+      pos.push({
+        x:W*0.18+(i%cols)*(W*0.64/(cols-1))+(Math.random()-0.5)*22,
+        y:H*0.22+Math.floor(i/cols)*(H*0.56/(rows-1||1))+(Math.random()-0.5)*22
+      });
+    }
+  }else{
+    for(let i=0;i<N;i++){
+      const a=(i/N)*Math.PI*2+Math.random()*0.6, r=(0.12+Math.random()*0.22)*Math.min(W,H);
+      pos.push({x:cx+Math.cos(a)*r, y:cy+Math.sin(a)*r});
+    }
+  }
+  return pos;
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAW — GRID (3D wireframe perspective lines)
+// ═══════════════════════════════════════════════════════
+function drawGrid(){
+  ctxGrid.clearRect(0,0,W,H);
+  ctxGrid.fillStyle='#02020b'; ctxGrid.fillRect(0,0,W,H);
+  if(!profile) return;
+
+  // Perspective grid lines converging to center
+  const cx=W/2, cy=H/2;
+  ctxGrid.save();
+  ctxGrid.globalAlpha=0.06;
+  ctxGrid.strokeStyle='#c8a84c';
+  ctxGrid.lineWidth=0.5;
+
+  // Radial lines
+  for(let i=0;i<16;i++){
+    const a=(i/16)*Math.PI*2;
+    ctxGrid.beginPath();
+    ctxGrid.moveTo(cx,cy);
+    ctxGrid.lineTo(cx+Math.cos(a)*W, cy+Math.sin(a)*H);
+    ctxGrid.stroke();
+  }
+
+  // Concentric ellipses
+  for(let r=60;r<Math.max(W,H);r+=80){
+    ctxGrid.beginPath();
+    ctxGrid.ellipse(cx,cy,r,r*0.45,0,0,Math.PI*2);
+    ctxGrid.stroke();
+  }
+  ctxGrid.restore();
+
+  // Locomotion flow lines
+  ctxGrid.save(); ctxGrid.globalAlpha=0.04;
+  const [hr,hg,hb]=profile.haloColor;
+  ctxGrid.strokeStyle=`rgb(${hr},${hg},${hb})`;
+  ctxGrid.lineWidth=0.6;
+  const lines=profile.locomotion==='swimming'?10:4;
+  for(let i=0;i<lines;i++){
+    ctxGrid.beginPath();
+    const y0=H*(0.05+i*(0.9/lines));
+    ctxGrid.moveTo(0,y0);
+    for(let x=0;x<=W;x+=4){
+      const y=y0+Math.sin(x*0.006+t*0.3+i*0.8)*24+Math.sin(x*0.015+t*0.15)*8;
+      ctxGrid.lineTo(x,y);
+    }
+    ctxGrid.stroke();
+  }
+  ctxGrid.restore();
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAW — FIELD (L6 emergent)
+// ═══════════════════════════════════════════════════════
+function drawField(){
+  ctxF.clearRect(0,0,W,H);
+  if(!profile) return;
+  bubbles.forEach(b=>{
+    if(b.signal<0.45) return;
+    const [cr,cg,cb]=b.haloColor;
+    const gf=ctxF.createRadialGradient(b.x,b.y,0,b.x,b.y,70+b.signal*55);
+    gf.addColorStop(0,`rgba(${cr},${cg},${cb},0.07)`);
+    gf.addColorStop(1,'transparent');
+    ctxF.fillStyle=gf;
+    ctxF.beginPath(); ctxF.arc(b.x,b.y,70+b.signal*55,0,Math.PI*2); ctxF.fill();
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAW — MAIN
+// ═══════════════════════════════════════════════════════
+function drawMain(){
+  ctxM.clearRect(0,0,W,H);
+  if(!profile) return;
+
+  // Synaptic filaments
+  synapses.forEach(s=>{
+    const a=bubbles[s.a], b=bubbles[s.b];
+    const [cr,cg,cb]=a.color;
+    const alpha=0.04+s.weight*0.16;
+    ctxM.beginPath();
+    ctxM.moveTo(a.x,a.y);
+    ctxM.quadraticCurveTo(
+      (a.x+b.x)/2+Math.sin(t*0.5+s.a)*7,
+      (a.y+b.y)/2+Math.cos(t*0.4+s.b)*7,
+      b.x,b.y
+    );
+    if(s.flash>0){
+      ctxM.strokeStyle=`rgba(240,212,80,${s.flash})`;
+      ctxM.lineWidth=2; s.flash-=0.035;
+    }else{
+      ctxM.strokeStyle=`rgba(${cr},${cg},${cb},${alpha})`;
+      ctxM.lineWidth=s.weight*0.8;
+    }
+    ctxM.stroke();
+  });
+
+  // Pulses
+  pulses=pulses.filter(p=>p.t<1);
+  pulses.forEach(p=>{
+    const a=bubbles[p.a],b=bubbles[p.b];
+    const x=a.x+(b.x-a.x)*p.t, y=a.y+(b.y-a.y)*p.t;
+    const [cr,cg,cb]=a.color;
+    const pg=ctxM.createRadialGradient(x,y,0,x,y,7);
+    pg.addColorStop(0,`rgba(${cr},${cg},${cb},1)`);
+    pg.addColorStop(1,'transparent');
+    ctxM.fillStyle=pg;
+    ctxM.beginPath(); ctxM.arc(x,y,7,0,Math.PI*2); ctxM.fill();
+    const speed=0.018+(profile.dominantFreqHz*0.0007);
+    p.t+=speed;
+  });
+
+  // Motor paths
+  motorPaths.forEach((mp,mi)=>{
+    const pulse=0.15+mp.active*0.85;
+    ctxM.beginPath();
+    ctxM.moveTo(mp.bx,mp.by);
+    ctxM.quadraticCurveTo(
+      mp.bx+(mp.ex-mp.bx)*0.5+Math.sin(t*2.5+mp.phase)*10,
+      mp.by+(mp.ey-mp.by)*0.5+Math.cos(t*2+mp.phase)*10,
+      mp.ex,mp.ey
+    );
+    ctxM.strokeStyle=`rgba(255,85,34,${pulse*0.65})`; ctxM.lineWidth=1.5; ctxM.stroke();
+    ctxM.beginPath(); ctxM.arc(mp.ex,mp.ey,2.5+mp.active*2.5,0,Math.PI*2);
+    ctxM.fillStyle=`rgba(255,85,34,${pulse})`;
+    ctxM.fill();
+    if(mp.active>0) mp.active-=0.022;
+  });
+
+  // Bubbles
+  bubbles.forEach(b=>{
+    const act=0.3+0.7*b.signal;
+    const wAct=getWave(b);
+    const r=b.r+wAct*2.5;
+    const [cr,cg,cb]=b.color;
+    const [hr,hg,hb]=b.haloColor;
+
+    // Outer halo
+    const hR=r*(1.7+wAct*0.4);
+    const hg2=ctxM.createRadialGradient(b.x,b.y,r*0.15,b.x,b.y,hR);
+    hg2.addColorStop(0,`rgba(${hr},${hg},${hb},${act*0.38})`);
+    hg2.addColorStop(0.5,`rgba(${hr},${hg},${hb},${act*0.1})`);
+    hg2.addColorStop(1,'transparent');
+    ctxM.fillStyle=hg2;
+    ctxM.beginPath(); ctxM.arc(b.x,b.y,hR,0,Math.PI*2); ctxM.fill();
+
+    // Wave rings (neural oscillation)
+    const wR=r*(2.0+wAct*0.25);
+    ctxM.beginPath(); ctxM.arc(b.x,b.y,wR,0,Math.PI*2);
+    ctxM.strokeStyle=`rgba(${cr},${cg},${cb},${0.06+wAct*0.04})`;
+    ctxM.lineWidth=0.6; ctxM.stroke();
+
+    // Core gradient
+    const cg3=ctxM.createRadialGradient(b.x-r*0.2,b.y-r*0.25,0,b.x,b.y,r);
+    cg3.addColorStop(0,`rgba(${Math.min(255,cr+80)},${Math.min(255,cg+60)},${Math.min(255,cb+40)},${act})`);
+    cg3.addColorStop(0.65,`rgba(${cr},${cg},${cb},${act*0.8})`);
+    cg3.addColorStop(1,`rgba(${cr},${cg},${cb},${act*0.2})`);
+    ctxM.fillStyle=cg3;
+    ctxM.beginPath(); ctxM.arc(b.x,b.y,r,0,Math.PI*2); ctxM.fill();
+
+    // Ring
+    ctxM.beginPath(); ctxM.arc(b.x,b.y,r,0,Math.PI*2);
+    ctxM.strokeStyle=`rgba(${cr},${cg},${cb},${0.3+act*0.4})`; ctxM.lineWidth=0.7; ctxM.stroke();
+
+    // 3D wireframe highlight (top-left specular)
+    ctxM.beginPath(); ctxM.arc(b.x-r*0.28,b.y-r*0.28,r*0.22,0,Math.PI*2);
+    ctxM.fillStyle=`rgba(255,255,255,${act*0.08})`; ctxM.fill();
+
+    // Node type markers
+    if(b.isMotor){
+      ctxM.beginPath(); ctxM.arc(b.x,b.y,r+6,0,Math.PI*2);
+      ctxM.strokeStyle='rgba(255,85,34,0.3)'; ctxM.lineWidth=1;
+      ctxM.setLineDash([2,3]); ctxM.stroke(); ctxM.setLineDash([]);
+    }
+    if(b.isSensory){
+      ctxM.beginPath(); ctxM.arc(b.x,b.y,r+5+Math.sin(t*3+b.phase)*2,0,Math.PI*2);
+      ctxM.strokeStyle='rgba(46,240,216,0.25)'; ctxM.lineWidth=0.8; ctxM.stroke();
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DRAW — UI ANNOTATIONS (pipeline arrows, node labels)
+// ═══════════════════════════════════════════════════════
+function drawUI(){
+  ctxUI.clearRect(0,0,W,H);
+  if(!profile||bubbles.length===0) return;
+
+  // Active pipeline node annotation
+  const steps=profile.pipelineSteps||DEFAULT_PIPELINE;
+  const stepIdx=pipelineStep%steps.length;
+  const nodeIdx=Math.floor(stepIdx/steps.length*bubbles.length);
+  const activeB=bubbles[nodeIdx%bubbles.length];
+  if(!activeB) return;
+
+  // Crosshair on active node
+  const x=activeB.x, y=activeB.y, r=activeB.r+15;
+  ctxUI.strokeStyle='rgba(200,168,76,0.5)'; ctxUI.lineWidth=0.7;
+  ctxUI.beginPath(); ctxUI.moveTo(x-r,y); ctxUI.lineTo(x-r+8,y); ctxUI.stroke();
+  ctxUI.beginPath(); ctxUI.moveTo(x+r-8,y); ctxUI.lineTo(x+r,y); ctxUI.stroke();
+  ctxUI.beginPath(); ctxUI.moveTo(x,y-r); ctxUI.lineTo(x,y-r+8); ctxUI.stroke();
+  ctxUI.beginPath(); ctxUI.moveTo(x,y+r-8); ctxUI.lineTo(x,y+r); ctxUI.stroke();
+
+  // Label
+  const label=steps[stepIdx];
+  ctxUI.font=`300 ${10/DPR}px DM Mono,monospace`;
+  ctxUI.fillStyle='rgba(200,168,76,0.7)';
+  ctxUI.textAlign='left';
+  const lx=x+r+8, ly=y+4;
+  ctxUI.fillText(label.toUpperCase(), lx, ly);
+
+  // Line connecting
+  ctxUI.beginPath(); ctxUI.moveTo(x+r,y); ctxUI.lineTo(lx-2,y);
+  ctxUI.strokeStyle='rgba(200,168,76,0.25)'; ctxUI.lineWidth=0.5; ctxUI.stroke();
+}
+
+function getWave(b){
+  switch(b.wavePattern){
+    case 'burst': return Math.pow(Math.max(0,Math.sin(t*b.freq*3+b.phase)),2);
+    case 'ripple': return 0.5+0.5*Math.sin(t*b.freq*2+b.phase)*Math.sin(t*b.freq*0.3);
+    case 'pulse': return Math.pow(0.5+0.5*Math.sin(t*b.freq*4+b.phase),3);
+    case 'spiral': return 0.5+0.5*Math.sin(t*b.freq+b.phase+Math.atan2(b.y-H/2,b.x-W/2));
+    default: return 0.5+0.5*Math.sin(t*b.freq+b.phase);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// UPDATE SIM
+// ═══════════════════════════════════════════════════════
+let lastPulseT=0;
+function updateSim(){
+  if(!profile) return;
+
+  const p=profile;
+  bubbles.forEach((b,i)=>{
+    let dx=0,dy=0;
+    switch(b.movementStyle){
+      case 'undulating': dx=Math.cos(t*b.freq*0.5+b.phase)*0.4; dy=Math.sin(t*b.freq*0.3+i*0.2)*0.3; break;
+      case 'erratic': dx=(Math.random()-0.5)*0.7; dy=(Math.random()-0.5)*0.7; break;
+      case 'smooth': dx=Math.cos(t*0.18+b.phase)*0.15; dy=Math.sin(t*0.14+b.phase)*0.15; break;
+      case 'rhythmic': dx=Math.sin(t*b.freq*0.4+i*0.3)*0.3; dy=Math.cos(t*b.freq*0.3)*0.22; break;
+      case 'flocking':
+        let ax=0,ay=0,n=0;
+        bubbles.forEach(c=>{if(c===b)return;const d=Math.hypot(b.x-c.x,b.y-c.y);if(d<110){ax+=c.x-b.x;ay+=c.y-b.y;n++;}});
+        if(n>0){dx=(ax/n)*0.002;dy=(ay/n)*0.002;}
+        break;
+    }
+    b.vx=b.vx*0.96+dx*0.06; b.vy=b.vy*0.96+dy*0.06;
+    b.x+=b.vx; b.y+=b.vy;
+    const pad=50;
+    if(b.x<pad)b.vx+=0.04; if(b.x>W-pad)b.vx-=0.04;
+    if(b.y<pad)b.vy+=0.04; if(b.y>H-pad)b.vy-=0.04;
+    b.signal=0.2+0.8*(0.5+0.5*Math.sin(t*b.freq*1.3+b.phase));
+  });
+
+  motorPaths.forEach((mp,mi)=>{
+    const mb=bubbles.filter(b=>b.isMotor)[mi];
+    if(mb){mp.bx+=(mb.x-mp.bx)*0.05; mp.by+=(mb.y-mp.by)*0.05;}
+    if(Math.random()<0.014) mp.active=1;
+  });
+
+  // Pulse firing rate scaled to neural complexity
+  const pRate=Math.max(0.15, 0.5-profile.neuralComplexity*0.04);
+  if(t-lastPulseT>pRate&&synapses.length>0){
+    const s=synapses[Math.floor(Math.random()*synapses.length)];
+    pulses.push({a:s.a,b:s.b,t:0});
+    s.flash=0.8;
+    // LTP / LTD
+    if(Math.random()<profile.ltp){s.weight=Math.min(1,s.weight+0.04); ltpAccum++;}
+    else if(Math.random()<profile.ltd){s.weight=Math.max(0.05,s.weight-0.02); ltdAccum++;}
+    lastPulseT=t;
+  }
+
+  // Advance pipeline
+  pipelineT+=0.012;
+  if(pipelineT>0.9){
+    pipelineT=0;
+    pipelineStep++;
+    updatePipeline();
+  }
+}
+
+function updatePipeline(){
+  if(!profile) return;
+  const steps=profile.pipelineSteps||DEFAULT_PIPELINE;
+  const cur=pipelineStep%steps.length;
+  steps.forEach((_,i)=>{
+    const el=document.getElementById('ps'+i);
+    if(!el) return;
+    if(i<cur) el.className='pipe-step done';
+    else if(i===cur) el.className='pipe-step active';
+    else el.className='pipe-step';
+  });
+
+  // Update callout
+  document.getElementById('pc-step').textContent=steps[cur].substring(0,18).toUpperCase();
+  document.getElementById('pc-rate').textContent=(profile.dominantFreqHz+Math.round(Math.sin(t*0.5)*4)).toFixed(0)+' Hz';
+  document.getElementById('pc-coh').textContent=(75+Math.round(Math.sin(t*0.3)*15))+'%';
+}
+
+// ═══════════════════════════════════════════════════════
+// BOTTOM STRIP CHARTS
+// ═══════════════════════════════════════════════════════
+function updateBottom(){
+  if(!profile) return;
+
+  const gamma=0.5+0.5*Math.sin(t*profile.gammaHz*0.08)*(0.7+0.3*Math.pow(Math.abs(Math.sin(t*2.1)),2));
+  const theta=0.5+0.5*Math.sin(t*profile.thetaHz*0.08);
+  const avgSig=bubbles.reduce((s,b)=>s+b.signal,0)/(bubbles.length||1);
+  const avgWt=synapses.reduce((s,sy)=>s+sy.weight,0)/(synapses.length||1);
+  const field=Math.min(1,pulses.length/8);
+
+  document.getElementById('hm-coh').textContent=(avgSig*100).toFixed(0)+'%';
+  document.getElementById('pr-ltp').textContent=ltpAccum;
+  document.getElementById('pr-ltd').textContent=ltdAccum;
+  document.getElementById('pr-wt').textContent=(avgWt||0).toFixed(2);
+  document.getElementById('pr-pulses').textContent=pulses.length;
+
+  const vals=[gamma,theta,avgSig,avgWt||0,field];
+  const colors=['#c8a84c','#2ef0d8','#7744ee','#c8a84c','#ff2266'];
+  const fmts=[
+    v=>(v*profile.gammaHz).toFixed(0),
+    v=>(v*profile.thetaHz).toFixed(1),
+    v=>(v*100).toFixed(0),
+    v=>v.toFixed(2),
+    v=>(v*100).toFixed(0),
+  ];
+
+  vals.forEach((v,i)=>{
+    bwHist[i].push(v);
+    if(bwHist[i].length>BW_LEN) bwHist[i].shift();
+    const cv=document.getElementById('bc'+i);
+    if(!cv) return;
+    const ctx=cv.getContext('2d');
+    const W2=cv.offsetWidth||120,H2=cv.offsetHeight||34;
+    cv.width=W2*DPR; cv.height=H2*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,W2,H2);
+    ctx.beginPath();
+    bwHist[i].forEach((val,x)=>{
+      const px=(x/BW_LEN)*W2, py=H2-val*H2*0.8-H2*0.08;
+      x===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+    });
+    ctx.strokeStyle=colors[i]; ctx.lineWidth=1.2; ctx.stroke();
+    ctx.lineTo(W2,H2); ctx.lineTo(0,H2); ctx.closePath();
+    ctx.fillStyle=colors[i]+'15'; ctx.fill();
+    document.getElementById('bv'+i).textContent=fmts[i](v);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TOUR SYSTEM
+// ═══════════════════════════════════════════════════════
+const TOUR_STEPS = [
+  {
+    title:"AETHER Plasmoid Simulator",
+    body:"Welcome to the live neural simulation environment. This interface maps any animal's <em>biological neural architecture</em> directly into a plasmoid bubble network — a core AETHER framework visualization. Each simulation is generated by Claude in real time from actual neuroscience data. Use <strong>← → arrow keys</strong> or the buttons to navigate.",
+    target:'#hdr', placement:'bottom'
+  },
+  {
+    title:"The Search Bar",
+    body:"Type any animal name here. Claude queries its <em>biological neuroscience database</em> — neural complexity, locomotion type, brainwave frequencies, synaptic density — and builds the entire simulation from that profile. Try <strong>octopus</strong>, <strong>jellyfish</strong>, or <strong>mantis shrimp</strong> for dramatically different results.",
+    target:'#search-outer', placement:'bottom'
+  },
+  {
+    title:"The Plasmoid Network",
+    body:"Each <em>glowing bubble</em> is a plasmoid node. <strong>Gold nodes</strong> are motor output (phalanges / joints). <strong>Cyan nodes</strong> are sensory input. <strong>Violet nodes</strong> are interneurons. The <em>curved filaments</em> between them are synaptic connections — their thickness maps to synaptic weight. Watch them pulse as signals propagate.",
+    target:'#cv-main', placement:'center'
+  },
+  {
+    title:"Signal Propagation Loop",
+    body:"The bright <em>traveling dots</em> along filaments are action potentials — neural signals in motion. Firing rate scales with neural complexity: a jellyfish fires slowly (1–2 Hz), an octopus fires dense bursts (38 Hz). Each pulse triggers <strong>Hebbian LTP</strong> (filament thickens) or <strong>LTD</strong> (filament thins) — the network learns in real time.",
+    target:'#prop-callout', placement:'top'
+  },
+  {
+    title:"Wave Band Monitor",
+    body:"The <strong>γ gamma band</strong> drives motor commands — high-frequency bursts that initiate movement. <strong>θ theta</strong> encodes spatial memory and sequence learning. <strong>α alpha</strong> gates inhibitory pathways to suppress noise. Each animal has biologically calibrated values: a hummingbird's gamma is 70 Hz; a jellyfish barely reaches 2 Hz.",
+    target:'#panel-right', placement:'left'
+  },
+  {
+    title:"Signal Pipeline",
+    body:"Watch the <em>stepped pipeline</em> advance in real time — this is the cortex-to-body signal path unique to each animal. For an octopus: retinal input → optic lobe → central brain → arm ganglia → chromatophores. Each step lights up as the signal propagates through that stage. The pipeline is <strong>scientifically accurate</strong> to each species.",
+    target:'#pipeline-box', placement:'right'
+  },
+  {
+    title:"Bottom Telemetry Strip",
+    body:"Five live channels: <em>γ motor command frequency</em>, <em>θ memory trace</em>, <em>plasmoid coherence</em> (average signal synchrony), <em>synaptic plasticity</em> (average connection weight evolving over time), and <em>emergent field strength</em> (pulse density). All values recalibrate immediately when you switch animals.",
+    target:'#bottom', placement:'top'
+  },
+  {
+    title:"The AETHER Framework",
+    body:"This simulation is the digital embodiment layer of AETHER. The thesis: <strong>simulate first, then grow</strong>. Identify which synaptic topologies produce emergent behavior in silico. Those topologies become blueprints for guided in vitro neurogenesis — growing real synapses toward simulation-proven architectures. <em>Wave patterns in digital wiring become blueprints for biological wiring.</em>",
+    target:'#hdr', placement:'center'
+  }
+];
+
+let tourIdx=0;
+let tourActive=false;
+
+function startTour(){
+  tourIdx=0; tourActive=true;
+  document.getElementById('tour-overlay').classList.add('show');
+  renderTourStep();
+}
+function endTour(){
+  tourActive=false;
+  document.getElementById('tour-overlay').classList.remove('show');
+}
+function tourNext(){
+  if(tourIdx>=TOUR_STEPS.length-1){ endTour(); return; }
+  tourIdx++; renderTourStep();
+}
+function tourPrev(){
+  if(tourIdx<=0) return;
+  tourIdx--; renderTourStep();
+}
+
+function renderTourStep(){
+  const step=TOUR_STEPS[tourIdx];
+  document.getElementById('tc-step').textContent=`Step ${tourIdx+1} of ${TOUR_STEPS.length}`;
+  document.getElementById('tc-title').textContent=step.title;
+  document.getElementById('tc-body').innerHTML=step.body;
+  document.getElementById('tc-prog').textContent='●'.repeat(tourIdx+1)+'○'.repeat(TOUR_STEPS.length-tourIdx-1);
+  document.getElementById('tc-next-btn').textContent=tourIdx>=TOUR_STEPS.length-1?'Finish ✓':'Next →';
+
+  // Position spotlight + card
+  const target=document.querySelector(step.target);
+  const sp=document.getElementById('tour-spotlight');
+  const card=document.getElementById('tour-card');
+
+  if(!target||step.placement==='center'){
+    sp.style.cssText='opacity:0';
+    card.style.cssText='top:50%;left:50%;transform:translate(-50%,-50%)';
+    return;
+  }
+
+  const rect=target.getBoundingClientRect();
+  const pad=8;
+  sp.style.cssText=`left:${rect.left-pad}px;top:${rect.top-pad}px;width:${rect.width+pad*2}px;height:${rect.height+pad*2}px;opacity:1`;
+
+  // Position card
+  let top, left;
+  if(step.placement==='bottom'){
+    top=rect.bottom+16; left=Math.min(rect.left, window.innerWidth-340);
+  }else if(step.placement==='top'){
+    top=rect.top-16; left=Math.min(rect.left, window.innerWidth-340);
+    // adjust to show above
+    top-=200;
+  }else if(step.placement==='left'){
+    top=rect.top; left=rect.left-340;
+  }else if(step.placement==='right'){
+    top=rect.top; left=rect.right+16;
+  }
+  top=Math.max(10,Math.min(top,window.innerHeight-220));
+  left=Math.max(10,Math.min(left,window.innerWidth-340));
+  card.style.cssText=`top:${top}px;left:${left}px;transform:none`;
+}
+
+document.addEventListener('keydown',e=>{
+  if(!tourActive) return;
+  if(e.key==='ArrowRight'||e.key==='Enter') tourNext();
+  if(e.key==='ArrowLeft') tourPrev();
+  if(e.key==='Escape') endTour();
+});
+
+// ═══════════════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════════════
+let bgT=0;
+function loop(){
+  t+=0.011;
+  if(simActive) updateSim();
+  if(bgT++%5===0) drawGrid();
+  drawField(); drawMain(); drawUI();
+  updateBottom();
+  requestAnimationFrame(loop);
+}
+
+document.getElementById('animal-input').addEventListener('keydown',e=>{ if(e.key==='Enter') runSearch(); });
+window.addEventListener('resize',resize);
+resize();
+loop();
+</script>
+</body>
+</html>

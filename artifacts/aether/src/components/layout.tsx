@@ -192,6 +192,8 @@ const NAV_ITEMS = [
   { href: "/spin-transport",         label: "Spin Transport · Vacuum-State Computing · Zero Loss", icon: Atom },
   { href: "/warp-gravity",           label: "Warp Gravity · Alcubierre · 500D · Stacked Rings", icon: Atom },
   { href: "/observer-dimensions",    label: "Observer Dimensions · L8 Fusion · AETHER Field", icon: Atom },
+  { href: "/aether-cla",             label: "AETHER–CLA · Coherent Phase Lattice · Planetary Resonance", icon: Atom },
+  { href: "/guf-analysis",           label: "GUF Analysis · Collider v2 · Twisted Zipper · Compound-Eye", icon: Atom },
   { href: "/engines",               label: "Mastered Engines",            icon: Cpu },
   { href: "/galileo-newton",        label: "Galileo + Newton",            icon: Compass },
   { href: "/unified-field",         label: "Unified Field · Ψ·ΔG·e^iπ",   icon: Combine },
