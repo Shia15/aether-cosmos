@@ -205,6 +205,9 @@ import MotionLanguagePage from "@/pages/motion-language";
 import CarrierDimensionsPage from "@/pages/carrier-dimensions";
 import CoherenceDecoherencePage from "@/pages/coherence-decoherence";
 import EarthAtmospherePage from "@/pages/earth-atmosphere";
+import BohoBloomPage from "@/pages/boho-bloom";
+import ZoomTheZipperPage from "@/pages/zoom-the-zipper";
+import FlowNotebookPage from "@/pages/flow-notebook";
 import NeuralBrainSystemsPage from "@/pages/neural-brain-systems";
 import WavePoolSynthesisPage from "@/pages/wave-pool-synthesis";
 import SacredGeometryMathPage from "@/pages/sacred-geometry-math";
@@ -360,6 +363,9 @@ function Router() {
         <Route path="/cuca-gyroid" component={CucaGyroidPage} />
         <Route path="/aether-childrens-realm" component={AetherChildrensRealmPage} />
         <Route path="/computer-brains" component={ComputerBrainsPage} />
+        <Route path="/boho-bloom" component={BohoBloomPage} />
+        <Route path="/zoom-the-zipper" component={ZoomTheZipperPage} />
+        <Route path="/flow-notebook" component={FlowNotebookPage} />
         <Route path="/chaos-to-code" component={ChaosToCodingPage} />
         <Route path="/learning-layers" component={LearningLayersPage} />
         <Route path="/aether-seasons" component={AetherSeasonsPage} />

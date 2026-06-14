@@ -19,6 +19,7 @@ const BOOKS: Book[] = [
     gradient: "linear-gradient(135deg, #f9a8d4 0%, #fbcfe8 35%, #c084fc 100%)",
     glyph: "❀",
     accent: "#ec4899",
+    href: "/boho-bloom",
   },
   {
     id: "zoom-the-zipper",
@@ -27,6 +28,7 @@ const BOOKS: Book[] = [
     gradient: "linear-gradient(135deg, #fde68a 0%, #fb923c 50%, #ef4444 100%)",
     glyph: "⚡",
     accent: "#f97316",
+    href: "/zoom-the-zipper",
   },
   {
     id: "computer-brains",
@@ -53,6 +55,7 @@ const BOOKS: Book[] = [
     gradient: "linear-gradient(135deg, #a7f3d0 0%, #5eead4 45%, #38bdf8 100%)",
     glyph: "✿",
     accent: "#14b8a6",
+    href: "/flow-notebook",
   },
 ];
 
