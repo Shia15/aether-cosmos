@@ -205,6 +205,10 @@ import MotionLanguagePage from "@/pages/motion-language";
 import CarrierDimensionsPage from "@/pages/carrier-dimensions";
 import CoherenceDecoherencePage from "@/pages/coherence-decoherence";
 import EarthAtmospherePage from "@/pages/earth-atmosphere";
+import NeuralBrainSystemsPage from "@/pages/neural-brain-systems";
+import WavePoolSynthesisPage from "@/pages/wave-pool-synthesis";
+import SacredGeometryMathPage from "@/pages/sacred-geometry-math";
+import ResonantSystemsPage from "@/pages/resonant-systems";
 
 const queryClient = new QueryClient();
 
@@ -413,6 +417,10 @@ function Router() {
         <Route path="/carrier-dimensions" component={CarrierDimensionsPage} />
         <Route path="/coherence-decoherence" component={CoherenceDecoherencePage} />
         <Route path="/earth-atmosphere" component={EarthAtmospherePage} />
+        <Route path="/neural-brain-systems" component={NeuralBrainSystemsPage} />
+        <Route path="/wave-pool-synthesis" component={WavePoolSynthesisPage} />
+        <Route path="/sacred-geometry-math" component={SacredGeometryMathPage} />
+        <Route path="/resonant-systems" component={ResonantSystemsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

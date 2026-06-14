@@ -285,6 +285,10 @@ const NAV_ITEMS = [
   { href: "/carrier-dimensions",     label: "Carrier Dimensions · D9–D26 · AETHER Ring Memory · Scaling Warp", icon: Atom },
   { href: "/coherence-decoherence",  label: "Coherence & Decoherence · Healing · Fractal Light · Solar-Neural", icon: Atom },
   { href: "/earth-atmosphere",       label: "Earth & Atmosphere · Resonance · Climate Archives · Atmospheric Matrix", icon: Atom },
+  { href: "/neural-brain-systems",   label: "Neural Brain Systems · 8 Senses · NeuroHarmonics · Consciousness Extensions", icon: Atom },
+  { href: "/wave-pool-synthesis",    label: "Wave Pool Synthesis · CNT Generator · Navier-Stokes · AETHER CFG", icon: Atom },
+  { href: "/sacred-geometry-math",  label: "Sacred Geometry & Math · CUCA Equation · Integrals · Atomic Geometry", icon: Atom },
+  { href: "/resonant-systems",       label: "Resonant Systems · Quantum Substrate · Resonant Cell · Ancient Currents", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
