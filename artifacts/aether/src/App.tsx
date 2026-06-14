@@ -128,6 +128,7 @@ import EarlyUniversePage from "@/pages/early-universe";
 import PhononStackPage from "@/pages/phonon-stack";
 import CosmicRefinePage from "@/pages/cosmic-refine";
 import LiquidPrintPage from "@/pages/liquid-print";
+import PlateSwitchingPage from "@/pages/plate-switching";
 import AgentsPage from "@/pages/agents";
 import ModulesPage from "@/pages/modules";
 import MariCorePage from "@/pages/mari-core";
@@ -375,6 +376,7 @@ function Router() {
         <Route path="/phonon-stack" component={PhononStackPage} />
         <Route path="/cosmic-refine" component={CosmicRefinePage} />
         <Route path="/liquid-print" component={LiquidPrintPage} />
+        <Route path="/plate-switching" component={PlateSwitchingPage} />
         <Route path="/agents" component={AgentsPage} />
         <Route path="/modules" component={ModulesPage} />
         <Route path="/mari-core" component={MariCorePage} />

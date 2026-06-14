@@ -179,6 +179,7 @@ const NAV_ITEMS = [
   { href: "/phonon-stack",          label: "Phonon · 3D Stack",        icon: Thermometer },
   { href: "/cosmic-refine",         label: "Cosmic Refine · DM Halo",  icon: Aperture },
   { href: "/liquid-print",          label: "Liquid Print · Bio-Hybrid",  icon: Printer },
+  { href: "/plate-switching",       label: "Plate-Switching · Optical Hull · Compound-Eye · 7-Layer Stack", icon: Layers },
   { href: "/agents",                label: "Agents · Four Eggs",         icon: Egg },
   { href: "/modules",               label: "System Modules",             icon: LayoutGrid },
   { href: "/mari-core",             label: "M.A.R.I. Core · Pipeline",   icon: Cpu },
