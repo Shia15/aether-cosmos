@@ -193,6 +193,9 @@ import AllBusinessIdeasPage from "@/pages/all-business-ideas";
 import GufEnginePage from "@/pages/guf-engine";
 import PropulsionEnginePage from "@/pages/propulsion-engine";
 import StringNanobotPage from "@/pages/string-nanobot";
+import SpinTransportPage from "@/pages/spin-transport";
+import WarpGravityPage from "@/pages/warp-gravity";
+import ObserverDimensionsPage from "@/pages/observer-dimensions";
 
 const queryClient = new QueryClient();
 
@@ -389,6 +392,9 @@ function Router() {
         <Route path="/guf-engine" component={GufEnginePage} />
         <Route path="/propulsion-engine" component={PropulsionEnginePage} />
         <Route path="/string-nanobot" component={StringNanobotPage} />
+        <Route path="/spin-transport" component={SpinTransportPage} />
+        <Route path="/warp-gravity" component={WarpGravityPage} />
+        <Route path="/observer-dimensions" component={ObserverDimensionsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
