@@ -222,6 +222,7 @@ import GrandUnifiedFrameworkPage from "@/pages/grand-unified-framework";
 import WarpBubbleEnginePage from "@/pages/warp-bubble-engine";
 import WaterTransportPage from "@/pages/water-transport";
 import SolarArchitecturePage from "@/pages/solar-architecture";
+import SpacetimeNavPage from "@/pages/spacetime-nav";
 
 const queryClient = new QueryClient();
 
@@ -447,6 +448,7 @@ function Router() {
         <Route path="/warp-bubble-engine" component={WarpBubbleEnginePage} />
         <Route path="/water-transport" component={WaterTransportPage} />
         <Route path="/solar-architecture" component={SolarArchitecturePage} />
+        <Route path="/spacetime-nav" component={SpacetimeNavPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
