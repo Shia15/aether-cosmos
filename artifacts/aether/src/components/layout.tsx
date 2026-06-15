@@ -290,6 +290,7 @@ const NAV_ITEMS = [
   { href: "/sacred-geometry-math",  label: "Sacred Geometry & Math · CUCA Equation · Integrals · Atomic Geometry", icon: Atom },
   { href: "/resonant-systems",       label: "Resonant Systems · Quantum Substrate · Resonant Cell · Ancient Currents", icon: Atom },
   { href: "/symbol-sifter",          label: "Symbol Sifter · √ Growth vs √ · Mathematical Curve Engine", icon: Atom },
+  { href: "/cxe-equation",           label: "CXE · The Final Equation · Coherence Field · Ω_CXE", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
