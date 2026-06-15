@@ -226,6 +226,7 @@ import SpacetimeNavPage from "@/pages/spacetime-nav";
 import WaterDensityPage from "@/pages/water-density";
 import DialoguePage from "@/pages/dialogue";
 import NeuralCoherencePage from "@/pages/neural-coherence";
+import DarkSunPage from "@/pages/dark-sun";
 
 const queryClient = new QueryClient();
 
@@ -455,6 +456,7 @@ function Router() {
         <Route path="/water-density" component={WaterDensityPage} />
         <Route path="/dialogue" component={DialoguePage} />
         <Route path="/neural-coherence" component={NeuralCoherencePage} />
+        <Route path="/dark-sun" component={DarkSunPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

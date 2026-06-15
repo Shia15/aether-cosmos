@@ -303,6 +303,7 @@ const NAV_ITEMS = [
   { href: "/water-density",          label: "Water Density Dynamics · Gradient Field · Chladni · Emergent Spacetime · Quaternion Framework", icon: Atom },
   { href: "/dialogue",               label: "AETHER Dialogue · Strategic Synthesis Console · Trust-Amplifying Growth Exchange", icon: Atom },
   { href: "/neural-coherence",       label: "Neural Coherence · Cortisol HPA Axis · Glymphatic System · AETHER Inverse Signal Pipeline", icon: Atom },
+  { href: "/dark-sun",               label: "Dark Side of the Sun · Solar Cycles · Sunspots · Quantum Biology · Nano Motor · DNA Piano", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
