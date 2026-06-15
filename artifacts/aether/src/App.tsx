@@ -228,6 +228,7 @@ import DialoguePage from "@/pages/dialogue";
 import NeuralCoherencePage from "@/pages/neural-coherence";
 import DarkSunPage from "@/pages/dark-sun";
 import PhiCellularPage from "@/pages/phi-cellular";
+import WebbedLegPage from "@/pages/webbed-leg";
 
 const queryClient = new QueryClient();
 
@@ -459,6 +460,7 @@ function Router() {
         <Route path="/neural-coherence" component={NeuralCoherencePage} />
         <Route path="/dark-sun" component={DarkSunPage} />
         <Route path="/phi-cellular" component={PhiCellularPage} />
+        <Route path="/webbed-leg" component={WebbedLegPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
