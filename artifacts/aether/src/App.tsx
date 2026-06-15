@@ -230,6 +230,9 @@ import DarkSunPage from "@/pages/dark-sun";
 import PhiCellularPage from "@/pages/phi-cellular";
 import WebbedLegPage from "@/pages/webbed-leg";
 import CognitiveBandsPage from "@/pages/cognitive-bands";
+import PlasmaKnotsPage from "@/pages/plasma-knots";
+import BiomagnetismPage from "@/pages/biomagnetism";
+import SynthesizePage from "@/pages/synthesize";
 
 const queryClient = new QueryClient();
 
@@ -463,6 +466,9 @@ function Router() {
         <Route path="/phi-cellular" component={PhiCellularPage} />
         <Route path="/webbed-leg" component={WebbedLegPage} />
         <Route path="/cognitive-bands" component={CognitiveBandsPage} />
+        <Route path="/plasma-knots" component={PlasmaKnotsPage} />
+        <Route path="/biomagnetism" component={BiomagnetismPage} />
+        <Route path="/synthesize" component={SynthesizePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
