@@ -298,6 +298,7 @@ const NAV_ITEMS = [
   { href: "/grand-unified-framework", label: "Grand Unified Framework · 500D Stacked Rings · 8D Warp Drive · Φ-Coherence · PEEPT", icon: Atom },
   { href: "/warp-bubble-engine",     label: "Warp Bubble Engine · Twisted Zipper Drive · Φ-Modulated Warp Simulation", icon: Atom },
   { href: "/water-transport",        label: "Water Transport · Stone & Objects · Buoyancy · Acoustic · Ancient Megalith · ψ_water", icon: Atom },
+  { href: "/solar-architecture",     label: "Solar Architecture · Water-Resistant · Sun-Angled · Forward-Facing Structures", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
