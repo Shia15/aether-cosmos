@@ -214,6 +214,10 @@ import SacredGeometryMathPage from "@/pages/sacred-geometry-math";
 import ResonantSystemsPage from "@/pages/resonant-systems";
 import SymbolSifterPage from "@/pages/symbol-sifter";
 import CxeEquationPage from "@/pages/cxe-equation";
+import MagneticDropsPage from "@/pages/magnetic-drops";
+import FrogSimPaperPage from "@/pages/frog-sim-paper";
+import SpacetimeFabricPage from "@/pages/spacetime-fabric";
+import AetherVisualSystemPage from "@/pages/aether-visual-system";
 
 const queryClient = new QueryClient();
 
@@ -431,6 +435,10 @@ function Router() {
         <Route path="/resonant-systems" component={ResonantSystemsPage} />
         <Route path="/symbol-sifter" component={SymbolSifterPage} />
         <Route path="/cxe-equation" component={CxeEquationPage} />
+        <Route path="/magnetic-drops" component={MagneticDropsPage} />
+        <Route path="/frog-sim-paper" component={FrogSimPaperPage} />
+        <Route path="/spacetime-fabric" component={SpacetimeFabricPage} />
+        <Route path="/aether-visual-system" component={AetherVisualSystemPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

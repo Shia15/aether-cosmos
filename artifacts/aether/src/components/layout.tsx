@@ -291,6 +291,10 @@ const NAV_ITEMS = [
   { href: "/resonant-systems",       label: "Resonant Systems · Quantum Substrate · Resonant Cell · Ancient Currents", icon: Atom },
   { href: "/symbol-sifter",          label: "Symbol Sifter · √ Growth vs √ · Mathematical Curve Engine", icon: Atom },
   { href: "/cxe-equation",           label: "CXE · The Final Equation · Coherence Field · Ω_CXE", icon: Atom },
+  { href: "/magnetic-drops",         label: "Magnetic Drops · Ferrofluid · Oscillating Field Simulation", icon: Atom },
+  { href: "/frog-sim-paper",         label: "Frog Skin · Wood Frog Photonic Bio-Engine · Rana sylvatica", icon: Atom },
+  { href: "/spacetime-fabric",       label: "Spacetime Fabric · Layer 0 · All-Permeating Helical Medium", icon: Atom },
+  { href: "/aether-visual-system",   label: "AETHER Visual System · Chromatic State Engine · v0.2", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
