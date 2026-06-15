@@ -234,6 +234,7 @@ import PlasmaKnotsPage from "@/pages/plasma-knots";
 import BiomagnetismPage from "@/pages/biomagnetism";
 import SynthesizePage from "@/pages/synthesize";
 import GraphiteSynthesisPage from "@/pages/graphite-synthesis";
+import TimeProcessingPage from "@/pages/time-processing";
 
 const queryClient = new QueryClient();
 
@@ -471,6 +472,7 @@ function Router() {
         <Route path="/biomagnetism" component={BiomagnetismPage} />
         <Route path="/synthesize" component={SynthesizePage} />
         <Route path="/graphite-synthesis" component={GraphiteSynthesisPage} />
+        <Route path="/time-processing" component={TimeProcessingPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

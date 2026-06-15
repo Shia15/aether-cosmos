@@ -110,6 +110,7 @@ const NAV_ITEMS = [
   { href: "/biomagnetism",     label: "Biomagnetism · Heart Toroid · Magnetite Fe₃O₄ · Demagnetization · Non-Physical Patterns", icon: Atom },
   { href: "/synthesize",         label: "✦ Synthesize Pages · Cross-Page Knowledge Fusion · Emergent Insights · Concept Map", icon: Atom },
   { href: "/graphite-synthesis", label: "Gray Medium Substrate · Graphite · φ-Spiral Tweezers · Rydberg Entanglement · Phi-Flower", icon: Atom },
+  { href: "/time-processing",    label: "Time as Processing Delay · Lorentz Factor · Causal Bandwidth · Light Clock · AETHER C(x,t)", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
