@@ -233,6 +233,7 @@ import CognitiveBandsPage from "@/pages/cognitive-bands";
 import PlasmaKnotsPage from "@/pages/plasma-knots";
 import BiomagnetismPage from "@/pages/biomagnetism";
 import SynthesizePage from "@/pages/synthesize";
+import GraphiteSynthesisPage from "@/pages/graphite-synthesis";
 
 const queryClient = new QueryClient();
 
@@ -469,6 +470,7 @@ function Router() {
         <Route path="/plasma-knots" component={PlasmaKnotsPage} />
         <Route path="/biomagnetism" component={BiomagnetismPage} />
         <Route path="/synthesize" component={SynthesizePage} />
+        <Route path="/graphite-synthesis" component={GraphiteSynthesisPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
