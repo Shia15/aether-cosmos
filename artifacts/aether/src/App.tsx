@@ -229,6 +229,7 @@ import NeuralCoherencePage from "@/pages/neural-coherence";
 import DarkSunPage from "@/pages/dark-sun";
 import PhiCellularPage from "@/pages/phi-cellular";
 import WebbedLegPage from "@/pages/webbed-leg";
+import CognitiveBandsPage from "@/pages/cognitive-bands";
 
 const queryClient = new QueryClient();
 
@@ -461,6 +462,7 @@ function Router() {
         <Route path="/dark-sun" component={DarkSunPage} />
         <Route path="/phi-cellular" component={PhiCellularPage} />
         <Route path="/webbed-leg" component={WebbedLegPage} />
+        <Route path="/cognitive-bands" component={CognitiveBandsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

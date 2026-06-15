@@ -306,6 +306,7 @@ const NAV_ITEMS = [
   { href: "/dark-sun",               label: "Dark Side of the Sun · Solar Cycles · Sunspots · Quantum Biology · Nano Motor · DNA Piano", icon: Atom },
   { href: "/phi-cellular",           label: "φ-Cellular Architecture · Chaos→Order · Plasma · Load · Quantum Decoherence · Gyroid P3", icon: Atom },
   { href: "/webbed-leg",             label: "Webbed Leg Method · Touch the Ball · Full Perception Universe · 7-Layer Stack", icon: Atom },
+  { href: "/cognitive-bands",        label: "Cognitive Decoherence · 8 Bands → 16 · Sun as Antigen · Quasi-Affine Oscillation", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
