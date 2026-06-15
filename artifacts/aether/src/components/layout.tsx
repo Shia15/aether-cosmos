@@ -300,6 +300,7 @@ const NAV_ITEMS = [
   { href: "/water-transport",        label: "Water Transport · Stone & Objects · Buoyancy · Acoustic · Ancient Megalith · ψ_water", icon: Atom },
   { href: "/solar-architecture",     label: "Solar Architecture · Water-Resistant · Sun-Angled · Forward-Facing Structures", icon: Atom },
   { href: "/spacetime-nav",          label: "Spacetime Navigation Engine · AETHER Core UI · Dimensional Traversal", icon: Atom },
+  { href: "/water-density",          label: "Water Density Dynamics · Gradient Field · Chladni · Emergent Spacetime · Quaternion Framework", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

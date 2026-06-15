@@ -223,6 +223,7 @@ import WarpBubbleEnginePage from "@/pages/warp-bubble-engine";
 import WaterTransportPage from "@/pages/water-transport";
 import SolarArchitecturePage from "@/pages/solar-architecture";
 import SpacetimeNavPage from "@/pages/spacetime-nav";
+import WaterDensityPage from "@/pages/water-density";
 
 const queryClient = new QueryClient();
 
@@ -449,6 +450,7 @@ function Router() {
         <Route path="/water-transport" component={WaterTransportPage} />
         <Route path="/solar-architecture" component={SolarArchitecturePage} />
         <Route path="/spacetime-nav" component={SpacetimeNavPage} />
+        <Route path="/water-density" component={WaterDensityPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
