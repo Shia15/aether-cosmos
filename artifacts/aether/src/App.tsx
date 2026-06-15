@@ -220,6 +220,7 @@ import SpacetimeFabricPage from "@/pages/spacetime-fabric";
 import AetherVisualSystemPage from "@/pages/aether-visual-system";
 import GrandUnifiedFrameworkPage from "@/pages/grand-unified-framework";
 import WarpBubbleEnginePage from "@/pages/warp-bubble-engine";
+import WaterTransportPage from "@/pages/water-transport";
 
 const queryClient = new QueryClient();
 
@@ -443,6 +444,7 @@ function Router() {
         <Route path="/aether-visual-system" component={AetherVisualSystemPage} />
         <Route path="/grand-unified-framework" component={GrandUnifiedFrameworkPage} />
         <Route path="/warp-bubble-engine" component={WarpBubbleEnginePage} />
+        <Route path="/water-transport" component={WaterTransportPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
