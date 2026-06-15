@@ -10,6 +10,7 @@ import pipelineRouter from "./pipeline";
 import coreRouter from "./core";
 import importRouter from "./import";
 import aetherIntakeRouter from "./aether-intake";
+import dialogueRouter from "./dialogue";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(pipelineRouter);
 router.use(coreRouter);
 router.use(importRouter);
 router.use(aetherIntakeRouter);
+router.use(dialogueRouter);
 
 export default router;

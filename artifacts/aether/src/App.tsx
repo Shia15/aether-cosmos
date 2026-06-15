@@ -224,6 +224,7 @@ import WaterTransportPage from "@/pages/water-transport";
 import SolarArchitecturePage from "@/pages/solar-architecture";
 import SpacetimeNavPage from "@/pages/spacetime-nav";
 import WaterDensityPage from "@/pages/water-density";
+import DialoguePage from "@/pages/dialogue";
 
 const queryClient = new QueryClient();
 
@@ -451,6 +452,7 @@ function Router() {
         <Route path="/solar-architecture" component={SolarArchitecturePage} />
         <Route path="/spacetime-nav" component={SpacetimeNavPage} />
         <Route path="/water-density" component={WaterDensityPage} />
+        <Route path="/dialogue" component={DialoguePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
