@@ -302,6 +302,7 @@ const NAV_ITEMS = [
   { href: "/spacetime-nav",          label: "Spacetime Navigation Engine · AETHER Core UI · Dimensional Traversal", icon: Atom },
   { href: "/water-density",          label: "Water Density Dynamics · Gradient Field · Chladni · Emergent Spacetime · Quaternion Framework", icon: Atom },
   { href: "/dialogue",               label: "AETHER Dialogue · Strategic Synthesis Console · Trust-Amplifying Growth Exchange", icon: Atom },
+  { href: "/neural-coherence",       label: "Neural Coherence · Cortisol HPA Axis · Glymphatic System · AETHER Inverse Signal Pipeline", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
