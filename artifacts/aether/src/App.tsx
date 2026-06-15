@@ -218,6 +218,8 @@ import MagneticDropsPage from "@/pages/magnetic-drops";
 import FrogSimPaperPage from "@/pages/frog-sim-paper";
 import SpacetimeFabricPage from "@/pages/spacetime-fabric";
 import AetherVisualSystemPage from "@/pages/aether-visual-system";
+import GrandUnifiedFrameworkPage from "@/pages/grand-unified-framework";
+import WarpBubbleEnginePage from "@/pages/warp-bubble-engine";
 
 const queryClient = new QueryClient();
 
@@ -439,6 +441,8 @@ function Router() {
         <Route path="/frog-sim-paper" component={FrogSimPaperPage} />
         <Route path="/spacetime-fabric" component={SpacetimeFabricPage} />
         <Route path="/aether-visual-system" component={AetherVisualSystemPage} />
+        <Route path="/grand-unified-framework" component={GrandUnifiedFrameworkPage} />
+        <Route path="/warp-bubble-engine" component={WarpBubbleEnginePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

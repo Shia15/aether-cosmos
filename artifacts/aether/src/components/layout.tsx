@@ -295,6 +295,8 @@ const NAV_ITEMS = [
   { href: "/frog-sim-paper",         label: "Frog Skin · Wood Frog Photonic Bio-Engine · Rana sylvatica", icon: Atom },
   { href: "/spacetime-fabric",       label: "Spacetime Fabric · Layer 0 · All-Permeating Helical Medium", icon: Atom },
   { href: "/aether-visual-system",   label: "AETHER Visual System · Chromatic State Engine · v0.2", icon: Atom },
+  { href: "/grand-unified-framework", label: "Grand Unified Framework · 500D Stacked Rings · 8D Warp Drive · Φ-Coherence · PEEPT", icon: Atom },
+  { href: "/warp-bubble-engine",     label: "Warp Bubble Engine · Twisted Zipper Drive · Φ-Modulated Warp Simulation", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
