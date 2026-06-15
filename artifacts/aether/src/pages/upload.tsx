@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, FileText, Trash2, FolderOpen, X, Plus,
   Tag, ChevronDown, CheckCircle2, Loader2, AlertCircle, Sparkles,
-  Link2, Globe, Zap, Eye, BookOpen, ArrowLeft,
+  Link2, Globe, Zap, Eye, BookOpen, ArrowLeft, ExternalLink, Library,
 } from "lucide-react";
 import { extractPdfText, isPdfFile, isCodeFile, isTextFile, docTypFromFilename } from "@/lib/pdf-extract";
 
@@ -45,6 +45,170 @@ interface QueuedFile {
   tags: string[];
   autoFilled?: boolean;
 }
+
+// ─── Seed Papers ─────────────────────────────────────────────────────────────
+interface SeedPaper {
+  id: string;
+  title: string;
+  authors: string;
+  year: number;
+  venue: string;
+  url: string;
+  layer: Exclude<AetherLayer, "auto">;
+  theme: string;
+  abstract: string;
+}
+
+const SEED_PAPERS: SeedPaper[] = [
+  // MNĒSIS — input substrate, memory, raw signal
+  {
+    id: "world-models",
+    title: "World Models",
+    authors: "Ha, Schmidhuber",
+    year: 2018, venue: "arXiv · 1803.10122",
+    url: "https://arxiv.org/abs/1803.10122",
+    layer: "mnesis", theme: "memory",
+    abstract: "Can agents learn inside of their own dreams? A compressed generative world representation drives a controller.",
+  },
+  {
+    id: "scaling-laws",
+    title: "Scaling Laws for Neural Language Models",
+    authors: "Kaplan et al.",
+    year: 2020, venue: "arXiv · 2001.08361",
+    url: "https://arxiv.org/abs/2001.08361",
+    layer: "mnesis", theme: "substrate",
+    abstract: "Power-law relationships between model size, data volume, compute budget, and cross-entropy loss.",
+  },
+  {
+    id: "memory-networks",
+    title: "Memory Networks",
+    authors: "Weston, Chopra, Bordes",
+    year: 2014, venue: "arXiv · 1410.3916",
+    url: "https://arxiv.org/abs/1410.3916",
+    layer: "mnesis", theme: "recall",
+    abstract: "Long-term memory combined with inference components — an architecture for open QA tasks.",
+  },
+  {
+    id: "retrieval-augmented",
+    title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP",
+    authors: "Lewis et al.",
+    year: 2020, venue: "arXiv · 2005.11401",
+    url: "https://arxiv.org/abs/2005.11401",
+    layer: "mnesis", theme: "retrieval",
+    abstract: "RAG — parametric memory meets non-parametric retrieval from a dense vector store.",
+  },
+  // INFERNIA — compression, constraint, transformation
+  {
+    id: "attention",
+    title: "Attention Is All You Need",
+    authors: "Vaswani et al.",
+    year: 2017, venue: "NeurIPS",
+    url: "https://arxiv.org/abs/1706.03762",
+    layer: "infernia", theme: "architecture",
+    abstract: "The Transformer — pure self-attention, no convolution or recurrence, trained in parallel.",
+  },
+  {
+    id: "neural-ode",
+    title: "Neural Ordinary Differential Equations",
+    authors: "Chen, Rubanova, Bettencourt, Duvenaud",
+    year: 2018, venue: "NeurIPS",
+    url: "https://arxiv.org/abs/1806.07366",
+    layer: "infernia", theme: "dynamics",
+    abstract: "Hidden-state dynamics as a continuous ODE solved by black-box integrators — depth becomes a continuous variable.",
+  },
+  {
+    id: "shannon",
+    title: "A Mathematical Theory of Communication",
+    authors: "Shannon",
+    year: 1948, venue: "Bell System Technical Journal",
+    url: "https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf",
+    layer: "infernia", theme: "information",
+    abstract: "Entropy, channel capacity, and the fundamental limits of lossless data transmission.",
+  },
+  {
+    id: "diffusion-models",
+    title: "Denoising Diffusion Probabilistic Models",
+    authors: "Ho, Jain, Abbeel",
+    year: 2020, venue: "arXiv · 2006.11239",
+    url: "https://arxiv.org/abs/2006.11239",
+    layer: "infernia", theme: "compression",
+    abstract: "A diffusion Markov chain gradually adds noise; a learned reverse process reconstructs data.",
+  },
+  // ALETHEIA — truth, structure, knowledge graphs, emergence
+  {
+    id: "knowledge-graphs",
+    title: "Knowledge Graphs",
+    authors: "Hogan et al.",
+    year: 2021, venue: "ACM CSUR",
+    url: "https://arxiv.org/abs/2003.02320",
+    layer: "aletheia", theme: "graph",
+    abstract: "Comprehensive survey — knowledge graph creation, enrichment, quality assessment, and embedding.",
+  },
+  {
+    id: "self-org-criticality",
+    title: "Self-Organized Criticality",
+    authors: "Bak, Tang, Wiesenfeld",
+    year: 1987, venue: "Physical Review Letters",
+    url: "https://link.aps.org/doi/10.1103/PhysRevLett.59.381",
+    layer: "aletheia", theme: "emergence",
+    abstract: "Complex systems naturally evolve to a critical state where small perturbations trigger scale-free avalanches.",
+  },
+  {
+    id: "architecture-complexity",
+    title: "The Architecture of Complexity",
+    authors: "Simon",
+    year: 1962, venue: "Proc. American Philosophical Society",
+    url: "https://www.jstor.org/stable/985254",
+    layer: "aletheia", theme: "hierarchy",
+    abstract: "Complex systems are nearly-decomposable hierarchies — evolution and engineering converge on the same forms.",
+  },
+  {
+    id: "morphogenesis",
+    title: "The Chemical Basis of Morphogenesis",
+    authors: "Turing",
+    year: 1952, venue: "Philosophical Transactions B",
+    url: "https://royalsocietypublishing.org/doi/10.1098/rstb.1952.0012",
+    layer: "aletheia", theme: "pattern",
+    abstract: "Reaction-diffusion systems as the mathematical mechanism behind biological pattern formation.",
+  },
+  // REVERIE — output, synthesis, expression, consciousness
+  {
+    id: "gans",
+    title: "Generative Adversarial Networks",
+    authors: "Goodfellow et al.",
+    year: 2014, venue: "NeurIPS",
+    url: "https://arxiv.org/abs/1406.2661",
+    layer: "reverie", theme: "generation",
+    abstract: "Two networks in adversarial game: a generative model learns the data distribution by fooling a discriminator.",
+  },
+  {
+    id: "clip",
+    title: "Learning Transferable Visual Models From Natural Language Supervision",
+    authors: "Radford et al.",
+    year: 2021, venue: "ICML",
+    url: "https://arxiv.org/abs/2103.00020",
+    layer: "reverie", theme: "multimodal",
+    abstract: "CLIP — zero-shot visual recognition by training on 400M image-text pairs from the web.",
+  },
+  {
+    id: "consciousness-matter",
+    title: "Consciousness as a State of Matter",
+    authors: "Tegmark",
+    year: 2014, venue: "arXiv · 1401.1219",
+    url: "https://arxiv.org/abs/1401.1219",
+    layer: "reverie", theme: "consciousness",
+    abstract: "Perceptronium — conditions under which matter is conscious, framed in terms of integrated information.",
+  },
+  {
+    id: "iit",
+    title: "Consciousness as Integrated Information: A Provisional Manifesto",
+    authors: "Tononi",
+    year: 2004, venue: "BMC Neuroscience",
+    url: "https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42",
+    layer: "reverie", theme: "coherence",
+    abstract: "Φ (phi) — a measure of integrated information as the quantity of consciousness in a system.",
+  },
+];
 
 // ─── Content analyser ───────────────────────────────────────────────────────
 // Reads a document's text and infers layer, docType, source, and tags
@@ -151,6 +315,7 @@ export default function UploadPage() {
   const deleteDoc = useDeleteDocument();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const urlFormRef = useRef<HTMLDivElement>(null);
 
   // Manual text entry
   const [manualTitle, setManualTitle] = useState("");
@@ -343,6 +508,15 @@ export default function UploadPage() {
     setUrlTagInput("");
   };
 
+  const onImportPaper = (url: string) => {
+    setUrlInput(url);
+    setUrlResult(null);
+    setUrlError(null);
+    setTimeout(() => {
+      urlFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 80);
+  };
+
   const ingestQueue = async () => {
     const pending = queue.filter(f => f.status === "pending");
     for (const f of pending) {
@@ -462,7 +636,7 @@ export default function UploadPage() {
           </AnimatePresence>
 
           {/* ── URL / Link Import ── */}
-          <div className="rounded-xl border border-border/30 p-6 space-y-5">
+          <div ref={urlFormRef} className="rounded-xl border border-border/30 p-6 space-y-5">
             <div className="flex items-center gap-2">
               <Globe className="w-3.5 h-3.5 text-primary/60" />
               <div className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest flex-1">
@@ -719,6 +893,9 @@ export default function UploadPage() {
         </div>
       </div>
 
+      {/* ── Seed Papers ── */}
+      <SeedPapersPanel onImport={onImportPaper} />
+
       <div className="h-8" />
 
       {/* ── Document Viewer Overlay ── */}
@@ -945,6 +1122,143 @@ function QueueCard({ file, isExpanded, onToggle, onUpdate, onRemove, onAddTag, o
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Seed Papers Panel ──
+function SeedPapersPanel({ onImport }: { onImport: (url: string) => void }) {
+  const [activeLayer, setActiveLayer] = useState<Exclude<AetherLayer, "auto"> | "all">("all");
+
+  const tabs: { key: Exclude<AetherLayer, "auto"> | "all"; label: string; color: string }[] = [
+    { key: "all",      label: "All Papers",  color: "#64748b" },
+    { key: "mnesis",   label: "MNĒSIS",      color: LAYER_META.mnesis.color },
+    { key: "infernia", label: "INFERNIA",    color: LAYER_META.infernia.color },
+    { key: "aletheia", label: "ALETHEIA",    color: LAYER_META.aletheia.color },
+    { key: "reverie",  label: "REVERIE",     color: LAYER_META.reverie.color },
+  ];
+
+  const filtered = activeLayer === "all"
+    ? SEED_PAPERS
+    : SEED_PAPERS.filter(p => p.layer === activeLayer);
+
+  return (
+    <div className="rounded-xl border border-border/30 p-6 space-y-5">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Library className="w-3.5 h-3.5 text-primary/60" />
+        <div className="font-mono text-[10px] text-muted-foreground/50 uppercase tracking-widest flex-1">
+          Seed Papers · Physical Literature Links
+        </div>
+        <span className="font-mono text-[9px] px-2 py-0.5 rounded-full border border-primary/20 text-primary/50 bg-primary/5">
+          {SEED_PAPERS.length} papers
+        </span>
+      </div>
+
+      <p className="font-mono text-[10px] text-muted-foreground/40 leading-relaxed max-w-2xl">
+        Curated academic papers across AETHER themes. Click <span className="text-primary/60">Read</span> to open the source,
+        or <span className="text-primary/60">Import ↓</span> to pre-fill the URL importer above and crystallize it into the graph.
+      </p>
+
+      {/* Layer filter tabs */}
+      <div className="flex flex-wrap gap-1.5">
+        {tabs.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveLayer(tab.key)}
+            className="font-mono text-[9px] px-3 py-1 rounded border transition-all"
+            style={activeLayer === tab.key ? {
+              borderColor: `${tab.color}60`,
+              color: tab.color,
+              background: `${tab.color}12`,
+            } : {
+              borderColor: "rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.28)",
+            }}
+          >
+            {tab.label}
+            {tab.key !== "all" && (
+              <span className="ml-1.5 opacity-50">
+                {SEED_PAPERS.filter(p => p.layer === tab.key).length}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Papers grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {filtered.map(paper => {
+          const lm = LAYER_META[paper.layer];
+          return (
+            <motion.div
+              key={paper.id}
+              layout
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="group rounded-lg border border-border/20 hover:border-border/40 p-4 flex flex-col gap-3 transition-colors"
+            >
+              {/* Paper header */}
+              <div className="flex items-start gap-2.5">
+                <div
+                  className="w-7 h-7 rounded border shrink-0 flex items-center justify-center font-mono text-[10px] mt-0.5"
+                  style={{ borderColor: `${lm.color}40`, color: lm.color, background: `${lm.color}08` }}
+                >
+                  {lm.symbol}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-serif text-sm text-foreground/80 leading-snug line-clamp-2 mb-1">
+                    {paper.title}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                    <span className="font-mono text-[9px] text-muted-foreground/45">{paper.authors}</span>
+                    <span className="font-mono text-[9px] text-muted-foreground/25">·</span>
+                    <span className="font-mono text-[9px] text-muted-foreground/30">{paper.year}</span>
+                  </div>
+                  <div className="font-mono text-[8px] text-muted-foreground/25 truncate mt-0.5">
+                    {paper.venue}
+                  </div>
+                </div>
+              </div>
+
+              {/* Theme + abstract */}
+              <div className="space-y-1.5 flex-1">
+                <span
+                  className="inline-block font-mono text-[8px] px-1.5 py-0.5 rounded border"
+                  style={{ borderColor: `${lm.color}30`, color: `${lm.color}99` }}
+                >
+                  {paper.theme}
+                </span>
+                <p className="font-mono text-[10px] text-muted-foreground/40 leading-relaxed line-clamp-2">
+                  {paper.abstract}
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2 pt-1 mt-auto">
+                <a
+                  href={paper.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded border border-border/30 font-mono text-[10px] text-muted-foreground/50 hover:text-foreground hover:border-border/60 transition-all"
+                >
+                  <ExternalLink className="w-3 h-3" /> Read
+                </a>
+                <button
+                  onClick={() => onImport(paper.url)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded border font-mono text-[10px] transition-all"
+                  style={{ borderColor: `${lm.color}30`, color: lm.color }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = `${lm.color}10`; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = ""; }}
+                >
+                  <Zap className="w-3 h-3" /> Import ↓
+                </button>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 }
