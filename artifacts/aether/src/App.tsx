@@ -235,6 +235,7 @@ import BiomagnetismPage from "@/pages/biomagnetism";
 import SynthesizePage from "@/pages/synthesize";
 import GraphiteSynthesisPage from "@/pages/graphite-synthesis";
 import TimeProcessingPage from "@/pages/time-processing";
+import UAPEnergyPage from "@/pages/uap-energy";
 
 const queryClient = new QueryClient();
 
@@ -473,6 +474,7 @@ function Router() {
         <Route path="/synthesize" component={SynthesizePage} />
         <Route path="/graphite-synthesis" component={GraphiteSynthesisPage} />
         <Route path="/time-processing" component={TimeProcessingPage} />
+        <Route path="/uap-energy" component={UAPEnergyPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
