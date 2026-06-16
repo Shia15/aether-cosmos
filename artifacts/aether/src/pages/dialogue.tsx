@@ -13,6 +13,7 @@ const DIM     = "#3a5060";
 const TEXT    = "#c8d8e0";
 const GOLD    = "#c9a84c";
 const MUTED   = "#6a8898";
+const STONE   = "#b0a090";
 
 const mono  = "'Space Mono', monospace";
 const serif = "'Cinzel', serif";
@@ -22,9 +23,17 @@ const STORAGE_KEY = "aether.dialogue.v1";
 
 /* ── Types ────────────────────────────────────── */
 type Role = "user" | "assistant";
-interface Msg { id: string; role: Role; content: string; ts: number }
+interface Msg { id: string; role: Role; content: string; ts: number; isContext?: boolean }
 
-/* ── Strategic lenses (prompt starters) ──────── */
+interface ScanStats {
+  nodes: number;
+  edges: number;
+  concepts: number;
+  documents: number;
+  globalCoherence: number | null;
+}
+
+/* ── Strategic lenses ─────────────────────────── */
 const LENSES = [
   {
     group: "MOMENTUM",
@@ -62,7 +71,7 @@ const LENSES = [
     group: "SCALE",
     col: TEAL,
     prompts: [
-      "The Sea Milk Energy Camera exists as a concept. What is the shortest path from concept to first pilot?",
+      "I have 100+ live AETHER pages. What is the coherent product story connecting them all?",
       "Which AETHER idea has the widest addressable market and what is its first beachhead?",
     ],
   },
@@ -74,17 +83,21 @@ const LENSES = [
       "Where does my own vision for AETHER feel unclear to me? Help me crystallise it.",
     ],
   },
+  {
+    group: "DATA ANALYSIS",
+    col: STONE,
+    prompts: [
+      "Scan all data, then tell me what the knowledge graph reveals about AETHER's intellectual center of gravity.",
+      "Scan all data, then identify which concepts appear most and what domains are underrepresented.",
+    ],
+  },
 ];
 
 /* ── Utility ──────────────────────────────────── */
-function uid() {
-  return Math.random().toString(36).slice(2, 10);
-}
-
+function uid() { return Math.random().toString(36).slice(2, 10); }
 function timeStr(ts: number) {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
-
 function loadMessages(): Msg[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -103,10 +116,9 @@ function ThinkingDots() {
     const t = setInterval(() => setFrame(f => (f + 1) % 4), 400);
     return () => clearInterval(t);
   }, []);
-  const dots = ".".repeat(frame);
   return (
     <span style={{ fontFamily: mono, fontSize: 11, color: BLUE, letterSpacing: 2 }}>
-      CRYSTALLISING{dots}
+      CRYSTALLISING{"...".slice(0, frame)}
     </span>
   );
 }
@@ -114,28 +126,43 @@ function ThinkingDots() {
 /* ── Message bubble ───────────────────────────── */
 function Bubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === "user";
+  const isCtx  = msg.isContext;
+
+  if (isCtx) {
+    return (
+      <div style={{ marginBottom: 16 }}>
+        <div style={{
+          background: `${STONE}08`, border: `1px solid ${STONE}28`,
+          borderRadius: 6, padding: "10px 14px",
+        }}>
+          <div style={{ fontFamily: mono, fontSize: 8, color: STONE, marginBottom: 4 }}>
+            ◈ AETHER DATA SCAN INJECTED · {timeStr(msg.ts)}
+          </div>
+          <div style={{ fontFamily: mono, fontSize: 9, color: `${STONE}80`, lineHeight: 1.5,
+            maxHeight: 120, overflowY: "auto" }}>
+            {msg.content.slice(0, 400)}{msg.content.length > 400 ? "…" : ""}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
-      display: "flex",
-      flexDirection: "column",
+      display: "flex", flexDirection: "column",
       alignItems: isUser ? "flex-end" : "flex-start",
       marginBottom: 20,
     }}>
       <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 5,
+        display: "flex", alignItems: "center", gap: 8, marginBottom: 5,
         flexDirection: isUser ? "row-reverse" : "row",
       }}>
-        {/* avatar */}
         <div style={{
           width: 28, height: 28, borderRadius: "50%",
           background: isUser ? `${VIOLET}30` : `${BLUE}20`,
           border: `1px solid ${isUser ? VIOLET : BLUE}50`,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: mono, fontSize: 9, color: isUser ? VIOLET : BLUE,
-          flexShrink: 0,
+          fontFamily: mono, fontSize: 9, color: isUser ? VIOLET : BLUE, flexShrink: 0,
         }}>
           {isUser ? "SM" : "AE"}
         </div>
@@ -143,7 +170,6 @@ function Bubble({ msg }: { msg: Msg }) {
           {isUser ? "SHIA MILLER" : "AETHER DIALOGUE"} · {timeStr(msg.ts)}
         </span>
       </div>
-
       <div style={{
         maxWidth: "88%",
         background: isUser ? `${VIOLET}14` : `${BLUE}09`,
@@ -153,7 +179,6 @@ function Bubble({ msg }: { msg: Msg }) {
       }}>
         {msg.content.split("\n").map((line, i) => {
           if (!line.trim()) return <br key={i} />;
-          /* render bold (**text**) */
           const parts = line.split(/(\*\*[^*]+\*\*)/g);
           return (
             <p key={i} style={{
@@ -193,22 +218,73 @@ function LensPrompt({ text, col, onSend }: { text: string; col: string; onSend: 
   );
 }
 
+/* ── Data stats bar ───────────────────────────── */
+function StatsBar({ stats, scanning, onScan }:
+  { stats: ScanStats | null; scanning: boolean; onScan: () => void }) {
+  return (
+    <div style={{
+      display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
+      padding: "8px 14px",
+      background: `${STONE}06`, borderBottom: `1px solid ${STONE}15`,
+    }}>
+      <div style={{ fontFamily: mono, fontSize: 8, color: STONE, letterSpacing: 2 }}>AETHER DATA</div>
+      {stats ? (
+        <>
+          {[
+            { label: "PAGES", val: "100+" },
+            { label: "NODES",  val: String(stats.nodes) },
+            { label: "EDGES",  val: String(stats.edges) },
+            { label: "CONCEPTS", val: String(stats.concepts) },
+            { label: "DOCS",   val: String(stats.documents) },
+            { label: "C(x,t)", val: stats.globalCoherence != null ? stats.globalCoherence.toFixed(3) : "—" },
+          ].map(s => (
+            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ fontFamily: mono, fontSize: 7, color: DIM }}>{s.label}</span>
+              <span style={{ fontFamily: mono, fontSize: 9, color: TEAL }}>{s.val}</span>
+            </div>
+          ))}
+        </>
+      ) : (
+        <span style={{ fontFamily: mono, fontSize: 8, color: DIM }}>
+          Knowledge graph + concepts + documents available
+        </span>
+      )}
+      <div style={{ flex: 1 }} />
+      <button
+        onClick={onScan}
+        disabled={scanning}
+        style={{
+          fontFamily: mono, fontSize: 8, padding: "4px 12px", borderRadius: 4, cursor: "pointer",
+          border: `1px solid ${scanning ? DIM + "40" : STONE + "60"}`,
+          background: scanning ? "transparent" : `${STONE}10`,
+          color: scanning ? DIM : STONE,
+          display: "flex", alignItems: "center", gap: 6,
+        }}
+      >
+        {scanning ? "SCANNING…" : "◈ SCAN ALL DATA"}
+      </button>
+    </div>
+  );
+}
+
 /* ── Main page ────────────────────────────────── */
 export default function DialoguePage() {
-  const [messages, setMessages] = useState<Msg[]>(() => loadMessages());
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [messages, setMessages]   = useState<Msg[]>(() => loadMessages());
+  const [input,    setInput]      = useState("");
+  const [loading,  setLoading]    = useState(false);
+  const [error,    setError]      = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const [scanning, setScanning]   = useState(false);
+  const [scanStats, setScanStats] = useState<ScanStats | null>(null);
+  const bottomRef   = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { saveMessages(messages); }, [messages]);
-
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  /* ── Send a message to Claude ─── */
   const sendMessage = useCallback(async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
@@ -221,7 +297,11 @@ export default function DialoguePage() {
     setLoading(true);
 
     try {
-      const payload = next.map(m => ({ role: m.role, content: m.content }));
+      // Only send non-context messages to Claude
+      const payload = next
+        .filter(m => !m.isContext)
+        .map(m => ({ role: m.role, content: m.content }));
+
       const res = await fetch("/api/dialogue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -232,8 +312,7 @@ export default function DialoguePage() {
         throw new Error(d.error ?? `HTTP ${res.status}`);
       }
       const d = await res.json() as { reply: string };
-      const aetherMsg: Msg = { id: uid(), role: "assistant", content: d.reply, ts: Date.now() };
-      setMessages(prev => [...prev, aetherMsg]);
+      setMessages(prev => [...prev, { id: uid(), role: "assistant", content: d.reply, ts: Date.now() }]);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
@@ -242,10 +321,69 @@ export default function DialoguePage() {
     }
   }, [messages, loading]);
 
+  /* ── Scan all AETHER data and inject as context ─── */
+  const handleScan = useCallback(async () => {
+    if (scanning) return;
+    setScanning(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/dialogue/scan");
+      if (!res.ok) throw new Error(`Scan failed: HTTP ${res.status}`);
+      const d = await res.json() as { scanText: string; stats: ScanStats };
+      setScanStats(d.stats);
+
+      // Inject context block as a visible "context" message, then send to Claude
+      const ctxMsg: Msg = {
+        id: uid(), role: "user",
+        content: d.scanText,
+        ts: Date.now(),
+        isContext: true,
+      };
+      const next = [...messages, ctxMsg];
+      setMessages(next);
+      setLoading(true);
+
+      const payload = next
+        .filter(m => !m.isContext)
+        .concat({ id: uid(), role: "user", content: d.scanText, ts: Date.now() })
+        .map(m => ({ role: m.role, content: m.content }));
+
+      const apiRes = await fetch("/api/dialogue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: payload }),
+      });
+      if (!apiRes.ok) {
+        const err = await apiRes.json().catch(() => ({})) as { error?: string };
+        throw new Error(err.error ?? `HTTP ${apiRes.status}`);
+      }
+      const reply = await apiRes.json() as { reply: string };
+      setMessages(prev => [...prev, { id: uid(), role: "assistant", content: reply.reply, ts: Date.now() }]);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Scan error");
+    } finally {
+      setScanning(false);
+      setLoading(false);
+      setTimeout(() => textareaRef.current?.focus(), 50);
+    }
+  }, [scanning, messages]);
+
+  /* ── Smart send: if message starts with "scan all data" prefix, auto-scan first ─── */
+  const handleSend = useCallback(async (text: string) => {
+    const lower = text.toLowerCase();
+    if (lower.startsWith("scan all data")) {
+      // Append the user's question after injecting the scan
+      setInput("");
+      await handleScan();
+    } else {
+      await sendMessage(text);
+    }
+  }, [handleScan, sendMessage]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      sendMessage(input);
+      handleSend(input);
     }
   };
 
@@ -253,6 +391,7 @@ export default function DialoguePage() {
     if (window.confirm("Clear all dialogue history?")) {
       setMessages([]);
       localStorage.removeItem(STORAGE_KEY);
+      setScanStats(null);
     }
   };
 
@@ -267,7 +406,7 @@ export default function DialoguePage() {
 
       {/* ── Header ── */}
       <div style={{
-        padding: "18px 22px 14px",
+        padding: "16px 22px 12px",
         background: `linear-gradient(180deg,#030b14 0%,${BG} 100%)`,
         borderBottom: `1px solid ${BLUE}18`,
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -275,20 +414,20 @@ export default function DialoguePage() {
       }}>
         <div>
           <div style={{ fontFamily: mono, fontSize: 9, color: BLUE, letterSpacing: 4, marginBottom: 4 }}>
-            AETHER · STRATEGIC SYNTHESIS ENGINE
+            AETHER · STRATEGIC SYNTHESIS ENGINE · 100+ PAGES
           </div>
           <h1 style={{
-            fontFamily: serif, fontSize: "clamp(18px,3vw,28px)",
+            fontFamily: serif, fontSize: "clamp(18px,3vw,26px)",
             color: "#fff", margin: 0, letterSpacing: 2,
           }}>
             DIALOGUE <span style={{ color: TEAL }}>CONSOLE</span>
           </h1>
           <div style={{ fontFamily: body, fontSize: 13, color: DIM, marginTop: 3 }}>
-            Where insight meets action · Trust-amplifying strategic exchange
+            Strategic synthesis · Full AETHER knowledge · Live data scan
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           {/* coherence indicator */}
           <div style={{
             display: "flex", alignItems: "center", gap: 6,
@@ -298,46 +437,48 @@ export default function DialoguePage() {
             <div style={{
               width: 6, height: 6, borderRadius: "50%", background: GREEN,
               boxShadow: `0 0 6px ${GREEN}`,
-              animation: "pulse 2s infinite",
             }} />
             <span style={{ fontFamily: mono, fontSize: 9, color: GREEN }}>COHERENT</span>
           </div>
 
-          <button
-            onClick={() => setSidebarOpen(o => !o)}
-            style={{
-              fontFamily: mono, fontSize: 9, padding: "5px 12px", borderRadius: 4,
-              border: `1px solid ${DIM}40`, background: "transparent", color: DIM,
-              cursor: "pointer",
-            }}
-          >{sidebarOpen ? "HIDE LENSES" : "SHOW LENSES"}</button>
+          {scanStats && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 6,
+              background: `${STONE}12`, border: `1px solid ${STONE}30`,
+              borderRadius: 20, padding: "4px 12px",
+            }}>
+              <span style={{ fontFamily: mono, fontSize: 9, color: STONE }}>
+                ◈ DATA LOADED · {scanStats.nodes}N · {scanStats.concepts}C · {scanStats.documents}D
+              </span>
+            </div>
+          )}
+
+          <button onClick={() => setSidebarOpen(o => !o)} style={{
+            fontFamily: mono, fontSize: 9, padding: "5px 12px", borderRadius: 4,
+            border: `1px solid ${DIM}40`, background: "transparent", color: DIM, cursor: "pointer",
+          }}>{sidebarOpen ? "HIDE LENSES" : "SHOW LENSES"}</button>
 
           {messages.length > 0 && (
-            <button
-              onClick={clearHistory}
-              style={{
-                fontFamily: mono, fontSize: 9, padding: "5px 12px", borderRadius: 4,
-                border: `1px solid ${ROSE}40`, background: "transparent", color: ROSE,
-                cursor: "pointer",
-              }}
-            >CLEAR</button>
+            <button onClick={clearHistory} style={{
+              fontFamily: mono, fontSize: 9, padding: "5px 12px", borderRadius: 4,
+              border: `1px solid ${ROSE}40`, background: "transparent", color: ROSE, cursor: "pointer",
+            }}>CLEAR</button>
           )}
         </div>
       </div>
 
+      {/* ── Stats / Scan bar ── */}
+      <StatsBar stats={scanStats} scanning={scanning} onScan={handleScan} />
+
       {/* ── Body ── */}
-      <div style={{
-        flex: 1, display: "flex", overflow: "hidden", minHeight: 0,
-      }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", minHeight: 0 }}>
 
         {/* ── Sidebar ── */}
         {sidebarOpen && (
           <div style={{
             width: 280, flexShrink: 0,
-            background: PANEL,
-            borderRight: `1px solid ${BLUE}12`,
-            overflowY: "auto",
-            padding: "16px 12px",
+            background: PANEL, borderRight: `1px solid ${BLUE}12`,
+            overflowY: "auto", padding: "16px 12px",
           }}>
             <div style={{ fontFamily: mono, fontSize: 9, color: DIM, letterSpacing: 3, marginBottom: 14 }}>
               STRATEGIC LENSES
@@ -350,20 +491,52 @@ export default function DialoguePage() {
                   letterSpacing: 2, marginBottom: 8,
                   display: "flex", alignItems: "center", gap: 6,
                 }}>
-                  <div style={{
-                    width: 5, height: 5, borderRadius: "50%", background: lens.col,
-                  }} />
+                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: lens.col }} />
                   {lens.group}
                 </div>
                 {lens.prompts.map((p, i) => (
-                  <LensPrompt key={i} text={p} col={lens.col} onSend={t => sendMessage(t)} />
+                  <LensPrompt key={i} text={p} col={lens.col} onSend={t => handleSend(t)} />
                 ))}
               </div>
             ))}
 
-            {/* principles */}
+            {/* Page count reference */}
             <div style={{
               marginTop: 8, padding: "12px", borderRadius: 8,
+              background: `${STONE}07`, border: `1px solid ${STONE}18`,
+              marginBottom: 12,
+            }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: STONE, marginBottom: 8 }}>
+                AETHER PAGE INDEX
+              </div>
+              {[
+                { cat: "Physics & Math",     n: 15 },
+                { cat: "Field Theory",       n: 11 },
+                { cat: "Biology & Body",     n: 10 },
+                { cat: "Earth & Substrate",  n: 9 },
+                { cat: "Food & Nutrition",   n: 3 },
+                { cat: "Phase & Coupling",   n: 6 },
+                { cat: "Cosmology & History",n: 10 },
+                { cat: "Creative & Cultural",n: 5 },
+                { cat: "Education",          n: 4 },
+                { cat: "Simulation Labs",    n: 8 },
+                { cat: "Knowledge System",   n: 8 },
+              ].map(c => (
+                <div key={c.cat} style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                  <span style={{ fontFamily: body, fontSize: 11, color: MUTED }}>{c.cat}</span>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: TEAL }}>{c.n}</span>
+                </div>
+              ))}
+              <div style={{ borderTop: `1px solid ${STONE}20`, marginTop: 6, paddingTop: 6,
+                display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontFamily: mono, fontSize: 9, color: STONE }}>TOTAL</span>
+                <span style={{ fontFamily: mono, fontSize: 9, color: GREEN }}>100+</span>
+              </div>
+            </div>
+
+            {/* principles */}
+            <div style={{
+              marginTop: 0, padding: "12px", borderRadius: 8,
               background: `${BLUE}07`, border: `1px solid ${BLUE}18`,
             }}>
               <div style={{ fontFamily: mono, fontSize: 9, color: BLUE, marginBottom: 8 }}>
@@ -376,10 +549,7 @@ export default function DialoguePage() {
                 "Action over analysis",
                 "Compounding over linear",
               ].map((p, i) => (
-                <div key={i} style={{
-                  fontFamily: body, fontSize: 12, color: MUTED,
-                  lineHeight: 1.7, display: "flex", gap: 6,
-                }}>
+                <div key={i} style={{ fontFamily: body, fontSize: 12, color: MUTED, lineHeight: 1.7, display: "flex", gap: 6 }}>
                   <span style={{ color: BLUE, flexShrink: 0 }}>→</span>
                   <span>{p}</span>
                 </div>
@@ -389,14 +559,10 @@ export default function DialoguePage() {
         )}
 
         {/* ── Main chat area ── */}
-        <div style={{
-          flex: 1, display: "flex", flexDirection: "column",
-          overflow: "hidden", minWidth: 0,
-        }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", minWidth: 0 }}>
           {/* messages scroll area */}
-          <div style={{
-            flex: 1, overflowY: "auto", padding: "24px 28px 8px",
-          }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px 8px" }}>
+
             {/* empty state */}
             {isEmpty && (
               <div style={{
@@ -404,54 +570,52 @@ export default function DialoguePage() {
                 justifyContent: "center", height: "100%", textAlign: "center",
                 padding: "40px 20px",
               }}>
-                {/* AETHER sigil */}
                 <div style={{
                   width: 72, height: 72, borderRadius: "50%",
                   border: `1px solid ${BLUE}40`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  marginBottom: 20, position: "relative",
+                  marginBottom: 20,
                 }}>
                   <div style={{
                     width: 48, height: 48, borderRadius: "50%",
                     border: `1px solid ${TEAL}50`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                   }}>
-                    <div style={{
-                      fontFamily: serif, fontSize: 18, color: BLUE, letterSpacing: 1,
-                    }}>Æ</div>
+                    <div style={{ fontFamily: serif, fontSize: 18, color: BLUE, letterSpacing: 1 }}>Æ</div>
                   </div>
                 </div>
 
-                <h2 style={{
-                  fontFamily: serif, fontSize: 20, color: "#fff",
-                  margin: "0 0 10px", letterSpacing: 2,
-                }}>AETHER DIALOGUE</h2>
+                <h2 style={{ fontFamily: serif, fontSize: 20, color: "#fff", margin: "0 0 10px", letterSpacing: 2 }}>
+                  AETHER DIALOGUE
+                </h2>
                 <p style={{
                   fontFamily: body, fontSize: 15, color: DIM,
-                  maxWidth: 480, lineHeight: 1.75, marginBottom: 28,
+                  maxWidth: 520, lineHeight: 1.75, marginBottom: 10,
                 }}>
-                  A strategic synthesis space. Ask directly, think openly.
-                  AETHER knows every module, every framework, every tension.
-                  This is where idea meets reality, vision meets execution.
+                  A strategic synthesis space backed by the complete AETHER knowledge base —
+                  100+ pages, live graph data, and full document context.
+                  Ask anything. Or hit <span style={{ color: STONE, fontFamily: mono, fontSize: 12 }}>◈ SCAN ALL DATA</span> above
+                  to inject live graph + concepts + documents before asking.
                 </p>
 
                 <div style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                  gap: 10, maxWidth: 560, width: "100%",
+                  gap: 10, maxWidth: 620, width: "100%", marginTop: 18,
                 }}>
                   {[
-                    { q: "What has the most momentum right now?",  col: GREEN  },
-                    { q: "What would you stop or restructure?",    col: ROSE   },
-                    { q: "What synergy am I not seeing yet?",      col: VIOLET },
-                    { q: "Give me 3 actions for this week.",        col: AMBER  },
+                    { q: "What has the most momentum right now?",          col: GREEN  },
+                    { q: "What would you stop or restructure?",             col: ROSE   },
+                    { q: "What synergy am I not seeing yet?",               col: VIOLET },
+                    { q: "Give me 3 actions for this week.",                col: AMBER  },
+                    { q: "Scan all data, then tell me what the graph shows.", col: STONE  },
+                    { q: "Which 4 simulations are still to build and why?", col: TEAL   },
                   ].map((s, i) => (
-                    <button key={i} onClick={() => sendMessage(s.q)} style={{
+                    <button key={i} onClick={() => handleSend(s.q)} style={{
                       textAlign: "left", cursor: "pointer",
                       background: `${s.col}09`, border: `1px solid ${s.col}30`,
                       borderRadius: 8, padding: "10px 13px",
-                      fontFamily: body, fontSize: 13, color: TEXT,
-                      lineHeight: 1.55,
+                      fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.55,
                     }}>{s.q}</button>
                   ))}
                 </div>
@@ -462,27 +626,29 @@ export default function DialoguePage() {
             {messages.map(m => <Bubble key={m.id} msg={m} />)}
 
             {/* thinking indicator */}
-            {loading && (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "flex-start",
-                marginBottom: 20,
-              }}>
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 8, marginBottom: 5,
-                }}>
+            {(loading || scanning) && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginBottom: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: "50%",
                     background: `${BLUE}20`, border: `1px solid ${BLUE}50`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontFamily: mono, fontSize: 9, color: BLUE,
                   }}>AE</div>
-                  <span style={{ fontFamily: mono, fontSize: 9, color: DIM }}>AETHER DIALOGUE</span>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: DIM }}>
+                    {scanning ? "SCANNING ALL AETHER DATA" : "AETHER DIALOGUE"}
+                  </span>
                 </div>
                 <div style={{
                   background: `${BLUE}09`, border: `1px solid ${BLUE}28`,
                   borderRadius: "2px 12px 12px 12px", padding: "12px 16px",
                 }}>
                   <ThinkingDots />
+                  {scanning && (
+                    <div style={{ fontFamily: mono, fontSize: 8, color: DIM, marginTop: 4 }}>
+                      Fetching graph nodes · concepts · documents…
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -512,18 +678,15 @@ export default function DialoguePage() {
               display: "flex", gap: 10, alignItems: "flex-end",
               background: "#040e18", border: `1px solid ${BLUE}25`,
               borderRadius: 10, padding: "10px 14px",
-              transition: "border-color 0.2s",
-            }}
-              onFocus={() => {}}
-            >
+            }}>
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask anything — strategy, feedback, synthesis, what's working, what isn't..."
+                placeholder='Ask anything — or type "scan all data, then…" to inject live graph data first'
                 rows={2}
-                disabled={loading}
+                disabled={loading || scanning}
                 style={{
                   flex: 1, background: "transparent", border: "none", outline: "none",
                   fontFamily: body, fontSize: 15, color: TEXT, resize: "none",
@@ -531,15 +694,15 @@ export default function DialoguePage() {
                 }}
               />
               <button
-                onClick={() => sendMessage(input)}
-                disabled={!input.trim() || loading}
+                onClick={() => handleSend(input)}
+                disabled={!input.trim() || loading || scanning}
                 style={{
                   flexShrink: 0, alignSelf: "flex-end",
-                  background: (!input.trim() || loading) ? "transparent" : `${BLUE}20`,
-                  border: `1px solid ${(!input.trim() || loading) ? DIM + "30" : BLUE + "60"}`,
+                  background: (!input.trim() || loading || scanning) ? "transparent" : `${BLUE}20`,
+                  border: `1px solid ${(!input.trim() || loading || scanning) ? DIM + "30" : BLUE + "60"}`,
                   borderRadius: 7, padding: "8px 16px", cursor: "pointer",
                   fontFamily: mono, fontSize: 10,
-                  color: (!input.trim() || loading) ? DIM : BLUE,
+                  color: (!input.trim() || loading || scanning) ? DIM : BLUE,
                   transition: "all 0.15s",
                 }}
               >SEND ↵</button>
@@ -548,17 +711,13 @@ export default function DialoguePage() {
               fontFamily: mono, fontSize: 9, color: DIM + "80",
               marginTop: 6, textAlign: "center",
             }}>
-              ENTER to send · SHIFT+ENTER for new line · conversation saved locally
+              ENTER to send · SHIFT+ENTER for newline · ◈ SCAN ALL DATA to inject live graph context
             </div>
           </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
         textarea::placeholder { color: ${DIM}; }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
