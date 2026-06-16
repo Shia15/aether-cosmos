@@ -111,7 +111,7 @@ const EQUATIONS: Eq[] = [
   {
     id:"clcs-loop", cat:"AETHER Coherence", label:"CLCS Control Law",
     desc:"The closed-loop control that keeps AETHER nodes aligned. Not forcing — gently guiding. Natural flow plus coherence correction.",
-    tex:`${O("\\dot{\\mathbf{x}}")} = ${V("\\mathbf{v}(\\mathbf{x})")} + ${Vv("\\mathbf{u}_{input}")} + ${Coh("\\mathbf{u}_{control}}")} \\quad \\text{where} \\quad ${Coh("\\mathbf{u}")} = ${φ("K")}\\,${Vv("\\mathbf{E}(t)")}`,
+    tex:`${O("\\dot{\\mathbf{x}}")} = ${V("\\mathbf{v}(\\mathbf{x})")} + ${Vv("\\mathbf{u}_{\\mathrm{input}}")} + ${Coh("\\mathbf{u}_{\\mathrm{control}}")} \\quad \\text{where} \\quad ${Coh("\\mathbf{u}")} = ${φ("K")}\\,${Vv("\\mathbf{E}(t)")}`,
     terms:[
       { sym:"ẋ", name:"State velocity", color:C.op, meaning:"How fast the system state moves. Sum of natural flow + intention + correction." },
       { sym:"v(x)", name:"Natural vector field", color:C.var, meaning:"The system's inherent direction of motion — biology, physics, ecology. AETHER flows within this." },
@@ -360,6 +360,8 @@ export default function MathStudioPage() {
   const [loadId,      setLoadId]      = useState("");
   const [copied,      setCopied]      = useState(false);
   const [saveFlash,   setSaveFlash]   = useState(false);
+  const [imgState,    setImgState]    = useState<"idle"|"working"|"done-clip"|"done-dl">("idle");
+  const eqDisplayRef = useRef<HTMLDivElement>(null);
 
   const eq = EQUATIONS.find(e => e.id === selectedId) ?? EQUATIONS[0];
 
@@ -432,12 +434,11 @@ export default function MathStudioPage() {
     localStorage.setItem(LS_SAVED, JSON.stringify(next));
   };
 
-  // Copy to clipboard
+  // Copy text to clipboard
   const handleCopy = () => {
     navigator.clipboard.writeText(sourceForCopy).then(() => {
       setCopied(true); setTimeout(() => setCopied(false), 2000);
     }).catch(() => {
-      // fallback for insecure contexts
       const ta = document.createElement("textarea");
       ta.value = sourceForCopy;
       document.body.appendChild(ta); ta.select();
@@ -445,6 +446,126 @@ export default function MathStudioPage() {
       document.body.removeChild(ta);
       setCopied(true); setTimeout(() => setCopied(false), 2000);
     });
+  };
+
+  // Copy / download rendered equation as a PNG image
+  const handleCopyImage = async () => {
+    const el = eqDisplayRef.current;
+    if (!el || imgState === "working") return;
+    setImgState("working");
+
+    try {
+      // Wait for all web fonts (KaTeX) to be ready
+      await document.fonts.ready;
+
+      const rect = el.getBoundingClientRect();
+      const PAD  = 40;
+      const DPR  = 2; // retina
+      const W    = Math.max(Math.ceil(rect.width)  + PAD * 2, 420);
+      const H    = Math.ceil(rect.height) + PAD * 2 + 32; // +32 for footer label
+
+      // Collect same-origin stylesheet rules (KaTeX CSS is same-origin)
+      const inlineCss = Array.from(document.styleSheets).flatMap(ss => {
+        try { return Array.from(ss.cssRules).map(r => r.cssText); }
+        catch { return []; }
+      }).join("\n");
+
+      const label = showCustom ? "AETHER · CUSTOM EQUATION" : `AETHER · ${eq.label.toUpperCase()}`;
+
+      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" width="${W * DPR}" height="${H * DPR}">
+        <defs>
+          <linearGradient id="gb" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#fbbf2440"/>
+            <stop offset="50%"  stop-color="#00ff8820"/>
+            <stop offset="100%" stop-color="#06b6d440"/>
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="#020818"/>
+        <rect x="0" y="${(H - 32) * DPR}" width="100%" height="${32 * DPR}" fill="#020c1a"/>
+        <rect x="0" y="${(H - 33) * DPR}" width="100%" height="${DPR}" fill="url(#gb)"/>
+        <foreignObject x="0" y="0" width="${W * DPR}" height="${(H - 32) * DPR}">
+          <html xmlns="http://www.w3.org/1999/xhtml">
+          <head><style>
+            *{box-sizing:border-box;margin:0;padding:0;}
+            body{margin:0;padding:${PAD * DPR}px;background:transparent;
+                 display:flex;align-items:center;justify-content:center;
+                 min-height:${(H - 32) * DPR}px;}
+            ${inlineCss}
+            .aether-katex .katex{font-size:${2.2 * DPR}em;color:rgba(255,255,255,0.92);}
+            .aether-katex .katex .mfrac .frac-line{border-bottom-color:rgba(0,255,136,0.65)!important;}
+            .aether-katex .katex .sqrt>.sqrt-sign{color:rgba(0,255,136,0.75);}
+            .aether-katex .katex-display{overflow-x:visible;padding:0;}
+          </style></head>
+          <body>
+            <div class="aether-katex" style="max-width:${(W - PAD * 2) * DPR}px;overflow:visible">
+              ${el.innerHTML}
+            </div>
+          </body>
+          </html>
+        </foreignObject>
+      </svg>`;
+
+      const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl  = URL.createObjectURL(svgBlob);
+
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width  = W * DPR;
+          canvas.height = H * DPR;
+          const ctx = canvas.getContext("2d")!;
+
+          // Background
+          ctx.fillStyle = "#020818";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Equation panel
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(svgUrl);
+
+          // Footer label
+          const footerY = (H - 32) * DPR;
+          ctx.fillStyle = "#020c1a";
+          ctx.fillRect(0, footerY, canvas.width, 32 * DPR);
+          ctx.font = `${10 * DPR}px "Courier New", monospace`;
+          ctx.fillStyle = "rgba(0,255,136,0.45)";
+          ctx.textAlign = "center";
+          ctx.fillText(label, canvas.width / 2, footerY + 20 * DPR);
+          ctx.font = `${8 * DPR}px "Courier New", monospace`;
+          ctx.fillStyle = "rgba(255,255,255,0.15)";
+          ctx.fillText("AETHER Framework · shia miller · 2026", canvas.width / 2, footerY + 28 * DPR);
+
+          // Gradient border top line
+          const grd = ctx.createLinearGradient(0, 0, canvas.width, 0);
+          grd.addColorStop(0,   "#fbbf2440");
+          grd.addColorStop(0.5, "#00ff8860");
+          grd.addColorStop(1,   "#06b6d440");
+          ctx.fillStyle = grd;
+          ctx.fillRect(0, 0, canvas.width, DPR);
+          ctx.fillRect(0, canvas.height - DPR, canvas.width, DPR);
+
+          canvas.toBlob(pngBlob => {
+            if (!pngBlob) { reject(new Error("toBlob failed")); return; }
+            navigator.clipboard.write([new ClipboardItem({ "image/png": pngBlob })])
+              .then(() => { setImgState("done-clip"); setTimeout(() => setImgState("idle"), 2400); resolve(); })
+              .catch(() => {
+                // Clipboard API blocked → download the PNG
+                const a = document.createElement("a");
+                a.download = `aether-${showCustom ? "custom" : eq.id}-eq.png`;
+                a.href = canvas.toDataURL("image/png");
+                a.click();
+                setImgState("done-dl"); setTimeout(() => setImgState("idle"), 2400);
+                resolve();
+              });
+          }, "image/png");
+        };
+        img.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error("SVG load failed")); };
+        img.src = svgUrl;
+      });
+    } catch {
+      setImgState("idle");
+    }
   };
 
   return (
@@ -592,12 +713,14 @@ export default function MathStudioPage() {
 
               {showCustom && inputMode !== "latex" ? (
                 <div
+                  ref={eqDisplayRef}
                   className="ms-text-render"
                   style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 640, fontSize: 15, lineHeight: 1.85, textAlign: "left" }}
                   dangerouslySetInnerHTML={{ __html: rendered || '<span style="opacity:0.2;font-size:11px">start typing above to see your text rendered here</span>' }}
                 />
               ) : (
                 <div
+                  ref={eqDisplayRef}
                   style={{ position: "relative", zIndex: 1, maxWidth: "100%", overflowX: "auto" }}
                   className="aether-katex"
                   dangerouslySetInnerHTML={{ __html: rendered }}
@@ -607,10 +730,40 @@ export default function MathStudioPage() {
 
             {/* Action bar: Copy + Save */}
             <div style={{ borderTop: `1px solid ${BRD}`, padding: "8px 16px", display: "flex", gap: 8, alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
-              {/* Copy */}
+              {/* Copy LaTeX text */}
               <button onClick={handleCopy}
                 style={{ background: copied ? "rgba(251,191,36,0.15)" : "rgba(0,255,136,0.08)", border: `1px solid ${copied ? "#fbbf2460" : "rgba(0,255,136,0.25)"}`, color: copied ? "#fbbf24" : G, borderRadius: 4, padding: "4px 16px", cursor: "pointer", fontSize: 8, letterSpacing: 2, ...mono, transition: "all 0.2s" }}>
                 {copied ? "✓ COPIED" : "⧉ COPY TEXT"}
+              </button>
+
+              {/* Copy / download as PNG image */}
+              <button
+                onClick={handleCopyImage}
+                disabled={imgState === "working"}
+                title="Copy rendered equation as a PNG image (or download if clipboard is blocked)"
+                style={{
+                  background:  imgState === "done-clip" ? "rgba(6,182,212,0.18)"
+                             : imgState === "done-dl"   ? "rgba(192,132,252,0.15)"
+                             : imgState === "working"   ? "rgba(251,191,36,0.08)"
+                             : "rgba(6,182,212,0.07)",
+                  border: `1px solid ${
+                             imgState === "done-clip" ? "#06b6d460"
+                           : imgState === "done-dl"   ? "#c084fc60"
+                           : imgState === "working"   ? "rgba(251,191,36,0.3)"
+                           : "rgba(6,182,212,0.3)"}`,
+                  color:       imgState === "done-clip" ? "#06b6d4"
+                             : imgState === "done-dl"   ? "#c084fc"
+                             : imgState === "working"   ? "#fbbf24"
+                             : "#06b6d4",
+                  borderRadius: 4, padding: "4px 16px",
+                  cursor: imgState === "working" ? "wait" : "pointer",
+                  fontSize: 8, letterSpacing: 2, ...mono, transition: "all 0.2s",
+                  opacity: imgState === "working" ? 0.65 : 1,
+                }}>
+                {imgState === "done-clip" ? "✓ IMAGE COPIED"
+               : imgState === "done-dl"  ? "✓ IMAGE SAVED"
+               : imgState === "working"  ? "… RENDERING"
+               : "⬡ COPY IMAGE"}
               </button>
 
               {/* Save */}
