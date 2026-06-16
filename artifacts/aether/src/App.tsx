@@ -258,6 +258,7 @@ import SeamossTransceiverPage from "@/pages/seamoss-transceiver";
 import TorsionResonatorPage from "@/pages/torsion-resonator";
 import SeamossGatePage from "@/pages/seamoss-gate";
 import EngineComputerPage from "@/pages/engine-computer";
+import BioluminescenceSpectrumPage from "@/pages/bioluminescence-spectrum";
 
 const queryClient = new QueryClient();
 
@@ -519,6 +520,7 @@ function Router() {
         <Route path="/torsion-resonator" component={TorsionResonatorPage} />
         <Route path="/seamoss-gate" component={SeamossGatePage} />
         <Route path="/engine-computer" component={EngineComputerPage} />
+        <Route path="/bioluminescence-spectrum" component={BioluminescenceSpectrumPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
