@@ -114,6 +114,7 @@ const NAV_ITEMS = [
   { href: "/uap-energy",         label: "Wireless Power · Gravity · Anti-Gravity · UAP Energy Access · ZPE · IMR · GEM", icon: Atom },
   { href: "/tidal-movement",       label: "Tidal Movement · Moon's Tide Oscillation · Harmonic Constituents · Intertidal Life", icon: Waves },
   { href: "/bursting-quaternions", label: "Bursting Quaternions · ℍ and 𝕆 Division Algebras · Non-Commutative Burst · Analog Containment", icon: Atom },
+  { href: "/color-coherence",      label: "Color · Light · Coherence · SU(3) Color Charge · Blue Light Biology · Circadian C(x,t)", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
