@@ -257,6 +257,7 @@ import FullPerceptionUniversePage from "@/pages/full-perception-universe";
 import SeamossTransceiverPage from "@/pages/seamoss-transceiver";
 import TorsionResonatorPage from "@/pages/torsion-resonator";
 import SeamossGatePage from "@/pages/seamoss-gate";
+import EngineComputerPage from "@/pages/engine-computer";
 
 const queryClient = new QueryClient();
 
@@ -517,6 +518,7 @@ function Router() {
         <Route path="/seamoss-transceiver" component={SeamossTransceiverPage} />
         <Route path="/torsion-resonator" component={TorsionResonatorPage} />
         <Route path="/seamoss-gate" component={SeamossGatePage} />
+        <Route path="/engine-computer" component={EngineComputerPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
