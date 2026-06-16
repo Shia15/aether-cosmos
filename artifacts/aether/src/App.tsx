@@ -239,6 +239,7 @@ import UAPEnergyPage from "@/pages/uap-energy";
 import TidalMovementPage from "@/pages/tidal-movement";
 import BurstingQuaternionsPage from "@/pages/bursting-quaternions";
 import ColorCoherencePage from "@/pages/color-coherence";
+import RotationEnginePage from "@/pages/rotation-engine";
 
 const queryClient = new QueryClient();
 
@@ -481,6 +482,7 @@ function Router() {
         <Route path="/tidal-movement" component={TidalMovementPage} />
         <Route path="/bursting-quaternions" component={BurstingQuaternionsPage} />
         <Route path="/color-coherence" component={ColorCoherencePage} />
+        <Route path="/rotation-engine" component={RotationEnginePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
