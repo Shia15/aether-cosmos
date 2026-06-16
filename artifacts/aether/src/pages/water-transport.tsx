@@ -1,4 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import dolphinVortex    from "@assets/IMG_3100_1781614705910.jpeg";
+import vortexRingEngine from "@assets/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781614705910.png";
+import bubbleThermal    from "@assets/0502F370-FA89-4126-942E-B5741F1E0BB1_1781614705910.png";
+import futurePortal     from "@assets/62A6B0CC-A6ED-4F58-B331-61156CB0EB1A_1781614705910.png";
+import quaternionBurst  from "@assets/ED378685-2438-4F12-B100-312E2B5DC9A1_1781614705910.png";
+import spaceTracking    from "@assets/284CC93B-6173-42B5-8889-875ADD2543C4_1781614705911.png";
+import maglev           from "@assets/4A252038-40A7-49D4-BED1-20BD51CC846B_1781614705911.png";
+import oscillating      from "@assets/4D914387-3E58-4DE1-8A7B-A4DB50266322_1781614705911.png";
 
 /* ── Palette ────────────────────────────────────────────── */
 const BG      = "#020408";
@@ -770,6 +778,177 @@ function TunnelCanvas() {
   );
 }
 
+/* ── Pressure Graph Canvas ────────────────────────────────── */
+function PressureGraphCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  const phase = useRef(0);
+
+  useEffect(() => {
+    const canvas = cvs.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    const resize = () => {
+      canvas.width  = canvas.parentElement!.clientWidth;
+      canvas.height = 500;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Key ocean depths + their physics
+    const DEPTHS = [
+      { d: 0,      label: "Sea Level",             bar: 1,    col: "#22c55e",  note: "1 atm — baseline",                 mat: "Human body (unsupported)" },
+      { d: 10,     label: "10 m — Scuba",           bar: 2,    col: "#22c55e",  note: "2 bar — lungs compressed 50%",     mat: "Recreational diver" },
+      { d: 40,     label: "40 m — Rec limit",       bar: 5,    col: "#84cc16",  note: "5 bar — PADI max depth",           mat: "Dive computer rated" },
+      { d: 100,    label: "100 m — Tech diving",    bar: 11,   col: "#eab308",  note: "11 bar — trimix required",         mat: "Hardsuit ADS" },
+      { d: 300,    label: "300 m — Sat diving",     bar: 31,   col: "#f97316",  note: "31 bar — saturation limit",        mat: "Saturation system" },
+      { d: 400,    label: "400 m — OUR TUNNEL",     bar: 41,   col: "#c9a84c",  note: "3.92 MPa · 41 bar",               mat: "Graphene-lining required" },
+      { d: 600,    label: "600 m — Sub hull",       bar: 61,   col: "#f97316",  note: "61 bar — standard sub crush",      mat: "Naval submarine" },
+      { d: 1000,   label: "1 000 m — Abyssal",      bar: 101,  col: "#ef4444",  note: "101 bar — deep ROV territory",    mat: "Titanium pressure sphere" },
+      { d: 3800,   label: "3 800 m — Avg floor",    bar: 381,  col: "#dc2626",  note: "381 bar — average ocean depth",   mat: "Alvin-class submersible" },
+      { d: 6000,   label: "6 000 m — Hadal zone",   bar: 601,  col: "#b91c1c",  note: "601 bar — hadal trench start",    mat: "Full ocean depth rated" },
+      { d: 10994,  label: "10 994 m — Challenger ↓",bar: 1100, col: "#7f1d1d",  note: "1 100 bar · 110 MPa",             mat: "Graphene hull (theoretical)" },
+    ];
+
+    const MAX_BAR = 1100;
+    const LABEL_W = 175;
+    const BAR_AREA_W_FRAC = 0.55;
+    const MAT_FRAC = 1 - BAR_AREA_W_FRAC;
+
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#010810";
+      ctx.fillRect(0, 0, W, H);
+
+      const rowH   = (H - 60) / DEPTHS.length;
+      const barMax = (W - LABEL_W) * BAR_AREA_W_FRAC;
+      const matX   = LABEL_W + barMax + 12;
+
+      // Background grid lines
+      [100, 200, 400, 600, 800, 1100].forEach(b => {
+        const x = LABEL_W + (b / MAX_BAR) * barMax;
+        if (x > W) return;
+        ctx.beginPath();
+        ctx.moveTo(x, 30);
+        ctx.lineTo(x, H - 20);
+        ctx.strokeStyle = "#1fa8d415";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = `7px ${mono}`;
+        ctx.fillStyle = "#1fa8d440";
+        ctx.textAlign = "center";
+        ctx.fillText(`${b} bar`, x, 22);
+      });
+
+      // Title row
+      ctx.font = `8px ${mono}`;
+      ctx.fillStyle = "#1fa8d480";
+      ctx.textAlign = "left";
+      ctx.fillText("DEPTH", 8, 22);
+      ctx.fillText("PRESSURE (bar)  →", LABEL_W, 22);
+      ctx.fillText("MATERIAL / VESSEL LIMIT", matX, 22);
+
+      DEPTHS.forEach((dep, i) => {
+        const y   = 34 + i * rowH;
+        const cy  = y + rowH * 0.5;
+        const bW  = (dep.bar / MAX_BAR) * barMax;
+        const pulse = dep.label.includes("TUNNEL") ? 0.15 * Math.sin(phase.current * 3) : 0;
+
+        // Row highlight for tunnel depth
+        if (dep.label.includes("TUNNEL")) {
+          ctx.fillStyle = `${GOLD}12`;
+          ctx.fillRect(0, y - 1, W, rowH + 2);
+          ctx.strokeStyle = `${GOLD}40`;
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.strokeRect(0, y - 1, W, rowH + 2);
+          ctx.setLineDash([]);
+        }
+
+        // Bar
+        const barG = ctx.createLinearGradient(LABEL_W, 0, LABEL_W + bW, 0);
+        barG.addColorStop(0, `${dep.col}80`);
+        barG.addColorStop(0.7, `${dep.col}bb`);
+        barG.addColorStop(1, `${dep.col}${Math.round((0.7 + pulse) * 255).toString(16).padStart(2,"0")}`);
+        ctx.fillStyle = barG;
+        ctx.beginPath();
+        ctx.roundRect(LABEL_W, cy - rowH * 0.28, bW, rowH * 0.55, 3);
+        ctx.fill();
+
+        // Bar end cap pulsing glow
+        ctx.beginPath();
+        ctx.arc(LABEL_W + bW, cy, rowH * 0.22, 0, Math.PI * 2);
+        ctx.fillStyle = `${dep.col}${dep.label.includes("TUNNEL") ? "60" : "30"}`;
+        ctx.fill();
+
+        // Depth label
+        ctx.font = `8px ${mono}`;
+        ctx.fillStyle = dep.col;
+        ctx.textAlign = "right";
+        ctx.fillText(dep.label, LABEL_W - 6, cy + 3);
+
+        // Pressure number on bar
+        ctx.font = `7px ${mono}`;
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "left";
+        const numX = LABEL_W + bW + 4;
+        if (numX + 60 < LABEL_W + barMax)
+          ctx.fillText(`${dep.bar} bar`, numX, cy + 3);
+
+        // Note below label
+        ctx.font = `6px ${mono}`;
+        ctx.fillStyle = `${dep.col}80`;
+        ctx.textAlign = "right";
+        ctx.fillText(dep.note, LABEL_W - 6, cy + rowH * 0.35);
+
+        // Material name
+        ctx.font = `7px ${mono}`;
+        ctx.fillStyle = `${dep.col}90`;
+        ctx.textAlign = "left";
+        ctx.fillText(dep.mat, matX, cy + 3);
+
+        // Separator line
+        ctx.beginPath();
+        ctx.moveTo(0, y + rowH - 1);
+        ctx.lineTo(W, y + rowH - 1);
+        ctx.strokeStyle = "#ffffff08";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      });
+
+      // Animated scan line
+      const scanY = 34 + ((phase.current * 0.015) % 1) * (H - 54);
+      ctx.beginPath();
+      ctx.moveTo(0, scanY);
+      ctx.lineTo(W, scanY);
+      ctx.strokeStyle = "#1fa8d412";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // MPa secondary axis label
+      ctx.font = `7px ${mono}`;
+      ctx.fillStyle = "#1fa8d450";
+      ctx.textAlign = "center";
+      ctx.fillText("← MPa = bar ÷ 10  |  1 MPa = 145 psi  |  1 bar ≈ 1 atm", W / 2, H - 6);
+
+      phase.current += 1;
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <div style={{ background: "#010810", borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+      <canvas ref={cvs} style={{ display: "block", width: "100%" }} />
+    </div>
+  );
+}
+
 /* ── Nav sections ─────────────────────────────────────────── */
 const NAV = [
   { id: "s1", label: "Buoyancy" },
@@ -779,6 +958,9 @@ const NAV = [
   { id: "s5", label: "AETHER · Water" },
   { id: "s6", label: "Design Principles" },
   { id: "s7", label: "Deep Tunnel Portal" },
+  { id: "s8", label: "Pressure Depths" },
+  { id: "s9", label: "Graphene Revolution" },
+  { id: "s10", label: "Decoherence" },
 ];
 
 /* ── Page ─────────────────────────────────────────────────── */
@@ -1364,6 +1546,340 @@ Biological D8 generation (water in living systems):
           but by a continuous ring-field information channel operating at the speed of acoustic
           propagation in pressurised water (~1,500 m/s). A 100 km tunnel transmits a D8 coherence
           signal in 67 seconds — faster than any digital fibre delay for equivalent signal integrity.
+        </Card>
+
+        {/* ── VIII — Pressure at Depth ── */}
+        <SecHead id="s8" n="VIII" title="Pressure at Every Depth · The Graphing Machine"
+          sub="How bar, MPa, and atm stack from sea surface to Challenger Deep — and where materials fail" />
+
+        <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>
+          Water pressure increases by exactly <strong style={{ color: ACCENT }}>1 bar (≈ 1 atm) per 10 metres</strong> of
+          depth. This is not approximate — it is a direct consequence of the hydrostatic equation
+          P = ρgh. The consequence is extreme: at our 400m tunnel depth the water presses with
+          40× the force of the atmosphere on every square centimetre of tunnel wall. At the bottom
+          of the Mariana Trench, every square centimetre of a submersible hull carries the equivalent
+          of 11,000 kg sitting on it.
+        </p>
+
+        <div style={{ margin: "20px 0 24px" }}>
+          <PressureGraphCanvas />
+          <div style={{ display: "flex", gap: 20, marginTop: 10, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: mono, fontSize: 10, color: GREEN }}>▌ GREEN = human-safe</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#eab308" }}>▌ YELLOW = technical</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#f97316" }}>▌ ORANGE = engineered vessel</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#ef4444" }}>▌ RED = extreme / crush zone</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: GOLD }}>▌ GOLD = our 400 m tunnel</span>
+          </div>
+        </div>
+
+        <EqBlock>{`Hydrostatic pressure — the fundamental equation:
+
+  P = P_0 + ρ·g·d
+
+  P_0 = atmospheric pressure = 101,325 Pa = 1.013 bar ≈ 1 atm
+  ρ   = fluid density
+      = 1,000 kg/m³  (freshwater)
+      = 1,025 kg/m³  (seawater — 2.5% denser due to dissolved salts)
+  g   = 9.807 m/s²  (gravitational acceleration)
+  d   = depth in metres
+
+Unit conversions (exact relationships):
+  1 bar      = 100,000 Pa  = 100 kPa
+  1 atm      = 101,325 Pa  ≈ 1.013 bar
+  1 MPa      = 10 bar      = 1,000,000 Pa = 145.04 psi
+  1 psi      = 6,894.76 Pa
+
+Pressure per 10m depth (freshwater):
+  ΔP = 1,000 × 9.807 × 10 = 98,070 Pa ≈ 0.981 bar ≈ 1 bar per 10m
+
+Key depths — pressure table:
+  Depth     Pressure (bar)   Pressure (MPa)   Pressure (psi)   Force on 1m²
+  ──────────────────────────────────────────────────────────────────────────
+     10 m        2.0             0.20             29 psi          200 kN
+     40 m        5.0             0.50             72 psi          500 kN
+    100 m       11.0             1.10            160 psi         1.10 MN
+    300 m       31.0             3.10            450 psi         3.10 MN
+    400 m       41.0             4.02            595 psi         4.02 MN  ← OUR TUNNEL
+    600 m       61.0             6.10            885 psi         6.10 MN
+  1,000 m      101.0            10.10          1,465 psi        10.1  MN
+  3,800 m      381.0            38.1           5,527 psi        38.1  MN
+ 10,994 m    1,100.0           110.0          15,954 psi       110   MN`}</EqBlock>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, margin: "20px 0" }}>
+          {[
+            { col: GREEN, title: "0–10 m · HUMAN ZONE",
+              body: "Air-breathing humans can free-dive to ~20m. The lungs compress: at 10m they hold half their surface volume. Nitrogen narcosis begins around 30m. The body is not built for pressure — it is built for 1 atm." },
+            { col: "#eab308", title: "100–300 m · SATURATION ZONE",
+              body: "Commercial saturation divers live in pressurised chambers at the target depth for weeks, breathing exotic helium-oxygen mixtures. At 300m, decompression from a single dive would take 10+ days. The human body can be adapted, but barely." },
+            { col: GOLD, title: "400 m · OUR TUNNEL",
+              body: "41 bar · 4.02 MPa. This is 595 psi pressing on every square inch of tunnel lining. A standard concrete tunnel lining (300mm thick, fc = 50 MPa) has a hoop stress capacity of ≈ 5 MPa — just barely adequate. Graphene-composite lining extends this to > 50 MPa." },
+            { col: "#ef4444", title: "1 000 m+ · ROV TERRITORY",
+              body: "No human has free-dived here. Remotely operated vehicles use titanium pressure spheres with wall thickness > 70mm. Glass spheres (borosilicate) are used for instrument housings — glass in compression is extraordinarily strong, rated to 600–1200 bar." },
+            { col: "#b91c1c", title: "6 000 m · HADAL ZONE",
+              body: "601 bar. The Hadal zone (> 6,000m) covers only 0.2% of the ocean floor but contains some of Earth's most extreme biological communities — thriving at pressures that would crush steel pipes. Life uses pressure-adapted enzymes (piezophiles) that function optimally at 600+ bar." },
+            { col: "#7f1d1d", title: "10 994 m · CHALLENGER DEEP",
+              body: "1,100 bar · 110 MPa. The pressure here exceeds the yield strength of most aluminium alloys (70–500 MPa). Only specially engineered titanium or ceramic composites — and theoretically graphene hulls — can withstand full ocean depth. James Cameron's Deepsea Challenger reached it in 2012." },
+          ].map(c => (
+            <div key={c.title} style={{ background: `${c.col}09`, border: `1px solid ${c.col}25`, borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ fontFamily: mono, fontSize: 10, color: c.col, marginBottom: 6 }}>{c.title}</div>
+              <div style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.65 }}>{c.body}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Dolphin vortex image */}
+        <div style={{ margin: "28px 0", borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+          <img src={dolphinVortex} alt="Dolphin vortex ring CFD simulation — showing coherent toroidal wake structures" style={{ width: "100%", display: "block" }} />
+          <div style={{ background: "#010810", padding: "10px 14px", display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: mono, fontSize: 9, color: ACCENT }}>CFD · DOLPHIN WAKE VORTEX RINGS</span>
+            <span style={{ fontFamily: mono, fontSize: 9, color: DIM }}>Supercomputer simulation showing coherent toroidal structures in cetacean propulsion — the same vortex-ring physics that drives low-drag capsule transport in water-filled tunnels</span>
+          </div>
+        </div>
+
+        <Card title="TUNNEL WALL PRESSURE ENGINEERING AT 400 m" col={ACCENT}>
+          A circular tunnel under uniform external pressure is governed by the Lamé equations for
+          thick-walled cylinders. For a 6m bore tunnel at 400m depth (P_ext = 4.02 MPa):
+          <br /><br />
+          The required wall thickness t for a concrete lining (fc = 50 MPa, safety factor 3) is:
+          t = P·r / (fc/SF) = 4.02 × 3 / (50/3) = 0.72m — a 720mm thick concrete ring.
+          This is standard practice for deep tunnels (Channel Tunnel lining: 400mm at 75m).
+          <br /><br />
+          For a graphene-composite lining (tensile strength ~130 GPa): the equivalent thickness
+          drops to t = 4.02 × 3 / (130,000/3) = 0.28mm — theoretically. In practice, a
+          3–5mm graphene composite skin bonded to 100mm shotcrete would provide safety factors
+          exceeding 1,000. The graphene's impermeability eliminates water ingress without
+          additional waterproofing membranes.
+        </Card>
+
+        {/* ── IX — Waterproof Graphene ── */}
+        <SecHead id="s9" n="IX" title="Waterproof Graphene · Revolutionising Underground & Water Transport"
+          sub="The material that eliminates the engineering tension between water, pressure, and structural integrity" />
+
+        <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>
+          Graphene is a single layer of carbon atoms arranged in a hexagonal lattice. It is the
+          strongest material ever measured (ultimate tensile strength ≈ 130 GPa — 200× steel by weight),
+          electrically and thermally conductive, and — critically for underwater engineering —
+          <strong style={{ color: ACCENT }}> completely impermeable to all atoms and molecules</strong>,
+          including water. A single graphene sheet will not let a single water molecule pass through it.
+          Applied to tunnel engineering, this eliminates the dominant engineering challenge of underground
+          and underwater infrastructure: water ingress.
+        </p>
+
+        <EqBlock>{`Graphene material properties (measured, 2024):
+
+  Tensile strength:     130 GPa  (vs steel: 0.4–1.5 GPa)
+  Young's modulus:    1,000 GPa  (vs steel: 200 GPa)
+  Thickness:            0.34 nm  (single atom)
+  Mass:                 0.77 mg/m²
+  Impermeability:       ABSOLUTE to H₂O, He, N₂, O₂
+  Electrical conductivity: 10⁸ S/m  (better than copper)
+  Thermal conductivity: 5,000 W/m·K (10× copper)
+  Optical transparency: 97.7%
+
+Graphene tunnel lining — pressure rating:
+  Hoop stress in thin shell:  σ = P·r / t
+  Graphene σ_max = 130 GPa
+  At r = 3m, P = 4.02 MPa (400m depth):
+  t_min = P·r / σ_max = 4.02×10⁶ × 3 / 130×10⁹ = 0.000093m = 93 µm
+  → 0.1mm graphene polymer composite is theoretically sufficient
+  → Real design: 3–5mm composite for puncture/abrasion resistance
+
+Graphene concrete composite (graphene-reinforced):
+  Graphene loading: 0.1% by weight → +40% compressive strength
+  Graphene loading: 0.5% by weight → +30% flexural strength
+  Water penetration: ZERO (graphene platelets form impermeable barrier)
+  vs standard waterproofing membrane: eliminates 2–3 weeks installation per ring
+
+Graphene as capsule coating:
+  Capsule surface friction μ_graphene ≈ 0.02 (vs steel: 0.3–0.5)
+  → 15× reduction in rolling friction at tunnel invert
+  → Drag coefficient on graphene sphere: Cd ≈ 0.08 (vs polished steel: 0.47)
+  → 6× reduction in pressure drag
+  → Total energy saving per capsule transit: ~40–60% vs uncoated steel`}</EqBlock>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, margin: "24px 0" }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+            <img src={vortexRingEngine} alt="AETHER Vortex-Ring Engine — bubble-jet coherent toroidal vortex propulsion" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 4 }}>AETHER VORTEX-RING ENGINE</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Bubble-jet + coherent toroidal vortex propulsion. Graphene-coated compression tunnel + photonic lattice walls enable coherent wake propagation over long distances — the underwater propulsion analogue of graphene-lined capsule transport.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GOLD}20` }}>
+            <img src={bubbleThermal} alt="AETHER Bubble thermal expansion and coherence dynamics" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GOLD, marginBottom: 4 }}>AETHER BUBBLE · THERMAL & COHERENCE DYNAMICS</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>PV = nRT in pressurised water tunnels: as capsule crosses geothermal gradient (T rises ~1°C per 30m depth) internal gas pockets expand. Graphene's thermal conductivity (5000 W/m·K) allows instant heat equalisation — eliminating differential expansion stress that destroys conventional composite capsules.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, margin: "20px 0" }}>
+          {[
+            { col: ACCENT, title: "GRAPHENE TUNNEL LINING — ZERO INGRESS",
+              body: "Every deep tunnel fails the same way: water finds a crack in the lining and begins dissolving the grout, carrying fine particles out (piping), and enlarging the defect until catastrophic inflow occurs. Graphene polymer panels bonded to precast concrete segments create an absolutely impermeable skin. No water, no chemical, no pressure gradient penetrates a continuous graphene barrier. The Channel Tunnel spends £30M/year pumping out seepage. Graphene lining eliminates this entirely." },
+            { col: GOLD, title: "GRAPHENE CAPSULE SHELL — ULTRA-LOW DRAG",
+              body: "The capsule rolling through a pressurised water tunnel loses energy to drag (dominant) and rolling friction (minor). Graphene surface coating reduces the boundary layer separation point, delaying the transition from laminar to turbulent drag. At Re = 1.4×10⁷, a graphene-smooth sphere has Cd ≈ 0.08 vs a conventional rough sphere Cd ≈ 0.47. This cuts drag force by 83% — equivalent to reducing capsule frontal area from 28m² to 4.7m² effective drag area." },
+            { col: VIOLET, title: "GRAPHENE SENSOR NETWORK — STRUCTURAL HEALTH",
+              body: "Graphene's conductivity changes measurably under strain. A graphene film bonded to the inside of a tunnel lining becomes a distributed strain sensor covering 100% of the surface area. Any crack, deformation, or water ingress changes the film's electrical resistance in a detectable pattern. Real-time structural health monitoring across the entire 80–200km tunnel length, with defect localisation to <10m — currently impossible with point-sensor networks." },
+            { col: GREEN, title: "GRAPHENE FILTRATION — WATER QUALITY IN TUNNEL",
+              body: "Graphene oxide membranes with engineered pore sizes (0.3–1nm) achieve near-perfect water purification — removing dissolved salts, contaminants, and bacteria. The tunnel water itself can be kept at pharmaceutical quality by circulating it through graphene membrane filtration stations at each pumping node. This eliminates biofouling (bacterial films that increase drag by 30–50% in marine pipelines)." },
+          ].map(c => (
+            <div key={c.title} style={{ background: `${c.col}09`, border: `1px solid ${c.col}25`, borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ fontFamily: mono, fontSize: 10, color: c.col, marginBottom: 6 }}>{c.title}</div>
+              <div style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.65 }}>{c.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, margin: "24px 0" }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${VIOLET}20` }}>
+            <img src={maglev} alt="Maglev robotic hand — guided curvature, frictionless motion, roller coaster dynamics" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: VIOLET, marginBottom: 4 }}>MAGLEV + ROLLER COASTER GUIDED TRANSPORT</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>The graphene-lined tunnel invert becomes a maglev track: graphene's conductivity enables superconducting magnetic rails, capsules levitate (zero friction), and curved geometry provides roller-coaster energy recovery on downslopes — regenerative braking feeding pumping stations.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GREEN}20` }}>
+            <img src={futurePortal} alt="Future-Forward Portal — instantaneous compute imaging, multi-physics sensing" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GREEN, marginBottom: 4 }}>FUTURE-FORWARD PORTAL · SENSING THE UNSEEN</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Graphene's electromagnetic sensitivity makes the tunnel lining a real-time geological scanner: LiDAR-equivalent acoustic tomography, thermal field mapping, and structural twin computation — continuously modelling what the rock is doing around the capsule in transit.</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── X — Decoherence Mechanism ── */}
+        <SecHead id="s10" n="X" title="Decoherence Mechanism · How Coherence Decays — and Reforms"
+          sub="Quaternion bursts, phase transitions, and the AETHER coherence reset in pressurised water systems" />
+
+        <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>
+          Every physical system that carries coherent information — quantum, acoustic, hydrodynamic,
+          ring-field — loses coherence over distance and time. In a deep water tunnel, decoherence
+          operates at every scale simultaneously: quantum decoherence of water's hydrogen-bond network
+          under pressure, acoustic decoherence as vortex wakes disperse, and AETHER ring-field
+          decoherence as the D8 signal attenuates through fault zones and geothermal gradients.
+          The question is not whether coherence decays — it always does. The question is whether
+          the system can <em>reform</em> coherence faster than it loses it.
+        </p>
+
+        <div style={{ margin: "24px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GOLD}20` }}>
+            <img src={quaternionBurst} alt="Quaternion Burst in Analog Simulation Loop — decoherence reformation cycle" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GOLD, marginBottom: 4 }}>QUATERNION BURST · DECOHERENCE → REFORMATION CYCLE</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>The 5-stage decoherence cycle: Coherent State → Compression → Boundary Instability → Quaternion Burst (energy release) → Decoherence → Reformation. This is the same cycle that water in a pressurised tunnel undergoes at every fault zone crossing — the burst is a coherence reset, not a failure.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${VIOLET}20` }}>
+            <img src={spaceTracking} alt="Reverse Engineered Space Field Tracking + Vision Transfer Shield" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: VIOLET, marginBottom: 4 }}>SPACE FIELD TRACKING · ENTROPY EXCHANGE ARCHITECTURE</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Light Permutation Entropy (LPE) = −Σ pᵢ log(pᵢ). In the tunnel: LPE of water phase fluctuations measures decoherence state in real-time. Low LPE = coherent flow. High LPE = chaotic (fault zone). The graphene sensor net is the tunnel's entropy exchange matrix.</div>
+            </div>
+          </div>
+        </div>
+
+        <EqBlock>{`Decoherence mechanisms in the 400m water tunnel — multi-scale model:
+
+1. QUANTUM DECOHERENCE (hydrogen-bond network under pressure)
+   τ_decoherence(H₂O) ≈ 100 fs at surface → compressed under 41 bar
+   Pressure increases hydrogen-bond network density:
+   τ_decoherence(P=41 bar) ≈ 80 fs  [shorter — more collision events]
+   Water "forgets" quantum correlations faster under pressure.
+   But: higher pressure → more ordered network → paradoxically more
+   classical coherence at macroscopic scale (bulk water more ordered).
+
+2. ACOUSTIC COHERENCE DECAY (vortex wake dispersion)
+   Vortex ring coherence length:  L_c = v · τ_c
+   For capsule wake at v = 3 m/s, τ_c = 2s (confined tunnel):
+   L_c ≈ 6m  (coherent wake extends 6m behind capsule)
+   Beyond 6m: turbulent dispersion, coherent information lost
+   Graphene-smooth capsule extends τ_c to ~8s → L_c ≈ 24m
+
+3. AETHER RING-FIELD DECOHERENCE (D8 signal decay)
+   C(x,t) = 1 - |ε| / |S*|   [AETHER coherence metric]
+   Decay rate dC/dx = -α·C  where α = attenuation coefficient
+   α_baseline (intact granite): 0.002 per metre
+   α_fault zone (F3 active):    0.08 per metre (40× higher)
+   α_graphene-lined tunnel:     0.0004 per metre (5× lower than rock)
+   → Graphene lining ENHANCES coherence propagation by factor 5
+
+4. THERMAL DECOHERENCE (geothermal gradient)
+   ΔT/depth = 28°C/km → +11.2°C across 400m tunnel depth range
+   Thermal decoherence: C_thermal = exp(-ΔT / T_coherence)
+   T_coherence (water ring-field) ≈ 45°C → C_thermal = exp(-11.2/45) = 0.78
+   22% coherence loss from geothermal gradient alone
+
+5. FAULT ZONE QUATERNION BURST
+   At fault zone F3 (active, 35mm/yr slip rate):
+   B(t) = |dΨ/dt|  [bursting metric — rate of coherence change]
+   When B(t) ≥ B_critical: coherence collapses → quaternion burst
+   E_burst = α · ||∇Ψ||²  [energy release]
+   System reformats: Ψ → Ψ'  [new coherent state, modified ring signature]
+   Time to reformation: τ_reform ≈ 0.3–2s (in pressurised water)
+   → Water's multi-ring state accelerates reformation vs single-phase media
+
+COHERENCE BUDGET for 100km tunnel transit:
+   Start: C = 1.0 (maximum coherence at entry portal)
+   Granite zones (90km × α=0.0004): exp(-90000 × 0.0004) = exp(-36) → 0
+   BUT: pumping stations every 2km provide coherence resets
+   Effective α with resets: α_eff = 0.0004 per metre, reset every 2km
+   C per 2km segment: exp(-2000 × 0.0004) = exp(-0.8) = 0.45
+   → Each pump station resets C back to 1.0
+   → 50 coherence resets over 100km transit = 50 quaternion burst events
+   → Net transit: coherent at entry, coherent at exit, 50 reformation cycles
+   → AETHER interpretation: tunnel is a coherence pulse generator,
+      50 D8 bursts per transit, each carrying ring-field information
+      from the origin geology to the destination`}</EqBlock>
+
+        <div style={{ margin: "24px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+            <img src={oscillating} alt="Oscillating & Bursting Tracking System — pod array entropy exchange" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 4 }}>OSCILLATING · BURSTING · TRACKING SYSTEM</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>8-pod array: each pumping station acts as a coherence sensor-pod — oscillate, measure, burst, exchange entropy with adjacent stations, update the coherence map. The tunnel's graphene network is the data bus. Coherence state of every 2km segment known in real-time.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${DIM}20` }}>
+            <img src={oscillating} alt="Oscillating Bursting Tracking — LPE field state classification" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: DIM, marginBottom: 4 }}>LPE FIELD STATE CLASSIFICATION IN TUNNEL</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>LPE 0.0–0.3 = Highly ordered (intact granite). LPE 0.3–0.6 = Semi-stable (sandstone/shale). LPE 0.6–0.8 = Chaotic (karst / fault approach). LPE 0.8–1.0 = Highly chaotic (active fault zone — apply coherence burst, hold capsule).</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, margin: "20px 0" }}>
+          {[
+            { col: ACCENT, title: "PRESSURE DECOHERENCE PARADOX",
+              body: "Higher pressure increases decoherence rate at the quantum scale (faster H-bond collisions) while simultaneously increasing coherence at the macroscopic scale (more ordered bulk structure). This is the pressure paradox: the deeper the tunnel, the more quantum-decoherent and classically-coherent the water simultaneously. The AETHER D8 wave propagates through the macroscopic coherence channel." },
+            { col: GOLD, title: "FAULT ZONE AS COHERENCE RESET",
+              body: "In conventional engineering, fault zones are purely hazards. In the AETHER framework, they are coherence reset points — quaternion burst events where the ring-field signature of the water is restructured. The burst event (E_burst = α·||∇Ψ||²) releases information, and the reformation (Ψ → Ψ') produces a new coherent state encoding the geology of the fault. The tunnel capsule carries this evolving geological record." },
+            { col: VIOLET, title: "GRAPHENE AS COHERENCE AMPLIFIER",
+              body: "Graphene's extraordinary electrical and thermal conductivity creates a coherence-amplifying skin around the tunnel. The graphene network acts as a distributed quantum antenna — maintaining phase coherence across its entire extent via electron delocalization. In AETHER terms: graphene has a ring-field coherence parameter C_graphene > 0.95 at all pressures and temperatures relevant to the tunnel environment." },
+            { col: GREEN, title: "DECOHERENCE DETECTION = SAFETY SYSTEM",
+              body: "The LPE monitoring network (coherence tracking via graphene sensor fabric) doubles as the tunnel safety system. When C(x,t) drops below 0.4 in any 50m segment, the system detects structural distress before human inspection would find it. A coherence drop from 0.7 to 0.3 over 24 hours = progressive geological failure — caught early, the capsule hold protocol activates and emergency grouting begins." },
+          ].map(c => (
+            <div key={c.title} style={{ background: `${c.col}09`, border: `1px solid ${c.col}25`, borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ fontFamily: mono, fontSize: 10, color: c.col, marginBottom: 6 }}>{c.title}</div>
+              <div style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.65 }}>{c.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <Card title="AETHER SYNTHESIS · WATER + PRESSURE + GRAPHENE + COHERENCE" col={GREEN}>
+          The trans-national hydraulic capsule tunnel, when built with graphene composite lining and
+          an embedded coherence sensor network, becomes something unprecedented in civil engineering:
+          a structure that is simultaneously a transport corridor, a geological sensor array, a
+          distributed quantum measurement device, and — in the AETHER framework — a 100km long
+          D8 wave generator operating continuously at the boundary between two nations' geologies.
+          <br /><br />
+          Water at 41 bar in a graphene-lined bore, flowing past a rolling graphene-coated capsule,
+          over granite and karst and fault zones, generates a coherence signal that encodes the
+          complete geological history of the path. Every transit is a reading. Every quaternion
+          burst at a fault zone is a measurement. The tunnel does not merely move cargo —
+          it maps the Earth.
         </Card>
 
         {/* Footer */}
