@@ -253,6 +253,7 @@ import HexiclicalBodyMapPage from "@/pages/hexiclical-body-map";
 import AnimalNeuralPlasmoidPage from "@/pages/animal-neural-plasmoid";
 import BioInfinityDrivePage from "@/pages/bio-infinity-drive";
 import BiorefineryPropulsionPage from "@/pages/biorefinery-propulsion";
+import FullPerceptionUniversePage from "@/pages/full-perception-universe";
 
 const queryClient = new QueryClient();
 
@@ -509,6 +510,7 @@ function Router() {
         <Route path="/animal-neural-plasmoid" component={AnimalNeuralPlasmoidPage} />
         <Route path="/bio-infinity-drive" component={BioInfinityDrivePage} />
         <Route path="/biorefinery-propulsion" component={BiorefineryPropulsionPage} />
+        <Route path="/full-perception-universe" component={FullPerceptionUniversePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
