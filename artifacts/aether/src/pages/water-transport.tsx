@@ -9,6 +9,9 @@ import warpDrive       from "@assets/IMG_2203_1781615189390.png";
 import coherenceMech   from "@assets/IMG_2212_1781615189390.png";
 import tgemeMatrix     from "@assets/IMG_2217_1781615189390.png";
 import warpCore        from "@assets/IMG_2199_1781615189390.jpeg";
+import magneticRecon   from "@assets/F23D6CDB-AA6F-44AE-B136-E72229CEEA68_1781617123305.png";
+import plasmaTransport  from "@assets/BE46CD04-CA24-458D-AB3C-1BE609D84123_1781617123305.png";
+import droneSystem      from "@assets/BB7734DC-A62E-42CC-AE60-3E6912BF1494_1781617123305.png";
 import dolphinVortex    from "@assets/IMG_3100_1781614705910.jpeg";
 import vortexRingEngine from "@assets/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781614705910.png";
 import bubbleThermal    from "@assets/0502F370-FA89-4126-942E-B5741F1E0BB1_1781614705910.png";
@@ -1189,7 +1192,235 @@ const NAV = [
   { id: "s9", label: "Graphene Revolution" },
   { id: "s10", label: "Decoherence" },
   { id: "s11", label: "Origami Drone ∞" },
+  { id: "s12", label: "Magnetic Recon" },
 ];
+
+/* ── Magnetic Reconnection Canvas ────────────────────────── */
+function MagneticReconCanvas() {
+  const cvs  = useRef<HTMLCanvasElement>(null);
+  const raf  = useRef(0);
+  const tick = useRef(0);
+
+  useEffect(() => {
+    const canvas = cvs.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    const resize = () => {
+      canvas.width  = canvas.parentElement!.clientWidth;
+      canvas.height = 340;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const PHASE_FRAMES = 110;
+    const PHASES = [
+      { name: "EXPAND",       col: "#1a9fd4", desc: "Energy Stored · Magnetic Loops Grow" },
+      { name: "ACCUMULATE",   col: "#8b5cf6", desc: "Loops Approach · Field Gradient Increases" },
+      { name: "RECONNECTION", col: "#ffffff", desc: "Topology Changes · Energy Released" },
+      { name: "COMPRESS",     col: "#e8a030", desc: "Energy Concentrated · Loops Collapse" },
+      { name: "TRANSPORT",    col: "#22c55e", desc: "Move Through Substrate / Channels" },
+      { name: "RE-EXPAND",    col: "#1fd4c8", desc: "New Topology · Cycle Restarts" },
+    ];
+    const TOTAL = PHASES.length * PHASE_FRAMES;
+
+    const arc = (
+      ox: number, oy: number, r: number,
+      a0: number, a1: number, ccw: boolean,
+      col: string, lw: number
+    ) => {
+      ctx.beginPath();
+      ctx.arc(ox, oy, r, a0, a1, ccw);
+      ctx.strokeStyle = col;
+      ctx.lineWidth = lw;
+      ctx.stroke();
+    };
+
+    const draw = () => {
+      tick.current++;
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#010810";
+      ctx.fillRect(0, 0, W, H);
+
+      const cx = W / 2, cy = H / 2 - 28;
+      const phaseIdx = Math.floor((tick.current % TOTAL) / PHASE_FRAMES);
+      const phaseT   = (tick.current % PHASE_FRAMES) / PHASE_FRAMES;
+      const phase    = PHASES[phaseIdx];
+
+      /* separation of loop centres */
+      let sep = W * 0.20;
+      if (phaseIdx === 1) sep = W * (0.20 - phaseT * 0.08);
+      if (phaseIdx === 2) sep = W * 0.12;
+      if (phaseIdx === 3) sep = W * (0.12 + phaseT * 0.10);
+      if (phaseIdx >= 4)  sep = W * 0.22;
+
+      const nArcs = 5;
+
+      /* LEFT loop — blue, arcs above centre-line */
+      for (let i = 0; i < nArcs; i++) {
+        const frac = (i + 1) / (nArcs + 1);
+        const r    = sep * (0.35 + frac * 1.1);
+        const aBase = 0.35 + frac * 0.5;
+        const fade  = phaseIdx === 2 ? Math.max(0.04, 1 - phaseT * 1.8) * aBase
+                    : phaseIdx >= 3 && phaseIdx <= 4 ? aBase * 0.28
+                    : aBase;
+
+        if (phaseIdx < 2 || phaseIdx >= 5) {
+          arc(cx - sep, cy, r, Math.PI, 0, true,  `rgba(26,159,212,${fade})`, 0.8 + frac);
+          arc(cx - sep, cy, r, 0, Math.PI, false, `rgba(26,159,212,${fade * 0.5})`, 0.5 + frac * 0.5);
+        } else if (phaseIdx === 2) {
+          arc(cx - sep * 0.5, cy, r * (1 + phaseT * 0.5), Math.PI, 0, true, `rgba(26,159,212,${fade})`, 0.8 + frac);
+        } else {
+          /* new topology: vertical arcs */
+          const a2 = (phaseIdx === 3 ? phaseT * 0.4 : 0.35) * (0.2 + frac * 0.5);
+          arc(cx, cy - sep * 0.4, r * 0.65, 0, Math.PI, false, `rgba(26,159,212,${a2})`, 0.8 + frac);
+        }
+      }
+
+      /* RIGHT loop — amber, arcs below centre-line */
+      for (let i = 0; i < nArcs; i++) {
+        const frac = (i + 1) / (nArcs + 1);
+        const r    = sep * (0.35 + frac * 1.1);
+        const aBase = 0.35 + frac * 0.5;
+        const fade  = phaseIdx === 2 ? Math.max(0.04, 1 - phaseT * 1.8) * aBase
+                    : phaseIdx >= 3 && phaseIdx <= 4 ? aBase * 0.28
+                    : aBase;
+
+        if (phaseIdx < 2 || phaseIdx >= 5) {
+          arc(cx + sep, cy, r, 0, Math.PI, false, `rgba(232,160,48,${fade})`, 0.8 + frac);
+          arc(cx + sep, cy, r, Math.PI, 0, true,  `rgba(232,160,48,${fade * 0.5})`, 0.5 + frac * 0.5);
+        } else if (phaseIdx === 2) {
+          arc(cx + sep * 0.5, cy, r * (1 + phaseT * 0.5), 0, Math.PI, false, `rgba(232,160,48,${fade})`, 0.8 + frac);
+        } else {
+          const a2 = (phaseIdx === 3 ? phaseT * 0.4 : 0.35) * (0.2 + frac * 0.5);
+          arc(cx, cy + sep * 0.4, r * 0.65, Math.PI, 0, true, `rgba(232,160,48,${a2})`, 0.8 + frac);
+        }
+      }
+
+      /* X-LINE */
+      if (phaseIdx === 1 || phaseIdx === 2) {
+        const xa = phaseIdx === 1 ? phaseT * 0.75 : Math.max(0, 1 - phaseT * 1.4);
+        const xl = 16 + phaseT * 16;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = `rgba(255,255,255,${xa})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx - xl, cy - xl); ctx.lineTo(cx + xl, cy + xl); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx + xl, cy - xl); ctx.lineTo(cx - xl, cy + xl); ctx.stroke();
+        ctx.setLineDash([]);
+        if (xa > 0.25) {
+          ctx.font = `7px ${mono}`; ctx.fillStyle = `rgba(255,255,255,${xa})`; ctx.textAlign = "center";
+          ctx.fillText("X-LINE", cx + 34, cy - 22);
+        }
+      }
+
+      /* RECONNECTION: flash + plasma jets */
+      if (phaseIdx === 2) {
+        const jet  = phaseT * H * 0.27;
+        const intens = Math.sin(phaseT * Math.PI);
+        if (phaseT < 0.42) {
+          const fa = (0.42 - phaseT) * 1.8;
+          const gf = ctx.createRadialGradient(cx, cy, 0, cx, cy, phaseT * 90);
+          gf.addColorStop(0,   `rgba(255,255,255,${fa * 0.85})`);
+          gf.addColorStop(0.4, `rgba(150,110,255,${fa * 0.5})`);
+          gf.addColorStop(1,   "transparent");
+          ctx.fillStyle = gf; ctx.fillRect(0, 0, W, H);
+        }
+        if (jet > 4) {
+          const jg1 = ctx.createLinearGradient(cx, cy, cx, cy - jet);
+          jg1.addColorStop(0, `rgba(200,170,255,${intens})`);
+          jg1.addColorStop(0.5, `rgba(140,100,255,${intens * 0.6})`);
+          jg1.addColorStop(1, "transparent");
+          ctx.beginPath(); ctx.moveTo(cx-5,cy); ctx.lineTo(cx+5,cy); ctx.lineTo(cx+2,cy-jet); ctx.lineTo(cx-2,cy-jet); ctx.closePath();
+          ctx.fillStyle = jg1; ctx.fill();
+          const jg2 = ctx.createLinearGradient(cx, cy, cx, cy + jet);
+          jg2.addColorStop(0, `rgba(255,200,80,${intens})`);
+          jg2.addColorStop(0.5, `rgba(232,160,48,${intens * 0.6})`);
+          jg2.addColorStop(1, "transparent");
+          ctx.beginPath(); ctx.moveTo(cx-5,cy); ctx.lineTo(cx+5,cy); ctx.lineTo(cx+2,cy+jet); ctx.lineTo(cx-2,cy+jet); ctx.closePath();
+          ctx.fillStyle = jg2; ctx.fill();
+          ctx.font = `7px ${mono}`; ctx.textAlign = "left";
+          ctx.fillStyle = `rgba(200,170,255,${intens * 0.9})`; ctx.fillText("PLASMA JET ↑", cx + 8, cy - jet * 0.55);
+          ctx.fillStyle = `rgba(255,200,80,${intens * 0.9})`;  ctx.fillText("PLASMA JET ↓", cx + 8, cy + jet * 0.55);
+        }
+      }
+
+      /* TRANSPORT phase: flowing particles */
+      if (phaseIdx === 4) {
+        for (let p = 0; p < 9; p++) {
+          const prog = ((tick.current * 0.6 + p * 28) % 100) / 100;
+          const px = cx - sep + prog * sep * 2;
+          const py = cy + Math.sin(prog * Math.PI * 1.8 + p) * sep * 0.25;
+          const pa = Math.sin(prog * Math.PI) * 0.75;
+          ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(34,197,94,${pa})`; ctx.fill();
+          const tg = ctx.createLinearGradient(px - 14, py, px, py);
+          tg.addColorStop(0, "transparent"); tg.addColorStop(1, `rgba(34,197,94,${pa * 0.3})`);
+          ctx.fillStyle = tg; ctx.fillRect(px - 14, py - 1, 14, 2);
+        }
+        ctx.font = `8px ${mono}`; ctx.fillStyle = "rgba(34,197,94,0.65)"; ctx.textAlign = "center";
+        ctx.fillText("v = −k∇h · SUBSTRATE TRANSIT FLOW", cx, cy - sep * 0.95);
+      }
+
+      /* COMPRESS phase: field concentration glow */
+      if (phaseIdx === 3) {
+        const gAlpha = phaseT * 0.55;
+        const gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, 45 + phaseT * 20);
+        gr.addColorStop(0, `rgba(232,160,48,${gAlpha})`);
+        gr.addColorStop(0.6, `rgba(200,120,30,${gAlpha * 0.35})`);
+        gr.addColorStop(1, "transparent");
+        ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);
+        ctx.font = `8px ${mono}`; ctx.fillStyle = `rgba(232,160,48,${gAlpha * 1.6})`; ctx.textAlign = "center";
+        ctx.fillText("B ∝ 1/A · FIELD CONCENTRATION", cx, cy - 56);
+      }
+
+      /* Zone labels */
+      if (phaseIdx <= 1 || phaseIdx >= 5) {
+        ctx.font = `8px ${mono}`; ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(26,159,212,0.32)";  ctx.fillText("LOOP A  (−B)", cx - sep * 0.82, cy - sep * 0.78);
+        ctx.fillStyle = "rgba(232,160,48,0.32)"; ctx.fillText("LOOP B  (+B)", cx + sep * 0.82, cy - sep * 0.78);
+      }
+
+      /* Equation watermarks */
+      ctx.font = `9px ${mono}`; ctx.textAlign = "right";
+      ctx.fillStyle = "#c9a84c55"; ctx.fillText("E_B = B²/2μ₀", W - 14, 16);
+      ctx.font = `7.5px ${mono}`; ctx.fillStyle = "#6a889950";
+      ctx.fillText("∂B/∂t = ∇×(v×B) − η∇×(∇×B)", W - 14, 30);
+
+      /* Phase progress bar */
+      const barW = Math.min(W * 0.72, 520);
+      const barX = cx - barW / 2;
+      const barY = H - 54;
+      ctx.fillStyle = "#ffffff06"; ctx.fillRect(barX, barY, barW, 3);
+      ctx.fillStyle = phase.col;  ctx.fillRect(barX, barY, ((tick.current % TOTAL) / TOTAL) * barW, 3);
+      for (let i = 0; i < PHASES.length; i++) {
+        const dx = barX + (i / PHASES.length) * barW + barW / (PHASES.length * 2);
+        ctx.beginPath(); ctx.arc(dx, barY + 1.5, i === phaseIdx ? 5 : 3, 0, Math.PI * 2);
+        ctx.fillStyle = i === phaseIdx ? PHASES[i].col : "#ffffff18"; ctx.fill();
+        ctx.font = `6.5px ${mono}`; ctx.fillStyle = i === phaseIdx ? PHASES[i].col : "#ffffff25";
+        ctx.textAlign = "center"; ctx.fillText(PHASES[i].name, dx, barY + 20);
+      }
+
+      /* Phase label */
+      ctx.font = `11px ${mono}`; ctx.fillStyle = phase.col; ctx.textAlign = "center";
+      ctx.fillText(`PHASE ${phaseIdx + 1} · ${phase.name}`, cx, H - 66);
+      ctx.font = `9px ${mono}`; ctx.fillStyle = "#6a8898";
+      ctx.fillText(phase.desc, cx, H - 54);
+
+      raf.current = requestAnimationFrame(draw);
+    };
+
+    raf.current = requestAnimationFrame(draw);
+    return () => {
+      cancelAnimationFrame(raf.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas ref={cvs} style={{ width: "100%", display: "block", borderRadius: 8, border: `1px solid ${VIOLET}20` }} />
+  );
+}
 
 /* ── Page ─────────────────────────────────────────────────── */
 export default function WaterTransportPage() {
@@ -2413,6 +2644,357 @@ MULTIPLE DRONES — CONVOY SPACING:
           and living systems. The ∞ drone moves through the Earth the way coherence moves through
           the substrate: continuously, quietly, mapping as it goes.
         </Card>
+
+        {/* ── XII — Magnetic Reconstruction · MHD Energy Cycle ── */}
+        <SecHead id="s12" n="XII" title="Magnetic Reconstruction · MHD Energy Cycle"
+          sub="The Infinity Loop Origami Drone as a living magnetic reconnection engine — 6-phase topology cycle maps directly onto the folding and plasma architecture" />
+
+        <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>
+          The 6-phase cycle of <em>magnetic reconnection</em> — Expand · Accumulate · Reconnection · Compress · Transport · Re-Expand —
+          is not a metaphor for the ∞ drone. It <em>is</em> the drone. When opposing magnetic field loops approach each other,
+          field lines at the X-line break and reconnect: stored magnetic energy (E_B = B²/2μ₀) converts instantaneously
+          into plasma kinetic energy, heat, and EM radiation. The drone's infinity loop body <em>physically enacts</em> this
+          cycle — expanding its origami arms to grow the magnetic field geometry, allowing loops to accumulate and
+          approach the X-line, triggering reconnection-analogue energy release during the bore-entry pressure transition,
+          compressing to concentrate field strength (B ∝ 1/A), transporting through substrate channels, then re-expanding
+          to restart. The plasma cycle IS the transport cycle.
+        </p>
+
+        {/* Reference image gallery */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, margin: "0 0 28px" }}>
+          {[
+            { src: magneticRecon,  label: "MAGNETIC RECONSTRUCTION", sub: "6-Phase Cycle · MHD Physics · Water Flow Analogy", col: VIOLET },
+            { src: plasmaTransport, label: "INFINITY LOOP PLASMA CYCLE", sub: "Origami Structure · Compression · Plasma Parameters", col: ACCENT },
+            { src: droneSystem,    label: "DRONE SYSTEM ARCHITECTURE", sub: "EXPAND · OPERATE · COMPRESS · TRANSIT · REPEAT", col: GOLD },
+          ].map(img => (
+            <div key={img.label} style={{ borderRadius: 8, overflow: "hidden", border: `1px solid ${img.col}22` }}>
+              <img src={img.src} alt={img.label} style={{ width: "100%", display: "block" }} />
+              <div style={{ background: "#010810", padding: "8px 12px" }}>
+                <div style={{ fontFamily: mono, fontSize: 8, color: img.col, marginBottom: 3 }}>{img.label}</div>
+                <div style={{ fontFamily: mono, fontSize: 7, color: DIM }}>{img.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Animated canvas */}
+        <div style={{ margin: "0 0 24px" }}>
+          <MagneticReconCanvas />
+          <div style={{ display: "flex", gap: 18, marginTop: 8, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#1a9fd4" }}>● TEAL = Left loop · expanding / re-expanding</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#e8a030" }}>● AMBER = Right loop · opposing polarity</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#ffffff80" }}>✕ X-LINE = reconnection site · field topology break</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#8b5cf6" }}>↑↓ PLASMA JETS = energy release perpendicular to X-line</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: "#22c55e" }}>● PARTICLES = substrate transit flow · v = −k∇h</span>
+          </div>
+        </div>
+
+        <Card title="HOW MAGNETIC RECONNECTION POWERS THE DRONE ENERGY CYCLE" col={VIOLET}>
+          In standard MHD, magnetic reconnection converts stored field energy (E_B = B²/2μ₀) into
+          kinetic and thermal plasma energy at the X-line — the point where opposing field topologies meet.
+          The drone mirrors this architecture exactly: its two infinity-loop arms carry current along plasma
+          conduits (J = ρv, ∇×B = μ₀J), building field gradient as the loops approach during the
+          Accumulate phase. At the bore-entry transition node — the drone's "X-line" — field topology
+          changes: origami panels fold under hydraulic pressure, concentrating magnetic field (B ∝ 1/A),
+          releasing stored elastic + field energy as the drone accelerates into underground transit.
+          This is not metaphor. The induction equation governs both: ∂B/∂t = ∇×(v×B) − η∇×(∇×B).
+          In the drone, v is the panel-fold velocity, B is the coil field, η is the effective resistivity
+          of the graphene-plasma interface. Reconnection IS the fold event. Energy release IS the transit
+          acceleration. The water flow analogy is identical: flow paths approach, merge at a pressure
+          node, release energy, compress into a channel, transit underground, re-emerge.
+        </Card>
+
+        <EqBlock>{`MAGNETIC RECONNECTION — GOVERNING MHD EQUATIONS (mapped to Drone Architecture):
+
+INDUCTION EQUATION:
+  ∂B/∂t = ∇×(v×B) − η∇×(∇×B)
+  → v = panel-fold velocity field [m/s]
+  → B = internal coil magnetic field [T]
+  → η = graphene-plasma effective resistivity [Ω·m]
+  → Left term: field advection with folding geometry
+  → Right term: resistive diffusion / field reconnection rate
+
+GENERALISED OHM'S LAW (plasma in drone conduits):
+  E + v×B = ηJ     →    J = ρv   (Ampere carrier)
+  ∇×B = μ₀J               (Ampere's Law)
+  ∇·E  = ρ/ε₀             (Gauss's Law)
+  → Current density J circulates in the ∞ loop plasma conduit
+  → Magnetic field lines form toroidal vortex rings inside the loop structure
+
+MAGNETIC ENERGY DENSITY & RELEASE:
+  E_B = B²/2μ₀             [J/m³]
+  During Reconnection:    dE_B/dt < 0   ⟹  Energy is released
+  Energy Evolution:       dE_B/dt = −∫(ηJ²/μ₀)dV − (Outflows)
+  → Joule dissipation term: ηJ²/μ₀ [converted to plasma motion, heat, EM]
+  → Outflows: plasma jets perpendicular to X-line (↑ kinetic · ↓ kinetic)
+
+COMPRESSION — FIELD CONCENTRATION:
+  B ∝ 1/A    (as loop area A decreases, field B increases)
+  → Underground phase (A_compact = 0.12 × A_open): B increases 8.3×
+  → Energy densification: E_B scales as B² → 69× higher energy density
+  → This concentrated field drives the internal plasma cycle during transit
+
+TRANSIT FLOW (Water / Substrate Analogy):
+  v = −k∇h     (Darcy / potential gradient)
+  → h = hydraulic head  [m]
+  → k = substrate permeability coefficient
+  → Flow follows lowest potential — identical to plasma jet outflow direction
+
+ENERGY CYCLE (closed loop):
+  E_stored → E_kinetic → E_plasma → E_stored
+  EXPAND (low B, large A) → ACCUMULATE (∇B grows) → RECONNECTION (topology change)
+  → COMPRESS (high B, small A) → TRANSPORT (v = −k∇h) → RE-EXPAND (new topology)`}</EqBlock>
+
+        {/* 6-phase cycle grid */}
+        <div style={{ marginBottom: 8, fontFamily: mono, fontSize: 10, color: ACCENT, letterSpacing: 2 }}>
+          ∞ DRONE · 6-PHASE MAGNETIC RECONNECTION CYCLE
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, margin: "0 0 28px" }}>
+          {[
+            { n: "1", name: "EXPAND", col: "#1a9fd4",
+              drone: "Origami arms unfold · Systems activate · Low B, large area (A_open)",
+              mhd:   "Magnetic loops grow · Energy stored in geometry · Field strength low",
+              water: "Water seeks lowest potential · Flow paths spread across surface topography" },
+            { n: "2", name: "ACCUMULATE", col: "#8b5cf6",
+              drone: "Plasma cycle generates & stabilises · Loop arms fully extended · Field gradient builds",
+              mhd:   "Loops approach each other · Field gradient ∇B increases · Current sheet forms at intersection",
+              water: "Flow paths approach and interact · Pressure gradients form at convergence nodes" },
+            { n: "3", name: "RECONNECTION", col: "#ffffff",
+              drone: "Bore entry · Hydraulic pressure triggers fold · X-line topology change · Energy release → transit acceleration",
+              mhd:   "Field lines break and reconnect at X-line · dE_B/dt < 0 · Plasma jets outward ↑↓ · New stable topology",
+              water: "Paths merge and reconfigure · Energy released at confluence · New channel topology" },
+            { n: "4", name: "COMPRESS", col: "#e8a030",
+              drone: "Arms fold inward · Fields contained · B ∝ 1/A → B increases 8.3× · Hydrodynamic pod sealed",
+              mhd:   "Energy concentrated in small volume · High B, small area · E_B = B²/2μ₀ spikes · Loops collapse",
+              water: "Flow compresses into channels · Velocity increases · Pressure concentrates" },
+            { n: "5", name: "TRANSPORT", col: "#22c55e",
+              drone: "Compact pod transits water-filled channels / bore · v = −k∇h · Terrain mapping + pressure sensing",
+              mhd:   "Plasma jets transport energy along reconnected field lines · v = outflow velocity",
+              water: "Flows through underground channels · Emerges at lowest potential exit point" },
+            { n: "6", name: "RE-EXPAND", col: "#1fd4c8",
+              drone: "Depth decreases → pressure drops → origami spring-back → new ∞ cycle begins",
+              mhd:   "New magnetic topology is more stable configuration · Cycle restarts with fresh geometry",
+              water: "Emerges and spreads · New surface pattern · Lowest potential redistributes" },
+          ].map(p => (
+            <div key={p.n} style={{ background: `${p.col}08`, border: `1px solid ${p.col}28`, borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span style={{ fontFamily: mono, fontSize: 18, color: p.col, lineHeight: 1 }}>{p.n}</span>
+                <span style={{ fontFamily: mono, fontSize: 10, color: p.col, letterSpacing: 1.5 }}>{p.name}</span>
+              </div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: ACCENT, marginBottom: 4 }}>DRONE</div>
+              <div style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.55, marginBottom: 8 }}>{p.drone}</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: VIOLET, marginBottom: 4 }}>MHD PHYSICS</div>
+              <div style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.55, marginBottom: 8 }}>{p.mhd}</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM, marginBottom: 4 }}>WATER ANALOGY</div>
+              <div style={{ fontFamily: body, fontSize: 13, color: `${TEXT}99`, lineHeight: 1.55 }}>{p.water}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Plasma parameters + compression physics */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, margin: "0 0 28px" }}>
+          <Card title="PLASMA CYCLE PARAMETERS (Infinity Loop Conduit)" col={ACCENT}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {[
+                { eq: "J = ρv",         label: "Current Density", desc: "Plasma current circulates in ∞ loop" },
+                { eq: "∇×B = μ₀J",      label: "Ampere's Law",   desc: "Field lines form toroidal vortex rings" },
+                { eq: "∇·E = ρ/ε₀",     label: "Gauss's Law",    desc: "Charge density in plasma conduit" },
+                { eq: "B ∝ 1/A",         label: "Compression",    desc: "Field intensifies as loop folds" },
+                { eq: "E_B = B²/2μ₀",   label: "Field Energy",   desc: "Stored energy density [J/m³]" },
+                { eq: "v = −k∇h",        label: "Transit Flow",   desc: "Substrate potential gradient drive" },
+              ].map(item => (
+                <div key={item.eq} style={{ background: "#ffffff06", borderRadius: 6, padding: "10px 12px", border: `1px solid ${ACCENT}15` }}>
+                  <div style={{ fontFamily: mono, fontSize: 13, color: GOLD, marginBottom: 4 }}>{item.eq}</div>
+                  <div style={{ fontFamily: mono, fontSize: 8, color: ACCENT, marginBottom: 3 }}>{item.label}</div>
+                  <div style={{ fontFamily: body, fontSize: 12, color: DIM, lineHeight: 1.5 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card title="COMPRESSION — ENERGY CONCENTRATION" col={GOLD}>
+            <p style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.65, marginTop: 0 }}>
+              As the origami loop compresses (area A decreases), magnetic field strength increases
+              as B ∝ 1/A. This is the direct engineering application of flux conservation in
+              a folding magnetic geometry.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { label: "Open state area",     val: "A_open ≈ 50 m²",       col: ACCENT },
+                { label: "Compact state area",  val: "A_compact ≈ 6 m²",     col: GOLD },
+                { label: "Field amplification", val: "B × 8.3×",             col: VIOLET },
+                { label: "Energy densification",val: "E_B × 69× (B² scale)", col: "#ef4444" },
+                { label: "Internal plasma temp",val: "↑ proportional to B²", col: STONE },
+                { label: "Transit field mode",  val: "High B, sealed pod",   col: GREEN },
+              ].map(r => (
+                <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center",
+                  borderBottom: `1px solid #ffffff08`, paddingBottom: 6 }}>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: DIM }}>{r.label}</span>
+                  <span style={{ fontFamily: mono, fontSize: 10, color: r.col }}>{r.val}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* System specifications */}
+        <div style={{ marginBottom: 8, fontFamily: mono, fontSize: 10, color: GOLD, letterSpacing: 2 }}>
+          SYSTEM SPECIFICATIONS · INFINITY LOOP ORIGAMI DRONE
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, margin: "0 0 28px" }}>
+          {[
+            { label: "Length (compact)",     val: "0.8 – 1.2 m",   col: ACCENT },
+            { label: "Width (compressed)",   val: "0.6 – 0.8 m",   col: ACCENT },
+            { label: "Length (deployed)",    val: "3.5 – 5.0 m",   col: GOLD },
+            { label: "Width (deployed)",     val: "2.5 – 4.0 m",   col: GOLD },
+            { label: "Propulsion",           val: "Electric / Hybrid", col: VIOLET },
+            { label: "Endurance",            val: "12 – 48 hrs",   col: GREEN },
+            { label: "Depth rating",         val: "100 m+",         col: "#1fd4c8" },
+            { label: "Op. temperature",      val: "−10°C to 50°C", col: STONE },
+          ].map(s => (
+            <div key={s.label} style={{ background: `${s.col}08`, border: `1px solid ${s.col}20`,
+              borderRadius: 6, padding: "12px 14px", textAlign: "center" }}>
+              <div style={{ fontFamily: mono, fontSize: 16, color: s.col, marginBottom: 4 }}>{s.val}</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Structure features + compression system */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, margin: "0 0 28px" }}>
+          <div style={{ background: "#ffffff04", border: `1px solid ${ACCENT}20`, borderRadius: 8, padding: "16px 18px" }}>
+            <div style={{ fontFamily: mono, fontSize: 10, color: ACCENT, marginBottom: 10, letterSpacing: 1.5 }}>STRUCTURE FEATURES</div>
+            {["Lightweight Alloy Frame", "Shape Memory Composite Joints", "Water-Resistant Origami Skin",
+              "Modular Arms & Propulsion Units", "Plasma Conduits Along Loop", "Sensor & Comms Module",
+              "Power Core (Plasma / EM)"].map(f => (
+              <div key={f} style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.6,
+                borderBottom: "1px solid #ffffff06", paddingBottom: 5, marginBottom: 5 }}>
+                <span style={{ color: ACCENT, marginRight: 6 }}>›</span>{f}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: "#ffffff04", border: `1px solid ${GOLD}20`, borderRadius: 8, padding: "16px 18px" }}>
+            <div style={{ fontFamily: mono, fontSize: 10, color: GOLD, marginBottom: 10, letterSpacing: 1.5 }}>COMPRESSION SYSTEM</div>
+            {["Hydraulic / Electric Actuators", "Interlocking Panels", "Pressure Seal", "Ballast Adjustment",
+              "Field Containment Coils", "Plasma Density Lock", "Origami Crease Memory"].map(f => (
+              <div key={f} style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.6,
+                borderBottom: "1px solid #ffffff06", paddingBottom: 5, marginBottom: 5 }}>
+                <span style={{ color: GOLD, marginRight: 6 }}>›</span>{f}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: "#ffffff04", border: `1px solid ${VIOLET}20`, borderRadius: 8, padding: "16px 18px" }}>
+            <div style={{ fontFamily: mono, fontSize: 10, color: VIOLET, marginBottom: 10, letterSpacing: 1.5 }}>TRANSIT MODES</div>
+            {["Submerged Navigation", "Turbine / Jet Propulsion", "Buoyancy Control",
+              "Terrain Mapping & Obstacle Avoidance", "Pressure Gradient Sensing",
+              "Inertial / Stellar Guidance", "Substrate Flow Analysis"].map(f => (
+              <div key={f} style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.6,
+                borderBottom: "1px solid #ffffff06", paddingBottom: 5, marginBottom: 5 }}>
+                <span style={{ color: VIOLET, marginRight: 6 }}>›</span>{f}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mission modules */}
+        <div style={{ marginBottom: 8, fontFamily: mono, fontSize: 10, color: "#ef4444", letterSpacing: 2 }}>
+          MISSION MODULES · MODULAR PAYLOAD SYSTEM
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, margin: "0 0 28px" }}>
+          {[
+            { title: "ISR / SURVEILLANCE", col: "#ef4444",
+              items: ["ISR Sensors", "EO/IR Cameras", "LIDAR / SAR", "Wide-area Mapping"] },
+            { title: "COMMS RELAY", col: ACCENT,
+              items: ["Mesh Networking", "Signal Boosting", "Comms Relay Node", "Encrypted Burst TX"] },
+            { title: "WEAPON / TOOL BAY", col: GOLD,
+              items: ["Modular Payload", "Non-lethal / Lethal", "Precision Delivery", "Remote Release"] },
+            { title: "ENVIRONMENTAL", col: GREEN,
+              items: ["Water Sampling", "Geological Sensing", "Substrate Mapping", "Data Collection"] },
+          ].map(m => (
+            <div key={m.title} style={{ background: `${m.col}08`, border: `1px solid ${m.col}28`,
+              borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: m.col, marginBottom: 10, letterSpacing: 1 }}>{m.title}</div>
+              {m.items.map(item => (
+                <div key={item} style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.6,
+                  borderBottom: "1px solid #ffffff06", paddingBottom: 4, marginBottom: 4 }}>
+                  <span style={{ color: m.col, marginRight: 5, fontSize: 10 }}>●</span>{item}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Natural plasma analogs */}
+        <Card title="NATURAL PLASMA ANALOGUES → DRONE SYSTEM MAPPING" col={VIOLET}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div>
+              <div style={{ fontFamily: mono, fontSize: 9, color: VIOLET, marginBottom: 10, letterSpacing: 1.5 }}>NATURAL PHENOMENON</div>
+              {[
+                { nat: "Solar Flares / Coronal Loops", drone: "Plasma circulates in ∞ loop structure", col: GOLD },
+                { nat: "Magnetic Reconnection",        drone: "Expand / Compress releases energy",      col: "#ef4444" },
+                { nat: "Toroidal Vortices",            drone: "Toroidal magnetic vortex in loop",       col: VIOLET },
+                { nat: "Plasma Jets in Space",         drone: "Directed transit through channels",      col: ACCENT },
+                { nat: "Magnetotail (Earth)",          drone: "Substrate filament orientation field",   col: GREEN },
+                { nat: "Magnetic Island Coalescence",  drone: "Multi-drone swarm field merging",        col: STONE },
+                { nat: "Laboratory Plasma",            drone: "Dense Plasma Focus power core",          col: "#1fd4c8" },
+              ].map(row => (
+                <div key={row.nat} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8,
+                  borderBottom: "1px solid #ffffff06", padding: "6px 0" }}>
+                  <div style={{ fontFamily: body, fontSize: 13, color: row.col, lineHeight: 1.5 }}>{row.nat}</div>
+                  <div style={{ fontFamily: body, fontSize: 13, color: DIM,    lineHeight: 1.5 }}>{row.drone}</div>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 10, letterSpacing: 1.5 }}>KEY MHD PHYSICS PRINCIPLES</div>
+              {[
+                "Magnetic fields store energy in geometry — not in particles but in field topology",
+                "Compression increases field strength (B ∝ 1/A) — folding the geometry concentrates E_B",
+                "Current sheets form at loop intersection — the X-line is a current concentration zone",
+                "Reconnection changes field-line topology — new geometry is more stable than the old",
+                "Energy converts to plasma motion, heat, EM radiation — all recoverable forms",
+                "New topology is a more stable configuration — the system always seeks lowest-energy state",
+                "The water flow analogy is structurally identical to MHD outflow dynamics",
+              ].map((pt, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8, alignItems: "flex-start" }}>
+                  <span style={{ fontFamily: mono, fontSize: 9, color: VIOLET, marginTop: 2, flexShrink: 0 }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.6 }}>{pt}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        {/* Applications grid */}
+        <div style={{ marginTop: 24, marginBottom: 8, fontFamily: mono, fontSize: 10, color: STONE, letterSpacing: 2 }}>
+          POTENTIAL APPLICATIONS · MAGNETIC RECONNECTION ARCHITECTURE
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, margin: "0 0 32px" }}>
+          {[
+            { title: "STEALTH UNDERGROUND / UNDERWATER TRANSIT", col: "#1a9fd4",
+              body: "Compressed drone pod enters natural substrate channels. Water / plasma follows the path of least resistance (v = −k∇h). Minimal acoustic, EM, and radar signature — indistinguishable from geological flow." },
+            { title: "ADAPTIVE MORPHING FOR CONSTRAINED SPACES", col: VIOLET,
+              body: "Shape memory composite joints allow real-time geometry optimisation. As bore diameter narrows, the drone continuously re-calculates the optimal fold configuration to minimise hydraulic drag." },
+            { title: "ENERGY HARVESTING FROM PLASMA EVENTS", col: GOLD,
+              body: "During the Reconnection phase, energy release (dE_B/dt < 0) powers internal systems. The drone extracts energy from its own magnetic cycle — a self-sustaining plasma energy loop with minimal external power input." },
+            { title: "SWARM DEPLOYMENT & NETWORKED SYSTEMS", col: GREEN,
+              body: "Multiple drones operating in convoy spacing (200m minimum) create a magnetic field mesh. Inter-drone field coupling enables coordinated navigation and swarm coherence via the AETHER substrate filament protocol." },
+            { title: "MILITARY RECONNAISSANCE & RAPID REDEPLOYMENT", col: "#ef4444",
+              body: "ISR / EO-IR / LIDAR payload modules deploy during the Expand phase. Continuous ∞ cycle enables persistent surveillance with no fixed infrastructure — 24/7 coverage through aquifer and underground tunnel networks." },
+            { title: "DISASTER RESPONSE IN EXTREME ENVIRONMENTS", col: STONE,
+              body: "Water-resistant origami skin, depth rating 100m+, operating temperature −10°C to 50°C. Can navigate collapsed tunnels, flooded structures, and subterranean water systems inaccessible to surface vehicles." },
+          ].map(a => (
+            <div key={a.title} style={{ background: `${a.col}08`, border: `1px solid ${a.col}25`,
+              borderRadius: 8, padding: "16px 18px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: a.col, marginBottom: 8, letterSpacing: 1 }}>{a.title}</div>
+              <div style={{ fontFamily: body, fontSize: 13, color: TEXT, lineHeight: 1.65 }}>{a.body}</div>
+            </div>
+          ))}
+        </div>
 
         {/* Footer */}
         <div style={{
