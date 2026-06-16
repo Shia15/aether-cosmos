@@ -241,6 +241,9 @@ import BurstingQuaternionsPage from "@/pages/bursting-quaternions";
 import ColorCoherencePage from "@/pages/color-coherence";
 import RotationEnginePage from "@/pages/rotation-engine";
 import LiquidDensityPage from "@/pages/liquid-density";
+import FoodSubstrateCoherencePage from "@/pages/food-substrate-coherence";
+import SubstrateKitchenPage from "@/pages/substrate-kitchen";
+import LivingNutritionPage from "@/pages/living-nutrition";
 
 const queryClient = new QueryClient();
 
@@ -485,6 +488,9 @@ function Router() {
         <Route path="/color-coherence" component={ColorCoherencePage} />
         <Route path="/rotation-engine" component={RotationEnginePage} />
         <Route path="/liquid-density" component={LiquidDensityPage} />
+        <Route path="/food-substrate-coherence" component={FoodSubstrateCoherencePage} />
+        <Route path="/substrate-kitchen" component={SubstrateKitchenPage} />
+        <Route path="/living-nutrition" component={LivingNutritionPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
