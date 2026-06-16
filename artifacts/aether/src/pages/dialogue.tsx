@@ -528,7 +528,6 @@ export default function DialoguePage() {
                   flex: 1, background: "transparent", border: "none", outline: "none",
                   fontFamily: body, fontSize: 15, color: TEXT, resize: "none",
                   lineHeight: 1.6, minHeight: 44,
-                  placeholder: { color: DIM } as React.CSSProperties,
                 }}
               />
               <button
