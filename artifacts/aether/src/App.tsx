@@ -240,6 +240,7 @@ import TidalMovementPage from "@/pages/tidal-movement";
 import BurstingQuaternionsPage from "@/pages/bursting-quaternions";
 import ColorCoherencePage from "@/pages/color-coherence";
 import RotationEnginePage from "@/pages/rotation-engine";
+import LiquidDensityPage from "@/pages/liquid-density";
 
 const queryClient = new QueryClient();
 
@@ -483,6 +484,7 @@ function Router() {
         <Route path="/bursting-quaternions" component={BurstingQuaternionsPage} />
         <Route path="/color-coherence" component={ColorCoherencePage} />
         <Route path="/rotation-engine" component={RotationEnginePage} />
+        <Route path="/liquid-density" component={LiquidDensityPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
