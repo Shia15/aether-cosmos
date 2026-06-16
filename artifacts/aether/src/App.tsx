@@ -255,6 +255,7 @@ import BioInfinityDrivePage from "@/pages/bio-infinity-drive";
 import BiorefineryPropulsionPage from "@/pages/biorefinery-propulsion";
 import FullPerceptionUniversePage from "@/pages/full-perception-universe";
 import SeamossTransceiverPage from "@/pages/seamoss-transceiver";
+import TorsionResonatorPage from "@/pages/torsion-resonator";
 
 const queryClient = new QueryClient();
 
@@ -513,6 +514,7 @@ function Router() {
         <Route path="/biorefinery-propulsion" component={BiorefineryPropulsionPage} />
         <Route path="/full-perception-universe" component={FullPerceptionUniversePage} />
         <Route path="/seamoss-transceiver" component={SeamossTransceiverPage} />
+        <Route path="/torsion-resonator" component={TorsionResonatorPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
