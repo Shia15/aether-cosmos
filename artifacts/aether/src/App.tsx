@@ -245,6 +245,10 @@ import FoodSubstrateCoherencePage from "@/pages/food-substrate-coherence";
 import SubstrateKitchenPage from "@/pages/substrate-kitchen";
 import LivingNutritionPage from "@/pages/living-nutrition";
 import CompoundEyeRoadmapPage from "@/pages/compound-eye-roadmap";
+import InformationManifoldPage from "@/pages/information-manifold";
+import PhaseCouplingPage from "@/pages/phase-coupling";
+import BodyCoherenceScannerPage from "@/pages/body-coherence-scanner";
+import FogletSandstonePage from "@/pages/foglet-sandstone";
 
 const queryClient = new QueryClient();
 
@@ -493,6 +497,10 @@ function Router() {
         <Route path="/substrate-kitchen" component={SubstrateKitchenPage} />
         <Route path="/living-nutrition" component={LivingNutritionPage} />
         <Route path="/compound-eye-roadmap" component={CompoundEyeRoadmapPage} />
+        <Route path="/information-manifold" component={InformationManifoldPage} />
+        <Route path="/phase-coupling" component={PhaseCouplingPage} />
+        <Route path="/body-coherence-scanner" component={BodyCoherenceScannerPage} />
+        <Route path="/foglet-sandstone" component={FogletSandstonePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
