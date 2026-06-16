@@ -237,6 +237,7 @@ import GraphiteSynthesisPage from "@/pages/graphite-synthesis";
 import TimeProcessingPage from "@/pages/time-processing";
 import UAPEnergyPage from "@/pages/uap-energy";
 import TidalMovementPage from "@/pages/tidal-movement";
+import BurstingQuaternionsPage from "@/pages/bursting-quaternions";
 
 const queryClient = new QueryClient();
 
@@ -477,6 +478,7 @@ function Router() {
         <Route path="/time-processing" component={TimeProcessingPage} />
         <Route path="/uap-energy" component={UAPEnergyPage} />
         <Route path="/tidal-movement" component={TidalMovementPage} />
+        <Route path="/bursting-quaternions" component={BurstingQuaternionsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
