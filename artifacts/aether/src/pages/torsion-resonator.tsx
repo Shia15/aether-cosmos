@@ -24,7 +24,7 @@ const body  = "'Crimson Pro', Georgia, serif";
 /* Golden angle in radians */
 const GOLDEN_ANGLE = 2.39996322972865332; // 137.507764°
 
-type CanvasTab = "spin" | "photorefractive" | "cavity";
+type CanvasTab = "spin" | "photorefractive" | "cavity" | "gain";
 
 /* ══════════ GOLDEN-ANGLE FERMAT SPIRAL CANVAS ══════════ */
 function SpinCanvas() {
@@ -438,14 +438,236 @@ function CavityCanvas() {
   return <canvas ref={cvRef} style={{ display:"block", width:"100%", height:250 }} />;
 }
 
+/* ══════════ GAIN REGIONS CANVAS ══════════
+   Four subsystems surrounding a central large toroidal resonator:
+   MODE LOCKING · PHASE LOCKING · INTERFERENCE GRID · NODE CONTROL
+══════════════════════════════════════════ */
+function GainCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const raf   = useRef(0);
+  const t0    = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    function resize() {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const r = cv!.getBoundingClientRect();
+      cv!.width = r.width * dpr; cv!.height = r.height * dpr;
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resize(); window.addEventListener("resize", resize);
+
+    function loop() {
+      raf.current = requestAnimationFrame(loop);
+      t0.current += 0.012;
+      const T = t0.current;
+      const r = cv!.getBoundingClientRect();
+      const W = r.width, H = r.height;
+      ctx!.clearRect(0, 0, W, H); ctx!.fillStyle = BG; ctx!.fillRect(0, 0, W, H);
+
+      const cx = W / 2, cy = H / 2;
+      const bigR = Math.min(W, H) * 0.28; // Large resonator ring radius
+      const persp = 0.32;
+
+      // ── Central large resonator glow ──
+      const mainGlow = ctx!.createRadialGradient(cx, cy, 0, cx, cy, bigR * 1.6);
+      mainGlow.addColorStop(0, AMBER + "18");
+      mainGlow.addColorStop(0.5, VIOLET + "08");
+      mainGlow.addColorStop(1, "transparent");
+      ctx!.beginPath(); ctx!.ellipse(cx, cy, bigR*1.6, bigR*1.6*persp*2.2, 0, 0, Math.PI*2);
+      ctx!.fillStyle = mainGlow; ctx!.fill();
+
+      // ── Central resonator rings ──
+      [1.0, 0.72, 0.5].forEach((scale, ri) => {
+        const col = ri===0 ? INDIGO : ri===1 ? VIOLET : AMBER;
+        ctx!.beginPath(); ctx!.ellipse(cx, cy, bigR*scale, bigR*scale*persp, 0, 0, Math.PI*2);
+        ctx!.strokeStyle = col + (ri===0?"55":"30"); ctx!.lineWidth = ri===0?2:1; ctx!.stroke();
+      });
+
+      // ── Gain medium: energy density gradient across ring ──
+      for (let a = 0; a < Math.PI*2; a += 0.06) {
+        const gainPulse = 0.5 + 0.5 * Math.sin(T * 2.5 + a * 4);
+        const gx = cx + bigR * 0.86 * Math.cos(a);
+        const gy = cy + bigR * 0.86 * persp * Math.sin(a);
+        ctx!.beginPath(); ctx!.arc(gx, gy, 2.5 * gainPulse, 0, Math.PI*2);
+        ctx!.fillStyle = AMBER + Math.round(gainPulse * 70).toString(16).padStart(2,"0");
+        ctx!.fill();
+      }
+
+      // ── Standing wave energy density (radially) ──
+      const waveN = 7; // n=7 mode
+      for (let a = 0; a < Math.PI*2; a += 0.04) {
+        const standing = Math.abs(Math.cos(waveN * a + T * 0.3));
+        const rw = bigR * (0.5 + 0.5 * standing) * 0.9;
+        const wx = cx + rw * Math.cos(a);
+        const wy = cy + rw * persp * Math.sin(a);
+        ctx!.beginPath(); ctx!.arc(wx, wy, 1, 0, Math.PI*2);
+        ctx!.fillStyle = GREEN + "40"; ctx!.fill();
+      }
+
+      // ── Center label: MASSIVE GAIN REGION ──
+      ctx!.font = `7px ${serif}`; ctx!.textAlign = "center"; ctx!.fillStyle = AMBER + "cc";
+      ctx!.fillText("MASSIVE GAIN REGION", cx, cy - 5);
+      ctx!.font = `6px ${mono}`; ctx!.fillStyle = AMBER + "60";
+      ctx!.fillText("L = nλ/2  ·  Q = 2π·E/ΔE_cycle", cx, cy + 5);
+      ctx!.fillText("R(t) = (a√t·cos(αt), a√t·sin(αt), vt)", cx, cy + 15);
+
+      // ══ FOUR SUBSYSTEM PANELS ══
+      const panels = [
+        { key:"MODE LOCKING",    x:W*0.13, y:H*0.20, color:CYAN,
+          desc:"δ-pulse train locks all cavity modes to a single frequency comb", sub:"Δf = c/2L" },
+        { key:"PHASE LOCKING",   x:W*0.87, y:H*0.20, color:VIOLET,
+          desc:"PLL locks maser phase to Cs isotope reference — δφ < 1 mrad", sub:"φ_lock = ΔE/ℏ·t" },
+        { key:"INTERFERENCE\nGRID", x:W*0.13, y:H*0.80, color:LIME,
+          desc:"2D constructive interference pattern maps energy density", sub:"∑ cos(kₙ·r) → max" },
+        { key:"NODE CONTROL",    x:W*0.87, y:H*0.80, color:ROSE,
+          desc:"Standing-wave node placement via phase-array steering", sub:"x_node = nλ/2" },
+      ];
+
+      // ── Connection beams from center to each subsystem ──
+      panels.forEach(p => {
+        const pulseFrac = 0.5 + 0.5*Math.sin(T*1.8 + p.x*0.02);
+        const bx = cx + (p.x - cx)*pulseFrac;
+        const by = cy + (p.y - cy)*pulseFrac;
+        ctx!.beginPath(); ctx!.moveTo(cx, cy); ctx!.lineTo(p.x, p.y);
+        ctx!.strokeStyle = p.color+"20"; ctx!.lineWidth=0.8; ctx!.stroke();
+        // Traveling pulse
+        ctx!.beginPath(); ctx!.arc(bx, by, 2.5, 0, Math.PI*2);
+        ctx!.fillStyle = p.color+"cc"; ctx!.fill();
+      });
+
+      panels.forEach(p => {
+        const bw = W*0.19, bh = 60;
+        const bx = p.x - bw/2, by = p.y - bh/2;
+
+        // Box background
+        ctx!.fillStyle = `${p.color}10`; ctx!.fillRect(bx, by, bw, bh);
+        ctx!.strokeStyle = p.color+"55"; ctx!.lineWidth=1;
+        ctx!.strokeRect(bx, by, bw, bh);
+
+        // Title
+        ctx!.font = `7px ${serif}`; ctx!.textAlign = "center"; ctx!.fillStyle = p.color+"cc";
+        p.key.split("\n").forEach((ln, li) => ctx!.fillText(ln, p.x, by+12+li*10));
+        const titleH = p.key.split("\n").length * 10;
+
+        // Sub-equation
+        ctx!.font = `6px ${mono}`; ctx!.fillStyle = p.color+"88";
+        ctx!.fillText(p.sub, p.x, by+titleH+14);
+
+        // Animation specific to each subsystem
+        if (p.key === "MODE LOCKING") {
+          // Multiple modes → locked to one
+          for (let m=0; m<4; m++) {
+            const mx = bx+6, mw = bw-12;
+            const my = by+bh-14 + (m-1.5)*3.5;
+            const lockProgress = Math.min(1, Math.sin(T*0.6+m)*0.5+0.5);
+            const freq = 1 + m * 0.7 * (1-lockProgress);
+            ctx!.beginPath();
+            for (let px=0; px<=mw; px+=1) {
+              const v = Math.sin(freq * px*0.35 + T*(1+m*0.3)) * 2;
+              if (px===0) ctx!.moveTo(mx+px, my+v); else ctx!.lineTo(mx+px, my+v);
+            }
+            ctx!.strokeStyle = CYAN+Math.round(40+lockProgress*80).toString(16).padStart(2,"0");
+            ctx!.lineWidth=0.7; ctx!.stroke();
+          }
+
+        } else if (p.key === "PHASE LOCKING") {
+          // PLL circle with locked pointer
+          const plcx = p.x, plcy = by+bh-20;
+          ctx!.beginPath(); ctx!.arc(plcx, plcy, 10, 0, Math.PI*2);
+          ctx!.strokeStyle = VIOLET+"40"; ctx!.lineWidth=1; ctx!.stroke();
+          const lockAngle = T*2 - Math.sin(T*2)*0.8; // converging
+          const pa = [lockAngle, lockAngle + 0.3].map(a => ({
+            x: plcx+10*Math.cos(a), y: plcy+10*Math.sin(a)
+          }));
+          ctx!.beginPath(); ctx!.moveTo(plcx,plcy); ctx!.lineTo(pa[0].x,pa[0].y);
+          ctx!.strokeStyle=VIOLET+"cc"; ctx!.lineWidth=1.5; ctx!.stroke();
+          ctx!.beginPath(); ctx!.moveTo(plcx,plcy); ctx!.lineTo(pa[1].x,pa[1].y);
+          ctx!.strokeStyle=CYAN+"60"; ctx!.lineWidth=1; ctx!.stroke();
+          ctx!.font=`6px ${mono}`; ctx!.fillStyle=VIOLET+"88";
+          ctx!.fillText("PLL", plcx+13, plcy+3);
+
+        } else if (p.key.startsWith("INTERFERENCE")) {
+          // 2D interference dots
+          const gx0 = bx+4, gy0 = by+bh-20, gw = bw-8, gh=16;
+          for (let ix=0; ix<=gw; ix+=8) {
+            for (let iy=0; iy<=gh; iy+=8) {
+              const val = (Math.cos(ix*0.5 + T*1.5) + Math.cos(iy*0.5 + T*1.5))/2;
+              const alpha = Math.max(0, val);
+              ctx!.beginPath(); ctx!.arc(gx0+ix, gy0+iy, 2.5*alpha+0.5, 0, Math.PI*2);
+              ctx!.fillStyle = LIME+Math.round(alpha*160).toString(16).padStart(2,"0");
+              ctx!.fill();
+            }
+          }
+
+        } else { // NODE CONTROL
+          // Standing wave with moveable node markers
+          const nx0 = bx+6, nw = bw-12;
+          const ny = by+bh-14;
+          ctx!.beginPath();
+          for (let px=0; px<=nw; px+=1) {
+            const v = Math.sin(7 * px/nw * Math.PI + T*0.4) * 5;
+            if (px===0) ctx!.moveTo(nx0+px, ny+v); else ctx!.lineTo(nx0+px, ny+v);
+          }
+          ctx!.strokeStyle = ROSE+"80"; ctx!.lineWidth=1; ctx!.stroke();
+          // Node dots (zeros of standing wave)
+          for (let n=0; n<=7; n++) {
+            const nodeX = nx0 + (n/7)*nw;
+            ctx!.beginPath(); ctx!.arc(nodeX, ny, 2.5, 0, Math.PI*2);
+            ctx!.fillStyle = ROSE + "cc"; ctx!.fill();
+          }
+        }
+      });
+
+      // ── Spin-time propulsion sequence (bottom strip) ──
+      const steps = [
+        { n:"1", label:"COHERENCE\nESTABLISHED", color:CYAN   },
+        { n:"2", label:"SPIRAL\nSPIN-UP",        color:VIOLET },
+        { n:"3", label:"ENERGY DENSITY\nGRADIENT",color:AMBER },
+        { n:"4", label:"REACTIONLESS\nTHRUST",   color:GREEN  },
+      ];
+      const stripY = H * 0.91, stepW = W / 5;
+      ctx!.font = `6px ${mono}`; ctx!.textAlign = "center";
+      steps.forEach((s, i) => {
+        const sx = stepW * 0.6 + i * stepW;
+        const active = Math.floor(T * 0.5) % 4 === i;
+        ctx!.beginPath(); ctx!.arc(sx, stripY, 8, 0, Math.PI*2);
+        ctx!.fillStyle = s.color + (active ? "aa" : "25"); ctx!.fill();
+        ctx!.fillStyle = s.color + (active ? "ff" : "60");
+        ctx!.fillText(s.n, sx, stripY + 3);
+        s.label.split("\n").forEach((ln, li) => {
+          ctx!.font = `5px ${mono}`; ctx!.fillStyle = s.color + "80";
+          ctx!.fillText(ln, sx, stripY + 14 + li * 7);
+        });
+        if (i < 3) {
+          ctx!.beginPath(); ctx!.moveTo(sx+11, stripY); ctx!.lineTo(sx+stepW-11, stripY);
+          ctx!.strokeStyle = s.color+"30"; ctx!.lineWidth=0.8; ctx!.stroke();
+          const arrowFrac = ((T*0.5)%1);
+          const ax = sx+11 + arrowFrac*(stepW-22);
+          ctx!.beginPath(); ctx!.arc(ax, stripY, 2, 0, Math.PI*2);
+          ctx!.fillStyle = s.color+"aa"; ctx!.fill();
+        }
+      });
+      ctx!.font = `6px ${mono}`; ctx!.textAlign = "right"; ctx!.fillStyle = MUTED;
+      ctx!.fillText("SPIN-TIME PROPULSION SEQUENCE →", W-8, H-6);
+    }
+    loop();
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+  return <canvas ref={cvRef} style={{ display:"block", width:"100%", height:310 }} />;
+}
+
 /* ══════════ DATA ══════════ */
 const SPIN_EQS = [
-  { label:"Golden angle",         eq:"α = 137.508°",           note:"Derived from φ=(1+√5)/2: α = 360°(1−1/φ²). The angle that maximises angular spacing between consecutive points — densest packing with no repetition.", color:GOLD },
-  { label:"Fermat spiral (r)",     eq:"rₙ = a√n",              note:"Outward component: each successive point sits one unit of area further from the origin. The spiral expands uniformly in area, not radius.", color:CYAN },
-  { label:"Fermat spiral (θ)",     eq:"θₙ = n · 137.508°",     note:"Upward component mapped to rotation: as n→∞ (time advances), the angle increments by exactly one golden angle. No two points share a spoke.", color:VIOLET },
-  { label:"Angular momentum",      eq:"L = I · ω",             note:"I = moment of inertia. As r expands outward and I increases, ω must decrease to conserve L — the spin slows and spreads.", color:GREEN },
-  { label:"Torsion tensor",        eq:"T^μ_νρ = Γ^μ_[νρ]",    note:"Non-zero when spin density ≠ 0 (Einstein-Cartan). The antisymmetric connection acts as additional force on geodesics — propulsion from rotation.", color:VIOLET },
-  { label:"Frequency stability",   eq:"f = ΔE / h",            note:"Isotope transition energy ΔE (nuclear hyperfine splitting) divided by Planck's constant gives the oscillator frequency — a physical constant.", color:TEAL },
+  { label:"Golden angle",         eq:"α = 137.508°",                    note:"Derived from φ=(1+√5)/2: α = 360°(1−1/φ²). The angle that maximises angular spacing between consecutive points — densest packing with no repetition.", color:GOLD },
+  { label:"Fermat spiral (r)",     eq:"rₙ = a√n",                       note:"Outward component: each successive point sits one unit of area further from the origin. The spiral expands uniformly in area, not radius.", color:CYAN },
+  { label:"Fermat spiral (θ)",     eq:"θₙ = n · 137.508°",              note:"Upward component mapped to rotation: as n→∞ (time advances), the angle increments by exactly one golden angle. No two points share a spoke.", color:VIOLET },
+  { label:"3D Helical Trajectory", eq:"R(t) = (a√t·cos(αt), a√t·sin(αt), vt)", note:"Adds the temporal axis z=vt to the Fermat spiral. As time advances the system spirals upward AND outward simultaneously — spin-time unity.", color:ROSE },
+  { label:"Angular momentum",      eq:"L = I · ω",                      note:"I = moment of inertia. As r expands outward and I increases, ω must decrease to conserve L — the spin slows and spreads.", color:GREEN },
+  { label:"Torsion tensor",        eq:"T^μ_νρ = Γ^μ_[νρ]",             note:"Non-zero when spin density ≠ 0 (Einstein-Cartan). The antisymmetric connection acts as additional force on geodesics — propulsion from rotation.", color:VIOLET },
+  { label:"Frequency stability",   eq:"f = ΔE / h",                     note:"Isotope transition energy ΔE (nuclear hyperfine splitting) divided by Planck's constant gives the oscillator frequency — a physical constant.", color:TEAL },
+  { label:"Gain region Q",         eq:"Q = 2π · E_stored / E_loss",     note:"Quality factor of the maser cavity. Gain regions (mode locking, phase locking) suppress all but the desired mode, maximising Q. High-Q → narrow linewidth.", color:AMBER },
 ];
 
 const PHOTO_LIMITS = [
@@ -471,11 +693,12 @@ const AETHER_STACK = [
 ];
 
 const ISOTOPES = [
-  { sym:"¹³³Cs",  name:"Caesium-133",  f:"9.192 631 770 GHz", spin:"7/2", color:GOLD,   app:"SI second definition" },
-  { sym:"⁸⁷Rb",   name:"Rubidium-87",  f:"6.834 682 611 GHz", spin:"3/2", color:CYAN,   app:"Portable fountain clock" },
-  { sym:"²H",     name:"Deuterium",    f:"327.384 352 MHz",   spin:"1",   color:VIOLET, app:"NMR reference · 21cm" },
-  { sym:"³He",    name:"Helium-3",     f:"8.665 650 GHz",     spin:"1/2", color:GREEN,  app:"Maser · magnetometry" },
-  { sym:"¹H",     name:"Hydrogen",     f:"1.420 405 751 GHz", spin:"1/2", color:TEAL,   app:"Hydrogen maser · space clock" },
+  { sym:"¹³³Cs",  name:"Caesium-133",   f:"9.192 631 770 GHz", spin:"7/2", color:GOLD,   app:"SI second definition · primary clock" },
+  { sym:"⁸⁷Rb",   name:"Rubidium-87",   f:"6.834 682 611 GHz", spin:"3/2", color:CYAN,   app:"Portable fountain clock · gain lock" },
+  { sym:"⁸⁷Sr",   name:"Strontium-87",  f:"429.228 004 229 THz",spin:"9/2",color:ROSE,   app:"Optical lattice clock · 10⁻¹⁸ precision" },
+  { sym:"²H",     name:"Deuterium",     f:"327.384 352 MHz",   spin:"1",   color:VIOLET, app:"NMR reference · 21cm hydrogen line" },
+  { sym:"³He",    name:"Helium-3",      f:"8.665 650 GHz",     spin:"1/2", color:GREEN,  app:"Maser · magnetometry · gain medium" },
+  { sym:"¹H",     name:"Hydrogen",      f:"1.420 405 751 GHz", spin:"1/2", color:TEAL,   app:"Hydrogen maser · deep space clock" },
 ];
 
 /* ══════════ MAIN PAGE ══════════ */
@@ -501,6 +724,7 @@ export default function TorsionResonatorPage() {
     ["spin",           "GOLDEN SPIRAL · SPIN",   VIOLET],
     ["photorefractive","PHOTOREFRACTIVE LIMITS",  CYAN  ],
     ["cavity",         "TOROIDAL MASER CAVITY",   GREEN ],
+    ["gain",           "GAIN REGIONS",            AMBER ],
   ];
 
   return (
@@ -587,17 +811,19 @@ export default function TorsionResonatorPage() {
             <div style={{ padding:"6px 12px 5px", borderBottom:`1px solid ${BORDER}`,
               display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div style={{ fontSize:7, color:MUTED, letterSpacing:"0.15em", textTransform:"uppercase" }}>
-                {tab==="spin" ? "Golden-Angle Fermat Spiral (left: outward) · Torsion Helix (right: upward)" :
-                 tab==="photorefractive" ? "Kerr Saturation Curve · 5 Photorefractive Limits" :
-                 "Toroidal Maser Cavity · Phased Emitters · Isotope Core · Resonance Antinodes"}
+                {tab==="spin"           ? "Golden-Angle Fermat Spiral (left: outward) · Torsion Helix (right: upward)" :
+                 tab==="photorefractive"? "Kerr Saturation Curve · 5 Photorefractive Limits" :
+                 tab==="cavity"         ? "Toroidal Maser Cavity · Phased Emitters · Isotope Core · Resonance Antinodes" :
+                 "Mode Locking · Phase Locking · Interference Grid · Node Control · Spin-Time Sequence"}
               </div>
-              <div style={{ fontSize:8, color:tab==="spin"?VIOLET:tab==="photorefractive"?CYAN:GREEN }}>
-                {tab==="spin"?"α=137.508° N=144":tab==="photorefractive"?"Δn = n₂·I → Δnₛₐₜ":"Q > 10⁹ toroid"}
+              <div style={{ fontSize:8, color:tab==="spin"?VIOLET:tab==="photorefractive"?CYAN:tab==="cavity"?GREEN:AMBER }}>
+                {tab==="spin"?"R(t)=(a√t·cos(αt), a√t·sin(αt), vt)":tab==="photorefractive"?"Δn = n₂·I → Δnₛₐₜ":tab==="cavity"?"Q > 10⁹ toroid":"Q = 2π·E_stored/E_loss"}
               </div>
             </div>
             {tab==="spin"           && <SpinCanvas />}
             {tab==="photorefractive" && <PhotoCanvas />}
             {tab==="cavity"         && <CavityCanvas />}
+            {tab==="gain"           && <GainCanvas />}
           </div>
 
           {/* AETHER resonance stack */}
