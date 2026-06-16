@@ -250,6 +250,7 @@ import PhaseCouplingPage from "@/pages/phase-coupling";
 import BodyCoherenceScannerPage from "@/pages/body-coherence-scanner";
 import FogletSandstonePage from "@/pages/foglet-sandstone";
 import HexiclicalBodyMapPage from "@/pages/hexiclical-body-map";
+import AnimalNeuralPlasmoidPage from "@/pages/animal-neural-plasmoid";
 
 const queryClient = new QueryClient();
 
@@ -503,6 +504,7 @@ function Router() {
         <Route path="/body-coherence-scanner" component={BodyCoherenceScannerPage} />
         <Route path="/foglet-sandstone" component={FogletSandstonePage} />
         <Route path="/hexiclical-body-map" component={HexiclicalBodyMapPage} />
+        <Route path="/animal-neural-plasmoid" component={AnimalNeuralPlasmoidPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

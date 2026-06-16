@@ -11,6 +11,7 @@ import coreRouter from "./core";
 import importRouter from "./import";
 import aetherIntakeRouter from "./aether-intake";
 import dialogueRouter from "./dialogue";
+import animalProfileRouter from "./animal-profile";
 
 const router: IRouter = Router();
 
@@ -26,5 +27,6 @@ router.use(coreRouter);
 router.use(importRouter);
 router.use(aetherIntakeRouter);
 router.use(dialogueRouter);
+router.use(animalProfileRouter);
 
 export default router;
