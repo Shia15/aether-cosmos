@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import stephanBurnsNotebook from "@assets/image_1778072290136.jpg";
 
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#a78bfa",
   fontFamily:"'DM Mono',monospace", textTransform:"uppercase", marginBottom:6 };
@@ -226,20 +225,6 @@ export default function LunarCoherencePage() {
         <Section kicker="III · Source · Stephan Burns notebook · Jan 9 · 8:58 AM"
           title="Reclaim Identity · Program · System Thinking only"
           lead="Hand-written field-note threading orbital-resonance dust, lunar nanopacking, Robert Temple's 'new science in heaven', and Jupiter ionization-to-plasma. AETHER reads it as the orbital-resonance lemma for the tide-in-everything hypothesis above.">
-          <figure style={{ margin:0, borderRadius:12, overflow:"hidden",
-            background:"rgba(15,23,42,0.7)", border:"1px solid rgba(255,255,255,0.08)" }}>
-            <div style={{ width:"100%", maxHeight:760, background:"#000",
-              display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
-              <img src={stephanBurnsNotebook} alt="Stephan Burns notebook · Reclaim Identity · electro static dust clouds in orbital resonance points with the moon · Jan 9 · 8:58 AM"
-                loading="lazy"
-                style={{ maxWidth:"100%", maxHeight:760, objectFit:"contain", display:"block" }}/>
-            </div>
-            <figcaption style={{ padding:"0.8rem 1rem", fontSize:"0.82rem", color:"#cbd5e1", lineHeight:1.55 }}>
-              Stephan Burns — handwritten · Jan 9 · 8:58 AM. "Electro static dust clouds in orbital resonance points with the
-              moon · nanometer scale, pack shem · Interstellar dust force · Robert Temple · new science in heaven · big burst of
-              ionization on Jupiter · ionize + turn into plasma."
-            </figcaption>
-          </figure>
         </Section>
 
         {/* IV · Consciousness implication */}
