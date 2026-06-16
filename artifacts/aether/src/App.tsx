@@ -249,6 +249,7 @@ import InformationManifoldPage from "@/pages/information-manifold";
 import PhaseCouplingPage from "@/pages/phase-coupling";
 import BodyCoherenceScannerPage from "@/pages/body-coherence-scanner";
 import FogletSandstonePage from "@/pages/foglet-sandstone";
+import HexiclicalBodyMapPage from "@/pages/hexiclical-body-map";
 
 const queryClient = new QueryClient();
 
@@ -501,6 +502,7 @@ function Router() {
         <Route path="/phase-coupling" component={PhaseCouplingPage} />
         <Route path="/body-coherence-scanner" component={BodyCoherenceScannerPage} />
         <Route path="/foglet-sandstone" component={FogletSandstonePage} />
+        <Route path="/hexiclical-body-map" component={HexiclicalBodyMapPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
