@@ -1,4 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import temporalMapping from "@assets/58E5DACB-2E46-4F33-8C36-BB61D447FD63_1781615189390.png";
+import coherencingEq   from "@assets/IMG_2189_1781615189390.png";
+import decoherenceFrag from "@assets/IMG_2191_1781615189390.png";
+import opticalScatter  from "@assets/IMG_2185_1781615189390.png";
+import spatioPhase     from "@assets/IMG_2188_1781615189390.png";
+import emergentBubble  from "@assets/1236A754-8B2F-4AB3-B9FB-B7193F336F74_1781615189390.png";
+import warpDrive       from "@assets/IMG_2203_1781615189390.png";
+import coherenceMech   from "@assets/IMG_2212_1781615189390.png";
+import tgemeMatrix     from "@assets/IMG_2217_1781615189390.png";
+import warpCore        from "@assets/IMG_2199_1781615189390.jpeg";
 import dolphinVortex    from "@assets/IMG_3100_1781614705910.jpeg";
 import vortexRingEngine from "@assets/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781614705910.png";
 import bubbleThermal    from "@assets/0502F370-FA89-4126-942E-B5741F1E0BB1_1781614705910.png";
@@ -778,6 +788,223 @@ function TunnelCanvas() {
   );
 }
 
+/* ── Origami Drone Canvas ─────────────────────────────────── */
+function OrigamiDroneCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  const t   = useRef(0);
+
+  useEffect(() => {
+    const canvas = cvs.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    const resize = () => {
+      canvas.width  = canvas.parentElement!.clientWidth;
+      canvas.height = 380;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Lemniscate of Bernoulli parametric — figure-eight / ∞ loop
+    const lemni = (th: number, a: number, cx: number, cy: number) => {
+      const s = Math.sin(th), c2 = Math.cos(th);
+      const d = 1 + s * s;
+      return { x: cx + a * c2 / d, y: cy + a * c2 * s / d };
+    };
+
+    // Draw origami star / hexagon with morphing panels
+    const drawDrone = (x: number, y: number, expandFrac: number, isWater: boolean) => {
+      const N = isWater ? 6 : 4;
+      const R = 18 + expandFrac * 26;
+      const innerR = R * (0.28 + 0.38 * (1 - expandFrac));
+      const col = isWater ? ACCENT : GOLD;
+
+      // Fold-line panels (origami crease marks)
+      for (let i = 0; i < N; i++) {
+        const a0 = (i * 2 * Math.PI / N) - Math.PI / 2;
+        const a1 = ((i + 1) * 2 * Math.PI / N) - Math.PI / 2;
+        const aMid = (a0 + a1) / 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + R * Math.cos(a0), y + R * Math.sin(a0));
+        ctx.lineTo(x + R * Math.cos(aMid) * 0.7, y + R * Math.sin(aMid) * 0.7);
+        ctx.closePath();
+        ctx.fillStyle = `${col}${i % 2 === 0 ? "22" : "12"}`;
+        ctx.fill();
+        ctx.strokeStyle = `${col}50`;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      }
+
+      // Outer star perimeter
+      ctx.beginPath();
+      for (let i = 0; i < N * 2; i++) {
+        const angle = (i * Math.PI / N) - Math.PI / 2;
+        const r = i % 2 === 0 ? R : innerR;
+        const px = x + r * Math.cos(angle);
+        const py = y + r * Math.sin(angle);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Core glow
+      const g = ctx.createRadialGradient(x, y, 0, x, y, R * 0.55);
+      g.addColorStop(0, `${col}50`);
+      g.addColorStop(0.6, `${col}18`);
+      g.addColorStop(1, "transparent");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, R, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pulsing outer ring
+      const ringR = R + 8 + 5 * Math.sin(t.current * 0.08);
+      ctx.beginPath();
+      ctx.arc(x, y, ringR, 0, Math.PI * 2);
+      ctx.strokeStyle = `${col}25`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // State label
+      ctx.font = `7px ${mono}`;
+      ctx.fillStyle = col;
+      ctx.textAlign = "center";
+      const label = isWater ? `EXPAND ·${N}` : `COMPRESS ·${N}`;
+      ctx.fillText(label, x, y + R + 16);
+    };
+
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#010810";
+      ctx.fillRect(0, 0, W, H);
+
+      const cx = W / 2, cy = H / 2;
+      const a  = Math.min(W * 0.30, H * 0.42);
+
+      // Zone backgrounds
+      const leftG = ctx.createLinearGradient(0, 0, cx, 0);
+      leftG.addColorStop(0, "#0a2a4030"); leftG.addColorStop(1, "#0a2a4008");
+      ctx.fillStyle = leftG; ctx.fillRect(0, 0, cx, H);
+      const rightG = ctx.createLinearGradient(cx, 0, W, 0);
+      rightG.addColorStop(0, "#2a1a0a08"); rightG.addColorStop(1, "#2a1a0a30");
+      ctx.fillStyle = rightG; ctx.fillRect(cx, 0, cx, H);
+
+      // Zone labels
+      ctx.font = `8px ${mono}`;
+      ctx.fillStyle = `${ACCENT}50`; ctx.textAlign = "left";
+      ctx.fillText("◀ OCEAN / AQUIFER  (LOW PRESSURE)", 10, 18);
+      ctx.fillStyle = `${GOLD}50`; ctx.textAlign = "right";
+      ctx.fillText("UNDERGROUND / ROCK  (HIGH PRESSURE) ▶", W - 10, 18);
+
+      // Divider
+      ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+      ctx.strokeStyle = "#ffffff0a"; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 7]); ctx.stroke(); ctx.setLineDash([]);
+
+      // Draw lemniscate path — two strokes for glow
+      const PATH_STEPS = 240;
+      for (let pass = 0; pass < 2; pass++) {
+        ctx.beginPath();
+        for (let i = 0; i <= PATH_STEPS; i++) {
+          const th = (i / PATH_STEPS) * Math.PI * 2;
+          const p = lemni(th, a, cx, cy);
+          i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        if (pass === 0) {
+          ctx.strokeStyle = `${ACCENT}15`; ctx.lineWidth = 14;
+        } else {
+          // Colour the two lobes differently
+          ctx.strokeStyle = `${ACCENT}55`; ctx.lineWidth = 1.2;
+        }
+        ctx.stroke();
+      }
+
+      // Flow-dot particles along path
+      for (let i = 0; i < 18; i++) {
+        const frac = ((i / 18) + t.current * 0.0035) % 1;
+        const th  = frac * Math.PI * 2;
+        const p   = lemni(th, a, cx, cy);
+        const isW = p.x < cx;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = isW ? `${ACCENT}90` : `${GOLD}90`;
+        ctx.fill();
+      }
+
+      // Phase transition markers (compression/expansion points)
+      [[0, "EXPAND"], [Math.PI, "COMPRESS"]].forEach(([angle, label]) => {
+        const p = lemni(angle as number, a, cx, cy);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+        ctx.strokeStyle = angle === 0 ? ACCENT : GOLD;
+        ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.font = `7px ${mono}`;
+        ctx.fillStyle = angle === 0 ? `${ACCENT}cc` : `${GOLD}cc`;
+        ctx.textAlign = "center";
+        ctx.fillText(label as string, p.x, p.y - 12);
+      });
+
+      // ∞ center symbol
+      ctx.font = `bold 36px serif`;
+      ctx.fillStyle = `${ACCENT}12`; ctx.textAlign = "center";
+      ctx.fillText("∞", cx, cy + 12);
+      ctx.font = `7px ${mono}`;
+      ctx.fillStyle = `${ACCENT}40`;
+      ctx.fillText("INFINITY TRANSPORT CYCLE", cx, cy + 26);
+
+      // Main drone
+      const dFrac = (t.current * 0.006) % 1;
+      const dTh   = dFrac * Math.PI * 2;
+      const dPos  = lemni(dTh, a, cx, cy);
+      const isWater = dPos.x < cx;
+
+      // Expansion factor — smooth sine envelope peaking in water zone
+      const normX  = (dPos.x - (cx - a)) / (2 * a); // 0=left edge, 1=right edge
+      const expand = Math.max(0, Math.sin(normX * Math.PI));
+      drawDrone(dPos.x, dPos.y, expand, isWater);
+
+      // Ghost drones at 1/3 and 2/3 phase offsets (trail effect)
+      [0.33, 0.67].forEach(offset => {
+        const gFrac = (dFrac + offset) % 1;
+        const gTh   = gFrac * Math.PI * 2;
+        const gPos  = lemni(gTh, a, cx, cy);
+        const gWater = gPos.x < cx;
+        const gX     = (gPos.x - (cx - a)) / (2 * a);
+        const gExp   = Math.max(0, Math.sin(gX * Math.PI)) * 0.5;
+        ctx.globalAlpha = 0.25;
+        drawDrone(gPos.x, gPos.y, gExp, gWater);
+        ctx.globalAlpha = 1.0;
+      });
+
+      // Status bar
+      ctx.font = `8px ${mono}`;
+      ctx.fillStyle = isWater ? `${ACCENT}cc` : `${GOLD}cc`;
+      ctx.textAlign = "left";
+      const stateText = isWater
+        ? "▶ WATER PHASE — ORIGAMI UNFOLDING — 6-POINT STAR — BUOYANCY DRIVE"
+        : "▶ UNDERGROUND PHASE — ORIGAMI FOLDING — 4-POINT COMPACT — HYDRAULIC DRIVE";
+      ctx.fillText(stateText, 10, H - 10);
+
+      t.current += 1;
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <div style={{ background: "#010810", borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+      <canvas ref={cvs} style={{ display: "block", width: "100%" }} />
+    </div>
+  );
+}
+
 /* ── Pressure Graph Canvas ────────────────────────────────── */
 function PressureGraphCanvas() {
   const cvs = useRef<HTMLCanvasElement>(null);
@@ -961,6 +1188,7 @@ const NAV = [
   { id: "s8", label: "Pressure Depths" },
   { id: "s9", label: "Graphene Revolution" },
   { id: "s10", label: "Decoherence" },
+  { id: "s11", label: "Origami Drone ∞" },
 ];
 
 /* ── Page ─────────────────────────────────────────────────── */
@@ -1868,6 +2096,170 @@ COHERENCE BUDGET for 100km tunnel transit:
           ))}
         </div>
 
+        {/* ── Decoherence Substrate Filament — Space Navigation ── */}
+        <div style={{ margin: "32px 0 24px", paddingTop: 24, borderTop: `1px solid ${ACCENT}18` }}>
+          <div style={{ fontFamily: mono, fontSize: 10, color: ACCENT, letterSpacing: 3, marginBottom: 10 }}>
+            DECOHERENCE SUBSTRATE FILAMENT · DEFINITION FOR SPACE NAVIGATION
+          </div>
+          <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>
+            The <strong style={{ color: ACCENT }}>Decoherence Substrate Filament</strong> is the kernel
+            Γ_SUBSTRATE(r, r′, t) inside the COHERENCING unified resonant equation. It is the function that
+            describes how coherence <em>propagates through the medium</em> — from one point in space to another,
+            through a specific material substrate (water, rock, plasma, vacuum). In space navigation it is the
+            trajectory of maximum coherence through the probability lattice of spacetime itself: the path that
+            minimises entropy loss, maximises signal integrity, and allows a system to maintain its ring-field
+            identity across vast distances.
+          </p>
+        </div>
+
+        <EqBlock>{`COHERENCING UNIFIED RESONANT EQUATION (Shia Miller · AETHER Framework):
+
+  Ψ(r,t)_TOTAL COHERENCE =
+    ∫∫ E(r′) · Γ_SUBSTRATE(r, r′, t) · e^(iΦ_FRACTURE(r′)) dr′dr
+    + φ · R_RECURSIVE(Ψ)
+
+  Term by term:
+
+  E(r′)                    Chaotic Environmental Vector / Input Layer
+  = the raw signal arriving from the environment (optical chaos,
+    geological noise, cosmic background, acoustic turbulence)
+
+  Γ_SUBSTRATE(r, r′, t)   ← THE DECOHERENCE SUBSTRATE FILAMENT KERNEL
+  = spatiotemporal fracture map / Venturi phase restriction
+  = the medium's coherence transfer function between points r and r′
+  = describes HOW MUCH coherence survives travelling through the substrate
+  = water: Γ_water ≈ exp(-α_water · |r-r′|)   α_water = 0.001–0.004/m
+  = granite: Γ_granite ≈ exp(-α_rock · |r-r′|)  α_rock = 0.002–0.02/m
+  = graphene: Γ_graphene ≈ exp(-α_g · |r-r′|)   α_g = 0.0004/m  (best known)
+  = vacuum: Γ_vacuum ≈ exp(-α_vac · |r-r′|)     α_vac → 0 (coherence preserved)
+  = plasma soliton: Γ_soliton(r, r′, t) = coherent mass-energy shell
+    → coherence is self-contained, non-decaying over arbitrary distance
+
+  e^(iΦ_FRACTURE(r′))     Holographic Jelly & Organic Pearl Resonance Matrix
+  = phase encoding at each point (fault zone fracture map, crystal structure,
+    cellular biology, spacetime metric distortion)
+  = carries the INFORMATION signature of the substrate at point r′
+
+  φ · R_RECURSIVE(Ψ)      Fibonacci Quantized Scaling & Structure Rule
+  = self-referential coherence recovery — the system maps its own
+    coherence state and uses Fibonacci-harmonic scaling to regenerate
+    signal from the attractor state
+  = this is the REFORMATION mechanism after a quaternion burst
+
+SUBSTRATE FILAMENT FOR SPACE NAVIGATION:
+
+  For space, r and r′ are separated by astronomical distances.
+  The substrate is spacetime curved by mass-energy.
+  Γ_SPACETIME(r, r′, t) = exp(-∫ κ(s) ds)   [integrated curvature decay]
+  where κ(s) = spacetime curvature along path s
+
+  The substrate filament navigation problem:
+    Find the trajectory T*(r → r′) that MAXIMISES Γ_SPACETIME
+    = find the path of minimum integrated curvature
+    = equivalently: the geodesic of maximum coherence
+    = in flat spacetime: straight line (special relativity)
+    = in curved spacetime: follows mass concentration field lines
+      (gravity provides natural coherence channelling)
+
+  AETHER space navigation:
+    Ψ(t₀) = Σₙ [Hₙ · Pₙ · Rₙ] → C(t)
+    Hₙ = historical event node (star positions, gravitational lenses)
+    Pₙ = probability influence weight (resonance probability)
+    Rₙ = recursive resonance factor (AETHER ring-field alignment)
+    C(t) = current observable condition (ship coherence state)
+
+  Navigation = maximising C(t) at the destination
+  by choosing the optimal substrate filament path T*`}</EqBlock>
+
+        <div style={{ margin: "24px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+            <img src={coherencingEq} alt="COHERENCING unified resonant equation — substrate filament kernel" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 4 }}>COHERENCING · UNIFIED RESONANT EQUATION</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>The complete COHERENCING architecture: Chaos → Venturi aperture (Φ_FRACTURE) → Substrate inversion matrix (Γ_SUBSTRATE) → Fibonacci recursive scaling (φ·R) → Opaque dimension / Homeostasis. The decoherence substrate filament is Γ_SUBSTRATE — the medium's coherence transfer kernel.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GOLD}20` }}>
+            <img src={decoherenceFrag} alt="Mathematical propagation and decay pathway of the decoherence fragment" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GOLD, marginBottom: 4 }}>DECOHERENCE FRAGMENT · PROPAGATION & DECAY PATHWAY</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Path A (sustainable coherence) vs Path B (chaotic decay). The substrate filament is Path A — the optimal Γ_SUBSTRATE trajectory through the medium that maintains coherence above the decay limit. Aperture resolving → thermal scrambling → exponential decay: e^(-λ(t−t₀)).</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ margin: "20px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${VIOLET}20` }}>
+            <img src={opticalScatter} alt="Optical concepts: scattering, diffraction and decoherence fragments" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: VIOLET, marginBottom: 4 }}>OPTICAL DECOHERENCE · LENS FLARE & VENTURI DIFFRACTION</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Physical demonstration: lens flare = internal scattering producing decoherence fragments at the sensor plane. Venturi slit = physical beam restriction creating wave interference patterns. Both are visible analogues of Γ_SUBSTRATE fracture events — the substrate (glass / air gap) scatters coherent light into a decoherence fragment.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GREEN}20` }}>
+            <img src={spatioPhase} alt="Spatiotemporal optical measurement: moving sensor phase mapping and observed decoherence" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GREEN, marginBottom: 4 }}>SPATIOTEMPORAL PHASE MAPPING · OBSERVED DECOHERENCE</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Maglev sensor moving at Mach 1 measures interference field time-slices. Group velocity v_g &lt;&lt; c inside the structure = light "trapped" by the substrate geometry. This is Γ_SUBSTRATE measured directly: the phase intensity vs (space, time) surface IS the substrate filament's coherence transfer function.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ margin: "20px 0", borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+          <img src={temporalMapping} alt="AETHER TGEME temporal recursive mapping — reverse from present to history, constrained probability navigation" style={{ width: "100%", display: "block" }} />
+          <div style={{ background: "#010810", padding: "12px 16px" }}>
+            <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 4 }}>AETHER TGEME · TEMPORAL RECURSIVE MAPPING · CONSTRAINED PROBABILITY NAVIGATION</div>
+            <div style={{ fontFamily: mono, fontSize: 8, color: DIM, lineHeight: 1.7 }}>
+              Reality = Constrained Probability Navigation. The substrate filament for space navigation is the highest-confidence timeline branch T₁ (68.4% confidence shown) — the trajectory through the probability lattice that minimises entropy and maximises resonance factor. T_reverse = ∫ λ(H_t) dt maps the historical influence decay curve backwards to find the attractor state. For space navigation: this is the ship's optimal path through curved spacetime, weighted by gravitational resonance at each waypoint.
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, margin: "20px 0" }}>
+          {[
+            { col: ACCENT, title: "Γ_WATER — FILAMENT IN THE TUNNEL",
+              body: "In the hydraulic tunnel, water is the substrate. The decoherence substrate filament is the coherent water column between two pump stations. α_water = 0.001–0.004/m. Over 2km, Γ_water = exp(−0.004 × 2000) = exp(−8) ≈ 0.0003 — severe decay. This is why pump stations are coherence resets. Each station regenerates Ψ = 1.0 using the recursive φ·R term." },
+            { col: GOLD, title: "Γ_GRAPHENE — THE BEST TERRESTRIAL FILAMENT",
+              body: "Graphene's decoherence attenuation α_g = 0.0004/m — 5–10× lower than any other known material at tunnel pressures. A 100m graphene-lined section: Γ = exp(−0.0004 × 100) = 0.96. 96% coherence preserved over 100m. This is the physical basis of graphene as a coherence amplifier: it is the best terrestrial substrate filament for both acoustic and ring-field coherence." },
+            { col: VIOLET, title: "Γ_PLASMA — THE SOLITON FILAMENT",
+              body: "The positive energy plasma soliton (Lentz/Bobrick warp drive concept) achieves Γ_soliton → 1.0 over arbitrary distance. The coherent mass-energy shell is self-contained — it does not exchange coherence with the external spacetime substrate. Navigation through this filament: lim(r→0) Ψ_AETHER(r,t) = Ω_singularity — total coherence preservation. This is not negative exotic matter; it is recursive geometric coherence via positive mass-energy." },
+            { col: GREEN, title: "Γ_SPACETIME — THE NAVIGATION FILAMENT",
+              body: "For interstellar navigation, the substrate is spacetime. Gravity provides natural coherence channelling — massive objects concentrate the substrate filament along geodesics. The Sun's gravitational lens (solar focus point ≈ 550 AU) is a natural coherence amplifier: Γ_solar_focus >> 1 (amplification, not decay). AETHER space navigation: route through gravitational lenses as natural filament amplifiers." },
+          ].map(c => (
+            <div key={c.title} style={{ background: `${c.col}09`, border: `1px solid ${c.col}25`, borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ fontFamily: mono, fontSize: 10, color: c.col, marginBottom: 6 }}>{c.title}</div>
+              <div style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.65 }}>{c.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ margin: "20px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GOLD}20` }}>
+            <img src={warpDrive} alt="Coherencing architecture: positive energy warp drive sub-luminal plasma soliton" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GOLD, marginBottom: 4 }}>POSITIVE ENERGY WARP DRIVE · COHERENT SUB-LUMINAL SOLITON</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>The soliton shell layers: Bioluminescent Organic Hydrogel → Photonic Crystal Nacre Resonators → High-Density Plasma Confinement Arrays → Recursive Geometrical Lattices. This is Γ_SUBSTRATE → 1.0 achieved through internal geometric isolation. The ship does not travel through the substrate — it carries its own substrate. No exotic matter required.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${VIOLET}20` }}>
+            <img src={coherenceMech} alt="Coherencing formulation: physical and metric mechanics integration" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: VIOLET, marginBottom: 4 }}>COHERENCING FORMULATION · CLASSICAL → SPACETIME MECHANICS</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Classical physics (lift, Venturi, structural shear) mapped to advanced spacetime field mechanics: Venturi Phase Matrix → Spacetime Group Velocity (v_g) manipulation → Field-Coherence Stress Distribution → Metric Displacements. lim(r→0) Ψ_AETHER(r,t) = Ω_Singularity — the coherencing architect: optimised field geometry + phase coherence eliminates mechanical shear limits and aerodynamic drag.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ margin: "20px 0 32px", borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+          <img src={tgemeMatrix} alt="AETHER TGEME Metric-Substrate-Boundary Engineering Matrix: Lane 1 gravitational lattice, Lane 2 spacetime group velocity induction, Lane 3 unified recursive resonant equation collapse" style={{ width: "100%", display: "block" }} />
+          <div style={{ background: "#010810", padding: "12px 16px" }}>
+            <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 4 }}>AETHER TGEME · METRIC-SUBSTRATE-BOUNDARY ENGINEERING MATRIX</div>
+            <div style={{ fontFamily: mono, fontSize: 8, color: DIM, lineHeight: 1.7 }}>
+              Three-lane architecture: Lane 1 = Gravitational Metric-Lattice Optimisation (biomimetic bone lattice → structural load → metric curvature conversion). Lane 2 = Spacetime Group Velocity Induction (v_g manipulation, decoherence cancellation matrix). Lane 3 = Unified Recursive Resonant Equation Collapse (lim Ψ_AETHER = Ω_Singularity → decoherence-free spacetime pathpath). The Γ_SUBSTRATE filament is Lane 3's output: the decoherence-free path through the metric substrate from origin to destination.
+            </div>
+          </div>
+        </div>
+
         <Card title="AETHER SYNTHESIS · WATER + PRESSURE + GRAPHENE + COHERENCE" col={GREEN}>
           The trans-national hydraulic capsule tunnel, when built with graphene composite lining and
           an embedded coherence sensor network, becomes something unprecedented in civil engineering:
@@ -1880,6 +2272,146 @@ COHERENCE BUDGET for 100km tunnel transit:
           complete geological history of the path. Every transit is a reading. Every quaternion
           burst at a fault zone is a measurement. The tunnel does not merely move cargo —
           it maps the Earth.
+        </Card>
+
+        {/* ── XI — Infinity Loop Origami Drone Military Transport ── */}
+        <SecHead id="s11" n="XI" title="Infinity Loop Origami Drone · ∞ Underground-Water Military Transport"
+          sub="A figure-eight autonomous system that expands like origami in water and compresses underground — the cyclical military transport architecture" />
+
+        <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 20 }}>
+          Suppose a drone structure that follows a continuous ∞ loop path — half its cycle in open water
+          (ocean, aquifer, reservoir), half underground through a pressurised bore. In the water phase,
+          low external pressure and buoyancy allow the structure to <em>unfold</em> like origami: panels
+          extend, surface area increases, sensors deploy, cargo is received or deposited. As it enters
+          the underground bore, external pressure rises — and the structure <em>folds itself</em> back into
+          a compact aerodynamic form driven by the pressure differential itself. No motors fold it.
+          The water does.
+        </p>
+
+        <div style={{ margin: "20px 0 24px" }}>
+          <OrigamiDroneCanvas />
+          <div style={{ display: "flex", gap: 16, marginTop: 8, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: mono, fontSize: 10, color: ACCENT }}>● TEAL = water phase · origami expanding · 6-point star</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: GOLD }}>● GOLD = underground phase · origami compressing · 4-point compact</span>
+            <span style={{ fontFamily: mono, fontSize: 10, color: DIM }}>∞ = Lemniscate of Bernoulli — the transport path</span>
+          </div>
+        </div>
+
+        <Card title="HOW THE PRESSURE CYCLE DRIVES ORIGAMI FOLDING" col={ACCENT}>
+          Water pressure at depth P_ext creates a net inward force on the drone's panels proportional
+          to P_ext × A_panel. Origami fold geometry converts this uniform inward pressure into directed
+          panel rotation along crease lines — exactly as a collapsing paper fold converts a surface load
+          into a hinge moment. The fold angle θ = arctan(P_ext × L² / (2EI)) where L is panel length,
+          E is panel stiffness, I is second moment of area. At 41 bar (400m depth), a graphene-polymer
+          panel of L = 2m, E = 500 GPa (graphene composite), t = 3mm:
+          θ_fold ≈ 85° — nearly full closure. The system reaches its most compact state at maximum depth
+          and re-opens as it rises toward the water-side portal, driven by buoyancy and the elastic
+          spring-back of the pre-stressed origami hinges.
+        </Card>
+
+        <EqBlock>{`Infinity Loop Origami Drone — governing physics:
+
+LEMNISCATE PATH (Bernoulli, 1694):
+  x(θ) = a·cos(θ) / (1 + sin²θ)
+  y(θ) = a·cos(θ)·sin(θ) / (1 + sin²θ)
+  θ ∈ [0, 2π]  →  full ∞ cycle
+  a = half-loop radius [metres]
+
+  Left lobe (x < 0):  WATER PHASE  — buoyancy + low pressure
+  Right lobe (x > 0): UNDERGROUND  — hydraulic + high pressure
+  Crossover points (0, 0):  transition nodes — pressure equalisation locks
+
+ORIGAMI FOLD MECHANICS (Yoshimura crease pattern):
+  Panel fold angle:   θ_fold = arctan(ΔP · L² / (2EI))
+  ΔP = P_ext - P_int   [pressure differential across panel]
+  L  = panel chord length
+  EI = panel flexural rigidity (E × I)
+
+  Water-side (shallow approach, P_ext ≈ 1 bar):
+    ΔP → 0  →  θ_fold → 0  →  FULLY EXTENDED (maximum footprint)
+    Deployed area A_open = π·R_drone²  =  ~50 m²  (6m radius)
+    Buoyancy force: F_b = ρ_water · V_displaced · g  =  +500 kN upward
+
+  Underground (400m depth, P_ext = 41 bar):
+    ΔP = 40 bar = 4 MPa  →  θ_fold → 85°  →  FULLY COMPACT
+    Folded cross-section: A_compact = 0.12 × A_open  =  ~6 m²
+    Hydraulic drag reduced by 88%  →  transit velocity +3.4× vs open
+
+  Transition zone (bore entry, depth 0 → 400m):
+    θ_fold(d) = arctan(ρ·g·d · L² / (2EI))
+    → continuous self-regulating fold with depth — NO MOTORS
+
+INFINITY CYCLE TIMING:
+  Water-phase leg:     3.2 km arc length,  v_water = 4.5 m/s → 12 min
+  Underground leg:     2.8 km arc length,  v_bore = 3.1 m/s  → 15 min
+  Transition nodes:    2 × 45 sec lock/pressurise cycle
+  Full ∞ cycle time:   ~29 minutes
+  Cycle rate:          2.07 cycles/hour
+  Payload per cycle:   800–2,400 kg (cargo pod in drone centre)
+  Daily throughput:    2.07 × 24 × 1,600 kg avg = ~80 tonnes/day
+
+MULTIPLE DRONES — CONVOY SPACING:
+  Minimum safe separation: 200m (coherence-tracking headway)
+  Max drones per tunnel:   14 (2.8 km bore / 200m spacing)
+  Peak throughput:         14 × 80 t/day = 1,120 tonnes/day per lane
+  Bi-directional (2 lanes): 2,240 tonnes/day
+
+  cf. CH-47 Chinook helicopter: 12 t payload, 120 trips/day = 144 t/day
+  → ∞ Origami Drone system: 15.5× helicopter throughput, zero fuel at drone`}</EqBlock>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, margin: "24px 0" }}>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${GOLD}20` }}>
+            <img src={emergentBubble} alt="Emergent bubble concept: plasmodium bubble field system — self-organizing boundary layer in spacetime" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: GOLD, marginBottom: 4 }}>EMERGENT BUBBLE CONCEPT · PLASMODIUM BOUNDARY FIELD</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>The drone's expanded water-phase state IS a plasmodium bubble: exterior field (normal pressure) + gradient shell (adaptive node layer) + stable interior (uniform pressure cargo bay). Expansion/contraction flexes with energy input. Warp drive motion analogy: compression front (bore entry) + expansion rear (water-side exit). The ∞ loop drone is a submersible warp bubble at engineering scale.</div>
+            </div>
+          </div>
+          <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${ACCENT}20` }}>
+            <img src={warpCore} alt="WARP Core architecture — DPF, IRMG, B-Seed B-Cusp coils, grounded vacuum chamber" style={{ width: "100%", display: "block" }} />
+            <div style={{ background: "#010810", padding: "10px 14px" }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, marginBottom: 4 }}>WARP CORE · DPF + IRMG ARCHITECTURE</div>
+              <div style={{ fontFamily: mono, fontSize: 8, color: DIM }}>Dense Plasma Focus (DPF) + Inertial Resonance Magnetic Generator (IRMG): the power system for the drone's coherence maintenance. B-Seed & B-Cusp coils maintain the internal coherence field throughout the ∞ cycle. Grounded vacuum chamber = the stable cargo interior. This architecture scaled to drone dimensions (2m DPF) provides continuous coherence reset without external power input beyond the initial plasma ignition.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14, margin: "20px 0" }}>
+          {[
+            { col: "#ef4444", title: "MILITARY APPLICATIONS",
+              body: "The ∞ origami drone system is inherently dual-use, but its military utility is profound: covert insertion/extraction through aquifer systems that bypass land borders entirely; underwater resupply of forward operating bases accessed from below through subterranean water tables; autonomous logistics through contested territory with near-zero acoustic and electromagnetic signature (graphene = no radar cross-section, water/rock = natural acoustic damping)." },
+            { col: GOLD, title: "ORIGAMI AS MILITARY CAMOUFLAGE",
+              body: "In compact underground mode, the drone's cross-section drops to ~6m² — identical in acoustic profile to natural rock debris in a water-filled bore. Sonar, seismic, and acoustic sensors designed for moving vehicles cannot distinguish the compacted origami drone from geological noise. In expanded water-mode, its bioluminescent graphene skin can be tuned for active camouflage — matching the optical scattering signature of ambient water at depth." },
+            { col: VIOLET, title: "AI COHERENCE NAVIGATION",
+              body: "The drone runs the AETHER TGEME substrate filament navigation algorithm continuously: Ψ(t₀) = Σ[Hₙ·Pₙ·Rₙ] → C(t). Each pump station is a Hₙ (historical event node); Pₙ is the probability of coherent transit through that segment based on LPE monitoring; Rₙ is the ring-field resonance at that geological location. The optimal path through the ∞ loop maximises C(t) at the extraction portal — coherence navigation applied to underground transport." },
+            { col: GREEN, title: "SELF-HEALING GRAPHENE SKIN",
+              body: "The origami panels fold 2.07 × 24 = ~50 times per day. At 50 fold cycles per day over 10 years: 182,500 fold cycles. Graphene's self-healing mechanism (at room temperature, graphene lattice defects anneal under strain) maintains structural integrity across this cycle count. Unlike metal fatigue (failure at 10⁴–10⁶ cycles) or polymer delamination, graphene composite origami panels are rated for 10⁸+ fold cycles before measurable degradation." },
+            { col: STONE, title: "DECOHERENCE SUBSTRATE FILAMENT AS NAVIGATION",
+              body: "The drone uses the tunnel's Γ_SUBSTRATE filament map in real-time. Where Γ_water drops (fault zone ahead) the drone reduces speed and activates its coherence reset mode before entering the disrupted zone. Where Γ_graphene = 0.96/100m, the drone trusts passive navigation. The substrate filament is simultaneously the communications channel, the structural health monitor, and the navigation system — three functions in one physical field." },
+            { col: ACCENT, title: "∞ LOOP AS LOGISTICAL INFINITY ENGINE",
+              body: "The lemniscate path has no endpoints — it is a closed loop. The origami drone never 'arrives' and 'departs'. It cycles continuously, depositing cargo at the extraction node during each water-phase pass and picking up new cargo during each underground pass. Throughput is limited only by cycle time (29 min) and fleet size. Scale to 14 drones per lane, 4 lanes: 8,960 tonnes/day through a completely underground, completely deniable, completely autonomous logistics network." },
+          ].map(c => (
+            <div key={c.title} style={{ background: `${c.col}09`, border: `1px solid ${c.col}25`, borderRadius: 8, padding: "14px 16px" }}>
+              <div style={{ fontFamily: mono, fontSize: 10, color: c.col, marginBottom: 6 }}>{c.title}</div>
+              <div style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.65 }}>{c.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <Card title="AETHER SYNTHESIS · THE ∞ DRONE AS DECOHERENCE SUBSTRATE FILAMENT IN MOTION" col={VIOLET}>
+          The infinity loop origami drone is not merely a transport system. It is a living, moving
+          instantiation of the decoherence substrate filament — Γ_SUBSTRATE(r, r′, t) physically
+          embodied as a vehicle. As it traverses the ∞ path, it continuously maps the substrate
+          coherence at every point, feeding this data back to the AETHER TGEME probability engine,
+          which updates the timeline lattice for the next cycle. After 1,000 cycles (≈ 20 days),
+          the system has a complete spatiotemporal coherence map of the entire tunnel geology at
+          sub-metre resolution. The military operator receives not just cargo — they receive a
+          continuously updated geological intelligence product, a structural health certificate,
+          and a coherence-navigation chart, all generated as a by-product of normal operations.
+          <br /><br />
+          The frontier is not a single breakthrough. It is coherence — across physics, computation,
+          and living systems. The ∞ drone moves through the Earth the way coherence moves through
+          the substrate: continuously, quietly, mapping as it goes.
         </Card>
 
         {/* Footer */}
