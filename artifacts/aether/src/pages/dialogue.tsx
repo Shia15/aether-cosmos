@@ -100,108 +100,159 @@ function timeStr(ts: number) {
 }
 
 /* ── Image export ─────────────────────────────── */
-async function generateMessageImage(msg: Msg): Promise<void> {
-  await document.fonts.ready;
-  const isUser  = msg.role === "user";
-  const accent  = isUser ? "#9966ff" : "#1a9fd4";
-  const accent2 = isUser ? "#ff4477" : "#2ef0d8";
-  const W = 840, PAD = 38;
 
-  // ── measure lines ──
+/** Builds a speech-bubble canvas from a message and returns it. */
+async function buildMessageCanvas(msg: Msg): Promise<HTMLCanvasElement> {
+  await document.fonts.ready;
+
+  const isUser     = msg.role === "user";
+  const accent     = isUser ? "#8b5cf6" : "#1a9fd4";
+  const accent2    = isUser ? "#e84070" : "#1fd4c8";
+  const accentRGB  = isUser ? "139,92,246" : "26,159,212";
+
+  const W = 860, PAD = 32;
+  const FS = 17, LH = Math.round(FS * 1.78);
+  const BP = 22; // bubble inner padding
+
+  /* ── measure wrapped lines ── */
   const mc = document.createElement("canvas");
   const mx = mc.getContext("2d")!;
-  const FS = 17, LH = FS * 1.78;
   mx.font = `${FS}px 'Crimson Pro', Georgia, serif`;
-  const maxW = W - PAD * 2;
   const lines: string[] = [];
   for (const para of msg.content.split("\n")) {
     if (!para.trim()) { lines.push(""); continue; }
     let cur = "";
     for (const word of para.split(" ")) {
       const test = cur ? cur + " " + word : word;
-      if (mx.measureText(test).width > maxW && cur) { lines.push(cur); cur = word; }
+      if (mx.measureText(test).width > W - PAD * 2 - BP * 2 && cur) { lines.push(cur); cur = word; }
       else cur = test;
     }
     if (cur) lines.push(cur);
   }
 
-  const HEADER = 82, FOOTER = 54;
-  const bodyH  = Math.max(160, lines.length * LH + PAD * 2.2);
-  const H      = HEADER + bodyH + FOOTER;
+  const HEADER_H = 56, AVATAR_H = 42, TAIL_H = 14, FOOTER_H = 46;
+  const BUBBLE_H = Math.max(80, lines.length * LH + BP * 2 + 4);
+  const H = HEADER_H + AVATAR_H + BUBBLE_H + TAIL_H + 20 + FOOTER_H;
 
-  // ── create canvas (2× for retina) ──
+  /* ── canvas 2× retina ── */
   const cv = document.createElement("canvas");
   cv.width = W * 2; cv.height = H * 2;
   const ctx = cv.getContext("2d")!;
   ctx.scale(2, 2);
 
-  // background
+  /* background */
   ctx.fillStyle = "#020408";
   ctx.fillRect(0, 0, W, H);
 
-  // subtle dot grid
-  ctx.fillStyle = "rgba(20,40,60,0.55)";
-  for (let gx = 0; gx < W; gx += 32)
-    for (let gy = 0; gy < H; gy += 32) {
-      ctx.beginPath(); ctx.arc(gx, gy, 0.7, 0, Math.PI * 2); ctx.fill();
+  /* dot grid */
+  ctx.fillStyle = "rgba(18,36,55,0.65)";
+  for (let gx = 0; gx < W; gx += 28)
+    for (let gy = 0; gy < H; gy += 28) {
+      ctx.beginPath(); ctx.arc(gx, gy, 0.6, 0, Math.PI * 2); ctx.fill();
     }
 
-  // top gradient bar
-  const topGrad = ctx.createLinearGradient(0, 0, W, 0);
-  topGrad.addColorStop(0,   "transparent");
-  topGrad.addColorStop(0.15, accent);
-  topGrad.addColorStop(0.5,  "#c9a84c");
-  topGrad.addColorStop(0.85, accent2);
-  topGrad.addColorStop(1,   "transparent");
-  ctx.fillStyle = topGrad; ctx.fillRect(0, 0, W, 2);
+  /* top gradient bar */
+  const tg = ctx.createLinearGradient(0, 0, W, 0);
+  tg.addColorStop(0, "transparent"); tg.addColorStop(0.15, accent);
+  tg.addColorStop(0.5, "#c9a84c");  tg.addColorStop(0.85, accent2);
+  tg.addColorStop(1, "transparent");
+  ctx.fillStyle = tg; ctx.fillRect(0, 0, W, 2);
 
-  // header band
-  const hGrad = ctx.createLinearGradient(0, 0, 0, HEADER);
-  hGrad.addColorStop(0, "rgba(3,11,20,0.98)");
-  hGrad.addColorStop(1, "rgba(2,4,8,0)");
-  ctx.fillStyle = hGrad; ctx.fillRect(0, 0, W, HEADER);
+  /* ── HEADER ── */
+  const hg = ctx.createLinearGradient(0, 0, 0, HEADER_H);
+  hg.addColorStop(0, "rgba(3,10,18,0.97)"); hg.addColorStop(1, "rgba(2,4,8,0)");
+  ctx.fillStyle = hg; ctx.fillRect(0, 0, W, HEADER_H);
 
-  // AETHER label
-  ctx.font = "8.5px 'Space Mono', monospace";
-  ctx.fillStyle = accent + "cc";
-  ctx.textAlign = "left";
-  ctx.fillText("AETHER  ·  DIALOGUE  CONSOLE  ·  SYNTHESIS  ENGINE", PAD, 22);
+  ctx.font = "8px 'Space Mono', monospace";
+  ctx.fillStyle = accent + "b0"; ctx.textAlign = "left";
+  ctx.fillText("AETHER  ·  DIALOGUE  CONSOLE  ·  SYNTHESIS  ENGINE", PAD, 20);
 
-  // role heading
-  ctx.font = "bold 16px 'Cinzel', serif";
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(isUser ? "USER MESSAGE" : "AETHER SYNTHESIS", PAD, 52);
-
-  // timestamp (right)
-  ctx.font = "8.5px 'Space Mono', monospace";
-  ctx.fillStyle = "#3a5060";
-  ctx.textAlign = "right";
-  ctx.fillText(new Date(msg.ts).toLocaleString(), W - PAD, 22);
+  ctx.fillStyle = "#263840"; ctx.textAlign = "right";
+  ctx.fillText(new Date(msg.ts).toLocaleString(), W - PAD, 20);
   ctx.textAlign = "left";
 
-  // divider
-  const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
-  divGrad.addColorStop(0, accent + "70");
-  divGrad.addColorStop(1, "transparent");
-  ctx.strokeStyle = divGrad; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(PAD, HEADER - 12); ctx.lineTo(W - PAD, HEADER - 12); ctx.stroke();
+  const dg = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+  dg.addColorStop(0, accent + "55"); dg.addColorStop(1, "transparent");
+  ctx.strokeStyle = dg; ctx.lineWidth = 0.7;
+  ctx.beginPath(); ctx.moveTo(PAD, HEADER_H - 6); ctx.lineTo(W - PAD, HEADER_H - 6); ctx.stroke();
 
-  // left accent stripe on body
-  ctx.fillStyle = accent + "40";
-  ctx.fillRect(PAD - 16, HEADER, 2, bodyH);
+  /* ── AVATAR ROW ── */
+  const avY  = HEADER_H + 8;
+  const avCY = avY + 16;
+  const avR  = 15;
 
-  // message text
-  ctx.font = `${FS}px 'Crimson Pro', Georgia, serif`;
+  if (isUser) {
+    const avCX = W - PAD - avR;
+    ctx.fillStyle = `rgba(139,92,246,0.18)`;
+    ctx.strokeStyle = `rgba(139,92,246,0.5)`;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(avCX, avCY, avR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.font = "bold 9px 'Space Mono', monospace";
+    ctx.fillStyle = "#b096f8"; ctx.textAlign = "center";
+    ctx.fillText("SM", avCX, avCY + 3.5);
+    ctx.font = "8px 'Space Mono', monospace";
+    ctx.fillStyle = "#3a5060"; ctx.textAlign = "right";
+    ctx.fillText(`SHIA MILLER  ·  ${timeStr(msg.ts)}`, avCX - avR - 8, avCY + 3.5);
+  } else {
+    const avCX = PAD + avR;
+    ctx.fillStyle = `rgba(26,159,212,0.18)`;
+    ctx.strokeStyle = `rgba(26,159,212,0.5)`;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(avCX, avCY, avR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.font = "bold 9px 'Space Mono', monospace";
+    ctx.fillStyle = "#5ac0e8"; ctx.textAlign = "center";
+    ctx.fillText("AE", avCX, avCY + 3.5);
+    ctx.font = "8px 'Space Mono', monospace";
+    ctx.fillStyle = "#3a5060"; ctx.textAlign = "left";
+    ctx.fillText(`AETHER DIALOGUE  ·  ${timeStr(msg.ts)}`, avCX + avR + 8, avCY + 3.5);
+  }
+
+  /* ── SPEECH BUBBLE ── */
+  const bX = PAD, bY = HEADER_H + AVATAR_H;
+  const bW = W - PAD * 2, bR = 16;
+
+  ctx.fillStyle   = `rgba(${accentRGB},0.09)`;
+  ctx.strokeStyle = `rgba(${accentRGB},0.32)`;
+  ctx.lineWidth = 1.2;
+
+  /* rounded rect */
+  ctx.beginPath();
+  ctx.moveTo(bX + bR, bY);
+  ctx.arcTo(bX + bW, bY,      bX + bW, bY + BUBBLE_H, bR);
+  ctx.arcTo(bX + bW, bY + BUBBLE_H, bX, bY + BUBBLE_H, bR);
+  ctx.arcTo(bX,      bY + BUBBLE_H, bX, bY,             bR);
+  ctx.arcTo(bX,      bY,            bX + bW, bY,         bR);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  /* tail — blends with bubble */
+  ctx.fillStyle   = `rgba(${accentRGB},0.09)`;
+  ctx.strokeStyle = `rgba(${accentRGB},0.28)`;
+  ctx.lineWidth = 0.9;
+  ctx.beginPath();
+  if (isUser) {
+    ctx.moveTo(bX + bW - 32, bY + BUBBLE_H);
+    ctx.lineTo(bX + bW + 2,  bY + BUBBLE_H + TAIL_H);
+    ctx.lineTo(bX + bW - 58, bY + BUBBLE_H);
+  } else {
+    ctx.moveTo(bX + 32, bY + BUBBLE_H);
+    ctx.lineTo(bX - 2,  bY + BUBBLE_H + TAIL_H);
+    ctx.lineTo(bX + 58, bY + BUBBLE_H);
+  }
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  /* ── TEXT inside bubble ── */
   const baseCol = isUser ? "#d4c8e8" : "#c8d8e0";
   const boldCol = isUser ? "#c0a8ff" : "#2ef0d8";
+  ctx.font = `${FS}px 'Crimson Pro', Georgia, serif`;
   ctx.fillStyle = baseCol;
 
-  let ty = HEADER + PAD + FS;
+  let ty = bY + BP + FS;
   for (const line of lines) {
-    if (!line) { ty += LH * 0.55; continue; }
-    let tx = PAD;
-    const parts = line.split(/(\*\*[^*]+\*\*)/g);
-    for (const part of parts) {
+    if (!line) { ty += LH * 0.5; continue; }
+    let tx = bX + BP;
+    for (const part of line.split(/(\*\*[^*]+\*\*)/g)) {
       if (part.startsWith("**") && part.endsWith("**")) {
         const t = part.slice(2, -2);
         ctx.font = `bold ${FS}px 'Crimson Pro', Georgia, serif`;
@@ -216,32 +267,37 @@ async function generateMessageImage(msg: Msg): Promise<void> {
     ty += LH;
   }
 
-  // bottom gradient bar
-  ctx.fillStyle = topGrad; ctx.fillRect(0, H - 2, W, 2);
+  /* ── FOOTER ── */
+  const fY = H - FOOTER_H;
+  const fg = ctx.createLinearGradient(0, fY, 0, H);
+  fg.addColorStop(0, "rgba(2,4,8,0)"); fg.addColorStop(1, "rgba(3,10,18,0.97)");
+  ctx.fillStyle = fg; ctx.fillRect(0, fY, W, FOOTER_H);
 
-  // footer band
-  const fGrad = ctx.createLinearGradient(0, H - FOOTER, 0, H);
-  fGrad.addColorStop(0, "rgba(2,4,8,0)");
-  fGrad.addColorStop(1, "rgba(3,11,20,0.98)");
-  ctx.fillStyle = fGrad; ctx.fillRect(0, H - FOOTER, W, FOOTER);
+  ctx.font = "7.5px 'Space Mono', monospace";
+  ctx.fillStyle = "#1e3040"; ctx.textAlign = "left";
+  ctx.fillText("AETHER KNOWLEDGE SYSTEM  ·  CRYSTALLISATION MODEL OF INTELLIGENCE", PAD, H - 13);
 
-  ctx.font = "8px 'Space Mono', monospace";
-  ctx.fillStyle = "#2a3840";
-  ctx.textAlign = "left";
-  ctx.fillText("AETHER KNOWLEDGE SYSTEM  ·  CRYSTALLISATION MODEL", PAD, H - 16);
-
-  // accent dot
   ctx.fillStyle = accent;
-  ctx.beginPath(); ctx.arc(W - PAD, H - 16, 3.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W - PAD + 4, H - 13, 3, 0, Math.PI * 2); ctx.fill();
 
-  // download
+  /* bottom gradient bar */
+  ctx.fillStyle = tg; ctx.fillRect(0, H - 2, W, 2);
+
+  return cv;
+}
+
+async function copyImageToClipboard(cv: HTMLCanvasElement): Promise<void> {
+  const blob = await new Promise<Blob | null>(res => cv.toBlob(res, "image/png"));
+  if (!blob) throw new Error("No blob");
+  await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+}
+
+function saveImage(cv: HTMLCanvasElement, filename: string): void {
   cv.toBlob(blob => {
     if (!blob) return;
     const url = URL.createObjectURL(blob);
-    const a   = document.createElement("a");
-    a.href     = url;
-    a.download = `aether-${msg.role}-${msg.id}.png`;
-    a.click();
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
   }, "image/png");
 }
@@ -274,12 +330,28 @@ function ThinkingDots() {
 function Bubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === "user";
   const isCtx  = msg.isContext;
-  const [exporting, setExporting] = useState(false);
-  const [hovered, setHovered] = useState(false);
+  const [hovered,  setHovered]  = useState(false);
+  const [copyState, setCopyState] = useState<"idle"|"loading"|"done">("idle");
+  const [saveState, setSaveState] = useState<"idle"|"loading"|"done">("idle");
 
-  const handleExport = async () => {
-    setExporting(true);
-    try { await generateMessageImage(msg); } finally { setExporting(false); }
+  const handleCopy = async () => {
+    setCopyState("loading");
+    try {
+      const cv = await buildMessageCanvas(msg);
+      await copyImageToClipboard(cv);
+      setCopyState("done");
+      setTimeout(() => setCopyState("idle"), 2200);
+    } catch { setCopyState("idle"); }
+  };
+
+  const handleSave = async () => {
+    setSaveState("loading");
+    try {
+      const cv = await buildMessageCanvas(msg);
+      saveImage(cv, `aether-${msg.role}-${msg.id}.png`);
+      setSaveState("done");
+      setTimeout(() => setSaveState("idle"), 2200);
+    } catch { setSaveState("idle"); }
   };
 
   if (isCtx) {
@@ -355,47 +427,77 @@ function Bubble({ msg }: { msg: Msg }) {
         })}
       </div>
 
-      {/* ── Image export button ── */}
+      {/* ── Image export buttons ── */}
       <div style={{
-        display: "flex",
+        display: "flex", gap: 4,
         justifyContent: isUser ? "flex-end" : "flex-start",
         marginTop: 5,
         opacity: hovered ? 1 : 0,
         transition: "opacity 0.18s",
         pointerEvents: hovered ? "auto" : "none",
       }}>
+        {/* COPY button */}
         <button
-          onClick={handleExport}
-          disabled={exporting}
-          title="Save as themed image"
+          onClick={handleCopy}
+          disabled={copyState === "loading" || saveState === "loading"}
+          title="Copy image to clipboard"
           style={{
             display: "flex", alignItems: "center", gap: 5,
             padding: "3px 10px 3px 8px",
             fontFamily: mono, fontSize: 8, letterSpacing: "0.05em",
-            cursor: exporting ? "wait" : "pointer",
-            border: `1px solid ${accentCol}35`,
+            cursor: copyState === "loading" ? "wait" : "pointer",
+            border: `1px solid ${copyState === "done" ? GREEN + "70" : accentCol + "35"}`,
             borderRadius: 20,
-            background: exporting ? `${accentCol}10` : "transparent",
-            color: exporting ? accentCol : DIM,
+            background: copyState === "done"
+              ? `${GREEN}18`
+              : copyState === "loading" ? `${accentCol}10` : "transparent",
+            color: copyState === "done" ? GREEN : copyState === "loading" ? accentCol : DIM,
             transition: "all 0.15s",
           }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = `${accentCol}18`;
-            (e.currentTarget as HTMLButtonElement).style.color = accentCol;
-            (e.currentTarget as HTMLButtonElement).style.borderColor = `${accentCol}60`;
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-            (e.currentTarget as HTMLButtonElement).style.color = DIM;
-            (e.currentTarget as HTMLButtonElement).style.borderColor = `${accentCol}35`;
+        >
+          {copyState === "done" ? (
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <polyline points="1.5,6 4.5,9 10.5,3" />
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <rect x="4" y="1" width="7" height="9" rx="1" />
+              <path d="M2 3 H1.5 A0.5 0.5 0 0 0 1 3.5 V10.5 A0.5 0.5 0 0 0 1.5 11 H8.5 A0.5 0.5 0 0 0 9 10.5 V11" />
+            </svg>
+          )}
+          {copyState === "loading" ? "BUILDING…" : copyState === "done" ? "COPIED!" : "COPY"}
+        </button>
+
+        {/* SAVE button */}
+        <button
+          onClick={handleSave}
+          disabled={copyState === "loading" || saveState === "loading"}
+          title="Save image as PNG"
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            padding: "3px 10px 3px 8px",
+            fontFamily: mono, fontSize: 8, letterSpacing: "0.05em",
+            cursor: saveState === "loading" ? "wait" : "pointer",
+            border: `1px solid ${saveState === "done" ? AMBER + "70" : accentCol + "35"}`,
+            borderRadius: 20,
+            background: saveState === "done"
+              ? `${AMBER}18`
+              : saveState === "loading" ? `${accentCol}10` : "transparent",
+            color: saveState === "done" ? AMBER : saveState === "loading" ? accentCol : DIM,
+            transition: "all 0.15s",
           }}
         >
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.3">
-            <rect x="1" y="3" width="10" height="8" rx="1.2" />
-            <circle cx="6" cy="7" r="2" />
-            <path d="M4 3 L4.8 1 H7.2 L8 3" />
-          </svg>
-          {exporting ? "GENERATING…" : "SAVE AS IMAGE"}
+          {saveState === "done" ? (
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <polyline points="1.5,6 4.5,9 10.5,3" />
+            </svg>
+          ) : (
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <path d="M6 1 V7.5 M3.5 5.5 L6 8 L8.5 5.5" />
+              <path d="M1.5 9.5 V10.5 A0.5 0.5 0 0 0 2 11 H10 A0.5 0.5 0 0 0 10.5 10.5 V9.5" />
+            </svg>
+          )}
+          {saveState === "loading" ? "BUILDING…" : saveState === "done" ? "SAVED!" : "SAVE PNG"}
         </button>
       </div>
     </div>
