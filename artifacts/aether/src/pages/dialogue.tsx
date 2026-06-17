@@ -98,6 +98,153 @@ function uid() { return Math.random().toString(36).slice(2, 10); }
 function timeStr(ts: number) {
   return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
+
+/* ── Image export ─────────────────────────────── */
+async function generateMessageImage(msg: Msg): Promise<void> {
+  await document.fonts.ready;
+  const isUser  = msg.role === "user";
+  const accent  = isUser ? "#9966ff" : "#1a9fd4";
+  const accent2 = isUser ? "#ff4477" : "#2ef0d8";
+  const W = 840, PAD = 38;
+
+  // ── measure lines ──
+  const mc = document.createElement("canvas");
+  const mx = mc.getContext("2d")!;
+  const FS = 17, LH = FS * 1.78;
+  mx.font = `${FS}px 'Crimson Pro', Georgia, serif`;
+  const maxW = W - PAD * 2;
+  const lines: string[] = [];
+  for (const para of msg.content.split("\n")) {
+    if (!para.trim()) { lines.push(""); continue; }
+    let cur = "";
+    for (const word of para.split(" ")) {
+      const test = cur ? cur + " " + word : word;
+      if (mx.measureText(test).width > maxW && cur) { lines.push(cur); cur = word; }
+      else cur = test;
+    }
+    if (cur) lines.push(cur);
+  }
+
+  const HEADER = 82, FOOTER = 54;
+  const bodyH  = Math.max(160, lines.length * LH + PAD * 2.2);
+  const H      = HEADER + bodyH + FOOTER;
+
+  // ── create canvas (2× for retina) ──
+  const cv = document.createElement("canvas");
+  cv.width = W * 2; cv.height = H * 2;
+  const ctx = cv.getContext("2d")!;
+  ctx.scale(2, 2);
+
+  // background
+  ctx.fillStyle = "#020408";
+  ctx.fillRect(0, 0, W, H);
+
+  // subtle dot grid
+  ctx.fillStyle = "rgba(20,40,60,0.55)";
+  for (let gx = 0; gx < W; gx += 32)
+    for (let gy = 0; gy < H; gy += 32) {
+      ctx.beginPath(); ctx.arc(gx, gy, 0.7, 0, Math.PI * 2); ctx.fill();
+    }
+
+  // top gradient bar
+  const topGrad = ctx.createLinearGradient(0, 0, W, 0);
+  topGrad.addColorStop(0,   "transparent");
+  topGrad.addColorStop(0.15, accent);
+  topGrad.addColorStop(0.5,  "#c9a84c");
+  topGrad.addColorStop(0.85, accent2);
+  topGrad.addColorStop(1,   "transparent");
+  ctx.fillStyle = topGrad; ctx.fillRect(0, 0, W, 2);
+
+  // header band
+  const hGrad = ctx.createLinearGradient(0, 0, 0, HEADER);
+  hGrad.addColorStop(0, "rgba(3,11,20,0.98)");
+  hGrad.addColorStop(1, "rgba(2,4,8,0)");
+  ctx.fillStyle = hGrad; ctx.fillRect(0, 0, W, HEADER);
+
+  // AETHER label
+  ctx.font = "8.5px 'Space Mono', monospace";
+  ctx.fillStyle = accent + "cc";
+  ctx.textAlign = "left";
+  ctx.fillText("AETHER  ·  DIALOGUE  CONSOLE  ·  SYNTHESIS  ENGINE", PAD, 22);
+
+  // role heading
+  ctx.font = "bold 16px 'Cinzel', serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(isUser ? "USER MESSAGE" : "AETHER SYNTHESIS", PAD, 52);
+
+  // timestamp (right)
+  ctx.font = "8.5px 'Space Mono', monospace";
+  ctx.fillStyle = "#3a5060";
+  ctx.textAlign = "right";
+  ctx.fillText(new Date(msg.ts).toLocaleString(), W - PAD, 22);
+  ctx.textAlign = "left";
+
+  // divider
+  const divGrad = ctx.createLinearGradient(PAD, 0, W - PAD, 0);
+  divGrad.addColorStop(0, accent + "70");
+  divGrad.addColorStop(1, "transparent");
+  ctx.strokeStyle = divGrad; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD, HEADER - 12); ctx.lineTo(W - PAD, HEADER - 12); ctx.stroke();
+
+  // left accent stripe on body
+  ctx.fillStyle = accent + "40";
+  ctx.fillRect(PAD - 16, HEADER, 2, bodyH);
+
+  // message text
+  ctx.font = `${FS}px 'Crimson Pro', Georgia, serif`;
+  const baseCol = isUser ? "#d4c8e8" : "#c8d8e0";
+  const boldCol = isUser ? "#c0a8ff" : "#2ef0d8";
+  ctx.fillStyle = baseCol;
+
+  let ty = HEADER + PAD + FS;
+  for (const line of lines) {
+    if (!line) { ty += LH * 0.55; continue; }
+    let tx = PAD;
+    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+    for (const part of parts) {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        const t = part.slice(2, -2);
+        ctx.font = `bold ${FS}px 'Crimson Pro', Georgia, serif`;
+        ctx.fillStyle = boldCol;
+        ctx.fillText(t, tx, ty); tx += ctx.measureText(t).width;
+        ctx.font = `${FS}px 'Crimson Pro', Georgia, serif`;
+        ctx.fillStyle = baseCol;
+      } else {
+        ctx.fillText(part, tx, ty); tx += ctx.measureText(part).width;
+      }
+    }
+    ty += LH;
+  }
+
+  // bottom gradient bar
+  ctx.fillStyle = topGrad; ctx.fillRect(0, H - 2, W, 2);
+
+  // footer band
+  const fGrad = ctx.createLinearGradient(0, H - FOOTER, 0, H);
+  fGrad.addColorStop(0, "rgba(2,4,8,0)");
+  fGrad.addColorStop(1, "rgba(3,11,20,0.98)");
+  ctx.fillStyle = fGrad; ctx.fillRect(0, H - FOOTER, W, FOOTER);
+
+  ctx.font = "8px 'Space Mono', monospace";
+  ctx.fillStyle = "#2a3840";
+  ctx.textAlign = "left";
+  ctx.fillText("AETHER KNOWLEDGE SYSTEM  ·  CRYSTALLISATION MODEL", PAD, H - 16);
+
+  // accent dot
+  ctx.fillStyle = accent;
+  ctx.beginPath(); ctx.arc(W - PAD, H - 16, 3.5, 0, Math.PI * 2); ctx.fill();
+
+  // download
+  cv.toBlob(blob => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement("a");
+    a.href     = url;
+    a.download = `aether-${msg.role}-${msg.id}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, "image/png");
+}
 function loadMessages(): Msg[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -127,6 +274,13 @@ function ThinkingDots() {
 function Bubble({ msg }: { msg: Msg }) {
   const isUser = msg.role === "user";
   const isCtx  = msg.isContext;
+  const [exporting, setExporting] = useState(false);
+  const [hovered, setHovered] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try { await generateMessageImage(msg); } finally { setExporting(false); }
+  };
 
   if (isCtx) {
     return (
@@ -147,12 +301,18 @@ function Bubble({ msg }: { msg: Msg }) {
     );
   }
 
+  const accentCol = isUser ? VIOLET : BLUE;
+
   return (
-    <div style={{
-      display: "flex", flexDirection: "column",
-      alignItems: isUser ? "flex-end" : "flex-start",
-      marginBottom: 20,
-    }}>
+    <div
+      style={{
+        display: "flex", flexDirection: "column",
+        alignItems: isUser ? "flex-end" : "flex-start",
+        marginBottom: 20,
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <div style={{
         display: "flex", alignItems: "center", gap: 8, marginBottom: 5,
         flexDirection: isUser ? "row-reverse" : "row",
@@ -193,6 +353,50 @@ function Bubble({ msg }: { msg: Msg }) {
             </p>
           );
         })}
+      </div>
+
+      {/* ── Image export button ── */}
+      <div style={{
+        display: "flex",
+        justifyContent: isUser ? "flex-end" : "flex-start",
+        marginTop: 5,
+        opacity: hovered ? 1 : 0,
+        transition: "opacity 0.18s",
+        pointerEvents: hovered ? "auto" : "none",
+      }}>
+        <button
+          onClick={handleExport}
+          disabled={exporting}
+          title="Save as themed image"
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            padding: "3px 10px 3px 8px",
+            fontFamily: mono, fontSize: 8, letterSpacing: "0.05em",
+            cursor: exporting ? "wait" : "pointer",
+            border: `1px solid ${accentCol}35`,
+            borderRadius: 20,
+            background: exporting ? `${accentCol}10` : "transparent",
+            color: exporting ? accentCol : DIM,
+            transition: "all 0.15s",
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = `${accentCol}18`;
+            (e.currentTarget as HTMLButtonElement).style.color = accentCol;
+            (e.currentTarget as HTMLButtonElement).style.borderColor = `${accentCol}60`;
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+            (e.currentTarget as HTMLButtonElement).style.color = DIM;
+            (e.currentTarget as HTMLButtonElement).style.borderColor = `${accentCol}35`;
+          }}
+        >
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.3">
+            <rect x="1" y="3" width="10" height="8" rx="1.2" />
+            <circle cx="6" cy="7" r="2" />
+            <path d="M4 3 L4.8 1 H7.2 L8 3" />
+          </svg>
+          {exporting ? "GENERATING…" : "SAVE AS IMAGE"}
+        </button>
       </div>
     </div>
   );
