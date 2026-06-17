@@ -260,6 +260,7 @@ import SeamossGatePage from "@/pages/seamoss-gate";
 import EngineComputerPage from "@/pages/engine-computer";
 import BioluminescenceSpectrumPage from "@/pages/bioluminescence-spectrum";
 import SoiBuildingPage from "@/pages/soi-building";
+import RdSimulatorPage from "@/pages/rd-simulator";
 
 const queryClient = new QueryClient();
 
@@ -523,6 +524,7 @@ function Router() {
         <Route path="/engine-computer" component={EngineComputerPage} />
         <Route path="/bioluminescence-spectrum" component={BioluminescenceSpectrumPage} />
         <Route path="/soi-building" component={SoiBuildingPage} />
+        <Route path="/rd-simulator" component={RdSimulatorPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
