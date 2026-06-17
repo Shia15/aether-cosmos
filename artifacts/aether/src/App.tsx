@@ -261,6 +261,7 @@ import EngineComputerPage from "@/pages/engine-computer";
 import BioluminescenceSpectrumPage from "@/pages/bioluminescence-spectrum";
 import SoiBuildingPage from "@/pages/soi-building";
 import RdSimulatorPage from "@/pages/rd-simulator";
+import NeuralTopologyPage from "@/pages/neural-topology";
 
 const queryClient = new QueryClient();
 
@@ -525,6 +526,7 @@ function Router() {
         <Route path="/bioluminescence-spectrum" component={BioluminescenceSpectrumPage} />
         <Route path="/soi-building" component={SoiBuildingPage} />
         <Route path="/rd-simulator" component={RdSimulatorPage} />
+        <Route path="/neural-topology" component={NeuralTopologyPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
