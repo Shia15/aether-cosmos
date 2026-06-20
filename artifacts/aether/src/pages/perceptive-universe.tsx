@@ -337,6 +337,9 @@ export default function PerceptiveUniversePage() {
   const dsModeRef = useRef<"wave" | "particle">("wave");
   useEffect(() => { dsModeRef.current = dsMode; }, [dsMode]);
 
+  /* Hopfion burst */
+  const hopfRef = useRef<HTMLCanvasElement>(null);
+
   /* Control refs */
   const runRef    = useRef(running);
   const gMaxRef   = useRef(gammaMax);
@@ -811,6 +814,142 @@ export default function PerceptiveUniversePage() {
       /* mode indicator */
       ctx.fillStyle = mode === "wave" ? TEAL + "bb" : ROSE + "bb";
       ctx.fillText(mode === "wave" ? "WAVE MODE  ψ" : "PARTICLE MODE  ·", W / 2, H - 6);
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  /* ── Hopfion burst: coherent → squeeze → decohere → burst → new topology ── */
+  useEffect(() => {
+    const cv = hopfRef.current;
+    if (!cv) return;
+    cv.width = 280; cv.height = 280;
+    const ctx = cv.getContext("2d")!;
+    const CX = 140, CY = 140, R = 132;
+
+    let t = 0;
+    let raf: number;
+
+    const imgBuf = ctx.createImageData(280, 280);
+    const px = imgBuf.data;
+
+    // noise field (pre-seeded)
+    const noise = new Float32Array(280 * 280);
+    for (let i = 0; i < noise.length; i++) noise[i] = Math.random() * 2 - 1;
+
+    const CYCLE = Math.PI * 10; // full burst cycle period
+
+    const draw = () => {
+      t += 0.014;
+      const phase = (t % CYCLE) / CYCLE; // 0..1
+
+      for (let iy = 0; iy < 280; iy++) {
+        for (let ix = 0; ix < 280; ix++) {
+          const dx = (ix - CX) / R;
+          const dy = (iy - CY) / R;
+          const r = Math.sqrt(dx * dx + dy * dy);
+          const theta = Math.atan2(dy, dx);
+          const k = (iy * 280 + ix) * 4;
+
+          if (r > 1.01) {
+            px[k] = 2; px[k+1] = 4; px[k+2] = 8; px[k+3] = 255;
+            continue;
+          }
+
+          let R_ch = 0, G_ch = 0, B_ch = 0;
+
+          if (phase < 0.22) {
+            /* ── Coherent knot ── pulsing Gaussian */
+            const pulse = 0.82 + 0.18 * Math.sin(t * 5.5);
+            const amp   = Math.exp(-r * r * 9.5) * pulse;
+            const ring  = Math.exp(-((r - 0.28) * (r - 0.28)) * 55) * 0.35 * pulse;
+            const v = amp + ring;
+            R_ch = Math.round(46  * v);
+            G_ch = Math.round(240 * v);
+            B_ch = Math.round(216 * v);
+
+          } else if (phase < 0.44) {
+            /* ── Squeezing ── elliptical compression */
+            const sq  = (phase - 0.22) / 0.22;
+            const ang = t * 0.22;
+            const ex  = dx * Math.cos(ang) + dy * Math.sin(ang);
+            const ey  = -dx * Math.sin(ang) + dy * Math.cos(ang);
+            const rsq = Math.sqrt(ex * ex / (1 + sq * 0.72) ** 2 + ey * ey / Math.max(0.1, 1 - sq * 0.4) ** 2);
+            const amp = Math.exp(-rsq * rsq * 9) * (0.9 + 0.1 * Math.sin(t * 4));
+            R_ch = Math.round(201 * amp);
+            G_ch = Math.round(168 * amp);
+            B_ch = Math.round(76  * amp);
+
+          } else if (phase < 0.60) {
+            /* ── Decoherence ── Lindblad noise grows */
+            const dc  = (phase - 0.44) / 0.16;
+            const amp = Math.exp(-r * r * 9) * (1 - dc * 0.6);
+            const n   = noise[(iy * 280 + ix)] * dc * 0.35;
+            const v   = Math.max(0, amp + n);
+            R_ch = Math.round(160 * v * (1 - dc * 0.5) + 100 * v * dc);
+            G_ch = Math.round(180 * v);
+            B_ch = Math.round(200 * v);
+
+          } else if (phase < 0.75) {
+            /* ── BURST ── petals shoot outward */
+            const burst = (phase - 0.60) / 0.15;
+            const nP    = 6;
+            const petal = Math.cos(nP * theta) ** 2;
+            const shellD = (r - 0.1 - burst * 0.72);
+            const shell = Math.exp(-(shellD * shellD) * 22);
+            const flash = Math.exp(-r * r * 55) * (1 - burst) * 2.8;
+            const v     = petal * shell * (1 - burst * 0.4) + flash;
+            R_ch = Math.min(255, Math.round(255 * Math.min(1, v)));
+            G_ch = Math.min(255, Math.round(200 * Math.min(1, v * 0.9)));
+            B_ch = Math.min(255, Math.round(80  * Math.min(1, v * 0.6)));
+
+          } else {
+            /* ── New stable topology ── Chladni flower n=6 */
+            const settle = (phase - 0.75) / 0.25;
+            const nN = 6;
+            const radial  = Math.sin(Math.PI * r);
+            const angular = Math.cos(nN * theta + t * 0.04);
+            const u = radial * angular;
+            const nodal = Math.max(0, 1 - Math.abs(u) * 2.6);
+            const glow  = nodal * nodal * settle;
+            R_ch = Math.round(46  * glow);
+            G_ch = Math.round(240 * glow);
+            B_ch = Math.round(216 * glow);
+          }
+
+          px[k]   = Math.min(255, R_ch);
+          px[k+1] = Math.min(255, G_ch);
+          px[k+2] = Math.min(255, B_ch);
+          px[k+3] = 255;
+        }
+      }
+
+      ctx.putImageData(imgBuf, 0, 0);
+
+      /* rim */
+      ctx.beginPath();
+      ctx.arc(CX, CY, R, 0, Math.PI * 2);
+      ctx.strokeStyle = GOLD + "22";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      /* phase label */
+      const labels = [
+        "COHERENT KNOT  |α⟩",
+        "SQUEEZING  Ŝ(ζ)",
+        "DECOHERENCE  ℒ[ρ]",
+        "BURST  ΔQ_Hopf",
+        "NEW TOPOLOGY  n=6",
+      ];
+      const pi = phase < 0.22 ? 0 : phase < 0.44 ? 1 : phase < 0.60 ? 2 : phase < 0.75 ? 3 : 4;
+      const labelCol = [TEAL, GOLD, "#a0a8c0", AMB, TEAL][pi];
+      ctx.font = `bold 8px "Space Mono", monospace`;
+      ctx.textAlign = "center";
+      ctx.fillStyle = labelCol + "cc";
+      ctx.fillText(labels[pi], CX, 270);
 
       raf = requestAnimationFrame(draw);
     };
@@ -1326,6 +1465,161 @@ export default function PerceptiveUniversePage() {
           </div>
           <div style={{ fontFamily: mono, fontSize: 8, color: "#1a3040", marginTop: 12 }}>
             Ψ = Σᵢ aᵢ·φᵢ · C(x,t)  ·  [C &gt; φ⁻¹] → coherent commitment  ·  ρ_DMF = 0.4475
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════════════════
+            AETHER FIELD FORMALISM · TOPOLOGICAL TRANSITION
+        ═══════════════════════════════════════════════════════ */}
+        <div style={{ marginTop: 64 }}>
+          <div style={{
+            height: 1,
+            background: `linear-gradient(90deg, transparent, ${VIO}40, transparent)`,
+            marginBottom: 36,
+          }} />
+          <div style={{ fontFamily: mono, fontSize: 8, color: VIO + "70", letterSpacing: "0.18em", marginBottom: 4 }}>
+            AETHER FIELD FORMALISM  ·  MATHEMATICAL FRAMEWORK  ·  TOPOLOGICAL TRANSITION
+          </div>
+          <h2 style={{ fontFamily: serif, fontSize: 22, fontWeight: 400, color: "#e0f0f8", margin: "0 0 8px", letterSpacing: "0.06em" }}>
+            Governing Equations of the Aether Medium
+          </h2>
+          <p style={{ fontFamily: prose, fontSize: 13.5, color: "#2a4858", lineHeight: 1.7, maxWidth: 720, margin: "0 0 36px" }}>
+            The AETHER framework treats the primordial medium as a vector field Ψ that carries light, topology,
+            and gravitational-analogue filaments. Five governing equations describe its dynamics from coherent
+            formation through knotting, squeezing, environmental decoherence, and topological burst transition.
+          </p>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 32, alignItems: "flex-start" }}>
+
+            {/* ── Equation stack ── */}
+            <div style={{ flex: "1 1 360px" }}>
+
+              {([
+                {
+                  label: "I  ·  AETHER WAVE EQUATION  (governing field)",
+                  col: TEAL,
+                  eq: "∇²Ψ  −  (1/c²) ∂²Ψ/∂t²  +  κ · (Ψ × ∇×Ψ)  =  0",
+                  body: "Ψ is the Aether field amplitude — the light-body precursor. κ encodes the knotting topology: linking number or Hopf invariant. When κ = 0 the equation reduces to a standard wave equation. Non-zero κ introduces a self-interaction term that stabilises knotted, toroidal, and filamentary field configurations.",
+                },
+                {
+                  label: "II  ·  COHERENT STATE  (ordered phase relationship)",
+                  col: GOLD,
+                  eq: "â |α⟩  =  α |α⟩",
+                  body: "The field occupies a coherent state |α⟩ — the most classical quantum state, with well-defined phase. α is a complex amplitude encoding both magnitude and phase. Coherent states are eigenstates of the annihilation operator â, making them the quantum analogue of a classical oscillating field.",
+                },
+                {
+                  label: "III  ·  SQUEEZE OPERATOR  (compression / stretching)",
+                  col: AMB,
+                  eq: "Ŝ(ζ)  =  exp( ½ζ* â²  −  ½ζ â†² )",
+                  body: "Ŝ(ζ) squeezes phase-space uncertainty along one quadrature at the expense of the other. ζ = r·e^{iφ} controls the squeeze strength (r) and axis direction (φ). In the AETHER context, squeezing corresponds to compression of the coherent knot along a filament axis — building energy density before the topological transition.",
+                },
+                {
+                  label: "IV  ·  LINDBLAD MASTER EQUATION  (decoherence)",
+                  col: ROSE,
+                  eq: "dρ/dt  =  −i[H, ρ]  +  Σₖ ( Lₖ ρ Lₖ†  −  ½{Lₖ†Lₖ, ρ} )",
+                  body: "Environmental interaction degrades phase coherence. The Lindblad operators Lₖ model distinct dissipation channels — photon emission, phonon scattering, vacuum fluctuations. The anti-commutator term ½{Lₖ†Lₖ, ρ} ensures trace preservation (probability conservation). As decoherence grows, the Hopfion knot destabilises, triggering the burst.",
+                },
+                {
+                  label: "V  ·  ENERGY DENSITY  (field strength)",
+                  col: BIO,
+                  eq: "ℰ  ∝  |Ψ|²  +  |∇×Ψ|²",
+                  body: "The total energy density in the Aether sums the scalar amplitude squared (|Ψ|² — local field energy) and the curl-squared term (|∇×Ψ|² — vortex / rotational energy). Knotted configurations concentrate energy in both terms. At the compressional axis, |∇×Ψ|² spikes — this is where the filament axis and burst emerge.",
+                },
+                {
+                  label: "VI  ·  TOPOLOGICAL TRANSITION  (the burst)",
+                  col: VIO,
+                  eq: "BURST  ≡  ΔQ_Hopf ≠ 0  ·  |Δφ| < 2π",
+                  body: "Bursting is not a physical explosion — it is a topological transition. The Hopf charge Q_Hopf jumps to a new integer value as the field reconfigures. The phrase 'shorter than the interval between one and minus one' is now precise: the transition occurs within a sub-cycle phase flip |Δφ| < 2π, a topological discontinuity in phase space rather than a classical threshold crossing.",
+                },
+              ] as { label: string; col: string; eq: string; body: string }[]).map((item, i) => (
+                <div key={i} style={{
+                  marginBottom: 22, padding: "14px 18px",
+                  border: `1px solid ${item.col}25`,
+                  borderLeft: `2px solid ${item.col}60`,
+                  borderRadius: 6, background: item.col + "05",
+                }}>
+                  <div style={{ fontFamily: mono, fontSize: 7.5, color: item.col + "99", letterSpacing: "0.12em", marginBottom: 8 }}>
+                    {item.label}
+                  </div>
+                  <div style={{
+                    fontFamily: mono, fontSize: 12.5, color: item.col,
+                    background: "#000816", borderRadius: 4, padding: "8px 12px",
+                    marginBottom: 10, letterSpacing: "0.04em", lineHeight: 1.5,
+                    wordBreak: "break-all",
+                  }}>
+                    {item.eq}
+                  </div>
+                  <div style={{ fontFamily: prose, fontSize: 12.5, color: "#2a4060", lineHeight: 1.65 }}>
+                    {item.body}
+                  </div>
+                </div>
+              ))}
+
+              {/* Compact interpretation */}
+              <div style={{
+                marginTop: 8, padding: "16px 20px",
+                border: `1px solid ${GOLD}30`, borderRadius: 8,
+                background: `linear-gradient(135deg, ${GOLD}06, ${TEAL}04)`,
+              }}>
+                <div style={{ fontFamily: mono, fontSize: 7.5, color: GOLD + "80", letterSpacing: "0.12em", marginBottom: 10 }}>
+                  COMPACT INTERPRETATION
+                </div>
+                <div style={{ fontFamily: prose, fontSize: 13, color: "#2e4858", lineHeight: 1.75, fontStyle: "italic" }}>
+                  A coherent oscillating Aether field{" "}
+                  <span style={{ color: TEAL, fontStyle: "normal" }}>Ψ = α(t) e^{"{i·φ(t)}"}</span>{" "}
+                  undergoes squeezing and stretching along a compressional filament axis. Environmental interactions
+                  induce decoherence, causing the superposed state to transition into a new topological configuration.
+                  The apparent burst is the mathematical release of coherence into orthogonal modes —
+                  governed by a sudden change in the knot invariant. The flower{" "}
+                  <span style={{ color: GOLD, fontStyle: "normal" }}>🌷🌺🌸</span>{" "}
+                  is not metaphor; it is the actual mode structure of a post-burst Laguerre–Gaussian field.
+                </div>
+                <div style={{ fontFamily: mono, fontSize: 8.5, color: "#1a3040", marginTop: 12, lineHeight: 2 }}>
+                  ● = coherent Hopfion  ·  ↕ = squeeze operator Ŝ(ζ)  ·  ✦ = Lindblad decoherence boundary  ·  🌷 = emergent topological lobe
+                </div>
+              </div>
+            </div>
+
+            {/* ── Hopfion burst simulation ── */}
+            <div style={{ flex: "0 0 auto" }}>
+              <div style={{ fontFamily: mono, fontSize: 8, color: VIO + "99", letterSpacing: "0.12em", marginBottom: 10 }}>
+                HOPFION BURST  ·  LIVE TOPOLOGICAL TRANSITION
+              </div>
+              <canvas ref={hopfRef} style={{
+                display: "block", borderRadius: "50%",
+                boxShadow: `0 0 40px ${VIO}25, 0 0 80px ${TEAL}14`,
+                border: `1px solid ${VIO}18`,
+              }} />
+              <div style={{ fontFamily: prose, fontSize: 11.5, color: "#1e3848", lineHeight: 1.65, maxWidth: 280, marginTop: 12 }}>
+                Watch the full cycle: coherent teal knot → gold squeeze → grey decoherence →
+                amber burst flash → new 6-fold flower topology. Each cycle is one complete
+                topological transition ΔQ_Hopf. The burst occurs when the Lindblad dissipation
+                overcomes the coherence field's self-stabilisation.
+              </div>
+
+              {/* Conceptual diagram */}
+              <div style={{
+                marginTop: 18, padding: "14px 16px",
+                border: `1px solid ${VIO}20`, borderRadius: 8,
+                background: `${VIO}06`, maxWidth: 280,
+                fontFamily: mono, fontSize: 10, lineHeight: 2.2, textAlign: "center",
+              }}>
+                <div style={{ color: TEAL + "cc" }}>🌷</div>
+                <div style={{ color: GOLD + "80" }}>↗ &nbsp; | &nbsp; ↖</div>
+                <div>
+                  <span style={{ color: ROSE + "cc" }}>🌺</span>
+                  {" — "}
+                  <span style={{ color: "#ffffff", fontSize: 13 }}>●</span>
+                  {" — "}
+                  <span style={{ color: ROSE + "cc" }}>🌺</span>
+                </div>
+                <div style={{ color: GOLD + "80" }}>↘ &nbsp; | &nbsp; ↙</div>
+                <div style={{ color: BIO + "cc" }}>🌸</div>
+                <div style={{ marginTop: 8, fontSize: 7.5, color: "#1e3048", letterSpacing: "0.06em" }}>
+                  ● Hopfion knot  ·  lobes = emergent modes
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
