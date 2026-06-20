@@ -266,6 +266,7 @@ import MorphoPrimePage from "@/pages/morpho-prime";
 import PerceptiveUniversePage from "@/pages/perceptive-universe";
 import CoreResonancePage from "@/pages/core-resonance";
 import SynchronyFieldPage from "@/pages/synchrony-field";
+import StromatoliteFieldPage from "@/pages/stromatolite-field";
 
 const queryClient = new QueryClient();
 
@@ -535,6 +536,7 @@ function Router() {
         <Route path="/perceptive-universe" component={PerceptiveUniversePage} />
         <Route path="/core-resonance" component={CoreResonancePage} />
         <Route path="/synchrony-field" component={SynchronyFieldPage} />
+        <Route path="/stromatolite-field" component={StromatoliteFieldPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
