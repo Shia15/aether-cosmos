@@ -118,6 +118,7 @@ const NAV_ITEMS = [
   { href: "/color-coherence",      label: "Color · Light · Coherence · SU(3) Color Charge · Blue Light Biology · Circadian C(x,t)", icon: Atom },
   { href: "/rotation-engine",     label: "Engine · Differential Rotation System · Letter String Grammar · Quaternion Orbit · L-System", icon: Atom },
   { href: "/liquid-density",      label: "Substrate Materials · Liquid Density · Mixing Machine · 37 Materials · 0.659–13.534 g/cm³", icon: Atom },
+  { href: "/perceptive-universe", label: "Coherent & Decoherent States · Full Perceptive Universe · Allen–Cahn C(x,t) · Time-Varying Dilation γ", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
