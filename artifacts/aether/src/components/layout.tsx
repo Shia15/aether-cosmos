@@ -82,6 +82,7 @@ import {
   Infinity as InfinityIcon,
   BookA,
   SunMedium,
+  Camera,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -390,6 +391,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+
+  /* ── Screenshot ── */
+  const [shotState, setShotState] = useState<"idle" | "busy" | "done">("idle");
+
+  const captureScreenshot = useCallback(async () => {
+    if (shotState === "busy") return;
+    setShotState("busy");
+    try {
+      const { default: html2canvas } = await import("html2canvas");
+      const target = mainRef.current ?? document.documentElement;
+      const canvas = await html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#020408",
+        logging: false,
+        // Capture full scrollable height
+        height: target.scrollHeight,
+        windowHeight: target.scrollHeight,
+      });
+      const link = document.createElement("a");
+      const slug = location.replace(/\//g, "") || "home";
+      link.download = `aether-${slug}-${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      setShotState("done");
+      setTimeout(() => setShotState("idle"), 2000);
+    } catch {
+      setShotState("idle");
+    }
+  }, [shotState, location]);
 
   // Close drawer on route change
   useEffect(() => { setDrawerOpen(false); }, [location]);
@@ -517,8 +550,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      <div className="p-4 border-t border-border shrink-0">
-        <div className="text-xs font-mono text-muted-foreground/50 text-center">AETHER OS v1.2.0</div>
+      <div className="p-4 border-t border-border shrink-0 flex items-center justify-between gap-2">
+        <div className="text-xs font-mono text-muted-foreground/50">AETHER OS v1.2.0</div>
+        {/* Screenshot button */}
+        <button
+          onClick={captureScreenshot}
+          title="Screenshot full page"
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            padding: "4px 10px", borderRadius: 14, cursor: shotState === "busy" ? "wait" : "pointer",
+            border: `1px solid ${shotState === "done" ? "#44ee88" : "#1a3040"}`,
+            background: shotState === "done" ? "rgba(68,238,136,0.08)" : "rgba(46,240,216,0.05)",
+            color: shotState === "done" ? "#44ee88" : "#2ef0d8",
+            fontFamily: "'Space Mono', monospace",
+            fontSize: 8, letterSpacing: "0.08em",
+            transition: "all 0.2s",
+            opacity: shotState === "busy" ? 0.5 : 1,
+          }}
+        >
+          <Camera style={{ width: 10, height: 10 }} />
+          {shotState === "busy" ? "CAPTURING…" : shotState === "done" ? "SAVED ✓" : "SCREENSHOT"}
+        </button>
       </div>
     </>
   );
@@ -564,16 +616,35 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <line x1="2" y1="15" x2="18" y2="15" />
             </svg>
           </button>
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="w-5 h-5 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shrink-0">
               <Cpu className="w-3 h-3" />
             </div>
             <span className="font-serif text-sm tracking-widest text-foreground uppercase font-bold truncate">AETHER</span>
             <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", isHealthy ? "bg-primary animate-pulse" : "bg-destructive")} />
           </div>
+          {/* Mobile screenshot button */}
+          <button
+            onClick={captureScreenshot}
+            title="Screenshot page"
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 30, height: 30, borderRadius: "50%", cursor: shotState === "busy" ? "wait" : "pointer",
+              border: `1px solid ${shotState === "done" ? "#44ee88" : "#1a3040"}`,
+              background: shotState === "done" ? "rgba(68,238,136,0.1)" : "rgba(46,240,216,0.06)",
+              color: shotState === "done" ? "#44ee88" : "#2ef0d8",
+              transition: "all 0.2s", flexShrink: 0,
+              opacity: shotState === "busy" ? 0.5 : 1,
+            }}
+          >
+            <Camera style={{ width: 13, height: 13 }} />
+          </button>
         </header>
 
-        <main className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background">
+        <main
+          ref={mainRef}
+          className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background"
+        >
           {children}
         </main>
       </div>
