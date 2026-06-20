@@ -119,6 +119,7 @@ const NAV_ITEMS = [
   { href: "/rotation-engine",     label: "Engine · Differential Rotation System · Letter String Grammar · Quaternion Orbit · L-System", icon: Atom },
   { href: "/liquid-density",      label: "Substrate Materials · Liquid Density · Mixing Machine · 37 Materials · 0.659–13.534 g/cm³", icon: Atom },
   { href: "/perceptive-universe", label: "Coherent & Decoherent States · Full Perceptive Universe · Allen–Cahn C(x,t) · Time-Varying Dilation γ", icon: Atom },
+  { href: "/core-resonance", label: "CORE · Resonance Nodule · Orb Aura State · Sigil Growth · Ego Incubation · Cross-Page Synthesis", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },

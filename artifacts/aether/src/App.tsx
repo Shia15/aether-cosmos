@@ -264,6 +264,7 @@ import RdSimulatorPage from "@/pages/rd-simulator";
 import NeuralTopologyPage from "@/pages/neural-topology";
 import MorphoPrimePage from "@/pages/morpho-prime";
 import PerceptiveUniversePage from "@/pages/perceptive-universe";
+import CoreResonancePage from "@/pages/core-resonance";
 
 const queryClient = new QueryClient();
 
@@ -531,6 +532,7 @@ function Router() {
         <Route path="/neural-topology" component={NeuralTopologyPage} />
         <Route path="/morpho-prime" component={MorphoPrimePage} />
         <Route path="/perceptive-universe" component={PerceptiveUniversePage} />
+        <Route path="/core-resonance" component={CoreResonancePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
