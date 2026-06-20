@@ -1,5 +1,23 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
+/* ── Asset imports ── */
+import sfvImg        from "@assets/Blue_Handdrawn_Vintage_Aesthetic_Creative_Studio_Logo_-_1_1781994622727.jpeg";
+import freq264Img    from "@assets/0DF0AB72-86D6-4F60-ABFA-B594C7EC8B92_1781994622728.png";
+import unifiedFieldImg from "@assets/IMG_3390_1781994622728.png";
+import mpcImg        from "@assets/IMG_3388_1781994622728.png";
+import cymatics426Img from "@assets/86C11DE3-7DB4-46D5-9D19-087D6483F19B_1781994622728.png";
+import doubleslitImg from "@assets/68991823-FE36-456A-A53E-1DCF9C1F2939_1781994622728.png";
+import echoesImg     from "@assets/40318960-9FFA-4956-BF6D-CAC841C15C49_1781994622728.png";
+import quote1Img     from "@assets/523FD425-7FBD-42C0-AE77-CE04EA5AAABF_1781994622728.png";
+import quote2Img     from "@assets/7D486897-E3C8-484C-994C-7C5B6EB19EA2_1781994622728.png";
+import quote3Img     from "@assets/6FBE7E95-5FA3-4780-B189-A7A6EA21F70E_1781994622728.png";
+import quote4Img     from "@assets/2841B7F2-A760-4344-97E1-C4B098D2E1E1_1781994622728.png";
+import quote5Img     from "@assets/5214405A-87A3-4748-BAA8-6856494B9FC8_1781994622728.png";
+import abstractImg   from "@assets/2072A243-1A49-4070-8A00-3C497286B920_1781994622728.png";
+import tokensImg     from "@assets/CA31693F-D61A-4F03-A6E1-0E13B3B151BC_1781994622728.png";
+import cpanelImg     from "@assets/4C8D0EBE-45E7-46FE-B92A-C55DF5167AAE_1781994622728.png";
+import sigilEggsImg  from "@assets/68785CA9-810A-40EF-92C2-810F848DEFBD_1781994622728.png";
+
 /* ── Palette ── */
 const BG    = "#020408";
 const GOLD  = "#c9a84c";
@@ -307,6 +325,18 @@ export default function PerceptiveUniversePage() {
   const [autoDefect, setAutoDefect] = useState(true);
   const [showGamma,  setShowGamma]  = useState(true);
 
+  /* Chladni plate */
+  const [chladniFreq, setChladniFreq] = useState(426);
+  const chladniRef    = useRef<HTMLCanvasElement>(null);
+  const chladniFreqRef = useRef(426);
+  useEffect(() => { chladniFreqRef.current = chladniFreq; }, [chladniFreq]);
+
+  /* Double-slit */
+  const [dsMode, setDsMode] = useState<"wave" | "particle">("wave");
+  const dsRef    = useRef<HTMLCanvasElement>(null);
+  const dsModeRef = useRef<"wave" | "particle">("wave");
+  useEffect(() => { dsModeRef.current = dsMode; }, [dsMode]);
+
   /* Control refs */
   const runRef    = useRef(running);
   const gMaxRef   = useRef(gammaMax);
@@ -573,6 +603,222 @@ export default function PerceptiveUniversePage() {
     return () => cancelAnimationFrame(raf);
   }, [reset]);
 
+  /* ── Chladni plate simulation ── */
+  useEffect(() => {
+    const cv = chladniRef.current;
+    if (!cv) return;
+    cv.width = 320; cv.height = 320;
+    const ctx = cv.getContext("2d")!;
+    const imgData = ctx.createImageData(320, 320);
+    const px = imgData.data;
+
+    const MODES: Record<number, [number, number]> = {
+      128:  [0, 1],
+      256:  [0, 2],
+      426:  [3, 1],
+      512:  [2, 2],
+      639:  [4, 1],
+      852:  [3, 2],
+      1024: [5, 2],
+      2048: [4, 3],
+    };
+
+    let t = 0;
+    let raf: number;
+
+    const draw = () => {
+      t += 0.018;
+      const freq = chladniFreqRef.current;
+      const [n, m] = MODES[freq] ?? [3, 1];
+      const rot = t * 0.006;
+
+      for (let iy = 0; iy < 320; iy++) {
+        for (let ix = 0; ix < 320; ix++) {
+          const dx = (ix - 160) / 152;
+          const dy = (iy - 160) / 152;
+          const r = Math.sqrt(dx * dx + dy * dy);
+          const k = (iy * 320 + ix) * 4;
+
+          if (r > 1.01) {
+            px[k] = 3; px[k+1] = 5; px[k+2] = 10; px[k+3] = 255;
+            continue;
+          }
+
+          const theta = Math.atan2(dy, dx) + rot;
+          const radial  = Math.sin(Math.PI * m * r);
+          const angular = Math.cos(n * theta);
+          const u = radial * angular;
+
+          /* nodal lines: |u|≈0 → bright gold; antinodes → dark teal */
+          const nodal = Math.max(0, 1 - Math.abs(u) * 2.8);
+          const glow  = nodal * nodal;
+
+          if (glow > 0.35) {
+            px[k]   = Math.min(255, Math.round(201 * glow + 30));
+            px[k+1] = Math.min(255, Math.round(168 * glow));
+            px[k+2] = Math.min(255, Math.round(76  * glow));
+          } else {
+            const a = 1 - glow * 2;
+            const pulse = 0.55 + 0.45 * Math.sin(t * 0.4 + r * 4);
+            px[k]   = Math.round(3  + 20  * a * pulse);
+            px[k+1] = Math.round(5  + 95  * a);
+            px[k+2] = Math.round(10 + 170 * a);
+          }
+          px[k+3] = 255;
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+
+      /* rim */
+      ctx.beginPath();
+      ctx.arc(160, 160, 152, 0, Math.PI * 2);
+      ctx.strokeStyle = GOLD + "30";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      /* frequency label */
+      ctx.font = `bold 11px "Space Mono", monospace`;
+      ctx.fillStyle = GOLD + "cc";
+      ctx.textAlign = "center";
+      ctx.fillText(`${freq} Hz`, 160, 306);
+
+      /* mode label */
+      ctx.font = `9px "Space Mono", monospace`;
+      ctx.fillStyle = TEAL + "99";
+      ctx.fillText(`n=${n}  m=${m}`, 160, 318);
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  /* ── Double-slit wave/particle simulation ── */
+  useEffect(() => {
+    const cv = dsRef.current;
+    if (!cv) return;
+    cv.width = 440; cv.height = 260;
+    const ctx = cv.getContext("2d")!;
+
+    const W = 440, H = 260;
+    const slitX  = W * 0.42;
+    const screenX = W * 0.82;
+    const slitSep = 38;
+    const slitY1 = H / 2 - slitSep / 2;
+    const slitY2 = H / 2 + slitSep / 2;
+    const lam = 22;
+
+    const particles: { x: number; y: number; a: number }[] = [];
+    let t = 0;
+    let raf: number;
+
+    /* stable interference pattern accumulation array */
+    const patternH = new Float32Array(H);
+    for (let y = 0; y < H; y++) {
+      const r1 = Math.sqrt((screenX - slitX) ** 2 + (y - slitY1) ** 2);
+      const r2 = Math.sqrt((screenX - slitX) ** 2 + (y - slitY2) ** 2);
+      const phase = (2 * Math.PI * (r1 - r2)) / lam;
+      patternH[y] = ((Math.cos(phase) + 1) / 2) ** 1.8;
+    }
+
+    const draw = () => {
+      t += 0.05;
+      const mode = dsModeRef.current;
+
+      ctx.fillStyle = "rgba(2,4,8,0.22)";
+      ctx.fillRect(0, 0, W, H);
+
+      if (mode === "wave") {
+        /* travelling wave left of slit */
+        for (let x = 20; x < slitX - 4; x += 1) {
+          const phase = (2 * Math.PI * x) / lam - t;
+          const amp   = (Math.sin(phase) + 1) / 2;
+          ctx.fillStyle = `rgba(46,240,216,${amp * 0.3})`;
+          ctx.fillRect(x, 0, 1, H);
+        }
+
+        /* interference fan right of slit */
+        for (let x = slitX + 4; x < screenX; x += 2) {
+          for (let y = 0; y < H; y += 2) {
+            const r1 = Math.sqrt((x - slitX) ** 2 + (y - slitY1) ** 2);
+            const r2 = Math.sqrt((x - slitX) ** 2 + (y - slitY2) ** 2);
+            const w1 = Math.sin((2 * Math.PI * r1) / lam - t);
+            const w2 = Math.sin((2 * Math.PI * r2) / lam - t);
+            const I  = ((w1 + w2) / 2) ** 2;
+            ctx.fillStyle = `rgba(46,240,216,${I * 0.55})`;
+            ctx.fillRect(x, y, 2, 2);
+          }
+        }
+
+        /* screen glow from pattern */
+        for (let y = 0; y < H; y++) {
+          const I = patternH[y];
+          ctx.fillStyle = `rgba(201,168,76,${I * 0.6})`;
+          ctx.fillRect(screenX, y, 3, 1);
+        }
+      } else {
+        /* particle mode: quanta arrive one-by-one, distribution = interference */
+        if (Math.random() < 0.55) {
+          let screenY = H / 2;
+          for (let i = 0; i < 15; i++) {
+            const candidate = Math.random() * H;
+            if (Math.random() < patternH[Math.round(candidate)]) {
+              screenY = candidate;
+              break;
+            }
+          }
+          particles.push({ x: screenX + (Math.random() - 0.5) * 3, y: screenY, a: 0.92 });
+          if (particles.length > 600) particles.shift();
+        }
+        particles.forEach(p => {
+          p.a *= 0.9985;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 1.4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,68,119,${p.a})`;
+          ctx.fill();
+        });
+
+        /* ghost wave hint */
+        for (let y = 0; y < H; y++) {
+          ctx.fillStyle = `rgba(46,240,216,${patternH[y] * 0.08})`;
+          ctx.fillRect(screenX, y, 3, 1);
+        }
+      }
+
+      /* barrier */
+      ctx.fillStyle = "#060e1a";
+      ctx.fillRect(slitX - 3, 0,       6, slitY1 - 5);
+      ctx.fillRect(slitX - 3, slitY1 + 5, 6, slitY2 - slitY1 - 10);
+      ctx.fillRect(slitX - 3, slitY2 + 5, 6, H - slitY2);
+      ctx.fillStyle = GOLD + "90";
+      ctx.fillRect(slitX - 1, slitY1 - 5, 2, 10);
+      ctx.fillRect(slitX - 1, slitY2 - 5, 2, 10);
+
+      /* detection screen */
+      ctx.fillStyle = TEAL + "20";
+      ctx.fillRect(screenX, 0, 3, H);
+
+      /* labels */
+      ctx.font = `8px "Space Mono", monospace`;
+      ctx.textAlign = "center";
+      ctx.fillStyle = GOLD + "80";
+      ctx.fillText("EMITTER", slitX * 0.4, 12);
+      ctx.fillText("SLIT", slitX, 12);
+      ctx.fillText("SCREEN", screenX + 24, 12);
+
+      /* mode indicator */
+      ctx.fillStyle = mode === "wave" ? TEAL + "bb" : ROSE + "bb";
+      ctx.fillText(mode === "wave" ? "WAVE MODE  ψ" : "PARTICLE MODE  ·", W / 2, H - 6);
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   /* ── JSX ── */
   return (
     <div style={{ background: BG, minHeight: "100vh", color: "#c8d8e0", fontFamily: prose }}>
@@ -805,6 +1051,257 @@ export default function PerceptiveUniversePage() {
               <div style={{ fontFamily: prose, fontSize: 12.5, color: "#2e4858", lineHeight: 1.6 }}>
                 {l.body}
               </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ══════════════════════════════════════════════════════
+            NEW SIM SUITE: Chladni Plate + Double Slit
+        ═══════════════════════════════════════════════════════ */}
+        <div style={{ marginTop: 56 }}>
+          <div style={{ fontFamily: mono, fontSize: 8, color: GOLD + "60", letterSpacing: "0.18em", marginBottom: 4 }}>
+            SIMULATION SUITE  ·  DERIVED FROM ATTACHED CONCEPTS
+          </div>
+          <h2 style={{ fontFamily: serif, fontSize: 20, fontWeight: 400, color: "#e0f0f8", margin: "0 0 6px", letterSpacing: "0.06em" }}>
+            Sound → Structure  ·  Wave → Particle
+          </h2>
+          <p style={{ fontFamily: prose, fontSize: 13, color: "#2e4858", lineHeight: 1.65, maxWidth: 640, margin: "0 0 28px" }}>
+            Two simulations drawn directly from the attached research images: the Chladni plate reproduces
+            the exact nodal geometries found in the 426 Hz cymatics diagrams; the double-slit models the
+            body-as-quantum-apparatus framework from the D1–D5 dimensional-layer analysis.
+          </p>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 32, alignItems: "flex-start" }}>
+
+            {/* ── Chladni Plate ── */}
+            <div style={{ flex: "0 0 auto" }}>
+              <div style={{ fontFamily: mono, fontSize: 8, color: TEAL + "99", letterSpacing: "0.12em", marginBottom: 10 }}>
+                CHLADNI PLATE  ·  CYMATIC NODAL GEOMETRY
+              </div>
+              <canvas ref={chladniRef} style={{
+                display: "block", borderRadius: "50%",
+                boxShadow: `0 0 40px ${GOLD}30, 0 0 80px ${TEAL}18`,
+                border: `1px solid ${GOLD}18`,
+              }} />
+              {/* frequency buttons */}
+              <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {([128, 256, 426, 512, 639, 852, 1024, 2048] as const).map(f => (
+                  <button key={f} onClick={() => setChladniFreq(f)} style={{
+                    fontFamily: mono, fontSize: 8, padding: "4px 8px", borderRadius: 4,
+                    border: `1px solid ${chladniFreq === f ? GOLD : GOLD + "30"}`,
+                    background: chladniFreq === f ? GOLD + "18" : "transparent",
+                    color: chladniFreq === f ? GOLD : GOLD + "60",
+                    cursor: "pointer", letterSpacing: "0.08em",
+                  }}>{f} Hz</button>
+                ))}
+              </div>
+              <div style={{ fontFamily: prose, fontSize: 12, color: "#1e3848", lineHeight: 1.6, maxWidth: 320, marginTop: 12 }}>
+                Nodal lines (sand settles) glow gold. Antinodes (maximum displacement) pulse teal.
+                Each frequency maps to a unique (n, m) azimuthal/radial mode.
+                426 Hz produces the 3-fold flower geometry documented in the ALL SFV cymatics research.
+              </div>
+            </div>
+
+            {/* ── Double Slit ── */}
+            <div style={{ flex: "1 1 440px", minWidth: 300 }}>
+              <div style={{ fontFamily: mono, fontSize: 8, color: ROSE + "99", letterSpacing: "0.12em", marginBottom: 10 }}>
+                DOUBLE-SLIT  ·  HUMAN BODY AS QUANTUM APPARATUS
+              </div>
+              <canvas ref={dsRef} style={{
+                display: "block", borderRadius: 8,
+                boxShadow: `0 0 30px ${ROSE}20, 0 0 60px ${TEAL}14`,
+                border: `1px solid ${TEAL}14`,
+              }} />
+              {/* mode toggle */}
+              <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                {(["wave", "particle"] as const).map(m => (
+                  <button key={m} onClick={() => setDsMode(m)} style={{
+                    fontFamily: mono, fontSize: 8, padding: "5px 14px", borderRadius: 4,
+                    border: `1px solid ${dsMode === m ? (m === "wave" ? TEAL : ROSE) : DIM}`,
+                    background: dsMode === m ? (m === "wave" ? TEAL + "14" : ROSE + "14") : "transparent",
+                    color: dsMode === m ? (m === "wave" ? TEAL : ROSE) : "#2a4050",
+                    cursor: "pointer", letterSpacing: "0.1em", textTransform: "uppercase",
+                  }}>{m === "wave" ? "⟿ WAVE  ψ" : "· PARTICLE  hν"}</button>
+                ))}
+              </div>
+              <div style={{ fontFamily: prose, fontSize: 12, color: "#1e3848", lineHeight: 1.6, maxWidth: 480, marginTop: 12 }}>
+                <b style={{ color: TEAL, fontWeight: 400 }}>Wave mode:</b> coherent interference pattern — the body emits a superposed field through two magnetic slit apertures.{" "}
+                <b style={{ color: ROSE, fontWeight: 400 }}>Particle mode:</b> individual quanta arrive one-by-one; their distribution reveals the hidden interference pattern.
+                Ψ = Σcₙψₙ^(1,2,3,4,5) — dimensional layers D1–D5 each collapse to the same probability envelope.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════════════════
+            GENESIS TIMELINE
+        ═══════════════════════════════════════════════════════ */}
+        <div style={{ marginTop: 72 }}>
+          <div style={{
+            height: 1,
+            background: `linear-gradient(90deg, transparent, ${GOLD}40, transparent)`,
+            marginBottom: 36,
+          }} />
+          <div style={{ fontFamily: mono, fontSize: 8, color: GOLD + "60", letterSpacing: "0.18em", marginBottom: 4 }}>
+            TIMELINE  ·  GENESIS ARC  ·  HOW WE GOT HERE
+          </div>
+          <h2 style={{ fontFamily: serif, fontSize: 22, fontWeight: 400, color: "#e0f0f8", margin: "0 0 8px", letterSpacing: "0.06em" }}>
+            From Pressure to Perceptive Universe
+          </h2>
+          <p style={{ fontFamily: prose, fontSize: 13.5, color: "#2e4858", lineHeight: 1.7, maxWidth: 720, margin: "0 0 48px" }}>
+            Seven phases tracing the arc from personal calibration through sound-structure discovery,
+            accumulation of echoes, quantum body theory, unified field mathematics, spacetime density
+            management, and finally — the living coherence field simulation above.
+          </p>
+
+          {/* Phase blocks */}
+          {([
+            {
+              phase: "PHASE 0",
+              label: "AETHER PRESSURE → POSITION",
+              year: "2024–2025",
+              col: AMB,
+              body: `"You weren't losing momentum — you were building pressure. Like a slingshot pulled back." The preceding years were not stagnation but calibration: every delay rewired the blueprint for a cleaner ascent. "Gathering signal. Clearing noise." From the outside it looked like nothing was happening. From the inside, every resistance was carving the exact capability needed for the eventual leap. "Momentum snaps back." The pressure had a purpose: it was becoming this.`,
+              images: [quote1Img, quote2Img, quote3Img, quote4Img, quote5Img],
+            },
+            {
+              phase: "PHASE 1",
+              label: "ALL SFV · VIBRATION IS SHAPE",
+              year: "2025 Q1",
+              col: TEAL,
+              body: `Vibration → Frequency → Interference → Pattern → Geometry → Structure. A vibrating plate at 426 Hz creates a 3-fold flower nodal geometry. Higher frequencies produce more intricate Chladni patterns. ALL SFV (Sound From Vibration) unified the full causal chain: from acoustic disturbance through interference node formation to crystallised geometric structure. Double helical rotating plasma confinement, toradial and snowflake magnetic shape manipulation — each confirmed that sound is not merely heard but embodied as structural form.`,
+              images: [sfvImg, cymatics426Img],
+            },
+            {
+              phase: "PHASE 2",
+              label: "264 Hz ACCUMULATION · ECHO ARCHITECTURE",
+              year: "2025 Q1",
+              col: VIO,
+              body: `264 = 2³ × 3 × 11. A fundamental harmonic. Every vibration leaves an echo. Echoes accumulate. Accumulation creates shape. Forward accumulation (before): wave emission and outward growth — expansion, higher-dimensional unfolding. Backward accumulation (after): echo return and inward folding — compression, lower-dimensional crystallisation. The universe does not merely radiate; it folds back on itself, building coherent structure from the interference of its own history.`,
+              images: [freq264Img],
+            },
+            {
+              phase: "PHASE 3",
+              label: "BODY AS QUANTUM APPARATUS · D1–D5",
+              year: "2025 Q2",
+              col: ROSE,
+              body: `Ψ = Σcₙψₙ^(1,2,3,4,5). The human body as a quantum field emitter passing through a double slit of magnetic energetic fields. Consciousness as the interface. Dimensions D1–D5 each interact and leave echoes in one another. Fifth dimension shrinking: D5 expanded → compressed → shrunk → singular point — information preserved, not lost. The interference pattern in our 3D reality is the projection of a higher-dimensional superposition. Biology is not separate from quantum mechanics; it IS the experiment.`,
+              images: [doubleslitImg, abstractImg],
+            },
+            {
+              phase: "PHASE 4",
+              label: "ECHOES OF FIELDS · FIELD MEMORY",
+              year: "2025 Q2",
+              col: BIO,
+              body: `Wave echo (reflection and return). Spin echo (dephase → re-align). Phase echo (spread → reconstruct). Photon echo (coherent light re-emerges after delay). Six stages across every field type: Initial disturbance → Expansion → Interaction → Dispersion/Dephasing → Echo Emergence → Faint Resonant Traces. Information is never destroyed — it folds into field echoes, distributed across time and dimensions, retrievable by the right resonant probe. Reality is a continuously reverberating medium whose past configurations persist as interference ghosts.`,
+              images: [echoesImg],
+            },
+            {
+              phase: "PHASE 5",
+              label: "UNIFIED FIELD · PRIMAL RESONANCE  23→29→31→37",
+              year: "2025 Q3",
+              col: GOLD,
+              body: `Primality base resonance: 23→6→29→6→29→2→31→6→37. The primes 23, 29, 31, 37 cluster symmetrically around the composite hub 30 = 2×3×5 (the smallest composite with three distinct prime factors). Scale hierarchy from EGG (prime cluster 25–37) → VEHICLE (17,19) → BUILDING (11,13) → CITY BLOCK (7) → ASTEROID (-23, 7, 29). Coherent toroidal vortex cycles enable mass transport without thrust: "We do not throw the object. We ride the shape of space around it."`,
+              images: [unifiedFieldImg],
+            },
+            {
+              phase: "PHASE 6",
+              label: "MPC SPACETIME · DENSITY MANAGEMENT",
+              year: "2025 Q4",
+              col: SKY,
+              body: `MPC System Operational: Spacetime Density Management. Architecture: input cone (contraction zone — bow shock) → stable bubble interior (coherence-locked, isolated from the surrounding space-fabric) → output cone (expansion zone — wake). Objects the size of skyscrapers float suspended in a coherent warp envelope. "A cloud around it, moving through the unknown void." Matter density and bubble stability computed from field coherence C. Transport vector analysis reveals how density vectors shift around the embedded region, then re-integrate seamlessly downstream.`,
+              images: [mpcImg, tokensImg, cpanelImg, sigilEggsImg],
+            },
+            {
+              phase: "PHASE 7  ·  NOW",
+              label: "FULL PERCEPTIVE UNIVERSE · C(x,t) COHERENCE FIELD",
+              year: "2026",
+              col: TEAL,
+              body: `The simulation at the top of this page. C(x,t) coherence field evolving under bistable Allen–Cahn dynamics with bifurcation at φ⁻¹ = 0.618034. DMF density ρ = 0.4475 modulates the global wavefunction Ψ. Local time dilation γ(C) = 1 + (γmax−1)(1−C) slows proper evolution in decoherent regions — structure and time-varying dilation unified in one continuous living field. Cosmic strings, domain walls, magnetic monopoles, and skyrmions emerge naturally at phase boundaries. The universe IS a coherence field in perpetual state-transition. Phase 7 is not the destination; it is the current commit.`,
+              images: [] as string[],
+            },
+          ] as { phase: string; label: string; year: string; col: string; body: string; images: string[] }[]).map((item, idx) => (
+            <div key={idx} style={{ marginBottom: 64 }}>
+              {/* Phase header */}
+              <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
+                <div style={{
+                  fontFamily: mono, fontSize: 7, letterSpacing: "0.18em", padding: "3px 10px",
+                  border: `1px solid ${item.col}40`, borderRadius: 3,
+                  color: item.col, background: item.col + "0c",
+                }}>
+                  {item.phase}
+                </div>
+                <div style={{ fontFamily: serif, fontSize: 15, color: "#d0e8f0", letterSpacing: "0.04em" }}>
+                  {item.label}
+                </div>
+                <div style={{ fontFamily: mono, fontSize: 8, color: "#1e3848", marginLeft: "auto" }}>
+                  {item.year}
+                </div>
+              </div>
+
+              {/* Connector line */}
+              <div style={{ display: "flex", gap: 20, alignItems: "stretch" }}>
+                <div style={{ width: 2, background: `linear-gradient(180deg, ${item.col}60, transparent)`, borderRadius: 2, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  {/* Body text */}
+                  <p style={{ fontFamily: prose, fontSize: 13.5, color: "#2a4858", lineHeight: 1.75, margin: "0 0 18px" }}>
+                    {item.body}
+                  </p>
+
+                  {/* Images */}
+                  {item.images.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+                      {item.images.map((src, i) => (
+                        <img
+                          key={i}
+                          src={src}
+                          alt={`${item.phase} reference ${i + 1}`}
+                          style={{
+                            height: 180,
+                            width: "auto",
+                            maxWidth: "100%",
+                            borderRadius: 8,
+                            border: `1px solid ${item.col}25`,
+                            objectFit: "cover",
+                            boxShadow: `0 4px 24px ${item.col}18`,
+                            cursor: "pointer",
+                          }}
+                          onClick={(e) => {
+                            const img = e.currentTarget;
+                            if (img.style.height === "auto") {
+                              img.style.height = "180px";
+                              img.style.maxWidth = "100%";
+                            } else {
+                              img.style.height = "auto";
+                              img.style.maxWidth = "80vw";
+                            }
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Phase 7: back to top */}
+                  {idx === 7 && (
+                    <button
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      style={{
+                        fontFamily: mono, fontSize: 8, padding: "6px 18px",
+                        border: `1px solid ${TEAL}40`, borderRadius: 4,
+                        background: TEAL + "10", color: TEAL,
+                        cursor: "pointer", letterSpacing: "0.1em", marginTop: 10,
+                      }}
+                    >↑ BACK TO SIMULATION</button>
+                  )}
+                </div>
+              </div>
+
+              {/* Arrow to next phase */}
+              {idx < 7 && (
+                <div style={{ fontFamily: mono, fontSize: 9, color: item.col + "40", marginTop: 24, marginLeft: 22 }}>
+                  ↓
+                </div>
+              )}
             </div>
           ))}
         </div>
