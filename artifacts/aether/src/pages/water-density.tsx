@@ -82,6 +82,189 @@ function Tbl({ headers, rows, accent = BLUE }:
 }
 
 /* ══════════════════════════════════════════════════
+   CIRCULAR CHLADNI CANVAS  (Section IV upgrade)
+══════════════════════════════════════════════════ */
+const CHLADNI_WATER_FREQS: [number, number, number][] = [
+  [128, 0, 1], [256, 0, 2], [426, 3, 1], [512, 2, 2],
+];
+
+function CircularChladniCanvas() {
+  const cvRef    = useRef<HTMLCanvasElement>(null);
+  const [freq, setFreq] = useState(426);
+  const freqRef  = useRef(426);
+  useEffect(() => { freqRef.current = freq; }, [freq]);
+
+  useEffect(() => {
+    const cv = cvRef.current;
+    if (!cv) return;
+    cv.width = 260; cv.height = 260;
+    const ctx = cv.getContext("2d")!;
+    const imgBuf = ctx.createImageData(260, 260);
+    const px = imgBuf.data;
+    let t = 0, raf: number;
+
+    const draw = () => {
+      t += 0.018;
+      const f    = freqRef.current;
+      const mode = CHLADNI_WATER_FREQS.find(x => x[0] === f) ?? [426, 3, 1];
+      const n = mode[1], m = mode[2];
+      const rot = t * 0.006;
+
+      for (let iy = 0; iy < 260; iy++) {
+        for (let ix = 0; ix < 260; ix++) {
+          const dx = (ix - 130) / 122, dy = (iy - 130) / 122;
+          const r = Math.sqrt(dx * dx + dy * dy);
+          const k = (iy * 260 + ix) * 4;
+          if (r > 1.01) { px[k]=2;px[k+1]=4;px[k+2]=8;px[k+3]=255; continue; }
+          const theta = Math.atan2(dy, dx) + rot;
+          const u     = Math.sin(Math.PI * m * r) * Math.cos(n * theta);
+          const nodal = Math.max(0, 1 - Math.abs(u) * 2.8);
+          const glow  = nodal * nodal;
+          if (glow > 0.35) {
+            px[k]  =Math.min(255,Math.round(201*glow+30));
+            px[k+1]=Math.min(255,Math.round(168*glow));
+            px[k+2]=Math.min(255,Math.round(76*glow));
+          } else {
+            const a=1-glow*2;
+            px[k]=Math.round(3+20*a); px[k+1]=Math.round(5+95*a); px[k+2]=Math.round(10+170*a);
+          }
+          px[k+3]=255;
+        }
+      }
+      ctx.putImageData(imgBuf,0,0);
+      ctx.beginPath(); ctx.arc(130,130,122,0,Math.PI*2);
+      ctx.strokeStyle=`${AMBER}30`; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.font=`bold 9px 'Space Mono',monospace`; ctx.textAlign="center";
+      ctx.fillStyle=`${AMBER}cc`;
+      ctx.fillText(`${f} Hz  ·  n=${n}  m=${m}`, 130, 250);
+      raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div>
+      <canvas ref={cvRef} style={{
+        display:"block", borderRadius:"50%",
+        border:`1px solid ${AMBER}20`,
+        boxShadow:`0 0 28px ${AMBER}14, 0 0 56px ${TEAL}0a`,
+      }} />
+      <div style={{ display:"flex", gap:6, marginTop:10, flexWrap:"wrap" }}>
+        {CHLADNI_WATER_FREQS.map(([f]) => (
+          <button key={f} onClick={() => setFreq(f)} style={{
+            fontFamily: mono, fontSize:8, padding:"4px 10px",
+            borderRadius:4, cursor:"pointer",
+            border:`1px solid ${freq===f?AMBER:AMBER+"30"}`,
+            background: freq===f ? `${AMBER}14` : "transparent",
+            color: freq===f ? AMBER : `${AMBER}50`,
+          }}>{f} Hz</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   HOPFION BURST CANVAS  (Section VI)
+══════════════════════════════════════════════════ */
+function HopfionBurstCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const cv = cvRef.current;
+    if (!cv) return;
+    cv.width = 230; cv.height = 230;
+    const ctx = cv.getContext("2d")!;
+    const CX = 115, CY = 115, R = 108;
+    const imgBuf = ctx.createImageData(230, 230);
+    const px = imgBuf.data;
+    const noise = new Float32Array(230 * 230);
+    for (let i=0; i<noise.length; i++) noise[i]=Math.random()*2-1;
+    const CYCLE = Math.PI * 10;
+    let t = 0, raf: number;
+
+    const draw = () => {
+      t += 0.014;
+      const phase = (t % CYCLE) / CYCLE;
+
+      for (let iy=0; iy<230; iy++) {
+        for (let ix=0; ix<230; ix++) {
+          const dx=(ix-CX)/R, dy=(iy-CY)/R;
+          const r=Math.sqrt(dx*dx+dy*dy);
+          const theta=Math.atan2(dy,dx);
+          const k=(iy*230+ix)*4;
+          if (r>1.01){px[k]=2;px[k+1]=4;px[k+2]=8;px[k+3]=255;continue;}
+          let Rc=0,Gc=0,Bc=0;
+
+          if (phase<0.22) {
+            const pulse=0.82+0.18*Math.sin(t*5.5);
+            const amp=Math.exp(-r*r*9.5)*pulse;
+            const rd=r-0.28;
+            const ring=Math.exp(-(rd*rd)*55)*0.35*pulse;
+            const v=amp+ring;
+            Rc=Math.round(29*v); Gc=Math.round(158*v); Bc=Math.round(212*v);
+          } else if (phase<0.44) {
+            const sq=(phase-0.22)/0.22, ang=t*0.22;
+            const ex=dx*Math.cos(ang)+dy*Math.sin(ang);
+            const ey=-dx*Math.sin(ang)+dy*Math.cos(ang);
+            const sx=1+sq*0.72, sy=Math.max(0.3,1-sq*0.4);
+            const rsq=Math.sqrt(ex*ex/(sx*sx)+ey*ey/(sy*sy));
+            const amp=Math.exp(-rsq*rsq*9)*0.9;
+            Rc=Math.round(201*amp); Gc=Math.round(168*amp); Bc=Math.round(76*amp);
+          } else if (phase<0.60) {
+            const dc=(phase-0.44)/0.16;
+            const amp=Math.exp(-r*r*9)*(1-dc*0.6);
+            const nv=noise[iy*230+ix]*dc*0.35;
+            const v=Math.max(0,amp+nv);
+            Rc=Math.round(160*v*(1-dc*0.5)+100*v*dc);
+            Gc=Math.round(180*v); Bc=Math.round(200*v);
+          } else if (phase<0.75) {
+            const burst=(phase-0.60)/0.15;
+            const ct=Math.cos(6*theta);
+            const petal=ct*ct;
+            const sd=r-0.1-burst*0.72;
+            const shell=Math.exp(-(sd*sd)*22);
+            const flash=Math.exp(-r*r*55)*(1-burst)*2.8;
+            const v=petal*shell*(1-burst*0.4)+flash;
+            Rc=Math.min(255,Math.round(255*Math.min(1,v)));
+            Gc=Math.min(255,Math.round(200*Math.min(1,v*0.9)));
+            Bc=Math.min(255,Math.round(80*Math.min(1,v*0.6)));
+          } else {
+            const radial=Math.sin(Math.PI*r);
+            const angular=Math.cos(6*theta+t*0.04);
+            const u=radial*angular;
+            const nodal=Math.max(0,1-Math.abs(u)*2.6);
+            const glow=nodal*nodal;
+            Rc=Math.round(29*glow); Gc=Math.round(158*glow); Bc=Math.round(212*glow);
+          }
+          px[k]=Math.min(255,Rc);px[k+1]=Math.min(255,Gc);px[k+2]=Math.min(255,Bc);px[k+3]=255;
+        }
+      }
+      ctx.putImageData(imgBuf,0,0);
+      ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);
+      ctx.strokeStyle=`${GOLD}18`;ctx.lineWidth=1;ctx.stroke();
+      const labels=["COHERENT  |α⟩","SQUEEZE  Ŝ(ζ)","DECOHERENCE  ℒ","BURST  ΔQ_Hopf","STABLE n=6"];
+      const pi=phase<0.22?0:phase<0.44?1:phase<0.60?2:phase<0.75?3:4;
+      const lc=[`${TEAL}ee`,`${AMBER}ee`,"rgba(160,170,200,0.9)",`${AMBER}ee`,`${TEAL}ee`][pi];
+      ctx.font=`bold 7px 'Space Mono',monospace`;ctx.textAlign="center";
+      ctx.fillStyle=lc; ctx.fillText(labels[pi],CX,222);
+      raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <canvas ref={cvRef} style={{
+      display:"block", borderRadius:"50%",
+      border:`1px solid ${VIOLET}28`,
+      boxShadow:`0 0 24px ${VIOLET}18`,
+    }} />
+  );
+}
+
+/* ══════════════════════════════════════════════════
    MAIN SIMULATION CANVAS
 ══════════════════════════════════════════════════ */
 type CanvasMode = "gradient" | "chladni" | "warp";
@@ -726,6 +909,52 @@ f_mn = (π/2) · √(D/ρh) · (m²/Lx² + n²/Ly²)`}</EQ>
           ]}
         />
 
+        {/* ── IV-b — Circular Chladni · Polar Mode ── */}
+        <div style={{ marginTop: 32 }}>
+          <div style={{ fontFamily: mono, fontSize: 10, color: AMBER, letterSpacing: 2, marginBottom: 6 }}>
+            LIVE CIRCULAR CHLADNI  ·  FARADAY WAVE GEOMETRY IN WATER
+          </div>
+          <p style={{ fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.75, margin: "0 0 16px", maxWidth: 680 }}>
+            The rectangular plate formula Z = cos(mπx)cos(nπy) approximates square plates.
+            Real cymbals, bowls, and water surfaces are <em>circular</em> — their eigenmodes use polar
+            coordinates: <span style={{ fontFamily: mono, fontSize: 12, color: AMBER }}>u(r,θ) = sin(πmr) · cos(nθ)</span>.
+            At <strong style={{ color: AMBER }}>426 Hz</strong> in water, Faraday waves form the exact
+            3-fold flower below — n=3 azimuthal, m=1 radial. This is the ALL SFV cymatic reference pattern.
+            Gold lines = nodes (water accumulates here). Teal regions = antinodes (water thrown outward).
+          </p>
+          <div style={{ display:"flex", gap:28, flexWrap:"wrap", alignItems:"flex-start" }}>
+            <CircularChladniCanvas />
+            <div style={{ flex:"1 1 260px", fontFamily: body, fontSize: 14, color: TEXT, lineHeight: 1.75 }}>
+              <div style={{ fontFamily: mono, fontSize: 9, color: AMBER+"90", letterSpacing: 1, marginBottom: 10 }}>
+                FREQUENCY → WATER SURFACE GEOMETRY
+              </div>
+              {[
+                ["128 Hz", "n=0 m=1", "Simple concentric ring — lowest radial mode; water piles at one central node circle"],
+                ["256 Hz", "n=0 m=2", "Double ring — two concentric node circles; water collects in two distinct bands"],
+                ["426 Hz", "n=3 m=1", "3-fold flower — documented in ALL SFV research; Faraday wave petal structure"],
+                ["512 Hz", "n=2 m=2", "X-star pattern — 2 azimuthal nodes + 2 radial rings; 4-fold symmetry"],
+              ].map(([f, mode, desc]) => (
+                <div key={f} style={{ marginBottom: 10, paddingLeft: 10, borderLeft: `2px solid ${AMBER}30` }}>
+                  <span style={{ fontFamily: mono, fontSize: 10, color: AMBER }}>{f}</span>
+                  {" · "}
+                  <span style={{ fontFamily: mono, fontSize: 10, color: TEAL }}>{mode}</span>
+                  {" — "}
+                  <span style={{ color: DIM, fontSize: 13 }}>{desc}</span>
+                </div>
+              ))}
+              <div style={{ marginTop: 14, padding:"10px 14px", background:`${AMBER}08`, border:`1px solid ${AMBER}20`, borderRadius:6, fontSize:13, color:DIM, lineHeight:1.7 }}>
+                Faraday (1831): vibrate a water container vertically — the surface organizes into
+                the same nodal geometry as a Chladni plate. The underlying math is identical.
+                The medium changes; the geometry does not. See{" "}
+                <span style={{ fontFamily:mono, fontSize:11, color:TEAL }}>
+                  AETHER · Full Perceptive Universe
+                </span>
+                {" "}for the live bistable field version of this simulation.
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ── V — Emergent Spacetime ── */}
         <SecHead id="s5" n="V" title="Emergent Spacetime from Fluid Dynamics"
           sub="Water flow doesn't just move through space — it creates the geometry it moves in" col={VIOLET} />
@@ -841,6 +1070,73 @@ Control Alphabet interventions:
           3-layer system — matching the same operators defined in the Grand Unified Framework.
         </Card>
 
+        {/* ── VI-b — Quaternion ↔ Hopfion Unification ── */}
+        <div style={{ marginTop: 36 }}>
+          <div style={{ fontFamily: mono, fontSize: 10, color: GOLD, letterSpacing: 2, marginBottom: 6 }}>
+            QUATERNION BURST  ↔  HOPFION BURST  ·  THE SAME TOPOLOGY
+          </div>
+          <p style={{ fontFamily: body, fontSize: 15, color: TEXT, lineHeight: 1.8, marginBottom: 16, maxWidth: 700 }}>
+            The quaternion algebraic burst described above (LPE {'>'} 0.6 → shear wave detonation → phase
+            restabilization) is not merely analogous to a topological Hopfion burst — it <em>is</em> the
+            same event expressed in two different mathematical languages. The threshold numbers match:
+            {" "}<span style={{ fontFamily: mono, fontSize: 12, color: GOLD }}>LPE {'>'} 0.6  ≡  C {'>'} φ⁻¹ = 0.618034</span>.
+            One describes the entropy of a water flow field; the other describes the bifurcation
+            threshold of the Allen-Cahn coherence field. Same transition, different coordinates.
+          </p>
+
+          <div style={{ overflowX:"auto", margin:"0 0 20px" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", fontFamily:body, fontSize:13 }}>
+              <thead>
+                <tr style={{ borderBottom:`1px solid ${GOLD}35` }}>
+                  {["Phase","Water Q~AETHER (Section VI)","Perceptive Universe (Hopfion)","Threshold"].map((h,i) => (
+                    <th key={i} style={{ fontFamily:mono, fontSize:9, color:GOLD, textAlign:"left", padding:"6px 10px", letterSpacing:1 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  ["1 — Coherent", "Real-axis flow, stable laminar, 8–15mm levitation gap", "|α⟩ coherent knot, Ψ localised at origin", "LPE < 0.3  ·  C < 0.38"],
+                  ["2 — Rotational", "Imaginary rotation i,j,k — onset turbulence, eddy formation", "Squeeze operator Ŝ(ζ) elongates Wigner function", "LPE 0.3–0.6  ·  C 0.38–0.618"],
+                  ["3 — Decoherence", "High-frequency shear wave precursor, film thickness oscillates", "Lindblad ℒ[ρ] spreads coherence to environment", "LPE → 0.6  ·  C → φ⁻¹"],
+                  ["4 — Burst", "ALGEBRAIC BURST: LPE > 0.6 → EM pulse 30–300 MHz", "ΔQ_Hopf ≠ 0 — topological charge jumps", "LPE > 0.6  ·  C > 0.618"],
+                  ["5 — Restabilize", "Phase-conjugate mirror inversion, waveform cancels distortion", "New stable topology n=6 flower, energy redistributed", "LPE → 0  ·  C → 1"],
+                ].map((row,ri) => (
+                  <tr key={ri} style={{ borderBottom:"1px solid #ffffff06", background:ri%2===0?"#ffffff02":"transparent" }}>
+                    {row.map((c,ci) => (
+                      <td key={ci} style={{ padding:"8px 10px", color: ci===3?GOLD:TEXT, verticalAlign:"top", fontFamily:ci===3?mono:body, fontSize:ci===3?10:13 }}>{c}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ display:"flex", gap:24, flexWrap:"wrap", alignItems:"flex-start" }}>
+            <div>
+              <div style={{ fontFamily:mono, fontSize:9, color:GOLD+"80", letterSpacing:1, marginBottom:8 }}>
+                LIVE HOPFION BURST  ·  SAME 5-PHASE CYCLE
+              </div>
+              <HopfionBurstCanvas />
+            </div>
+            <div style={{ flex:"1 1 260px" }}>
+              <div style={{ fontFamily:mono, fontSize:9, color:GOLD+"80", letterSpacing:1, marginBottom:10 }}>
+                WHY THE NUMBERS MATCH
+              </div>
+              {[
+                { col:GOLD, title:"φ⁻¹ = 0.618034", body:"The golden ratio inverse is the fixed point of the logistic map and the bifurcation threshold for period-doubling. It appears in both LPE (information-theoretic) and Allen-Cahn (energy-landscape) descriptions of the same instability." },
+                { col:VIOLET, title:"Topological charge ΔQ_Hopf", body:"When LPE exceeds φ⁻¹, the water vortex field undergoes a topological re-routing identical to a Hopfion knot changing its winding number. The burst is a topological phase transition — not just a fluid event." },
+                { col:TEAL, title:"EM pulse = quantum coherence burst", body:"The VHF emission (30–300 MHz) observed at LPE > 0.6 corresponds to the decoherence emission ℒ[ρ] in the quantum Lindblad framework — energy escaping from the collapsing coherent state into the environment." },
+                { col:BLUE, title:"Control Alphabet = field operators", body:"The ~ · o · n · S control operators in Q~AETHER map directly to the quantum optical tools: squeezing (Ŝ), measuring (observable ⟨n⟩), perturbation (displacement D̂), and phase-conjugate validation (mirror)." },
+              ].map(c => (
+                <div key={c.title} style={{ marginBottom:10, padding:"10px 14px", background:`${c.col}08`, border:`1px solid ${c.col}22`, borderRadius:6 }}>
+                  <div style={{ fontFamily:mono, fontSize:9, color:c.col, marginBottom:5 }}>{c.title}</div>
+                  <div style={{ fontFamily:body, fontSize:13, color:DIM, lineHeight:1.7 }}>{c.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* ── VII — Warp Chamber ── */}
         <SecHead id="s7" n="VII" title="Warping Space Fabric via Dark Matter Oscillation"
           sub="Commercial warp transport chambers using coherent dark matter wave synchronization through fluid media" col={ROSE} />
@@ -903,6 +1199,99 @@ Key principles:
             ["Interstellar mass transport", "Planetary scale", "Move asteroid-scale mass across cosmic distances", "Dark matter + water field coupling at scale"],
           ]}
         />
+
+        {/* ── VIII — Allen-Cahn Bridge ── */}
+        <div id="s8" style={{ marginTop: 64, scrollMarginTop: 80 }}>
+          <div style={{ fontFamily: mono, fontSize: 10, color: TEAL, letterSpacing: 3, marginBottom: 6 }}>VIII</div>
+          <h2 style={{ fontFamily: serif, fontSize: 26, color: "#fff", margin: "0 0 4px", letterSpacing: 1 }}>
+            Allen-Cahn Bridge · Water as Coherence Field
+          </h2>
+          <div style={{ fontFamily: body, fontSize: 15, color: DIM, marginBottom: 20 }}>
+            Unifying water density dynamics, cosmic field coherence, and the perceptive universe under one equation
+          </div>
+          <div style={{ height: 1, background: `linear-gradient(90deg,${TEAL}60,transparent)`, marginBottom: 28 }} />
+        </div>
+
+        <p style={{ fontFamily: body, fontSize: 16, lineHeight: 1.8, marginBottom: 18 }}>
+          The Allen-Cahn equation was derived in 1979 to model phase separation in metal alloys —
+          but it describes the same dynamics as water at 4°C, as cosmic field coherence, and as
+          every bistable system that exists. The coherence field C(x,t) ∈ [0,1] that runs
+          through the Perceptive Universe simulation is water density written in field language.
+          They are the same equation. The same threshold. The same burst.
+        </p>
+
+        <EQ>{`Allen-Cahn equation (unified form):
+  ∂C/∂t = ε²∇²C − V'(C)
+
+Bistable potential (double-well):
+  V(C) = −C²/2 + C⁴/4   →   V'(C) = −C + C³ = C(C−1)(C+1)
+
+Fixed points: C* = 0 (decoherent)   C* = ±1 (coherent)
+Bifurcation threshold: C = φ⁻¹ = 0.618034
+
+Water density analog:
+  C(x,t) → ρ_water(x,y,t) / ρ_max       [normalized density]
+  ε²∇²C  → diffusion of density gradient ∇ρ
+  V'(C)  → restoring force toward 4°C maximum density
+
+Temperature → coherence mapping:
+  T = 0°C  (ice)     →  C = 0.92  (coherent, ordered lattice)
+  T = 4°C  (max ρ)   →  C = 1.00  (maximum coherence: ρ = 999.97 kg/m³)
+  T = 20°C (warm)    →  C = 0.76  (partial coherence)
+  T = 40°C (hot)     →  C = 0.55  (approaching bifurcation — C < φ⁻¹)
+  T = 60°C (near bp) →  C = 0.38  (low coherence — rapid density drop)
+  T = 100°C (vapor)  →  C = 0.00  (fully decoherent — phase transition)
+
+Threshold crossing:
+  C drops below φ⁻¹ = 0.618  →  bistable restoring force reverses sign
+  →  system cannot return to coherent well under normal conditions
+  →  external perturbation required (cooling, pressure, phase-conjugation)`}</EQ>
+
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:12, margin:"20px 0 28px" }}>
+          {[
+            { col:TEAL, title:"C(x,t) = ρ_water / ρ_max",
+              body:"Normalizing water density to its 4°C maximum gives the Allen-Cahn coherence field exactly. Dense, cold water = coherent (C→1). Warm, thin water = decoherent (C→0). The field obeys the same bistable dynamics in both interpretations." },
+            { col:AMBER, title:"φ⁻¹ = 0.618 = LPE 0.6 threshold",
+              body:"The φ⁻¹ coherence bifurcation threshold from the Allen-Cahn model matches the LPE > 0.6 burst threshold from the Q~AETHER quaternion framework. Both are measuring the same topological instability — just in different coordinate systems." },
+            { col:VIOLET, title:"Domain walls = phase boundaries",
+              body:"Allen-Cahn domain walls — thin transition zones between C=0 and C=1 — are precisely the ice-water and water-vapor phase boundaries. Their width ε sets the sharpness of the transition: small ε = sharp boundary (cold day); large ε = diffuse interface (warm fog)." },
+            { col:BLUE, title:"ε²∇²C = density diffusion",
+              body:"The Laplacian term ε²∇²C drives the density field toward local uniformity. In water, this is thermal diffusion spreading heat (and therefore density) through the fluid. High ε = fast diffusion (warm water); low ε = slow diffusion (cold, viscous water near 0°C)." },
+            { col:GREEN, title:"V(C) = Gibbs free energy",
+              body:"The bistable potential V(C) = −C²/2 + C⁴/4 is the Landau-Ginzburg free energy of water at its phase transition. The two wells at C=±1 correspond to the two stable phases (liquid water, ice). The barrier at C=0 is the activation energy for phase change." },
+            { col:ROSE, title:"Faraday waves = C(x,t) modulation",
+              body:"When water is vibrated acoustically (Faraday, Chladni), the surface height η(x,t) modulates the density field ρ_water. Nodes (zero displacement) = high density (C→1). Antinodes (maximum displacement) = low density (C→0). The cymatic pattern is the coherence field." },
+          ].map(c => (
+            <div key={c.title} style={{ background:`${c.col}08`, border:`1px solid ${c.col}22`, borderRadius:8, padding:"13px 16px" }}>
+              <div style={{ fontFamily:mono, fontSize:9, color:c.col, letterSpacing:1, marginBottom:6 }}>{c.title}</div>
+              <div style={{ fontFamily:body, fontSize:13, color:DIM, lineHeight:1.7 }}>{c.body}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ padding:"18px 22px", background:`${TEAL}08`, border:`1px solid ${TEAL}22`, borderRadius:8, marginBottom:20 }}>
+          <div style={{ fontFamily:mono, fontSize:10, color:TEAL, letterSpacing:2, marginBottom:10 }}>
+            THE UNIFIED CHAIN  ·  WATER → FIELD → COSMOS
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:10 }}>
+            {[
+              ["Water density ρ(x,y,t)", "Allen-Cahn C(x,t)", "C = ρ/ρ_max"],
+              ["4°C density maximum", "Coherent well C=1", "ρ = 999.97 kg/m³"],
+              ["Faraday nodal geometry", "Chladni polar mode", "u(r,θ) = sin(πmr)cos(nθ)"],
+              ["LPE > 0.6 quaternion burst", "C > φ⁻¹ Allen-Cahn burst", "Same topological transition"],
+              ["Phase-conjugate mirror", "Time-reversal operator T̂", "Lindblad restabilization"],
+              ["Acoustic metric ds²", "γ(C) time dilation", "Dense water = slow clocks"],
+            ].map(([a,b,eq]) => (
+              <div key={a} style={{ fontFamily:body, fontSize:12, lineHeight:1.6 }}>
+                <span style={{ color:BLUE }}>{a}</span>
+                <span style={{ color:DIM }}> = </span>
+                <span style={{ color:TEAL }}>{b}</span>
+                <br />
+                <span style={{ fontFamily:mono, fontSize:9, color:GOLD }}>{eq}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Summary */}
         <div style={{
