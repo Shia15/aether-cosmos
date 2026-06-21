@@ -280,6 +280,7 @@ import EmergenceNetworkPage from "@/pages/emergence-network";
 import PlasmaConfinementPage from "@/pages/plasma-confinement";
 import TaitKnotsPage from "@/pages/tait-knots";
 import PlantCoherenceSystemPage from "@/pages/plant-coherence-system";
+import EnergeticFieldSimPage from "@/pages/energetic-field-sim";
 
 const queryClient = new QueryClient();
 
@@ -563,6 +564,7 @@ function Router() {
         <Route path="/plasma-confinement" component={PlasmaConfinementPage} />
         <Route path="/tait-knots" component={TaitKnotsPage} />
         <Route path="/plant-coherence-system" component={PlantCoherenceSystemPage} />
+        <Route path="/energetic-field-sim" component={EnergeticFieldSimPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
