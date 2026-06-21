@@ -415,7 +415,9 @@ export default function PhiAetherView() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="relative flex flex-col h-full overflow-hidden" style={{ background:"#03050d", fontFamily:"'Raleway',sans-serif", fontWeight:300, color:"rgba(168,188,232,0.9)" }}>
+    <div className="relative" style={{ background:"#03050d", fontFamily:"'Raleway',sans-serif", fontWeight:300, color:"rgba(168,188,232,0.9)" }}>
+      {/* ── Simulation viewport — fixed 100vh dashboard ── */}
+      <div className="relative flex flex-col overflow-hidden" style={{ height:"100vh" }}>
       {/* Sacred-geometry background */}
       <canvas ref={bgRef} className="absolute inset-0 pointer-events-none z-0" />
       <div className="absolute inset-0 pointer-events-none z-0" style={{ background:"radial-gradient(ellipse 80% 60% at 50% 40%, rgba(30,20,80,0.45) 0%, transparent 70%)" }} />
@@ -590,6 +592,7 @@ export default function PhiAetherView() {
       </div>
 
       <style>{`@keyframes pulse-rune{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}`}</style>
+      </div>{/* end simulation viewport */}
 
       {/* ── INFERNIA + Animal Neural Sim appendix ───────────────────────────── */}
       <div style={{ padding: "2rem 2rem 3.5rem", borderTop: "1px solid rgba(58,80,128,0.25)", background: "#020617" }}>
