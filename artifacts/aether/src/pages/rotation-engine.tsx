@@ -134,6 +134,14 @@ function applyLSystem(str: string, gens: number): string {
   return s;
 }
 
+/* ── lyapunov comparison strings ────────────────────────────────────────── */
+const LYA_COMPS = [
+  { str: "RGB",    col: ORB2,  label: "RGB · SU(3) singlet"  },
+  { str: "~onS",   col: STR2,  label: "~onS · control"       },
+  { str: "^RGB",   col: RUST,  label: "^RGB · burst"         },
+  { str: "RRRRRR", col: ENG2,  label: "RRRRRR · mono"        },
+] as const;
+
 /* ── shared components ───────────────────────────────────────────────────── */
 function Chip({ c = PALE, children }: { c?: string; children: string }) {
   return <span style={{ fontFamily: mono, fontSize: 11, color: c, background: `${c}14`, border: `1px solid ${c}40`, borderRadius: 4, padding: "2px 8px", display: "inline-block", margin: "2px 3px" }}>{children}</span>;
@@ -156,7 +164,7 @@ function Pull({ col = ENG, children }: { col?: string; children: string }) {
 }
 
 /* ── canvas ──────────────────────────────────────────────────────────────── */
-type Mode = "orbit" | "ticker" | "lsystem";
+type Mode = "orbit" | "ticker" | "lsystem" | "lyapunov" | "cayley";
 
 function EngineCanvas({ mode, activeString }: { mode: Mode; activeString: string }) {
   const cvs = useRef<HTMLCanvasElement>(null);
@@ -191,6 +199,18 @@ function EngineCanvas({ mode, activeString }: { mode: Mode; activeString: string
     let lsysQ: Q = [1, 0, 0, 0];
 
     const FRAMES_PER_LETTER = 14;
+
+    /* ── lyapunov parallel simulation state ── */
+    const lyaQs: Q[] = LYA_COMPS.map(() => [1, 0, 0, 0] as Q);
+    const lyaIdxs: number[] = LYA_COMPS.map(() => 0);
+    const LYA_HIST = 300;
+    const lyaVhist: number[][] = LYA_COMPS.map(() => []);
+
+    /* ── cayley walk state ── */
+    type CayNode = { b: number; c: number; col: string; sym: string };
+    const cayNodes: CayNode[] = [];
+    let cayQ: Q = [1, 0, 0, 0];
+    let cayStep = 0;
 
     /* project imaginary quaternion (b,c,d) → 2D with rotating camera */
     const project = (q: Q, W: number, H: number, viewT: number) => {
@@ -516,6 +536,186 @@ function EngineCanvas({ mode, activeString }: { mode: Mode; activeString: string
         });
         ctx.fillStyle = `${ENG}80`;
         ctx.fillText("L-SYSTEM  ·  grows every 3s", W * 0.5 - 80, H - 10);
+
+      /* ═══ LYAPUNOV STABILITY PLOT ══════════════════════════════════════ */
+      } else if (mode === "lyapunov") {
+        if (t % FRAMES_PER_LETTER === 0) {
+          LYA_COMPS.forEach((comp, ci) => {
+            const sym = comp.str[lyaIdxs[ci] % comp.str.length];
+            lyaIdxs[ci]++;
+            lyaQs[ci] = applyLetter(lyaQs[ci], sym);
+            const qq = lyaQs[ci];
+            const V = qq[1] ** 2 + qq[2] ** 2 + qq[3] ** 2;
+            lyaVhist[ci].push(V);
+            if (lyaVhist[ci].length > LYA_HIST) lyaVhist[ci].shift();
+          });
+        }
+
+        const chartX = W * 0.07, chartY = H * 0.14;
+        const chartW = W * 0.57, chartH = H * 0.70;
+
+        ctx.fillStyle = `${SURF}80`;
+        ctx.beginPath(); ctx.roundRect(chartX - 4, chartY - 4, chartW + 8, chartH + 8, 6);
+        ctx.fill();
+
+        for (let vi = 0; vi <= 4; vi++) {
+          const v = vi * 0.25;
+          const gy = chartY + chartH - v * chartH;
+          ctx.strokeStyle = `${LINE}60`; ctx.lineWidth = 0.5; ctx.setLineDash([3, 4]);
+          ctx.beginPath(); ctx.moveTo(chartX, gy); ctx.lineTo(chartX + chartW, gy); ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.font = `7px ${mono}`; ctx.fillStyle = `${BODY}70`; ctx.textAlign = "right";
+          ctx.fillText(v.toFixed(2), chartX - 5, gy + 3);
+        }
+
+        ctx.font = `9px ${mono}`; ctx.fillStyle = PALE; ctx.textAlign = "center";
+        ctx.fillText("V(q) = b² + c² + d²   (Lyapunov function)", chartX + chartW * 0.5, chartY - 12);
+        ctx.font = `7px ${mono}`; ctx.fillStyle = `${BODY}50`;
+        ctx.fillText("time (frames) →", chartX + chartW * 0.5, chartY + chartH + 14);
+
+        ctx.strokeStyle = `${RUST}30`; ctx.lineWidth = 1; ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.moveTo(chartX, chartY); ctx.lineTo(chartX + chartW, chartY); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = `7px ${mono}`; ctx.fillStyle = `${RUST}60`; ctx.textAlign = "left";
+        ctx.fillText("V = 1 (pure imaginary — max rotation)", chartX + 4, chartY + 9);
+
+        LYA_COMPS.forEach((comp, ci) => {
+          const hist = lyaVhist[ci];
+          if (hist.length < 2) return;
+          ctx.beginPath();
+          hist.forEach((v, xi) => {
+            const px2 = chartX + (xi / LYA_HIST) * chartW;
+            const py2 = chartY + chartH - Math.min(v, 1.0) * chartH;
+            if (xi === 0) ctx.moveTo(px2, py2); else ctx.lineTo(px2, py2);
+          });
+          ctx.strokeStyle = comp.col; ctx.lineWidth = 1.8; ctx.stroke();
+          const lastV = hist[hist.length - 1];
+          const ex = chartX + ((hist.length - 1) / LYA_HIST) * chartW;
+          const ey = chartY + chartH - Math.min(lastV, 1.0) * chartH;
+          ctx.beginPath(); ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = comp.col; ctx.fill();
+        });
+
+        const legX = W * 0.70, legY = H * 0.08;
+        ctx.font = `8px ${mono}`; ctx.fillStyle = `${PALE}80`; ctx.textAlign = "left";
+        ctx.fillText("STRING  ·  V  ·  STATUS", legX, legY + 8);
+
+        LYA_COMPS.forEach((comp, ci) => {
+          const hist = lyaVhist[ci];
+          const lastV = hist.length ? hist[hist.length - 1] : 0;
+          const prevV = hist.length > 5 ? hist[hist.length - 6] : lastV;
+          const dV = lastV - prevV;
+          const stable = dV <= 0.0005;
+          const ly = legY + 30 + ci * 64;
+
+          ctx.font = `bold 11px ${mono}`; ctx.fillStyle = comp.col; ctx.textAlign = "left";
+          ctx.fillText(`"${comp.str}"`, legX, ly);
+          ctx.font = `8px ${mono}`; ctx.fillStyle = `${BODY}80`;
+          ctx.fillText(comp.label, legX, ly + 14);
+
+          const barW = W * 0.23;
+          ctx.fillStyle = `${comp.col}12`; ctx.strokeStyle = `${comp.col}30`; ctx.lineWidth = 0.5;
+          ctx.beginPath(); ctx.roundRect(legX, ly + 20, barW, 9, 3); ctx.fill(); ctx.stroke();
+          ctx.fillStyle = comp.col;
+          ctx.beginPath(); ctx.roundRect(legX, ly + 20, Math.min(lastV, 1.0) * barW, 9, 3); ctx.fill();
+
+          ctx.font = `8px ${mono}`; ctx.fillStyle = PALE; ctx.textAlign = "left";
+          ctx.fillText(`V = ${lastV.toFixed(3)}`, legX, ly + 44);
+          ctx.fillStyle = stable ? STR2 : RUST; ctx.textAlign = "right";
+          ctx.fillText(stable ? "▼ STABLE" : "▲ UNSTABLE", legX + barW, ly + 44);
+          ctx.textAlign = "left";
+        });
+
+        ctx.font = `7px ${mono}`; ctx.fillStyle = `${BODY}45`; ctx.textAlign = "center";
+        ctx.fillText("dV/dt = −2q_a · ½(−q_b·ω_x − q_c·ω_y − q_d·ω_z)   ·   V→0 = stable, V→1 = pure imaginary", W * 0.5, H - 8);
+
+      /* ═══ CAYLEY GRAPH WALK ══════════════════════════════════════════════ */
+      } else if (mode === "cayley") {
+        if (t % FRAMES_PER_LETTER === 0) {
+          const sym = str[cayStep % str.length];
+          cayStep++;
+          cayQ = applyLetter(cayQ, sym);
+          cayNodes.push({ b: cayQ[1], c: cayQ[2], col: getLetterCol(sym), sym });
+          if (cayNodes.length > 200) cayNodes.shift();
+        }
+
+        const gcx = W * 0.40, gcy = H * 0.50;
+        const scl = Math.min(W * 0.30, H * 0.38);
+
+        [0.25, 0.5, 0.75, 1.0].forEach(r => {
+          ctx.beginPath(); ctx.arc(gcx, gcy, r * scl, 0, Math.PI * 2);
+          ctx.strokeStyle = r === 1.0 ? `${LINE}90` : `${LINE}40`;
+          ctx.lineWidth = r === 1.0 ? 0.8 : 0.4; ctx.stroke();
+          ctx.font = `7px ${mono}`; ctx.fillStyle = `${BODY}35`; ctx.textAlign = "left";
+          if (r < 1.0) ctx.fillText(r.toFixed(2), gcx + r * scl + 3, gcy + 9);
+        });
+
+        ctx.strokeStyle = `${LINE}55`; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(gcx - scl * 1.08, gcy); ctx.lineTo(gcx + scl * 1.08, gcy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(gcx, gcy - scl * 1.08); ctx.lineTo(gcx, gcy + scl * 1.08); ctx.stroke();
+        ctx.font = `8px ${mono}`; ctx.fillStyle = `${BODY}60`; ctx.textAlign = "left";
+        ctx.fillText("b (i-axis)", gcx + scl + 6, gcy + 4);
+        ctx.fillText("c (j-axis)", gcx + 5, gcy - scl - 6);
+
+        if (cayNodes.length > 1) {
+          for (let i = 1; i < cayNodes.length; i++) {
+            const pa = cayNodes[i - 1], pb = cayNodes[i];
+            const frac = i / cayNodes.length;
+            ctx.beginPath();
+            ctx.moveTo(gcx + pa.b * scl, gcy - pa.c * scl);
+            ctx.lineTo(gcx + pb.b * scl, gcy - pb.c * scl);
+            const aHex = Math.round(frac * 200).toString(16).padStart(2, "0");
+            ctx.strokeStyle = `${pb.col}${aHex}`;
+            ctx.lineWidth = 0.7 + frac * 1.6; ctx.stroke();
+          }
+        }
+
+        cayNodes.forEach((nd, ni) => {
+          const nx = gcx + nd.b * scl, ny = gcy - nd.c * scl;
+          const frac = ni / cayNodes.length;
+          const isLast = ni === cayNodes.length - 1;
+          const aHex = Math.round((0.15 + frac * 0.85) * 255).toString(16).padStart(2, "0");
+          const r = isLast ? 6 : 1.5 + frac * 2.5;
+          ctx.beginPath(); ctx.arc(nx, ny, r, 0, Math.PI * 2);
+          ctx.fillStyle = isLast ? nd.col : `${nd.col}${aHex}`; ctx.fill();
+          if (isLast) {
+            const grd = ctx.createRadialGradient(nx, ny, 0, nx, ny, 20);
+            grd.addColorStop(0, `${nd.col}55`); grd.addColorStop(1, "transparent");
+            ctx.beginPath(); ctx.arc(nx, ny, 20, 0, Math.PI * 2);
+            ctx.fillStyle = grd; ctx.fill();
+            ctx.font = `bold 10px ${mono}`; ctx.fillStyle = nd.col; ctx.textAlign = "left";
+            ctx.fillText(nd.sym, nx + 10, ny - 3);
+          }
+        });
+
+        ctx.beginPath(); ctx.arc(gcx, gcy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = `${WHITE}25`; ctx.fill();
+        ctx.font = `7px ${mono}`; ctx.fillStyle = `${PALE}45`; ctx.textAlign = "center";
+        ctx.fillText("e", gcx, gcy + 15);
+
+        ctx.font = `9px ${mono}`; ctx.fillStyle = ENG2; ctx.textAlign = "left";
+        ctx.fillText(`CAYLEY WALK  ·  step ${cayStep}`, 14, 18);
+        ctx.font = `8px ${mono}`; ctx.fillStyle = `${PALE}80`;
+        ctx.fillText(`q = ${cayQ[0].toFixed(3)} + ${cayQ[1].toFixed(3)}i + ${cayQ[2].toFixed(3)}j + ${cayQ[3].toFixed(3)}k`, 14, 34);
+        const qMag = Math.sqrt(cayQ.reduce((s, v) => s + v * v, 0));
+        ctx.fillText(`|q| = ${qMag.toFixed(4)}`, 14, 48);
+        ctx.fillText(`d(e, q) word len ≈ ${cayStep}`, 14, 62);
+
+        const lpX = W * 0.74, lpY = 10;
+        ctx.font = `8px ${mono}`; ctx.fillStyle = `${PALE}70`; ctx.textAlign = "left";
+        ctx.fillText("GENERATOR → CAYLEY EDGE", lpX, lpY + 10);
+        LETTERS.slice(0, 9).forEach((l, li) => {
+          const ly = lpY + 28 + li * 21;
+          ctx.beginPath(); ctx.moveTo(lpX, ly + 5); ctx.lineTo(lpX + 22, ly + 5);
+          ctx.strokeStyle = l.col; ctx.lineWidth = 2; ctx.stroke();
+          ctx.beginPath(); ctx.arc(lpX + 22, ly + 5, 3, 0, Math.PI * 2);
+          ctx.fillStyle = l.col; ctx.fill();
+          ctx.font = `7px ${mono}`; ctx.fillStyle = `${PALE}85`; ctx.textAlign = "left";
+          ctx.fillText(`${l.sym}  ${l.name}`, lpX + 30, ly + 9);
+        });
+
+        ctx.font = `7px ${mono}`; ctx.fillStyle = `${BODY}45`; ctx.textAlign = "center";
+        ctx.fillText(`"${str}"  ·  WALK IN SU(2) CAYLEY GRAPH  ·  (b, c) PROJECTION  ·  unit sphere S³`, W * 0.42, H - 8);
       }
 
       raf.current = requestAnimationFrame(draw);
@@ -535,9 +735,11 @@ function EngineCanvas({ mode, activeString }: { mode: Mode; activeString: string
 /* ── controls ────────────────────────────────────────────────────────────── */
 function ModeTabs({ value, onChange }: { value: Mode; onChange: (m: Mode) => void }) {
   const tabs = [
-    { k: "orbit"   as Mode, label: "3D Orbit Tracer",         col: ORB2  },
-    { k: "ticker"  as Mode, label: "Letter Engine Ticker",     col: ENG2  },
-    { k: "lsystem" as Mode, label: "L-System String Growth",   col: STR2  },
+    { k: "orbit"    as Mode, label: "3D Orbit Tracer",          col: ORB2  },
+    { k: "ticker"   as Mode, label: "Letter Engine Ticker",    col: ENG2  },
+    { k: "lsystem"  as Mode, label: "L-System String Growth",  col: STR2  },
+    { k: "lyapunov" as Mode, label: "Lyapunov Stability Plot", col: DIFF2 },
+    { k: "cayley"   as Mode, label: "Cayley Graph Walk",       col: STR   },
   ];
   return (
     <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
@@ -647,9 +849,11 @@ export default function RotationEnginePage() {
           </div>
           <EngineCanvas mode={mode} activeString={preset.str} />
           <div style={{ fontFamily: mono, fontSize: 9, color: BODY, marginTop: 7, lineHeight: 1.8 }}>
-            {mode === "orbit"   && `ORBIT TRACER · STRING "${preset.str}" · EACH LETTER FIRES EVERY 14 FRAMES · TRAIL LENGTH 320 · 3D ROTATING CAMERA · CURRENT LETTER + QUATERNION STATE TOP-LEFT · LETTER PROGRESS STRIP BOTTOM · i/j/k REFERENCE AXES (faint)"`}
-            {mode === "ticker"  && `LETTER ENGINE · STRING "${preset.str}" · SCROLLING TAPE WITH ACTIVE HIGHLIGHT · FOUR COMPONENT BARS (a/b/c/d) UPDATING LIVE · ω ANGULAR VELOCITY VECTOR RIGHT · TAPE SHOWS ±${Math.floor(8)} CONTEXT CHARACTERS`}
-            {mode === "lsystem" && `L-SYSTEM GENERATOR · SEED "${preset.str}" · PRODUCTION RULES APPLIED EVERY 3 SECONDS · GEN 0→4 THEN RESETS · LEFT: 2D ORBIT (b,c projection) · RIGHT: GROWING STRING WITH ACTIVE CHARACTER · RULE TABLE BOTTOM-LEFT`}
+            {mode === "orbit"    && `ORBIT TRACER · STRING "${preset.str}" · EACH LETTER FIRES EVERY 14 FRAMES · TRAIL LENGTH 320 · 3D ROTATING CAMERA · CURRENT LETTER + QUATERNION STATE TOP-LEFT · LETTER PROGRESS STRIP BOTTOM · i/j/k REFERENCE AXES (faint)`}
+            {mode === "ticker"   && `LETTER ENGINE · STRING "${preset.str}" · SCROLLING TAPE WITH ACTIVE HIGHLIGHT · FOUR COMPONENT BARS (a/b/c/d) UPDATING LIVE · ω ANGULAR VELOCITY VECTOR RIGHT · TAPE SHOWS ±${Math.floor(8)} CONTEXT CHARACTERS`}
+            {mode === "lsystem"  && `L-SYSTEM GENERATOR · SEED "${preset.str}" · PRODUCTION RULES APPLIED EVERY 3 SECONDS · GEN 0→4 THEN RESETS · LEFT: 2D ORBIT (b,c projection) · RIGHT: GROWING STRING WITH ACTIVE CHARACTER · RULE TABLE BOTTOM-LEFT`}
+            {mode === "lyapunov" && `LYAPUNOV STABILITY · 4 FIXED STRINGS (RGB / ~onS / ^RGB / RRRRRR) RUNNING IN PARALLEL · V(q)=b²+c²+d² PLOTTED OVER TIME · V→0 STABLE · V→1 PURE IMAGINARY · dV/dt SIGN SHOWN IN LEGEND · SECTION III EQUATION LIVE`}
+            {mode === "cayley"   && `CAYLEY GRAPH WALK · STRING "${preset.str}" · EACH LETTER = ONE EDGE IN SU(2) CAYLEY GRAPH · (b,c) 2D PROJECTION · FADING TRAIL SHOWS RECENT WALK · UNIT SPHERE RINGS AT r=0.25/0.5/0.75/1.0 · SECTION VI VISUALISED`}
           </div>
         </div>
 
