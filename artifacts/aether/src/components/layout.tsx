@@ -134,6 +134,7 @@ const NAV_ITEMS = [
   { href: "/plasma-confinement", label: "Plasma Confinement · Tokamak · Magnetic Mirror · D-Shape · Stellarator · MHD · Flux Surfaces · Shafranov · Banana Orbits", icon: Atom },
   { href: "/tait-knots", label: "Tait Knots · Plasma Morphology · Tokamak Stellarator Spheromak RFP · Nuclear Alchemy · Fusion Topology · Knot Theory", icon: Atom },
   { href: "/energetic-field-sim", label: "Energetic Field Simulator · Predicted Space · Scalar Wave · Coherence · Divergence", icon: Atom },
+  { href: "/chocolate-tempering", label: "Chocolate Tempering · Cocoa Butter Crystal Axis · Form V · DP Coherence · Bloom Differential", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },

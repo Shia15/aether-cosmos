@@ -281,6 +281,7 @@ import PlasmaConfinementPage from "@/pages/plasma-confinement";
 import TaitKnotsPage from "@/pages/tait-knots";
 import PlantCoherenceSystemPage from "@/pages/plant-coherence-system";
 import EnergeticFieldSimPage from "@/pages/energetic-field-sim";
+import ChocolateTemperingPage from "@/pages/chocolate-tempering";
 
 const queryClient = new QueryClient();
 
@@ -565,6 +566,7 @@ function Router() {
         <Route path="/tait-knots" component={TaitKnotsPage} />
         <Route path="/plant-coherence-system" component={PlantCoherenceSystemPage} />
         <Route path="/energetic-field-sim" component={EnergeticFieldSimPage} />
+        <Route path="/chocolate-tempering" component={ChocolateTemperingPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
