@@ -124,6 +124,7 @@ const NAV_ITEMS = [
   { href: "/stromatolite-field", label: "Stromatolite Field · Biological Computation · Irreversible Structure · Coherent-Decoherent Wave States · Real Space Transversal", icon: Atom },
   { href: "/aether-matrix", label: "AETHER Matrix · Creative Engine · Φ(E,S)=K · Type to Create · Sigil Crystallization · Kuramoto Field", icon: Atom },
   { href: "/understanding-strand", label: "Understanding Strand · Human Worldline · Prime Bursts · Flower Branching · Quantum Measurement Problem · Decoherence Collapse", icon: Atom },
+  { href: "/gravitational-field", label: "Gravitational Field Coherence · Human Cat Eagle Dolphin Salmon Bat Earthworm · COT · Buoyancy · Tensegrity · Graph Map", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
