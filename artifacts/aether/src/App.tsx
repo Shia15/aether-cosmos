@@ -276,6 +276,7 @@ import PhotonEmissionPage from "@/pages/photon-emission";
 import TranscendentArtPage from "@/pages/transcendent-art";
 import NeuroMetabolicPage from "@/pages/neuro-metabolic";
 import EmergenceNetworkPage from "@/pages/emergence-network";
+import PlasmaConfinementPage from "@/pages/plasma-confinement";
 
 const queryClient = new QueryClient();
 
@@ -555,6 +556,7 @@ function Router() {
         <Route path="/transcendent-art" component={TranscendentArtPage} />
         <Route path="/neuro-metabolic" component={NeuroMetabolicPage} />
         <Route path="/emergence-network" component={EmergenceNetworkPage} />
+        <Route path="/plasma-confinement" component={PlasmaConfinementPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
