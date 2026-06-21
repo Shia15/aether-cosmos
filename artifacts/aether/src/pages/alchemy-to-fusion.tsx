@@ -1502,6 +1502,7 @@ export default function AlchemyToFusionPage() {
             <Bridge to="/ultra-magnetism" label="Ultra-Magnetism · Spin Pairings" sub="Singlet and triplet — orbital symmetries that decide what binds." accent={B.violet} />
             <Bridge to="/quantum-vacuum" label="Quantum Vacuum · Aharonov-Bohm" sub="Vacuum is not empty — it is structured by the vector potential." accent={B.violet} />
             <Bridge to="/spin-vacuum" label="Spin Vacuum · Persistent Transport" sub="Magnetic textures and confinement of spin currents." accent={B.cyan} />
+            <Bridge to="/tait-knots" label="Tait Knots → Plasma Morphology" sub="0₁ unknot → Tokamak · 3₁ trefoil → Stellarator · 4₁ figure-eight → RFP · 5₁ → Spheromak. Knot table = confinement topology." accent={B.rose} />
             <Bridge to="/knot-topology" label="Knot Topology · MHD Helicity" sub="Magnetic field-line knottedness — the same math that holds plasma." accent={B.green} />
             <Bridge to="/piano-arithmetic" label="Piano Arithmetic · Physics ↔ Metaphysics" sub="The same seam-discipline applied to a different rig." accent={B.gold} />
             <Bridge to="/heliospheric-coherence" label="Heliospheric Coherence" sub="The Sun does this for free. We are still learning the trick." accent={B.amber} />

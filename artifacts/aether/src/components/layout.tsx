@@ -132,6 +132,7 @@ const NAV_ITEMS = [
   { href: "/neuro-metabolic", label: "Neuro-Metabolic · Brain · Brainstem · Reward Circuits · Dopamine · Mitochondria · ROS · Microglia · BBB · HPA · Cytokines", icon: Atom },
   { href: "/emergence-network", label: "Emergence Network · Flower Filament Fireworks · Gray-Scott · Hebbian Plasticity · Field Computation · Distributed Adaptive", icon: Atom },
   { href: "/plasma-confinement", label: "Plasma Confinement · Tokamak · Magnetic Mirror · D-Shape · Stellarator · MHD · Flux Surfaces · Shafranov · Banana Orbits", icon: Atom },
+  { href: "/tait-knots", label: "Tait Knots · Plasma Morphology · Tokamak Stellarator Spheromak RFP · Nuclear Alchemy · Fusion Topology · Knot Theory", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
