@@ -51,11 +51,11 @@ function AetherCoreCanvas({
 
     const resize = () => {
       const p = canvas.parentElement!;
-      const side = Math.min(p.clientWidth, 520);
+      const side = Math.min(p.clientWidth, 860);
       canvas.width  = side;
-      canvas.height = Math.round(side * 1.55);
+      canvas.height = Math.round(side * 1.45);
       canvas.style.width  = side + "px";
-      canvas.style.height = Math.round(side * 1.55) + "px";
+      canvas.style.height = Math.round(side * 1.45) + "px";
     };
     resize();
     window.addEventListener("resize", resize);
@@ -794,20 +794,19 @@ export default function SpacetimeNavPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 20px 96px" }}>
-
-        {/* ── Live Interface ── */}
-        <div style={{ marginTop: 40, display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ fontFamily: mono, fontSize: 10, color: TEXT_D, letterSpacing: 2, marginBottom: 10 }}>
-            LIVE INTERFACE · CLICK NODES TO ACTIVATE · CLICK BOTTOM TO NAVIGATE
-          </div>
-          <AetherCoreCanvas
-            navState={navState}
-            coreMode={coreMode}
-            syncPct={syncPct}
-            onNodeClick={handleNodeClick}
-            onInitiate={handleInitiate}
-          />
+      {/* ── Live Interface — full-width breakout ── */}
+      <div style={{ padding: "40px 24px 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ fontFamily: mono, fontSize: 10, color: TEXT_D, letterSpacing: 2, marginBottom: 10 }}>
+          LIVE INTERFACE · CLICK NODES TO ACTIVATE · CLICK BOTTOM TO NAVIGATE
+        </div>
+        <AetherCoreCanvas
+          navState={navState}
+          coreMode={coreMode}
+          syncPct={syncPct}
+          onNodeClick={handleNodeClick}
+          onInitiate={handleInitiate}
+        />
+        <div style={{ width: "100%", maxWidth: 860 }}>
           <ControlPanel
             coreMode={coreMode}
             setMode={setCoreMode}
@@ -815,6 +814,9 @@ export default function SpacetimeNavPage() {
             log={log}
           />
         </div>
+      </div>
+
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 20px 96px" }}>
 
         {/* ═══════════════════════════════════════
             APP SPECIFICATION DOCUMENT
