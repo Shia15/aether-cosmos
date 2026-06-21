@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import humanStrandImg from "@assets/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000038123.png";
+import humanStrandImg  from "@assets/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000038123.png";
+import strandDiagram  from "@assets/C20E8497-E3A4-4693-AB3B-D03440AEA4B8_1782000566540.png";
+import humanStrand2   from "@assets/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000566540.png";
 
 /* ── Palette ─────────────────────────────────────────── */
 const BG   = "#020408";
@@ -792,11 +794,40 @@ export default function UnderstandingStrandPage() {
           ))}
         </div>
 
-        {/* Reference image */}
-        <SH n="VII" title="Reference Visualization" sub="Human as energetic strand of understanding · the visual grounding for this simulation" col={DIM} />
-        <div style={{ borderRadius:12, overflow:"hidden", border:`1px solid ${BLUE}18`, marginBottom:32 }}>
-          <img src={humanStrandImg} alt="Human as energetic strand of understanding"
-            style={{ width:"100%", display:"block", opacity:0.9 }} />
+        {/* Reference images */}
+        <SH n="VII" title="Reference Visualizations" sub="The full mathematical diagram + human energetic strand images that ground this simulation" col={DIM} />
+
+        {/* Full-width diagram — most information-dense */}
+        <div style={{ marginBottom:16 }}>
+          <div style={{ fontFamily:mono, fontSize:9, color:TEAL, letterSpacing:2, marginBottom:8 }}>
+            THE UNDERSTANDING STRAND IN LENGTH FABRIC SPACE · COMPLETE MATHEMATICAL DIAGRAM
+          </div>
+          <div style={{ borderRadius:12, overflow:"hidden", border:`1px solid ${TEAL}22`, marginBottom:6 }}>
+            <img src={strandDiagram} alt="The Understanding Strand in Length Fabric Space — full mathematical diagram"
+              style={{ width:"100%", display:"block", opacity:0.95 }} />
+          </div>
+          <div style={{ fontFamily:body, fontSize:13, color:DIM, lineHeight:1.8 }}>
+            The complete model: information accumulation I(t) and N_branches ≈ e^I · decoherence D(t) = e^(−t/τ) splitting at D {"<"} Dc ·
+            prime-burst generation B(n) = log(p_n) at positions 2,3,5,7,11... · fractal flower growth N_(k+1) = N_k + φ·N_k ·
+            splitting condition U·P {">"} Dc · quantum measurement as information resolution P(k) = |c_k|².
+            The horizontal axis is length fabric space (information time t₀→t₇...). Branch points mark moments when reality can no longer
+            be represented as a single coherent possibility.
+          </div>
+        </div>
+
+        {/* Two-up: both human strand images */}
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:32 }}>
+          {[
+            { src: humanStrandImg, label: "Human as Energetic Strand · Quantum Measurement Problem · Born Rule · Superposition",   col: BLUE },
+            { src: humanStrand2,  label: "Human as Energetic Strand · Bursting Primes · Length Fabric Space · Possibility Collapse", col: TEAL },
+          ].map(({ src, label, col }) => (
+            <div key={label} style={{ borderRadius:10, overflow:"hidden", border:`1px solid ${col}20` }}>
+              <img src={src} alt={label} style={{ width:"100%", display:"block", opacity:0.92 }} />
+              <div style={{ padding:"6px 10px", fontFamily:mono, fontSize:8, color:`${col}70`, lineHeight:1.6 }}>
+                {label}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Closing */}
