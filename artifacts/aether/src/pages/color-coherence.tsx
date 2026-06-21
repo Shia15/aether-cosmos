@@ -494,6 +494,189 @@ function ColorCanvas({ mode }: { mode: Mode }) {
   );
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   C_cog(x,t) SIMULATOR — Section VII live canvas
+   Simulates: melatonin, NE, serotonin/5-HT, acetylcholine, and composite
+   C_cog(t) = w_NE·[NE]/ref + w_5HT·[5HT]/ref + w_ACh·[ACh]/ref
+   over a 24-hour day with AETHER blue-light protocol windows shaded
+══════════════════════════════════════════════════════════════════════════ */
+function CogCoherenceCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  const tick = useRef(0);
+
+  useEffect(() => {
+    const canvas = cvs.current!;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    const resize = () => {
+      canvas.width  = canvas.parentElement!.clientWidth;
+      canvas.height = 360;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    /* ── Neurotransmitter models ── */
+    // Melatonin: Gaussian peaked at 02:00, wrapping around midnight
+    const melatonin = (h: number): number => {
+      let d = h - 2;
+      if (d > 12) d -= 24;
+      return Math.max(0.04, 0.82 * Math.exp(-(d * d) / 18));
+    };
+    // Norepinephrine: driven by morning blue light, peaks 09:00
+    const norepinephrine = (h: number): number => {
+      if (h < 6 || h > 22) return 0.08;
+      return 0.10 + 0.70 * Math.exp(-Math.pow(h - 9, 2) / 22);
+    };
+    // Serotonin / 5-HT: builds from morning blue, peaks ~13:00
+    const serotonin5HT = (h: number): number => {
+      if (h < 6 || h > 23) return 0.06;
+      const sig = (x: number) => 1 / (1 + Math.exp(-x * 2.5));
+      return 0.06 + 0.74 * sig(h - 7) * sig(21 - h);
+    };
+    // Acetylcholine: high when awake (07-21), low during sleep, REM spikes at 02 & 04
+    const acetylcholine = (h: number): number => {
+      if (h < 6) return 0.14 + 0.40 * (Math.exp(-Math.pow(h - 2, 2) / 0.5) + 0.6 * Math.exp(-Math.pow(h - 4, 2) / 0.4));
+      const sig = (x: number) => 1 / (1 + Math.exp(-x * 2.5));
+      if (h < 7) return 0.14 + 0.52 * sig(h - 6.5);
+      if (h > 21) return 0.66 - 0.52 * sig(h - 21.5);
+      return 0.66;
+    };
+    // C_cog composite (weighted, normalised)
+    const NE_REF = 0.80, ST_REF = 0.80, AC_REF = 0.66;
+    const W_NE = 0.40, W_ST = 0.35, W_AC = 0.25;
+    const ccog = (h: number): number => {
+      const v = (W_NE * norepinephrine(h) / NE_REF +
+                 W_ST * serotonin5HT(h)    / ST_REF +
+                 W_AC * acetylcholine(h)   / AC_REF) / (W_NE + W_ST + W_AC);
+      return Math.min(1, Math.max(0, v));
+    };
+
+    const curves = [
+      { fn: melatonin,      col: MELA,  lw: 1.6, label: "Melatonin"       },
+      { fn: norepinephrine, col: GOLD,  lw: 1.8, label: "NE"              },
+      { fn: serotonin5HT,   col: GRN,   lw: 1.8, label: "Serotonin / 5-HT" },
+      { fn: acetylcholine,  col: BLU2,  lw: 1.6, label: "ACh"             },
+      { fn: ccog,           col: WHI,   lw: 2.6, label: "C_cog(t)"        },
+    ];
+
+    /* ── AETHER protocol windows ── */
+    const windows = [
+      { s: 0,  e: 6,  bg: "#1a1030", txt: "NIGHT  21–06", col: MELA  },
+      { s: 6,  e: 9,  bg: "#12203a", txt: "MORNING  06–09", col: BLU2 },
+      { s: 9,  e: 14, bg: "#0e1e32", txt: "MIDDAY  09–14", col: CYAN  },
+      { s: 14, e: 18, bg: "#131c2a", txt: "AFTERNOON  14–18", col: GOLD },
+      { s: 18, e: 21, bg: "#1e1510", txt: "EVENING  18–21", col: GOLD },
+      { s: 21, e: 24, bg: "#1a1030", txt: "NIGHT  21–06", col: MELA  },
+    ] as const;
+
+    const N = 600; // curve resolution
+
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      const t = tick.current++ * 0.005;
+      const PL = 56, PR = 18, PT = 32, PB = 56;
+      const CW = W - PL - PR, CH = H - PT - PB;
+
+      ctx.fillStyle = BG0; ctx.fillRect(0, 0, W, H);
+
+      // Protocol window shading
+      for (const w of windows) {
+        const x1 = PL + (w.s / 24) * CW, x2 = PL + (w.e / 24) * CW;
+        ctx.fillStyle = w.bg; ctx.fillRect(x1, PT, x2 - x1, CH);
+        // Bottom label
+        ctx.fillStyle = `${w.col}55`;
+        ctx.font = `6.5px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(w.txt, (x1 + x2) / 2, PT + CH + 22);
+        // Top border tick
+        ctx.fillStyle = `${w.col}30`;
+        ctx.fillRect(x1, PT, x2 - x1, 2);
+      }
+
+      // Grid
+      ctx.strokeStyle = `${LINE}60`; ctx.lineWidth = 0.5;
+      for (let h = 0; h <= 24; h += 3) {
+        const x = PL + (h / 24) * CW;
+        ctx.beginPath(); ctx.moveTo(x, PT); ctx.lineTo(x, PT + CH); ctx.stroke();
+        ctx.fillStyle = BODY; ctx.font = `7.5px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(`${String(h % 24).padStart(2, "0")}:00`, x, PT + CH + 38);
+      }
+      for (let v = 0; v <= 1; v += 0.25) {
+        const y = PT + CH * (1 - v);
+        ctx.beginPath(); ctx.moveTo(PL, y); ctx.lineTo(PL + CW, y); ctx.stroke();
+        ctx.fillStyle = BODY; ctx.font = `8px ${mono}`; ctx.textAlign = "right";
+        ctx.fillText(v.toFixed(2), PL - 7, y + 3);
+      }
+
+      // Curve paths
+      for (const c of curves) {
+        ctx.beginPath(); ctx.strokeStyle = c.col; ctx.lineWidth = c.lw;
+        for (let i = 0; i <= N; i++) {
+          const h = (i / N) * 24;
+          const x = PL + (h / 24) * CW;
+          const y = PT + CH * (1 - c.fn(h));
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      // Animated time cursor (cycles 24h)
+      const scanH = (t * 3) % 24;
+      const scanX = PL + (scanH / 24) * CW;
+      ctx.strokeStyle = `${CYAN}55`; ctx.lineWidth = 1;
+      ctx.setLineDash([3, 5]);
+      ctx.beginPath(); ctx.moveTo(scanX, PT); ctx.lineTo(scanX, PT + CH); ctx.stroke();
+      ctx.setLineDash([]);
+      // Dots on each curve at cursor
+      for (const c of curves) {
+        const v = c.fn(scanH);
+        const y = PT + CH * (1 - v);
+        ctx.beginPath(); ctx.arc(scanX, y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = c.col; ctx.fill();
+      }
+      // Time label
+      const hh = Math.floor(scanH), mm = Math.floor((scanH % 1) * 60);
+      ctx.fillStyle = `${CYAN}bb`; ctx.font = `7px ${mono}`; ctx.textAlign = "center";
+      ctx.fillText(`${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}`, scanX, PT - 8);
+
+      // Legend strip
+      const legendItems = [
+        { col: MELA, label: "Melatonin" },
+        { col: GOLD, label: "NE / Norepinephrine" },
+        { col: GRN,  label: "Serotonin / 5-HT" },
+        { col: BLU2, label: "Acetylcholine" },
+        { col: WHI,  label: "C_cog(t)" },
+      ];
+      let lx = PL;
+      for (const l of legendItems) {
+        ctx.strokeStyle = l.col; ctx.lineWidth = l.col === WHI ? 2.5 : 1.6;
+        ctx.beginPath(); ctx.moveTo(lx, PT - 14); ctx.lineTo(lx + 16, PT - 14); ctx.stroke();
+        ctx.fillStyle = l.col; ctx.font = `7.5px ${mono}`; ctx.textAlign = "left";
+        ctx.fillText(l.label, lx + 20, PT - 10);
+        lx += 8 + ctx.measureText(l.label).width + 36;
+      }
+
+      // Y-axis label
+      ctx.save(); ctx.translate(14, PT + CH / 2); ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = BODY; ctx.font = `8px ${mono}`; ctx.textAlign = "center";
+      ctx.fillText("NORMALISED CONCENTRATION", 0, 0);
+      ctx.restore();
+
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <div style={{ borderRadius: 10, overflow: "hidden", border: `1px solid ${LINE}`, marginTop: 22 }}>
+      <canvas ref={cvs} style={{ display: "block", width: "100%" }} />
+    </div>
+  );
+}
+
 function ModeTabs({ value, onChange }: { value: Mode; onChange: (m: Mode) => void }) {
   const tabs = [
     { k: "su3"      as Mode, label: "SU(3) Color Root Diagram", col: BLU2 },
@@ -928,6 +1111,15 @@ BLUE LIGHT HAZARD (photochemical retinal damage):
     NIGHT    (21:00–06:00):  Zero blue exposure (candle, salt lamp, blackout)
                               → peak melatonin → slow-wave sleep → glymphatic clearance
                               → C(x,t) → 1: the SU(3) singlet, the repair state`}</EQ>
+
+        <CogCoherenceCanvas />
+        <div style={{ fontFamily: mono, fontSize: 7.5, color: BODY, marginTop: 8, lineHeight: 2 }}>
+          C_cog(t) SIMULATION · C_cog = w_NE·[NE]/ref + w_5HT·[5HT]/ref + w_ACh·[ACh]/ref ·
+          w_NE=0.40 · w_5HT=0.35 · w_ACh=0.25 · Melatonin Gaussian peak at 02:00 σ²=18 ·
+          NE Gaussian peak at 09:00 · Serotonin sigmoidal rise from 07:00 fall at 21:00 ·
+          ACh waking plateau 0.66 + REM spikes at 02:00 &amp; 04:00 ·
+          Animated cursor scans 24-hour cycle · SHADED WINDOWS = AETHER blue-light protocol
+        </div>
 
         <Pull col={BLU2}>"The same three-color geometry that holds the proton together holds your perception together. When you flood your retina with blue light at midnight, you are asking the B-quark to dominate the singlet — unbalancing the coherence that takes 9 hours of darkness to rebuild."</Pull>
 
