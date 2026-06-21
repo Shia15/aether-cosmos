@@ -198,6 +198,7 @@ const NAV_ITEMS = [
   { href: "/symbolic-pillars",      label: "Symbolic Pillars · GT",    icon: Triangle },
   { href: "/mari",                  label: "M.A.R.I. · Four-Egg",      icon: Aperture },
   { href: "/organoid-intel",        label: "Organoid Intel · Bio-Hw",  icon: Microscope },
+  { href: "/plant-coherence-system", label: "Plant Coherence System · Photosynthesis · Visual · Immunity · Phi · AETHER", icon: Cpu },
   { href: "/plant-intel",           label: "Plant Intel · Pre-Neural", icon: Cpu },
   { href: "/ferro-modes",           label: "Ferrofluid · Two-Mode",    icon: Magnet },
   { href: "/vortex-math",           label: "Vortex Math · 3·6·9 / 144", icon: Sigma },

@@ -279,6 +279,7 @@ import NeuroMetabolicPage from "@/pages/neuro-metabolic";
 import EmergenceNetworkPage from "@/pages/emergence-network";
 import PlasmaConfinementPage from "@/pages/plasma-confinement";
 import TaitKnotsPage from "@/pages/tait-knots";
+import PlantCoherenceSystemPage from "@/pages/plant-coherence-system";
 
 const queryClient = new QueryClient();
 
@@ -561,6 +562,7 @@ function Router() {
         <Route path="/emergence-network" component={EmergenceNetworkPage} />
         <Route path="/plasma-confinement" component={PlasmaConfinementPage} />
         <Route path="/tait-knots" component={TaitKnotsPage} />
+        <Route path="/plant-coherence-system" component={PlantCoherenceSystemPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
