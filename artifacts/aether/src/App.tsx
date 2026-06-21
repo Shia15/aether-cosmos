@@ -274,6 +274,7 @@ import CavityComputerPage from "@/pages/cavity-computer";
 import EventHorizonPage from "@/pages/event-horizon";
 import PhotonEmissionPage from "@/pages/photon-emission";
 import TranscendentArtPage from "@/pages/transcendent-art";
+import NeuroMetabolicPage from "@/pages/neuro-metabolic";
 
 const queryClient = new QueryClient();
 
@@ -551,6 +552,7 @@ function Router() {
         <Route path="/event-horizon" component={EventHorizonPage} />
         <Route path="/photon-emission" component={PhotonEmissionPage} />
         <Route path="/transcendent-art" component={TranscendentArtPage} />
+        <Route path="/neuro-metabolic" component={NeuroMetabolicPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
