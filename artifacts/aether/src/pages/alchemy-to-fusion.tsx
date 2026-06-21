@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgReactor from "@assets/PNG_image_1777497089577.png";
@@ -94,6 +94,345 @@ function P({ children }: { children: React.ReactNode }) {
       color: B.ink, margin: "0 0 10px 0",
     }}>{children}</p>
   );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Live canvas simulations                                             */
+/* ------------------------------------------------------------------ */
+
+function BindingEnergyCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const canvas = cvs.current!;
+    const ctx = canvas.getContext("2d")!;
+    let t = 0;
+    const MONO = "'Space Mono', monospace";
+    const SANS = "Inter, sans-serif";
+    const DATA: [number, number][] = [
+      [1,0],[2,1.11],[3,2.57],[4,7.07],[6,5.33],[7,5.60],[8,7.06],
+      [12,7.68],[14,7.48],[16,7.97],[20,8.03],[24,8.26],[28,8.45],
+      [32,8.48],[40,8.55],[48,8.63],[56,8.79],[60,8.78],[64,8.76],
+      [80,8.71],[100,8.63],[120,8.51],[140,8.40],[160,8.28],[180,8.15],
+      [197,7.92],[208,7.87],[235,7.59],[238,7.57],
+    ];
+    const resize = () => {
+      const p = canvas.parentElement!;
+      canvas.width = p.clientWidth;
+      canvas.height = 270;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = B.bg; ctx.fillRect(0, 0, W, H);
+      const PL = 56, PR = 24, PT = 36, PB = 48;
+      const CW = W - PL - PR, CH = H - PT - PB;
+      const toX = (a: number) => PL + (a / 238) * CW;
+      const toY = (b: number) => PT + CH - (b / 10) * CH;
+      ctx.fillStyle = `${B.cyan}10`; ctx.fillRect(PL, PT, toX(56) - PL, CH);
+      ctx.fillStyle = `${B.amber}08`; ctx.fillRect(toX(120), PT, PL + CW - toX(120), CH);
+      [2, 4, 6, 8].forEach(be => {
+        const gy = toY(be);
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(PL, gy); ctx.lineTo(PL + CW, gy); ctx.stroke();
+        ctx.font = `7px ${MONO}`; ctx.fillStyle = "rgba(154,163,184,0.6)"; ctx.textAlign = "right";
+        ctx.fillText(be + "", PL - 4, gy + 3);
+      });
+      [0, 50, 100, 150, 200].forEach(a => {
+        const gx = toX(a);
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(gx, PT); ctx.lineTo(gx, PT + CH); ctx.stroke();
+        ctx.font = `8px ${SANS}`; ctx.fillStyle = "rgba(154,163,184,0.6)"; ctx.textAlign = "center";
+        ctx.fillText(`${a}`, gx, PT + CH + 14);
+      });
+      ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + CH); ctx.lineTo(PL + CW, PT + CH); ctx.stroke();
+      ctx.font = `9px ${SANS}`; ctx.fillStyle = B.dim; ctx.textAlign = "center";
+      ctx.fillText("Mass Number  A", PL + CW * 0.5, H - 8);
+      ctx.save(); ctx.translate(11, PT + CH * 0.5); ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Binding Energy / nucleon  (MeV)", 0, 0); ctx.restore();
+      ctx.beginPath();
+      DATA.forEach(([a, be], i) => {
+        const x = toX(a), y = toY(be);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = B.ink; ctx.lineWidth = 2.2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(toX(4), toY(7.07), 4, 0, Math.PI * 2);
+      ctx.fillStyle = B.cyan; ctx.fill();
+      ctx.font = `7px ${MONO}`; ctx.fillStyle = B.cyan; ctx.textAlign = "left";
+      ctx.fillText("⁴He", toX(4) + 6, toY(7.07) + 3);
+      ctx.beginPath(); ctx.arc(toX(238), toY(7.57), 4, 0, Math.PI * 2);
+      ctx.fillStyle = B.amber; ctx.fill();
+      ctx.font = `7px ${MONO}`; ctx.fillStyle = B.amber; ctx.textAlign = "right";
+      ctx.fillText("²³⁸U", toX(238) - 6, toY(7.57) + 3);
+      const feX = toX(56), feY = toY(8.79);
+      ctx.beginPath(); ctx.arc(feX, feY, 6, 0, Math.PI * 2);
+      ctx.fillStyle = B.gold; ctx.fill();
+      ctx.font = `8px ${MONO}`; ctx.fillStyle = B.gold; ctx.textAlign = "center";
+      ctx.fillText("⁵⁶Fe  8.79 MeV/n", feX, feY - 14);
+      ctx.fillText("IRON PEAK", feX, feY - 24);
+      const scanA = ((t * 0.22) % 237) + 1;
+      let scanBE = 0;
+      for (let i = 1; i < DATA.length; i++) {
+        if (DATA[i][0] >= scanA) {
+          const f = (scanA - DATA[i-1][0]) / (DATA[i][0] - DATA[i-1][0]);
+          scanBE = DATA[i-1][1] + f * (DATA[i][1] - DATA[i-1][1]);
+          break;
+        }
+      }
+      const sx = toX(scanA), sy = toY(scanBE);
+      const dotCol = scanA < 56 ? B.cyan : scanA > 120 ? B.amber : B.green;
+      const gr = ctx.createRadialGradient(sx, sy, 0, sx, sy, 18);
+      gr.addColorStop(0, `${dotCol}70`); gr.addColorStop(1, "transparent");
+      ctx.beginPath(); ctx.arc(sx, sy, 18, 0, Math.PI * 2); ctx.fillStyle = gr; ctx.fill();
+      ctx.beginPath(); ctx.arc(sx, sy, 4, 0, Math.PI * 2); ctx.fillStyle = dotCol; ctx.fill();
+      ctx.font = `8px ${MONO}`; ctx.fillStyle = dotCol; ctx.textAlign = "left";
+      const lbl = scanA < 56 ? "← fusion gain" : scanA > 120 ? "fission gain →" : "iron plateau";
+      ctx.fillText(`A=${Math.round(scanA)}  ${scanBE.toFixed(2)} MeV/n  ${lbl}`, sx + 9, sy - 5);
+      ctx.font = `8px ${MONO}`; ctx.textAlign = "center";
+      ctx.fillStyle = `${B.cyan}90`; ctx.fillText("FUSION ZONE", toX(28), PT + 16);
+      ctx.fillStyle = `${B.amber}80`; ctx.fillText("FISSION ZONE", toX(180), PT + 16);
+      ctx.font = `9px ${MONO}`; ctx.fillStyle = B.ink; ctx.textAlign = "left";
+      ctx.fillText("NUCLEAR BINDING ENERGY  ·  THE ALCHEMICAL MAP OF MATTER", PL, PT - 14);
+      t++;
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+  return <canvas ref={cvs} style={{ display: "block", width: "100%", borderRadius: 6 }} />;
+}
+
+function GamowWindowCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  const [tempKeV, setTempKeV] = useState(10);
+  const tempRef = useRef(10);
+  useEffect(() => {
+    const canvas = cvs.current!;
+    const ctx = canvas.getContext("2d")!;
+    const MONO = "'Space Mono', monospace";
+    const SANS = "Inter, sans-serif";
+    const EG_DT = 986;
+    const N = 400;
+    const resize = () => {
+      const p = canvas.parentElement!;
+      canvas.width = p.clientWidth;
+      canvas.height = 250;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = B.bg; ctx.fillRect(0, 0, W, H);
+      const PL = 52, PR = 24, PT = 36, PB = 44;
+      const CW = W - PL - PR, CH = H - PT - PB;
+      const T = tempRef.current;
+      const Emax = Math.max(100, T * 14);
+      const toX = (E: number) => PL + (E / Emax) * CW;
+      const toY = (y: number) => PT + CH - y * CH;
+      [0, 20, 40, 60, 80, 100].filter(e => e <= Emax).forEach(E => {
+        const gx = toX(E);
+        ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(gx, PT); ctx.lineTo(gx, PT + CH); ctx.stroke();
+        ctx.font = `8px ${SANS}`; ctx.fillStyle = "rgba(154,163,184,0.5)"; ctx.textAlign = "center";
+        ctx.fillText(`${E}`, gx, PT + CH + 14);
+      });
+      const mbVals: number[] = [], gamowVals: number[] = [], winVals: number[] = [];
+      let mbMax = 0, gamowMax = 0, winMax = 0;
+      for (let i = 0; i <= N; i++) {
+        const E = (i / N) * Emax;
+        const mb = E > 0 ? Math.sqrt(E) * Math.exp(-E / T) : 0;
+        const g = E > 0 ? Math.exp(-Math.sqrt(EG_DT / E)) : 0;
+        const w = mb * g;
+        mbVals.push(mb); gamowVals.push(g); winVals.push(w);
+        if (mb > mbMax) mbMax = mb;
+        if (g > gamowMax) gamowMax = g;
+        if (w > winMax) winMax = w;
+      }
+      ctx.beginPath();
+      mbVals.forEach((mb, i) => {
+        const x = toX((i / N) * Emax), y = toY(mbMax > 0 ? mb / mbMax : 0);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = `${B.cyan}90`; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.beginPath();
+      gamowVals.forEach((g, i) => {
+        const x = toX((i / N) * Emax), y = toY(gamowMax > 0 ? g / gamowMax : 0);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = `${B.rose}90`; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.beginPath();
+      winVals.forEach((w, i) => {
+        const x = toX((i / N) * Emax), y = toY(winMax > 0 ? w / winMax : 0);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.lineTo(toX(Emax), toY(0)); ctx.lineTo(toX(0), toY(0)); ctx.closePath();
+      ctx.fillStyle = `${B.gold}20`; ctx.fill();
+      ctx.beginPath();
+      winVals.forEach((w, i) => {
+        const x = toX((i / N) * Emax), y = toY(winMax > 0 ? w / winMax : 0);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = B.gold; ctx.lineWidth = 2.2; ctx.stroke();
+      const peakIdx = winVals.indexOf(winMax);
+      const peakE = (peakIdx / N) * Emax;
+      const px = toX(peakE);
+      ctx.strokeStyle = `${B.gold}50`; ctx.lineWidth = 0.8; ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(px, PT); ctx.lineTo(px, PT + CH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = `8px ${MONO}`; ctx.fillStyle = B.gold; ctx.textAlign = "left";
+      ctx.fillText(`Peak  ${peakE.toFixed(1)} keV`, px + 4, PT + 14);
+      ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + CH); ctx.lineTo(PL + CW, PT + CH); ctx.stroke();
+      ctx.font = `9px ${SANS}`; ctx.fillStyle = B.dim; ctx.textAlign = "center";
+      ctx.fillText("Ion Energy  E  (keV)", PL + CW * 0.5, H - 6);
+      ctx.save(); ctx.translate(12, PT + CH * 0.5); ctx.rotate(-Math.PI / 2);
+      ctx.fillText("Probability  (normalized)", 0, 0); ctx.restore();
+      const legItems: [string, string][] = [
+        [B.cyan, "Maxwell-Boltzmann  f(E) ∝ √E·e^(−E/kT)"],
+        [B.rose, "Gamow factor  P(E) ∝ e^(−√(E_G/E))"],
+        [B.gold, "Gamow window  (product — the reaction sweet spot)"],
+      ];
+      legItems.forEach(([col, lbl], li) => {
+        const ly = PT + 8 + li * 18;
+        ctx.beginPath(); ctx.moveTo(W - 230, ly + 5); ctx.lineTo(W - 206, ly + 5);
+        ctx.strokeStyle = col; ctx.lineWidth = li === 2 ? 2.2 : 1.5; ctx.stroke();
+        ctx.font = `8px ${SANS}`; ctx.fillStyle = B.dim; ctx.textAlign = "left";
+        ctx.fillText(lbl, W - 202, ly + 9);
+      });
+      const Mkelvin = (T * 11.6).toFixed(0);
+      ctx.font = `9px ${MONO}`; ctx.fillStyle = B.ink; ctx.textAlign = "left";
+      ctx.fillText(`D-T GAMOW WINDOW  ·  T = ${T} keV  ≈  ${Mkelvin} M K`, PL, PT - 14);
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+  return (
+    <div>
+      <canvas ref={cvs} style={{ display: "block", width: "100%", borderRadius: 6 }} />
+      <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, whiteSpace: "nowrap" }}>Plasma temperature:</span>
+        <input type="range" min={1} max={80} value={tempKeV} onChange={e => {
+          const v = Number(e.target.value);
+          setTempKeV(v);
+          tempRef.current = v;
+        }} style={{ flex: 1, accentColor: B.gold }} />
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 11, color: B.gold, minWidth: 110, textAlign: "right" }}>
+          {tempKeV} keV ≈ {(tempKeV * 11.6).toFixed(0)} M K
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function LawsonCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const canvas = cvs.current!;
+    const ctx = canvas.getContext("2d")!;
+    let t2 = 0;
+    const MONO = "'Space Mono', monospace";
+    const SANS = "Inter, sans-serif";
+    const EXPS = [
+      { name: "JET 1997",    T: 13.5, nt: 1.5e20, col: B.cyan,   note: "Q = 0.67" },
+      { name: "JT-60U",      T: 18,   nt: 1.0e20, col: B.violet, note: "D-D equivalent" },
+      { name: "TFTR 1994",   T: 30,   nt: 0.8e20, col: B.green,  note: "D-T plasma" },
+      { name: "NIF 2022",    T: 60,   nt: 0.5e20, col: B.rose,   note: "Q_fuel > 1" },
+      { name: "ITER (goal)", T: 20,   nt: 3e20,   col: B.gold,   note: "Q = 10 target" },
+      { name: "DEMO (proj)", T: 20,   nt: 1e21,   col: B.amber,  note: "prototype plant" },
+    ];
+    const resize = () => {
+      const p = canvas.parentElement!;
+      canvas.width = p.clientWidth;
+      canvas.height = 300;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+    const draw = () => {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = B.bg; ctx.fillRect(0, 0, W, H);
+      const PL = 60, PR = 180, PT = 36, PB = 48;
+      const CW = W - PL - PR, CH = H - PT - PB;
+      const LTmin = 0, LTmax = 2, LNmin = 18, LNmax = 22;
+      const toX = (T: number) => PL + ((Math.log10(T) - LTmin) / (LTmax - LTmin)) * CW;
+      const toY = (nt: number) => PT + CH - ((Math.log10(nt) - LNmin) / (LNmax - LNmin)) * CH;
+      [1, 2, 5, 10, 20, 50, 100].forEach(T => {
+        const gx = toX(T);
+        if (gx < PL || gx > PL + CW) return;
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(gx, PT); ctx.lineTo(gx, PT + CH); ctx.stroke();
+        ctx.font = `8px ${SANS}`; ctx.fillStyle = "rgba(154,163,184,0.6)"; ctx.textAlign = "center";
+        ctx.fillText(`${T}`, gx, PT + CH + 14);
+      });
+      [1e18, 1e19, 1e20, 1e21, 1e22].forEach(nt => {
+        const gy = toY(nt);
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(PL, gy); ctx.lineTo(PL + CW, gy); ctx.stroke();
+        ctx.font = `7px ${MONO}`; ctx.fillStyle = "rgba(154,163,184,0.6)"; ctx.textAlign = "right";
+        ctx.fillText(`10^${Math.round(Math.log10(nt))}`, PL - 4, gy + 3);
+      });
+      ctx.beginPath();
+      let first = true;
+      for (let logT = LTmin + 0.01; logT <= LTmax; logT += 0.02) {
+        const T = Math.pow(10, logT), nt = 1.5e21 / T;
+        if (nt < 1e18 || nt > 1e22) continue;
+        const x = toX(T), y = toY(nt);
+        if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+      }
+      ctx.lineTo(toX(100), PT); ctx.lineTo(PL, PT); ctx.closePath();
+      ctx.fillStyle = `${B.ember}10`; ctx.fill();
+      ctx.beginPath(); first = true;
+      for (let logT = LTmin + 0.01; logT <= LTmax; logT += 0.02) {
+        const T = Math.pow(10, logT), nt = 1.5e21 / T;
+        if (nt < 1e18 || nt > 1e22) continue;
+        const x = toX(T), y = toY(nt);
+        if (first) { ctx.moveTo(x, y); first = false; } else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = B.ember; ctx.lineWidth = 1.8; ctx.setLineDash([6, 4]); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = `8px ${MONO}`; ctx.fillStyle = B.ember; ctx.textAlign = "left";
+      ctx.fillText("n·τ·T ≥ 1.5×10²¹  m⁻³·s·keV", toX(1.5), toY(5.5e20) - 8);
+      ctx.fillText("← IGNITION REGION", toX(35), PT + 14);
+      ctx.strokeStyle = "rgba(255,255,255,0.2)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PL, PT); ctx.lineTo(PL, PT + CH); ctx.lineTo(PL + CW, PT + CH); ctx.stroke();
+      ctx.font = `9px ${SANS}`; ctx.fillStyle = B.dim; ctx.textAlign = "center";
+      ctx.fillText("Ion Temperature  T  (keV)", PL + CW * 0.5, H - 8);
+      ctx.save(); ctx.translate(12, PT + CH * 0.5); ctx.rotate(-Math.PI / 2);
+      ctx.fillText("n · τ  (m⁻³ · s)", 0, 0); ctx.restore();
+      EXPS.forEach((ex, ei) => {
+        const x = toX(ex.T), y = toY(ex.nt);
+        const pulse = 0.5 + 0.5 * Math.sin(t2 * 0.05 + ei * 1.3);
+        const gr = ctx.createRadialGradient(x, y, 0, x, y, 16);
+        gr.addColorStop(0, `${ex.col}${Math.round(70 * pulse).toString(16).padStart(2, "0")}`);
+        gr.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(x, y, 16, 0, Math.PI * 2); ctx.fillStyle = gr; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, 5.5, 0, Math.PI * 2); ctx.fillStyle = ex.col; ctx.fill();
+      });
+      EXPS.forEach((ex, ei) => {
+        const lx = PL + CW + 14, ly = PT + ei * 42;
+        ctx.beginPath(); ctx.arc(lx + 5, ly + 8, 5, 0, Math.PI * 2);
+        ctx.fillStyle = ex.col; ctx.fill();
+        ctx.font = `bold 9px ${SANS}`; ctx.fillStyle = ex.col; ctx.textAlign = "left";
+        ctx.fillText(ex.name, lx + 14, ly + 11);
+        ctx.font = `8px ${SANS}`; ctx.fillStyle = B.dim;
+        ctx.fillText(ex.note, lx + 14, ly + 23);
+      });
+      ctx.font = `9px ${MONO}`; ctx.fillStyle = B.ink; ctx.textAlign = "left";
+      ctx.fillText("LAWSON CRITERION  ·  D-T IGNITION  ·  LOG-LOG", PL, PT - 14);
+      t2++;
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+  return <canvas ref={cvs} style={{ display: "block", width: "100%", borderRadius: 6 }} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -709,6 +1048,13 @@ export default function AlchemyToFusionPage() {
             </table>
             <div style={{ marginTop: 12 }}>
               <Chip color={B.cyan}>measured · falsifiable · routine in labs</Chip>
+            </div>
+          </Card>
+          <Card accent={B.dim} style={{ marginTop: 16 }}>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 8 }}>Nuclear Binding Energy Curve — live simulation</div>
+            <BindingEnergyCanvas />
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, marginTop: 8, lineHeight: 1.6 }}>
+              Binding energy per nucleon plotted for A = 1–238. The iron peak (⁵⁶Fe, 8.79 MeV/n) is the deepest valley of nuclear stability. Moving left toward hydrogen releases energy by fusion; moving right from uranium releases energy by fission. The animated dot scans the curve — cyan in the fusion zone (A{"<"}56), amber in the fission zone (A{">"}120), green at the plateau. Transmutation is real: it is motion along this curve.
             </div>
           </Card>
         </section>
@@ -1491,6 +1837,355 @@ export default function AlchemyToFusionPage() {
               talk: be specific about what is real, name the speculative parts, do not
               collapse the two.
             </P>
+          </Card>
+        </section>
+
+        {/* §18 Gamow Window */}
+        <section style={{ marginBottom: 44 }} data-testid="section-18">
+          <H num="18" label="The Gamow Window · Why Quantum Tunneling Makes Fusion Possible" accent={B.violet} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+            <Card accent={B.violet}>
+              <P>
+                The Coulomb barrier between two protons is roughly{" "}
+                <strong style={{ color: B.violet }}>1 MeV</strong>. To overcome it classically,
+                you need a temperature of around <strong style={{ color: B.violet }}>10¹⁰ K</strong> —
+                ten billion kelvin. The Sun's core is only 15 million kelvin. Classical physics
+                says the Sun cannot fuse hydrogen. The Sun clearly does. Quantum mechanics is the
+                answer.
+              </P>
+              <P>
+                Two effects conspire. Maxwell-Boltzmann statistics give every ion a thermal speed
+                distribution — a few rare ions have much more energy than average. And quantum
+                tunneling lets particles pass through the barrier even when they lack the classical
+                energy to surmount it. The tunneling probability for a pair of nuclei approaching
+                with energy E is:
+              </P>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 12.5, color: B.violet, background: "rgba(180,156,255,0.08)", borderRadius: 4, padding: "10px 14px", marginBottom: 10 }}>
+                P(E) ∝ exp(−√(E_G / E))
+              </div>
+              <P>
+                where E_G is the <strong style={{ color: B.violet }}>Gamow energy</strong> — for
+                D-T it is ~986 keV². At low E, this factor plunges to zero. The Maxwell-Boltzmann
+                distribution gives vanishingly few ions at high E. Multiply the two: the product
+                — the <strong style={{ color: B.gold }}>Gamow window</strong> — has a narrow peak
+                at an intermediate energy. For D-T plasma at 10 keV, the peak sits around 14–20 keV.
+                Only ions in that window are doing the actual fusing.
+              </P>
+              <div style={{ marginTop: 8 }}>
+                <Chip color={B.violet}>tunneling · not classical</Chip>{" "}
+                <Chip color={B.gold}>Gamow window · the reaction sweet spot</Chip>
+              </div>
+            </Card>
+            <Card accent={B.violet}>
+              <P>
+                The Gamow peak energy shifts with temperature: hotter plasma moves the
+                Maxwell-Boltzmann peak right, widening the window. Use the slider to see how
+                the reaction rate sweet spot changes. D-T tokamaks operate near 10–20 keV
+                because that is where the Gamow window aligns with achievable confinement.
+              </P>
+              <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }} data-testid="table-gamow">
+                <thead>
+                  <tr>
+                    <Th>Reaction</Th>
+                    <Th>Gamow Energy E_G</Th>
+                    <Th>Optimal T (keV)</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <Td accent={B.amber}>D + T</Td>
+                    <Td>≈ 986 keV²</Td>
+                    <Td>~10–20 keV</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.cyan}>D + D</Td>
+                    <Td>≈ 1 820 keV²</Td>
+                    <Td>~50–100 keV</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.violet}>D + ³He</Td>
+                    <Td>≈ 1 500 keV²</Td>
+                    <Td>~80–200 keV</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.gold}>p + ¹¹B</Td>
+                    <Td>≈ 3 600 keV²</Td>
+                    <Td>~300–600 keV</Td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style={{ marginTop: 4 }}>
+                <Chip color={B.dim}>p+¹¹B window is 30× harder to reach than D-T</Chip>
+              </div>
+            </Card>
+          </div>
+          <Card accent={B.dim}>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 8 }}>Interactive Gamow Window — D-T reaction rate sweet spot</div>
+            <GamowWindowCanvas />
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, marginTop: 10, lineHeight: 1.6 }}>
+              The <span style={{ color: B.cyan }}>cyan curve</span> is the Maxwell-Boltzmann energy distribution of ions in the plasma (most ions at low energy). The <span style={{ color: B.rose }}>rose curve</span> is the Gamow tunneling factor (exponentially higher probability at higher energy). Their product — the <span style={{ color: B.gold }}>gold filled region</span> — is the Gamow window: the only energies where fusion is actually happening. Drag the slider to raise or lower the plasma temperature and watch the window shift.
+            </div>
+          </Card>
+        </section>
+
+        {/* §19 Lawson Criterion */}
+        <section style={{ marginBottom: 44 }} data-testid="section-19">
+          <H num="19" label="Lawson's Line · The Engineering Triple Product" accent={B.ember} />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+            <Card accent={B.ember}>
+              <P>
+                In 1957 John Lawson wrote a short paper asking a simple question: what does a
+                fusion reactor need to break even? His answer was a product of three quantities —
+                density, confinement time, and temperature — and it set the engineering target for
+                the entire field ever since.
+              </P>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 12.5, color: B.ember, background: "rgba(255,138,92,0.08)", borderRadius: 4, padding: "10px 14px", marginBottom: 10 }}>
+                n · τ · T ≥ 1.5 × 10²¹ m⁻³ · s · keV
+              </div>
+              <P>
+                where <strong style={{ color: B.ember }}>n</strong> is plasma density
+                (particles per m³), <strong style={{ color: B.ember }}>τ</strong> (tau) is
+                the energy confinement time (seconds), and{" "}
+                <strong style={{ color: B.ember }}>T</strong> is temperature in keV. Getting
+                all three large simultaneously is the problem. Different confinement approaches
+                trade off between them in fundamentally different ways:
+              </P>
+              <ul style={{ fontFamily: "Inter, sans-serif", fontSize: 13.2, lineHeight: 1.75, color: B.ink, paddingLeft: 18, margin: "0 0 10px 0" }}>
+                <li><strong style={{ color: B.gold }}>Magnetic confinement (tokamak):</strong> low–moderate n (~10²⁰ m⁻³), τ of seconds. Achieves the product by making τ long.</li>
+                <li><strong style={{ color: B.cyan }}>Inertial confinement (laser):</strong> extreme n (~10³¹ m⁻³), τ of nanoseconds. Achieves the product by making n enormous.</li>
+                <li><strong style={{ color: B.violet }}>Magnetized targets:</strong> intermediate n, intermediate τ — the path private companies like General Fusion and Helion are exploring.</li>
+              </ul>
+              <div style={{ marginTop: 4 }}>
+                <Chip color={B.ember}>n · τ · T — the universal yardstick</Chip>
+              </div>
+            </Card>
+            <Card accent={B.ember}>
+              <P>
+                The diagram plots every major fusion milestone as a point on the n·τ vs T plane.
+                Every point below-left of the ignition curve has not reached break-even. ITER is
+                designed to cross it. Progress over 70 years is visible: the frontier has moved
+                roughly <strong style={{ color: B.green }}>10⁶× in triple product</strong> since
+                the first tokamaks in the early 1960s — faster than Moore's Law over the same
+                period. Whether the last decade of scaling gets the field to Q_eng {">"} 1 is the
+                open question.
+              </P>
+              <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-lawson">
+                <thead>
+                  <tr>
+                    <Th>Experiment</Th>
+                    <Th>n·τ (m⁻³·s)</Th>
+                    <Th>T (keV)</Th>
+                    <Th>Note</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <Td accent={B.cyan}>JET 1997</Td>
+                    <Td>1.5 × 10²⁰</Td>
+                    <Td>13.5</Td>
+                    <Td>Q = 0.67 — closest tokamak to break-even</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.violet}>JT-60U</Td>
+                    <Td>1.0 × 10²⁰</Td>
+                    <Td>18</Td>
+                    <Td>D-D plasma; equivalent D-T conditions</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.rose}>NIF 2022</Td>
+                    <Td>0.5 × 10²⁰</Td>
+                    <Td>~60</Td>
+                    <Td>Q_fuel {">"} 1; ICF milestone — different axis than MCF</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.gold}>ITER (goal)</Td>
+                    <Td>3 × 10²⁰</Td>
+                    <Td>20</Td>
+                    <Td>Q = 10 design target; first burning plasma</Td>
+                  </tr>
+                  <tr>
+                    <Td accent={B.amber}>DEMO (proj.)</Td>
+                    <Td>~10²¹</Td>
+                    <Td>20</Td>
+                    <Td>Prototype power plant; Q_eng {">"} 1 required</Td>
+                  </tr>
+                </tbody>
+              </table>
+            </Card>
+          </div>
+          <Card accent={B.dim}>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 8 }}>Lawson Diagram — real machine data · ignition boundary</div>
+            <LawsonCanvas />
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, marginTop: 10, lineHeight: 1.6 }}>
+              Log-log plot of confinement parameter (n·τ) vs ion temperature. The <span style={{ color: B.ember }}>dashed orange curve</span> is the D-T ignition boundary (n·τ·T = 1.5×10²¹). Points above-right of it are ignited. Every glowing dot is a real measurement. ITER's goal sits just above the boundary — the first machine designed to reach the right side of Lawson's line.
+            </div>
+          </Card>
+        </section>
+
+        {/* §20 Emerging Pathways */}
+        <section style={{ marginBottom: 44 }} data-testid="section-20">
+          <H num="20" label="Emerging Pathways · Fusion Beyond the Standard Roadmap" accent={B.green} />
+          <P>
+            ITER and inertial confinement are the official roadmap. But fusion's design space is
+            large, and a generation of private companies and national labs have bet on approaches
+            that go off-road. Each pathway makes a different trade — temperature vs density,
+            aneutronic vs efficient, pulsed vs steady-state. Not all will succeed. All are real
+            physics.
+          </P>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+            <Card accent={B.green}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 14, color: B.green, fontVariant: "small-caps", letterSpacing: 0.8, marginBottom: 8 }}>Magnetized Liner Inertial Fusion (MagLIF)</div>
+              <P>
+                Sandia National Laboratories. A thin metal liner implodes around a preheated,
+                pre-magnetized D-T plasma driven by the Z-machine — the world's most powerful
+                pulsed-power facility at 26 MA. The axial magnetic field trapped inside the liner
+                suppresses thermal conduction losses as the plasma is compressed by a factor of
+                ~40×, reaching conditions where alpha heating begins. The neutron yield has been
+                growing decade-over-decade.
+              </P>
+              <div style={{ marginBottom: 6 }}>
+                <Chip color={B.green}>concept: pulsed magnetized ICF</Chip>{" "}
+                <Chip color={B.cyan}>status: multi-kJ yield · scaling research</Chip>
+              </div>
+              <P>
+                <strong style={{ color: B.dim }}>Bottleneck:</strong> achieving TBR {">"} 1 in a
+                pulsed geometry; liner fabrication precision at scale; repetition rate for a
+                power plant.
+              </P>
+            </Card>
+            <Card accent={B.cyan}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 14, color: B.cyan, fontVariant: "small-caps", letterSpacing: 0.8, marginBottom: 8 }}>Field-Reversed Configuration (FRC)</div>
+              <P>
+                TAE Technologies, Helion Energy, and Commonwealth Fusion each run FRC or
+                FRC-adjacent devices. An FRC is a compact toroid — plasma rings that generate
+                their own internal magnetic structure with no central column. They are smaller,
+                cheaper, and potentially compatible with direct energy conversion (Helion's approach:
+                recover electricity from the decelerating plasma without a thermal cycle).
+                Helion's Polaris is targeting D-³He; TAE is targeting p+¹¹B — both aneutronic.
+              </P>
+              <div style={{ marginBottom: 6 }}>
+                <Chip color={B.cyan}>concept: compact toroid / direct conversion</Chip>{" "}
+                <Chip color={B.violet}>status: reactor-demo scale, 2030s targets</Chip>
+              </div>
+              <P>
+                <strong style={{ color: B.dim }}>Bottleneck:</strong> plasma stability at ignition
+                conditions; aneutronic fuels need ~10× higher T than D-T; direct conversion
+                efficiency unproven at scale.
+              </P>
+            </Card>
+            <Card accent={B.violet}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 14, color: B.violet, fontVariant: "small-caps", letterSpacing: 0.8, marginBottom: 8 }}>Muon-Catalyzed Fusion (μCF)</div>
+              <P>
+                A muon is 207× heavier than an electron. When it substitutes for an electron in a
+                hydrogen molecule, it shrinks the atom by 207× — pulling the nuclei close enough
+                that they fuse at room temperature without any confinement. One muon can catalyze
+                ~150 D-T fusions before it decays (110 μs lifetime). The energy from those fusions
+                is real and measured. The problem is the muon itself: producing one costs ~5 GeV
+                of energy from an accelerator, while 150 D-T reactions yield only ~2.6 GeV.
+              </P>
+              <div style={{ marginBottom: 6 }}>
+                <Chip color={B.violet}>concept: room-temperature catalysis</Chip>{" "}
+                <Chip color={B.dim}>status: demonstrated, not energy-positive</Chip>
+              </div>
+              <P>
+                <strong style={{ color: B.dim }}>Bottleneck:</strong> muon production is 5× more
+                expensive than the energy gained; α-sticking (muons trapped in He-4 before
+                completing cycles) limits catalysis to ~150 fusions — needs ~1 000 to break even.
+                No known path to adequate muon yield.
+              </P>
+            </Card>
+            <Card accent={B.amber}>
+              <div style={{ fontFamily: "'Cinzel', serif", fontSize: 14, color: B.amber, fontVariant: "small-caps", letterSpacing: 0.8, marginBottom: 8 }}>Magnetized Target Fusion (MTF)</div>
+              <P>
+                General Fusion (Vancouver) compresses a magnetized plasma target with a
+                collapsing liquid-metal cavity. Pistons driven by steam hammers implode the
+                lithium-lead wall, which compresses and heats the FRC plasma inside to fusion
+                conditions. Liquid metal simultaneously acts as the neutron absorber, tritium
+                breeder, and coolant — closing the fuel loop in a single material. The
+                pulsed approach avoids the plasma-wall contact problem entirely.
+              </P>
+              <div style={{ marginBottom: 6 }}>
+                <Chip color={B.amber}>concept: liquid-metal implosion + FRC</Chip>{" "}
+                <Chip color={B.green}>status: demonstration machine operating</Chip>
+              </div>
+              <P>
+                <strong style={{ color: B.dim }}>Bottleneck:</strong> achieving sufficient plasma
+                temperature before compression (~5 keV start); acoustic symmetry of the liquid-metal
+                implosion; repetition rate for commercial pulsed-power economics.
+              </P>
+            </Card>
+          </div>
+          <Card accent={B.dim}>
+            <div style={{ fontFamily: "'Cinzel', serif", fontSize: 14, color: B.ink, fontVariant: "small-caps", letterSpacing: 0.8, marginBottom: 10 }}>Pathway Comparison</div>
+            <table style={{ width: "100%", borderCollapse: "collapse" }} data-testid="table-pathways">
+              <thead>
+                <tr>
+                  <Th>Approach</Th>
+                  <Th>Confinement</Th>
+                  <Th>Fuel</Th>
+                  <Th>n (m⁻³)</Th>
+                  <Th>τ (s)</Th>
+                  <Th>Neutrons</Th>
+                  <Th>Readiness</Th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <Td accent={B.gold}>Tokamak (ITER)</Td>
+                  <Td>Magnetic</Td>
+                  <Td>D-T</Td>
+                  <Td>~10²⁰</Td>
+                  <Td>~3–5</Td>
+                  <Td>High (14.1 MeV)</Td>
+                  <Td accent={B.green}>Highest</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.rose}>ICF / NIF</Td>
+                  <Td>Inertial (laser)</Td>
+                  <Td>D-T</Td>
+                  <Td>~10³¹</Td>
+                  <Td>~10⁻¹¹</Td>
+                  <Td>High</Td>
+                  <Td accent={B.amber}>Science proven; plant concept early</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.green}>MagLIF</Td>
+                  <Td>Mag. inertial</Td>
+                  <Td>D-T</Td>
+                  <Td>~10²⁶</Td>
+                  <Td>~10⁻⁸</Td>
+                  <Td>High</Td>
+                  <Td accent={B.amber}>Lab scale; scaling unclear</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.cyan}>FRC (Helion)</Td>
+                  <Td>Compact toroid</Td>
+                  <Td>D-³He</Td>
+                  <Td>~10²²</Td>
+                  <Td>~10⁻³</Td>
+                  <Td>Low</Td>
+                  <Td accent={B.amber}>Demo scale; 2030 target</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.amber}>MTF (Gen. Fusion)</Td>
+                  <Td>Magnetized target</Td>
+                  <Td>D-T</Td>
+                  <Td>~10²³</Td>
+                  <Td>~10⁻⁵</Td>
+                  <Td>High</Td>
+                  <Td accent={B.amber}>Demo machine running</Td>
+                </tr>
+                <tr>
+                  <Td accent={B.violet}>μCF</Td>
+                  <Td>None (room temp)</Td>
+                  <Td>D-T / D-D</Td>
+                  <Td>Solid</Td>
+                  <Td>Catalytic</Td>
+                  <Td>High</Td>
+                  <Td accent={B.rose}>Energy-negative; no known fix</Td>
+                </tr>
+              </tbody>
+            </table>
           </Card>
         </section>
 
