@@ -270,6 +270,7 @@ import StromatoliteFieldPage from "@/pages/stromatolite-field";
 import AetherMatrixPage from "@/pages/aether-matrix";
 import UnderstandingStrandPage from "@/pages/understanding-strand";
 import GravitationalFieldPage from "@/pages/gravitational-field";
+import CavityComputerPage from "@/pages/cavity-computer";
 
 const queryClient = new QueryClient();
 
@@ -543,6 +544,7 @@ function Router() {
         <Route path="/aether-matrix" component={AetherMatrixPage} />
         <Route path="/understanding-strand" component={UnderstandingStrandPage} />
         <Route path="/gravitational-field" component={GravitationalFieldPage} />
+        <Route path="/cavity-computer" component={CavityComputerPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

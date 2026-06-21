@@ -125,6 +125,7 @@ const NAV_ITEMS = [
   { href: "/aether-matrix", label: "AETHER Matrix · Creative Engine · Φ(E,S)=K · Type to Create · Sigil Crystallization · Kuramoto Field", icon: Atom },
   { href: "/understanding-strand", label: "Understanding Strand · Human Worldline · Prime Bursts · Flower Branching · Quantum Measurement Problem · Decoherence Collapse", icon: Atom },
   { href: "/gravitational-field", label: "Gravitational Field Coherence · Human Cat Eagle Dolphin Salmon Bat Earthworm · COT · Buoyancy · Tensegrity · Graph Map", icon: Atom },
+  { href: "/cavity-computer", label: "Cavity Computer · Enclosed Loop Recursive Computation · Fluid Substrate · Navier-Stokes · Packet Switching · Space-Time Filament", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
