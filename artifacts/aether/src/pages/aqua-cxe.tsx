@@ -5,7 +5,10 @@ import imgPoster   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_10_01_PM_1777223
 import imgFrames   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_09_42_PM_1777223511075.png";
 import imgDecadron from "@assets/ChatGPT_Image_Apr_26,_2026,_01_12_09_PM_1777223532329.png";
 import imgAqua2    from "@assets/ChatGPT_Image_Apr_26,_2026,_01_13_15_PM_1777223596911.png";
-import imgLoop     from "@assets/ChatGPT_Image_Apr_26,_2026,_01_13_40_PM_1777223641885.png";
+import imgLoop          from "@assets/ChatGPT_Image_Apr_26,_2026,_01_13_40_PM_1777223641885.png";
+import imgNestedScaling from "@assets/IMG_3461_1782003806201.png";
+import imgMpcDensity    from "@assets/IMG_3459_1782003806201.png";
+import img426Hz         from "@assets/0DE9502F-C577-457B-BC49-46AE3A83F6D7_1782003806201.png";
 
 const B = {
   bg: "#06080f",
@@ -456,6 +459,344 @@ function ResonantNexusSimulator() {
   );
 }
 
+/* ───────────────────── NEXUS DRIVE LOOP DEVICE ───────────────────── */
+
+function NexusDriveLoopDevice() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const [loopBal,  setLoopBal]  = useState(0.50);
+  const [harmCpl,  setHarmCpl]  = useState(0.68);
+  const [scaleIdx, setScaleIdx] = useState(1);
+
+  const pRef = useRef({ loopBal, harmCpl, scaleIdx });
+  useEffect(() => { pRef.current = { loopBal, harmCpl, scaleIdx }; }, [loopBal, harmCpl, scaleIdx]);
+
+  const [liveEff,   setLiveEff]   = useState(0);
+  const [liveProps, setLiveProps] = useState({ intake: 0.35, compute: 0.33, memory: 0.32 });
+
+  const SCALES = [
+    { label:"EGG",        size:"0.15 m",    col: B.cyan   },
+    { label:"VEHICLE",    size:"~5 m",      col: B.gold   },
+    { label:"CITY BLOCK", size:"~100 m",    col: B.green  },
+    { label:"ASTEROID",   size:"~9 km",     col: B.violet },
+    { label:"MOON",       size:"~2,900 km", col: B.amber  },
+    { label:"PLANET",     size:"~6,400 km", col: B.rose   },
+  ];
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const dpr  = Math.max(1, window.devicePixelRatio || 1);
+    const cssW = cv.clientWidth, cssH = cv.clientHeight;
+    cv.width  = Math.round(cssW * dpr);
+    cv.height = Math.round(cssH * dpr);
+    const ctx = cv.getContext("2d")!;
+    ctx.scale(dpr, dpr);
+    const W = cssW, H = cssH;
+
+    const CX = W * 0.37, CY = H * 0.50;
+    const LOOP_R = Math.min(CX, CY) * 0.76;
+
+    const FREQS = [426, 852, 1278, 1704, 2130, 2556, 2982, 3408, 3834, 4260];
+    const FCOLS = [B.cyan, B.gold, B.ferro, B.green, B.violet, B.blue, B.rose, B.amber, B.cyan, B.gold];
+
+    // Prime cluster resonance gates from Nested Scaling diagram
+    const PRIMES = [3, 5, 13, 29, 37];
+    const primeAngles = PRIMES.map((_, i) => -Math.PI / 2 + (i / PRIMES.length) * Math.PI * 2);
+
+    const scales = [
+      { label:"EGG",        size:"0.15 m",    col: B.cyan   },
+      { label:"VEHICLE",    size:"~5 m",      col: B.gold   },
+      { label:"CITY BLOCK", size:"~100 m",    col: B.green  },
+      { label:"ASTEROID",   size:"~9 km",     col: B.violet },
+      { label:"MOON",       size:"~2,900 km", col: B.amber  },
+      { label:"PLANET",     size:"~6,400 km", col: B.rose   },
+    ];
+
+    let t = 0, raf2 = 0;
+
+    const draw = () => {
+      t++;
+      const { loopBal: LB, harmCpl: HC, scaleIdx: SI } = pRef.current;
+
+      // Lobe proportions
+      const rawI = 0.38 - 0.14 * LB, rawC = 0.33, rawM = 0.29 + 0.14 * LB;
+      const tot  = rawI + rawC + rawM;
+      const ip = rawI / tot, cp = rawC / tot, mp = rawM / tot;
+
+      // Loop efficiency — geometric mean of proportions × harmonic coupling
+      const eff = Math.cbrt(ip * cp * mp) * 3 * (0.50 + 0.44 * HC);
+
+      if (t % 12 === 0) { setLiveEff(eff); setLiveProps({ intake: ip, compute: cp, memory: mp }); }
+
+      ctx.fillStyle = B.bg; ctx.fillRect(0, 0, W, H);
+
+      /* ── MPC warp-effect density aura ── */
+      const warpR = LOOP_R * 1.55;
+      const wg = ctx.createRadialGradient(CX, CY, LOOP_R * 0.2, CX, CY, warpR);
+      wg.addColorStop(0, `rgba(123,228,234,${0.07 + 0.07 * eff})`);
+      wg.addColorStop(0.5, `rgba(180,140,255,${0.04 * eff})`);
+      wg.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = wg; ctx.beginPath(); ctx.arc(CX, CY, warpR, 0, Math.PI * 2); ctx.fill();
+
+      // Density warp ellipses (space-fabric profile rings)
+      for (let k = 1; k <= 4; k++) {
+        const er = LOOP_R * (0.35 + k * 0.22);
+        ctx.beginPath(); ctx.ellipse(CX, CY, er, er * 0.33, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(123,228,234,${0.055 - k * 0.010})`; ctx.lineWidth = 0.8; ctx.stroke();
+      }
+
+      /* ── Drive loop base track ── */
+      ctx.beginPath(); ctx.arc(CX, CY, LOOP_R, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(180,200,255,0.07)`; ctx.lineWidth = 14; ctx.stroke();
+
+      /* ── Three arc segments ── */
+      const segCols   = [B.cyan, B.ferro, B.green];
+      const segArcs   = [ip * Math.PI * 2, cp * Math.PI * 2, mp * Math.PI * 2];
+      const segLabels = ["INTAKE", "COMPUTE", "MEMORY"];
+      let aStart = -Math.PI / 2;
+      for (let k = 0; k < 3; k++) {
+        ctx.beginPath(); ctx.arc(CX, CY, LOOP_R, aStart, aStart + segArcs[k]);
+        ctx.strokeStyle = segCols[k]; ctx.lineWidth = 8;
+        ctx.globalAlpha = 0.55 + 0.40 * eff; ctx.stroke(); ctx.globalAlpha = 1;
+        const midA = aStart + segArcs[k] / 2;
+        ctx.font = "7px ui-monospace, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillStyle = segCols[k];
+        ctx.fillText(
+          `${segLabels[k]} ${([ip, cp, mp][k] * 100).toFixed(0)}%`,
+          CX + Math.cos(midA) * (LOOP_R + 24),
+          CY + Math.sin(midA) * (LOOP_R + 24)
+        );
+        aStart += segArcs[k];
+      }
+
+      /* ── Energy packet rotating around loop ── */
+      const pktA = -Math.PI / 2 + (t * 0.025) % (Math.PI * 2);
+      for (let k = 12; k >= 0; k--) {
+        const ta = pktA - k * 0.055;
+        ctx.beginPath(); ctx.arc(CX + Math.cos(ta) * LOOP_R, CY + Math.sin(ta) * LOOP_R, 4 * (1 - k / 12), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,200,${(1 - k / 12) * 0.65})`; ctx.fill();
+      }
+      const pktX = CX + Math.cos(pktA) * LOOP_R, pktY = CY + Math.sin(pktA) * LOOP_R;
+      const pgrd = ctx.createRadialGradient(pktX, pktY, 0, pktX, pktY, 14);
+      pgrd.addColorStop(0, "rgba(255,255,220,0.9)"); pgrd.addColorStop(1, "rgba(255,255,220,0)");
+      ctx.beginPath(); ctx.arc(pktX, pktY, 14, 0, Math.PI * 2); ctx.fillStyle = pgrd; ctx.fill();
+      ctx.beginPath(); ctx.arc(pktX, pktY, 4,  0, Math.PI * 2); ctx.fillStyle = "#ffffdc"; ctx.fill();
+
+      /* ── Prime cluster gate nodes ── */
+      for (let k = 0; k < PRIMES.length; k++) {
+        const ga = primeAngles[k];
+        const gx2 = CX + Math.cos(ga) * LOOP_R, gy2 = CY + Math.sin(ga) * LOOP_R;
+        const diff = ((pktA - ga) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+        const isHit = diff < 0.22 || diff > Math.PI * 2 - 0.22;
+        const gcol = isHit ? B.gold : B.violet;
+        const gr2  = ctx.createRadialGradient(gx2, gy2, 0, gx2, gy2, isHit ? 14 : 8);
+        gr2.addColorStop(0, gcol + "cc"); gr2.addColorStop(1, gcol + "00");
+        ctx.beginPath(); ctx.arc(gx2, gy2, isHit ? 14 : 8, 0, Math.PI * 2); ctx.fillStyle = gr2; ctx.fill();
+        ctx.beginPath(); ctx.arc(gx2, gy2, isHit ? 5 : 3.5, 0, Math.PI * 2); ctx.fillStyle = gcol; ctx.fill();
+        ctx.font = "7px ui-monospace, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillStyle = gcol + "cc";
+        ctx.fillText(`P${PRIMES[k]}`, CX + Math.cos(ga) * (LOOP_R - 22), CY + Math.sin(ga) * (LOOP_R - 22));
+      }
+
+      /* ── Central efficiency gauge ── */
+      const GR = 48;
+      const cg2 = ctx.createRadialGradient(CX, CY, 0, CX, CY, GR * 1.4);
+      cg2.addColorStop(0, `rgba(123,228,234,${0.14 + 0.16 * eff})`); cg2.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = cg2; ctx.beginPath(); ctx.arc(CX, CY, GR * 1.4, 0, Math.PI * 2); ctx.fill();
+
+      ctx.beginPath(); ctx.arc(CX, CY, GR, -Math.PI / 2, Math.PI * 2 - Math.PI / 2);
+      ctx.strokeStyle = `rgba(180,200,255,0.10)`; ctx.lineWidth = 6; ctx.stroke();
+
+      const effGr = ctx.createLinearGradient(CX - GR, CY, CX + GR, CY);
+      effGr.addColorStop(0, B.cyan); effGr.addColorStop(0.5, B.gold); effGr.addColorStop(1, B.ferro);
+      ctx.beginPath(); ctx.arc(CX, CY, GR, -Math.PI / 2, -Math.PI / 2 + eff * Math.PI * 2);
+      ctx.strokeStyle = effGr; ctx.lineWidth = 6; ctx.stroke();
+
+      ctx.font = "bold 16px ui-monospace, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = B.ink; ctx.fillText(`${(eff * 100).toFixed(0)}%`, CX, CY - 5);
+      ctx.font = "7px ui-monospace, monospace"; ctx.fillStyle = B.muted; ctx.fillText("EFF", CX, CY + 9);
+
+      /* ── Right panel: 426 Hz harmonic bars ── */
+      const RX = W * 0.71, RY = 14, RW = W - RX - 12, RH = H * 0.62;
+      const maxBH = RH - 28;
+      const bw    = (RW / FREQS.length) - 2;
+
+      ctx.font = "7px ui-monospace, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillStyle = B.muted; ctx.fillText("426 Hz HARMONIC RESONANCE", RX + RW / 2, RY);
+
+      ctx.beginPath(); ctx.moveTo(RX, RY + 18 + maxBH); ctx.lineTo(RX + RW, RY + 18 + maxBH);
+      ctx.strokeStyle = `rgba(180,200,255,0.18)`; ctx.lineWidth = 0.7; ctx.stroke();
+
+      for (let k = 0; k < FREQS.length; k++) {
+        const bx  = RX + k * (bw + 2);
+        const osc = 0.4 + 0.6 * Math.abs(Math.sin(t * 0.055 * (k + 1) + k * 0.8));
+        const bh  = maxBH * osc * Math.exp(-k * 0.16) * HC * (0.6 + 0.35 * eff);
+        const by  = RY + 18 + maxBH - bh;
+        const bg2 = ctx.createLinearGradient(bx, by + bh, bx, by);
+        bg2.addColorStop(0, FCOLS[k] + "25"); bg2.addColorStop(1, FCOLS[k] + "cc");
+        ctx.fillStyle = bg2; ctx.fillRect(bx, by, bw, bh);
+        ctx.strokeStyle = FCOLS[k] + "50"; ctx.lineWidth = 0.5; ctx.strokeRect(bx, by, bw, bh);
+        ctx.font = "5.5px ui-monospace, monospace"; ctx.textAlign = "center";
+        ctx.fillStyle = FCOLS[k] + "90"; ctx.textBaseline = "top";
+        ctx.fillText(`${FREQS[k]}`, bx + bw / 2, RY + 18 + maxBH + 2);
+        ctx.textBaseline = "bottom"; ctx.fillStyle = FCOLS[k] + "70";
+        ctx.fillText(`${k + 1}×`, bx + bw / 2, RY + 16);
+      }
+
+      /* ── Stats below bars ── */
+      const SY = RY + RH + 8;
+      const rows = [
+        { l:"LOOP η",  v:`${(eff*100).toFixed(1)}%`,   c: B.cyan   },
+        { l:"INTAKE",  v:`${(ip*100).toFixed(0)}%`,    c: B.cyan   },
+        { l:"COMPUTE", v:`${(cp*100).toFixed(0)}%`,    c: B.ferro  },
+        { l:"MEMORY",  v:`${(mp*100).toFixed(0)}%`,    c: B.green  },
+        { l:"426 HC",  v:`${(HC*100).toFixed(0)}%`,    c: B.violet },
+        { l:"SCALE",   v: scales[SI]?.label ?? "—",    c: B.gold   },
+      ];
+      for (let k = 0; k < rows.length; k++) {
+        const r = rows[k];
+        ctx.font = "6px ui-monospace, monospace"; ctx.textAlign = "left"; ctx.textBaseline = "top";
+        ctx.fillStyle = r.c + "60"; ctx.fillText(r.l, RX, SY + k * 12);
+        ctx.font = "7.5px ui-monospace, monospace"; ctx.textAlign = "right"; ctx.fillStyle = r.c;
+        ctx.fillText(r.v, RX + RW, SY + k * 12);
+      }
+
+      /* ── Bottom: nested scale ruler ── */
+      const scaleY = H * 0.80, scaleX = 12, scaleW = W - 24;
+      const segW2  = scaleW / scales.length;
+
+      ctx.font = "6px ui-monospace, monospace"; ctx.textAlign = "left"; ctx.textBaseline = "top";
+      ctx.fillStyle = B.muted;
+      ctx.fillText("NESTED SCALING POSITION  ·  Coherent Egg → Resonant Planet", scaleX, scaleY - 12);
+
+      for (let k = 0; k < scales.length; k++) {
+        const sx = scaleX + k * segW2, isA = k === SI;
+        ctx.fillStyle = isA ? scales[k].col + "18" : "rgba(180,200,255,0.03)";
+        ctx.fillRect(sx + 1, scaleY, segW2 - 2, 38);
+        ctx.strokeStyle = isA ? scales[k].col : "rgba(180,200,255,0.10)";
+        ctx.lineWidth = isA ? 1.5 : 0.5; ctx.strokeRect(sx + 1, scaleY, segW2 - 2, 38);
+        ctx.font = "6px ui-monospace, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "top";
+        ctx.fillStyle = isA ? scales[k].col : B.muted;
+        ctx.fillText(scales[k].label, sx + segW2 / 2, scaleY + 4);
+        ctx.fillStyle = isA ? scales[k].col + "99" : B.muted + "99";
+        ctx.fillText(scales[k].size, sx + segW2 / 2, scaleY + 16);
+        if (isA) {
+          const pulse2 = 0.5 + 0.5 * Math.sin(t * 0.08);
+          ctx.fillStyle = `rgba(255,255,255,${pulse2 * 0.7})`;
+          ctx.fillText("◆ ACTIVE", sx + segW2 / 2, scaleY + 28);
+        }
+      }
+
+      raf2 = requestAnimationFrame(draw);
+    };
+
+    raf2 = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(raf2);
+  }, []); // eslint-disable-line
+
+  return (
+    <div className="rounded-md border overflow-hidden" style={{ borderColor: B.border, background: B.panel }}
+         data-testid="nexus-drive-loop-device">
+      <div className="px-4 py-3 flex items-center justify-between border-b"
+           style={{ borderColor: B.border, background: B.panelLite }}>
+        <div className="text-[10.5px] uppercase tracking-[0.3em]"
+             style={{ color: B.gold, fontFamily: "Inter, sans-serif" }}>
+          Nexus Drive Loop · Efficiency Proportion Device
+        </div>
+        <div className="flex items-center gap-2 text-[10px]"
+             style={{ color: B.muted, fontFamily: "ui-monospace, monospace" }}>
+          η <span className="tabular-nums" style={{ color: B.gold }}>{(liveEff * 100).toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <canvas ref={cvRef} className="block w-full" style={{ height: 440, background: B.bg }} />
+
+      <div className="grid md:grid-cols-3 gap-3 p-4 border-t" style={{ borderColor: B.border }}>
+        <div className="rounded-md p-3 border" style={{ borderColor: B.border, background: B.panel }}>
+          <div className="flex items-baseline justify-between">
+            <div className="text-[10.5px] uppercase tracking-[0.28em]"
+                 style={{ color: B.cyan, fontFamily: "Inter, sans-serif" }}>Loop Balance</div>
+            <div className="text-[11px] tabular-nums"
+                 style={{ color: B.muted, fontFamily: "ui-monospace, monospace" }}>
+              {loopBal < 0.4 ? "INTAKE-LED" : loopBal > 0.6 ? "MEMORY-LED" : "BALANCED"}
+            </div>
+          </div>
+          <input type="range" min={0} max={1} step={0.01} value={loopBal}
+            onChange={e => setLoopBal(parseFloat(e.target.value))}
+            aria-label="Loop balance control"
+            className="w-full mt-2" style={{ accentColor: B.cyan }} />
+          <div className="text-[10.5px] mt-1" style={{ color: B.muted }}>
+            Shifts proportion between intake and memory lobes. Balanced (0.5) maximises geometric-mean efficiency.
+          </div>
+        </div>
+
+        <div className="rounded-md p-3 border" style={{ borderColor: B.border, background: B.panel }}>
+          <div className="flex items-baseline justify-between">
+            <div className="text-[10.5px] uppercase tracking-[0.28em]"
+                 style={{ color: B.violet, fontFamily: "Inter, sans-serif" }}>426 Hz Coupling</div>
+            <div className="text-[11px] tabular-nums"
+                 style={{ color: B.muted, fontFamily: "ui-monospace, monospace" }}>{(harmCpl * 100).toFixed(0)}%</div>
+          </div>
+          <input type="range" min={0} max={1} step={0.01} value={harmCpl}
+            onChange={e => setHarmCpl(parseFloat(e.target.value))}
+            aria-label="426 Hz harmonic coupling control"
+            className="w-full mt-2" style={{ accentColor: B.violet }} />
+          <div className="text-[10.5px] mt-1" style={{ color: B.muted }}>
+            Carrier coupling to the 426 Hz harmonic family. Strong coupling amplifies all harmonics
+            (426 → 852 → 1278 → … → 4260 Hz) and raises loop efficiency.
+          </div>
+        </div>
+
+        <div className="rounded-md p-3 border" style={{ borderColor: B.border, background: B.panel }}>
+          <div className="text-[10.5px] uppercase tracking-[0.28em] mb-2"
+               style={{ color: B.gold, fontFamily: "Inter, sans-serif" }}>Operating Scale</div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {SCALES.map((s, i) => (
+              <button key={s.label} onClick={() => setScaleIdx(i)}
+                className="text-[8px] uppercase tracking-wide px-1.5 py-1.5 rounded border"
+                style={{
+                  borderColor: scaleIdx === i ? s.col : B.border,
+                  background:  scaleIdx === i ? s.col + "22" : "transparent",
+                  color:       scaleIdx === i ? s.col : B.muted,
+                  fontFamily:  "ui-monospace, monospace", cursor: "pointer",
+                }}>
+                {s.label}
+              </button>
+            ))}
+          </div>
+          <div className="text-[10.5px] mt-2" style={{ color: B.muted }}>
+            Nested scaling stage — coherent egg (0.15 m) through vehicle, city block, asteroid, moon, to
+            resonant planet (6,400 km).
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 p-4 border-t"
+           style={{ borderColor: B.border, background: B.panelLite }}>
+        {([
+          { label:"INTAKE LOBE",  val: liveProps.intake,  col: B.cyan,  note: "Piezo + Thermal + EM" },
+          { label:"COMPUTE LOBE", val: liveProps.compute, col: B.ferro, note: "Ferrofluid logic" },
+          { label:"MEMORY LOBE",  val: liveProps.memory,  col: B.green, note: "DNA crystal + biolum" },
+        ] as const).map(r => (
+          <div key={r.label} className="rounded-md p-3 border"
+               style={{ borderColor: B.border, background: B.panel }}>
+            <div className="text-[9.5px] uppercase tracking-[0.28em]"
+                 style={{ color: B.muted, fontFamily: "Inter, sans-serif" }}>{r.label}</div>
+            <div className="mt-1 text-[22px] tabular-nums"
+                 style={{ color: r.col, fontFamily: "ui-monospace, monospace" }}>{(r.val * 100).toFixed(0)}%</div>
+            <div className="mt-1 h-[5px] rounded-full overflow-hidden"
+                 style={{ background: "#0a0e1c", border: `1px solid ${B.border}` }}>
+              <div className="h-full rounded-full transition-[width] duration-150"
+                   style={{ width:`${r.val * 100}%`,
+                     background:`linear-gradient(90deg,${r.col}55,${r.col})` }} />
+            </div>
+            <div className="text-[10px] mt-1.5" style={{ color: B.muted }}>{r.note}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ───────────────────── PAGE ───────────────────── */
 
 const BRIDGES: { href: string; title: string; subtitle: string }[] = [
@@ -632,6 +973,59 @@ export default function AquaCxePage() {
               title="An architectural simulator, not a measurement."
               body="Numbers are arbitrary units chosen to match the diagram's logic. The interest is the
               shape of the loop, not the magnitudes." />
+          </div>
+        </section>
+
+        {/* SECTION 07 — NEXUS DRIVE LOOP EFFICIENCY PROPORTION DEVICE */}
+        <section className="ax-fade space-y-3" style={{ animationDelay: "400ms" }} data-testid="ax-nexus-device">
+          <H num="07" label="Nexus Drive Loop · Efficiency Proportion Device." accent={B.gold} />
+          <p className="text-[13.5px] leading-relaxed" style={{ color: B.text }}>
+            Three reference diagrams define the device. The <em>Nested Scaling Principle</em> maps the loop
+            from a coherent egg (0.15 m) through vehicle, city block, asteroid, and moon to a resonant planet —
+            anchored by five prime-cluster resonance gates (3 · 5 · 13 · 29 · 37) that act as coherence
+            checkpoints on the loop. The <em>MPC Spacetime Density</em> poster provides the warp-effect aura
+            geometry: contraction cone → bubble interior → expansion cone, stable and coherence-locked. The
+            <em> 426 Hz Vibration Pattern</em> chart shows the harmonic family that carries each lobe —
+            fundamental at 426 Hz through ten harmonics to 4260 Hz, each creating a progressively more
+            complex cymatic geometry as the loop deepens. The instrument below reads all three simultaneously.
+          </p>
+
+          {/* Three reference images */}
+          <div className="grid md:grid-cols-3 gap-3">
+            <ImgFig src={imgNestedScaling}
+              alt="The Nested Scaling Principle: from coherent egg to resonant planet, with prime cluster resonance gates 3, 5, 29, 13, 37 and size progression EGG→VEHICLE→CITY BLOCK→ASTEROID→MOON→PLANET."
+              caption="Nested Scaling · Coherent Egg → Resonant Planet · Prime Gates 3·5·13·29·37" />
+            <ImgFig src={imgMpcDensity}
+              alt="MPC System Operational: Spacetime Density Management — space-fabric density profile showing input contraction cone, bubble interior (stable, coherence-locked), and output expansion cone."
+              caption="MPC System · Spacetime Density Management · Warp-Effect Density Profile" />
+            <ImgFig src={img426Hz}
+              alt="426 Hz Vibration Pattern: Sound · Shape · Energy — frequency spectrum showing fundamental 426 Hz and harmonics 852, 1278, 1704, 2130, 2556, 2982, 3408, 3834, 4260 Hz, plus cymatic plate patterns."
+              caption="426 Hz · Harmonic Resonance Family · Sound · Shape · Energy" />
+          </div>
+
+          {/* Live device */}
+          <NexusDriveLoopDevice />
+
+          {/* Concept cards */}
+          <div className="grid md:grid-cols-3 gap-3 mt-2">
+            <Card accent={B.gold} eyebrow="Nested Scaling · Proportion"
+              title="EGG → PLANET — the same loop at every scale."
+              body={<>The device does not change — only the scale it operates at changes. The five prime gates
+                (3 · 5 · 13 · 29 · 37) are the coherence checkpoints the energy packet crosses on each
+                revolution. At the EGG scale (0.15 m) the loop is a microfluidic cell. At PLANET scale
+                (6,400 km) it is the same proportion, different medium.</>} />
+            <Card accent={B.violet} eyebrow="MPC Density · Warp Aura"
+              title="Contraction cone → coherent bubble → expansion cone."
+              body={<>The warp-effect density rings behind the loop visualise the MPC system: incoming
+                energy contracts through a dense input cone, locks into the stable coherent interior (the
+                loop ring itself), and exits through an expansion cone. The aura brightens as efficiency
+                rises — the bubble is more stable when the loop is balanced.</>} />
+            <Card accent={B.rose} eyebrow="426 Hz · Harmonic Carrier"
+              title="One frequency creates many — the harmonic bar chart."
+              body={<>The 426 Hz fundamental drives the INTAKE arc. Its second harmonic (852 Hz) carries
+                the COMPUTE arc. The third (1278 Hz) the MEMORY arc. Harmonics 4–10 (1704 → 4260 Hz)
+                reinforce the loop's sub-structures — a more complex cymatic geometry means a richer
+                information substrate. The coupling slider sets how strongly the 426 Hz family is engaged.</>} />
           </div>
         </section>
 
