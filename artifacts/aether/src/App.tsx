@@ -267,6 +267,7 @@ import PerceptiveUniversePage from "@/pages/perceptive-universe";
 import CoreResonancePage from "@/pages/core-resonance";
 import SynchronyFieldPage from "@/pages/synchrony-field";
 import StromatoliteFieldPage from "@/pages/stromatolite-field";
+import AetherMatrixPage from "@/pages/aether-matrix";
 
 const queryClient = new QueryClient();
 
@@ -537,6 +538,7 @@ function Router() {
         <Route path="/core-resonance" component={CoreResonancePage} />
         <Route path="/synchrony-field" component={SynchronyFieldPage} />
         <Route path="/stromatolite-field" component={StromatoliteFieldPage} />
+        <Route path="/aether-matrix" component={AetherMatrixPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
