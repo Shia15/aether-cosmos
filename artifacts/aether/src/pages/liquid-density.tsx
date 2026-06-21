@@ -900,7 +900,7 @@ LIQUID METAL BIOELECTRONICS (AETHER interface):
           ))}
         </div>
         <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}cc`, marginTop: 12, textAlign: "center" }}>
-          Shia Millet · AetherLife.co · Cosmic Chaos Corporation™ · 2026
+          Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · 2026
         </div>
       </div>
     </div>

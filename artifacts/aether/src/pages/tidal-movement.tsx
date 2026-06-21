@@ -907,7 +907,7 @@ export default function TidalMovementPage() {
             ΔC_tidal = −(GM_M r²/r_M³)·γ·P₂(cosθ)  ·  Schumann shift ±0.02Hz at spring  ·  C-field precedes water by ~3h
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}cc`, marginTop: 12 }}>
-            Shia Millet · AetherLife.co · Cosmic Chaos Corporation™ · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · 2026
           </div>
         </div>
       </div>

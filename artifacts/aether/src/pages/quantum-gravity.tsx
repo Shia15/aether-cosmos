@@ -513,7 +513,7 @@ The Webbed Leg connection:
             Gμν = 8πG Tμν (‖C‖→1) ←─ C(x,t) ∈ ℍ ─→ iħ∂|Ψ⟩/∂t = Ĥ|Ψ⟩ (‖C‖→0)
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 14 }}>
-            Shia Millet · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
           </div>
         </div>
       </div>

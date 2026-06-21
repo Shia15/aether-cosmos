@@ -913,7 +913,7 @@ AETHER = Webbed Leg × Touch the Ball × 7-Layer Efficient Perception
             storing more. By representing more efficiently.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 14 }}>
-            Shia Millet · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
           </div>
         </div>
       </div>

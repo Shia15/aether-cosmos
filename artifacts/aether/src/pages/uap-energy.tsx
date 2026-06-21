@@ -923,7 +923,7 @@ export default function UAPEnergyPage() {
             m_eff = m₀ · C_local/C_max   ·   a_UAP = F/m_eff   ·   UAP P ~ 1GW → D1 substrate tap
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}cc`, marginTop: 12 }}>
-            Shia Millet · AetherLife.co · Cosmic Chaos Corporation™ · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · 2026
           </div>
         </div>
       </div>

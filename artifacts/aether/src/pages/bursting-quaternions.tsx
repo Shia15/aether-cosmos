@@ -979,7 +979,7 @@ PHASE 4: PHASE RESTABILISATION (LPE decreasing from 0.75 → 0.25)
             ~ → o → n → S  ·  BaTiO₃ phase conjugate  ·  VHF 30–300 MHz  ·  ΔC_burst = A·δ³(x−x_b)·e^(−t/τ)
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}cc`, marginTop: 12 }}>
-            Shia Millet · AetherLife.co · Cosmic Chaos Corporation™ · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · 2026
           </div>
         </div>
       </div>
