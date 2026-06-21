@@ -128,6 +128,7 @@ const NAV_ITEMS = [
   { href: "/cavity-computer", label: "Cavity Computer · Enclosed Loop Recursive Computation · Fluid Substrate · Navier-Stokes · Packet Switching · Space-Time Filament", icon: Atom },
   { href: "/event-horizon", label: "Event Horizon · Black Hole · Decoherence to Coherence · Golden Oscillation · Hawking Radiation · φ-Crystallization · Page Curve", icon: Atom },
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
+  { href: "/transcendent-art", label: "Transcendent Art · Superposition · Supernova · Excitation Pathways · Jablonski Diagram · Nucleosynthesis · Quantum Yield", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
