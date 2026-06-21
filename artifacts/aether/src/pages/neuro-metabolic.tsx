@@ -194,7 +194,7 @@ function BrainRewardCanvas() {
         packets.push({ path: CORTICAL_PATH, t: 0, speed: 0.009, col: TEAL, label: "DA" });
       }
       if (!reward && t % 80 === 0) {
-        packets.push({ path: MESO_PATH, t: 0, speed: 0.006, col: VIO + "80", label: "DA" });
+        packets.push({ path: MESO_PATH, t: 0, speed: 0.006, col: VIO, label: "DA" });
       }
       if (stress && t % 10 === 0) {
         packets.push({ path: HPA_PATH, t: 0, speed: 0.010, col: AMB, label: "CRH" });

@@ -130,6 +130,7 @@ const NAV_ITEMS = [
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
   { href: "/transcendent-art", label: "Transcendent Art · Superposition · Supernova · Excitation Pathways · Jablonski Diagram · Nucleosynthesis · Quantum Yield", icon: Atom },
   { href: "/neuro-metabolic", label: "Neuro-Metabolic · Brain · Brainstem · Reward Circuits · Dopamine · Mitochondria · ROS · Microglia · BBB · HPA · Cytokines", icon: Atom },
+  { href: "/emergence-network", label: "Emergence Network · Flower Filament Fireworks · Gray-Scott · Hebbian Plasticity · Field Computation · Distributed Adaptive", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
