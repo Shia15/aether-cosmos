@@ -434,6 +434,45 @@ function lbBtn(disabled: boolean): React.CSSProperties {
 /* ============================================================ */
 /*                            PAGE                                */
 /* ============================================================ */
+function KnowledgeMapCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const nodes: {x:number;y:number;vx:number;vy:number;col:string;label:string}[] = [
+      {x:W*0.15,y:H*0.4,vx:0.2,vy:0.15,col:"#2ef0d8",label:"Image"},
+      {x:W*0.35,y:H*0.6,vx:-0.15,vy:0.2,col:"#9966ff",label:"Video"},
+      {x:W*0.55,y:H*0.3,vx:0.1,vy:-0.2,col:"#c9a84c",label:"Audio"},
+      {x:W*0.75,y:H*0.55,vx:-0.2,vy:0.1,col:"#ff4477",label:"Doc"},
+      {x:W*0.5,y:H*0.7,vx:0.15,vy:-0.15,col:"#44aaff",label:"Map"},
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach((n,i)=>{
+        n.x+=n.vx; n.y+=n.vy;
+        if(n.x<20||n.x>W-20)n.vx*=-1; if(n.y<20||n.y>H-20)n.vy*=-1;
+        nodes.slice(i+1).forEach(m=>{
+          const d=Math.hypot(n.x-m.x,n.y-m.y);
+          if(d<200){ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y);ctx.strokeStyle=`rgba(255,255,255,${(1-d/200)*0.06})`;ctx.lineWidth=0.5;ctx.stroke();}
+        });
+        const pls=0.8+0.2*Math.sin(t*0.04+i);
+        ctx.beginPath();ctx.arc(n.x,n.y,8*pls,0,Math.PI*2);ctx.fillStyle=n.col+"99";ctx.fill();
+        ctx.fillStyle=n.col; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="center"; ctx.fillText(n.label,n.x,n.y+18); ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("KNOWLEDGE MAP · 3000+ MEDIA · CATEGORY ENGINE · INTELLIGENT TAGGING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function KnowledgeMapPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [filter, setFilter] = useState<Cat | "all">("all");
@@ -575,6 +614,13 @@ export default function KnowledgeMapPage() {
       background: T.bg, minHeight: "100vh", color: T.text,
       fontFamily: T.ui,
     }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>KNOWLEDGE MAP · 3000+ MEDIA · CATEGORY ENGINE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 media-type nodes bouncing + linking — the live AETHER knowledge map simulation.</p></div>
+          <KnowledgeMapCanvas />
+        </div>
+      </div>
       {/* HEADER */}
       <header style={{
         position: "sticky", top: 0, zIndex: 300,

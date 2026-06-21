@@ -79,6 +79,39 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
   { key: "constants", label: "Constants",    sym: "π",  col: C.amber },
 ];
 
+function MathEngineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,5,12,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<360;i+=15){
+        const a=(i/180)*Math.PI;
+        const r1=20+15*Math.sin(t*0.02+a*3);
+        const r2=50+20*Math.cos(t*0.015+a*2);
+        const x1=cx+r1*Math.cos(a),y1=cy+r1*Math.sin(a)*0.55;
+        const x2=cx+r2*Math.cos(a),y2=cy+r2*Math.sin(a)*0.55;
+        const alpha=0.08+0.1*Math.abs(Math.sin(t*0.025+a));
+        ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=`rgba(68,170,255,${alpha})`;ctx.lineWidth=0.6;ctx.stroke();
+        ctx.beginPath();ctx.arc(x2,y2,2+Math.sin(t*0.03+a)*0.5,0,Math.PI*2);ctx.fillStyle=`rgba(153,102,255,${alpha*2})`;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fillStyle="rgba(68,170,255,0.9)";ctx.fill();
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("MATH ENGINE · PRIME INSPECTION · GATE ALGEBRA · MATRIX OPS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MathEnginePage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("inspect");
@@ -561,6 +594,13 @@ export default function MathEnginePage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(5,5,12,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MATH ENGINE · PRIME INSPECTION · GATE ALGEBRA · MATRIX OPS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>360° radial math field — the live AETHER unified math engine simulation.</p></div>
+          <MathEngineCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[10px] tracking-[0.4em] uppercase mb-2" style={{ color: C.muted }}>
           AETHER · UNIFIED MATH ENGINE · APRIL 2026

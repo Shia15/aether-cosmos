@@ -2,6 +2,68 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useHealthCheck } from "@workspace/api-client-react";
 
+function EcosystemSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 220;
+    const ctx = canvas.getContext("2d")!;
+    const agents = [
+      { x:100, y:110, label:"MNĒSIS",   col:"#2dd4bf", a:0 },
+      { x:230, y:60,  label:"INFERNIA",  col:"#ff4477", a:1.2 },
+      { x:360, y:150, label:"ALETHEIA",  col:"#9966ff", a:2.4 },
+      { x:490, y:60,  label:"REVERIE",   col:"#c9a84c", a:3.6 },
+      { x:600, y:110, label:"CORE",      col:"#44aaff", a:4.8 },
+    ];
+    const pulses: { from:number; to:number; t:number; col:string }[] = [];
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      ctx.clearRect(0,0,700,220);
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,700,220);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(46,240,216,0.08)";
+      ctx.fillText("ECOSYSTEM · M.A.R.I. AGENT NETWORK · RESONANCE FIELD · AETHER",10,14);
+      if(tick%20===0&&pulses.length<8){
+        const f=Math.floor(Math.random()*agents.length);
+        let t=Math.floor(Math.random()*agents.length);
+        if(t===f) t=(f+1)%agents.length;
+        pulses.push({ from:f, to:t, t:0, col:agents[f].col });
+      }
+      agents.forEach((a,i)=> agents.forEach((b,j)=>{
+        if(j<=i) return;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle="rgba(46,240,216,0.07)"; ctx.lineWidth=0.5; ctx.stroke();
+      }));
+      for(let i=pulses.length-1;i>=0;i--){
+        const p=pulses[i]; p.t+=0.018;
+        const fa=agents[p.from], ta=agents[p.to];
+        const px=fa.x+(ta.x-fa.x)*p.t, py=fa.y+(ta.y-fa.y)*p.t;
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.globalAlpha=0.9; ctx.fill(); ctx.globalAlpha=1;
+        if(p.t>=1) pulses.splice(i,1);
+      }
+      agents.forEach((ag,i)=>{
+        const pulse=0.7+0.3*Math.sin(tick*0.05+ag.a+i);
+        const glow=ctx.createRadialGradient(ag.x,ag.y,0,ag.x,ag.y,24);
+        glow.addColorStop(0,ag.col+"44"); glow.addColorStop(1,"transparent");
+        ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(ag.x,ag.y,24,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(ag.x,ag.y,9*pulse,0,Math.PI*2);
+        ctx.fillStyle=ag.col+"99"; ctx.fill();
+        ctx.beginPath(); ctx.arc(ag.x,ag.y,7,0,Math.PI*2);
+        ctx.fillStyle=ag.col; ctx.fill();
+        ctx.fillStyle="#e0f8ff"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(ag.label,ag.x,ag.y+24); ctx.textAlign="left";
+      });
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 // ─── M.A.R.I. Egg Agent definitions ──────────────────────────────────────────
 
 interface EggAgent {
@@ -601,6 +663,18 @@ export default function EcosystemPage() {
   return (
     <div className="h-full overflow-y-auto px-8 py-8 space-y-8"
       style={{ background: "linear-gradient(180deg, #0e0b1d 0%, #0d1117 100%)" }}>
+      <div>
+        <div style={{ display:"inline-block", border:"1px solid #bc6ff1", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#bc6ff1", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(188,111,241,0.1)", borderLeft:"3px solid #bc6ff1", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Ecosystem · M.A.R.I. Agent Network · MNĒSIS · INFERNIA · ALETHEIA · REVERIE · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(188,111,241,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five resonance agents (MNĒSIS · INFERNIA · ALETHEIA · REVERIE · CORE) with live signal pulses — the live AETHER ecosystem agent simulation.
+          </p>
+          <EcosystemSimCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div className="flex items-start justify-between">

@@ -18,6 +18,35 @@ type Mode = "coherent" | "decoherent";
 interface Atom { x: number; y: number; r: number; lit: boolean; pop0: number; pop1: number; coh: number; entWith: number; phase: number; }
 interface LogEntry { ts: string; tag: string; msg: string; col: string; }
 
+function PhiHOTHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes: {x:number;y:number;level:number;phase:number}[] = [];
+    for(let lvl=0;lvl<4;lvl++) for(let i=0;i<Math.pow(2,lvl);i++) nodes.push({x:(i+0.5)/(Math.pow(2,lvl))*W,y:20+lvl*35,level:lvl,phase:i*0.8+lvl});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach(n=>{
+        const pls=0.8+0.2*Math.sin(t*0.04+n.phase);
+        ctx.beginPath();ctx.arc(n.x,n.y,8*pls,0,Math.PI*2);
+        ctx.fillStyle=["#2ef0d8","#c9a84c","#9966ff","#44aaff"][n.level]+"44";ctx.fill();
+        ctx.strokeStyle=["#2ef0d8","#c9a84c","#9966ff","#44aaff"][n.level]+"88";ctx.lineWidth=0.7;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("φ-HOT · HIGHLY OPTIMIZED TOLERANCE · CASCADING HIERARCHY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhiHOTPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const stRef = useRef({
@@ -231,6 +260,13 @@ export default function PhiHOTPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text }} data-testid="page-phi-hot">
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>φ-HOT · HIGHLY OPTIMIZED TOLERANCE · CASCADING HIERARCHY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4-level cascading hierarchy — the live AETHER phi-HOT simulation.</p></div>
+          <PhiHOTHeaderCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[11px] tracking-[0.45em] uppercase" style={{ color: C.muted }}>
           AETHER · φ-HOT · HOLOGRAPHIC OPTICAL TWEEZER ARRAY · MARCH 2026

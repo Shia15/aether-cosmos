@@ -255,12 +255,50 @@ const COLOR: Record<string, { text: string; border: string; bg: string; badge: s
   primary: { text: "text-primary",     border: "border-primary/30",     bg: "bg-primary/5",     badge: "bg-primary/10 text-primary border-primary/20" },
 };
 
+function QAetherHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const bits: {x:number;y:number;state:number;phase:number}[]=[];
+    for(let i=0;i<24;i++) bits.push({x:50+i*35,y:cy,state:Math.random()>0.5?1:0,phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      bits.forEach(b=>{
+        const sup=0.5+0.5*Math.sin(t*0.05+b.phase);
+        if(t%80===0) b.state=Math.random()>0.5?1:0;
+        const col=b.state===1?"#2ef0d8":"#9966ff";
+        ctx.beginPath();ctx.arc(b.x,cy-20+b.state*40,10+sup*4,0,Math.PI*2);ctx.fillStyle=col+"33";ctx.fill();ctx.strokeStyle=col+"99";ctx.lineWidth=0.7;ctx.stroke();
+        ctx.fillStyle=col;ctx.font="bold 7px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(b.state===1?"|1⟩":"|0⟩",b.x,cy-20+b.state*40+2.5);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("Q-AETHER · QUANTUM COHERENCE · SUPERPOSITION · ENTANGLEMENT · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QAetherPage() {
   const [openEq, setOpenEq] = useState<string | null>(null);
   const [openLayer, setOpenLayer] = useState<string | null>(null);
 
   return (
     <div className="flex-1 overflow-y-auto px-8 py-8 space-y-16">
+      <div style={{flexShrink:0,marginLeft:-32,marginRight:-32,marginTop:-32}}>
+        <div style={{padding:"8px 32px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 32px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>Q-AETHER · QUANTUM COHERENCE · SUPERPOSITION · ENTANGLEMENT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>24 qubits in superposition — the live AETHER Q-coherence simulation.</p></div>
+          <QAetherHeaderCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div className="space-y-4">

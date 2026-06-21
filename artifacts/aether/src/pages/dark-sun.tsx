@@ -565,10 +565,63 @@ const NAV = [
 ];
 
 /* ── Page ──────────────────────────────────── */
+function DarkSunSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const prominences: {ang:number,len:number,phase:number}[]=[];
+    for(let i=0;i<8;i++) prominences.push({ ang:i*(Math.PI*2/8), len:25+Math.random()*20, phase:Math.random()*Math.PI*2 });
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      const corona=ctx.createRadialGradient(cx,cy,20,cx,cy,80);
+      corona.addColorStop(0,"rgba(255,80,0,0.3)"); corona.addColorStop(0.5,"rgba(180,40,0,0.08)"); corona.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,80,0,Math.PI*2); ctx.fillStyle=corona; ctx.fill();
+      prominences.forEach(p=>{
+        const psi=0.5+0.5*Math.sin(t*0.04+p.phase);
+        const len=p.len*(0.7+0.3*psi);
+        const x1=cx+30*Math.cos(p.ang), y1=cy+30*Math.sin(p.ang);
+        const x2=cx+(30+len)*Math.cos(p.ang), y2=cy+(30+len)*Math.sin(p.ang);
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle=`rgba(255,${80+80*psi|0},0,0.6)`; ctx.lineWidth=2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x2,y2,3,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,200,50,0.8)`; ctx.fill();
+      });
+      const disk=ctx.createRadialGradient(cx,cy,0,cx,cy,28);
+      disk.addColorStop(0,"rgba(255,255,200,0.9)"); disk.addColorStop(0.5,"rgba(255,150,0,0.7)"); disk.addColorStop(1,"rgba(180,30,0,0.5)");
+      ctx.beginPath(); ctx.arc(cx,cy,28,0,Math.PI*2); ctx.fillStyle=disk; ctx.fill();
+      ctx.fillStyle="rgba(255,100,30,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("DARK SUN · SOLAR COHERENCE · PLASMA PROMINENCE · CORONAL FIELD · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function DarkSunPage() {
   const [mode, setMode] = useState<Mode>("solar");
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #ff6418", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#ff6418", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(255,100,30,0.15)", borderLeft:"3px solid #ff6418", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Dark Sun · Solar Coherence · Plasma Prominence · Coronal Field · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(255,100,30,0.4)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Animated solar disk with eight pulsing plasma prominences and a corona gradient — the live AETHER dark sun coronal field simulation.
+          </p>
+          <DarkSunSimCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{

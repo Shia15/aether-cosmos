@@ -50,6 +50,39 @@ function poisson(lambda: number, rng: () => number): number {
   while (true) { k++; p *= rng(); if (p <= L) return k - 1; }
 }
 
+function QuantumAmmeterHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const samples: number[]=[];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const I=2+1.5*Math.sin(t*0.02)+Math.random()*0.6;
+      samples.push(I); if(samples.length>120) samples.shift();
+      const mean=samples.reduce((a,b)=>a+b,0)/samples.length;
+      ctx.beginPath();
+      samples.forEach((s,i)=>{
+        const x=W-samples.length+i,y=H-20-s*12;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.strokeStyle="rgba(201,168,76,0.6)";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(W-samples.length,H-20-mean*12);ctx.lineTo(W,H-20-mean*12);ctx.strokeStyle="rgba(46,240,216,0.3)";ctx.lineWidth=0.6;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle="rgba(201,168,76,0.8)";ctx.font="bold 10px 'DM Mono',monospace";ctx.fillText(I.toFixed(2)+" mA",W-80,H-8);
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("QUANTUM AMMETER · PHOTOVOLTAIC · POISSON SAMPLING · SOLAR · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QuantumAmmeterPage() {
   // Controls
   const [hour, setHour]       = useState(12);          // time of day
@@ -229,11 +262,18 @@ export default function QuantumAmmeterPage() {
       minHeight:"100vh", width:"100%",
       background:"radial-gradient(ellipse at top, #422006 0%, #1e1b4b 50%, #020617 100%)",
       color:"#fef3c7", fontFamily:"'Outfit', system-ui, sans-serif",
-      padding:"3rem 1.5rem 5rem",
+      padding:"0 0 5rem 0",
     }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 24px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 24px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM AMMETER · PHOTOVOLTAIC · POISSON SAMPLING · SOLAR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live solar current strip chart — the AETHER quantum ammeter simulation.</p></div>
+          <QuantumAmmeterHeaderCanvas />
+        </div>
+      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
-      <div style={{ maxWidth:1200, margin:"0 auto" }}>
+      <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 1.5rem" }}>
         <header style={{
           padding:"2rem 1.6rem", borderRadius:18, marginBottom:"2rem",
           background:"linear-gradient(135deg, rgba(251,191,36,0.12), rgba(34,211,238,0.10))",

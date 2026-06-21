@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -297,16 +297,58 @@ function HardProblemGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function NonPhysicalCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const phenomena: {angle:number;speed:number;dist:number;col:string;opacity:number}[] = [];
+    for(let i=0;i<18;i++) phenomena.push({angle:Math.random()*Math.PI*2,speed:(Math.random()-0.5)*0.02,dist:20+Math.random()*80,col:["#9966ff","#2ef0d8","#c9a84c","#ff4477"][Math.floor(Math.random()*4)],opacity:0.3+Math.random()*0.5});
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,2,12,0.3)"; ctx.fillRect(0,0,W,H);
+      const auraR=60+Math.sin(t*0.03)*10;
+      const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,auraR);
+      grad.addColorStop(0,"rgba(153,102,255,0.08)");grad.addColorStop(1,"transparent");
+      ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+      phenomena.forEach(p=>{
+        p.angle+=p.speed;
+        const px=cx+Math.cos(p.angle)*p.dist,py=cy+Math.sin(p.angle)*p.dist*0.5;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.strokeStyle=p.col+"11";ctx.lineWidth=0.4;ctx.stroke();
+        const pls=0.7+0.3*Math.sin(t*0.04+p.angle);
+        ctx.beginPath();ctx.arc(px,py,4*pls,0,Math.PI*2);ctx.fillStyle=p.col+Math.round(p.opacity*255).toString(16).padStart(2,"0");ctx.fill();
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NON-PHYSICAL PHENOMENA · AURA FIELD · SYNCHRONICITY · MORPHIC · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NonPhysicalPhenomenaPage() {
   return (
     <div
       data-testid="page-non-physical-phenomena"
       style={{
         background: B.bg, color: B.ink, minHeight: "100vh",
-        padding: "40px 32px 80px", fontFamily: "Inter, sans-serif",
+        fontFamily: "Inter, sans-serif",
       }}
     >
-      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(4,2,12,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NON-PHYSICAL PHENOMENA · AURA FIELD · SYNCHRONICITY · MORPHIC · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 orbiting aura particles — the live AETHER non-physical phenomena simulation.</p></div>
+          <NonPhysicalCanvas />
+        </div>
+      </div>
+      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 32px 80px" }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 3, marginBottom: 8 }}>

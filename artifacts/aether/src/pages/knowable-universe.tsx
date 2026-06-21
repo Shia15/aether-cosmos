@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -351,15 +351,57 @@ function UniverseKnowsItselfGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function KnowableCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 155;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    const stars: {x:number;y:number;r:number;blink:number}[] = [];
+    for(let i=0;i<80;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.3,blink:Math.random()*Math.PI*2});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      stars.forEach(s=>{
+        const alpha=0.4+0.6*Math.abs(Math.sin(t*0.02+s.blink));
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${alpha})`;ctx.fill();
+      });
+      for(let ring=1;ring<=5;ring++){
+        const r=ring*16;
+        const alpha=0.05+0.04*Math.sin(t*0.015+ring);
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(68,170,255,${alpha})`;ctx.lineWidth=0.8;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.fillStyle="rgba(68,170,255,0.9)";ctx.fill();
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("KNOWABLE UNIVERSE · COSMIC HORIZON · OBSERVABLE SPHERE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function KnowableUniversePage() {
   return (
     <div
       data-testid="page-knowable-universe"
       style={{
+
         background: B.bg, color: B.ink, minHeight: "100vh",
         padding: "40px 32px 80px", fontFamily: "Inter, sans-serif",
       }}
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>KNOWABLE UNIVERSE · COSMIC HORIZON · OBSERVABLE SPHERE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>80 blinking stars + 5 observable-horizon rings — the live AETHER universe simulation.</p></div>
+          <KnowableCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>

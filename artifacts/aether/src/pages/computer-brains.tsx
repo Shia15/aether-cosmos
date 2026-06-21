@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 
 import chipDesign  from "@assets/ChatGPT_Image_Dec_8,_2025,_10_29_41_AM_1778090307695.png";
@@ -479,6 +479,58 @@ function EndPage() {
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
+function ComputerBrainsCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const nodes=[
+      { label:"CPU", x:W*0.2, y:H*0.5, col:"#2ef0d8" },
+      { label:"RAM", x:W*0.38, y:H*0.3, col:"#9966ff" },
+      { label:"GPU", x:W*0.38, y:H*0.7, col:"#c9a84c" },
+      { label:"CACHE", x:W*0.56, y:H*0.4, col:"#44aaff" },
+      { label:"BUS", x:W*0.56, y:H*0.65, col:"#44cc77" },
+      { label:"OUTPUT", x:W*0.75, y:H*0.5, col:"#ff4477" },
+    ];
+    const edges=[[0,1],[0,2],[1,3],[2,4],[3,5],[4,5]];
+    const packets: {from:number,to:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,13,31,0.2)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      if(tick%15===0&&packets.length<12) packets.push({ from:Math.floor(Math.random()*edges.length), to:0, t:0 });
+      edges.forEach(([a,b])=>{
+        ctx.beginPath(); ctx.moveTo(nodes[a].x,nodes[a].y); ctx.lineTo(nodes[b].x,nodes[b].y);
+        ctx.strokeStyle="rgba(46,240,216,0.08)"; ctx.lineWidth=1; ctx.stroke();
+      });
+      for(let i=packets.length-1;i>=0;i--){
+        const p=packets[i]; p.t+=0.03;
+        const [ea,eb]=edges[p.from];
+        const x=nodes[ea].x+(nodes[eb].x-nodes[ea].x)*p.t;
+        const y=nodes[ea].y+(nodes[eb].y-nodes[ea].y)*p.t;
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=nodes[ea].col; ctx.shadowColor=nodes[ea].col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(p.t>=1) packets.splice(i,1);
+      }
+      nodes.forEach(n=>{
+        ctx.beginPath(); ctx.arc(n.x,n.y,12,0,Math.PI*2);
+        ctx.fillStyle=n.col; ctx.shadowColor=n.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+22);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COMPUTER BRAINS · CPU · RAM · GPU · CACHE · BUS · OUTPUT · AETHER CHIP STORY",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function ComputerBrainsPage() {
   const [page, setPage] = useState(0);
   const [fading, setFading] = useState(false);
@@ -515,10 +567,23 @@ export default function ComputerBrainsPage() {
       minHeight: "100vh", width: "100%",
       background: "#020d1f",
       display: "flex", flexDirection: "column",
+
       alignItems: "center", justifyContent: "flex-start",
       padding: "16px 12px 32px",
       fontFamily: "'Nunito', 'Quicksand', cursive",
     }}>
+      <div style={{ width:"100%", marginBottom:20 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Computer Brains · CPU · RAM · GPU · Cache · Bus · Output · AETHER Chip Story
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six chip components (CPU/teal · RAM/violet · GPU/gold · Cache/blue · Bus/green · Output/rose) with live data packets flowing through the circuit — the AETHER computer brain simulation.
+          </p>
+          <ComputerBrainsCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes chip-float-0 { 0%,100%{transform:translate(-50%,-50%) translateY(0);} 50%{transform:translate(-50%,-50%) translateY(-14px);} }
         @keyframes chip-float-1 { 0%,100%{transform:translate(-50%,-50%) translateY(-6px);} 50%{transform:translate(-50%,-50%) translateY(10px);} }

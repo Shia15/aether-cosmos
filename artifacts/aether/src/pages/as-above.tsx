@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface TooltipData {
   date: string; title: string; body: string; tags: string[];
@@ -101,6 +101,58 @@ const CENTER_EVENTS: ColEvent[] = [
   },
 ];
 
+function AsAboveCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const eras = [
+      { label:"YOUNGER\nDRYAS", col:"#60a5fa", x:W*0.10, y:H*0.5 },
+      { label:"BRONZE AGE\nCOLLAPSE", col:"#f59e0b", x:W*0.24, y:H*0.5 },
+      { label:"COSMIC\nIMPACT", col:"#ef4444", x:W*0.38, y:H*0.5 },
+      { label:"PLASMA\nEVENT", col:"#a78bfa", x:W*0.52, y:H*0.5 },
+      { label:"SOLAR\nMICRONOVA", col:"#fb923c", x:W*0.66, y:H*0.5 },
+      { label:"GEOLOGICAL\nRECORD", col:"#34d399", x:W*0.80, y:H*0.5 },
+      { label:"COHERENT\nSYNTHESIS", col:"#2ef0d8", x:W*0.93, y:H*0.5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,5,15,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<eras.length-1;i++) {
+        const a=eras[i],b=eras[i+1];
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+        const pkt=(t*0.012+i*0.4)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+      }
+      eras.forEach((e,i)=>{
+        const pulse=1+0.08*Math.sin(t*0.035+i*0.9);
+        const g=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,16*pulse);
+        g.addColorStop(0,e.col+"cc"); g.addColorStop(0.5,e.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(e.x,e.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=e.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=e.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=e.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        e.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,e.x,e.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(96,165,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AS ABOVE · COHERENT CATASTROPHISM · HISTORICAL TIMELINE SYNTHESIS",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AsAbovePage() {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,6 +164,26 @@ export default function AsAbovePage() {
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-6 max-w-6xl mx-auto">
+      <div>
+        <div style={{ display:"inline-block", background:"rgba(96,165,250,0.07)", border:"1px solid rgba(96,165,250,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#60a5fa", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(5,5,15,0.88)", border:"1px solid rgba(96,165,250,0.1)",
+          borderLeft:"3px solid #60a5fa", borderRadius:10, padding:20, marginBottom:8 }}>
+          <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:18, color:"#e0eeff", margin:"0 0 6px" }}>
+            As Above · Coherent Catastrophism · Historical Timeline Synthesis
+          </h2>
+          <p style={{ fontFamily:"monospace", fontSize:12, color:"rgba(150,180,220,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Seven historical catastrophe nodes (Younger Dryas/blue · Bronze Age Collapse/amber · Cosmic Impact/red
+            · Plasma Event/violet · Solar Micronova/orange · Geological Record/green · Coherent Synthesis/teal)
+            with timeline photon packets streaming sequentially — the coherent catastrophism timeline synthesis.
+          </p>
+          <AsAboveCanvas />
+        </div>
+      </div>
+
       {/* Header */}
       <div className="space-y-2">
         <div className="font-mono text-xs text-amber-400/50 uppercase tracking-[0.25em]">AETHER · Coherent Catastrophism</div>

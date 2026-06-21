@@ -82,9 +82,54 @@ const HYDROGEN = [
   { c: B.blue,   k: "Hβ · 486 nm",       v: "n = 4 → n = 2 · cyan-blue Balmer line · second-strongest visible hydrogen feature" },
 ];
 
+import { useEffect, useRef } from "react";
+
+function PianoArithmeticHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const keys=24;
+    const kw=W/keys;
+    const freqs=[1,9/8,5/4,4/3,3/2,5/3,15/8,2].map(f=>Math.round(f*100)/100);
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let k=0;k<keys;k++){
+        const oct=Math.floor(k/8),note=k%8;
+        const freq=freqs[note]*Math.pow(2,oct);
+        const amp=40+20*Math.sin(t*0.04*freq);
+        const isBlack=[1,2,4,5,6].includes(note%7);
+        const baseCol=isBlack?"rgba(153,102,255,":"rgba(46,240,216,";
+        const h=amp+30;
+        ctx.fillStyle=baseCol+"0.3)";
+        ctx.fillRect(k*kw+1,H-h,kw-2,h);
+        ctx.strokeStyle=baseCol+"0.6)";ctx.lineWidth=0.5;
+        ctx.strokeRect(k*kw+1,H-h,kw-2,h);
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PIANO ARITHMETIC · HARMONIC RATIOS · JUST INTONATION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PianoArithmeticPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="piano-arithmetic-page">
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-16,marginRight:-16}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PIANO ARITHMETIC · HARMONIC RATIOS · JUST INTONATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>24 just-intonation keys animating — the live AETHER piano arithmetic simulation.</p></div>
+          <PianoArithmeticHeaderCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

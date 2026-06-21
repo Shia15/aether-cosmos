@@ -385,6 +385,42 @@ const NAV = [
 ];
 
 /* ── Page ──────────────────────────────────────────── */
+function SolarArchitectureHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2+10;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const sunR=22+3*Math.sin(t*0.03);
+      const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,sunR);
+      grd.addColorStop(0,"rgba(255,220,80,0.9)");grd.addColorStop(1,"rgba(255,140,20,0)");
+      ctx.beginPath();ctx.arc(cx,cy,sunR,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+      for(let i=0;i<8;i++){
+        const angle=i/8*Math.PI*2+t*0.01;
+        const r1=sunR+4,r2=sunR+12+6*Math.sin(t*0.05+i);
+        ctx.beginPath();ctx.moveTo(cx+Math.cos(angle)*r1,cy+Math.sin(angle)*r1);ctx.lineTo(cx+Math.cos(angle)*r2,cy+Math.sin(angle)*r2);ctx.strokeStyle="rgba(255,200,50,0.5)";ctx.lineWidth=1.5;ctx.stroke();
+      }
+      for(let p=1;p<=5;p++){
+        const r=40+p*14,speed=0.008/p,angle=t*speed;
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle="rgba(255,160,30,0.06)";ctx.lineWidth=0.4;ctx.stroke();
+        ctx.beginPath();ctx.arc(cx+Math.cos(angle)*r,cy+Math.sin(angle)*r*0.5,3,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.7)";ctx.fill();
+      }
+      ctx.fillStyle="rgba(255,180,40,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SOLAR ARCHITECTURE · PHOTON FLUX · HELION DESIGN · LIGHT HARVESTING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SolarArchitecturePage() {
   const [lat,    setLat]    = useState(35);
   const [season, setSeason] = useState<"summer" | "winter" | "equinox">("equinox");
@@ -392,7 +428,13 @@ export default function SolarArchitecturePage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SOLAR ARCHITECTURE · PHOTON FLUX · HELION DESIGN · LIGHT HARVESTING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Pulsing sun with 5 orbital bodies — the live AETHER solar architecture simulation.</p></div>
+          <SolarArchitectureHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{
         padding: "68px 32px 44px",

@@ -180,6 +180,47 @@ function Img({ src, alt, maxW = 640, cap }: { src: string; alt: string; maxW?: n
 /* ══════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════ */
+function CoreResonanceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for(let i=0;i<5;i++){
+        const r=20+i*18;
+        const psi=0.5+0.5*Math.sin(t*0.035-i*0.6);
+        const hue=180+i*30;
+        const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        g.addColorStop(0,`hsla(${hue},80%,60%,${psi*0.3})`); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${hue},80%,60%,0.18)`; ctx.lineWidth=1; ctx.stroke();
+      }
+      const N=7;
+      for(let i=0;i<N;i++){
+        const ang=i*(Math.PI*2/N)+t*0.012;
+        const r=70; const rx=cx+r*Math.cos(ang), ry=cy+r*Math.sin(ang);
+        const psi=0.5+0.5*Math.sin(t*0.05+i*0.9);
+        ctx.beginPath(); ctx.arc(rx,ry,5+3*psi,0,Math.PI*2);
+        ctx.fillStyle=`hsl(${200+i*25},80%,60%)`; ctx.shadowColor=`hsl(${200+i*25},80%,60%)`; ctx.shadowBlur=10*psi; ctx.fill(); ctx.shadowBlur=0;
+      }
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CORE RESONANCE · COHERENCE FIELD · STANDING WAVE · ORBITAL HARMONICS · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CoreResonancePage() {
   const [orbState, setOrbState] = useState<OrbState>("core");
   const [nurture, setNurture]   = useState(0);
@@ -192,6 +233,18 @@ export default function CoreResonancePage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: TEXT }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Core Resonance · Coherence Field · Standing Wave · Orbital Harmonics · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five nested coherence rings with seven orbital harmonic nodes rotating in formation — the live AETHER core resonance standing wave simulation.
+          </p>
+          <CoreResonanceCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{
         textAlign:"center", padding:"60px 24px 40px",

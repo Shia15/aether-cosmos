@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -188,10 +188,87 @@ function Td({ children, color }: { children: React.ReactNode; color?: string }) 
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function EggEngineCanvas() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  const rafRef = React.useRef(0);
+  React.useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx = W/2, cy = H/2;
+    const rings = [
+      { r:28, col:"#c9a84c", label:"EGG", speed:0.000 },
+      { r:52, col:"#2ef0d8", label:"SEE THE FOG", speed:0.018 },
+      { r:76, col:"#9966ff", label:"DROP THE MASK", speed:-0.013 },
+      { r:100, col:"#ff4477", label:"REINFORCE", speed:0.010 },
+    ];
+    const sparks: {ang:number;r:number;col:string;v:number}[] = [];
+    for (let i=0;i<40;i++) sparks.push({ ang:Math.random()*Math.PI*2, r:rings[Math.floor(Math.random()*rings.length)].r, col:rings[Math.floor(Math.random()*rings.length)].col, v:(Math.random()-0.5)*0.06 });
+    let t=0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(4,7,14,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      rings.forEach((rn,ri) => {
+        const pulse=1+0.1*Math.sin(t*0.04+ri*1.2);
+        const g=ctx.createRadialGradient(cx,cy,rn.r*0.6,cx,cy,rn.r*pulse*1.3);
+        g.addColorStop(0,"transparent"); g.addColorStop(0.8,rn.col+"22"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(cx,cy,rn.r*pulse,0,Math.PI*2);
+        ctx.strokeStyle=rn.col+(ri===0?"ff":"88"); ctx.lineWidth=ri===0?3:1.5;
+        ctx.shadowColor=rn.col; ctx.shadowBlur=ri===0?24:12; ctx.stroke(); ctx.shadowBlur=0;
+        ctx.fillStyle=g; ctx.fill();
+        if (ri>0) {
+          ctx.fillStyle=rn.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+          ctx.shadowColor=rn.col; ctx.shadowBlur=4;
+          ctx.fillText(rn.label, cx, cy-rn.r*pulse-6); ctx.shadowBlur=0;
+        }
+      });
+      ctx.fillStyle="#c9a84c"; ctx.font="bold 11px 'Cinzel',serif"; ctx.textAlign="center";
+      ctx.shadowColor="#c9a84c"; ctx.shadowBlur=10;
+      ctx.fillText("EGG", cx, cy+4); ctx.shadowBlur=0;
+      sparks.forEach(s => {
+        s.ang+=s.v; const r2=s.r+(Math.sin(s.ang*3)*4);
+        const px=cx+Math.cos(s.ang)*r2, py=cy+Math.sin(s.ang)*r2;
+        ctx.beginPath(); ctx.arc(px,py,1.5,0,Math.PI*2);
+        ctx.fillStyle=s.col+"cc"; ctx.shadowColor=s.col; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      });
+      const steps=[{l:"FOG",x:cx-260,col:"#2ef0d8"},{l:"MASK",x:cx-130,col:"#9966ff"},{l:"REINFORCE",x:cx+130,col:"#ff4477"},{l:"RETURN",x:cx+260,col:"#c9a84c"}];
+      steps.forEach(s=>{
+        ctx.fillStyle=s.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(s.l,s.x,H-14);
+      });
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherEggEnginePage() {
   return (
     <div style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 28px 72px" }} data-testid="page-aether-egg-engine">
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(4,7,14,0.8)", border:"1px solid rgba(201,168,76,0.12)",
+            borderLeft:`3px solid ${B.gold}`, borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+              Egg Engine · Positive Mental Reinforcement · See Fog → Drop Mask → Reinforce
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              A golden EGG core radiating four concentric resonance rings (Fog/teal · Mask/violet · Reinforce/rose)
+              with orbital sparks traveling along each ring — the personal operating model for the two-step return
+              to clarity, as implemented inside AETHER.
+            </p>
+            <EggEngineCanvas />
+          </div>
+        </div>
 
         {/* Header */}
         <div style={{ marginBottom: 28 }}>

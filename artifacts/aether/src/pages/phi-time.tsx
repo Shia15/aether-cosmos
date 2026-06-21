@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgClock        from "@assets/ChatGPT_Image_Apr_26,_2026,_02_23_24_PM_1777227807101.png";
@@ -98,9 +99,97 @@ const USES = [
   { c: B.violet, l: "COHERENCE FIELD · REGULATION" },
 ];
 
+function PhiTimeCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 300;
+  const PHI = 1.6180339887;
+  const GOLDEN_ANGLE = Math.PI * 2 * (1 - 1 / PHI);
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#070418"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cx = W / 2, cy = H / 2;
+      const N = 200 + Math.floor((t * 0.3) % 300);
+      const scale = 5.8;
+      for (let i = 0; i < N; i++) {
+        const angle = i * GOLDEN_ANGLE;
+        const r = Math.sqrt(i) * scale;
+        const x = cx + r * Math.cos(angle + t * 0.01);
+        const y = cy + r * Math.sin(angle + t * 0.01);
+        const frac = i / N;
+        const pulse = 0.4 + 0.5 * Math.sin(i * 0.12 + t * 0.05);
+        const sz = 2 + frac * 2.5;
+        const hue = (i * 0.8 + t * 0.5) % 360;
+        const r2 = Math.round(Math.sin(hue * Math.PI / 180 + 0) * 40 + 195);
+        const g2 = Math.round(Math.sin(hue * Math.PI / 180 + 2.1) * 50 + 155);
+        const b2 = Math.round(Math.sin(hue * Math.PI / 180 + 4.2) * 60 + 210);
+        ctx.beginPath();
+        ctx.arc(x, y, sz, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r2},${g2},${b2},${pulse})`;
+        ctx.fill();
+      }
+      ctx.fillStyle = "#e9b94e";
+      ctx.font = "bold 11px 'Space Mono', monospace";
+      ctx.fillText(`φ = ${PHI.toFixed(10)}`, cx - 68, cy + H / 2 - 20);
+      ctx.fillStyle = "rgba(248,238,212,0.35)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("φ-TIME · GOLDEN ANGLE PHYLLOTAXIS · SUNFLOWER CLOCK", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function PhiTimeHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const PHI=1.6180339887;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<8;i++){
+        const interval=Math.pow(PHI,i)*3;
+        const x=(t*0.5)%(interval*W/100);
+        const phase=(t*0.5/interval)%1;
+        const bx=(phase*W)%W;
+        const col=["#2ef0d8","#c9a84c","#9966ff","#44aaff","#44cc77","#ff4477","#c084fc","#f472b6"][i];
+        ctx.beginPath();ctx.arc(bx,20+i*15,4,0,Math.PI*2);ctx.fillStyle=col+"cc";ctx.fill();
+        ctx.beginPath();ctx.moveTo(bx-20,20+i*15);ctx.lineTo(bx,20+i*15);ctx.strokeStyle=col+"44";ctx.lineWidth=0.6;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("φ-TIME · GOLDEN RATIO TIME INTERVALS · TEMPORAL COHERENCE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhiTimePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="phi-time-page">
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-16,marginRight:-16}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>φ-TIME · GOLDEN RATIO TIME INTERVALS · TEMPORAL COHERENCE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 phi-interval time streams — the live AETHER phi-time simulation.</p></div>
+          <PhiTimeHeaderCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}
@@ -124,8 +213,27 @@ export default function PhiTimePage() {
             <Chip c={B.amber}  l="222.5° = 2π/φ" />
             <Chip c={B.cyan}   l="t_n = T₀·φⁿ" />
             <Chip c={B.violet} l="5 domains · 1 bus" />
-            <Chip c={B.green}  l="incommensurable by design" />
           </div>
+          <div style={{ marginTop:24 }}>
+            <div style={{ display:"inline-block", background:"rgba(233,185,78,0.1)", border:"1px solid rgba(233,185,78,0.3)",
+              borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+              color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+              Live Simulation
+            </div>
+            <div style={{ background:B.panel, border:`1px solid rgba(220,180,90,0.2)`, borderLeft:`3px solid ${B.gold}`,
+              borderRadius:10, padding:20 }}>
+              <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+                φ-Time · Golden Angle Phyllotaxis Sunflower Clock
+              </h2>
+              <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.muted, margin:"0 0 14px", lineHeight:1.65 }}>
+                Each dot is placed at the golden angle (137.5°) from the previous, growing outward at √i.
+                This creates a sunflower phyllotaxis — the same pattern in pine cones, seeds, and leaf arrangements.
+                φ-Time proposes that scheduling events at golden-ratio intervals minimizes resonant noise.
+              </p>
+              <PhiTimeCanvas />
+            </div>
+          </div>
+          <Chip c={B.green}  l="incommensurable by design" />
 
           <div className="mt-6 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>
             <div className="text-[10px] uppercase tracking-[0.32em] mb-2"

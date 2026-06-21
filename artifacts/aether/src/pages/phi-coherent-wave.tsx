@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgGrid  from "@assets/ChatGPT_Image_Apr_26,_2026,_02_29_23_PM_1777228166552.png";
@@ -97,9 +98,117 @@ const ACROSTIC = [
   { c: B.rose,   k: "R · Reflect",    v: "The mirror back into the doctrine — reading the system on itself" },
 ];
 
+function PhiWaveCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 220;
+  const PHI = 1.6180339887;
+  const DOMAINS = [
+    { color:"#e9b94e", label:"φ" }, { color:"#f5b942", label:"λ" },
+    { color:"#7be4ea", label:"ψ" }, { color:"#7be59f", label:"H" },
+    { color:"#b48cff", label:"E" }, { color:"#f59ec3", label:"R" },
+    { color:"#7cc8ff", label:"Γ" }, { color:"#ff7a6a", label:"Ω" },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#080513"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const midY = H / 2;
+      const domainW = W / DOMAINS.length;
+      DOMAINS.forEach((d, i) => {
+        const x0 = i * domainW;
+        const grad = ctx.createLinearGradient(x0, 0, x0 + domainW, 0);
+        grad.addColorStop(0, d.color + "22");
+        grad.addColorStop(0.5, d.color + "11");
+        grad.addColorStop(1, d.color + "22");
+        ctx.fillStyle = grad;
+        ctx.fillRect(x0, 0, domainW, H);
+        ctx.fillStyle = d.color + "55";
+        ctx.font = "bold 10px 'Space Mono', monospace";
+        ctx.fillText(d.label, x0 + domainW / 2 - 4, 18);
+      });
+      ctx.beginPath();
+      for (let x = 0; x <= W; x++) {
+        const phase = (x / W) * PHI * Math.PI * 8 - t * 0.015;
+        const env = 0.85 + 0.15 * Math.sin((x / W) * Math.PI * 2 * PHI - t * 0.008);
+        const y = midY + Math.sin(phase) * 70 * env;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "#e9b94e";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      for (let x = 0; x <= W; x++) {
+        const phase2 = (x / W) * PHI * PHI * Math.PI * 8 - t * 0.022;
+        const y = midY + Math.sin(phase2) * 28;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "#b48cff55";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(248,238,212,0.06)";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+      ctx.fillStyle = "rgba(248,238,212,0.4)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("φ-COHERENT STANDING WAVE · EIGHT SUBSTRATE DOMAINS", 10, H - 10);
+      tRef.current += 0.6;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function PhiCoherentWaveHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const PHI=1.6180339887;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const waves=5;
+      for(let w=0;w<waves;w++){
+        ctx.beginPath();
+        for(let x=0;x<W;x++){
+          const freq=0.01*Math.pow(PHI,w);
+          const amp=(H*0.15)/Math.pow(PHI,w);
+          const y=H*0.5+Math.sin(x*freq+t*0.04+w*PHI)*amp;
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=`hsla(${w*50+160},70%,60%,${0.4-w*0.06})`;ctx.lineWidth=1;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("φ-COHERENT WAVE · PHI-SCALED FREQUENCIES · HARMONIC STACK · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhiCoherentWavePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="phi-coherent-wave-page">
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-16,marginRight:-16}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>φ-COHERENT WAVE · PHI-SCALED FREQUENCIES · HARMONIC STACK · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 phi-ratio harmonic waves — the live AETHER phi coherent wave simulation.</p></div>
+          <PhiCoherentWaveHeaderCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">
@@ -124,6 +233,25 @@ export default function PhiCoherentWavePage() {
             <Chip c={B.cyan}   l="EIGHT SUBSTRATES" />
             <Chip c={B.violet} l="EVENT INDEX → PHASE" />
             <Chip c={B.green}  l="UNIFORM, NON-OVERLAPPING SPREAD" />
+          </div>
+          <div style={{ marginTop:24 }}>
+            <div style={{ display:"inline-block", background:"rgba(233,185,78,0.1)", border:"1px solid rgba(233,185,78,0.3)",
+              borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+              color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+              Live Simulation
+            </div>
+            <div style={{ background:B.panel, border:`1px solid rgba(220,180,90,0.2)`, borderLeft:`3px solid ${B.gold}`,
+              borderRadius:10, padding:20 }}>
+              <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+                φ-Coherent Standing Wave · Eight Substrate Domains
+              </h2>
+              <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.muted, margin:"0 0 14px", lineHeight:1.65 }}>
+                Two sine waves — primary (gold, frequency φ×8π) and overtone (violet, frequency φ²×8π) — scroll
+                at their respective golden-ratio frequencies. The canvas is divided into 8 colored substrate domains,
+                each tinted by its own AETHER symbol.
+              </p>
+              <PhiWaveCanvas />
+            </div>
           </div>
 
           <div className="mt-6 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>

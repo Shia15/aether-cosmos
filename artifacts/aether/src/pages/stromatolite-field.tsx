@@ -388,6 +388,38 @@ function EQ({ children }: { children: string }) {
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function StromatoliteFieldHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const mats: {x:number;w:number;maxH:number;phase:number}[]=[];
+    for(let i=0;i<18;i++) mats.push({x:10+i*48,w:32,maxH:50+Math.random()*50,phase:i*0.35});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle="rgba(46,240,216,0.04)"; ctx.fillRect(0,H-20,W,20);
+      mats.forEach(m=>{
+        const h=m.maxH*(0.6+0.4*Math.sin(t*0.02+m.phase));
+        const y=H-20-h;
+        const grd=ctx.createLinearGradient(0,y,0,H-20);
+        grd.addColorStop(0,"rgba(46,240,216,0.02)");grd.addColorStop(1,"rgba(68,204,119,0.15)");
+        ctx.fillStyle=grd;ctx.fillRect(m.x,y,m.w,h);
+        ctx.strokeStyle="rgba(46,240,216,0.2)";ctx.lineWidth=0.5;ctx.strokeRect(m.x,y,m.w,h);
+      });
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("STROMATOLITE FIELD · MICROBIAL MAT · PHOTOSYNTHETIC · ANCIENT REEF · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function StromatoliteFieldPage() {
   const [params, setParams] = useState<SimParams>({
     lightDecay: 0.015,
@@ -408,6 +440,13 @@ export default function StromatoliteFieldPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>STROMATOLITE FIELD · MICROBIAL MAT · PHOTOSYNTHETIC · ANCIENT REEF · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 breathing microbial mats — the live AETHER stromatolite field simulation.</p></div>
+          <StromatoliteFieldHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 70% 50% at 50% 0%, ${GREEN}08, transparent)` }}>

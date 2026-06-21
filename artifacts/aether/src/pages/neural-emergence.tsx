@@ -32,6 +32,37 @@ type Pulse = {
 
 type NodeArr = { act: number; phase: number; fired: boolean }[];
 
+function NeuralEmergenceHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const waves: {x:number;amp:number;freq:number;speed:number;col:string}[] = [];
+    for(let i=0;i<5;i++) waves.push({x:0,amp:30+i*8,freq:0.006+i*0.003,speed:0.015+i*0.008,col:["#2ef0d8","#44aaff","#9966ff","#c9a84c","#ff4477"][i]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,16,0.3)"; ctx.fillRect(0,0,W,H);
+      waves.forEach((w,i)=>{
+        ctx.beginPath();
+        for(let px=0;px<W;px++){
+          const y=H*0.5+Math.sin(px*w.freq+t*w.speed)*w.amp*Math.sin(t*0.01+i);
+          px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+        }
+        ctx.strokeStyle=w.col+"66";ctx.lineWidth=1;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NEURAL EMERGENCE · SIGNAL WAVES · MOVEMENT PATTERNS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NeuralEmergencePage() {
   const netCanvasRef = useRef<HTMLCanvasElement>(null);
   const bodyCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -388,6 +419,13 @@ export default function NeuralEmergencePage() {
 
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-8 max-w-7xl mx-auto">
+      <div style={{flexShrink:0,marginBottom:8}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,16,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:16}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEURAL EMERGENCE · SIGNAL WAVES · MOVEMENT PATTERNS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 modulated wave bands — the live AETHER neural emergence simulation.</p></div>
+          <NeuralEmergenceHeaderCanvas />
+        </div>
+      </div>
       <div className="space-y-2">
         <div className="font-mono text-xs text-cyan-400/50 uppercase tracking-[0.25em]">AETHER · Neural Emergence Layer</div>
         <h1 className="font-serif text-4xl text-foreground">Emergent Movement</h1>

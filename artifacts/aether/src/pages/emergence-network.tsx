@@ -2,6 +2,58 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
+function EmergenceNetCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 220;
+    const ctx = canvas.getContext("2d")!;
+    const N = 18;
+    const nodes = Array.from({ length:N }, (_, i) => ({
+      x: 60 + Math.random()*580, y: 30 + Math.random()*160,
+      vx: (Math.random()-.5)*0.3, vy: (Math.random()-.5)*0.3,
+      col: ["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff"][i%5],
+      phase: Math.random()*Math.PI*2,
+    }));
+    const edges: [number,number][] = [];
+    for(let i=0;i<N;i++) for(let j=i+1;j<N;j++) {
+      const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+      if(Math.sqrt(dx*dx+dy*dy)<160) edges.push([i,j]);
+    }
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      ctx.clearRect(0,0,700,220);
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,700,220);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(46,240,216,0.08)";
+      ctx.fillText("EMERGENCE NETWORK · SELF-ORGANIZING INTELLIGENCE · AETHER",10,14);
+      nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy;
+        if(n.x<30||n.x>670) n.vx*=-1;
+        if(n.y<20||n.y>200) n.vy*=-1;
+      });
+      edges.forEach(([a,b])=>{
+        const na=nodes[a], nb=nodes[b];
+        const dx=na.x-nb.x, dy=na.y-nb.y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d>180) return;
+        const alpha=(1-d/180)*0.25;
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=`rgba(46,240,216,${alpha})`; ctx.lineWidth=0.8; ctx.stroke();
+      });
+      nodes.forEach((n,i)=>{
+        const pulse=0.6+0.4*Math.sin(tick*0.04+n.phase+i*0.4);
+        ctx.beginPath(); ctx.arc(n.x,n.y,5*pulse,0,Math.PI*2);
+        ctx.fillStyle=n.col; ctx.globalAlpha=0.85; ctx.fill(); ctx.globalAlpha=1;
+      });
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 /* ── Palette (AETHER dark) ─────────────────── */
 const BG   = "#020408";
 const TEAL = "#2ef0d8";
@@ -623,6 +675,18 @@ export default function EmergenceNetworkPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Emergence Network · Self-Organizing Intelligence · Dynamic Topology · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            18 drifting nodes forming emergent connections as they approach each other — the live AETHER emergence network simulation.
+          </p>
+          <EmergenceNetCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"56px 24px 32px",
         background:`radial-gradient(ellipse 80% 55% at 50% 0%,

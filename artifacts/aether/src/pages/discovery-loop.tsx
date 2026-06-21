@@ -33,6 +33,59 @@ interface Meta   { x: number; y: number; vx: number; vy: number; life: number; }
 
 interface LogEvent { ts: string; phase: Phase; msg: string; }
 
+function DiscoveryLoopCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const stages=[
+      { label:"OBSERVE", col:"#2ef0d8", ang:-Math.PI/2 },
+      { label:"HYPOTHESIZE", col:"#9966ff", ang:-Math.PI/2+Math.PI*2/5 },
+      { label:"EXPERIMENT", col:"#c9a84c", ang:-Math.PI/2+Math.PI*4/5 },
+      { label:"ANALYZE", col:"#44aaff", ang:-Math.PI/2+Math.PI*6/5 },
+      { label:"SYNTHESIZE", col:"#44cc77", ang:-Math.PI/2+Math.PI*8/5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      const R=60;
+      stages.forEach((s,i)=>{
+        const nx=cx+R*Math.cos(s.ang), ny=cy+R*Math.sin(s.ang);
+        const next=stages[(i+1)%stages.length];
+        const nx2=cx+R*Math.cos(next.ang), ny2=cy+R*Math.sin(next.ang);
+        ctx.beginPath(); ctx.moveTo(nx,ny); ctx.lineTo(nx2,ny2);
+        ctx.strokeStyle=s.col+"44"; ctx.lineWidth=1; ctx.stroke();
+      });
+      const progress=(t%120)/120;
+      const stageIdx=Math.floor(progress*5);
+      const stageProg=(progress*5)%1;
+      const from=stages[stageIdx%5], to=stages[(stageIdx+1)%5];
+      const bx=cx+R*Math.cos(from.ang)+(cx+R*Math.cos(to.ang)-cx-R*Math.cos(from.ang))*stageProg;
+      const by=cy+R*Math.sin(from.ang)+(cy+R*Math.sin(to.ang)-cy-R*Math.sin(from.ang))*stageProg;
+      ctx.beginPath(); ctx.arc(bx,by,7,0,Math.PI*2);
+      ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+      stages.forEach(s=>{
+        const nx=cx+R*Math.cos(s.ang), ny=cy+R*Math.sin(s.ang);
+        ctx.beginPath(); ctx.arc(nx,ny,10,0,Math.PI*2);
+        ctx.fillStyle=s.col; ctx.shadowColor=s.col; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=s.col; ctx.font="bold 6px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(s.label,nx,ny+22);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("DISCOVERY LOOP · OBSERVE · HYPOTHESIZE · EXPERIMENT · ANALYZE · SYNTHESIZE · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function DiscoveryLoopPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef({
@@ -367,6 +420,18 @@ export default function DiscoveryLoopPage() {
   return (
     <div data-testid="discovery-root" className="min-h-screen p-6"
          style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Discovery Loop · Observe · Hypothesize · Experiment · Analyze · Synthesize · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five-stage scientific loop with a live token tracing the cycle — the live AETHER discovery loop simulation.
+          </p>
+          <DiscoveryLoopCanvas />
+        </div>
+      </div>
 
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border }}>
         <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>

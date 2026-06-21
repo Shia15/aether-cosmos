@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -399,10 +399,115 @@ function SeasonWheel() {
   );
 }
 
+function SeasonalCoherenceCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 200;
+  const WAVES = [
+    { label:"Daily · 24h",          color:"#E6B85C", freq:0.042, amp:26, phase:0 },
+    { label:"Seasonal · 91d",        color:"#7CE0B0", freq:0.011, amp:32, phase:1.1 },
+    { label:"Yearly · 365d",         color:"#7CD7FF", freq:0.0028, amp:20, phase:2.2 },
+    { label:"Generational · 27y",    color:"#B49CFF", freq:0.0003, amp:38, phase:0.5 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#070918"; ctx.fillRect(0, 0, W, H);
+      const midY = H / 2;
+      const t = tRef.current;
+      const sumLine: number[] = [];
+      WAVES.forEach((w, wi) => {
+        ctx.beginPath();
+        for (let x = 0; x <= W; x++) {
+          const theta = (x / W) * 6 * Math.PI + t * w.freq + w.phase;
+          const y = midY + Math.sin(theta) * w.amp * 0.7;
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          sumLine[x] = (sumLine[x] || 0) + Math.sin(theta) * w.amp * 0.7;
+        }
+        ctx.strokeStyle = w.color + "88";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        const labelX = 8 + wi * 210;
+        const labelY = 14 + wi * 14;
+        ctx.fillStyle = w.color;
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.fillText(w.label, labelX, labelY);
+      });
+      ctx.beginPath();
+      for (let x = 0; x <= W; x++) {
+        const y = midY + (sumLine[x] || 0) / 3.5;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 8px 'Space Mono', monospace";
+      ctx.fillText("Φ(t) composite", W - 110, 14);
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+      tRef.current += 0.4;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function SeasonalCoherenceHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const seasons=[
+      {x:115,col:"#2ef0d8",label:"SPRING"},
+      {x:305,col:"#44cc77",label:"SUMMER"},
+      {x:495,col:"#c9a84c",label:"AUTUMN"},
+      {x:685,col:"#44aaff",label:"WINTER"},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      seasons.forEach((s,i)=>{
+        const amp=40+10*Math.sin(t*0.03+i*Math.PI/2);
+        ctx.beginPath();
+        for(let x=s.x-90;x<=s.x+90;x+=3){
+          const y=H/2+amp*Math.sin((x-s.x)*0.05+t*0.04+i*Math.PI/2);
+          x===s.x-90?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=s.col+"88";ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle=s.col;ctx.font="bold 7px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(s.label,s.x,H-10);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SEASONAL COHERENCE · CIRCADIAN RHYTHM · FIELD SYNC · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SeasonalCoherencePage() {
   const [hemisphere, setHemisphere] = useState<"N" | "S">("N");
   return (
     <div data-testid="seasonal-coherence-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SEASONAL COHERENCE · CIRCADIAN RHYTHM · FIELD SYNC · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 seasonal wave harmonics — the live AETHER seasonal coherence simulation.</p></div>
+          <SeasonalCoherenceHeaderCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         <div style={{ marginBottom: 28 }}>
@@ -423,6 +528,25 @@ export default function SeasonalCoherencePage() {
             <Chip accent={B.violet}>Generational · 27a</Chip>
             <Chip accent={B.rose}>9 calendar systems</Chip>
             <Chip accent={B.amber}>9 regional flora rows × 4 seasons</Chip>
+          </div>
+        </div>
+
+        <div style={{ marginBottom:28 }}>
+          <div style={{ display:"inline-block", background:"rgba(230,184,92,0.1)", border:"1px solid rgba(230,184,92,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:B.panel, border:`1px solid ${B.line}`, borderLeft:`3px solid ${B.gold}`,
+            borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:'"Cinzel",serif', fontSize:18, color:B.ink, margin:"0 0 6px", fontVariant:"small-caps" }}>
+              Φ(t) · Four Coherence Oscillators
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.dim, margin:"0 0 14px", lineHeight:1.65 }}>
+              Daily (gold) · Seasonal (green) · Yearly (cyan) · Generational (violet) — each sine wave scrolls at its
+              own frequency. The bright white line is Φ(t), their composite sum: one equation, four clocks.
+            </p>
+            <SeasonalCoherenceCanvas />
           </div>
         </div>
 

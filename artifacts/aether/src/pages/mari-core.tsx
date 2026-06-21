@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   Waves,
   Brain,
@@ -100,6 +101,49 @@ const CORE_BITS: CoreBit[] = [
   { icon: Coins,     label: "Token Flow Generator", primary: C.cyan, note: "prompt assembly" },
 ];
 
+function MariCoreCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    const eggs=[
+      {r:18,col:"#a855f7",label:"M"},
+      {r:18,col:"#22c55e",label:"A"},
+      {r:18,col:"#f97316",label:"R"},
+      {r:18,col:"#3b82f6",label:"I"},
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(6,7,12,0.3)"; ctx.fillRect(0,0,W,H);
+      eggs.forEach((e,i)=>{
+        const a=(i/4)*Math.PI*2+t*0.012;
+        const ex=cx+60*Math.cos(a),ey=cy+25*Math.sin(a);
+        const pls=0.8+0.2*Math.sin(t*0.04+i);
+        ctx.beginPath();ctx.arc(ex,ey,e.r*pls,0,Math.PI*2);ctx.fillStyle=e.col+"44";ctx.fill();
+        ctx.strokeStyle=e.col+"88";ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle=e.col;ctx.font="bold 10px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(e.label,ex,ey+4);ctx.textAlign="left";
+        eggs.forEach((e2,j)=>{
+          if(j<=i)return;
+          const a2=(j/4)*Math.PI*2+t*0.012;
+          const ex2=cx+60*Math.cos(a2),ey2=cy+25*Math.sin(a2);
+          ctx.beginPath();ctx.moveTo(ex,ey);ctx.lineTo(ex2,ey2);ctx.strokeStyle=`rgba(255,255,255,0.06)`;ctx.lineWidth=0.5;ctx.stroke();
+        });
+      });
+      ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fillStyle="rgba(200,180,255,0.7)";ctx.fill();
+      ctx.fillStyle="rgba(200,180,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("M.A.R.I. CORE · 4-EGG RESONANCE · MNESIS · ALETHEIA · REVERIE · INFERNIA · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MariCorePage() {
   return (
     <div
@@ -107,6 +151,13 @@ export default function MariCorePage() {
       style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="mari-core-page"
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #a855f7",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#a855f7",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(6,7,12,0.8)",borderLeft:"3px solid #a855f7",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#a855f7",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>M.A.R.I. CORE · 4-EGG RESONANCE · MNESIS · ALETHEIA · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(168,85,247,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 orbiting MARI eggs in resonance — the live AETHER MARI core simulation.</p></div>
+          <MariCoreCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes mc-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes mc-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

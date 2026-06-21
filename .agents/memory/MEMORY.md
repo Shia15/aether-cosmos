@@ -1,0 +1,1 @@
+- [Live Simulation grep trap](live-sim-grep-trap.md) — existing blocks use "Live Simulation" mixed-case; always grep case-insensitively (`grep -qi`) to audit coverage.

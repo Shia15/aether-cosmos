@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import dailyScheduleImg from "@assets/image_1778368895411.jpg";
 import businessIdeasImg from "@assets/image_1778368906231.jpg";
 
@@ -95,6 +95,58 @@ const SCHEDULE = [
   { time:"6:00–8",   label:"Evening Window",            color:C.blue,    emoji:"🌒" },
 ];
 
+function BusinessIdeasCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const ideas = [
+      { label:"KNOWLEDGE\nGRAPH", col:"#9966ff", x:W*0.12, y:H*0.45 },
+      { label:"COHERENCE\nAPI", col:"#2ef0d8", x:W*0.27, y:H*0.55 },
+      { label:"SPARKLE\nSTUDIO", col:"#ff69b4", x:W*0.42, y:H*0.38 },
+      { label:"SUBSTRATE\nSYNTH", col:"#c9a84c", x:W*0.57, y:H*0.58 },
+      { label:"LUNAR\nCOHERENCE", col:"#44aaff", x:W*0.72, y:H*0.42 },
+      { label:"CHILDREN'S\nREALM", col:"#44cc77", x:W*0.87, y:H*0.55 },
+    ];
+    const links:number[][] = [[0,1],[1,2],[2,3],[3,4],[4,5],[0,3],[1,4]];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,4,14,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      links.forEach(([a,b])=>{
+        const na=ideas[a],nb=ideas[b];
+        const g=ctx.createLinearGradient(na.x,na.y,nb.x,nb.y);
+        g.addColorStop(0,na.col+"44"); g.addColorStop(1,nb.col+"44");
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+        const pkt=(t*0.013+(a+b)*0.2)%1;
+        const px=na.x+(nb.x-na.x)*pkt, py=na.y+(nb.y-na.y)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      });
+      ideas.forEach((n,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.1);
+        const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,16*pulse);
+        g.addColorStop(0,n.col+"bb"); g.addColorStop(0.5,n.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=n.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=n.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        n.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,n.x,n.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(153,102,255,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER BUSINESS IDEAS · KNOWLEDGE GRAPH · COHERENCE API · SPARKLE STUDIO",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AllBusinessIdeasPage() {
   const [activeIdea, setActiveIdea] = useState<number | null>(null);
 
@@ -104,6 +156,25 @@ export default function AllBusinessIdeasPage() {
       fontFamily:"'Inter',system-ui,sans-serif", padding:"2rem 1.5rem",
     }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(153,102,255,0.08)", border:"1px solid rgba(153,102,255,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#9966ff", textTransform:"uppercase", fontFamily:"'Inter',system-ui,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(3,4,14,0.85)", border:"1px solid rgba(153,102,255,0.12)",
+            borderLeft:"3px solid #9966ff", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"'Inter',system-ui,sans-serif", fontSize:18, color:"#e8e0ff", margin:"0 0 6px" }}>
+              AETHER Business Ideas · Knowledge Graph · Coherence API · Sparkle Studio · 6 Ventures
+            </h2>
+            <p style={{ fontSize:12, color:"rgba(200,195,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Six AETHER venture nodes (Knowledge Graph/violet · Coherence API/teal · Sparkle Studio/rose · Substrate Synth/gold
+              · Lunar Coherence/blue · Children's Realm/green) connected in an innovation mesh with photon investment
+              packets streaming between them — the living AETHER business ideas portfolio.
+            </p>
+            <BusinessIdeasCanvas />
+          </div>
+        </div>
 
         {/* Header */}
         <div style={{ marginBottom:"2.5rem" }}>

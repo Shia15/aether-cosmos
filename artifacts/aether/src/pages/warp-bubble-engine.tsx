@@ -58,6 +58,42 @@ function DomainSlider({ idx, value, focused, onChange, onFocus }: DomainSliderPr
   );
 }
 
+function WarpBubbleEngineHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      for(let layer=3;layer>=1;layer--){
+        const r=layer*22+5*Math.sin(t*0.04+layer);
+        const compress=0.4+0.1*layer;
+        ctx.beginPath();ctx.ellipse(cx-8,cy,r*0.4,r*compress,0,0,Math.PI*2);ctx.strokeStyle=`rgba(68,170,255,${0.1+layer*0.04})`;ctx.lineWidth=0.8;ctx.stroke();
+        ctx.beginPath();ctx.ellipse(cx+8,cy,r*0.4,r*compress,0,0,Math.PI*2);ctx.strokeStyle=`rgba(255,100,30,${0.1+layer*0.04})`;ctx.lineWidth=0.8;ctx.stroke();
+      }
+      ctx.beginPath();ctx.ellipse(cx,cy,10,6,0,0,Math.PI*2);ctx.fillStyle="rgba(255,255,255,0.15)";ctx.fill();ctx.strokeStyle="rgba(255,255,255,0.4)";ctx.lineWidth=0.6;ctx.stroke();
+      const wakeLen=60+20*Math.sin(t*0.03);
+      ctx.beginPath();
+      for(let x=0;x<=wakeLen;x+=3){
+        const y=cy+5*Math.sin(x*0.1+t*0.06);
+        x===0?ctx.moveTo(cx+10+x,y):ctx.lineTo(cx+10+x,y);
+      }
+      ctx.strokeStyle="rgba(68,170,255,0.2)";ctx.lineWidth=0.6;ctx.stroke();
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("WARP BUBBLE ENGINE · ALCUBIERRE METRIC · SPACE COMPRESSION · EXOTIC MATTER · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function WarpBubbleEnginePage() {
   const warpRef   = useRef<HTMLCanvasElement>(null);
   const phiRef    = useRef<HTMLCanvasElement>(null);
@@ -536,6 +572,13 @@ export default function WarpBubbleEnginePage() {
       background: BG, minHeight: "100vh", display: "flex", flexDirection: "column",
       fontFamily: MONO, color: "#c8d8e0", overflow: "hidden",
     }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:8}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WARP BUBBLE ENGINE · ALCUBIERRE METRIC · SPACE COMPRESSION · EXOTIC MATTER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Alcubierre bubble: compressed front + expanded rear — the live AETHER warp bubble simulation.</p></div>
+          <WarpBubbleEngineHeaderCanvas />
+        </div>
+      </div>
       {/* Top bar */}
       <div style={{
         background: PANEL_BG, borderBottom: `1px solid ${BORDER}`,

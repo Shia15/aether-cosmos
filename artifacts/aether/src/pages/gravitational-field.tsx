@@ -621,6 +621,35 @@ function SH({ n, title, sub, col = TEAL }: { n: string; title: string; sub: stri
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function GravFieldCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      for(let r=10;r<80;r+=15){
+        const alpha=0.08+(0.12*(80-r)/80)*Math.abs(Math.sin(t*0.02));
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(255,68,119,${alpha})`; ctx.lineWidth=0.8; ctx.stroke();
+      }
+      const bodies=[{x:cx,y:cy,r:14,col:"rgba(201,168,76,0.9)"},{x:cx+100+40*Math.cos(t*0.018),y:cy+40*Math.sin(t*0.018),r:7,col:"rgba(68,170,255,0.85)"},{x:cx-90+30*Math.cos(t*0.025+2),y:cy+30*Math.sin(t*0.025+2),r:5,col:"rgba(68,204,119,0.8)"}];
+      bodies.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fillStyle=b.col;ctx.fill();});
+      ctx.fillStyle="rgba(255,68,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GRAVITATIONAL FIELD · INVERSE SQUARE LAW · ORBITAL BODY · FORCE LINES · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GravitationalFieldPage() {
   const [gMult,      setGMult]      = useState(1.0);
   const [showForces, setShowForces] = useState(true);
@@ -641,6 +670,13 @@ export default function GravitationalFieldPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #ff4477",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ff4477",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ff4477",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ff4477",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GRAVITATIONAL FIELD · ORBITAL BODY · FORCE LINES · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,68,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Inverse-square force rings + three orbiting bodies — live AETHER gravity simulation.</p></div>
+          <GravFieldCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 80% 60% at 50% 0%, ${ROSE}07, ${BLUE}04, transparent)` }}>

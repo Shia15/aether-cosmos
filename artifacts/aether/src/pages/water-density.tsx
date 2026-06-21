@@ -949,12 +949,53 @@ const NAV = [
 ];
 
 /* ── Page ─────────────────────────────────────── */
+function WaterDensityHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const layers=5;
+    const layerCols=["rgba(20,80,160,","rgba(30,100,180,","rgba(40,120,200,","rgba(60,150,220,","rgba(100,200,255,"];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      for(let l=0;l<layers;l++){
+        const y0=l*(H/layers),y1=(l+1)*(H/layers);
+        const density=1-l/layers;
+        ctx.fillStyle=layerCols[l]+`${0.05+density*0.1})`;
+        ctx.fillRect(0,y0,W,y1-y0);
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=4){
+          const wave=y0+3*Math.sin(x*0.03+t*0.03+l*0.5);
+          x===0?ctx.moveTo(x,wave):ctx.lineTo(x,wave);
+        }
+        ctx.strokeStyle=layerCols[l]+`${0.2+density*0.2})`;ctx.lineWidth=0.8;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(100,200,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("WATER DENSITY · THERMOCLINE · HALOCLINE · PYCNOCLINE · OCEAN LAYERS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function WaterDensityPage() {
   const [mode, setMode] = useState<CanvasMode>("gradient");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WATER DENSITY · THERMOCLINE · HALOCLINE · PYCNOCLINE · OCEAN LAYERS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 ocean density layers with wave interfaces — the live AETHER water density simulation.</p></div>
+          <WaterDensityHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{
         padding: "66px 28px 42px", textAlign: "center",

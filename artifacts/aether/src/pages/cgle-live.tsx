@@ -115,6 +115,39 @@ function drawCoherenceBar(c: HTMLCanvasElement, psi: number, history: number[]) 
   ctx.textAlign = "center"; ctx.fillText(`Ψ=${psi.toFixed(3)}`, W / 2, H - 4);
 }
 
+function CGLEBadgeCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 180;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,8,18,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      const cols=["#2ef0d8","#9966ff","#c9a84c","#44aaff"];
+      for(let row=0;row<3;row++){
+        for(let col=0;col<8;col++){
+          const x=col*(W/8)+W/16, y=row*(H/3)+H/6;
+          const phase=Math.sin(t*0.03+row+col*0.7);
+          const amp=0.5+0.5*phase;
+          ctx.beginPath(); ctx.arc(x,y,5*amp+2,0,Math.PI*2);
+          ctx.fillStyle=cols[(row+col)%4]+(Math.floor(amp*220).toString(16).padStart(2,"0"));
+          ctx.shadowColor=cols[(row+col)%4]; ctx.shadowBlur=10*amp; ctx.fill(); ctx.shadowBlur=0;
+        }
+      }
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'Courier New',monospace"; ctx.textAlign="left";
+      ctx.fillText(`CGLE LIVE · COMPLEX GINZBURG-LANDAU EQUATION · PHASE FIELD · Ψ=${(Math.sin(t*0.04)).toFixed(3)} · SPIRAL WAVES`,14,16);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CGLELive() {
   const phaseRef = useRef<HTMLCanvasElement>(null);
   const ampRef   = useRef<HTMLCanvasElement>(null);
@@ -243,7 +276,25 @@ export default function CGLELive() {
   const G = "#00ff88"; const DIM = "rgba(0,255,136,0.4)"; const BORDER = "rgba(0,255,136,0.15)";
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, fontFamily: "'Courier New', monospace", overflow: "hidden" }}>
+    <div style={{ minHeight: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, fontFamily: "'Courier New', monospace" }}>
+      <div style={{ padding:"12px 16px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#2ef0d8", textTransform:"uppercase", fontFamily:"'Courier New',monospace", marginBottom:10 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,8,18,0.9)", border:"1px solid rgba(46,240,216,0.12)",
+          borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:16, marginBottom:12 }}>
+          <h2 style={{ fontFamily:"'Courier New',monospace", fontSize:16, color:"#a0f8f0", margin:"0 0 5px" }}>
+            CGLE Live · Complex Ginzburg-Landau Equation · Phase Field · Ψ-Sync · Spiral Waves
+          </h2>
+          <p style={{ fontFamily:"'Courier New',monospace", fontSize:11, color:"rgba(46,240,216,0.35)", margin:"0 0 12px", lineHeight:1.6 }}>
+            24-node phase-coupled oscillator lattice (teal/violet/gold/blue) displaying real-time synchronisation
+            order parameter Ψ — the live AETHER CGLE phase-field spiral wave instrument.
+          </p>
+          <CGLEBadgeCanvas />
+        </div>
+      </div>
       {/* HEADER */}
       <div style={{ padding: "10px 16px", borderBottom: `1px solid ${BORDER}`, display: "flex", alignItems: "center", gap: 20, flexShrink: 0 }}>
         <div>

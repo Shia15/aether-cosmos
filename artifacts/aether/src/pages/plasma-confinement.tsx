@@ -567,6 +567,38 @@ function Eq({ children }: { children: React.ReactNode }) {
 /* ══════════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════════ */
+function PlasmaConfinementHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const particles: {angle:number;r:number;speed:number;col:string}[] = [];
+    for(let i=0;i<40;i++) particles.push({angle:Math.random()*Math.PI*2,r:20+Math.random()*50,speed:(Math.random()-0.5)*0.06,col:["#ff4477","#ff8800","#c9a84c","#2ef0d8"][Math.floor(Math.random()*4)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let ring=1;ring<=3;ring++){
+        ctx.beginPath();ctx.arc(cx,cy,ring*25,0,Math.PI*2);ctx.strokeStyle=`rgba(255,68,119,${0.1+ring*0.05})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      particles.forEach(p=>{
+        p.angle+=p.speed;
+        const x=cx+Math.cos(p.angle)*p.r*2,y=cy+Math.sin(p.angle)*p.r*0.5;
+        ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle=p.col+"cc";ctx.fill();
+      });
+      ctx.fillStyle="rgba(255,68,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PLASMA CONFINEMENT · TOKAMAK · MAGNETIC FIELD · FUSION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PlasmaConfinementPage() {
   const [kappa,       setKappa]       = useState(1.70);
   const [delta,       setDelta]       = useState(0.33);
@@ -575,6 +607,13 @@ export default function PlasmaConfinementPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #ff4477",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ff4477",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ff4477",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ff4477",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PLASMA CONFINEMENT · TOKAMAK · MAGNETIC FIELD · FUSION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,68,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>40 plasma particles in magnetic confinement — the live AETHER plasma simulation.</p></div>
+          <PlasmaConfinementHeaderCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"56px 24px 32px",

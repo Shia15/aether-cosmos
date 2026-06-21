@@ -6,6 +6,39 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search as SearchIcon, Hexagon, Fingerprint, Layers } from "lucide-react";
 
+import { useEffect, useRef } from "react";
+
+function SearchHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes: {x:number;y:number;r:number;phase:number}[]=[];
+    for(let i=0;i<20;i++) nodes.push({x:Math.random()*W,y:Math.random()*H,r:3+Math.random()*5,phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach((n,i)=>{
+        if(i>0 && Math.random()>0.98){
+          const p=nodes[Math.floor(Math.random()*nodes.length)];
+          ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(p.x,p.y);ctx.strokeStyle="rgba(46,240,216,0.08)";ctx.lineWidth=0.4;ctx.stroke();
+        }
+        const pls=0.85+0.15*Math.sin(t*0.04+n.phase);
+        ctx.beginPath();ctx.arc(n.x,n.y,n.r*pls,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.1)";ctx.fill();ctx.strokeStyle="rgba(46,240,216,0.4)";ctx.lineWidth=0.5;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SEARCH · SEMANTIC INDEX · KNOWLEDGE RETRIEVAL · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SearchView() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<SearchConceptsType>("semantic");
@@ -25,6 +58,13 @@ export default function SearchView() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto w-full space-y-8 h-full flex flex-col">
+      <div style={{flexShrink:0,padding:"0 0 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SEARCH · SEMANTIC INDEX · KNOWLEDGE RETRIEVAL · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>20 knowledge nodes — the live AETHER semantic search simulation.</p></div>
+          <SearchHeaderCanvas />
+        </div>
+      </div>
       <header className="space-y-4 shrink-0">
         <h1 className="text-4xl font-serif tracking-tight text-foreground flex items-center gap-3">
           <SearchIcon className="w-8 h-8 text-primary" />

@@ -37,6 +37,40 @@ const TOUR_STEPS = [
   { dur: 7000, text: "Tour complete! 🌊 You've seen three PDE regimes: CGLE traveling waves and turbulence, Swift-Hohenberg stripes and hexagons, and multi-scale substrate coupling. Switch between them with the tabs above. Click the canvas anytime to inject a local perturbation and watch it propagate.", mode: null, spot: null, params: null },
 ];
 
+function PDEHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const N=60;
+    const u: number[] = new Array(N).fill(0).map((_,i)=>Math.sin(i/N*Math.PI*4)*0.5);
+    const v: number[] = new Array(N).fill(0);
+    const draw=()=>{
+      ctx.fillStyle="rgba(0,0,0,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=1;i<N-1;i++){
+        const acc=(u[i+1]-2*u[i]+u[i-1])*0.6;
+        v[i]+=acc*0.04; u[i]+=v[i]*0.04; v[i]*=0.999;
+      }
+      ctx.beginPath();
+      for(let i=0;i<N;i++){
+        const x=(i/N)*W,y=H*0.5-u[i]*H*0.35;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle="rgba(0,255,136,0.6)";ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle="rgba(0,255,136,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PDE SIMULATOR · WAVE EQUATION · EMERGENT COMPLEXITY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PDESimulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const modeRef = useRef<"cgle" | "sh" | "ms">("cgle");
@@ -469,6 +503,13 @@ export default function PDESimulator() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-black text-[#0f0] font-mono">
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00ff88",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00ff88",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(0,0,0,0.8)",borderLeft:"3px solid #00ff88",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00ff88",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PDE SIMULATOR · WAVE EQUATION · EMERGENT COMPLEXITY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,255,136,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>60-node wave equation — the live AETHER PDE simulator preview.</p></div>
+          <PDEHeaderCanvas />
+        </div>
+      </div>
       {/* Top bar */}
       <div className="flex items-center justify-between gap-3 px-4 py-2 border-b-2 border-[#00ff88] flex-shrink-0" style={{ background: "linear-gradient(135deg,#001a1a,#003333)" }}>
         <div>

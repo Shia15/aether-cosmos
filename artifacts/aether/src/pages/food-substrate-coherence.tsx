@@ -210,11 +210,61 @@ function FoodCoherenceCanvas({ phase }: { phase: number }) {
   return <canvas ref={cvs} style={{ width: "100%", display: "block", borderRadius: 8, border: `1px solid ${VIOLET}20` }} />;
 }
 
+function FoodSubCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const nodes = [
+      {x:W*0.1,y:H/2,col:"#44cc77",label:"SOIL"},
+      {x:W*0.28,y:H/2,col:"#2ef0d8",label:"ROOT"},
+      {x:W*0.46,y:H/2,col:"#c9a84c",label:"MYCO"},
+      {x:W*0.64,y:H/2,col:"#9966ff",label:"PLANT"},
+      {x:W*0.82,y:H/2,col:"#ff4477",label:"HUMAN"},
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<nodes.length-1;i++){
+        const a=nodes[i],b=nodes[i+1];
+        const pls=(t*0.012+i*0.2)%1;
+        const px=a.x+(b.x-a.x)*pls,py=a.y+(b.y-a.y)*pls;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle="rgba(255,255,255,0.06)"; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2); ctx.fillStyle=a.col; ctx.fill();
+      }
+      nodes.forEach((n,i)=>{
+        const pls=0.75+0.25*Math.sin(t*0.04+i);
+        ctx.beginPath(); ctx.arc(n.x,n.y,16*pls,0,Math.PI*2); ctx.fillStyle=n.col+"22"; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,11,0,Math.PI*2); ctx.fillStyle=n.col; ctx.fill();
+        ctx.fillStyle="#fff"; ctx.font="7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+25); ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("FOOD SUBSTRATE COHERENCE · SOIL → ROOT → MYCO → PLANT → HUMAN · AETHER",12,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function FoodSubstrateCoherencePage() {
   const [phase, setPhase] = useState(4);
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(1,12,10,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FOOD SUBSTRATE COHERENCE · SOIL → HUMAN · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Five substrate nodes — soil to root to myco to plant to human — live coherence flow.</p></div>
+          <FoodSubCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg, #010c0a 0%, #020e14 50%, #020408 100%)",

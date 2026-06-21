@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import imgSysA from "@assets/ChatGPT_Image_Apr_26,_2026,_12_44_55_PM_1777221900485.png";
 import imgSysB from "@assets/ChatGPT_Image_Apr_26,_2026,_12_45_08_PM_1777221911140.png";
 import imgEvolutions from "@assets/ChatGPT_Image_Apr_26,_2026,_12_45_29_PM_1777221942931.png";
@@ -47,11 +48,57 @@ const BIO: { tile: string; reading: string }[] = [
     reading: "Bio-responsive coil array reading the geomagnetic field for guidance. Aviation already uses geomagnetic navigation; vehicle propulsion off the grid is speculative." },
 ];
 
+function FerroDriveCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(0,10,25,0.3)"; ctx.fillRect(0, 0, W, H);
+      const bands = 6;
+      for (let b = 0; b < bands; b++) {
+        const phase = b * Math.PI / bands;
+        ctx.beginPath();
+        for (let px = 0; px < W; px++) {
+          const x = px / W;
+          const spike = Math.pow(Math.sin(x * Math.PI * 8 + t * 0.04 + phase), 12);
+          const flow = Math.sin(x * Math.PI * 3 - t * 0.025 + phase) * 0.3;
+          const y = H * 0.55 + (spike * 50 + flow * 25) * (1 - b / bands);
+          px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+        }
+        ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+        const grad = ctx.createLinearGradient(0, H * 0.3, 0, H);
+        const alpha = Math.floor((0.5 - b * 0.06) * 255).toString(16).padStart(2, "0");
+        grad.addColorStop(0, "#2ef0d8" + alpha);
+        grad.addColorStop(1, "rgba(46,240,216,0)");
+        ctx.fillStyle = grad; ctx.fill();
+      }
+      ctx.fillStyle = "rgba(46,240,216,0.3)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("FERRODRIVE · MAGNETIC FLUID PROPULSION · SPIKE & FLOW · AETHER", 12, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function FerroDriveView() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
       <style>{`@keyframes fd-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.fd-fade{animation:fd-fade .55s ease-out both}@media(prefers-reduced-motion:reduce){.fd-fade{animation:none}}`}</style>
-
+      <div style={{ padding:"20px 20px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:14 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(0,10,25,0.95)", border:"1px solid rgba(46,240,216,0.12)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:18, marginBottom:14 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:17, color:"#e0f8ff", margin:"0 0 6px" }}>FerroDrive · Magnetic Fluid Propulsion · Bio-Magnetic Systems · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(46,240,216,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Six ferrofluid spike-and-flow bands rising in traveling waves — the live AETHER ferrodrive simulation.</p>
+          <FerroDriveCanvas />
+        </div>
+      </div>
       <div className="max-w-6xl mx-auto px-7 py-10 space-y-12">
         <header className="fd-fade space-y-3" data-testid="fd-hero">
           <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: B.cyan }}>

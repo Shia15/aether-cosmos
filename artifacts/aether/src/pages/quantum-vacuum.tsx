@@ -20,6 +20,37 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
   { key: "pais",    label: "Pais · Room-T SC",     sym: "≈", col: C.violet },
 ];
 
+function QuantumVacuumHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const bubbles: {x:number;y:number;r:number;life:number;maxLife:number}[]=[];
+    const spawn=()=>{bubbles.push({x:Math.random()*W,y:H,r:2+Math.random()*8,life:0,maxLife:60+Math.random()*40});};
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      if(t%12===0) spawn();
+      for(let i=bubbles.length-1;i>=0;i--){
+        const b=bubbles[i]; b.life++; b.y-=0.8; b.r*=0.998;
+        if(b.life>b.maxLife){bubbles.splice(i,1);continue;}
+        const alpha=1-b.life/b.maxLife;
+        ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.strokeStyle=`rgba(153,102,255,${alpha*0.6})`;ctx.lineWidth=0.6;ctx.stroke();
+        ctx.beginPath();ctx.arc(b.x,b.y,b.r*0.3,0,Math.PI*2);ctx.fillStyle=`rgba(153,102,255,${alpha*0.15})`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("QUANTUM VACUUM · ZERO POINT FIELD · VIRTUAL PARTICLES · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QuantumVacuumPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("ab");
@@ -464,6 +495,13 @@ export default function QuantumVacuumPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM VACUUM · ZERO POINT FIELD · VIRTUAL PARTICLES · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Rising virtual particle bubbles — the live AETHER quantum vacuum simulation.</p></div>
+          <QuantumVacuumHeaderCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[10px] tracking-[0.4em] uppercase mb-2" style={{ color: C.muted }}>
           AETHER · QUANTUM VACUUM &amp; NON-LOCAL EM · APRIL 2026

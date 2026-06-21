@@ -315,6 +315,39 @@ function getNodeColor(
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+function GraphViewCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 140;
+    const W = canvas.width, H = canvas.height;
+    const nodes: {x:number;y:number;vx:number;vy:number;col:string}[] = [];
+    for(let i=0;i<30;i++) nodes.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*0.5,vy:(Math.random()-.5)*0.5,col:["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff"][i%5]});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,5,10,0.25)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach((n,i)=>{
+        n.x+=n.vx; n.y+=n.vy;
+        if(n.x<0||n.x>W)n.vx*=-1; if(n.y<0||n.y>H)n.vy*=-1;
+        nodes.slice(i+1).forEach(m=>{
+          const d=Math.hypot(n.x-m.x,n.y-m.y);
+          if(d<120){ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y);ctx.strokeStyle=`rgba(255,255,255,${(1-d/120)*0.08})`;ctx.lineWidth=0.5;ctx.stroke();}
+        });
+        const pls=0.7+0.3*Math.sin(t*0.03+i);
+        ctx.beginPath();ctx.arc(n.x,n.y,5*pls,0,Math.PI*2);ctx.fillStyle=n.col+"cc";ctx.fill();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GRAPH VIEW · KNOWLEDGE GRAPH · FORCE-DIRECTED · NODE MESH · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GraphView() {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphSectionRef = useRef<HTMLDivElement>(null);
@@ -529,6 +562,13 @@ export default function GraphView() {
 
   return (
     <div style={{ background: "#03050a", minHeight: "100vh", overflowY: "auto" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(3,5,10,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GRAPH VIEW · KNOWLEDGE GRAPH · NODE MESH · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>30-node force-directed graph — knowledge connections — live AETHER graph simulation.</p></div>
+          <GraphViewCanvas />
+        </div>
+      </div>
       {/* ── GRAPH SECTION ── */}
       <div ref={graphSectionRef} style={{ position: "relative", height: "65vh", minHeight: 460 }}>
         <div ref={containerRef} style={{ position: "absolute", inset: 0 }}>

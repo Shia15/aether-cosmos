@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgDoctrine from "@assets/ChatGPT_Image_Apr_26,_2026,_02_27_54_PM_1777228076738.png";
@@ -82,10 +83,81 @@ const ARC_EXAMPLES = [
   { c: B.cyan,  k: "Mind",      v: "Attention → meaning → insight → integration" },
 ];
 
+function DoctrineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const layers = [
+      { label:"SOLAR", col:"#fbbf24", x:W*0.16, r:28 },
+      { label:"PLANETARY", col:"#2ef0d8", x:W*0.38, r:22 },
+      { label:"EARTH\nELECTRIC", col:"#44cc77", x:W*0.60, r:20 },
+      { label:"HUMAN\nMEMORY", col:"#c084fc", x:W*0.82, r:18 },
+    ];
+    const principles = ["NOT A BELIEF SYSTEM","NOT A PROPHECY","COHERENCE · ENERGY · SCALE"];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(8,10,20,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<layers.length-1;i++) {
+        const a=layers[i],b=layers[i+1];
+        const g=ctx.createLinearGradient(a.x,H/2,b.x,H/2);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,H/2); ctx.lineTo(b.x,H/2);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+        const flow=(t*0.015+i*0.5)%1;
+        const px=a.x+(b.x-a.x)*flow;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+      }
+      layers.forEach((l,li)=>{
+        const pulse=1+0.1*Math.sin(t*0.035+li*1.1);
+        const g=ctx.createRadialGradient(l.x,H/2,0,l.x,H/2,l.r*2.2*pulse);
+        g.addColorStop(0,l.col+"bb"); g.addColorStop(0.5,l.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(l.x,H/2,l.r*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=l.col; ctx.shadowBlur=20*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(l.x,H/2,l.r*pulse,0,Math.PI*2);
+        ctx.strokeStyle=l.col; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=l.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        l.label.split("\n").forEach((ln,i)=>ctx.fillText(ln,l.x,H/2+l.r*pulse+13+i*10));
+      });
+      ctx.fillStyle="rgba(251,191,36,0.35)"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="left";
+      principles.forEach((p,i)=>ctx.fillText(p,14,20+i*13));
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherDoctrinePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="aether-doctrine-page">
       <div className="max-w-5xl mx-auto">
+
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(251,191,36,0.07)", border:"1px solid rgba(251,191,36,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(8,10,20,0.85)", border:"1px solid rgba(251,191,36,0.1)",
+            borderLeft:`3px solid ${B.gold}`, borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+              The AETHER Doctrine · Solar → Planetary → Earth Electric → Human Memory
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Four energy cascade layers (Solar/gold · Planetary/teal · Earth Electric/green · Human Memory/violet)
+              with live flow packets streaming between them — the AETHER doctrine of coupled planetary energy
+              transmission, not a belief system, not a prophecy, a coherence framework.
+            </p>
+            <DoctrineCanvas />
+          </div>
+        </div>
 
         <header className="mb-10">
           <div className="text-[10.5px] uppercase tracking-[0.32em] mb-2"

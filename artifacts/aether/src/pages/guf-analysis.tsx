@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const GUF_DIMS = [
@@ -78,9 +80,52 @@ const ANALYSIS_TABS = [
   { name: "Mass Plot", color: "#10b981", desc: "Live invariant-mass histogram streaming collision-by-collision. Expected GUF peaks appear as bumps above the QCD background. The 5σ discovery threshold line is drawn automatically; when a peak crosses it, the significance readout in the top bar triggers an alert." },
 ];
 
+function GufAnalysisCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    const dims=[{col:"#00ffee",label:"Space"},{col:"#7c3aed",label:"Time"},{col:"#d97706",label:"Energy"},{col:"#10b981",label:"Info"},{col:"#ef4444",label:"Charge"},{col:"#f59e0b",label:"Spin"}];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,6,23,0.25)"; ctx.fillRect(0,0,W,H);
+      dims.forEach((d,i)=>{
+        const x=W*(i+0.5)/dims.length;
+        const amp=40+20*Math.sin(t*0.02+i*1.1);
+        ctx.beginPath();
+        for(let px=0;px<W;px++){
+          const wave=Math.sin(px*0.02-t*0.03+i*0.8)*amp*Math.exp(-Math.pow((px-x)/150,2));
+          const yy=H/2+wave;
+          px===0?ctx.moveTo(px,yy):ctx.lineTo(px,yy);
+        }
+        ctx.strokeStyle=d.col+"88"; ctx.lineWidth=1.5; ctx.stroke();
+        const pls=0.7+0.3*Math.sin(t*0.04+i);
+        ctx.fillStyle=d.col; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(d.label,x,H-8); ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(0,255,238,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GUF ANALYSIS · 6-DIMENSION COLLIDER · SPACE TIME ENERGY INFO CHARGE SPIN · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GufAnalysisPage() {
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00ffee",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00ffee",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,6,23,0.8)",borderLeft:"3px solid #00ffee",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00ffee",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GUF ANALYSIS · 6-DIMENSION COLLIDER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,255,238,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Six-dimension waveform collider — space, time, energy, info, charge, spin — live.</p></div>
+          <GufAnalysisCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ padding: "3rem 2rem 2rem", borderBottom: "1px solid #1e293b", background: "linear-gradient(180deg,#000d1a 0%,#020617 100%)" }}>

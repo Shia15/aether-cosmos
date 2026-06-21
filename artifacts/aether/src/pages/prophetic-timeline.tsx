@@ -26,9 +26,49 @@ const STATIONS = [
     flag: "End of the seven-year arc." },
 ];
 
+import { useEffect, useRef } from "react";
+
+function PropheticTimelineHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const stars: {x:number;y:number;r:number;phase:number;col:string}[] = [];
+    for(let i=0;i<40;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2,phase:Math.random()*Math.PI*2,col:["#c9a84c","#9966ff","#2ef0d8"][Math.floor(Math.random()*3)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      stars.forEach(s=>{
+        const alpha=0.4+0.6*Math.sin(t*0.04+s.phase);
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.col+Math.round(alpha*200).toString(16).padStart(2,"0");ctx.fill();
+      });
+      const cx=W/2,cy=H/2;
+      for(let r=20;r<=80;r+=20){
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(201,168,76,${0.08+r*0.003})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PROPHETIC TIMELINE · TEMPORAL VISION · ASTROLOGICAL FORECAST · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PropheticTimelineView() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PROPHETIC TIMELINE · TEMPORAL VISION · ASTROLOGICAL FORECAST · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>40 star field nodes — the live AETHER prophetic timeline simulation.</p></div>
+          <PropheticTimelineHeaderCanvas />
+        </div>
+      </div>
       <style>{`@keyframes pt-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.pt-fade{animation:pt-fade .55s ease-out both}@media(prefers-reduced-motion:reduce){.pt-fade{animation:none}}`}</style>
 
       <div className="max-w-5xl mx-auto px-7 py-10 space-y-10">

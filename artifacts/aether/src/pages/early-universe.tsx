@@ -83,6 +83,41 @@ const EPOCHS: Epoch[] = [
 const LOG_T_MIN = -43;
 const LOG_T_MAX = 18;
 
+function EarlyUniverseCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const particles: {x:number,y:number,vx:number,vy:number,col:string,r:number}[]=[];
+    const bang=()=>{ particles.length=0; for(let i=0;i<40;i++){ const ang=Math.random()*Math.PI*2,spd=0.5+Math.random()*2; particles.push({ x:cx,y:cy,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,col:`hsl(${Math.random()*60+10},90%,65%)`,r:1.5+Math.random()*2 }); } };
+    bang();
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.12)"; ctx.fillRect(0,0,W,H);
+      t++;
+      if(t%200===0) bang();
+      particles.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.vx*=0.995; p.vy*=0.995;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      });
+      const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,20+10*Math.sin(t*0.05));
+      glow.addColorStop(0,"rgba(255,150,50,0.4)"); glow.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,20+10*Math.sin(t*0.05),0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+      ctx.fillStyle="rgba(255,150,50,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("EARLY UNIVERSE · BIG BANG · NUCLEOSYNTHESIS · RECOMBINATION · CMB · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function EarlyUniversePage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("quadratic");
@@ -644,6 +679,18 @@ export default function EarlyUniversePage() {
 
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #ff9632", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#ff9632", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(255,150,50,0.15)", borderLeft:"3px solid #ff9632", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Early Universe · Big Bang · Nucleosynthesis · Recombination · CMB · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(255,150,50,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Repeating big bang — 40 particles exploding outward from a glowing primordial core — the live AETHER early universe simulation.
+          </p>
+          <EarlyUniverseCanvas />
+        </div>
+      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · early universe · quadratic gravity · ToE · standard model

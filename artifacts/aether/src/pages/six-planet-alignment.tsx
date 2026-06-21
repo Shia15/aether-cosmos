@@ -22,6 +22,44 @@ const PHI = 1.618034;
 
 type View = "alignment" | "resonance" | "dynamics";
 
+function SixPlanetAlignmentHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const planets=[
+      {r:20,speed:0.05,col:"#c9a84c",size:5,label:"☿"},
+      {r:32,speed:0.035,col:"#ff8844",size:6,label:"♀"},
+      {r:46,speed:0.025,col:"#44aaff",size:6,label:"♁"},
+      {r:60,speed:0.018,col:"#ff4477",size:5,label:"♂"},
+      {r:75,speed:0.012,col:"#c9a84c",size:8,label:"♃"},
+      {r:90,speed:0.008,col:"#9966ff",size:7,label:"♄"},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      planets.forEach(p=>{
+        ctx.beginPath();ctx.arc(cx,cy,p.r,0,Math.PI*2);ctx.strokeStyle="rgba(255,255,255,0.04)";ctx.lineWidth=0.4;ctx.stroke();
+        const angle=t*p.speed;
+        const x=cx+Math.cos(angle)*p.r,y=cy+Math.sin(angle)*p.r*0.45;
+        ctx.beginPath();ctx.arc(x,y,p.size,0,Math.PI*2);ctx.fillStyle=p.col+"99";ctx.fill();ctx.strokeStyle=p.col+"cc";ctx.lineWidth=0.6;ctx.stroke();
+        ctx.fillStyle=p.col;ctx.font="7px serif";ctx.textAlign="center";ctx.fillText(p.label,x,y+2.5);ctx.textAlign="left";
+      });
+      ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle="#ffcc44";ctx.fill();
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SIX PLANET ALIGNMENT · ORBITAL RESONANCE · CONJUNCTIONS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SixPlanetAlignmentPage() {
   const skyRef = useRef<HTMLCanvasElement>(null);
   const waveRef = useRef<HTMLCanvasElement>(null);
@@ -200,6 +238,13 @@ export default function SixPlanetAlignmentPage() {
   return (
     <div data-testid="six-planet-root" className="min-h-screen p-6"
          style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SIX PLANET ALIGNMENT · ORBITAL RESONANCE · CONJUNCTIONS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 orbiting planets — the live AETHER six planet alignment simulation.</p></div>
+          <SixPlanetAlignmentHeaderCanvas />
+        </div>
+      </div>
 
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
         <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>

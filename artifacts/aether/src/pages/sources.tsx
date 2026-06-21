@@ -66,6 +66,35 @@ type Tab = "import" | "history" | "gaps";
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+function SourcesHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const books: {x:number;col:string;phase:number}[]=[];
+    for(let i=0;i<18;i++) books.push({x:30+i*46,col:["#2ef0d8","#9966ff","#c9a84c","#44aaff","#ff4477","#44cc77"][i%6],phase:i*0.4});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      books.forEach(b=>{
+        const h=40+15*Math.sin(t*0.025+b.phase);
+        const y=H-h-10;
+        ctx.fillStyle=b.col+"22";ctx.fillRect(b.x,y,28,h);ctx.strokeStyle=b.col+"55";ctx.lineWidth=0.5;ctx.strokeRect(b.x,y,28,h);
+        ctx.fillStyle=b.col+"88";ctx.fillRect(b.x+3,y,2,h);
+      });
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SOURCES · REFERENCE LIBRARY · CITATIONS · BIBLIOGRAPHY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SourcesPage() {
   const { toast } = useToast();
   const [tab, setTab] = useState<Tab>("import");
@@ -365,7 +394,13 @@ export default function SourcesPage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SOURCES · REFERENCE LIBRARY · CITATIONS · BIBLIOGRAPHY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 animated reference books — the live AETHER sources simulation.</p></div>
+          <SourcesHeaderCanvas />
+        </div>
+      </div>
       {/* ── Header ── */}
       <div className="px-8 pt-8 pb-0 shrink-0">
         <div className="font-mono text-xs text-primary tracking-[0.3em] mb-3 uppercase">

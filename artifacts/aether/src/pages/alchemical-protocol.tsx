@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -283,6 +283,77 @@ function LineageGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function AlchemyCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const ELEMENTS = [
+    { sym:"🜁", name:"Air",   col:"#44aaff", x:0.15 },
+    { sym:"🜂", name:"Fire",  col:"#ff4477", x:0.33 },
+    { sym:"🜃", name:"Water", col:"#2ef0d8", x:0.51 },
+    { sym:"🜄", name:"Earth", col:"#44cc77", x:0.69 },
+    { sym:"⊕",  name:"Aether",col:"#c9a84c", x:0.87 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#070918"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cy = H / 2;
+      for (let i = 0; i < ELEMENTS.length - 1; i++) {
+        const a = ELEMENTS[i], b = ELEMENTS[i+1];
+        const ax = a.x * W, bx = b.x * W;
+        const grad = ctx.createLinearGradient(ax, cy, bx, cy);
+        grad.addColorStop(0, a.col + "66");
+        grad.addColorStop(1, b.col + "66");
+        ctx.beginPath(); ctx.moveTo(ax, cy); ctx.lineTo(bx, cy);
+        ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.stroke();
+      }
+      ELEMENTS.forEach((el, i) => {
+        const ex = el.x * W;
+        const pulse = 0.65 + 0.35 * Math.sin(t * 0.04 + i * 1.2);
+        const r = 28 * pulse;
+        const g = ctx.createRadialGradient(ex, cy, 0, ex, cy, r);
+        g.addColorStop(0, el.col + "cc");
+        g.addColorStop(0.4, el.col + "44");
+        g.addColorStop(1, el.col + "00");
+        ctx.beginPath(); ctx.arc(ex, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(ex, cy, 16, 0, Math.PI * 2);
+        ctx.fillStyle = el.col + "88"; ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "13px serif"; ctx.textAlign = "center";
+        ctx.fillText(el.sym, ex, cy + 5);
+        ctx.fillStyle = el.col + "bb";
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.fillText(el.name, ex, cy + 38);
+        ctx.textAlign = "left";
+        if (i < ELEMENTS.length - 1) {
+          const nx = ELEMENTS[i+1].x * W;
+          const arrowX = ex + (nx - ex) / 2;
+          const arrowPulse = Math.sin(t * 0.06 + i * 0.5);
+          ctx.fillStyle = `rgba(255,255,255,${0.2 + 0.3 * arrowPulse})`;
+          ctx.font = "10px sans-serif"; ctx.textAlign = "center";
+          ctx.fillText("→", arrowX, cy + 4);
+          ctx.textAlign = "left";
+        }
+      });
+      ctx.fillStyle = "rgba(180,140,80,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("ALCHEMICAL PROTOCOL · ELEMENTAL TRANSMUTATION · AIR→FIRE→WATER→EARTH→AETHER", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AlchemicalProtocolPage() {
   return (
     <div
@@ -293,6 +364,26 @@ export default function AlchemicalProtocolPage() {
       }}
     >
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#c9a84c", textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(7,9,24,0.8)", border:"1px solid rgba(201,168,76,0.12)",
+            borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#E7ECF7", margin:"0 0 6px" }}>
+              Alchemical Protocol · Elemental Transmutation · Air→Fire→Water→Earth→Aether
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,210,240,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Five elements connected by gradient bridges, each pulsing at its own resonant phase. The alchemical
+              symbols (Air 🜁 · Fire 🜂 · Water 🜃 · Earth 🜄 · Aether ⊕) animate sequentially, with glowing arrows
+              marking each transmutation step — the metaphorical protocol underlying AETHER's curatorial method.
+            </p>
+            <AlchemyCanvas />
+          </div>
+        </div>
+
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 3, marginBottom: 8 }}>

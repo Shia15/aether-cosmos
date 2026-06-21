@@ -35,6 +35,42 @@ const MORSE_DICT: Record<string, string> = {
   "––·": "G", "––": "M", "···–": "V", "·––": "W", "–·––": "Y", "·–·–": "AE",
 };
 
+function PlantIntelHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes: {x:number;y:number;r:number;phase:number;col:string;connected:number[]}[] = [
+      {x:450,y:85,r:18,phase:0,col:"#44cc77",connected:[1,2,3,4,5,6]},
+      {x:200,y:50,r:10,phase:1,col:"#2ef0d8",connected:[0]},{x:700,y:50,r:10,phase:2,col:"#c9a84c",connected:[0]},
+      {x:100,y:100,r:8,phase:3,col:"#44cc77",connected:[1]},{x:300,y:120,r:8,phase:4,col:"#44cc77",connected:[1]},
+      {x:600,y:120,r:8,phase:5,col:"#c9a84c",connected:[2]},{x:800,y:100,r:8,phase:6,col:"#2ef0d8",connected:[2]},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach(n=>{
+        n.connected.forEach(ci=>{
+          const c=nodes[ci];ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(c.x,c.y);ctx.strokeStyle="rgba(68,204,119,0.15)";ctx.lineWidth=0.7;ctx.stroke();
+        });
+      });
+      nodes.forEach(n=>{
+        const pls=0.85+0.15*Math.sin(t*0.04+n.phase);
+        ctx.beginPath();ctx.arc(n.x,n.y,n.r*pls,0,Math.PI*2);ctx.fillStyle=n.col+"33";ctx.fill();ctx.strokeStyle=n.col+"77";ctx.lineWidth=0.7;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PLANT INTELLIGENCE · PRE-NEURAL COGNITION · MYCELIUM NETWORK · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PlantIntelPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("slime");
@@ -811,6 +847,13 @@ export default function PlantIntelPage() {
   // ===== UI =====
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-32,marginRight:-32}}>
+        <div style={{padding:"8px 32px"}}><div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 32px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PLANT INTELLIGENCE · PRE-NEURAL COGNITION · MYCELIUM NETWORK · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>7 mycelium nodes — the live AETHER plant intelligence simulation.</p></div>
+          <PlantIntelHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>

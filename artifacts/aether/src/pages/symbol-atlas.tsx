@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
@@ -149,6 +149,36 @@ const PROGRESSION = [
   { sym: "Ω", phase: "FIELD-STABILIZED", desc: "Living system · mycelial internet · regenerative", col: C.teal },
 ];
 
+function SymbolAtlasHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const syms=["∞","∇","∂","Ψ","Φ","Σ","Ω","∆","λ","π","⊗","⊕","∮","∝","⊥"];
+    const items: {x:number;y:number;sym:string;phase:number;col:string}[]=[];
+    for(let i=0;i<15;i++) items.push({x:30+i*58,y:30+Math.random()*(H-50),sym:syms[i],phase:i*0.42,col:["#2ef0d8","#9966ff","#c9a84c","#44aaff","#ff4477"][i%5]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      items.forEach(s=>{
+        const alpha=0.2+0.2*Math.sin(t*0.04+s.phase);
+        ctx.fillStyle=s.col+Math.round(alpha*255).toString(16).padStart(2,"0");
+        ctx.font=`${16+6*Math.sin(t*0.03+s.phase)}px serif`;
+        ctx.fillText(s.sym,s.x,s.y);
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SYMBOL ATLAS · GLYPH LIBRARY · NOTATION · MATHEMATICAL LANGUAGE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SymbolAtlasPage() {
   const [tab, setTab] = useState<Tab>("axis");
   const [search, setSearch] = useState("");
@@ -169,6 +199,13 @@ export default function SymbolAtlasPage() {
 
   return (
     <div data-testid="symbol-atlas-root" className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SYMBOL ATLAS · GLYPH LIBRARY · NOTATION · MATHEMATICAL LANGUAGE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>15 pulsing mathematical glyphs — the live AETHER symbol atlas simulation.</p></div>
+          <SymbolAtlasHeaderCanvas />
+        </div>
+      </div>
 
       {/* HEADER */}
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>

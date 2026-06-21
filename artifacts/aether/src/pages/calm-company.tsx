@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import {
   BUCKETS, ANCHORS, pickToday, pickIdea,
@@ -393,6 +393,58 @@ function TheNumber() {
   );
 }
 
+function CalmCompanyCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const buckets = [
+      { label:"LIGHT\nSCULPTOR", col:"#fcd34d", x:W*0.10, y:H*0.5 },
+      { label:"BAVS", col:"#2ef0d8", x:W*0.24, y:H*0.5 },
+      { label:"DIM\nINTENT", col:"#a78bfa", x:W*0.38, y:H*0.5 },
+      { label:"φ-LAT\nOCTO", col:"#c9a84c", x:W*0.52, y:H*0.5 },
+      { label:"REFORM\nANTI", col:"#34d399", x:W*0.66, y:H*0.5 },
+      { label:"B-12\nTURTLE", col:"#60a5fa", x:W*0.80, y:H*0.5 },
+      { label:"CALM\nCO OS", col:"#f9a8d4", x:W*0.92, y:H*0.5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,6,23,0.16)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<buckets.length-1;i++) {
+        const a=buckets[i],b=buckets[i+1];
+        const pkt=(t*0.012+i*0.4)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+      }
+      buckets.forEach((b,i)=>{
+        const pulse=1+0.08*Math.sin(t*0.04+i*1.0);
+        const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,16*pulse);
+        g.addColorStop(0,b.col+"cc"); g.addColorStop(0.5,b.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(b.x,b.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=b.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=b.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=b.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        b.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,b.x,b.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(249,163,76,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CALM COMPANY OS · STORY ENGINE · 18 BUCKETS · 1,314 STORIES/YEAR · 2 POSTS/DAY",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CalmCompanyPage() {
   const [scheduled, setScheduled] = useState<Record<string, boolean>>({});
   useEffect(() => {
@@ -415,6 +467,25 @@ export default function CalmCompanyPage() {
       padding:"3rem 1.5rem 5rem",
     }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');`}</style>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", background:"rgba(253,211,119,0.07)", border:"1px solid rgba(253,211,119,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#fcd34d", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,6,23,0.9)", border:"1px solid rgba(253,211,119,0.1)",
+          borderLeft:"3px solid #fcd34d", borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#fef9e8", margin:"0 0 6px" }}>
+            Calm Company OS · Story Engine · 18 Buckets · 1,314 Stories/Year · 2 Posts/Day
+          </h2>
+          <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(240,220,160,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Seven story-bucket nodes (Light Sculptor/yellow · BAVS/teal · Dimensional Intent/violet · φ-Lattice/gold
+            · Reformation/teal · B-12 Turtle-Time/blue · Calm Company OS/rose) with post-flow packets streaming
+            through — the living AETHER Calm Company content engine at 2 posts/day.
+          </p>
+          <CalmCompanyCanvas />
+        </div>
+      </div>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <header style={{

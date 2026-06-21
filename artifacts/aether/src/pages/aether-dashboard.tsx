@@ -752,6 +752,74 @@ const TABS = [
   { id:"mapping", label:"Agent Map" },
 ];
 
+function DashboardCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 180;
+    const W = canvas.width, H = canvas.height;
+    const agents = [
+      { k:"Mnesis" as AgentKey,   col:"#9b72e8", x:W*0.12, phase:0.0 },
+      { k:"Infernia" as AgentKey, col:"#e8a45a", x:W*0.28, phase:1.0 },
+      { k:"Aletheia" as AgentKey, col:"#5ae8c8", x:W*0.44, phase:2.0 },
+      { k:"Reverie" as AgentKey,  col:"#e85a9b", x:W*0.60, phase:0.7 },
+      { k:"Titanium" as AgentKey, col:"#5a9be8", x:W*0.76, phase:1.5 },
+    ];
+    const busNodes = [
+      { label:"EIE", col:"#c9a84c", x:W*0.87, y:H*0.35 },
+      { label:"MEM", col:"#44cc77", x:W*0.87, y:H*0.65 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(1,3,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      const cy=H*0.46;
+      agents.forEach((ag,i)=>{
+        if (i<agents.length-1) {
+          const b=agents[i+1];
+          const g=ctx.createLinearGradient(ag.x,cy,b.x,cy);
+          g.addColorStop(0,ag.col+"55"); g.addColorStop(1,b.col+"55");
+          ctx.beginPath(); ctx.moveTo(ag.x,cy); ctx.lineTo(b.x,cy);
+          ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+          const pkt=(t*0.013+i*0.55)%1;
+          const px=ag.x+(b.x-ag.x)*pkt;
+          ctx.beginPath(); ctx.arc(px,cy,2,0,Math.PI*2);
+          ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        }
+        const pulse=1+0.08*Math.sin(t*0.04+ag.phase);
+        const g=ctx.createRadialGradient(ag.x,cy,0,ag.x,cy,18*pulse);
+        g.addColorStop(0,ag.col+"cc"); g.addColorStop(0.6,ag.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(ag.x,cy,16*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=ag.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=ag.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=ag.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(ag.k,ag.x,cy+22*pulse+5);
+      });
+      const lastAg=agents[agents.length-1];
+      busNodes.forEach(bn=>{
+        ctx.beginPath(); ctx.moveTo(lastAg.x,cy); ctx.lineTo(bn.x,bn.y);
+        ctx.strokeStyle=bn.col+"44"; ctx.lineWidth=1; ctx.stroke();
+        const bpkt=(t*0.015)%1;
+        const bpx=lastAg.x+(bn.x-lastAg.x)*bpkt, bpy=cy+(bn.y-cy)*bpkt;
+        ctx.beginPath(); ctx.arc(bpx,bpy,2,0,Math.PI*2);
+        ctx.fillStyle=bn.col; ctx.shadowColor=bn.col; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(bn.x,bn.y,10,0,Math.PI*2);
+        ctx.strokeStyle=bn.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=bn.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(bn.label,bn.x,bn.y+4);
+      });
+      ctx.fillStyle="rgba(155,114,232,0.35)"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER DASHBOARD · MULTI-AGENT CONTROL · EIE · MEMORY · INTEGRATIONS",14,16);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ position:"absolute", top:0, left:0, width:"100%", height:180, opacity:0.55, pointerEvents:"none", zIndex:0 }} />;
+}
+
 export default function AetherDashboardPage() {
   const [agent, setAgent] = useState<AgentKey>("Mnesis");
   const [tab, setTab] = useState("chat");
@@ -773,6 +841,7 @@ export default function AetherDashboardPage() {
       `}</style>
 
       <NebulaBackground activeAgent={agent}/>
+      <DashboardCanvas />
 
       <div style={{ position:"relative", zIndex:1, height:"100%", display:"flex", flexDirection:"column" }}>
         {/* Top bar */}

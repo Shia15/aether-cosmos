@@ -120,6 +120,52 @@ const LOG_MSGS = [
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
+function ControlPanelCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const agents=[
+      { label:"EIE", col:"#2ef0d8", x:W*0.15, y:H*0.5 },
+      { label:"MEMORY", col:"#9966ff", x:W*0.3, y:H*0.35 },
+      { label:"PROMPT", col:"#c9a84c", x:W*0.45, y:H*0.65 },
+      { label:"TRIGGER", col:"#44aaff", x:W*0.6, y:H*0.4 },
+      { label:"INTEGR", col:"#44cc77", x:W*0.75, y:H*0.55 },
+      { label:"AGENT", col:"#ff4477", x:W*0.88, y:H*0.5 },
+    ];
+    const signals: {from:number,to:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,5,20,0.2)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      if(tick%14===0&&signals.length<12) signals.push({ from:Math.floor(Math.random()*5), to:5, t:0 });
+      for(let i=signals.length-1;i>=0;i--){
+        const s=signals[i]; s.t+=0.025;
+        const a=agents[s.from], b=agents[s.to];
+        const x=a.x+(b.x-a.x)*s.t, y=a.y+(b.y-a.y)*s.t;
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(s.t>=1) signals.splice(i,1);
+      }
+      agents.forEach(a=>{
+        ctx.beginPath(); ctx.arc(a.x,a.y,12,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=a.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(a.label,a.x,a.y+22);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CONTROL PANEL · EIE · MEMORY · PROMPT · TRIGGER · INTEGRATIONS · MULTI-AGENT · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function ControlPanelView() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [selected, setSelected] = useState<NodeId | null>(null);
@@ -195,6 +241,18 @@ export default function ControlPanelView() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif" }}>
+      <div style={{ padding:"16px 28px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Control Panel · EIE · Memory · Prompt · Trigger · Integrations · Multi-Agent · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six multi-agent nodes (EIE/teal · Memory/violet · Prompt/gold · Trigger/blue · Integrations/green · Agent/rose) with live signal routing — the AETHER control panel simulation.
+          </p>
+          <ControlPanelCanvas />
+        </div>
+      </div>
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid rgba(96,165,250,0.12)", padding: "14px 28px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>

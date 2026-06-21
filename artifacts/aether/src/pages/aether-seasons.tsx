@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 const PILLARS = [
   { icon: "🌍", title: "Systems Thinking", desc: "Seeing parts as a connected whole." },
   { icon: "🧠", title: "Pattern Recognition", desc: "Naming the shapes that repeat across scales." },
@@ -138,6 +139,68 @@ function Section({ id, kicker, title, children }: { id?: string; kicker: string;
   );
 }
 
+function SeasonalCycleCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const SEASONS = [
+    { name:"Spring",  col:"#44cc77", angle: 0 },
+    { name:"Summer",  col:"#facc15", angle: Math.PI / 2 },
+    { name:"Autumn",  col:"#c9a84c", angle: Math.PI },
+    { name:"Winter",  col:"#44aaff", angle: Math.PI * 3 / 2 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#0a0c14"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cx = W / 2, cy = H / 2, R = 85;
+      const rot = t * 0.005;
+      [40, 65, 85].forEach(r => {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(200,200,255,0.05)"; ctx.lineWidth = 1; ctx.stroke();
+      });
+      SEASONS.forEach((s, i) => {
+        const angle = s.angle + rot;
+        const sx = cx + R * Math.cos(angle);
+        const sy = cy + R * Math.sin(angle);
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.04 + i * 1.5);
+        const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 20 * pulse);
+        g.addColorStop(0, s.col); g.addColorStop(0.5, s.col + "55"); g.addColorStop(1, s.col + "00");
+        ctx.beginPath(); ctx.arc(sx, sy, 20 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(sx, sy, 10, 0, Math.PI * 2);
+        ctx.fillStyle = s.col + "99"; ctx.fill();
+        ctx.fillStyle = s.col;
+        ctx.font = "8px 'Space Mono', monospace"; ctx.textAlign = "center";
+        ctx.fillText(s.name, sx, sy + (sy > cy ? 28 : -18));
+        ctx.textAlign = "left";
+        const next = SEASONS[(i + 1) % 4];
+        const na = next.angle + rot;
+        const nx = cx + R * Math.cos(na), ny = cy + R * Math.sin(na);
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(nx, ny);
+        ctx.strokeStyle = s.col + "33"; ctx.lineWidth = 1; ctx.stroke();
+      });
+      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 14);
+      cg.addColorStop(0, "#fff"); cg.addColorStop(0.4, "#c9a84c"); cg.addColorStop(1, "#c9a84c00");
+      ctx.beginPath(); ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+      ctx.fillStyle = cg; ctx.fill();
+      ctx.fillStyle = "rgba(200,200,180,0.28)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER SEASONS · LEARNING IN LAYERS · SEASONAL EDUCATIONAL CYCLES", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherSeasonsPage() {
   return (
     <div data-testid="page-aether-seasons" style={{
@@ -150,6 +213,26 @@ export default function AetherSeasonsPage() {
       overflowX: "hidden",
     }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(68,204,119,0.08)", border:"1px solid rgba(68,204,119,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#44cc77", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(10,12,20,0.8)", border:"1px solid rgba(68,204,119,0.12)",
+            borderLeft:"3px solid #44cc77", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e2e8f0", margin:"0 0 6px" }}>
+              AETHER Seasons · Learning in Layers · Seasonal Educational Cycles
+            </h2>
+            <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(200,220,200,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Four seasons (Spring/green · Summer/yellow · Autumn/gold · Winter/blue) orbit a golden core on
+              concentric field rings, slowly rotating. Each season pulses and connects to the next via gossamer
+              arcs — the temporal rhythm of the AETHER Seasons educational media brand.
+            </p>
+            <SeasonalCycleCanvas />
+          </div>
+        </div>
+
         {/* Masthead */}
         <header style={{
           padding: "2.5rem 2rem",

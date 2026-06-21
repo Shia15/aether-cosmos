@@ -225,15 +225,69 @@ function KeyTester() {
   );
 }
 
+function CliNanoCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const lines=[
+      "$ aether cli nano --mode=interactive",
+      "  → Initialising AETHER nano shell v2.1...",
+      "  → Loading coherence lattice: [████████████] 100%",
+      "  → AETHER OS ready. Type :help for commands.",
+      "  $ _ ",
+    ];
+    let t=0, cursor=true;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,10,2,0.22)"; ctx.fillRect(0,0,W,H);
+      t++;
+      if(t%30===0) cursor=!cursor;
+      ctx.fillStyle="#4ade80"; ctx.font="12px 'JetBrains Mono',monospace"; ctx.textAlign="left";
+      lines.forEach((line,i)=>{
+        const alpha=Math.min(1,(t-i*20)/30);
+        if(alpha>0){
+          const display=i===lines.length-1&&cursor?line.replace("_","▋"):line;
+          ctx.globalAlpha=alpha;
+          ctx.fillStyle=i===0?"#4ade80":i===1||i===2||i===3?"rgba(134,239,172,0.7)":"#4ade80";
+          ctx.fillText(display,20,H*0.15+i*H*0.165);
+        }
+      });
+      ctx.globalAlpha=1;
+      ctx.fillStyle="rgba(74,222,128,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("CLI · NANO · AETHER INTERACTIVE SHELL · KEY TESTER · CHEAT SHEET · LAUNCH FLAGS",14,12);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CliNanoPage() {
   return (
     <div data-testid="page-cli-nano" style={{
       minHeight:"100vh", width:"100%",
       background:"radial-gradient(ellipse at top, #052e16 0%, #020617 60%, #000 100%)",
       color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
+
       padding:"3rem 1.5rem 5rem",
     }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #4ade80", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#4ade80", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,8,2,0.9)", border:"1px solid rgba(74,222,128,0.1)", borderLeft:"3px solid #4ade80", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0ffe0", margin:"0 0 6px" }}>
+            CLI · nano · AETHER Interactive Shell · Key Tester · Cheat Sheet · Launch Flags
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(74,222,128,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Live terminal session with animated command output, blinking cursor, and progressive line reveal — the AETHER nano shell simulation.
+          </p>
+          <CliNanoCanvas />
+        </div>
+      </div>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <header style={{

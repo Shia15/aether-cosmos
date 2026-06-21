@@ -487,12 +487,57 @@ const NAV = [
 ];
 
 /* ── Page ──────────────────────────────────── */
+function WebbedLegHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2+10;
+    let t=0;
+    const toes=5;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const legPoints: {x:number;y:number}[]=[];
+      for(let i=0;i<toes;i++){
+        const spread=0.6;
+        const angle=-Math.PI/2+(i/(toes-1)-0.5)*spread*Math.PI;
+        const toeLen=35+8*Math.sin(t*0.04+i*0.5);
+        const tx=cx+Math.cos(angle)*toeLen,ty=cy+Math.sin(angle)*toeLen;
+        legPoints.push({x:tx,y:ty});
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(tx,ty);ctx.strokeStyle="rgba(68,204,119,0.4)";ctx.lineWidth=1.5;ctx.stroke();
+        ctx.beginPath();ctx.arc(tx,ty,3,0,Math.PI*2);ctx.fillStyle="rgba(68,204,119,0.6)";ctx.fill();
+      }
+      for(let i=0;i<legPoints.length-1;i++){
+        const a=legPoints[i],b=legPoints[i+1];
+        const mx=(a.x+b.x)/2+(cy-a.y)*0.08,my=(a.y+b.y)/2;
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(mx,my,b.x,b.y);ctx.strokeStyle="rgba(68,204,119,0.12)";ctx.lineWidth=6;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fillStyle="rgba(68,204,119,0.3)";ctx.fill();
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("WEBBED LEG · BIO-HYBRID LOCOMOTION · AMPHIBIAN MORPHOLOGY · HYDRO-FIELD · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function WebbedLegPage() {
   const [mode, setMode] = useState<Mode>("membrane");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WEBBED LEG · BIO-HYBRID LOCOMOTION · AMPHIBIAN MORPHOLOGY · HYDRO-FIELD · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5-toe webbed foot with membrane fills — the live AETHER webbed-leg simulation.</p></div>
+          <WebbedLegHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{
         padding: "66px 28px 42px", textAlign: "center",

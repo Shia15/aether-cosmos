@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgPaper from "@assets/ChatGPT_Image_Apr_26,_2026,_02_25_54_PM_1777227956352.png";
@@ -85,9 +86,90 @@ const REFS = [
   "Flash Joule heating applications for nanodiamonds",
 ];
 
+function MyceliumNetworkCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 280;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    type Branch = { x: number; y: number; angle: number; len: number; depth: number; age: number };
+    const rng = (seed: number) => {
+      let s = seed;
+      return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+    };
+    const rand = rng(42);
+    const branches: Branch[] = [];
+    const MAX_DEPTH = 7;
+    function sprout(x: number, y: number, angle: number, len: number, depth: number) {
+      if (depth > MAX_DEPTH || len < 3) return;
+      branches.push({ x, y, angle, len, depth, age: 0 });
+    }
+    for (let i = 0; i < 5; i++) sprout(W * (0.1 + i * 0.2), H, -Math.PI / 2 + (rand() - 0.5) * 0.3, 60 + rand() * 20, 0);
+    const grown: Branch[] = [];
+    function step() {
+      if (branches.length === 0) return;
+      const b = branches.shift()!;
+      grown.push({ ...b });
+      const ex = b.x + Math.cos(b.angle) * b.len;
+      const ey = b.y + Math.sin(b.angle) * b.len;
+      if (b.depth < MAX_DEPTH && ey > 10) {
+        const nlen = b.len * (0.62 + rand() * 0.12);
+        sprout(ex, ey, b.angle + (rand() - 0.5) * 0.7, nlen, b.depth + 1);
+        if (rand() < 0.65) sprout(ex, ey, b.angle + (rand() - 0.5) * 1.2, nlen * 0.7, b.depth + 2);
+      }
+    }
+    for (let i = 0; i < 200; i++) step();
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#F1ECDC"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      grown.forEach((b, i) => {
+        const pulse = 0.55 + 0.35 * Math.sin(t * 0.025 + i * 0.15);
+        const ex = b.x + Math.cos(b.angle) * b.len;
+        const ey = b.y + Math.sin(b.angle) * b.len;
+        const thick = Math.max(0.4, (MAX_DEPTH - b.depth) * 0.6);
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y);
+        ctx.lineTo(ex, ey);
+        const alpha = Math.round(pulse * 200).toString(16).padStart(2, "0");
+        ctx.strokeStyle = b.depth < 3 ? `#3F5A2C${alpha}` : b.depth < 5 ? `#5A7C45${alpha}` : `#86A36F${alpha}`;
+        ctx.lineWidth = thick;
+        ctx.stroke();
+      });
+      for (let p = 0; p < 6; p++) {
+        const px = (t * 0.8 + p * 143) % W;
+        const py = 40 + (p * 47) % (H - 60);
+        const a = 0.35 + 0.25 * Math.sin(t * 0.04 + p);
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5 + Math.sin(t * 0.03 + p) * 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(134,163,111,${a})`;
+        ctx.fill();
+      }
+      ctx.fillStyle = "rgba(63,90,44,0.5)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("MYCELIUM NETWORK · BRANCHING GROWTH SIMULATION", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function MyceliumSubstratePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="mycelium-substrate-page">
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MYCELIUM SUBSTRATE · HYPHAL NETWORK · NUTRIENT FLOW · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live mycelium network growth — the AETHER substrate simulation.</p></div>
+          <MyceliumNetworkCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}
@@ -110,6 +192,24 @@ export default function MyceliumSubstratePage() {
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             {FACTS.map((f) => <Chip key={f.l} {...f} />)}
+          </div>
+          <div style={{ marginTop:24 }}>
+            <div style={{ display:"inline-block", background:"rgba(90,124,69,0.12)", border:"1px solid rgba(90,124,69,0.3)",
+              borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+              color:B.mossDeep, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+              Live Simulation
+            </div>
+            <div style={{ background:B.panel, border:`1px solid ${B.border}`, borderLeft:`3px solid ${B.mossDeep}`,
+              borderRadius:10, padding:20 }}>
+              <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+                Mycelium Network · Branching Growth Simulation
+              </h2>
+              <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.muted, margin:"0 0 14px", lineHeight:1.65 }}>
+                Five root nodes sprout from the base, each branching recursively up to depth 7 with organic angular jitter
+                (growth constant k=0.62). Pulse amplitude breathes slowly. Drifting spore particles represent nutrient transport.
+              </p>
+              <MyceliumNetworkCanvas />
+            </div>
           </div>
 
           <div className="mt-6 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panelWarm }}>

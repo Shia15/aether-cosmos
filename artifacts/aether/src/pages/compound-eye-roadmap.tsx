@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const BG     = "#020408";
 const ACCENT = "#1fa8d4";
@@ -182,6 +182,40 @@ const BUILDS = [
   },
 ];
 
+function CompoundEyeCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const facets: {ang:number,r:number,col:string,phase:number}[]=[];
+    for(let i=0;i<18;i++) facets.push({ ang:i*(Math.PI*2/18), r:55, col:`hsl(${i*20},75%,55%)`, phase:Math.random()*Math.PI*2 });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      facets.forEach(f=>{
+        const psi=0.5+0.5*Math.sin(t*0.04+f.phase);
+        const x=cx+f.r*Math.cos(f.ang), y=cy+f.r*Math.sin(f.ang);
+        ctx.beginPath(); ctx.arc(x,y,10+4*psi,0,Math.PI*2);
+        ctx.fillStyle=f.col; ctx.shadowColor=f.col; ctx.shadowBlur=8*psi; ctx.fill(); ctx.shadowBlur=0;
+      });
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,16);
+      g.addColorStop(0,"#2ef0d8bb"); g.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+      ctx.fillStyle="rgba(31,168,212,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COMPOUND EYE ROADMAP · FACETED OPTICS · OMMATIDIAL ARRAY · AETHER PHOTONIC SENSOR",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CompoundEyeRoadmapPage() {
   const [selectedThread, setSelectedThread] = useState<string | null>(null);
   const [selectedBuild, setSelectedBuild]   = useState<string | null>(null);
@@ -190,6 +224,18 @@ export default function CompoundEyeRoadmapPage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #1fa8d4", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#1fa8d4", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(31,168,212,0.1)", borderLeft:"3px solid #1fa8d4", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Compound Eye Roadmap · Faceted Optics · Ommatidial Array · AETHER Photonic Sensor
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(31,168,212,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Eighteen chromatic ommatidial facets pulsing in a compound-eye ring pattern — the live AETHER bio-photonic sensor simulation.
+          </p>
+          <CompoundEyeCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#06020e 0%,#030812 50%,#020408 100%)",

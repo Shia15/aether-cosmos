@@ -218,7 +218,45 @@ const GUARDRAILS = [
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
+
+function LearningLayersCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const layers=[
+      {y:H*0.2,col:"#2ef0d8",label:"Layer 1 · Seed"},
+      {y:H*0.4,col:"#9966ff",label:"Layer 2 · Pattern"},
+      {y:H*0.6,col:"#c9a84c",label:"Layer 3 · Signal"},
+      {y:H*0.8,col:"#ff4477",label:"Layer 4 · Coherence"},
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      layers.forEach((l,i)=>{
+        const wave=Math.sin(t*0.02+i*0.8)*8;
+        const alpha=0.3+0.4*Math.abs(Math.sin(t*0.015+i));
+        ctx.beginPath();
+        for(let px=0;px<W;px++){
+          const y=l.y+Math.sin(px*0.02+t*0.025+i*1.2)*wave;
+          px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+        }
+        ctx.strokeStyle=l.col+Math.round(alpha*255).toString(16).padStart(2,"0"); ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=l.col; ctx.font="8px 'DM Mono',monospace"; ctx.fillText(l.label,14,l.y-4);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("LEARNING IN LAYERS · AETHER SEASONS · 5-BOOK SERIES · EDUCATIONAL BRAND · AETHER",280,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
 
 export default function LearningLayersPage() {
   return (
@@ -226,6 +264,13 @@ export default function LearningLayersPage() {
       minHeight: "100vh", background: T.bg, color: T.ink,
       fontFamily: "'Inter', system-ui, sans-serif",
     }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LEARNING IN LAYERS · AETHER SEASONS · 5-BOOK SERIES · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 learning-layer sine waves — the live AETHER educational brand animation.</p></div>
+          <LearningLayersCanvas />
+        </div>
+      </div>
 
       {/* ── Masthead ─────────────────────────────────────────────────────────── */}
       <div style={{

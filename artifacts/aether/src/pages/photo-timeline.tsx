@@ -67,6 +67,42 @@ const C = {
   white: "#e2e8f0", dim: "#4a6080",
 };
 
+function PhotoTimelineHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const events: {x:number;y:number;col:string;label:string;phase:number}[] = [
+      {x:80,y:72,col:"#2ef0d8",label:"2020",phase:0},
+      {x:200,y:48,col:"#9966ff",label:"2021",phase:1},
+      {x:320,y:90,col:"#c9a84c",label:"2022",phase:2},
+      {x:440,y:55,col:"#44aaff",label:"2023",phase:3},
+      {x:560,y:80,col:"#44cc77",label:"2024",phase:4},
+      {x:680,y:45,col:"#ff4477",label:"2025",phase:5},
+      {x:800,y:72,col:"#2ef0d8",label:"2026",phase:6},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      ctx.beginPath();for(let i=0;i<events.length;i++){i===0?ctx.moveTo(events[i].x,events[i].y):ctx.lineTo(events[i].x,events[i].y);}ctx.strokeStyle="rgba(46,240,216,0.15)";ctx.lineWidth=1;ctx.stroke();
+      events.forEach(e=>{
+        const pls=0.8+0.2*Math.sin(t*0.04+e.phase);
+        ctx.beginPath();ctx.arc(e.x,e.y,9*pls,0,Math.PI*2);ctx.fillStyle=e.col+"33";ctx.fill();ctx.strokeStyle=e.col+"88";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle=e.col;ctx.font="bold 7px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(e.label,e.x,e.y+3);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PHOTO TIMELINE · VISUAL ARCHIVE · TEMPORAL MEMORY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhotoTimelinePage() {
   const [selected, setSelected] = useState<typeof PHOTOS[0] | null>(null);
   const [view, setView] = useState<"timeline" | "grid">("timeline");
@@ -90,6 +126,13 @@ export default function PhotoTimelinePage() {
 
   return (
     <div style={{ minHeight: "100%", background: C.bg, color: C.white, fontFamily: "'DM Mono',monospace", overflowY: "auto" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PHOTO TIMELINE · VISUAL ARCHIVE · TEMPORAL MEMORY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>7 milestone nodes — the live AETHER photo timeline simulation.</p></div>
+          <PhotoTimelineHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(0,229,192,0.1)", padding: "2rem 2.5rem 1.5rem" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.35em", color: C.teal, textTransform: "uppercase", marginBottom: 8 }}>

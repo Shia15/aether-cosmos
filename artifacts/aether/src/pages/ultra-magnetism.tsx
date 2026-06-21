@@ -23,6 +23,45 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
 
 type Phase = "ferro" | "anti" | "para";
 
+function UltraMagnetismHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const lines=14;
+      for(let i=0;i<lines;i++){
+        const angle=i/lines*Math.PI;
+        const strength=0.4+0.3*Math.sin(t*0.04+i*0.3);
+        ctx.beginPath();
+        for(let s=0;s<=40;s++){
+          const frac=s/40;
+          const r=60*frac;
+          const fieldAngle=angle+Math.PI*0.3*Math.sin(r*0.06+t*0.02)*frac;
+          const x=cx+r*Math.cos(fieldAngle);
+          const y=cy+r*Math.sin(fieldAngle)*0.5;
+          s===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=`rgba(255,68,119,${strength*0.3})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(cx-12,cy,6,0,Math.PI*2);ctx.fillStyle="rgba(255,68,119,0.6)";ctx.fill();
+      ctx.beginPath();ctx.arc(cx+12,cy,6,0,Math.PI*2);ctx.fillStyle="rgba(68,170,255,0.6)";ctx.fill();
+      ctx.fillStyle="rgba(255,68,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("ULTRA MAGNETISM · MAGNETIC FIELD · FLUX DENSITY · DIPOLE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UltraMagnetismPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("lattice");
@@ -546,6 +585,13 @@ export default function UltraMagnetismPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #ff4477",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ff4477",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ff4477",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ff4477",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>ULTRA MAGNETISM · MAGNETIC FIELD · FLUX DENSITY · DIPOLE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,68,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>14 curved field lines + N/S poles — the live AETHER ultra-magnetism simulation.</p></div>
+          <UltraMagnetismHeaderCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[10px] tracking-[0.4em] uppercase mb-2" style={{ color: C.muted }}>
           AETHER · ULTRA-MAGNETISM × SUPERCONDUCTIVITY · APRIL 2026

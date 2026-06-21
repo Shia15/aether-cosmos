@@ -156,10 +156,53 @@ const HIEROGLYPHS = [
   { sym: "⟨⟩", name: "Double Helix / ḥ", op: "Vortical Propagation", desc: "Γ_helix — the dynamic flow. The double strand of DNA, the rotating magnetic field, the galactic arm.", color: V.blue },
 ];
 
+function SpacetimeFabricHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const rows=8,cols=20;
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          const bx=c/cols*W,by=r/rows*H;
+          const distFromCenter=Math.sqrt(Math.pow(c/cols-0.5,2)+Math.pow(r/rows-0.5,2));
+          const warp=20*Math.exp(-distFromCenter*4)*Math.sin(t*0.04);
+          const x=bx,y=by+warp;
+          if(c>0){
+            ctx.beginPath();ctx.moveTo((c-1)/cols*W,by+warp);ctx.lineTo(x,y);ctx.strokeStyle=`rgba(153,102,255,${0.05+0.1*Math.exp(-distFromCenter*3)})`;ctx.lineWidth=0.4;ctx.stroke();
+          }
+          if(r>0){
+            const prevWarp=20*Math.exp(-Math.sqrt(Math.pow(c/cols-0.5,2)+Math.pow((r-1)/rows-0.5,2))*4)*Math.sin(t*0.04);
+            ctx.beginPath();ctx.moveTo(bx,(r-1)/rows*H+prevWarp);ctx.lineTo(x,y);ctx.strokeStyle=`rgba(153,102,255,${0.05+0.1*Math.exp(-distFromCenter*3)})`;ctx.lineWidth=0.4;ctx.stroke();
+          }
+        }
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SPACETIME FABRIC · CURVATURE · GRAVITATIONAL LENSING · GEODESIC · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SpacetimeFabricPage() {
   return (
     <div style={{ height: "100%", overflowY: "auto", background: V.bg, color: V.text, fontFamily: V.serif }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPACETIME FABRIC · CURVATURE · GRAVITATIONAL LENSING · GEODESIC · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live warped grid — the AETHER spacetime fabric simulation.</p></div>
+          <SpacetimeFabricHeaderCanvas />
+        </div>
+      </div>
       {/* ── Hero ── */}
       <div style={{ background: "linear-gradient(180deg,rgba(4,10,20,1),rgba(2,4,8,1))", borderBottom: `1px solid ${V.border}`, padding: "60px 48px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 80% at 50% 0%, rgba(68,136,255,0.05),transparent)", pointerEvents: "none" }} />

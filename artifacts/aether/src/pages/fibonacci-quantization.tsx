@@ -32,6 +32,40 @@ function zeckendorf(n: number) {
   return used;
 }
 
+function FibQuantCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const cx = W/2, cy = H/2;
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      const n = Math.floor(t*0.15) % 144 + 1;
+      for (let i=0; i<n; i++) {
+        const angle = i * 2.3999;
+        const r = Math.sqrt(i) * 9;
+        const x = cx + r*Math.cos(angle);
+        const y = cy + r*Math.sin(angle);
+        if (x>0&&x<W&&y>0&&y<H) {
+          const a = 0.4+0.5*(i/n);
+          ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(201,168,76,${a})`; ctx.fill();
+        }
+      }
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText(`FIBONACCI QUANTIZATION · GOLDEN ANGLE · φ SPIRAL · n=${n} · AETHER`,14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function FibonacciQuantizationPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef({
@@ -301,6 +335,13 @@ export default function FibonacciQuantizationPage() {
   return (
     <div data-testid="fqp-root" className="min-h-screen p-6"
          style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(10,8,2,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FIBONACCI QUANTIZATION · GOLDEN ANGLE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Golden-angle spiral — n dots phyllotaxis growing in real time.</p></div>
+          <FibQuantCanvas />
+        </div>
+      </div>
 
       <div className="border-b pb-5 mb-6 flex items-end justify-between gap-4 flex-wrap" style={{ borderColor: C.border }}>
         <div>

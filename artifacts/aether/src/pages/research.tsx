@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const PHI = "1.6180339887";
 const GOLD = "#fbbf24";
@@ -99,11 +99,58 @@ const COLLAB = [
   },
 ];
 
+function ResearchHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes: {x:number;y:number;r:number;phase:number;col:string;label:string}[]=[
+      {x:450,y:72,r:18,phase:0,col:"#c9a84c",label:"5Φ"},
+      {x:180,y:35,r:11,phase:1,col:"#2ef0d8",label:"MATH"},
+      {x:340,y:25,r:10,phase:2,col:"#9966ff",label:"FIELD"},
+      {x:560,y:25,r:10,phase:3,col:"#44cc77",label:"BIO"},
+      {x:720,y:35,r:11,phase:4,col:"#ff4477",label:"COSMO"},
+      {x:150,y:110,r:9,phase:5,col:"#44aaff",label:"PHYS"},
+      {x:310,y:118,r:9,phase:6,col:"#c9a84c",label:"CHEM"},
+      {x:590,y:118,r:9,phase:7,col:"#2ef0d8",label:"COMP"},
+      {x:750,y:110,r:9,phase:8,col:"#9966ff",label:"ASTRO"},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.slice(1).forEach(n=>{
+        ctx.beginPath();ctx.moveTo(nodes[0].x,nodes[0].y);ctx.lineTo(n.x,n.y);ctx.strokeStyle=n.col+"22";ctx.lineWidth=0.5;ctx.stroke();
+      });
+      nodes.forEach(n=>{
+        const pls=0.85+0.15*Math.sin(t*0.04+n.phase);
+        ctx.beginPath();ctx.arc(n.x,n.y,n.r*pls,0,Math.PI*2);ctx.fillStyle=n.col+"22";ctx.fill();ctx.strokeStyle=n.col+"66";ctx.lineWidth=0.7;ctx.stroke();
+        ctx.fillStyle=n.col;ctx.font="5px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(n.label,n.x,n.y+2);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("RESEARCH · KNOWLEDGE SYNTHESIS · FIELD STUDY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function Research() {
   const [activeDiscovery, setActiveDiscovery] = useState<string | null>("rational");
 
   return (
     <div style={{ height: "100%", overflowY: "auto", background: "rgb(4,3,18)", color: "rgba(255,255,255,0.85)", fontFamily: "'Raleway', 'Georgia', sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>RESEARCH · KNOWLEDGE SYNTHESIS · FIELD STUDY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>The live AETHER research knowledge graph simulation.</p></div>
+          <ResearchHeaderCanvas />
+        </div>
+      </div>
       {/* MASTHEAD */}
       <div style={{ background: "linear-gradient(180deg, rgba(251,191,36,0.06) 0%, transparent 100%)", borderBottom: "1px solid rgba(251,191,36,0.15)", padding: "24px 32px 20px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 4 }}>

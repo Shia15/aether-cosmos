@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
@@ -83,6 +83,58 @@ const OPEN_QUESTIONS = [
   "Long-term ecological monitoring of AETHER-based medical systems",
 ];
 
+function WhitepaperCanvas() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  const rafRef = React.useRef(0);
+  React.useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const nodes = [
+      { x:W*0.12, y:H*0.5, col:"#ff4477", label:"ENTROPY", size:26, phase:0.0 },
+      { x:W*0.30, y:H*0.42, col:"#9966ff", label:"BIOLOGICAL", size:20, phase:1.1 },
+      { x:W*0.50, y:H*0.5, col:"#c9a84c", label:"COHERENCE", size:30, phase:2.2 },
+      { x:W*0.70, y:H*0.42, col:"#44aaff", label:"COMPUTATIONAL", size:20, phase:0.7 },
+      { x:W*0.88, y:H*0.5, col:"#2ef0d8", label:"RESONANT", size:26, phase:1.8 },
+    ];
+    const links=[[0,1],[1,2],[2,3],[3,4],[0,2],[2,4]];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      links.forEach(([a,b])=>{
+        const na=nodes[a],nb=nodes[b];
+        const flow=(t*0.015+a*0.5+b*0.3)%1;
+        const g=ctx.createLinearGradient(na.x,na.y,nb.x,nb.y);
+        g.addColorStop(0,na.col+"55"); g.addColorStop(1,nb.col+"55");
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.shadowColor=na.col; ctx.shadowBlur=6; ctx.stroke(); ctx.shadowBlur=0;
+        const px=na.x+(nb.x-na.x)*flow, py=na.y+(nb.y-na.y)*flow;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+      });
+      nodes.forEach(n=>{
+        const pulse=1+0.1*Math.sin(t*0.035+n.phase);
+        const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.size*2*pulse);
+        g.addColorStop(0,n.col+"bb"); g.addColorStop(0.5,n.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.size*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=n.col; ctx.shadowBlur=18; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.size*pulse,0,Math.PI*2);
+        ctx.strokeStyle=n.col; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=n.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+n.size*pulse+12);
+      });
+      ctx.fillStyle="rgba(201,168,76,0.45)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("SCALE-INVARIANT FRAMEWORK · ENTROPY ↔ COHERENCE · EMERGENT INTELLIGENCE",14,20);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherWhitepaperPage() {
   const [tab, setTab] = useState<Tab>("abstract");
 
@@ -95,6 +147,26 @@ export default function AetherWhitepaperPage() {
 
   return (
     <div data-testid="whitepaper-root" className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+
+      <div style={{ marginBottom:20 }}>
+        <div style={{ display:"inline-block", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:C.gold, textTransform:"uppercase", fontFamily:"'JetBrains Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,7,14,0.8)", border:"1px solid rgba(201,168,76,0.12)",
+          borderLeft:`3px solid ${C.gold}`, borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:C.white, margin:"0 0 6px" }}>
+            AETHER Whitepaper · Scale-Invariant Framework · Entropy ↔ Coherence · Emergent Intelligence
+          </h2>
+          <p style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five domain nodes (Entropy/rose · Biological/violet · Coherence/gold · Computational/blue · Resonant/teal)
+            connected by bidirectional flow links with photon packets streaming between them — the five-node
+            knowledge architecture of the AETHER scale-invariant coherence whitepaper.
+          </p>
+          <WhitepaperCanvas />
+        </div>
+      </div>
 
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
         <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>

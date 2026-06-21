@@ -47,9 +47,54 @@ const BRIDGES: { href: string; title: string; subtitle: string }[] = [
     subtitle: "The transform alongside the rest of the symbolic library." },
 ];
 
+import { useEffect, useRef } from "react";
+
+function PrimeAntiPrimeHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const primes=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47];
+    const composites=[4,6,8,9,10,12,14,15,16,18,20,21,22,24,25];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      primes.forEach((p,i)=>{
+        const x=25+i*40,y=H*0.35;
+        const pls=0.85+0.15*Math.sin(t*0.05+i*0.6);
+        ctx.beginPath();ctx.arc(x,y,14*pls,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.2)";ctx.fill();ctx.strokeStyle="rgba(46,240,216,0.6)";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle="#2ef0d8";ctx.font="bold 8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(String(p),x,y+3);
+      });
+      composites.forEach((c,i)=>{
+        const x=25+i*40,y=H*0.72;
+        const pls=0.85+0.15*Math.sin(t*0.03+i*0.8+Math.PI);
+        ctx.beginPath();ctx.arc(x,y,12*pls,0,Math.PI*2);ctx.fillStyle="rgba(255,68,119,0.15)";ctx.fill();ctx.strokeStyle="rgba(255,68,119,0.4)";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle="#ff4477";ctx.font="bold 8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(String(c),x,y+3);
+      });
+      ctx.textAlign="left";
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PRIME · ANTI-PRIME · NUMBER THEORY · FACTORIZATION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PrimeAntiPrimeView() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PRIME · ANTI-PRIME · NUMBER THEORY · FACTORIZATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>15 primes + 15 composites — the live AETHER prime anti-prime simulation.</p></div>
+          <PrimeAntiPrimeHeaderCanvas />
+        </div>
+      </div>
       <style>{`@keyframes pap-fade { from { opacity:0; transform: translateY(6px) } to { opacity:1; transform: none } }
         .pap-fade { animation: pap-fade 0.55s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .pap-fade { animation: none; } }`}</style>

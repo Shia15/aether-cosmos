@@ -37,6 +37,35 @@ const RASTER_CHANNELS = 16;
 // Microfluidic channel layout (Tab 3)
 type Channel = { x0: number; y0: number; x1: number; y1: number; r: number };
 
+function OrganoidHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const cells: {x:number;y:number;r:number;phase:number;col:string}[] = [];
+    for(let i=0;i<24;i++) cells.push({x:30+Math.random()*(W-60),y:15+Math.random()*(H-30),r:6+Math.random()*10,phase:Math.random()*Math.PI*2,col:["#2ef0d8","#c084fc","#44aaff","#c9a84c"][Math.floor(Math.random()*4)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      cells.forEach(c=>{
+        c.phase+=0.02;
+        const pls=0.8+0.2*Math.sin(c.phase);
+        ctx.beginPath();ctx.arc(c.x,c.y,c.r*pls,0,Math.PI*2);ctx.fillStyle=c.col+"33";ctx.fill();ctx.strokeStyle=c.col+"88";ctx.lineWidth=0.7;ctx.stroke();
+        ctx.beginPath();ctx.arc(c.x,c.y,c.r*0.3,0,Math.PI*2);ctx.fillStyle=c.col+"55";ctx.fill();
+      });
+      ctx.fillStyle="rgba(192,132,252,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("ORGANOID INTELLIGENCE · BIO-FERROFLUID · NEURAL ORGANOID · 12×12 ARRAY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function OrganoidIntelPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("x144");
@@ -757,6 +786,13 @@ export default function OrganoidIntelPage() {
   // ===== UI =====
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-32,marginRight:-32}}>
+        <div style={{padding:"8px 32px"}}><div style={{display:"inline-block",border:"1px solid #c084fc",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c084fc",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 32px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c084fc",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c084fc",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>ORGANOID INTELLIGENCE · BIO-FERROFLUID · NEURAL ORGANOID · 12×12 ARRAY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(192,132,252,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>24 pulsing organoid cells — the live AETHER organoid intelligence simulation.</p></div>
+          <OrganoidHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>

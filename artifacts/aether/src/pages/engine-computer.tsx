@@ -1,5 +1,59 @@
 import { useEffect, useRef, useState } from "react";
 
+function EngineComputerCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 220;
+    const ctx = canvas.getContext("2d")!;
+    const strokes = [
+      { name:"INTAKE",    col:"#30e0e8", angle:0 },
+      { name:"COMPRESS",  col:"#9966ff", angle:90 },
+      { name:"POWER",     col:"#ff5580", angle:180 },
+      { name:"EXHAUST",   col:"#e8b030", angle:270 },
+    ];
+    const cx=350, cy=110, r=70;
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      ctx.clearRect(0,0,700,220);
+      ctx.fillStyle="#04030a"; ctx.fillRect(0,0,700,220);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(232,176,48,0.08)";
+      ctx.fillText("ENGINE COMPUTER · 4-STROKE OTTO CYCLE · COMPUTE ENGINE · AETHER",10,14);
+      const angle=(tick*0.8)%360;
+      strokes.forEach((s,i)=>{
+        const a=((angle+s.angle)%360)*Math.PI/180;
+        const x=cx+r*Math.cos(a), y=cy+r*Math.sin(a);
+        ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2);
+        ctx.fillStyle=s.col+"99"; ctx.fill();
+        ctx.beginPath(); ctx.arc(x,y,7,0,Math.PI*2);
+        ctx.fillStyle=s.col; ctx.fill();
+        ctx.fillStyle="#e0f8ff"; ctx.font="7px 'DM Mono',monospace"; ctx.textAlign="center";
+        const lx=cx+(r+28)*Math.cos(a), ly=cy+(r+28)*Math.sin(a);
+        ctx.fillText(s.name,lx,ly+3); ctx.textAlign="left";
+        const phase=((angle+s.angle)%360)/360;
+        const glow=ctx.createRadialGradient(x,y,0,x,y,18);
+        glow.addColorStop(0,s.col+"55"); glow.addColorStop(1,"transparent");
+        ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(x,y,18,0,Math.PI*2); ctx.fill();
+        void i;
+      });
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle="rgba(232,176,48,0.2)"; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+      const pistonY=cy+Math.sin(tick*0.05)*40;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx,pistonY);
+      ctx.strokeStyle="#e8b030"; ctx.lineWidth=2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2);
+      ctx.fillStyle="#e8b030"; ctx.fill();
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 /* ── Palette ── */
 const BG     = "#04030a";
 const PANEL  = "rgba(4,3,10,0.97)";
@@ -591,6 +645,18 @@ export default function EngineComputerPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT, fontFamily:mono, overflowY:"auto" }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #30e0e8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#30e0e8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(4,3,10,0.9)", border:"1px solid rgba(48,224,232,0.1)", borderLeft:"3px solid #30e0e8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Engine Computer · 4-Stroke Otto Cycle · Intake · Compress · Power · Exhaust · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(48,224,232,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Four stroke phases orbiting a crankshaft with a live piston — the live AETHER engine computer simulation.
+          </p>
+          <EngineComputerCanvas />
+        </div>
+      </div>
 
       {/* ── HEADER ── */}
       <div style={{ padding:"12px 20px 10px", borderBottom:`1px solid ${BORDER}`,

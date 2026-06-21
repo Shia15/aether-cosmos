@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Palette ─────────────────────────────────────────────────────
@@ -148,6 +148,45 @@ const PAD_ANOMALIES = [
 // ═══════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════
+function HyperCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 155;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,5,12,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<8;i++){
+        const a=(i/8)*Math.PI*2+t*0.01;
+        const r=40+20*Math.sin(t*0.015+i*0.8);
+        const px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(px,py);
+        ctx.strokeStyle=`rgba(100,220,255,${0.15+0.1*Math.sin(t*0.03+i)})`; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath(); ctx.arc(px,py,3+2*Math.sin(t*0.04+i),0,Math.PI*2);
+        ctx.fillStyle="rgba(100,220,255,0.7)"; ctx.fill();
+        for(let j=i+1;j<8;j++){
+          const a2=(j/8)*Math.PI*2+t*0.01;
+          const r2=40+20*Math.sin(t*0.015+j*0.8);
+          const px2=cx+r2*Math.cos(a2),py2=cy+r2*Math.sin(a2);
+          const d=Math.hypot(px-px2,py-py2);
+          if(d<70){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px2,py2);ctx.strokeStyle=`rgba(153,102,255,${(1-d/70)*0.12})`;ctx.lineWidth=0.5;ctx.stroke();}
+        }
+      }
+      ctx.beginPath(); ctx.arc(cx,cy,8,0,Math.PI*2); ctx.fillStyle="rgba(153,102,255,0.9)"; ctx.fill();
+      ctx.fillStyle="rgba(100,220,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("HYPERCOMPUTATION · PHI-BRIDGE · TRUE LANGUAGE · BEYOND TURING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function HypercomputationPage() {
   const [now, setNow] = useState(() => new Date());
   const [tab, setTab] = useState<Tab>("language");
@@ -188,6 +227,13 @@ export default function HypercomputationPage() {
 
   return (
     <div data-testid="hypercomputation-root" className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #64dcff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#64dcff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(5,5,12,0.8)",borderLeft:"3px solid #64dcff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#64dcff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>HYPERCOMPUTATION · PHI-BRIDGE · TRUE LANGUAGE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(100,220,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8-node phi-bridge rotor — beyond-Turing coherence — live AETHER hypercomputation.</p></div>
+          <HyperCanvas />
+        </div>
+      </div>
 
       {/* ════ HEADER ════ */}
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>

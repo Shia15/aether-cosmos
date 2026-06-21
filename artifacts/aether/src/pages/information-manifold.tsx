@@ -284,11 +284,55 @@ function ManifoldCanvas({ activeLayer }: { activeLayer: string | null }) {
   return <canvas ref={cvs} style={{ width: "100%", display: "block", borderRadius: 8, border: `1px solid ${ACCENT}18` }} />;
 }
 
+function InfoManifoldCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 155;
+    const W = canvas.width, H = canvas.height;
+    const N=40;
+    const pts: {x:number;y:number}[] = [];
+    for(let i=0;i<N;i++) pts.push({x:Math.random()*W,y:Math.random()*H});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const upts=pts.map((p,i)=>({x:p.x+Math.sin(t*0.015+i*0.4)*8,y:p.y+Math.cos(t*0.012+i*0.5)*6}));
+      upts.forEach((a,i)=>{
+        upts.slice(i+1).forEach((b,j)=>{
+          const d=Math.hypot(a.x-b.x,a.y-b.y);
+          if(d<120){
+            const col=d<60?"#9966ff":"#2ef0d8";
+            ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+            ctx.strokeStyle=col+Math.round((1-d/120)*30).toString(16).padStart(2,"0"); ctx.lineWidth=0.5; ctx.stroke();
+          }
+        });
+        const pls=0.6+0.4*Math.sin(t*0.03+i*0.7);
+        ctx.beginPath();ctx.arc(a.x,a.y,3*pls,0,Math.PI*2);ctx.fillStyle=`rgba(153,102,255,${pls*0.8})`;ctx.fill();
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("INFORMATION MANIFOLD · TOPOLOGY · KNOWLEDGE SURFACE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function InformationManifoldPage() {
   const [activeLayer, setActiveLayer] = useState<string | null>(null);
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>INFORMATION MANIFOLD · TOPOLOGY · KNOWLEDGE SURFACE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>40-node drifting manifold — topology of knowledge — live AETHER information surface.</p></div>
+          <InfoManifoldCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#020a04 0%,#030e12 50%,#020408 100%)",

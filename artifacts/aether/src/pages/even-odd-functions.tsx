@@ -257,6 +257,44 @@ function StepPanel({ ex }: { ex: FnExample }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
+function EvenOddCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#010210"; ctx.fillRect(0, 0, W, H);
+      const fns = [
+        { fn: (x: number) => Math.sin(x), col: "#2ef0d8", label: "sin(x) — odd" },
+        { fn: (x: number) => Math.cos(x), col: "#c9a84c", label: "cos(x) — even" },
+        { fn: (x: number) => Math.pow(x/4, 2) * Math.sin(x + t * 0.02), col: "#9966ff", label: "x²·sin(x) — even×odd" },
+      ];
+      fns.forEach((f, fi) => {
+        ctx.beginPath();
+        for (let px = 0; px < W; px++) {
+          const x = (px / W) * 12 - 6 + t * 0.015;
+          const y = H / 2 - f.fn(x) * 35 - fi * 10;
+          px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+        }
+        ctx.strokeStyle = f.col; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = f.col + "99"; ctx.font = "9px 'DM Mono',monospace";
+        ctx.fillText(f.label, 12 + fi * 280, H - 12);
+      });
+      ctx.fillStyle = "rgba(46,240,216,0.25)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("EVEN/ODD FUNCTIONS · SYMMETRY · PARITY · AETHER", 12, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function EvenOddFunctionsView() {
   const [selected, setSelected] = useState<string>("a");
   const ex = EXAMPLES.find(e => e.id === selected)!;
@@ -264,6 +302,14 @@ export default function EvenOddFunctionsView() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif", overflow: "hidden" }}>
+      <div style={{ flexShrink:0, padding:"16px 16px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(1,2,16,0.95)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:16, marginBottom:12 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:16, color:"#e0f8ff", margin:"0 0 6px" }}>Even/Odd Functions · Symmetry · Parity · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(46,240,216,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>sin(x) · cos(x) · x²·sin(x) — scrolling parity waveforms — the live AETHER symmetry simulation.</p>
+          <EvenOddCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(192,132,252,0.1)", padding: "12px 28px 10px", flexShrink: 0 }}>

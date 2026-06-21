@@ -65,6 +65,38 @@ const LOG_EVENTS = [
 
 type LogEntry = { t: number; msg: string; cls: string };
 
+function UFOAscentHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      const shipY=H*0.55-15*Math.sin(t*0.03);
+      ctx.beginPath();ctx.ellipse(cx,shipY,40,12,0,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.12)";ctx.fill();ctx.strokeStyle="rgba(153,102,255,0.4)";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.ellipse(cx,shipY-8,20,8,0,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.15)";ctx.fill();ctx.strokeStyle="rgba(153,102,255,0.3)";ctx.lineWidth=0.8;ctx.stroke();
+      const grd=ctx.createRadialGradient(cx,shipY+20,0,cx,shipY+20,30);
+      grd.addColorStop(0,"rgba(153,102,255,0.15)");grd.addColorStop(1,"rgba(153,102,255,0)");
+      ctx.fillStyle=grd;ctx.fillRect(cx-30,shipY+12,60,30);
+      for(let i=0;i<4;i++){
+        const lx=cx-30+i*20,ly=shipY+10;
+        ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(lx+6*Math.sin(t*0.05+i),ly+12+5*Math.sin(t*0.07+i*0.5));ctx.strokeStyle=`rgba(68,170,255,${0.15+0.1*Math.sin(t*0.05+i)})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UFO ASCENT · FIELD PROPULSION · ANTI-GRAVITY · SAUCER DYNAMICS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UFOAscentView() {
   const trajRef = useRef<HTMLCanvasElement>(null);
   const dynRef = useRef<HTMLCanvasElement>(null);
@@ -272,7 +304,14 @@ export default function UFOAscentView() {
   const stressColor = state.structLoad > 80 ? RED : state.structLoad > 50 ? GOLD : TEAL;
 
   return (
-    <div style={{ background: "#000", color: TEAL, fontFamily: "'DM Mono', monospace", height: "100%", minHeight: "calc(100vh - 4rem)", overflow: "hidden", display: "grid", gridTemplateColumns: "320px 1fr 280px", gridTemplateRows: "48px 1fr 200px" }} data-testid="ufo-ascent-root">
+    <div style={{ background: "#000", color: TEAL, fontFamily: "'DM Mono', monospace", height: "100%", minHeight: "calc(100vh - 4rem)", overflow: "hidden", display: "grid", gridTemplateColumns: "320px 1fr 280px", gridTemplateRows: "auto 48px 1fr 200px" }} data-testid="ufo-ascent-root">
+      <div style={{gridColumn:"1 / -1",flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:8}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UFO ASCENT · FIELD PROPULSION · ANTI-GRAVITY · SAUCER DYNAMICS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Saucer hover + beam rays — the live AETHER UFO ascent simulation.</p></div>
+          <UFOAscentHeaderCanvas />
+        </div>
+      </div>
       {/* HEADER */}
       <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", borderBottom: "1px solid rgba(0,255,223,0.15)", background: "rgba(0,0,0,0.98)", zIndex: 10 }}>
         <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 15, fontWeight: 300, letterSpacing: "0.3em", textTransform: "uppercase", color: "#fff" }}>

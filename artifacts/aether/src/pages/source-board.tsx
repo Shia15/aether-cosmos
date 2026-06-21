@@ -601,11 +601,47 @@ function SH({ n, title, sub, col=TEAL }: { n:string; title:string; sub:string; c
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function SourceBoardHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const cols=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff","#44cc77"];
+    const cards: {x:number;y:number;w:number;h:number;col:string;phase:number}[]=[];
+    for(let i=0;i<12;i++) cards.push({x:Math.random()*(W-80),y:20+Math.random()*(H-50),w:60+Math.random()*40,h:20+Math.random()*20,col:cols[Math.floor(Math.random()*cols.length)],phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      cards.forEach(c=>{
+        const alpha=0.05+0.05*Math.sin(t*0.03+c.phase);
+        ctx.fillStyle=c.col+Math.round(alpha*255).toString(16).padStart(2,"0");ctx.fillRect(c.x,c.y,c.w,c.h);
+        ctx.strokeStyle=c.col+"44";ctx.lineWidth=0.5;ctx.strokeRect(c.x,c.y,c.w,c.h);
+      });
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SOURCE BOARD · KNOWLEDGE CARDS · REFERENCE MATRIX · CURATION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SourceBoardPage() {
   const [efficiency, setEfficiency] = useState(0.06);
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SOURCE BOARD · KNOWLEDGE CARDS · REFERENCE MATRIX · CURATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 floating knowledge cards — the live AETHER source board simulation.</p></div>
+          <SourceBoardHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 70% 50% at 50% 0%, ${GRN}07, ${GOLD}04, transparent)` }}>

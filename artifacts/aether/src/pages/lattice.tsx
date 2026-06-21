@@ -537,6 +537,46 @@ function drawBridge(
 // ─────────────────────────────────────────────────────────────────────────────
 type View = "map" | "field" | "bridge" | "molecular" | "framework";
 
+function LatticeHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const N=12,M=6;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let r=0;r<M;r++) for(let c=0;c<N;c++){
+        const x=W*(c+0.5)/N,y=H*(r+0.5)/M;
+        const wave=Math.sin(t*0.02+c*0.5+r*0.8);
+        const pls=0.5+0.5*wave;
+        const col=wave>0?"#2ef0d8":"#9966ff";
+        ctx.beginPath();ctx.arc(x,y,4*Math.abs(pls)+1,0,Math.PI*2);ctx.fillStyle=col+Math.round(Math.abs(pls)*150+50).toString(16).padStart(2,"0");ctx.fill();
+        if(c<N-1){
+          const nx=W*(c+1.5)/N;
+          const wv2=Math.sin(t*0.02+(c+1)*0.5+r*0.8);
+          ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(nx,y);
+          ctx.strokeStyle=`rgba(46,240,216,${0.05+0.1*Math.abs(wave)})`;ctx.lineWidth=0.5;ctx.stroke();
+        }
+        if(r<M-1){
+          const ny=H*(r+1.5)/M;
+          ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,ny);
+          ctx.strokeStyle=`rgba(46,240,216,${0.05+0.1*Math.abs(wave)})`;ctx.lineWidth=0.5;ctx.stroke();
+        }
+      }
+      ctx.fillStyle="rgba(0,229,192,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("CGLE LATTICE · COUPLED OSCILLATORS · WAVE PROPAGATION · 2D FIELD · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function LatticePage() {
   const [activeView, setActiveView] = useState<View>("map");
   const [selectedNode, setSelectedNode] = useState<BioNode | null>(null);
@@ -706,6 +746,13 @@ export default function LatticePage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00e5c0",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00e5c0",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #00e5c0",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00e5c0",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>CGLE LATTICE · COUPLED OSCILLATORS · WAVE PROPAGATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,229,192,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12×6 oscillator grid — teal/violet wave field — the live AETHER CGLE lattice simulation.</p></div>
+          <LatticeHeaderCanvas />
+        </div>
+      </div>
 
       {/* ── Header ────────────────────────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-8 pt-8 pb-4 space-y-3 border-b border-border/30">

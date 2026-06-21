@@ -619,6 +619,43 @@ function CrystalMap({ bloodType }: { bloodType: "O"|"A"|"B"|"AB" }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 type Tab = "multiscale" | "receptors" | "organoid" | "pineal" | "psilocybin" | "consciousness" | "crystals";
 
+function NeuralPsychedelicHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const rings=6;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,2,16,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let r=0;r<rings;r++){
+        const pts=24;
+        const rad=20+r*14;
+        const cx=W*0.5+Math.cos(t*0.01+r)*40;
+        const cy=H*0.5+Math.sin(t*0.008+r*0.7)*20;
+        const hue=r*55+t;
+        ctx.beginPath();
+        for(let i=0;i<=pts;i++){
+          const a=(i/pts)*Math.PI*2;
+          const warp=rad+Math.sin(a*3+t*0.04+r)*8;
+          const x=cx+Math.cos(a)*warp,y=cy+Math.sin(a)*warp*(H/W*3);
+          i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=`rgba(${100+r*25},${50+r*30},${200-r*20},0.4)`;ctx.lineWidth=0.7;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NEURAL PSYCHEDELIC · RECEPTOR BINDING · PINEAL · ORGANOID · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NeuralPsychedelicPage() {
   const [tab, setTab] = useState<Tab>("multiscale");
   const [scaleIdx, setScaleIdx] = useState(3);
@@ -752,6 +789,13 @@ export default function NeuralPsychedelicPage() {
 
   return (
     <div style={{ minHeight: "100%", background: C.bg, color: C.white, fontFamily: "'DM Mono',monospace", overflowY: "auto" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00e5c0",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00e5c0",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(4,2,16,0.8)",borderLeft:"3px solid #00e5c0",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00e5c0",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEURAL PSYCHEDELIC · RECEPTOR BINDING · PINEAL · ORGANOID · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,229,192,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 warping torus rings — the live AETHER neural psychedelic simulation.</p></div>
+          <NeuralPsychedelicHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(0,229,192,0.1)", padding: "2rem 2.5rem 1.5rem" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.35em", color: C.teal, textTransform: "uppercase", marginBottom: 8 }}>

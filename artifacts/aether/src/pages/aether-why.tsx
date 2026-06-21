@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#a78bfa",
@@ -58,6 +59,57 @@ const SECTIONS = [
   },
 ];
 
+function WhyCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 220;
+  const WORDS = [
+    { text:"Knowledge",  col:"#2ef0d8", x:0.12, y:0.30 },
+    { text:"Coherence",  col:"#c9a84c", x:0.30, y:0.65 },
+    { text:"Synthesis",  col:"#9966ff", x:0.50, y:0.28 },
+    { text:"Discovery",  col:"#44aaff", x:0.70, y:0.68 },
+    { text:"AETHER",     col:"#ff4477", x:0.88, y:0.38 },
+  ];
+  const LINKS = [[0,1],[1,2],[2,3],[3,4],[0,2],[1,3],[0,4]];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#020408"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      LINKS.forEach(([a, b]) => {
+        const pa = WORDS[a], pb = WORDS[b];
+        const alpha = 0.06 + 0.04 * Math.sin(t * 0.025 + a);
+        ctx.beginPath(); ctx.moveTo(pa.x * W, pa.y * H); ctx.lineTo(pb.x * W, pb.y * H);
+        ctx.strokeStyle = `rgba(167,139,250,${alpha})`; ctx.lineWidth = 0.8; ctx.stroke();
+      });
+      WORDS.forEach((w, i) => {
+        const wx = w.x * W, wy = w.y * H;
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.035 + i * 1.1);
+        const g = ctx.createRadialGradient(wx, wy, 0, wx, wy, 30 * pulse);
+        g.addColorStop(0, w.col + "cc"); g.addColorStop(0.4, w.col + "33"); g.addColorStop(1, w.col + "00");
+        ctx.beginPath(); ctx.arc(wx, wy, 30 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.fillStyle = w.col;
+        ctx.font = "bold 9px 'Cinzel', serif"; ctx.textAlign = "center";
+        ctx.fillText(w.text, wx, wy + 3);
+        ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(167,139,250,0.28)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER · THE WHY · FOUNDERS VISION · KNOWLEDGE SYNTHESIS", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherWhyPage() {
   return (
     <div data-testid="page-aether-why" style={{
@@ -66,6 +118,26 @@ export default function AetherWhyPage() {
       color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
+      <div style={{ maxWidth:900, margin:"0 auto 20px" }}>
+        <div style={{ display:"inline-block", background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#a78bfa", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,4,14,0.8)", border:"1px solid rgba(167,139,250,0.12)",
+          borderLeft:"3px solid #a78bfa", borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e2e8f0", margin:"0 0 6px" }}>
+            AETHER · The Why · Founders Vision · Knowledge Synthesis
+          </h2>
+          <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(200,210,255,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five core concepts (Knowledge · Coherence · Synthesis · Discovery · AETHER) floating as radiant nodes,
+            connected by violet gossamer links — the knowledge graph of the founders letter. Each node pulses in
+            its own color, showing the web of ideas that motivated building AETHER.
+          </p>
+          <WhyCanvas />
+        </div>
+      </div>
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
         .article-body p { font-family:'Cormorant Garamond', Georgia, serif; font-size:1.15rem; line-height:1.78; color:#e2e8f0; margin:0 0 1.15rem; }

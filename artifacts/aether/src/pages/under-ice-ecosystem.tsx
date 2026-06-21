@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -219,6 +219,160 @@ function CurrentGlyph() {
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
 
+function UnderIceCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 380;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const ICE_H = 72;
+
+    interface Organism { x:number; y:number; vx:number; vy:number; r:number; col:string; type:"krill"|"diatom"|"copepod" }
+    const organisms: Organism[] = Array.from({length:60}, (_,i) => ({
+      x: Math.random()*W, y: ICE_H+10+Math.random()*(H-ICE_H-30),
+      vx: (Math.random()-0.5)*0.6, vy: (Math.random()-0.5)*0.3,
+      r: 2.5+Math.random()*4, col: ["#7CD7FF","#BFE3FF","#7CE0B0","#B49CFF"][i%4],
+      type: (["krill","diatom","copepod"] as const)[i%3],
+    }));
+
+    const brineChannels = Array.from({length:8}, (_,i) => ({
+      x: (i+0.5)/8*W + (Math.random()-0.5)*40,
+      w: 3+Math.random()*6,
+      depth: 20+Math.random()*45,
+    }));
+
+    const crystals = Array.from({length:22}, (_,i) => ({
+      x: (i/22)*W, y: Math.random()*ICE_H*0.7,
+      size: 10+Math.random()*20, angle: Math.random()*Math.PI,
+    }));
+
+    let t = 0;
+
+    const draw = () => {
+      const bgGrd=ctx.createLinearGradient(0,ICE_H,0,H);
+      bgGrd.addColorStop(0,"#010f1e"); bgGrd.addColorStop(1,"#010812");
+      ctx.fillStyle=bgGrd; ctx.fillRect(0,0,W,H);
+
+      const iceGrd=ctx.createLinearGradient(0,0,0,ICE_H);
+      iceGrd.addColorStop(0,"#3a6188"); iceGrd.addColorStop(0.6,"#1a3d5c"); iceGrd.addColorStop(1,"#0e2235");
+      ctx.fillStyle=iceGrd; ctx.fillRect(0,0,W,ICE_H);
+
+      for (const c of crystals){
+        const glow=0.15+0.08*Math.sin(t*0.02+c.x*0.01);
+        ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.angle+t*0.003);
+        for (let arm=0;arm<6;arm++){
+          ctx.rotate(Math.PI/3);
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,c.size);
+          ctx.strokeStyle=`rgba(191,227,255,${glow})`; ctx.lineWidth=0.8; ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(0,c.size*0.4); ctx.lineTo(c.size*0.2,c.size*0.6);
+          ctx.lineTo(-c.size*0.2,c.size*0.6); ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      for (const br of brineChannels){
+        const brGrd=ctx.createLinearGradient(br.x,0,br.x+br.w,0);
+        brGrd.addColorStop(0,"transparent"); brGrd.addColorStop(0.5,"rgba(1,12,30,0.9)"); brGrd.addColorStop(1,"transparent");
+        ctx.fillStyle=brGrd; ctx.fillRect(br.x,0,br.w,br.depth);
+        ctx.fillStyle="rgba(14,165,233,0.15)"; ctx.fillRect(br.x,br.depth,br.w,3);
+      }
+
+      ctx.strokeStyle="rgba(14,165,233,0.35)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(0,ICE_H); ctx.lineTo(W,ICE_H);
+      for (let x=0;x<W;x+=4){
+        const wy=ICE_H+3*Math.sin((x+t*0.5)*0.06);
+        x===0?ctx.moveTo(x,wy):ctx.lineTo(x,wy);
+      }
+      ctx.stroke();
+      ctx.strokeStyle="rgba(14,165,233,0.1)"; ctx.lineWidth=0.5;
+      ctx.beginPath();
+      for (let x=0;x<W;x+=4){
+        const wy=ICE_H+8+5*Math.sin((x+t*0.4)*0.05+1);
+        x===0?ctx.moveTo(x,wy):ctx.lineTo(x,wy);
+      }
+      ctx.stroke();
+
+      for (const o of organisms){
+        o.x+=o.vx; o.y+=o.vy;
+        if(o.x<0)o.x=W; if(o.x>W)o.x=0;
+        if(o.y<ICE_H+6||o.y>H-10){o.vy*=-0.9; o.y=Math.max(ICE_H+6,Math.min(H-10,o.y));}
+        o.vx+=(Math.random()-0.5)*0.04; o.vy+=(Math.random()-0.5)*0.02;
+        o.vx=Math.max(-1,Math.min(1,o.vx)); o.vy=Math.max(-0.5,Math.min(0.5,o.vy));
+
+        const glow=0.5+0.5*Math.sin(t*0.06+o.x*0.02);
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r+3*glow,0,Math.PI*2);
+        ctx.fillStyle=o.col+Math.round(glow*30).toString(16).padStart(2,"0"); ctx.fill();
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2);
+        ctx.fillStyle=o.col+Math.round(0.5*255).toString(16).padStart(2,"0"); ctx.fill();
+
+        if(o.type==="krill"){
+          ctx.beginPath(); ctx.moveTo(o.x,o.y-o.r*1.3); ctx.lineTo(o.x-o.r*0.8,o.y+o.r*0.6);
+          ctx.lineTo(o.x+o.r*0.8,o.y+o.r*0.6); ctx.closePath();
+          ctx.strokeStyle=o.col+"60"; ctx.lineWidth=0.5; ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle="rgba(191,227,255,0.2)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("ICE CRYSTAL LATTICE · BRINE CHANNELS · KRILL · DIATOMS · COPEPODS",W/2,H-10);
+      ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
+function UnderIceEcosystemHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const creatures: {x:number;y:number;vx:number;vy:number;size:number;phase:number}[]=[];
+    for(let i=0;i<8;i++) creatures.push({x:Math.random()*W,y:30+Math.random()*(H-40),vx:(-0.3+Math.random()*0.6),vy:(-0.15+Math.random()*0.3),size:2+Math.random()*4,phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle="rgba(20,40,80,0.15)"; ctx.fillRect(0,0,W,H);
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=4){
+        const y=14+3*Math.sin(x*0.05+t*0.02);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,0);ctx.lineTo(0,0);ctx.closePath();ctx.fillStyle="rgba(150,200,255,0.08)";ctx.fill();
+      for(let d=0;d<3;d++){
+        const yp=20+d*15;
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=6){
+          const y2=yp+5*Math.sin(x*0.04+t*0.015+d*0.8);
+          x===0?ctx.moveTo(x,y2):ctx.lineTo(x,y2);
+        }
+        ctx.strokeStyle=`rgba(100,160,255,${0.04+d*0.02})`;ctx.lineWidth=1.5;ctx.stroke();
+      }
+      creatures.forEach(c=>{
+        c.x+=c.vx+0.1*Math.sin(t*0.03+c.phase);c.y+=c.vy+0.05*Math.cos(t*0.04+c.phase);
+        if(c.x<0)c.x=W;if(c.x>W)c.x=0;if(c.y<20)c.y=H-20;if(c.y>H-10)c.y=30;
+        ctx.beginPath();ctx.arc(c.x,c.y,c.size,0,Math.PI*2);ctx.fillStyle=`rgba(100,200,255,${0.25+0.2*Math.sin(t*0.05+c.phase)})`;ctx.fill();
+      });
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UNDER-ICE ECOSYSTEM · BIOLUMINESCENCE · HYDROTHERMAL · CRYOSPHERE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UnderIceEcosystemPage() {
   return (
     <div
@@ -226,7 +380,13 @@ export default function UnderIceEcosystemPage() {
       data-testid="page-under-ice-ecosystem"
     >
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UNDER-ICE ECOSYSTEM · BIOLUMINESCENCE · HYDROTHERMAL · CRYOSPHERE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 bioluminescent creatures under ice sheets — the live AETHER under-ice simulation.</p></div>
+            <UnderIceEcosystemHeaderCanvas />
+          </div>
+        </div>
         {/* HEADER */}
         <header style={{ marginBottom: 36 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, letterSpacing: 3, color: B.dim, textTransform: "uppercase", marginBottom: 10 }}>
@@ -249,6 +409,26 @@ export default function UnderIceEcosystemPage() {
             <Chip color={B.violet}>return planned · 2028</Chip>
           </div>
         </header>
+
+        <div style={{ marginBottom:36 }}>
+          <div style={{ display:"inline-block", background:"rgba(124,215,255,0.1)", border:"1px solid rgba(124,215,255,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.cyan, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:B.panel, border:`1px solid ${B.line}`, borderLeft:`3px solid ${B.ice}`,
+            borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:'"Cinzel",serif', fontSize:18, color:B.ink, margin:"0 0 6px", fontVariant:"small-caps" }}>
+              Under-Ice Ecosystem · Crystal Lattice · Brine Channels · Organisms
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.dim, margin:"0 0 14px", lineHeight:1.65 }}>
+              Below Antarctic ice shelves, hexagonal ice crystals (top) lock in brine channels that drain salt into the water column,
+              creating currents that sustain krill, diatoms, and copepods. The newly exposed George VI seafloor hosts ecosystems
+              that have not seen light in millennia.
+            </p>
+            <UnderIceCanvas />
+          </div>
+        </div>
 
         {/* §01 What was found */}
         <section style={{ marginBottom: 44 }} data-testid="section-01">

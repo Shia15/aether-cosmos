@@ -529,11 +529,87 @@ const NAV_ITEMS = [
   { id: "s7", label: "AETHER" },
 ];
 
+function BurstingQuatCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const axes = [
+      { label:"i", col:"#ef4444", angle:0 },
+      { label:"j", col:"#22d3ee", angle:Math.PI/2 },
+      { label:"k", col:"#a78bfa", angle:Math.PI },
+      { label:"-i", col:"#f97316", angle:3*Math.PI/2 },
+    ];
+    const particles: { x:number,y:number,vx:number,vy:number,col:string,life:number,maxLife:number }[]=[];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.14)"; ctx.fillRect(0,0,W,H);
+      t++;
+      if (t%8===0) {
+        const col=axes[Math.floor(Math.random()*axes.length)].col;
+        const ang=Math.random()*Math.PI*2, spd=1.5+Math.random()*2.5;
+        particles.push({ x:cx,y:cy, vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd, col, life:60, maxLife:60 });
+      }
+      for (let i=particles.length-1;i>=0;i--) {
+        const p=particles[i];
+        p.x+=p.vx; p.y+=p.vy; p.life--;
+        const a=p.life/p.maxLife;
+        ctx.beginPath(); ctx.arc(p.x,p.y,2.5*a,0,Math.PI*2);
+        ctx.fillStyle=p.col+(Math.floor(a*255).toString(16).padStart(2,"0"));
+        ctx.shadowColor=p.col; ctx.shadowBlur=6*a; ctx.fill(); ctx.shadowBlur=0;
+        if (p.life<=0) particles.splice(i,1);
+      }
+      axes.forEach((ax,i)=>{
+        const len=90+10*Math.sin(t*0.04+i);
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx+Math.cos(ax.angle)*len,cy+Math.sin(ax.angle)*len);
+        ctx.strokeStyle=ax.col+"88"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=ax.col; ctx.font="bold 14px monospace"; ctx.textAlign="center";
+        ctx.fillText(ax.label, cx+Math.cos(ax.angle)*(len+14), cy+Math.sin(ax.angle)*(len+14)+4);
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,16);
+      gc.addColorStop(0,"#ffffffcc"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,14+3*Math.sin(t*0.08),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#fff"; ctx.shadowBlur=20; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(167,139,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BURSTING QUATERNIONS · i · j · k AXES · PARTICLE BURST · QUATERNION ROTATION FIELD",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BurstingQuaternionsPage() {
   const [mode, setMode] = useState<Mode>("statespace");
 
   return (
     <div style={{ background: BG0, minHeight: "100vh", fontFamily: body, color: PALE }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(167,139,250,0.07)", border:"1px solid rgba(167,139,250,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#a78bfa", textTransform:"uppercase", fontFamily:body, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,7,14,0.9)", border:"1px solid rgba(167,139,250,0.1)",
+          borderLeft:"3px solid #a78bfa", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:body, fontSize:18, color:"#ede9fe", margin:"0 0 6px" }}>
+            Bursting Quaternions · i · j · k Axes · Particle Burst · Quaternion Rotation Field
+          </h2>
+          <p style={{ fontFamily:body, fontSize:12, color:"rgba(200,180,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Four quaternion axes (i/red · j/cyan · k/violet · -i/orange) radiating from a bright synthesis core,
+            with chromatic particles bursting outward from the center and fading — the live AETHER quaternion
+            rotation field in continuous motion.
+          </p>
+          <BurstingQuatCanvas />
+        </div>
+      </div>
 
       {/* ── HERO ── */}
       <div style={{ position: "relative", overflow: "hidden" }}>

@@ -222,6 +222,42 @@ function TimelineCanvas({ entries, hovered, onHover }: {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
+function CrashoutCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const particles: {x:number,y:number,vx:number,vy:number,col:string,life:number}[]=[];
+    let t=0;
+    const spawn=()=>{
+      const cx=W/2, cy=H/2;
+      const ang=Math.random()*Math.PI*2, spd=1+Math.random()*3;
+      particles.push({ x:cx, y:cy, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, col:`hsl(${Math.random()*60+5},90%,60%)`, life:1 });
+    };
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,8,18,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      if(t%3===0&&particles.length<80) spawn();
+      for(let i=particles.length-1;i>=0;i--){
+        const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life-=0.012;
+        if(p.life<=0||p.x<0||p.x>W||p.y>H){ particles.splice(i,1); continue; }
+        ctx.globalAlpha=p.life; ctx.beginPath(); ctx.arc(p.x,p.y,2.5,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      }
+      ctx.globalAlpha=1;
+      ctx.fillStyle="rgba(255,100,30,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CRASHOUT · SIGNAL BURST · ENTROPY CASCADE · PARTICLE DECAY · AETHER FAULT DETECTION",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CrashoutPage() {
   const [entries, setEntries] = useState<Entry[]>(loadEntries);
   const [text, setText] = useState("");
@@ -318,6 +354,18 @@ export default function CrashoutPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden" }}>
+      <div style={{ padding:"16px 24px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", border:"1px solid #ff6418", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#ff6418", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,8,18,0.9)", border:"1px solid rgba(255,100,30,0.15)", borderLeft:"3px solid #ff6418", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Crashout · Signal Burst · Entropy Cascade · Particle Decay · AETHER Fault Detection
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(255,100,30,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Hot orange particle burst erupting from centre with gravity-curved trajectories — the live AETHER crashout entropy fault simulation.
+          </p>
+          <CrashoutCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ padding: "6px 16px", borderBottom: `1px solid ${BRD}`, display: "flex", alignItems: "center", gap: 14, flexShrink: 0, flexWrap: "wrap" }}>

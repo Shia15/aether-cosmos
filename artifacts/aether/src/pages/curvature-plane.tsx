@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgCurvature from "@assets/ChatGPT_Image_Apr_26,_2026,_02_36_00_PM_1777228564980.png";
@@ -86,9 +87,58 @@ const SCALES = [
   { c: B.rose,   k: "10²⁵ m",   v: "Cosmological scale — observable-universe horizon · the upper edge of the diagram" },
 ];
 
+function CurvaturePlaneCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      const ROWS=8, COLS=20;
+      for(let r=0;r<ROWS;r++){
+        for(let c=0;c<COLS;c++){
+          const x=W*0.05+c*(W*0.9/(COLS-1));
+          const baseY=cy+((r-(ROWS/2))*18);
+          const distX=(x-cx)/cx, distY=(baseY-cy)/cy;
+          const curve=30*Math.sin(t*0.02+distX*3)*(1-Math.abs(distY)*0.5);
+          const y=baseY+curve;
+          const psi=0.5+0.5*Math.sin(t*0.04+distX*2+r*0.6);
+          const hue=180+distX*60;
+          ctx.beginPath(); ctx.arc(x,y,1.5,0,Math.PI*2);
+          ctx.fillStyle=`hsla(${hue},75%,65%,${0.3+0.4*psi})`; ctx.fill();
+        }
+      }
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CURVATURE PLANE · SPACETIME MANIFOLD · GEODESIC FIELD · RIEMANN TENSOR · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CurvaturePlanePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="curvature-plane-page">
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Curvature Plane · Spacetime Manifold · Geodesic Field · Riemann Tensor · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            8×20 dot grid deformed by a live sinusoidal curvature wave — the live AETHER Riemannian spacetime manifold simulation.
+          </p>
+          <CurvaturePlaneCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

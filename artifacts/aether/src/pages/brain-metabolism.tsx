@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const C = {
   ink: "#090e15", ink2: "#0f1822", ink3: "#141f2e",
@@ -22,6 +22,64 @@ const SECTIONS = [
   { id: "spectrum", label: "Spectrum" },
   { id: "synthesis", label: "Synthesis" },
 ];
+
+function BrainMetabolismCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const nodes = [
+      { label:"GLUCOSE\nINTAKE", col:"#60a5fa", angle:-Math.PI/2, r:110 },
+      { label:"ATP\nSYNTH", col:"#fcd34d", angle:-Math.PI/2+Math.PI*2/5, r:110 },
+      { label:"NEURO\nTRANS", col:"#a78bfa", angle:-Math.PI/2+Math.PI*4/5, r:110 },
+      { label:"MYELIN\nREPAIR", col:"#34d399", angle:-Math.PI/2+Math.PI*6/5, r:110 },
+      { label:"COHERE\nFIELD", col:"#2ef0d8", angle:-Math.PI/2+Math.PI*8/5, r:110 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(9,14,21,0.16)"; ctx.fillRect(0,0,W,H);
+      t++;
+      nodes.forEach((s,i)=>{
+        const a=nodes[(i+1)%nodes.length];
+        const sx=cx+Math.cos(s.angle)*s.r, sy=cy+Math.sin(s.angle)*s.r;
+        const ax=cx+Math.cos(a.angle)*a.r, ay=cy+Math.sin(a.angle)*a.r;
+        const pkt=(t*0.01+i*0.4)%1;
+        const px=sx+(ax-sx)*pkt, py=sy+(ay-sy)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(sx,sy,ax,ay);
+        g.addColorStop(0,s.col+"44"); g.addColorStop(1,a.col+"44");
+        ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ax,ay);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      });
+      nodes.forEach((s,i)=>{
+        const dx=cx+Math.cos(s.angle)*s.r, dy=cy+Math.sin(s.angle)*s.r;
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.25);
+        const g=ctx.createRadialGradient(dx,dy,0,dx,dy,16*pulse);
+        g.addColorStop(0,s.col+"cc"); g.addColorStop(0.5,s.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(dx,dy,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=16*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=s.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,dx,dy+18*pulse+li*9));
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,16);
+      gc.addColorStop(0,"#4a9fc4cc"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,14+2*Math.sin(t*0.05),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#4a9fc4"; ctx.shadowBlur=20; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(96,165,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BRAIN METABOLISM · GLUCOSE INTAKE · ATP SYNTHESIS · NEUROTRANSMITTER · MYELIN REPAIR · COHERENCE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
 
 export default function BrainMetabolismView() {
   const [active, setActive] = useState("abstract");
@@ -72,6 +130,26 @@ export default function BrainMetabolismView() {
                         radial-gradient(ellipse 500px 400px at 5% 70%, rgba(201,168,76,0.03) 0%, transparent 60%)`,
       minHeight: "100%", height: "100%", overflowY: "auto", overflowX: "hidden", position: "relative", scrollBehavior: "smooth",
     }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(96,165,250,0.07)", border:"1px solid rgba(96,165,250,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#60a5fa", textTransform:"uppercase", fontFamily:C.mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(9,14,21,0.9)", border:"1px solid rgba(96,165,250,0.1)",
+          borderLeft:"3px solid #60a5fa", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:C.serif, fontSize:18, color:"#e0f0ff", margin:"0 0 6px" }}>
+            Brain Metabolism · Glucose Intake · ATP Synthesis · Neurotransmitter · Myelin Repair · Coherence
+          </h2>
+          <p style={{ fontFamily:C.mono, fontSize:12, color:"rgba(150,200,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five brain metabolism nodes (Glucose Intake/blue · ATP Synthesis/yellow · Neurotransmitter/violet · Myelin
+            Repair/teal · Coherence Field/mint) in a pentagonal ring with metabolic flow packets cycling between each
+            system — the live AETHER brain metabolism engine.
+          </p>
+          <BrainMetabolismCanvas />
+        </div>
+      </div>
+
       {/* progress */}
       <div style={{ position: "sticky", top: 0, height: 2, zIndex: 99, background: `linear-gradient(90deg,${C.teal},${C.purple},${C.gold})`, width: scroll + "%", transition: "width .1s linear" }} />
 

@@ -3,7 +3,7 @@ import resonantCell from "@assets/65A7A2E3-063F-4F8A-A92B-D74BB81B294B_178144838
 import ancientCurrents from "@assets/8D9910A2-2ACC-4CAA-8532-84639E46A5E7_1781448388514.png";
 import atlantisBeacon from "@assets/IMG_1764_1781448388514.jpeg";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const TABS = [
   { id: "quantum",  label: "Quantum Substrate State" },
@@ -14,11 +14,131 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+function ChladniCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 380;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+
+    const MODES: [number,number][] = [[2,1],[2,2],[3,1],[3,2],[3,3],[4,1],[4,2],[4,3],[4,4],[5,2]];
+    let modeIdx = 0, modeT = 0, fadeAlpha = 1;
+    const CELL = 6;
+    const GW = Math.floor(W/CELL), GH = Math.floor(H/CELL);
+    const OX = (W-GW*CELL)/2, OY = (H-GH*CELL)/2;
+
+    let t = 0;
+
+    const chladni = (xi:number,yi:number,m:number,n:number):number => {
+      const x=xi/GW, y=yi/GH;
+      return Math.cos(m*Math.PI*x)*Math.cos(n*Math.PI*y) - Math.cos(n*Math.PI*x)*Math.cos(m*Math.PI*y);
+    };
+
+    const draw = () => {
+      ctx.fillStyle="#020617"; ctx.fillRect(0,0,W,H);
+
+      modeT++;
+      if (modeT>240){ modeIdx=(modeIdx+1)%MODES.length; modeT=0; }
+      fadeAlpha=modeT<30 ? modeT/30 : modeT>210 ? 1-(modeT-210)/30 : 1;
+
+      const [m,n]=MODES[modeIdx];
+      const threshold=0.12+0.04*Math.sin(t*0.05);
+
+      for (let xi=0;xi<GW;xi++){
+        for (let yi=0;yi<GH;yi++){
+          const z=chladni(xi,yi,m,n);
+          const abz=Math.abs(z);
+          const px=OX+xi*CELL, py=OY+yi*CELL;
+          if (abz<threshold){
+            const bright=1-(abz/threshold);
+            ctx.fillStyle=`rgba(74,222,128,${bright*0.75*fadeAlpha})`;
+            ctx.fillRect(px,py,CELL-1,CELL-1);
+          } else {
+            const dark=Math.min(1,abz)*0.06*fadeAlpha;
+            ctx.fillStyle=`rgba(56,189,248,${dark})`;
+            ctx.fillRect(px,py,CELL-1,CELL-1);
+          }
+        }
+      }
+
+      const pX=W*0.78, pY=30;
+      ctx.fillStyle="rgba(74,222,128,0.6)"; ctx.font="8.5px 'Space Mono',monospace";
+      ctx.fillText(`MODE (m=${m}, n=${n})`,pX,pY);
+      ctx.fillStyle="rgba(56,189,248,0.5)"; ctx.font="7px 'Space Mono',monospace";
+      ctx.fillText("z = cos(mπx)cos(nπy) − cos(nπx)cos(mπy)",pX,pY+18);
+      ctx.fillStyle="rgba(74,222,128,0.35)";
+      ctx.fillText("▓ SAND · NODAL LINES",pX,pY+34);
+      ctx.fillText("CHLADNI RESONANT PATTERN",pX,pY+50);
+
+      ctx.fillStyle="rgba(74,222,128,0.2)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText(`CHLADNI FIGURE · RESONANT STANDING WAVE · CYCLING MODES`,W/2,H-8);
+      ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
+function ResonantSystemsHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const systems=[
+      {x:130,y:72,col:"#2ef0d8",f:1.0},
+      {x:320,y:72,col:"#9966ff",f:1.5},
+      {x:510,y:72,col:"#c9a84c",f:2.0},
+      {x:700,y:72,col:"#44cc77",f:2.5},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      systems.forEach(s=>{
+        for(let ring=1;ring<=4;ring++){
+          const r=(ring*15+6*Math.sin(t*0.04*s.f+ring))*0.9;
+          ctx.beginPath();ctx.arc(s.x,s.y,r,0,Math.PI*2);ctx.strokeStyle=s.col+Math.round(0.04+ring*0.06).toString(16);ctx.lineWidth=0.6;ctx.stroke();
+        }
+        ctx.beginPath();ctx.arc(s.x,s.y,5,0,Math.PI*2);ctx.fillStyle=s.col+"aa";ctx.fill();
+        ctx.beginPath();
+        for(let x=s.x-70;x<=s.x+70;x+=2){
+          const y=s.y+25*Math.sin((x-s.x)*0.1*s.f+t*0.06*s.f);
+          x===s.x-70?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=s.col+"55";ctx.lineWidth=0.7;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("RESONANT SYSTEMS · COUPLED OSCILLATORS · FIELD HARMONICS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ResonantSystemsPage() {
   const [active, setActive] = useState<TabId>("quantum");
 
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>RESONANT SYSTEMS · COUPLED OSCILLATORS · FIELD HARMONICS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 coupled resonant oscillator systems — the live AETHER resonant systems simulation.</p></div>
+          <ResonantSystemsHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #0c1a0c 40%, #0f0a1a 100%)", borderBottom: "1px solid #14532d", padding: "2.5rem 2rem 2rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -32,6 +152,25 @@ export default function ResonantSystemsPage() {
           <p style={{ color: "#94a3b8", fontSize: "1rem", margin: 0, maxWidth: 700 }}>
             From topologically protected tritium breeding in quantum-coherent fusion substrates to 10-acre field platforms measuring coupled energy systems — and the ancient tidal power systems that powered civilization before fossil fuels.
           </p>
+        </div>
+      </div>
+
+      <div style={{ padding:"1.5rem 2rem 0", maxWidth:1100, margin:"0 auto" }}>
+        <div style={{ display:"inline-block", background:"rgba(74,222,128,0.1)", border:"1px solid rgba(74,222,128,0.3)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#86efac", textTransform:"uppercase", marginBottom:"1rem" }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(74,222,128,0.2)",
+          borderLeft:"3px solid #4ade80", borderRadius:14, padding:"1.5rem", marginBottom:"1.5rem" }}>
+          <h2 style={{ fontSize:"1.2rem", fontWeight:700, color:"#86efac", margin:"0 0 0.35rem" }}>
+            Chladni Figure · Resonant Standing Wave Patterns
+          </h2>
+          <p style={{ color:"#94a3b8", fontSize:"0.82rem", margin:"0 0 1rem", lineHeight:1.65 }}>
+            Sand on a vibrating plate self-organizes into the nodal lines of the standing wave — the places where the
+            plate is not moving. Bright green = sand accumulation (nodal lines). Cycles through 10 resonant modes (m, n).
+          </p>
+          <ChladniCanvas />
         </div>
       </div>
 

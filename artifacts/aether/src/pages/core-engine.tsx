@@ -128,6 +128,53 @@ const PRESETS: Array<{ label: string; tau: number; desc: string; color: string }
   { label: "τ = 2.0", tau: 2.0, desc: "Deep crystallisation",      color: "#8b5cf6" },
 ];
 
+function CoreEngineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const layers=[
+      { label:"L1·SUBSTRATE", col:"#2ef0d8", r:80 },
+      { label:"L2·COHERENCE", col:"#9966ff", r:60 },
+      { label:"L3·SYNTHESIS", col:"#c9a84c", r:42 },
+      { label:"L4·INFERENCE", col:"#44aaff", r:26 },
+      { label:"L5·OUTPUT",    col:"#ff4477", r:12 },
+    ];
+    const pulses: {layer:number,a:number}[]=[];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      if(t%20===0&&pulses.length<8) pulses.push({ layer:Math.floor(Math.random()*4), a:0 });
+      layers.forEach((l,i)=>{
+        const psi=0.5+0.5*Math.sin(t*0.04+i*1.1);
+        ctx.beginPath(); ctx.arc(cx,cy,l.r,0,Math.PI*2);
+        ctx.strokeStyle=l.col; ctx.globalAlpha=0.12+0.08*psi; ctx.lineWidth=2; ctx.stroke();
+        ctx.globalAlpha=1;
+        ctx.fillStyle=l.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(l.label,cx,cy-l.r-5);
+      });
+      for(let i=pulses.length-1;i>=0;i--){
+        const p=pulses[i]; p.a+=0.04;
+        const lr=layers[p.layer];
+        ctx.beginPath(); ctx.arc(cx,cy,lr.r*(1+p.a*0.3),0,Math.PI*2);
+        ctx.strokeStyle=lr.col; ctx.globalAlpha=Math.max(0,0.6-p.a); ctx.lineWidth=2; ctx.stroke(); ctx.globalAlpha=1;
+        if(p.a>=1.5) pulses.splice(i,1);
+      }
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CORE ENGINE · L1→L5 STACK · SUBSTRATE · COHERENCE · SYNTHESIS · INFERENCE · OUTPUT · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CoreEnginePage() {
   const [state, setState] = useState<CoreState | null>(null);
   const [running, setRunning] = useState(false);
@@ -220,6 +267,18 @@ export default function CoreEnginePage() {
 
   return (
     <div className="h-full overflow-y-auto px-8 py-8 space-y-8">
+      <div>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Core Engine · L1→L5 Stack · Substrate · Coherence · Synthesis · Inference · Output · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five concentric rings (L1 teal → L5 rose) with pulsing coherence waves radiating outward — the live AETHER core engine L1→L5 stack simulation.
+          </p>
+          <CoreEngineCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div>
         <div className="font-mono text-xs text-primary tracking-[0.3em] mb-3 uppercase">

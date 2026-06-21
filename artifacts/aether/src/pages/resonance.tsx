@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import quoteResonance from "@assets/ChatGPT_Image_Apr_25,_2026,_05_21_14_PM_1777152079090.png";
 import quoteQuiet from "@assets/ChatGPT_Image_Apr_25,_2026,_05_22_00_PM_1777152122490.png";
 import quoteHumanBeings from "@assets/ChatGPT_Image_Apr_25,_2026,_05_23_45_PM_1777152228349.png";
@@ -84,6 +85,106 @@ const QUOTES: Quote[] = [
   },
 ];
 
+function WaveInterferenceCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 360;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+
+    const CELL = 7;
+    const GW = Math.floor(W/CELL), GH = Math.floor(H/CELL);
+    const OX = (W-GW*CELL)/2, OY = (H-GH*CELL)/2;
+    const LAM = 8;
+    const S1x=0.25, S1y=0.5, S2x=0.75, S2y=0.5;
+    let t = 0;
+
+    const draw = () => {
+      ctx.fillStyle="#06070C"; ctx.fillRect(0,0,W,H);
+
+      for (let xi=0;xi<GW;xi++){
+        for (let yi=0;yi<GH;yi++){
+          const fx=xi/GW, fy=yi/GH;
+          const r1=Math.sqrt((fx-S1x)**2+(fy-S1y)**2);
+          const r2=Math.sqrt((fx-S2x)**2+(fy-S2y)**2);
+          const a1=Math.cos(2*Math.PI*r1/LAM*GW-t*0.08);
+          const a2=Math.cos(2*Math.PI*r2/LAM*GW-t*0.08);
+          const amp=(a1+a2)/2;
+          const px=OX+xi*CELL, py=OY+yi*CELL;
+          if (amp>0){
+            ctx.fillStyle=`rgba(181,150,232,${amp*0.65})`;
+          } else {
+            ctx.fillStyle=`rgba(14,165,233,${(-amp)*0.45})`;
+          }
+          ctx.fillRect(px,py,CELL-1,CELL-1);
+        }
+      }
+
+      const s1px=OX+S1x*GW*CELL, s1py=OY+S1y*GH*CELL;
+      const s2px=OX+S2x*GW*CELL, s2py=OY+S2y*GH*CELL;
+      const pulseR=4+2*Math.sin(t*0.1);
+      ctx.beginPath(); ctx.arc(s1px,s1py,pulseR,0,Math.PI*2);
+      ctx.fillStyle="rgba(181,150,232,0.9)"; ctx.fill();
+      ctx.beginPath(); ctx.arc(s1px,s1py,pulseR+6,0,Math.PI*2);
+      ctx.strokeStyle="rgba(181,150,232,0.4)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(s2px,s2py,pulseR,0,Math.PI*2);
+      ctx.fillStyle="rgba(14,165,233,0.9)"; ctx.fill();
+      ctx.beginPath(); ctx.arc(s2px,s2py,pulseR+6,0,Math.PI*2);
+      ctx.strokeStyle="rgba(14,165,233,0.4)"; ctx.lineWidth=1; ctx.stroke();
+
+      ctx.fillStyle="rgba(181,150,232,0.6)"; ctx.font="7px 'Space Mono',monospace";
+      ctx.fillText("S₁",s1px-7,s1py-14);
+      ctx.fillStyle="rgba(14,165,233,0.6)";
+      ctx.fillText("S₂",s2px-7,s2py-14);
+
+      ctx.fillStyle="rgba(200,190,230,0.3)"; ctx.font="7.5px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("WAVE INTERFERENCE · CONSTRUCTIVE (BRIGHT) · DESTRUCTIVE (DARK) · TWO COHERENT SOURCES",W/2,H-8);
+      ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
+function ResonanceHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const freqs=[1,2,3,4,5,6];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      freqs.forEach((f,i)=>{
+        const amp=(30-i*3);const col=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44cc77","#44aaff"][i];
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=2){
+          const y=H/2+amp*Math.sin((x/W)*Math.PI*2*f+t*0.04+i*0.5);
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=col+(i===0?"99":"44");ctx.lineWidth=i===0?1.5:0.6;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("RESONANCE · HARMONICS · STANDING WAVES · FREQUENCY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ResonancePage() {
   return (
     <div
@@ -91,6 +192,13 @@ export default function ResonancePage() {
       style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="resonance-page"
     >
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>RESONANCE · HARMONICS · STANDING WAVES · FREQUENCY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 harmonic frequencies — the live AETHER resonance simulation.</p></div>
+          <ResonanceHeaderCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes rs-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes rs-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }
@@ -146,6 +254,28 @@ export default function ResonancePage() {
           <p className="text-[12.5px] mt-3 italic" style={{ color: C.muted }}>
             — five carries · one voice
           </p>
+        </div>
+
+        <div style={{ marginBottom:"2.5rem" }}>
+          <div style={{ display:"inline-block", background:"rgba(181,150,232,0.1)", border:"1px solid rgba(181,150,232,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#c4b5f4", textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:"1rem" }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(20,18,32,0.62)", border:"1px solid rgba(181,150,232,0.18)",
+            borderLeft:"3px solid #b596e8", borderRadius:14, padding:"1.5rem" }}>
+            <h2 style={{ fontSize:"1.2rem", fontWeight:700, color:"#e8e2f2", margin:"0 0 0.35rem",
+              fontFamily:"'Cinzel',serif" }}>
+              Wave Interference · Two Coherent Sources
+            </h2>
+            <p style={{ color:"#a4a0b8", fontSize:"0.82rem", margin:"0 0 1rem", lineHeight:1.65,
+              fontFamily:"Inter,sans-serif" }}>
+              Two resonant sources (S₁, S₂) emit concentric waves. Where crests meet crests — constructive interference,
+              bright violet. Where crest meets trough — destructive interference, dark. This is resonance as physics:
+              the same principle operating in AETHER's crystallization model.
+            </p>
+            <WaveInterferenceCanvas />
+          </div>
         </div>
 
         {/* quote gallery */}

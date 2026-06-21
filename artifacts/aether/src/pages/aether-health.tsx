@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgFramework from "@assets/ChatGPT_Image_Apr_26,_2026,_02_32_30_PM_1777228352274.png";
@@ -90,10 +91,95 @@ const FOODS = [
     body: "Omega-3 (EPA/DHA), curcumin, sulforaphane, and regular aerobic activity all measurably raise BDNF and lower neuroinflammatory markers. Polyphenols also modulate blood-brain-barrier integrity." },
 ];
 
+function HealthRadialCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const SYSTEMS = [
+    { label:"Gut",       col:"#44cc77", angle: 0 },
+    { label:"Neural",    col:"#9966ff", angle: Math.PI * 2 / 5 },
+    { label:"Immune",    col:"#ff4477", angle: Math.PI * 4 / 5 },
+    { label:"Endocrine", col:"#c9a84c", angle: Math.PI * 6 / 5 },
+    { label:"Cardiac",   col:"#44aaff", angle: Math.PI * 8 / 5 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#F8F4E8"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cx = W / 2, cy = H / 2;
+      const R = 80;
+      [40, 60, 80].forEach(r => {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(100,80,50,0.08)"; ctx.lineWidth = 1; ctx.stroke();
+      });
+      SYSTEMS.forEach((sys, i) => {
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.035 + i * 1.3);
+        const nx = cx + R * Math.cos(sys.angle);
+        const ny = cy + R * Math.sin(sys.angle);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny);
+        ctx.strokeStyle = sys.col + "55"; ctx.lineWidth = 1.5; ctx.stroke();
+        const g = ctx.createRadialGradient(nx, ny, 0, nx, ny, 18 * pulse);
+        g.addColorStop(0, sys.col);
+        g.addColorStop(0.5, sys.col + "66");
+        g.addColorStop(1, sys.col + "00");
+        ctx.beginPath(); ctx.arc(nx, ny, 18 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(nx, ny, 9, 0, Math.PI * 2);
+        ctx.fillStyle = sys.col; ctx.fill();
+        const lx = cx + (R + 28) * Math.cos(sys.angle);
+        const ly = cy + (R + 28) * Math.sin(sys.angle);
+        ctx.fillStyle = sys.col;
+        ctx.font = "8px 'Space Mono', monospace"; ctx.textAlign = "center";
+        ctx.fillText(sys.label, lx, ly + 3);
+        ctx.textAlign = "left";
+      });
+      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 16);
+      cg.addColorStop(0, "#c9a84c");
+      cg.addColorStop(0.4, "#c9a84c88");
+      cg.addColorStop(1, "#c9a84c00");
+      ctx.beginPath(); ctx.arc(cx, cy, 16, 0, Math.PI * 2);
+      ctx.fillStyle = cg; ctx.fill();
+      ctx.fillStyle = "rgba(80,60,30,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER HEALTH · BIO-COHERENCE · 5-SYSTEM RADIAL MAP", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherHealthPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="aether-health-page">
       <div className="max-w-5xl mx-auto">
+
+        <div style={{ marginBottom:20 }}>
+          <div style={{ display:"inline-block", background:"rgba(68,204,119,0.08)", border:"1px solid rgba(68,204,119,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.mossDeep, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:B.panel, border:`1px solid rgba(100,80,50,0.15)`,
+            borderLeft:`3px solid ${B.mossDeep}`, borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+              Bio-Coherence · 5-System Radial Map · Gut · Neural · Immune · Endocrine · Cardiac
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.text, margin:"0 0 14px", lineHeight:1.65 }}>
+              Five body systems arranged radially around a golden coherence core. Each node pulses at its own
+              biological frequency, connected to the center by color-coded spokes. Concentric field rings show the
+              coherence radius — the zone of health intervention overlap addressed by the AETHER framework.
+            </p>
+            <HealthRadialCanvas />
+          </div>
+        </div>
 
         <header className="mb-10">
           <div className="text-[10.5px] uppercase tracking-[0.32em] mb-2"

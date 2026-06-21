@@ -194,6 +194,59 @@ function Colorbar() {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
+function CoreIntelligenceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const agents = [
+      { name:"MNESIS", col:"#c084fc", x:W*0.15, y:H*0.5, phase:0.0 },
+      { name:"INFERNIA", col:"#2ef0d8", x:W*0.32, y:H*0.5, phase:1.2 },
+      { name:"ALETHEIA", col:"#c9a84c", x:W*0.50, y:H*0.5, phase:2.4 },
+      { name:"REVERIE", col:"#ff4477", x:W*0.68, y:H*0.5, phase:0.8 },
+      { name:"TITANIUM τ", col:"#44aaff", x:W*0.85, y:H*0.5, phase:1.8 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,5,20,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<agents.length-1;i++) {
+        const a=agents[i],b=agents[i+1];
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"66"); g.addColorStop(1,b.col+"66");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+        const pkt=(t*0.014+i*0.6)%1;
+        const px=a.x+(b.x-a.x)*pkt, py=a.y+(b.y-a.y)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+      }
+      agents.forEach(ag=>{
+        const pulse=1+0.1*Math.sin(t*0.04+ag.phase);
+        for (let ri=0;ri<3;ri++) {
+          const r=(22+ri*14)*pulse;
+          ctx.beginPath(); ctx.arc(ag.x,ag.y,r,0,Math.PI*2);
+          ctx.strokeStyle=ag.col+(ri===0?"cc":"44"); ctx.lineWidth=ri===0?2:0.8;
+          ctx.shadowColor=ag.col; ctx.shadowBlur=(ri===0?18:6)*pulse; ctx.stroke(); ctx.shadowBlur=0;
+        }
+        ctx.fillStyle=ag.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(ag.name,ag.x,ag.y+36*pulse+10);
+        ctx.fillStyle="#fff"; ctx.font="bold 7px 'DM Mono',monospace";
+        ctx.fillText("τ",ag.x,ag.y+3);
+      });
+      ctx.fillStyle="rgba(192,132,252,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER-CORE · GRAY-SCOTT RD · CGLE τ DOPING · 5 INTELLIGENCE AGENTS",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherCoreView() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const U    = useRef(new Float32Array(N));
@@ -331,6 +384,26 @@ export default function AetherCoreView() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif", overflow: "hidden" }}>
+
+      <div style={{ padding:"12px 28px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", background:"rgba(192,132,252,0.07)", border:"1px solid rgba(192,132,252,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#c084fc", textTransform:"uppercase", fontFamily:"Raleway,sans-serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(3,5,20,0.85)", border:"1px solid rgba(192,132,252,0.1)",
+          borderLeft:"3px solid #c084fc", borderRadius:10, padding:20, marginBottom:10 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e0d8ff", margin:"0 0 6px" }}>
+            AETHER-Core · Crystalline Intelligence Engine · 5 Agents · Gray-Scott RD · CGLE τ Doping
+          </h2>
+          <p style={{ fontFamily:"Raleway,sans-serif", fontSize:12, color:"rgba(200,195,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five intelligence agent nodes (Mnesis/violet · Infernia/teal · Aletheia/gold · Reverie/rose · Titanium τ/blue)
+            connected in series with photon coupling packets — the AETHER-Core crystalline intelligence engine
+            topology, each agent pulsing in its own τ resonance ring.
+          </p>
+          <CoreIntelligenceCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(192,132,252,0.12)", padding: "12px 28px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>

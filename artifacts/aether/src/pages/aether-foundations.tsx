@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import particleStandardModel from "@assets/IMG_1669_1778070592522.jpeg";
 import silverMoonEclipse from "@assets/IMG_1654_1778070592522.jpeg";
@@ -111,6 +112,74 @@ const TOC = [
   { anchor:"particle",   num:"VI",  label:"Standard Model Reference",  bridgeLabel:"→ Q~AETHER",                       bridgeHref:"/q-aether" },
 ];
 
+function CrystallizationCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const PARTICLES: { x:number; y:number; r:number; phase:number; speed:number; col:string }[] = [];
+  for (let i = 0; i < 60; i++) {
+    PARTICLES.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: 1.5 + Math.random() * 3, phase: Math.random() * Math.PI * 2,
+      speed: 0.008 + Math.random() * 0.012,
+      col: ["#2ef0d8","#c9a84c","#9966ff","#ff4477","#44aaff"][Math.floor(Math.random()*5)],
+    });
+  }
+  const pRef = useRef(PARTICLES);
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#040612"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cx = W / 2, cy = H / 2;
+      for (let ring = 1; ring <= 5; ring++) {
+        const r = ring * 22;
+        const alpha = 0.04 + 0.03 * Math.sin(t * 0.02 + ring);
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(46,240,216,${alpha})`; ctx.lineWidth = 0.5; ctx.stroke();
+      }
+      pRef.current.forEach((p, i) => {
+        const drift = Math.sin(t * p.speed + p.phase);
+        const px = p.x + drift * 8;
+        const py = p.y + Math.cos(t * p.speed + p.phase * 1.3) * 5;
+        const alpha = 0.4 + 0.6 * Math.sin(t * p.speed * 1.5 + p.phase);
+        const g = ctx.createRadialGradient(px, py, 0, px, py, p.r * 2.5);
+        g.addColorStop(0, p.col);
+        g.addColorStop(0.5, p.col + "66");
+        g.addColorStop(1, p.col + "00");
+        ctx.beginPath(); ctx.arc(px, py, p.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.globalAlpha = alpha; ctx.fill(); ctx.globalAlpha = 1;
+        if (i < 59) {
+          const q = pRef.current[i+1];
+          const dist = Math.hypot(q.x - p.x, q.y - p.y);
+          if (dist < 100) {
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = p.col + "22"; ctx.lineWidth = 0.5; ctx.stroke();
+          }
+        }
+      });
+      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 18);
+      cg.addColorStop(0, "#ffffff");
+      cg.addColorStop(0.3, "#c9a84c");
+      cg.addColorStop(1, "#c9a84c00");
+      ctx.beginPath(); ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+      ctx.fillStyle = cg; ctx.fill();
+      ctx.fillStyle = "rgba(46,240,216,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER FOUNDATIONS · CRYSTALLIZATION MODEL · SOURCE MATERIAL", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherFoundationsPage() {
   return (
     <div data-testid="page-aether-foundations" style={{
@@ -124,6 +193,26 @@ export default function AetherFoundationsPage() {
       `}</style>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(46,240,216,0.08)", border:"1px solid rgba(46,240,216,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#2ef0d8", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(4,6,18,0.8)", border:"1px solid rgba(46,240,216,0.12)",
+            borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e2e8f0", margin:"0 0 6px" }}>
+              Crystallization Model · Particle Field · Source Material
+            </h2>
+            <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(200,210,255,0.55)", margin:"0 0 14px", lineHeight:1.65 }}>
+              60 particles drawn from the AETHER palette (teal · gold · violet · rose · blue) drift in slow Lissajous
+              paths, connecting to neighbors within 100px with gossamer threads. A golden crystallization core pulses
+              at center — the attractor that seeds coherence from dispersed source material.
+            </p>
+            <CrystallizationCanvas />
+          </div>
+        </div>
+
         {/* Masthead */}
         <header style={{
           padding:"2.2rem 2rem", borderRadius:20,

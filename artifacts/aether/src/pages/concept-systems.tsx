@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import imgProducts from "@assets/870b94f0-ef64-47ba-b130-d8c26ac96ff3_1777221871725.png";
 import imgTokenSystem from "@assets/5f816d5c-e98d-4498-93e4-a3be9087c8d3_1777221875021.png";
 import imgRobotSmall from "@assets/ChatGPT_Image_Apr_26,_2026,_12_54_37_PM_1777222481541.png";
@@ -35,11 +36,73 @@ const ROBOT_SCALES = [
     alt: "Iridescent emerald-green glass locker on the left, 1.2 m tall, with iris-style doors and an 800 W boost charge label. On the right, a large humanoid quad-rotor robot in flight with bioenchanical hard-noise actuator rotors. Spec strip below shows joint torque 5 N·m, flight efficiency 160 W hover, battery 21.6 V · 10 000 mAh, ≈ 216 Wh, scale comparison vs a 6 ft human, and a Power-vs-Mass chart marking 160 W." },
 ];
 
+function ConceptSystemsCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const concepts=[
+      { label:"TOKENS", col:"#2ef0d8", x:W*0.15, y:H*0.5 },
+      { label:"PRODUCTS", col:"#9966ff", x:W*0.32, y:H*0.35 },
+      { label:"ROBOTS", col:"#c9a84c", x:W*0.5, y:H*0.5 },
+      { label:"SYSTEMS", col:"#44aaff", x:W*0.68, y:H*0.65 },
+      { label:"NETWORK", col:"#44cc77", x:W*0.85, y:H*0.5 },
+    ];
+    const links=[[0,1],[1,2],[2,3],[3,4],[0,4],[1,3]];
+    const flows: {i:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.2)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      if(tick%18===0&&flows.length<10) flows.push({ i:Math.floor(Math.random()*links.length), t:0 });
+      links.forEach(([a,b])=>{
+        ctx.beginPath(); ctx.moveTo(concepts[a].x,concepts[a].y); ctx.lineTo(concepts[b].x,concepts[b].y);
+        ctx.strokeStyle="rgba(46,240,216,0.07)"; ctx.lineWidth=1; ctx.stroke();
+      });
+      for(let i=flows.length-1;i>=0;i--){
+        const f=flows[i]; f.t+=0.028;
+        const [a,b]=links[f.i];
+        const x=concepts[a].x+(concepts[b].x-concepts[a].x)*f.t;
+        const y=concepts[a].y+(concepts[b].y-concepts[a].y)*f.t;
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=concepts[a].col; ctx.shadowColor=concepts[a].col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(f.t>=1) flows.splice(i,1);
+      }
+      concepts.forEach(c=>{
+        ctx.beginPath(); ctx.arc(c.x,c.y,12,0,Math.PI*2);
+        ctx.fillStyle=c.col; ctx.shadowColor=c.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=c.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(c.label,c.x,c.y+22);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CONCEPT SYSTEMS · TOKENS · PRODUCTS · ROBOTS · SYSTEMS · NETWORK · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function ConceptSystemsView() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
       <style>{`@keyframes cs-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.cs-fade{animation:cs-fade .55s ease-out both}@media(prefers-reduced-motion:reduce){.cs-fade{animation:none}}`}</style>
-
+      <div style={{ padding:"24px 28px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Concept Systems · Tokens · Products · Robots · Systems · Network · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five concept nodes connected in a coherence network with live signal packets flowing between them — the AETHER concept systems simulation.
+          </p>
+          <ConceptSystemsCanvas />
+        </div>
+      </div>
       <div className="max-w-6xl mx-auto px-7 py-10 space-y-12">
         <header className="cs-fade space-y-3" data-testid="cs-hero">
           <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: B.iridescent }}>

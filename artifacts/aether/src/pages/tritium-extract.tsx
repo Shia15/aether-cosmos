@@ -59,6 +59,42 @@ function rand(a: number, b: number) { return a + Math.random() * (b - a); }
 function clamp(v: number, a: number, b: number) { return Math.max(a, Math.min(b, v)); }
 
 // ── Main page ────────────────────────────────────────────────────────────────
+function TritiumExtractHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const particles: {x:number;y:number;vx:number;vy:number;life:number}[]=[];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      if(Math.random()<0.3) particles.push({x:W*0.5+(-1+Math.random()*2)*20,y:H*0.7,vx:(-1+Math.random()*2)*0.6,vy:-1.2-Math.random(),life:1});
+      for(let i=particles.length-1;i>=0;i--){
+        const p=particles[i];
+        p.x+=p.vx;p.y+=p.vy;p.life-=0.018;
+        const alpha=p.life*0.8;
+        ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fillStyle=`rgba(68,170,255,${alpha})`;ctx.fill();
+        if(p.life<=0) particles.splice(i,1);
+      }
+      for(let i=0;i<3;i++){
+        const angle=i/3*Math.PI*2+t*0.02*(i+1);
+        const ox=W*0.5+20*Math.cos(angle),oy=H/2+10*Math.sin(angle);
+        ctx.beginPath();ctx.arc(ox,oy,4,0,Math.PI*2);ctx.fillStyle=`rgba(68,170,255,${0.3+0.3*Math.sin(t*0.05+i)})`;ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(W*0.5,H/2,12,0,Math.PI*2);ctx.strokeStyle="rgba(68,170,255,0.2)";ctx.lineWidth=0.5;ctx.stroke();
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("TRITIUM EXTRACT · HYDROGEN ISOTOPE · NUCLEAR FUSION · BETA DECAY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function TritiumExtractPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef  = useRef({
@@ -477,7 +513,13 @@ export default function TritiumExtractPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11 }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:8}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TRITIUM EXTRACT · HYDROGEN ISOTOPE · NUCLEAR FUSION · BETA DECAY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Tritium nucleus + rising beta particles — the live AETHER tritium extract simulation.</p></div>
+          <TritiumExtractHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ padding: "6px 14px", borderBottom: `1px solid ${BRD}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <span style={{ fontSize: 12, letterSpacing: 4, fontWeight: 700 }}>TRITIUM EXTRACTION</span>

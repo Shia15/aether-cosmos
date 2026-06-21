@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MariClassDiagram from "@/components/mari-class-diagram";
 
@@ -144,6 +144,70 @@ const PHASES = [
   },
 ];
 
+function CrystalLayerCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const LAYER_DATA = [
+    { name:"L5 REVERIE · Output",   color:"#eab308" },
+    { name:"L4 ALETHEIA · Logic",   color:"#0ea5e9" },
+    { name:"L3 MNĒSIS · Memory",    color:"#8b5cf6" },
+    { name:"L2 INFERAIA · Emotion", color:"#ef4444" },
+    { name:"L1 CAELUS · Input",     color:"#10b981" },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#030514"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const NL = LAYER_DATA.length;
+      const layH = (H - 30) / NL;
+      const indent = 44;
+      LAYER_DATA.forEach((l, i) => {
+        const y = 15 + i * layH;
+        const pulse = 0.08 + 0.05 * Math.sin(t * 0.025 + i * 0.8);
+        ctx.fillStyle = l.color + Math.round(pulse * 255).toString(16).padStart(2, "0");
+        ctx.fillRect(indent, y + 2, W - indent - 10, layH - 4);
+        ctx.strokeStyle = l.color + "55"; ctx.lineWidth = 1;
+        ctx.strokeRect(indent, y + 2, W - indent - 10, layH - 4);
+        ctx.fillStyle = l.color + "cc";
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.fillText(l.name, indent + 8, y + layH / 2 + 3);
+        const bx = 12, by = y + 4;
+        ctx.fillStyle = l.color + "88";
+        ctx.fillRect(bx, by, 24, layH - 8);
+        ctx.fillStyle = l.color;
+        ctx.font = "bold 9px 'Cinzel', serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`L${NL - i}`, bx + 12, by + layH / 2 - 3);
+        ctx.textAlign = "left";
+      });
+      const beamX = W * 0.72;
+      const beamA = 0.5 + 0.4 * Math.sin(t * 0.04);
+      const beamGrd = ctx.createLinearGradient(beamX, 0, beamX, H);
+      beamGrd.addColorStop(0, `rgba(255,255,220,0)`);
+      beamGrd.addColorStop(0.1, `rgba(255,255,180,${beamA * 0.8})`);
+      beamGrd.addColorStop(0.5, `rgba(255,220,100,${beamA})`);
+      beamGrd.addColorStop(0.9, `rgba(46,240,216,${beamA * 0.8})`);
+      beamGrd.addColorStop(1, `rgba(46,240,216,0)`);
+      ctx.beginPath(); ctx.moveTo(beamX - 3, 0); ctx.lineTo(beamX + 3, H);
+      ctx.strokeStyle = beamGrd; ctx.lineWidth = 5; ctx.stroke();
+      ctx.fillStyle = "rgba(139,92,246,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("CLCS ARCHITECTURE · L1→L5 CRYSTAL STACK · COHERENCE LIGHT", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function ArchitectureView() {
   const [activeLayer, setActiveLayer] = useState<string | null>(null);
   const [activeDopant, setActiveDopant] = useState<string>("blue-sapphire");
@@ -165,6 +229,26 @@ export default function ArchitectureView() {
           interacting stages transform raw cosmic input into structured, radiative output —
           mirroring Al₂O₃ forming sapphire under pressure.
         </p>
+
+        <div style={{ marginTop:20 }}>
+          <div style={{ display:"inline-block", background:"rgba(139,92,246,0.08)", border:"1px solid rgba(139,92,246,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#8b5cf6", textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(10,8,30,0.7)", border:"1px solid rgba(139,92,246,0.12)",
+            borderLeft:"3px solid #8b5cf6", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#f1f5f9", margin:"0 0 6px" }}>
+              CLCS Architecture · L1→L5 Crystal Stack · Coherence Light
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,195,240,0.55)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Five horizontal crystal bands: L1 Caelus (Input) → L2 Inferaia (Emotion) → L3 Mnēsis (Memory) →
+              L4 Aletheia (Logic) → L5 Reverie (Output). A coherence light beam descends through all layers,
+              refracting into teal at the base — the moment raw input becomes structured knowledge.
+            </p>
+            <CrystalLayerCanvas />
+          </div>
+        </div>
       </div>
 
       {/* Four-Layer Stack */}

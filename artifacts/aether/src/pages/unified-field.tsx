@@ -134,6 +134,39 @@ function drawPolyhedron(
 }
 
 // ─── PAGE ─────────────────────────────────────────────────────────────
+function UnifiedFieldHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const forces=["EM","STRONG","WEAK","GRAVITY"];
+    const fcols=["#44aaff","#ff4477","#44cc77","#c9a84c"];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      forces.forEach((lb,i)=>{
+        const angle=i/forces.length*Math.PI*2+t*0.008;
+        const r=45+8*Math.sin(t*0.04+i);
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.55;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle=fcols[i]+"44";ctx.lineWidth=1;ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle=fcols[i]+"33";ctx.fill();ctx.strokeStyle=fcols[i]+"66";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle=fcols[i]+"88";ctx.font="7px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(lb,x,y+3);ctx.textAlign="left";
+      });
+      ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,20);grd.addColorStop(0,"rgba(255,255,255,0.7)");grd.addColorStop(1,"rgba(46,240,216,0)");ctx.fillStyle=grd;ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UNIFIED FIELD · ELECTROWEAK · GRAND UNIFICATION · TOE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UnifiedFieldPage() {
   const cvRef  = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -356,6 +389,13 @@ export default function UnifiedFieldPage() {
 
   return (
     <div className="min-h-screen" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UNIFIED FIELD · ELECTROWEAK · GRAND UNIFICATION · TOE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>EM · Strong · Weak · Gravity rotating orbits — the live AETHER unified field simulation.</p></div>
+          <UnifiedFieldHeaderCanvas />
+        </div>
+      </div>
       {/* HERO CANVAS */}
       <section className="relative" style={{ height: "min(720px, 80vh)" }} data-testid="unified-hero">
         <canvas ref={cvRef} data-testid="unified-field-canvas"

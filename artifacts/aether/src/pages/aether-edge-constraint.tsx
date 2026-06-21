@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -406,10 +406,86 @@ const LANGUAGE_AXES: { axis: string; animal: string; human: string; cuca: string
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function CoherenceFieldCanvas() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  const rafRef = React.useRef(0);
+  React.useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const nodes = [
+      { x:W*0.15, y:H*0.42, r:22, col:"#c9a84c", label:"ANALOG\nSYSTEM", phase:0.0 },
+      { x:W*0.38, y:H*0.55, r:18, col:"#2ef0d8", label:"COHERENCE\nFIELD", phase:1.5 },
+      { x:W*0.58, y:H*0.38, r:20, col:"#9966ff", label:"COUPLING\nCONFLICT", phase:0.8 },
+      { x:W*0.78, y:H*0.52, r:16, col:"#ff4477", label:"EDGE\nINSTABILITY", phase:2.1 },
+      { x:W*0.90, y:H*0.36, r:14, col:"#44aaff", label:"DISCRETE\nDEMAND", phase:3.0 },
+    ];
+    const links = [[0,1],[1,2],[2,3],[3,4],[0,2]];
+    let t=0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(4,7,14,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      links.forEach(([a,b]) => {
+        const na=nodes[a],nb=nodes[b];
+        const tension = 0.5+0.5*Math.sin(t*0.022+(a+b)*0.7);
+        const g=ctx.createLinearGradient(na.x,na.y,nb.x,nb.y);
+        g.addColorStop(0,na.col+"66"); g.addColorStop(1,nb.col+"66");
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1+tension*1.5;
+        ctx.shadowColor=na.col; ctx.shadowBlur=8*tension; ctx.stroke(); ctx.shadowBlur=0;
+        const mid={x:(na.x+nb.x)/2,y:(na.y+nb.y)/2};
+        const pkt = (t*0.018+(a+b)*0.4)%1;
+        const px=na.x+(nb.x-na.x)*pkt, py=na.y+(nb.y-na.y)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#ffffff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        void mid;
+      });
+      nodes.forEach(n => {
+        const pulse = 1+0.12*Math.sin(t*0.04+n.phase);
+        const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*2.2*pulse);
+        g.addColorStop(0,n.col+"cc"); g.addColorStop(0.5,n.col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=n.col; ctx.shadowBlur=20*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r*pulse,0,Math.PI*2);
+        ctx.strokeStyle=n.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=n.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        n.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,n.x,n.y+n.r*pulse+12+li*10));
+      });
+      ctx.fillStyle="rgba(201,168,76,0.5)"; ctx.font="10px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("‖E(t)‖ ↑  ⟹  C(x,t) ↓  ⟹  instability",14,22);
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherEdgeConstraintView() {
   return (
     <div style={{ minHeight: "100vh", background: B.bg, color: B.ink, padding: "28px 24px 60px" }} data-testid="page-aether-edge-constraint">
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(4,7,14,0.8)", border:"1px solid rgba(201,168,76,0.12)",
+            borderLeft:`3px solid ${B.gold}`, borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+              AETHER Edge Constraint · Coherence Field · ‖E(t)‖ ↑ ⟹ C(x,t) ↓ ⟹ Instability
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Five nodes (Analog System · Coherence Field · Coupling Conflict · Edge Instability · Discrete Demand)
+              connected by tension-varying links with white photon packets streaming between them — the AETHER
+              cephalopod edge constraint model shown as a living coherence field graph.
+            </p>
+            <CoherenceFieldCanvas />
+          </div>
+        </div>
 
         {/* Title */}
         <div style={{ marginBottom: 28 }}>

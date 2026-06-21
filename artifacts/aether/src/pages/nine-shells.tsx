@@ -208,6 +208,40 @@ function ShellDetail({ shell, value, a, b, c }: { shell: Shell; value: number; a
   );
 }
 
+function NineShellsHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const shells=9;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let s=1;s<=shells;s++){
+        const r=s*12;
+        const hue=s*40;
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(${[46,153,201,100,255,68,100,201,68][s-1]},${[240,102,240,240,68,204,150,102,204][s-1]},${[216,255,216,100,120,119,255,255,68][s-1]},${0.3+0.05*Math.sin(t*0.04+s)})`;
+        ctx.lineWidth=0.8;ctx.stroke();
+        const angle=t*0.02*(s%3===0?-1:1)+s;
+        const px=cx+r*Math.cos(angle),py=cy+r*Math.sin(angle);
+        ctx.beginPath();ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=`hsl(${s*40},80%,60%)`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NINE SHELLS · ORBITAL RESONANCE · HARMONIC LATTICE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NineShellsView() {
   const [a, setA] = useState(3);
   const [b, setB] = useState(4);
@@ -428,6 +462,13 @@ export default function NineShellsView() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: '"DM Mono", monospace' }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NINE SHELLS · ORBITAL RESONANCE · HARMONIC LATTICE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>9 concentric orbital shells — the live AETHER nine shells simulation.</p></div>
+          <NineShellsHeaderCanvas />
+        </div>
+      </div>
       {/* TOPBAR */}
       <header className="flex items-center justify-between gap-4 px-4 md:px-8 py-3 border-b relative overflow-hidden flex-wrap"
         style={{ background: C.panel, borderColor: C.border }}>

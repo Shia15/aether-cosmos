@@ -306,6 +306,38 @@ function TransceiverCanvas({ mode }: { mode: TxMode }) {
 /* ══════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════ */
+function SeamossTransceiverHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let ring=1;ring<=4;ring++){
+        const r=ring*18+6*Math.sin(t*0.03+ring);
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(68,204,119,${0.05+ring*0.04})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      for(let i=0;i<8;i++){
+        const angle=i/8*Math.PI*2+t*0.015;
+        const x=cx+Math.cos(angle)*65,y=cy+Math.sin(angle)*40;
+        ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle="rgba(68,204,119,0.4)";ctx.fill();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle="rgba(68,204,119,0.06)";ctx.lineWidth=0.4;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SEAMOSS TRANSCEIVER · BIO-SIGNAL · ALGAE ANTENNA · TRANSMISSION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SeamossTransceiverPage() {
   const [mode, setMode] = useState<TxMode>("rx");
   const [activeIon, setActiveIon] = useState(0);
@@ -330,7 +362,13 @@ export default function SeamossTransceiverPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT, fontFamily:mono, overflowY:"auto" }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SEAMOSS TRANSCEIVER · BIO-SIGNAL · ALGAE ANTENNA · TRANSMISSION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 bio-signal orbital beacons — the live AETHER seamoss transceiver simulation.</p></div>
+          <SeamossTransceiverHeaderCanvas />
+        </div>
+      </div>
       {/* ── HEADER ── */}
       <div style={{ padding:"12px 20px 10px", borderBottom:`1px solid ${BORDER}`,
         background:"rgba(2,8,6,0.98)", position:"sticky", top:0, zIndex:20 }}>

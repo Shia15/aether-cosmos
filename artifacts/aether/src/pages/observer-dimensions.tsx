@@ -107,9 +107,50 @@ const SECTIONS = [
   },
 ];
 
+import { useEffect, useRef } from "react";
+
+function ObserverDimensionsCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const dims=8;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let d=0;d<dims;d++){
+        const angle=d*(Math.PI*2/dims)+t*0.01;
+        const r=55+d*5;
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.5;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle=`rgba(46,240,216,${0.05+0.05*d})`;ctx.lineWidth=0.5;ctx.stroke();
+        const pls=0.8+0.2*Math.sin(t*0.04+d);
+        ctx.beginPath();ctx.arc(x,y,6*pls,0,Math.PI*2);ctx.fillStyle=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff","#44cc77","#c9a84c","#ff4477"][d]+"55";ctx.fill();ctx.strokeStyle=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff","#44cc77","#c9a84c","#ff4477"][d]+"99";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff","#44cc77","#c9a84c","#ff4477"][d];ctx.font="bold 8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(`L${d+1}`,x,y+3);ctx.textAlign="left";
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("OBSERVER DIMENSIONS · L1–L8 · PERCEPTION LAYERS · COHERENCE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ObserverDimensionsPage() {
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>OBSERVER DIMENSIONS · L1–L8 · PERCEPTION LAYERS · COHERENCE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 rotating dimension nodes — the live AETHER observer dimensions simulation.</p></div>
+          <ObserverDimensionsCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem 1.5rem" }}>
 
         <div style={{ textAlign: "center", marginBottom: "3rem", padding: "2rem 1rem" }}>

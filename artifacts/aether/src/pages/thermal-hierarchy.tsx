@@ -35,6 +35,42 @@ function dosMode(nu: number, mode: DosMode) {
   return peak;
 }
 
+function ThermalHierarchyHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const tiers=5;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let tier=0;tier<tiers;tier++){
+        const y=10+tier*(H-10)/tiers;
+        const heat=1-tier/tiers;
+        const r=Math.round(20+heat*200),g=Math.round(4+heat*60),b=Math.round(8);
+        const wave=8*Math.sin(t*0.04+tier*0.6);
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=4){
+          const wy=y+wave*Math.sin(x*0.02+t*0.03);
+          x===0?ctx.moveTo(x,wy):ctx.lineTo(x,wy);
+        }
+        ctx.strokeStyle=`rgba(${r},${g},${b},${0.2+heat*0.3})`;ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle=`rgba(${r},${g},${b},0.05)`;
+        ctx.lineTo(W,y+(H-10)/tiers);ctx.lineTo(0,y+(H-10)/tiers);ctx.closePath();ctx.fill();
+      }
+      ctx.fillStyle="rgba(255,80,20,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("THERMAL HIERARCHY · HEAT GRADIENT · ENTROPY LADDER · CONDUCTION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ThermalHierarchyPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [T, setT] = useState(2.5);
@@ -150,6 +186,13 @@ export default function ThermalHierarchyPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text }} data-testid="page-thermal-hierarchy">
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #ff4420",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ff4420",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ff4420",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ff4420",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>THERMAL HIERARCHY · HEAT GRADIENT · ENTROPY LADDER · CONDUCTION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,68,32,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5-tier heat cascade — the live AETHER thermal hierarchy simulation.</p></div>
+          <ThermalHierarchyHeaderCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[11px] tracking-[0.45em] uppercase" style={{ color: C.muted }}>
           AETHER · THERMAL HIERARCHY ENGINE · APRIL 2026

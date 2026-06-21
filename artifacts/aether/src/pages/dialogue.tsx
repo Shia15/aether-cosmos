@@ -574,6 +574,55 @@ function StatsBar({ stats, scanning, onScan }:
 }
 
 /* ── Main page ────────────────────────────────── */
+function DialogueSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const agents=[
+      { x:W*0.15, y:H*0.45, col:"#2ef0d8", label:"AGENT A", msg:0 },
+      { x:W*0.85, y:H*0.55, col:"#9966ff", label:"AGENT B", msg:0 },
+    ];
+    const packets: {x:number,y:number,tx:number,ty:number,t:number,col:string}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      if(tick%30===0&&packets.length<8){
+        const from=agents[tick%2===0?0:1], to=agents[tick%2===0?1:0];
+        packets.push({ x:from.x,y:from.y,tx:to.x,ty:to.y,t:0,col:from.col });
+      }
+      ctx.setLineDash([4,8]);
+      ctx.beginPath(); ctx.moveTo(agents[0].x,agents[0].y); ctx.lineTo(agents[1].x,agents[1].y);
+      ctx.strokeStyle="rgba(255,255,255,0.05)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.setLineDash([]);
+      for(let i=packets.length-1;i>=0;i--){
+        const p=packets[i]; p.t+=0.025;
+        const px=p.x+(p.tx-p.x)*p.t, py=p.y+(p.ty-p.y)*p.t;
+        ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(p.t>=1) packets.splice(i,1);
+      }
+      agents.forEach(a=>{
+        ctx.beginPath(); ctx.arc(a.x,a.y,18,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=a.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(a.label,a.x,a.y+32);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("DIALOGUE · MULTI-AGENT COHERENCE · EMERGENT CONSENSUS · MESSAGE FLOW · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function DialoguePage() {
   const [messages, setMessages]   = useState<Msg[]>(() => loadMessages());
   const [input,    setInput]      = useState("");
@@ -707,8 +756,22 @@ export default function DialoguePage() {
     <div style={{
       background: BG, minHeight: "100vh",
       display: "flex", flexDirection: "column",
+
       fontFamily: body, color: TEXT,
     }}>
+
+      <div style={{ padding:"24px 24px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Dialogue · Multi-Agent Coherence · Emergent Consensus · Message Flow · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Two agent nodes exchanging live message packets across a channel — the live AETHER multi-agent dialogue simulation.
+          </p>
+          <DialogueSimCanvas />
+        </div>
+      </div>
 
       {/* ── Header ── */}
       <div style={{

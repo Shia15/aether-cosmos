@@ -182,6 +182,45 @@ function drawFarm(
   ctx.fillText(`ψ=${psi.toFixed(3)}`, cx, cy - pulse - 3);
 }
 
+function CircularFarmBadgeCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 180;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const rings=[35,65,90,110];
+    const dots: {ang:number,r:number,col:string,speed:number}[]=[];
+    rings.forEach((r,i)=>{
+      const col=["#44cc77","#c9a84c","#2ef0d8","#9966ff"][i];
+      for(let j=0;j<8;j++) dots.push({ ang:j*(Math.PI/4), r, col, speed:0.01*(i%2===0?1:-1) });
+    });
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,8,18,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      rings.forEach((r,i)=>{
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=["#44cc77","#c9a84c","#2ef0d8","#9966ff"][i]+"33"; ctx.lineWidth=1; ctx.stroke();
+      });
+      dots.forEach(d=>{
+        d.ang+=d.speed;
+        const x=cx+d.r*Math.cos(d.ang), y=cy+d.r*Math.sin(d.ang);
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=d.col; ctx.shadowColor=d.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+      });
+      ctx.fillStyle="rgba(68,204,119,0.35)"; ctx.font="9px 'Courier New',monospace"; ctx.textAlign="left";
+      ctx.fillText("CIRCULAR FARM · φ-GOLDEN SPIRAL · COMPANION PLANTING · SYNTROPIC AGROFORESTRY · AETHER GROWING SYSTEM",14,16);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 export default function CircularFarmPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -356,7 +395,25 @@ export default function CircularFarmPage() {
   const psiBar = Math.min(100, stats.psi * 161.8); // φ-normalized
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11 }}>
+    <div style={{ minHeight: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, fontSize: 11 }}>
+      <div style={{ padding:"12px 16px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", background:"rgba(68,204,119,0.07)", border:"1px solid rgba(68,204,119,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#44cc77", textTransform:"uppercase", marginBottom:10 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,8,18,0.9)", border:"1px solid rgba(68,204,119,0.12)",
+          borderLeft:"3px solid #44cc77", borderRadius:10, padding:16, marginBottom:12 }}>
+          <h2 style={{ fontSize:16, color:"#a0f8d0", margin:"0 0 5px" }}>
+            Circular Farm · φ-Golden Spiral · Companion Planting · Syntropic Agroforestry · AETHER
+          </h2>
+          <p style={{ fontSize:11, color:"rgba(68,204,119,0.35)", margin:"0 0 12px", lineHeight:1.6 }}>
+            Four concentric planting rings (green · gold · teal · violet) with companion organisms orbiting
+            in golden-angle patterns — the live AETHER circular farm golden-spiral growing simulation.
+          </p>
+          <CircularFarmBadgeCanvas />
+        </div>
+      </div>
 
       {/* ── HEADER ─────────────────────────────────────────────────────── */}
       <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BRD}`, flexShrink: 0 }}>

@@ -167,6 +167,58 @@ function drawOrganoid(
   ctx.fillText(stateLabel, 6, H - 4);
 }
 
+function CerebralOrganoidCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 240;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const nodes: {x:number,y:number,col:string,r:number,label:string}[]=[
+      { x:cx, y:cy, col:"#f472b6", r:22, label:"ORGANOID CORE" },
+      { x:cx-130, y:cy-60, col:"#a78bfa", r:14, label:"NEOCORTEX" },
+      { x:cx+130, y:cy-60, col:"#60a5fa", r:14, label:"HIPPOCAMPUS" },
+      { x:cx-130, y:cy+60, col:"#34d399", r:14, label:"BRAINSTEM" },
+      { x:cx+130, y:cy+60, col:"#fbbf24", r:14, label:"CEREBELLUM" },
+    ];
+    const signals: {from:number,to:number,t:number,col:string}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.16)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      nodes.forEach((a,i)=>nodes.forEach((b,j)=>{ if(i===0&&j>0){
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=b.col+"22"; ctx.lineWidth=1; ctx.stroke();
+      }}));
+      if(tick%18===0) signals.push({ from:0, to:1+Math.floor(Math.random()*4), t:0, col:nodes[1+Math.floor(Math.random()*4)].col });
+      for(let i=signals.length-1;i>=0;i--){
+        const s=signals[i]; s.t+=0.03;
+        const a=nodes[s.from], b=nodes[s.to];
+        const px=a.x+(b.x-a.x)*s.t, py=a.y+(b.y-a.y)*s.t;
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=s.col; ctx.shadowColor=s.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(s.t>=1) signals.splice(i,1);
+      }
+      nodes.forEach(n=>{
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r+2*Math.sin(tick*0.06),0,Math.PI*2);
+        ctx.fillStyle=n.col+"33"; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+        ctx.fillStyle=n.col; ctx.shadowColor=n.col; ctx.shadowBlur=16; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle="#fff"; ctx.font="bold 6px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+n.r+12);
+      });
+      ctx.fillStyle="rgba(244,114,182,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CEREBRAL ORGANOIDS · NEOCORTEX · HIPPOCAMPUS · BRAINSTEM · CEREBELLUM · AETHER NEURAL MAP",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function CerebralOrganoidPage() {
   const [tab, setTab] = useState<"organoid"|"biology"|"psychedelics"|"aether">("organoid");
@@ -253,6 +305,25 @@ export default function CerebralOrganoidPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(244,114,182,0.07)", border:"1px solid rgba(244,114,182,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:C.pink, textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(244,114,182,0.1)",
+          borderLeft:`3px solid ${C.pink}`, borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'Raleway',sans-serif", fontSize:18, color:"#fde8f4", margin:"0 0 6px" }}>
+            Cerebral Organoids · Neocortex · Hippocampus · Brainstem · Cerebellum · Neural Signals
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(244,114,182,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five cerebral organoid nodes (Core/pink · Neocortex/violet · Hippocampus/blue · Brainstem/teal
+            · Cerebellum/gold) with live neural signal packets propagating between regions — the AETHER
+            cerebral organoid brain simulation.
+          </p>
+          <CerebralOrganoidCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="border-b px-6 py-4 sticky top-0 z-20"
         style={{ background: C.panel + "ee", borderColor: C.pink + "25" }}>

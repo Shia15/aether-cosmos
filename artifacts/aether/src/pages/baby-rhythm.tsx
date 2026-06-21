@@ -451,14 +451,91 @@ function Plate({ src, caption, alt }: { src:string; caption:string; alt:string }
   );
 }
 
+function BabyRhythmCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const modules = [
+      { label:"FEEDING\nTRACKER", col:"#f472b6", x:W*0.12, y:H*0.5 },
+      { label:"SLEEP\nRHYTHM", col:"#a78bfa", x:W*0.28, y:H*0.5 },
+      { label:"DIAPER\nLOG", col:"#34d399", x:W*0.44, y:H*0.5 },
+      { label:"GROWTH\nMILESTONES", col:"#fbbf24", x:W*0.60, y:H*0.5 },
+      { label:"SOOTHING\nSCHEDULE", col:"#60a5fa", x:W*0.76, y:H*0.5 },
+      { label:"DIAPER\nBAG", col:"#f97316", x:W*0.91, y:H*0.5 },
+    ];
+    const stars:{x:number;y:number;r:number;phase:number}[]=[];
+    for (let i=0;i<50;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*1.5,phase:Math.random()*Math.PI*2});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(20,10,60,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      stars.forEach(s=>{
+        const a=0.3+0.3*Math.sin(t*0.03+s.phase);
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(253,240,240,${a})`; ctx.fill();
+      });
+      for (let i=0;i<modules.length-1;i++) {
+        const a=modules[i],b=modules[i+1];
+        const pkt=(t*0.015+i*0.5)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"44"); g.addColorStop(1,b.col+"44");
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      }
+      modules.forEach((m,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.1);
+        const g=ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,16*pulse);
+        g.addColorStop(0,m.col+"cc"); g.addColorStop(0.5,m.col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(m.x,m.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=m.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=m.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=m.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        m.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,m.x,m.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(244,114,182,0.45)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BABY RHYTHM · FEEDING · SLEEP · DIAPER · GROWTH · SOOTHING · DIAPER BAG",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BabyRhythmPage() {
   return (
     <div data-testid="page-baby-rhythm" style={{
       minHeight:"100vh", width:"100%",
       background:"radial-gradient(ellipse at top, #4c1d95 0%, #1e1b4b 45%, #020617 100%)",
       color:"#fef3c7", fontFamily:"'Outfit', system-ui, sans-serif",
-      padding:"3rem 1.5rem 5rem",
+      padding:"1.5rem 1.5rem 5rem",
     }}>
+      <div style={{ maxWidth:1100, margin:"0 auto 24px" }}>
+        <div style={{ display:"inline-block", background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#f472b6", textTransform:"uppercase", fontFamily:"'Outfit',system-ui,sans-serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(20,10,60,0.85)", border:"1px solid rgba(244,114,182,0.12)",
+          borderLeft:"3px solid #f472b6", borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"'Outfit',system-ui,sans-serif", fontSize:18, color:"#fef3c7", margin:"0 0 6px" }}>
+            Baby Rhythm · Feeding · Sleep · Diaper · Growth · Soothing · Diaper Bag
+          </h2>
+          <p style={{ fontFamily:"'Outfit',system-ui,sans-serif", fontSize:12, color:"rgba(253,240,200,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six baby care modules (Feeding/rose · Sleep/violet · Diaper/teal · Growth/gold · Soothing/blue · Diaper Bag/orange)
+            linked by care-routine streams against a twinkling starfield — the living Baby Rhythm daily care constellation
+            for tracking routines and milestones.
+          </p>
+          <BabyRhythmCanvas />
+        </div>
+      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>

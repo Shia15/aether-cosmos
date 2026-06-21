@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#67e8f9",
@@ -138,6 +138,37 @@ const ENTRIES: Entry[] = [
     link:"/divine-timing" },
 ];
 
+function GlossaryCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 140;
+    const W = canvas.width, H = canvas.height;
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(12,74,110,0.3)"; ctx.fillRect(0,0,W,H);
+      letters.forEach((l,i)=>{
+        const x=W*(i+0.5)/26;
+        const wave=Math.sin(t*0.03+i*0.4)*20;
+        const alpha=0.3+0.5*Math.abs(Math.sin(t*0.025+i*0.6));
+        ctx.fillStyle=`rgba(103,232,249,${alpha})`;
+        ctx.font=`${12+Math.abs(Math.sin(t*0.02+i*0.5))*6}px 'DM Mono',monospace`;
+        ctx.textAlign="center"; ctx.fillText(l,x,H/2+wave);
+      });
+      ctx.textAlign="left";
+      ctx.fillStyle="rgba(103,232,249,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GLOSSARY · A–Z AETHER VOCABULARY · 40 TERMS · 11 CATEGORIES · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GlossaryPage() {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<Cat | "All">("All");
@@ -176,6 +207,13 @@ export default function GlossaryPage() {
       color:"#e0f2fe", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
+      <div style={{flexShrink:0,marginBottom:20,padding:"0 0.5rem"}}>
+        <div style={{display:"inline-block",border:"1px solid #67e8f9",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#67e8f9",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(12,74,110,0.4)",borderLeft:"3px solid #67e8f9",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#67e8f9",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GLOSSARY · A–Z AETHER VOCABULARY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(103,232,249,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>26 letters waving — 40 terms · 11 categories — the live AETHER glossary animation.</p></div>
+          <GlossaryCanvas />
+        </div>
+      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1100, margin:"0 auto" }}>

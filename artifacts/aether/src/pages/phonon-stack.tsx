@@ -22,6 +22,43 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
 
 type Phonon = { x: number; y: number; vx: number; vy: number; alive: number; col: string };
 
+function PhononStackHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const layers=5;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let l=0;l<layers;l++){
+        const freq=0.008*(l+1);
+        const amp=20-l*2.5;
+        const y0=20+l*22;
+        ctx.beginPath();
+        for(let x=0;x<W;x++){
+          const y=y0+Math.sin(x*freq+t*0.04+l*0.8)*amp;
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        const col=["#2ef0d8","#9966ff","#c9a84c","#44aaff","#44cc77"][l];
+        ctx.strokeStyle=col+"66";ctx.lineWidth=1;ctx.stroke();
+        const dotX=(t*1.5+l*150)%W;
+        const dotY=y0+Math.sin(dotX*freq+t*0.04+l*0.8)*amp;
+        ctx.beginPath();ctx.arc(dotX,dotY,4,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PHONON STACK · ACOUSTIC QUANTA · LATTICE VIBRATIONS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhononStackPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("phonons");
@@ -509,6 +546,13 @@ export default function PhononStackPage() {
 
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-32,marginRight:-32}}>
+        <div style={{padding:"8px 32px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 32px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PHONON STACK · ACOUSTIC QUANTA · LATTICE VIBRATIONS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 layered phonon waves — the live AETHER phonon stack simulation.</p></div>
+          <PhononStackHeaderCanvas />
+        </div>
+      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · phonons · thermal · 3D-stacked transistors · twisted liquid pipe

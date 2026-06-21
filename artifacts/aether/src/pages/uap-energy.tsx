@@ -495,12 +495,52 @@ const NAV = [
   { id: "s7", label: "AETHER" },
 ];
 
+function UAPEnergyHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      for(let ring=1;ring<=4;ring++){
+        const r=ring*18+4*Math.sin(t*0.04+ring);
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(153,102,255,${0.06+ring*0.04})`;ctx.lineWidth=0.4;ctx.stroke();
+      }
+      for(let b=0;b<5;b++){
+        const angle=b/5*Math.PI*2+t*0.025;
+        const r2=32+10*Math.sin(t*0.05+b);
+        const bx=cx+Math.cos(angle)*r2,by=cy+Math.sin(angle)*r2*0.55;
+        ctx.beginPath();ctx.arc(bx,by,3,0,Math.PI*2);ctx.fillStyle=`rgba(153,102,255,${0.4+0.3*Math.sin(t*0.06+b)})`;ctx.fill();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(bx,by);ctx.strokeStyle="rgba(153,102,255,0.06)";ctx.lineWidth=0.3;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,12);grd.addColorStop(0,"rgba(255,255,255,0.9)");grd.addColorStop(1,"rgba(153,102,255,0)");ctx.fillStyle=grd;ctx.fill();
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UAP ENERGY · ZERO-POINT · FIELD PROPULSION · EXOTIC MATTER · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UAPEnergyPage() {
   const [mode, setMode] = useState<Mode>("wireless");
 
   return (
     <div style={{ background: BG0, minHeight: "100vh", fontFamily: body, color: PALE }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UAP ENERGY · ZERO-POINT · FIELD PROPULSION · EXOTIC MATTER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4-ring orbital field + 5 field beacons — the live AETHER UAP energy simulation.</p></div>
+          <UAPEnergyHeaderCanvas />
+        </div>
+      </div>
       {/* ── HERO ── */}
       <div style={{ position: "relative", overflow: "hidden" }}>
         <div style={{

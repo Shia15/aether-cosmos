@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import letterImg from "@assets/IMG_1704_1778075886223.jpeg";
 
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#fbbf24",
@@ -61,16 +62,76 @@ const FIELD_PRINCIPLES = [
   { t:"Positivity influences paradigm", d:"Not toxic positivity that denies what hurts — generative positivity that names what hurts and then tilts the lens by one degree toward what's possible. One degree compounds." },
 ];
 
+function DivineTimingCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const windows=[
+      { x:W*0.1, label:"OCT 15", col:"#fbbf24" },
+      { x:W*0.28, label:"OCT 21", col:"#9966ff" },
+      { x:W*0.46, label:"BLIND", col:"rgba(255,255,255,0.2)" },
+      { x:W*0.64, label:"MID-NOV", col:"#2ef0d8" },
+      { x:W*0.82, label:"NOV 29", col:"#ff4477" },
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      ctx.beginPath(); ctx.moveTo(W*0.05,cy); ctx.lineTo(W*0.95,cy);
+      ctx.strokeStyle="rgba(251,191,36,0.15)"; ctx.lineWidth=1; ctx.stroke();
+      windows.forEach((w,i)=>{
+        const psi=0.5+0.5*Math.sin(t*0.04+i*1.2);
+        ctx.beginPath(); ctx.arc(w.x,cy,10+5*psi,0,Math.PI*2);
+        ctx.fillStyle=w.col; ctx.shadowColor=w.col; ctx.shadowBlur=14*psi; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=w.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(w.label,w.x,cy+26);
+        if(i>0){
+          const prev=windows[i-1];
+          ctx.beginPath(); ctx.moveTo(prev.x,cy); ctx.lineTo(w.x,cy);
+          ctx.strokeStyle=`${w.col}33`; ctx.lineWidth=1; ctx.stroke();
+        }
+      });
+      const sunR=14+4*Math.sin(t*0.05);
+      const sunG=ctx.createRadialGradient(cx,cy-60,0,cx,cy-60,sunR);
+      sunG.addColorStop(0,"rgba(251,191,36,0.9)"); sunG.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy-60,sunR,0,Math.PI*2); ctx.fillStyle=sunG; ctx.fill();
+      ctx.fillStyle="rgba(251,191,36,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("DIVINE TIMING · ERIS-IN-PISCES TRANSIT · 5 WINDOWS · FIELD OF NUMBERS · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function DivineTimingPage() {
   return (
     <div data-testid="page-divine-timing" style={{
       minHeight:"100vh", width:"100%",
       background:"radial-gradient(ellipse at top, #4c1d95 0%, #1e1b4b 50%, #020617 100%)",
+
       color:"#fef3c7", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');`}</style>
-
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #fbbf24", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#fbbf24", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(251,191,36,0.15)", borderLeft:"3px solid #fbbf24", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Divine Timing · Eris-in-Pisces Transit · 5 Windows · Field of Numbers · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(251,191,36,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five Eris transit windows (Oct 15 · Oct 21 · Blind · Mid-Nov · Nov 29) with a pulsing sun — the live AETHER divine timing transit simulation.
+          </p>
+          <DivineTimingCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <header style={{
           padding:"2.2rem 1.8rem", borderRadius:18, marginBottom:"2rem",

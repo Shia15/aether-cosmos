@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import earthResonanceCoupled from "@assets/IMG_2708_1781446780853.png";
 import earthResonance4Seas from "@assets/ECEE5F00-2517-4697-8031-C87261CE412A_1781446780853.png";
 import treeSapClimate from "@assets/DAA77E2A-BAAE-435F-A029-5F15FEFE56CD_1781446780853.png";
@@ -20,11 +21,66 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+function EarthAtmosphereCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const layers=[
+      { name:"TROPOSPHERE", r:40, col:"#60a5fa" },
+      { name:"STRATOSPHERE", r:55, col:"#34d399" },
+      { name:"MESOSPHERE", r:68, col:"#a78bfa" },
+      { name:"THERMOSPHERE", r:79, col:"#f472b6" },
+      { name:"EXOSPHERE", r:88, col:"rgba(255,255,255,0.2)" },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      layers.slice().reverse().forEach(l=>{
+        ctx.beginPath(); ctx.arc(cx,cy,l.r,0,Math.PI*2);
+        ctx.strokeStyle=l.col+"55"; ctx.lineWidth=8; ctx.stroke();
+      });
+      const earthG=ctx.createRadialGradient(cx,cy,0,cx,cy,32);
+      earthG.addColorStop(0,"#1e40af"); earthG.addColorStop(0.6,"#15803d"); earthG.addColorStop(1,"#1e3a5f");
+      ctx.beginPath(); ctx.arc(cx,cy,32,0,Math.PI*2); ctx.fillStyle=earthG; ctx.fill();
+      layers.forEach((l,i)=>{
+        const labelAng=-Math.PI/2+i*0.3;
+        const lx=cx+(l.r+10)*Math.cos(labelAng), ly=cy+(l.r+10)*Math.sin(labelAng);
+        ctx.fillStyle=l.col; ctx.font="bold 6px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(l.name,lx,ly);
+      });
+      ctx.fillStyle="rgba(96,165,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("EARTH ATMOSPHERE · TROPOSPHERE · STRATOSPHERE · MESOSPHERE · THERMOSPHERE · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function EarthAtmospherePage() {
   const [active, setActive] = useState<TabId>("earth");
 
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #60a5fa", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#60a5fa", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(96,165,250,0.1)", borderLeft:"3px solid #60a5fa", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Earth Atmosphere · Troposphere · Stratosphere · Mesosphere · Thermosphere · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(96,165,250,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five concentric atmospheric layers around a live Earth core with labeled altitude rings — the live AETHER atmospheric resonance simulation.
+          </p>
+          <EarthAtmosphereCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #0f172a 100%)", borderBottom: "1px solid #134e4a", padding: "2.5rem 2rem 2rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>

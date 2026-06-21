@@ -326,6 +326,61 @@ function EnvCard({ env, expanded, onToggle }: { env: typeof ENVIRONMENTS[0]; exp
   );
 }
 
+function OSFieldCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const ENVS = [
+    { label:"Personal\nField",  col:"#9966ff", x:0.15, y:0.35 },
+    { label:"Work\nField",      col:"#2ef0d8", x:0.35, y:0.60 },
+    { label:"Creative\nField",  col:"#c9a84c", x:0.55, y:0.30 },
+    { label:"Research\nField",  col:"#44aaff", x:0.72, y:0.65 },
+    { label:"System\nField",    col:"#ff4477", x:0.87, y:0.38 },
+  ];
+  const LINKS = [[0,1],[1,2],[2,3],[3,4],[0,2],[1,3]];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#020408"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      LINKS.forEach(([a, b]) => {
+        const pa = ENVS[a], pb = ENVS[b];
+        const ax = pa.x * W, ay = pa.y * H, bx = pb.x * W, by = pb.y * H;
+        const alpha = 0.08 + 0.06 * Math.sin(t * 0.03 + a);
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+        ctx.strokeStyle = `rgba(46,240,216,${alpha})`; ctx.lineWidth = 1; ctx.stroke();
+      });
+      ENVS.forEach((env, i) => {
+        const ex = env.x * W, ey = env.y * H;
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.035 + i * 1.2);
+        const g = ctx.createRadialGradient(ex, ey, 0, ex, ey, 26 * pulse);
+        g.addColorStop(0, env.col); g.addColorStop(0.4, env.col + "55"); g.addColorStop(1, env.col + "00");
+        ctx.beginPath(); ctx.arc(ex, ey, 26 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(ex, ey, 12, 0, Math.PI * 2);
+        ctx.fillStyle = env.col + "aa"; ctx.fill();
+        const lines = env.label.split("\n");
+        ctx.fillStyle = env.col + "cc";
+        ctx.font = "8px 'Space Mono', monospace"; ctx.textAlign = "center";
+        lines.forEach((ln, li) => ctx.fillText(ln, ex, ey + 30 + li * 10));
+        ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(153,102,255,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER OS · ENVIRONMENT FIELD MAP · MULTI-CONTEXT AGENT ROUTER", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherOS() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const bgRef = useRef<HTMLCanvasElement>(null);
@@ -359,6 +414,26 @@ export default function AetherOS() {
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(3,5,20)", overflow: "hidden", position: "relative" }}>
       <canvas ref={bgRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.4, pointerEvents: "none" }} />
+
+      <div style={{ padding:"16px 28px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", background:"rgba(251,191,36,0.06)", border:"1px solid rgba(251,191,36,0.2)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#fbbf24", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(5,8,30,0.8)", border:"1px solid rgba(251,191,36,0.1)",
+          borderLeft:"3px solid #fbbf24", borderRadius:10, padding:20, marginBottom:12 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#fbbf24", margin:"0 0 6px" }}>
+            AETHER OS · Environment Field Map · Multi-Context Agent Router
+          </h2>
+          <p style={{ fontFamily:"Raleway,sans-serif", fontSize:12, color:"rgba(255,240,180,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five environment fields (Personal · Work · Creative · Research · System) shown as glowing nodes
+            connected by teal coherence links. Each field pulses at its own activation frequency — the topology
+            of the AETHER OS multi-context intelligence router.
+          </p>
+          <OSFieldCanvas />
+        </div>
+      </div>
 
       {/* HEADER */}
       <div style={{ padding: "20px 28px 16px", borderBottom: "1px solid rgba(251,191,36,0.12)", flexShrink: 0, position: "relative" }}>

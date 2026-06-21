@@ -402,6 +402,35 @@ const GROUP_COLORS: Record<string, string> = {
   Cosmological: "text-teal-400 bg-teal-500/10 border border-teal-500/20",
 };
 
+function SimulationHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const particles: {x:number;y:number;vx:number;vy:number;col:string;r:number}[]=[];
+    for(let i=0;i<30;i++) particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*1.5,vy:(Math.random()-0.5)*1.5,col:["#2ef0d8","#9966ff","#c9a84c"][Math.floor(Math.random()*3)],r:2+Math.random()*3});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      particles.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>W) p.vx*=-1;
+        if(p.y<0||p.y>H) p.vy*=-1;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.col+"55";ctx.fill();ctx.strokeStyle=p.col+"88";ctx.lineWidth=0.5;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SIMULATION · PARTICLE DYNAMICS · N-BODY · FIELD EVOLUTION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SimulationPage() {
   const [activeEq, setActiveEq] = useState<string | null>(null);
   const [activeConst, setActiveConst] = useState<string | null>(null);
@@ -417,7 +446,13 @@ export default function SimulationPage() {
 
   return (
     <div className="flex-1 overflow-y-auto px-8 py-8 space-y-14">
-
+      <div style={{flexShrink:0}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SIMULATION · PARTICLE DYNAMICS · N-BODY · FIELD EVOLUTION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>30 bouncing particles — the live AETHER simulation engine.</p></div>
+          <SimulationHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="space-y-3">
         <div className="font-mono text-xs text-primary/60 tracking-[0.3em] uppercase">Universe Simulation Terminal</div>

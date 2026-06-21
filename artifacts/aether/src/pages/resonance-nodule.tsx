@@ -212,7 +212,128 @@ function ResonanceOrb({ activeAgent, onAgentClick, breathPhase }:
   );
 }
 
+function ResonanceCoreCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 360;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const cx = W/2, cy = H/2;
+    let t = 0;
+
+    const AGENTS = ORBITAL_AGENTS;
+    const ORB_R = 80;
+    const RING_R = 165;
+
+    interface Ripple { r:number; alpha:number; hue:number }
+    const ripples: Ripple[] = [];
+    let rippleT = 0;
+
+    const draw = () => {
+      ctx.fillStyle="#070918"; ctx.fillRect(0,0,W,H);
+
+      rippleT++;
+      if (rippleT>45){ ripples.push({r:ORB_R,alpha:0.6,hue:270}); rippleT=0; }
+      for (let i=ripples.length-1;i>=0;i--){
+        const rp=ripples[i]; rp.r+=1.6; rp.alpha-=0.012;
+        if(rp.alpha<=0){ripples.splice(i,1);continue;}
+        ctx.beginPath(); ctx.arc(cx,cy,rp.r,0,Math.PI*2);
+        ctx.strokeStyle=`hsla(${rp.hue},70%,65%,${rp.alpha})`; ctx.lineWidth=1; ctx.stroke();
+      }
+
+      const pulse=0.85+0.15*Math.sin(t*0.04);
+      const coreGrd=ctx.createRadialGradient(cx,cy,0,cx,cy,ORB_R*pulse);
+      coreGrd.addColorStop(0,"rgba(181,150,232,0.9)");
+      coreGrd.addColorStop(0.4,"rgba(139,92,246,0.6)");
+      coreGrd.addColorStop(0.8,"rgba(100,60,200,0.3)");
+      coreGrd.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,ORB_R*pulse,0,Math.PI*2); ctx.fillStyle=coreGrd; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx,cy,ORB_R*pulse*0.55,0,Math.PI*2);
+      ctx.fillStyle="rgba(220,210,255,0.5)"; ctx.fill();
+
+      ctx.strokeStyle="rgba(155,111,232,0.25)"; ctx.lineWidth=0.7;
+      ctx.beginPath(); ctx.arc(cx,cy,RING_R,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,RING_R*1.2,0,Math.PI*2);
+      ctx.strokeStyle="rgba(155,111,232,0.12)"; ctx.stroke();
+
+      AGENTS.forEach((ag,i)=>{
+        const a=(ag.angle+t*0.5)*Math.PI/180;
+        const ax=cx+RING_R*Math.cos(a), ay=cy+RING_R*Math.sin(a);
+        ctx.beginPath(); ctx.arc(ax,ay,18,0,Math.PI*2);
+        ctx.fillStyle=ag.aura+"44"; ctx.fill();
+        ctx.strokeStyle=ag.aura+"99"; ctx.lineWidth=1.2; ctx.stroke();
+        ctx.fillStyle=ag.aura; ctx.font="11px serif"; ctx.textAlign="center";
+        ctx.fillText(ag.symbol,ax,ay+4); ctx.textAlign="left";
+        ctx.fillStyle=ag.aura+"88"; ctx.font="6.5px 'Space Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(ag.name,ax,ay+26); ctx.textAlign="left";
+
+        const lineAlpha=0.08+0.06*Math.sin(t*0.05+i);
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(ax,ay);
+        ctx.strokeStyle=ag.aura+Math.round(lineAlpha*255).toString(16).padStart(2,"0");
+        ctx.lineWidth=0.8; ctx.stroke();
+      });
+
+      THOUGHT_ORBS.forEach((orb,i)=>{
+        const a=(orb.angle+t*0.3*(i%2===0?1:-1))*Math.PI/180;
+        const ox=cx+orb.r*Math.cos(a), oy=cy+orb.r*Math.sin(a);
+        ctx.beginPath(); ctx.arc(ox,oy,8,0,Math.PI*2);
+        ctx.fillStyle=`rgba(155,111,232,${orb.opacity*0.5})`; ctx.fill();
+        ctx.strokeStyle=`rgba(155,111,232,${orb.opacity})`; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.fillStyle=`rgba(220,210,255,${orb.opacity})`; ctx.font="6px 'Space Mono',monospace";
+        ctx.textAlign="center"; ctx.fillText(orb.label,ox,oy+18); ctx.textAlign="left";
+      });
+
+      ctx.fillStyle="rgba(200,190,255,0.25)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("RESONANCE CORE · ORBITAL AGENTS · EMOTIONAL-VIBRATIONAL FIELD",cx,H-10); ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
+
+function ResonanceNoduleHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const nodules: {angle:number;r:number;phase:number}[]=[];
+    for(let i=0;i<12;i++) nodules.push({angle:i/12*Math.PI*2,r:40+Math.random()*25,phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodules.forEach((n,i)=>{
+        const pls=0.85+0.15*Math.sin(t*0.04+n.phase);
+        const x=cx+Math.cos(n.angle+t*0.01)*n.r*pls;
+        const y=cy+Math.sin(n.angle+t*0.01)*n.r*0.55*pls;
+        const next=nodules[(i+1)%nodules.length];
+        const nx2=cx+Math.cos(next.angle+t*0.01)*next.r;
+        const ny2=cy+Math.sin(next.angle+t*0.01)*next.r*0.55;
+        ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(nx2,ny2);ctx.strokeStyle="rgba(68,170,255,0.12)";ctx.lineWidth=0.5;ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,5+3*pls,0,Math.PI*2);ctx.fillStyle="rgba(68,170,255,0.2)";ctx.fill();ctx.strokeStyle="rgba(68,170,255,0.5)";ctx.lineWidth=0.7;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("RESONANCE NODULE · STANDING WAVE · HARMONIC · FIELD COUPLING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
 
 export default function ResonanceNodulePage() {
   const [activeAgent, setActiveAgent] = useState<string | null>("guardian");
@@ -240,7 +361,35 @@ export default function ResonanceNodulePage() {
 
   return (
     <div className="h-full overflow-y-auto">
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>RESONANCE NODULE · STANDING WAVE · HARMONIC · FIELD COUPLING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 orbiting resonance nodules — the live AETHER resonance nodule simulation.</p></div>
+          <ResonanceNoduleHeaderCanvas />
+        </div>
+      </div>
       <div className="max-w-7xl mx-auto p-8 space-y-10">
+
+        <div style={{ marginBottom:"1.5rem" }}>
+          <div style={{ display:"inline-block", background:"rgba(124,92,246,0.1)", border:"1px solid rgba(124,92,246,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#c4b5fd", textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:"1rem" }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(124,92,246,0.2)",
+            borderLeft:"3px solid #7c3aed", borderRadius:12, padding:"1.25rem" }}>
+            <h2 style={{ fontSize:"1.1rem", fontWeight:700, color:"#ddd6fe", margin:"0 0 0.3rem",
+              fontFamily:"'Cinzel',serif" }}>
+              Resonance Core · Orbital Agent Field
+            </h2>
+            <p style={{ color:"#7c6faa", fontSize:"0.8rem", margin:"0 0 0.75rem", lineHeight:1.6,
+              fontFamily:"'Space Mono',monospace" }}>
+              The pulsing violet core anchors six orbital agents — Dreamer, Catalyst, Guardian, Visionary, Rebel, Nurturer
+              — each circling with their own frequency. Thought orbs drift between them. Ripple pulses radiate outward.
+            </p>
+            <ResonanceCoreCanvas />
+          </div>
+        </div>
 
         {/* ── Header ─────────────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between">

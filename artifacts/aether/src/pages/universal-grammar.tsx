@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -243,10 +243,55 @@ function LightAttenuation() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function UniversalGrammarHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const words=["S","NP","VP","Det","N","V","PP","Adj"];
+    const angles=words.map((_,i)=>i/words.length*Math.PI*2);
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const r=48;
+      words.forEach((w,i)=>{
+        const angle=angles[i]+t*0.008;
+        const x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle)*0.55;
+        const pulse=0.5+0.5*Math.sin(t*0.06+i*0.7);
+        ctx.beginPath();ctx.arc(x,y,3+pulse*2,0,Math.PI*2);ctx.fillStyle=`rgba(68,170,255,${0.3+pulse*0.3})`;ctx.fill();
+        if(i<words.length-1){
+          const a2=angles[i+1]+t*0.008;
+          const x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2)*0.55;
+          ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle="rgba(68,170,255,0.08)";ctx.lineWidth=0.4;ctx.stroke();
+        }
+        ctx.fillStyle="rgba(68,170,255,0.4)";ctx.font="8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(w,x,y+3);ctx.textAlign="left";
+      });
+      ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.fillStyle="rgba(255,255,255,0.5)";ctx.fill();
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UNIVERSAL GRAMMAR · SYNTAX TREE · LANGUAGE STRUCTURE · CHOMSKY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UniversalGrammarPage() {
   return (
     <div data-testid="universal-grammar-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UNIVERSAL GRAMMAR · SYNTAX TREE · LANGUAGE STRUCTURE · CHOMSKY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 rotating syntax-tree nodes (S NP VP…) — the live AETHER universal grammar simulation.</p></div>
+            <UniversalGrammarHeaderCanvas />
+          </div>
+        </div>
 
         {/* Title page */}
         <div style={{ marginBottom: 22 }}>

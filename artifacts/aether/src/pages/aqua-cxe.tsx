@@ -810,6 +810,65 @@ const BRIDGES: { href: string; title: string; subtitle: string }[] = [
     subtitle: "Where today's posters land before they become engines. Aqua Cxe has been pinned." },
 ];
 
+function AquaCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const rings=[
+      { r:90, col:"#00d4ff", speed:0.003, n:8 },
+      { r:62, col:"#0ea5e9", speed:-0.005, n:6 },
+      { r:38, col:"#38bdf8", speed:0.009, n:5 },
+    ];
+    const bubbles:{x:number;y:number;r:number;speed:number;phase:number}[]=[];
+    for (let i=0;i<25;i++) bubbles.push({
+      x:Math.random()*W, y:H+Math.random()*80, r:2+Math.random()*5,
+      speed:0.3+Math.random()*0.7, phase:Math.random()*Math.PI*2,
+    });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(0,15,30,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      bubbles.forEach(b=>{
+        b.y-=b.speed;
+        if (b.y<-20) b.y=H+20;
+        const wobble=Math.sin(t*0.03+b.phase)*3;
+        ctx.beginPath(); ctx.arc(b.x+wobble,b.y,b.r,0,Math.PI*2);
+        ctx.strokeStyle="#00d4ff33"; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(b.x+wobble-b.r*0.3,b.y-b.r*0.3,b.r*0.25,0,Math.PI*2);
+        ctx.fillStyle="#ffffff33"; ctx.fill();
+      });
+      rings.forEach((ring)=>{
+        const ang=t*ring.speed;
+        for (let i=0;i<ring.n;i++) {
+          const a=ang+(i/ring.n)*Math.PI*2;
+          const px=cx+Math.cos(a)*ring.r, py=cy+Math.sin(a)*ring.r;
+          ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
+          const g=ctx.createRadialGradient(px,py,0,px,py,8);
+          g.addColorStop(0,ring.col+"cc"); g.addColorStop(1,"transparent");
+          ctx.fillStyle=g; ctx.shadowColor=ring.col; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+        }
+        ctx.beginPath(); ctx.arc(cx,cy,ring.r,0,Math.PI*2);
+        ctx.strokeStyle=ring.col+"22"; ctx.lineWidth=1; ctx.stroke();
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,22);
+      gc.addColorStop(0,"#00d4ffcc"); gc.addColorStop(0.5,"#00d4ff44"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,20,0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#00d4ff"; ctx.shadowBlur=24; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="#00d4ff44"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AQUA-CXE · WATER-COHERENCE EXCHANGE · STRUCTURED WATER DYNAMICS",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AquaCxePage() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
@@ -818,6 +877,26 @@ export default function AquaCxePage() {
         @media (prefers-reduced-motion: reduce) { .ax-fade { animation: none; } }`}</style>
 
       <div className="max-w-5xl mx-auto px-7 py-10 space-y-10">
+        <div>
+          <div style={{ display:"inline-block", background:"rgba(0,212,255,0.07)", border:"1px solid rgba(0,212,255,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#00d4ff", textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(0,15,30,0.88)", border:"1px solid rgba(0,212,255,0.1)",
+            borderLeft:"3px solid #00d4ff", borderRadius:10, padding:20, marginBottom:8 }}>
+            <h2 style={{ fontFamily:"Inter,sans-serif", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+              Aqua-CXE · Water-Coherence Exchange · Structured Water Orbital Dynamics
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(150,210,230,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Three orbital rings (outer/cyan · mid/sky · inner/light-blue) of rotating coherence nodes around a
+              central water-coherence core, with 25 rising bubbles and a wobbling vortex field — the live Aqua-CXE
+              structured-water coherence engine.
+            </p>
+            <AquaCanvas />
+          </div>
+        </div>
+
 
         {/* HERO */}
         <header className="ax-fade space-y-3" data-testid="ax-hero">

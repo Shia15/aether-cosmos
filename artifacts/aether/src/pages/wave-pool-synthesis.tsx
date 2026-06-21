@@ -3,22 +3,173 @@ import navierStokesSide from "@assets/IMG_1829_1781448388514.jpeg";
 import cntGenerator3D from "@assets/IMG_1832_1781448388514.jpeg";
 import wavePoolTopView from "@assets/Grok_Image_2026-05-11_at_10.40.20_PM_1781448388514.png";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const TABS = [
   { id: "physical",  label: "Wave Pool Physical" },
   { id: "side",      label: "Navier-Stokes Config" },
   { id: "cnt",       label: "CNT Generator" },
   { id: "topview",   label: "AETHER CFG · Top View" },
+  { id: "sim",       label: "● Live Simulation" },
 ] as const;
 
+function WavePoolCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const [freq,  setFreq]  = useState(1.0);
+  const [tidal, setTidal] = useState(0.6);
+  const pRef = useRef({ freq: 1.0, tidal: 0.6 });
+  useEffect(() => { pRef.current.freq  = freq;  }, [freq]);
+  useEffect(() => { pRef.current.tidal = tidal; }, [tidal]);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 450;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const NX = 100, NY = 50;
+    const cw = W / NX, ch = H / NY;
+    const u  = new Float32Array(NX * NY);
+    const up = new Float32Array(NX * NY);
+    const un = new Float32Array(NX * NY);
+    const at = (x: number, y: number) => y * NX + x;
+    const C2 = 0.18, DAMP = 0.9988;
+    let t = 0;
+
+    const tick = () => {
+      const { freq: f, tidal: lf } = pRef.current;
+      const omega = f * 0.12;
+      u[at(50,25)] = 0.9 * Math.sin(t * omega);
+      u[at(14,12)] = lf * 0.5 * Math.sin(t * omega * 0.618 + 1.0);
+      u[at(86,38)] = lf * 0.5 * Math.sin(t * omega * 0.618 + 2.618);
+
+      for (let y = 1; y < NY - 1; y++) {
+        for (let x = 1; x < NX - 1; x++) {
+          if ((x===50&&y===25)||(x===14&&y===12)||(x===86&&y===38)) continue;
+          const i = at(x,y);
+          un[i] = DAMP*(2*u[i]-up[i]+C2*(u[at(x+1,y)]+u[at(x-1,y)]+u[at(x,y+1)]+u[at(x,y-1)]-4*u[i]));
+        }
+      }
+      for (let x=0; x<NX; x++) { un[at(x,0)]=un[at(x,1)]*0.5; un[at(x,NY-1)]=un[at(x,NY-2)]*0.5; }
+      for (let y=0; y<NY; y++) { un[at(0,y)]=un[at(1,y)]*0.5; un[at(NX-1,y)]=un[at(NX-2,y)]*0.5; }
+      up.set(u); u.set(un);
+
+      ctx.fillStyle="#020617"; ctx.fillRect(0,0,W,H);
+
+      for (let y=0; y<NY; y++) {
+        for (let x=0; x<NX; x++) {
+          const h = Math.max(-1, Math.min(1, u[at(x,y)] * 2.5));
+          let r, g, b;
+          if (h>=0) { r=2+Math.round(230*h); g=4+Math.round(152*h); b=Math.round(8*(1-h)); }
+          else { const v=-h; r=Math.round(2+43*v*(1-v)); g=Math.round(4+236*v); b=Math.round(8+208*v); }
+          ctx.fillStyle=`rgb(${r},${g},${b})`;
+          ctx.fillRect(x*cw, y*ch, cw+0.5, ch+0.5);
+        }
+      }
+
+      ctx.strokeStyle="#ffffff88"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(50*cw,25*ch,7,0,Math.PI*2); ctx.stroke();
+
+      ctx.strokeStyle="#c9a84c44"; ctx.lineWidth=1.5; ctx.beginPath();
+      for (let i=0;i<=320;i++){
+        const a=i*0.11, rs=a*3.5*(1.61803/(Math.PI*2));
+        const sx=50*cw+rs*Math.cos(a), sy=25*ch+rs*Math.sin(a);
+        i===0?ctx.moveTo(sx,sy):ctx.lineTo(sx,sy);
+      }
+      ctx.stroke();
+
+      const lf2=pRef.current.tidal;
+      if (lf2>0.1){
+        ctx.strokeStyle=`rgba(56,189,248,${lf2*0.8})`; ctx.lineWidth=1.5;
+        for (const[tx,ty] of [[14,12],[86,38]] as [number,number][]){
+          ctx.beginPath(); ctx.arc(tx*cw,ty*ch,5,0,Math.PI*2); ctx.stroke();
+        }
+      }
+
+      ctx.fillStyle="rgba(200,216,224,0.55)"; ctx.font="8px 'Space Mono',monospace";
+      ctx.fillText("CNT SOURCE · φ=1.618",50*cw+10,25*ch+4);
+      ctx.fillStyle="rgba(56,189,248,0.55)";
+      ctx.fillText("M2 TIDAL",14*cw+6,12*ch-4);
+      ctx.fillText("M2 TIDAL",86*cw+6,38*ch-4);
+
+      t++; rafRef.current=requestAnimationFrame(tick);
+    };
+
+    rafRef.current=requestAnimationFrame(tick);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <div>
+      <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:8 }} />
+      <div style={{ display:"flex", flexWrap:"wrap", gap:"1.5rem", padding:"0.75rem 0 0" }}>
+        <label style={{ display:"flex", flexDirection:"column", gap:3, color:"#2dd4bf", fontSize:"0.78rem", fontFamily:"monospace" }}>
+          <span>Wave Frequency: {freq.toFixed(1)}×</span>
+          <input type="range" min={0.5} max={3.0} step={0.1} value={freq}
+            onChange={e=>setFreq(+e.target.value)} style={{ accentColor:"#2dd4bf", width:180 }} />
+        </label>
+        <label style={{ display:"flex", flexDirection:"column", gap:3, color:"#38bdf8", fontSize:"0.78rem", fontFamily:"monospace" }}>
+          <span>Tidal Force: {(tidal*100).toFixed(0)}%</span>
+          <input type="range" min={0} max={1.0} step={0.05} value={tidal}
+            onChange={e=>setTidal(+e.target.value)} style={{ accentColor:"#38bdf8", width:180 }} />
+        </label>
+      </div>
+    </div>
+  );
+}
+
 type TabId = (typeof TABS)[number]["id"];
+
+function WavePoolSynthesisHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cy=H/2;
+    let t=0;
+    const freqs=[1,2,3,0.5,1.5];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      freqs.forEach((f,i)=>{
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=3){
+          const y=cy+20*Math.sin(x*0.01*f+t*0.04+i*0.6)/freqs.length;
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        const col=["#2ef0d8","#9966ff","#c9a84c","#44aaff","#44cc77"][i];
+        ctx.strokeStyle=col+"40";ctx.lineWidth=0.7;ctx.stroke();
+      });
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=3){
+        const y=cy+freqs.reduce((s,f,i)=>s+20*Math.sin(x*0.01*f+t*0.04+i*0.6)/freqs.length,0);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle="rgba(255,255,255,0.5)";ctx.lineWidth=1.2;ctx.stroke();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("WAVE POOL SYNTHESIS · SUPERPOSITION · HARMONIC BLEND · FOURIER · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
 
 export default function WavePoolSynthesisPage() {
   const [active, setActive] = useState<TabId>("physical");
 
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:8}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WAVE POOL SYNTHESIS · SUPERPOSITION · HARMONIC BLEND · FOURIER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 harmonic waves summing to a resultant — the live AETHER wave pool synthesis simulation.</p></div>
+          <WavePoolSynthesisHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #0f172a 100%)", borderBottom: "1px solid #0d9488", padding: "2.5rem 2rem 2rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -200,6 +351,39 @@ export default function WavePoolSynthesisPage() {
                 <div key={title} style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: "0.75rem", padding: "1rem" }}>
                   <div style={{ color: "#2dd4bf", fontSize: "0.85rem", fontWeight: 700, marginBottom: "0.35rem" }}>{title}</div>
                   <div style={{ color: "#94a3b8", fontSize: "0.78rem", lineHeight: 1.5 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Tab 5: Live Simulation ── */}
+        {active === "sim" && (
+          <div>
+            <div style={{ marginBottom:"1.5rem" }}>
+              <h2 style={{ fontSize:"1.4rem", fontWeight:700, color:"#99f6e4", margin:"0 0 0.4rem" }}>
+                AETHER Wave Pool · Live 2-D Wave Equation Simulation
+              </h2>
+              <p style={{ color:"#94a3b8", margin:0, fontSize:"0.95rem", lineHeight:1.6 }}>
+                Real-time explicit finite-difference 2-D wave simulation on a 100×50 grid.
+                CNT point source at (50,25) drives coherent wavefronts at your chosen frequency.
+                Two M2 tidal nodes at (14,12) and (86,38) oscillate at freq × φ⁻¹ (golden sub-harmonic).
+                Absorbing boundaries. CFL = 0.18. φ = 1.61803 spiral overlay at source.
+              </p>
+            </div>
+            <div style={{ background:"#0f172a", border:"1px solid #0d9488", borderLeft:"4px solid #2dd4bf", borderRadius:"0.75rem", padding:"1.25rem", marginBottom:"1.5rem" }}>
+              <WavePoolCanvas />
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"1rem" }}>
+              {[
+                ["2-D Wave Equation", "u_tt = c²(u_xx + u_yy) — discretized with CFL=0.18 (Courant–Friedrichs–Lewy condition ensures c·dt/dx ≤ 1/√2 for numerical stability). DAMP=0.9988 per step models viscous dissipation."],
+                ["CNT Point Source", "Node (50,25) is driven at your chosen frequency — analogous to the CNT composite disc emitting a coherent electromagnetic field into the water medium. Wave crests are amber, troughs teal."],
+                ["M2 Tidal Forcing", "Nodes at (14,12) and (86,38) oscillate at freq × 0.618 (φ⁻¹ golden sub-harmonic). Models the M2 lunar tidal constituent at 7.27×10⁻⁵ rad/s in a dimensionless scaled domain."],
+                ["φ Golden Spiral", "The gold spiral at the source follows r = a·φ·θ/2π — under adjoint optimization the CNT disc wave crests naturally converge to this curve. Interference nodes appear at φ-ratio ring spacings."],
+              ].map(([title, desc]) => (
+                <div key={title} style={{ background:"#0f172a", border:"1px solid #1e293b", borderRadius:"0.75rem", padding:"1rem" }}>
+                  <div style={{ color:"#2dd4bf", fontSize:"0.85rem", fontWeight:700, marginBottom:"0.35rem" }}>{title}</div>
+                  <div style={{ color:"#94a3b8", fontSize:"0.78rem", lineHeight:1.5 }}>{desc}</div>
                 </div>
               ))}
             </div>

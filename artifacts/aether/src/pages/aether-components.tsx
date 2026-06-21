@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -231,12 +231,85 @@ function ConnectionWeb({ selected }: { selected: string | null }) {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
+function ComponentFrameworkCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const comps = [
+      { x:W*0.14, y:H*0.4, col:"#c084fc", label:"CORE\nHUB", phase:0.0, size:24 },
+      { x:W*0.30, y:H*0.6, col:"#2ef0d8", label:"EGGS", phase:1.1, size:18 },
+      { x:W*0.46, y:H*0.38, col:"#c9a84c", label:"MEMORY\nBUS", phase:2.2, size:20 },
+      { x:W*0.62, y:H*0.62, col:"#ff4477", label:"EVOLUTION\nENGINE", phase:0.6, size:18 },
+      { x:W*0.77, y:H*0.40, col:"#44aaff", label:"COMMS", phase:1.5, size:20 },
+      { x:W*0.90, y:H*0.60, col:"#44cc77", label:"MONITOR", phase:3.0, size:16 },
+    ];
+    const links=[[0,1],[0,2],[1,3],[2,3],[3,4],[4,5],[0,4]];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,5,20,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      links.forEach(([a,b])=>{
+        const na=comps[a],nb=comps[b];
+        const g=ctx.createLinearGradient(na.x,na.y,nb.x,nb.y);
+        g.addColorStop(0,na.col+"55"); g.addColorStop(1,nb.col+"55");
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.2; ctx.stroke();
+        const pkt=(t*0.015+(a+b)*0.3)%1;
+        const px=na.x+(nb.x-na.x)*pkt, py=na.y+(nb.y-na.y)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+      });
+      comps.forEach(c=>{
+        const pulse=1+0.1*Math.sin(t*0.04+c.phase);
+        const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,c.size*2*pulse);
+        g.addColorStop(0,c.col+"bb"); g.addColorStop(0.5,c.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(c.x,c.y,c.size*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=c.col; ctx.shadowBlur=16*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(c.x,c.y,c.size*pulse,0,Math.PI*2);
+        ctx.strokeStyle=c.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=c.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        c.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,c.x,c.y+c.size*pulse+10+li*9));
+      });
+      ctx.fillStyle="rgba(192,132,252,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER COMPONENT FRAMEWORK · CORE HUB · EGGS · MEMORY BUS · EVOLUTION ENGINE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherComponentsView() {
   const [selected, setSelected] = useState<string | null>(null);
   const comp = selected ? COMPONENTS.find(c => c.id === selected) : null;
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif", overflow: "hidden" }}>
+
+      <div style={{ padding:"12px 28px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", background:"rgba(192,132,252,0.07)", border:"1px solid rgba(192,132,252,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#c084fc", textTransform:"uppercase", fontFamily:"Raleway,sans-serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(3,5,20,0.85)", border:"1px solid rgba(192,132,252,0.1)",
+          borderLeft:"3px solid #c084fc", borderRadius:10, padding:20, marginBottom:10 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e0d8ff", margin:"0 0 6px" }}>
+            AETHER Component Framework · 6 Nodes · Core Hub → Eggs → Memory → Evolution → Comms → Monitor
+          </h2>
+          <p style={{ fontFamily:"Raleway,sans-serif", fontSize:12, color:"rgba(200,195,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six component nodes connected by intelligence link mesh with white photon packets streaming
+            between them — the living AETHER modular component graph showing Core Hub, Eggs, Memory Bus,
+            Evolution Engine, Communications, and Monitor all pulsing in synchronized coherence.
+          </p>
+          <ComponentFrameworkCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(192,132,252,0.1)", padding: "12px 28px 10px", flexShrink: 0 }}>

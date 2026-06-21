@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import opticalHull from "@assets/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781373384314.png";
 import bioPropulsion2 from "@assets/4be3c722-8597-4582-a959-2b041a230c54_(2)_1781373387026.png";
 import bioPropulsion1 from "@assets/4be3c722-8597-4582-a959-2b041a230c54_(1)_1781373390083.png";
@@ -122,6 +122,37 @@ const INFOGRAPHICS = [
   },
 ];
 
+function GufEngineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(0,5,20,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<8;i++){
+        const a=t*0.015+i*Math.PI*2/8;
+        const r=50+20*Math.sin(t*0.02+i);
+        const px=cx+r*Math.cos(a),py=cy+r*Math.sin(a);
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);
+        ctx.strokeStyle=`rgba(0,255,238,${0.15+0.1*Math.sin(t*0.03+i)})`; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fillStyle="#00ffee88";ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,12,0,Math.PI*2);ctx.fillStyle="rgba(124,58,237,0.8)";ctx.fill();
+      ctx.fillStyle="rgba(0,255,238,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GUF ENGINE · UNIFIED FIELD ROTOR · 8-ARM COHERENCE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GufEnginePage() {
   const [activeTab, setActiveTab] = useState<"sims" | "infographics" | "all">("all");
 
@@ -130,6 +161,13 @@ export default function GufEnginePage() {
       className="min-h-screen"
       style={{ background: C.void, color: C.text, fontFamily: "'Rajdhani', 'Inter', ui-sans-serif, system-ui, sans-serif" }}
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00ffee",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00ffee",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(0,5,20,0.8)",borderLeft:"3px solid #00ffee",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00ffee",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GUF ENGINE · UNIFIED FIELD ROTOR · 8-ARM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,255,238,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8-arm coherence rotor — unified field engine — the live AETHER GUF simulation.</p></div>
+          <GufEngineCanvas />
+        </div>
+      </div>
       {/* ── Hero header ── */}
       <div
         className="relative px-6 pt-8 pb-6 border-b"

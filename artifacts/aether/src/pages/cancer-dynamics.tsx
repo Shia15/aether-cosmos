@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
@@ -63,6 +63,55 @@ const TRANSLATIONAL = [
   { tag: "CROSS-DISCIPLINARY TEAMS",       col: C.pink,    body: "Engage data scientists, behavioural scientists, and clinicians to bridge mechanistic biology and patient experience." },
 ];
 
+function CancerDynamicsCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const rings = [
+      { label:"TUMOR CORE", col:"#ef4444", r:40 },
+      { label:"SYSTEMIC", col:"#f59e0b", r:68 },
+      { label:"MENTAL", col:"#a78bfa", r:96 },
+      { label:"NUTRITION", col:"#34d399", r:115 },
+    ];
+    let t=0;
+    const particles: {ang:number,r:number,col:string,speed:number}[]=[];
+    rings.forEach((ring,i)=>{
+      for (let j=0;j<6;j++) particles.push({ ang:j*(Math.PI*2/6)+i*0.5, r:ring.r, col:ring.col, speed:(i%2===0?1:-1)*0.012 });
+    });
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.14)"; ctx.fillRect(0,0,W,H);
+      t++;
+      rings.forEach(ring=>{
+        ctx.beginPath(); ctx.arc(cx,cy,ring.r,0,Math.PI*2);
+        ctx.strokeStyle=ring.col+"44"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=ring.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(ring.label,cx,cy-ring.r-6);
+      });
+      particles.forEach(p=>{
+        p.ang+=p.speed;
+        const px=cx+Math.cos(p.ang)*p.r, py=cy+Math.sin(p.ang)*p.r;
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,16);
+      gc.addColorStop(0,"#ef4444cc"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,14+2*Math.sin(t*0.06),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#ef4444"; ctx.shadowBlur=18; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(167,139,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CANCER DYNAMICS · TUMOR CORE · SYSTEMIC · MENTAL · NUTRITION · CONCENTRIC LIVING SYSTEM MAP",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CancerDynamicsPage() {
   const [tab, setTab] = useState<Tab>("overview");
 
@@ -78,6 +127,25 @@ export default function CancerDynamicsPage() {
 
   return (
     <div data-testid="cancer-dynamics-root" className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", background:"rgba(167,139,250,0.07)", border:"1px solid rgba(167,139,250,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:C.purple, textTransform:"uppercase", fontFamily:"inherit", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,7,14,0.9)", border:"1px solid rgba(124,92,252,0.2)",
+          borderLeft:`3px solid ${C.purple}`, borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:18, color:C.white, margin:"0 0 6px" }}>
+            Cancer Dynamics · Tumor Core → Systemic → Mental → Nutrition → AETHER Field
+          </h2>
+          <p style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:12, color:"rgba(200,180,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five cancer dynamics layers rendered as a living concentric ring system — Tumor Core outward to the AETHER
+            Coherence Field, each layer showing its sub-factors, pathways, and AETHER interventions mapped as a
+            live system dynamics canvas.
+          </p>
+          <CancerDynamicsCanvas />
+        </div>
+      </div>
 
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
         <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>

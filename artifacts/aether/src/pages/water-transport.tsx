@@ -1423,12 +1423,56 @@ function MagneticReconCanvas() {
 }
 
 /* ── Page ─────────────────────────────────────────────────── */
+function WaterTransportHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const drops: {x:number;y:number;vy:number;size:number}[]=[];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.28)"; ctx.fillRect(0,0,W,H);
+      if(Math.random()<0.08) drops.push({x:100+Math.random()*(W-200),y:0,vy:1.2+Math.random()*1.5,size:2+Math.random()*3});
+      for(let i=drops.length-1;i>=0;i--){
+        const d=drops[i];
+        d.y+=d.vy;
+        ctx.beginPath();ctx.arc(d.x,d.y,d.size,0,Math.PI*2);ctx.fillStyle=`rgba(68,170,255,${0.4-d.y/H*0.3})`;ctx.fill();
+        if(d.y>H) drops.splice(i,1);
+      }
+      for(let wave=0;wave<3;wave++){
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=4){
+          const y=H-20-wave*12+6*Math.sin(x*0.02+t*0.03+wave*1.2);
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=`rgba(68,170,255,${0.1+wave*0.04})`;ctx.lineWidth=0.8;ctx.stroke();
+        ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=`rgba(20,60,140,${0.06+wave*0.02})`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("WATER TRANSPORT · XYLEM · PHLOEM · TRANSPIRATION · OSMOSIS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function WaterTransportPage() {
   const [mode, setMode] = useState<Mode>("buoyancy");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WATER TRANSPORT · XYLEM · PHLOEM · TRANSPIRATION · OSMOSIS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Falling drops + 3-wave surface pool — the live AETHER water transport simulation.</p></div>
+          <WaterTransportHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{
         padding: "68px 32px 44px",

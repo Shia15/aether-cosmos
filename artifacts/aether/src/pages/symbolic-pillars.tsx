@@ -69,6 +69,40 @@ const CONSTELLATION: Record<Animal, { name: string; ra: number; dec: number; col
 // Stored as a NEGATIVE year to match the slider's BCE = negative convention.
 const YOUNGER_DRYAS_BCE = -10950;
 
+function SymbolicPillarsHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const pillars=7;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let p=0;p<pillars;p++){
+        const x=60+p*(W-120)/pillars;
+        const h=60+30*Math.sin(t*0.025+p*0.8);
+        const y=H-h-10;
+        const col=["#2ef0d8","#9966ff","#c9a84c","#44aaff","#ff4477","#44cc77","#2ef0d8"][p];
+        const grd=ctx.createLinearGradient(0,y,0,H-10);
+        grd.addColorStop(0,col+"44");grd.addColorStop(1,col+"08");
+        ctx.fillStyle=grd;ctx.fillRect(x-12,y,24,h);
+        ctx.strokeStyle=col+"55";ctx.lineWidth=0.5;ctx.strokeRect(x-12,y,24,h);
+        ctx.fillStyle=col+"66";ctx.fillRect(x-16,y-6,32,6);
+        ctx.fillStyle=col+"66";ctx.fillRect(x-16,H-16,32,6);
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SYMBOLIC PILLARS · ARCHETYPE · FOUNDATIONAL GLYPHS · MEANING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SymbolicPillarsPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("pillars");
@@ -487,6 +521,13 @@ export default function SymbolicPillarsPage() {
 
   return (
     <div className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "ui-sans-serif, system-ui" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SYMBOLIC PILLARS · ARCHETYPE · FOUNDATIONAL GLYPHS · MEANING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>7 animated pillars — the live AETHER symbolic pillars simulation.</p></div>
+          <SymbolicPillarsHeaderCanvas />
+        </div>
+      </div>
       <header className="mb-6">
         <div className="text-[10px] tracking-[0.4em] uppercase" style={{ color: C.muted }}>
           AETHER · SYMBOLIC PILLAR MAPPER · GÖBEKLI TEPE ~9600–8200 BCE

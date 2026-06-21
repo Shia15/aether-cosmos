@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useListConcepts, useGenerateEquations, useListEquations } from "@workspace/api-client-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,50 @@ import { FunctionSquare, Beaker, Zap, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListEquationsQueryKey } from "@workspace/api-client-react";
+
+function EquationsSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 180;
+    const ctx = canvas.getContext("2d")!;
+    const fns = [
+      { label:"sin(x)",  fn:(x:number)=>Math.sin(x),          col:"#2ef0d8" },
+      { label:"cos(x)",  fn:(x:number)=>Math.cos(x),          col:"#9966ff" },
+      { label:"e^(-x²)", fn:(x:number)=>Math.exp(-x*x*0.3),   col:"#c9a84c" },
+      { label:"tanh(x)", fn:(x:number)=>Math.tanh(x),         col:"#ff4477" },
+    ];
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      ctx.clearRect(0,0,700,180);
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,700,180);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(46,240,216,0.08)";
+      ctx.fillText("EQUATION LABORATORY · FUNCTION SYNTHESIS · CONCEPT TOPOLOGY · AETHER",10,14);
+      const phase=tick*0.025;
+      fns.forEach(f=>{
+        ctx.beginPath();
+        for(let px=0;px<700;px++){
+          const x=(px/700)*10-5+phase;
+          const y=90-f.fn(x)*50;
+          px===0 ? ctx.moveTo(px,y) : ctx.lineTo(px,y);
+        }
+        ctx.strokeStyle=f.col; ctx.lineWidth=1.5; ctx.globalAlpha=0.7; ctx.stroke(); ctx.globalAlpha=1;
+      });
+      ctx.fillStyle="#e0f8ff"; ctx.font="8px 'DM Mono',monospace";
+      fns.forEach((f,i)=>{
+        ctx.fillStyle=f.col;
+        ctx.fillText(f.label, 10+i*160, 170);
+      });
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
 
 export default function EquationsView() {
   const { toast } = useToast();
@@ -61,6 +105,18 @@ export default function EquationsView() {
 
   return (
     <div className="p-8 max-w-6xl mx-auto w-full space-y-8 h-full flex flex-col">
+      <div style={{ flexShrink:0 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Equation Laboratory · sin · cos · e^(-x²) · tanh · Function Synthesis · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Four scrolling mathematical waveforms — the live AETHER equation synthesis simulation.
+          </p>
+          <EquationsSimCanvas />
+        </div>
+      </div>
       <header className="space-y-2 shrink-0">
         <h1 className="text-4xl font-serif tracking-tight text-foreground flex items-center gap-3">
           <FunctionSquare className="w-8 h-8 text-accent" />

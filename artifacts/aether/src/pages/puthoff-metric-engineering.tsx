@@ -214,9 +214,51 @@ function PublicationLandscapeGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+import { useEffect, useRef } from "react";
+
+function PuthoffHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let ring=1;ring<=5;ring++){
+        const r=ring*18+Math.sin(t*0.02+ring)*5;
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(153,102,255,${0.06+ring*0.04})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      for(let i=0;i<8;i++){
+        const angle=i/8*Math.PI*2+t*0.015;
+        const r=60+10*Math.sin(t*0.03+i);
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.6;
+        ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.5)";ctx.fill();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle="rgba(153,102,255,0.08)";ctx.lineWidth=0.4;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PUTHOFF METRIC ENGINEERING · VACUUM ENERGY · ZERO POINT · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PuthoffMetricEngineeringPage() {
   return (
     <div data-testid="page-puthoff-metric-engineering" style={{ background: B.bg, minHeight: "100vh", padding: "32px 28px", color: B.ink }}>
+      <div style={{flexShrink:0,margin:"-32px -28px 20px"}}>
+        <div style={{padding:"8px 28px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 28px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PUTHOFF METRIC ENGINEERING · VACUUM ENERGY · ZERO POINT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 orbital nodes around vacuum energy core — the AETHER Puthoff metric simulation.</p></div>
+          <PuthoffHeaderCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>

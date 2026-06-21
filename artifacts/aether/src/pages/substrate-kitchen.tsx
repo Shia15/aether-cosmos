@@ -305,10 +305,46 @@ function KitchenMathCanvas() {
   return <canvas ref={cvs} style={{ width: "100%", display: "block", borderRadius: 8, border: `1px solid ${GOLD}18` }} />;
 }
 
+function SubstrateKitchenHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const bubbles: {x:number;y:number;r:number;vy:number;phase:number;col:string}[]=[];
+    for(let i=0;i<20;i++) bubbles.push({x:Math.random()*W,y:H+Math.random()*40,r:2+Math.random()*6,vy:0.4+Math.random()*0.6,phase:Math.random()*Math.PI*2,col:["#2ef0d8","#9966ff","#c9a84c","#44cc77"][Math.floor(Math.random()*4)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      ctx.fillStyle="rgba(46,240,216,0.03)"; ctx.fillRect(0,H-30,W,30);
+      bubbles.forEach(b=>{
+        b.y-=b.vy; b.x+=Math.sin(t*0.02+b.phase)*0.5;
+        if(b.y<-10){b.y=H+10;b.x=Math.random()*W;}
+        ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.strokeStyle=b.col+"44";ctx.lineWidth=0.6;ctx.stroke();
+        ctx.beginPath();ctx.arc(b.x-b.r*0.3,b.y-b.r*0.3,b.r*0.25,0,Math.PI*2);ctx.fillStyle=b.col+"33";ctx.fill();
+      });
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SUBSTRATE KITCHEN · BIO-SYNTHESIS · CULTURE · GROWTH MEDIUM · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SubstrateKitchenPage() {
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SUBSTRATE KITCHEN · BIO-SYNTHESIS · CULTURE · GROWTH MEDIUM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>20 rising culture bubbles — the live AETHER substrate kitchen simulation.</p></div>
+          <SubstrateKitchenHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#080501 0%,#040c14 50%,#020408 100%)",
         borderBottom: `1px solid ${AMBER}20`, padding: "60px 40px 40px", textAlign: "center" }}>

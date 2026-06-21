@@ -550,11 +550,55 @@ const NAV = [
 ];
 
 /* ── Page ─────────────────────────────────────── */
+function NeuralCoherenceHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const nodes: {x:number;y:number;phase:number;col:string}[] = [];
+    for(let i=0;i<20;i++) nodes.push({x:50+Math.random()*(W-100),y:20+Math.random()*(H-40),phase:Math.random()*Math.PI*2,col:["#2ef0d8","#9966ff","#44aaff","#ff4477"][Math.floor(Math.random()*4)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach((a,i)=>{
+        nodes.slice(i+1).forEach(b=>{
+          const d=Math.hypot(b.x-a.x,b.y-a.y);
+          if(d>180)return;
+          const coh=Math.cos(a.phase-b.phase+t*0.02);
+          if(coh<0)return;
+          ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle=`rgba(46,240,216,${coh*0.15})`;ctx.lineWidth=0.5;ctx.stroke();
+        });
+        a.phase+=0.02;
+        const pls=0.7+0.3*Math.sin(a.phase+t*0.03);
+        ctx.beginPath();ctx.arc(a.x,a.y,7*pls,0,Math.PI*2);ctx.fillStyle=a.col+"55";ctx.fill();ctx.strokeStyle=a.col+"99";ctx.lineWidth=0.8;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NEURAL COHERENCE · KURAMOTO PHASE SYNC · GAMMA BINDING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NeuralCoherencePage() {
   const [mode, setMode] = useState<CanvasMode>("hpa");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEURAL COHERENCE · KURAMOTO PHASE SYNC · GAMMA BINDING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>20 phase-coupled nodes in live Kuramoto sync — the AETHER neural coherence simulation.</p></div>
+          <NeuralCoherenceHeaderCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{

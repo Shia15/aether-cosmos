@@ -358,6 +358,47 @@ function MomentumEquation({ phase }: { phase: DronePhase }) {
 /* ══════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════ */
+function BioInfinityCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const arms = 8;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.15)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let a=0;a<arms;a++) {
+        const baseAng=(a/arms)*Math.PI*2+t*0.008;
+        for (let r=20;r<120;r+=18) {
+          const ang=baseAng+r*0.03;
+          const px=cx+Math.cos(ang)*r, py=cy+Math.sin(ang)*r;
+          const hue=((a/arms)*360+t*0.5)%360;
+          const col=`hsl(${hue},90%,65%)`;
+          const alpha=0.3+0.4*(r/120)*Math.sin(t*0.04+a+r);
+          ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+          ctx.fillStyle=col; ctx.globalAlpha=alpha; ctx.shadowColor=col; ctx.shadowBlur=8; ctx.fill();
+        }
+      }
+      ctx.globalAlpha=1; ctx.shadowBlur=0;
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,24);
+      gc.addColorStop(0,"#ffffffdd"); gc.addColorStop(0.5,"#2ef0d888"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,22+3*Math.sin(t*0.05),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#2ef0d8"; ctx.shadowBlur=28; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(46,240,216,0.45)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIO INFINITY DRIVE · SPIRAL ARMS · QUANTUM COHERENCE · ∞ LOOP ENGINE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BioInfinityDrivePage() {
   const [activeIdx, setActiveIdx] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -413,6 +454,25 @@ export default function BioInfinityDrivePage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: TEXT, fontFamily: mono, overflowY: "auto" }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#2ef0d8", textTransform:"uppercase", fontFamily:mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)",
+          borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:mono, fontSize:18, color:"#d0fffa", margin:"0 0 6px" }}>
+            Bio Infinity Drive · 8 Spiral Arms · Quantum Coherence · ∞ Loop Engine
+          </h2>
+          <p style={{ fontFamily:mono, fontSize:12, color:"rgba(150,240,230,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Eight rotating spiral arms of chromatic particles cycling through the full spectrum, converging on a bright
+            coherence core — the Bio Infinity Drive as an infinite-loop biological-quantum engine with chromatic
+            resonance arms and glowing synthesis nexus.
+          </p>
+          <BioInfinityCanvas />
+        </div>
+      </div>
 
       {/* ── HEADER ── */}
       <div style={{

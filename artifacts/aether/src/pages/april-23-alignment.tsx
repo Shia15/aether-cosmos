@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgSoft   from "@assets/ChatGPT_Image_Apr_26,_2026,_02_28_36_PM_1777228120588.png";
@@ -95,10 +96,83 @@ const POSTURES = [
   { c: B.cyan,   k: "Use",    v: "Phase-relationship language as a modelling vocabulary" },
 ];
 
+function AlignmentCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const panels = [
+      { label:"REALITY\nOBJECT", col:"#3b82f6", x:W*0.1 },
+      { label:"SYMBOL\nLAYER", col:"#8b5cf6", x:W*0.26 },
+      { label:"ALIGNMENT\nFIELD", col:"#2ef0d8", x:W*0.42 },
+      { label:"EMOTIONAL\nMEMORY", col:"#f472b6", x:W*0.58 },
+      { label:"COSMIC\nTIMING", col:"#fbbf24", x:W*0.74 },
+      { label:"SYNTHESIS", col:"#34d399", x:W*0.90 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,5,20,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<panels.length-1;i++) {
+        const a=panels[i],b=panels[i+1];
+        const g=ctx.createLinearGradient(a.x,H/2,b.x,H/2);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,H/2); ctx.lineTo(b.x,H/2);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+        const pkt=(t*0.013+i*0.5)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+      }
+      panels.forEach((p,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.035+i*1.1);
+        const g=ctx.createRadialGradient(p.x,H/2,0,p.x,H/2,18*pulse);
+        g.addColorStop(0,p.col+"bb"); g.addColorStop(0.5,p.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(p.x,H/2,16*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=p.col; ctx.shadowBlur=16*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=p.col; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=p.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        p.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,p.x,H/2+22*pulse+li*9));
+        ctx.fillStyle=p.col+"cc"; ctx.font="bold 8px 'DM Mono',monospace";
+        ctx.fillText(`${i+1}`,p.x,H/2+4);
+      });
+      ctx.fillStyle="rgba(59,130,246,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("APRIL 23 · REALITY VS SYMBOLISM · SIX-PANEL DISCIPLINE · ALIGNMENT FIELD",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function April23AlignmentPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="april-23-alignment-page">
       <div className="max-w-5xl mx-auto">
+
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(59,130,246,0.07)", border:"1px solid rgba(59,130,246,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.blue, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(5,5,20,0.85)", border:"1px solid rgba(59,130,246,0.1)",
+            borderLeft:`3px solid ${B.blue}`, borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+              April 23 Alignment · Reality vs Symbolism · Six-Panel Discipline
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(150,180,220,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Six alignment panels (Reality Object/blue · Symbol Layer/violet · Alignment Field/teal · Emotional Memory/rose
+              · Cosmic Timing/gold · Synthesis/green) with flow packets streaming sequentially — the six-panel
+              discipline for separating reality from symbolic projection.
+            </p>
+            <AlignmentCanvas />
+          </div>
+        </div>
 
         <header className="mb-10">
           <div className="text-[10.5px] uppercase tracking-[0.32em] mb-2"

@@ -417,10 +417,52 @@ const NAV = [
   { id: "s7", label: "AETHER" },
 ];
 
+function GraphiteCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    const hexR = 16;
+    const cols = Math.ceil(W/(hexR*1.74))+1;
+    const rows = Math.ceil(H/(hexR*1.5))+1;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(18,16,12,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+        const x=c*hexR*1.74+(r%2)*hexR*0.87;
+        const y=r*hexR*1.5;
+        const wave=Math.sin(t*0.02+c*0.4+r*0.6);
+        const alpha=0.08+0.18*Math.abs(wave);
+        ctx.beginPath();
+        for(let k=0;k<6;k++){const a=(k/6)*Math.PI*2-Math.PI/6;ctx.lineTo(x+hexR*Math.cos(a),y+hexR*Math.sin(a));}
+        ctx.closePath();
+        ctx.strokeStyle=`rgba(200,190,170,${alpha})`; ctx.lineWidth=0.8; ctx.stroke();
+        if(wave>0.8){ctx.fillStyle=`rgba(200,190,170,${alpha*0.5})`; ctx.fill();}
+      }
+      ctx.fillStyle="rgba(200,190,170,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GRAPHITE SYNTHESIS · HEXAGONAL LATTICE · CARBON PLANES · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GraphiteSynthesisPage() {
   const [mode, setMode] = useState<Mode>("graphite");
   return (
     <div style={{ background: BG0, minHeight: "100vh", fontFamily: body, color: G80 }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid rgba(200,190,170,0.7)",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"rgba(200,190,170,0.9)",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(18,16,12,0.8)",borderLeft:"3px solid rgba(200,190,170,0.6)",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"rgba(200,190,170,0.9)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GRAPHITE SYNTHESIS · HEXAGONAL LATTICE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(200,190,170,0.4)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Animated carbon hexagonal lattice — the live AETHER graphite synthesis simulation.</p></div>
+          <GraphiteCanvas />
+        </div>
+      </div>
 
       {/* ── GRADIENT HERO ─────────────────────────────────────────────── */}
       <div style={{ padding: "0", position: "relative", overflow: "hidden" }}>

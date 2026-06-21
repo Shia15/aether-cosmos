@@ -89,6 +89,56 @@ const ENERGY_SOURCES = [
 ];
 
 // ── Main page ─────────────────────────────────────────────────────────────────
+function ReservoirCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const N_nodes = 20;
+    const nodes: {x:number;y:number;v:number;col:string}[] = [];
+    for (let i=0;i<N_nodes;i++) {
+      nodes.push({ x:60+Math.random()*(W-120), y:40+Math.random()*(H-80), v:Math.random(), col:`hsl(${240+i*12},80%,65%)` });
+    }
+    const links: [number,number][] = [];
+    for (let i=0;i<N_nodes;i++) for (let j=i+1;j<N_nodes;j++) {
+      const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
+      if (Math.sqrt(dx*dx+dy*dy)<160) links.push([i,j]);
+    }
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,2,26,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      nodes.forEach(n=>{ n.v=Math.max(0,Math.min(1,n.v+0.02*(Math.random()-0.5))); });
+      links.forEach(([a,b])=>{
+        const na=nodes[a],nb=nodes[b];
+        const alpha=0.15+0.3*(na.v+nb.v)*0.5;
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=`rgba(153,102,255,${alpha})`; ctx.lineWidth=0.8; ctx.stroke();
+      });
+      nodes.forEach(n=>{
+        const r=4+n.v*10;
+        const pulse=1+0.08*Math.sin(t*0.05+n.x*0.01);
+        ctx.beginPath(); ctx.arc(n.x,n.y,r*pulse,0,Math.PI*2);
+        ctx.fillStyle=n.col+(Math.floor(n.v*200).toString(16).padStart(2,"0"));
+        ctx.shadowColor=n.col; ctx.shadowBlur=r*pulse*2; ctx.fill(); ctx.shadowBlur=0;
+      });
+      const y=H-30;
+      ctx.fillStyle="#9966ff22"; ctx.fillRect(14,y,W-28,16);
+      ctx.fillStyle="#9966ff"; ctx.fillRect(14,y,(W-28)*0.6,16);
+      ctx.fillStyle="rgba(153,102,255,0.5)"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("ANALOG RESERVOIR COMPUTER · 20 COUPLED RC NODES · EDGE-OF-CHAOS DYNAMICS",14,18);
+      ctx.fillText("RESERVOIR OUTPUT →",14,y+11);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AnalogReservoirPage() {
   // Controls
   const [gain,     setGain]     = useState(1.2);   // 0 – 2.5 (mapped from 0–50kΩ)
@@ -238,6 +288,26 @@ export default function AnalogReservoirPage() {
 
   return (
     <div className="min-h-screen bg-[#030514] text-white font-['Raleway',sans-serif] pb-12">
+
+      <div className="px-6 pt-4">
+        <div style={{ display:"inline-block", background:"rgba(153,102,255,0.08)", border:"1px solid rgba(153,102,255,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#a78bfa", textTransform:"uppercase", fontFamily:"'Cinzel',serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(3,2,26,0.9)", border:"1px solid rgba(153,102,255,0.15)",
+          borderLeft:"3px solid #9966ff", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#e0d8ff", margin:"0 0 6px" }}>
+            Analog Reservoir Computer · 20 Coupled RC Nodes · Edge-of-Chaos Dynamics
+          </h2>
+          <p style={{ fontFamily:"Raleway,sans-serif", fontSize:12, color:"rgba(200,195,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Twenty coupled RC oscillator nodes in a randomized reservoir topology with live state evolution and
+            edge-of-chaos activation — glowing nodes pulse as their voltage state oscillates, with a reservoir
+            output bar tracking the emergent collective signal.
+          </p>
+          <ReservoirCanvas />
+        </div>
+      </div>
 
       {/* ── Header ── */}
       <div className="border-b border-purple-900/40 bg-[#07021a]/80 px-6 py-4 sticky top-0 z-20">

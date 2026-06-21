@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgAtom        from "@assets/ChatGPT_Image_Apr_26,_2026,_01_05_24_PM_1777223128052.png";
@@ -64,9 +65,52 @@ const BRIDGES: { href: string; title: string; subtitle: string }[] = [
     subtitle: "Where c shows up as a structural constant tying physics, chemistry, and information together." },
 ];
 
+function LightSpeedCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    const photons: {x:number;y:number;a:number;spd:number;col:string}[] = [];
+    for(let i=0;i<60;i++) photons.push({x:cx,y:cy,a:Math.random()*Math.PI*2,spd:3+Math.random()*4,col:["#ffcc44","#ff8844","#44aaff","#2ef0d8","#ff4477"][Math.floor(Math.random()*5)]});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.35)"; ctx.fillRect(0,0,W,H);
+      photons.forEach(p=>{
+        p.x+=Math.cos(p.a)*p.spd; p.y+=Math.sin(p.a)*p.spd;
+        if(p.x<0||p.x>W||p.y<0||p.y>H){p.x=cx;p.y=cy;p.a=Math.random()*Math.PI*2;}
+        const trail=6;
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-Math.cos(p.a)*trail*p.spd*0.4,p.y-Math.sin(p.a)*trail*p.spd*0.4);
+        ctx.strokeStyle=p.col+"aa";ctx.lineWidth=1;ctx.stroke();
+        ctx.beginPath();ctx.arc(p.x,p.y,1.5,0,Math.PI*2);ctx.fillStyle=p.col;ctx.fill();
+      });
+      for(let r=1;r<=3;r++){
+        const rr=r*28+Math.sin(t*0.02)*8;
+        ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);ctx.strokeStyle=`rgba(255,204,68,${0.08+0.05*Math.sin(t*0.03+r)})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(255,204,68,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("LIGHT-SPEED · PHOTON BURST · c = 299,792,458 m/s · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function LightSpeedPage() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #ffcc44",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ffcc44",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ffcc44",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ffcc44",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LIGHT-SPEED · PHOTON BURST · c = 299,792,458 m/s · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,204,68,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>60 photons radiating from centre — the live AETHER light-speed simulation.</p></div>
+          <LightSpeedCanvas />
+        </div>
+      </div>
       <style>{`@keyframes ls-fade { from { opacity:0; transform: translateY(6px) } to { opacity:1; transform: none } }
         .ls-fade { animation: ls-fade 0.55s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .ls-fade { animation: none; } }`}</style>

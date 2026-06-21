@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const FIELDS = [
@@ -83,9 +84,84 @@ const ECO_NODES = [
   { title: "Non-Binary Consciousness", color: "#ec4899", desc: "Consciousness as participatory spectrum: slime molds, plants, dolphins, humans — graded intelligence as the default of life. AETHER substrate couples all levels into one coherent resonance layer." },
 ];
 
+function ClaFieldCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const layers = [
+      { x:W*0.14, col:"#00d4ff", label:"PLANETARY\nRESONANCE", phase:0.0 },
+      { x:W*0.32, col:"#a78bfa", label:"CONSCIOUSNESS\nEXPANSION", phase:1.1 },
+      { x:W*0.50, col:"#10b981", label:"COHERENT\nPHASE LATTICE", phase:2.2 },
+      { x:W*0.68, col:"#f472b6", label:"REALITY\nENGINEERING", phase:0.8 },
+      { x:W*0.86, col:"#c9a84c", label:"AETHER\nSUBSTRATE", phase:1.7 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,6,23,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<layers.length-1;i++) {
+        const a=layers[i],b=layers[i+1];
+        const g=ctx.createLinearGradient(a.x,H/2,b.x,H/2);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,H/2); ctx.lineTo(b.x,H/2);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+        const flow=(t*0.016+i*0.5)%1;
+        const px=a.x+(b.x-a.x)*flow, py=H/2;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+      }
+      layers.forEach((l,li)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+l.phase);
+        const rings=[36,26,16];
+        rings.forEach((r,ri)=>{
+          const g=ctx.createRadialGradient(l.x,H/2,0,l.x,H/2,r*pulse);
+          g.addColorStop(0,l.col+(ri===0?"22":"11")); g.addColorStop(1,"transparent");
+          ctx.beginPath(); ctx.arc(l.x,H/2,r*pulse,0,Math.PI*2);
+          ctx.strokeStyle=l.col+(ri===0?"99":"44"); ctx.lineWidth=ri===0?2:1;
+          ctx.shadowColor=l.col; ctx.shadowBlur=(ri===0?18:8)*pulse; ctx.stroke(); ctx.shadowBlur=0;
+          ctx.fillStyle=g; ctx.fill();
+        });
+        ctx.fillStyle=l.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        l.label.split("\n").forEach((ln,i)=>ctx.fillText(ln,l.x,H/2+42+i*11));
+        ctx.fillStyle=l.col+"aa"; ctx.font="bold 9px 'DM Mono',monospace";
+        ctx.fillText(`L${li+1}`,l.x,H/2+4);
+      });
+      ctx.fillStyle="rgba(0,212,255,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER–CLA · COHERENT PHASE LATTICE ARCHITECTURE · UNIFIED RESONANCE SUBSTRATE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherClaPage() {
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+
+      <div style={{ padding:"16px 24px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(0,212,255,0.06)", border:"1px solid rgba(0,212,255,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#00d4ff", textTransform:"uppercase", fontFamily:"system-ui,sans-serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,6,23,0.85)", border:"1px solid rgba(0,212,255,0.1)",
+          borderLeft:"3px solid #00d4ff", borderRadius:10, padding:20, marginBottom:12 }}>
+          <h2 style={{ fontFamily:"system-ui,sans-serif", fontSize:18, color:"#e2e8f0", margin:"0 0 6px" }}>
+            AETHER–CLA · Coherent Phase Lattice Architecture · Five Unified Resonance Layers
+          </h2>
+          <p style={{ fontFamily:"system-ui,sans-serif", fontSize:12, color:"rgba(150,200,220,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five nested resonance layers (Planetary/cyan · Consciousness/violet · Phase Lattice/teal · Reality Engineering/rose
+            · AETHER Substrate/gold) with live flow packets — the unified substrate of the AETHER–CLA white paper.
+          </p>
+          <ClaFieldCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ padding: "3rem 2rem 2rem", borderBottom: "1px solid #1e293b", background: "linear-gradient(180deg,#05101f 0%,#020617 100%)" }}>

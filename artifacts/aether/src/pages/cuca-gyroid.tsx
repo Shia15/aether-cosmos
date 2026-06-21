@@ -28,6 +28,45 @@ const SKIN_COLORS = ["#f97316", "#3b82f6", "#22c55e", "#9333ea"];
 
 type LogEntry = { t: number; msg: string; type: "ok" | "w" | "e" | "g" };
 
+function CucaGyroidCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for(let i=0;i<6;i++){
+        const ang=i*(Math.PI/3)+t*0.01;
+        const r=40+20*Math.sin(t*0.025+i);
+        const x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
+        const g=ctx.createRadialGradient(x,y,0,x,y,14);
+        const hue=270+i*20;
+        g.addColorStop(0,`hsla(${hue},80%,60%,0.73)`); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y);
+        ctx.strokeStyle=`hsla(${hue},80%,60%,0.13)`; ctx.lineWidth=1; ctx.stroke();
+      }
+      const iso: [number,number][]=[[-70,0],[70,0],[0,60],[-70,0]];
+      const skew=(x:number,y:number):[number,number]=>[cx+x+y*0.3,cy-y*0.5+20*Math.sin(t*0.02)];
+      ctx.beginPath();
+      iso.forEach(([ix,iy],i)=>{ const [sx,sy]=skew(ix,iy); if(i===0) ctx.moveTo(sx,sy); else ctx.lineTo(sx,sy); });
+      ctx.strokeStyle="rgba(147,51,234,0.25)"; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.fillStyle="rgba(147,51,234,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CUCA GYROID v3.0 · TRIPLY-PERIODIC MINIMAL SURFACE · PHOTONIC SCAFFOLD · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CucaGyroidPage() {
   const cnv0 = useRef<HTMLCanvasElement | null>(null);
   const cnv1 = useRef<HTMLCanvasElement | null>(null);
@@ -355,6 +394,18 @@ export default function CucaGyroidPage() {
 
   return (
     <div data-testid="page-cuca-gyroid" style={{ background: T.bg, color: T.text, fontFamily: T.mono, minHeight: "100vh", position: "relative" }}>
+      <div style={{ padding:"24px 24px 0", position:"relative", zIndex:1 }}>
+        <div style={{ display:"inline-block", border:"1px solid #9333ea", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#9333ea", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(147,51,234,0.15)", borderLeft:"3px solid #9333ea", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            CUCA Gyroid v3.0 · Triply-Periodic Minimal Surface · Photonic Scaffold · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(147,51,234,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six violet orbital nodes tracing a gyroid lattice with an isometric scaffold — the live AETHER CUCA Gyroid v3.0 photonic crystal simulation.
+          </p>
+          <CucaGyroidCanvas />
+        </div>
+      </div>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
         background: "radial-gradient(ellipse 60% 50% at 50% 40%,rgba(147,51,234,.06) 0%,transparent 60%)" }} />
       <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto", padding: "40px 22px 64px" }}>

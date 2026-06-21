@@ -187,6 +187,50 @@ function UnitCircle({ row, animAngle }: { row: Row; animAngle: number }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
+function TrigReferenceHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W*0.18,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const r=45;
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle="rgba(46,240,216,0.2)";ctx.lineWidth=0.5;ctx.stroke();
+      const angle=t*0.03-Math.PI/2;
+      const px=cx+r*Math.cos(angle),py=cy+r*Math.sin(angle);
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,cy);ctx.strokeStyle="rgba(201,168,76,0.6)";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(px,cy);ctx.lineTo(px,py);ctx.strokeStyle="rgba(255,68,119,0.6)";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(px,py);ctx.strokeStyle="rgba(46,240,216,0.6)";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.4)";ctx.fill();
+      ctx.beginPath();ctx.arc(px,py,4,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.8)";ctx.fill();
+      const startX=cx+r+20;
+      ctx.beginPath();
+      for(let x=0;x<=W-startX;x+=2){
+        const y=cy+35*Math.sin((x/(W-startX))*Math.PI*4+t*0.03);
+        x===0?ctx.moveTo(startX+x,y):ctx.lineTo(startX+x,y);
+      }
+      ctx.strokeStyle="rgba(255,68,119,0.35)";ctx.lineWidth=0.8;ctx.stroke();
+      ctx.beginPath();
+      for(let x=0;x<=W-startX;x+=2){
+        const y=cy+35*Math.cos((x/(W-startX))*Math.PI*4+t*0.03);
+        x===0?ctx.moveTo(startX+x,y):ctx.lineTo(startX+x,y);
+      }
+      ctx.strokeStyle="rgba(201,168,76,0.35)";ctx.lineWidth=0.8;ctx.stroke();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("TRIG REFERENCE · SINE · COSINE · UNIT CIRCLE · RADIANS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function TrigReferenceView() {
   const [selectedIdx, setSelectedIdx] = useState(3); // π/3 default
   const [animAngle, setAnimAngle] = useState(ROWS[3].radVal);
@@ -219,7 +263,13 @@ export default function TrigReferenceView() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif", overflow: "hidden" }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:8}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TRIG REFERENCE · SINE · COSINE · UNIT CIRCLE · RADIANS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live unit circle + sine/cosine waves — the AETHER trig reference simulation.</p></div>
+          <TrigReferenceHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(192,132,252,0.1)", padding: "12px 28px 10px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexShrink: 0 }}>
         <div>

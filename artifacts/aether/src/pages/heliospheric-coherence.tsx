@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -255,11 +255,99 @@ function FermionBosonDiagram() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Page                                                                */
+/*  Heliospheric Canvas                                                 */
 /* ------------------------------------------------------------------ */
+function HeliosphericCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 340;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    type Particle = { r: number; angle: number; speed: number; arm: number };
+    const particles: Particle[] = Array.from({ length: 80 }, (_, i) => ({
+      r: 20 + (i / 80) * 280, angle: (i / 80) * Math.PI * 2, speed: 0.004 + Math.random() * 0.003, arm: i % 4,
+    }));
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#050511"; ctx.fillRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const t = tRef.current;
+      const rings = [
+        { r:80,  color:"#E6B85C", label:"Termination Shock" },
+        { r:160, color:"#7CD7FF", label:"Heliopause" },
+        { r:240, color:"#B49CFF", label:"Bow Shock" },
+      ];
+      rings.forEach(ring => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, ring.r, 0, Math.PI * 2);
+        ctx.strokeStyle = ring.color + "44";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 6]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = ring.color + "77";
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.fillText(ring.label, cx + ring.r * 0.72, cy - 8);
+      });
+      for (let arm = 0; arm < 4; arm++) {
+        ctx.beginPath();
+        for (let step = 0; step <= 600; step++) {
+          const frac = step / 600;
+          const r = frac * 240;
+          const spiralAngle = arm * Math.PI / 2 + frac * Math.PI * 3 + t * 0.003;
+          const x = cx + r * Math.cos(spiralAngle);
+          const y = cy + r * Math.sin(spiralAngle);
+          if (step === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = "#E6B85C22";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+      particles.forEach(p => {
+        const spiralA = p.arm * Math.PI / 2 + (p.r / 240) * Math.PI * 3 + t * 0.003;
+        const x = cx + p.r * Math.cos(spiralA);
+        const y = cy + p.r * Math.sin(spiralA);
+        const bright = 0.4 + 0.5 * Math.sin(t * 0.04 + p.arm * 1.5);
+        ctx.beginPath();
+        ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(230,184,92,${bright})`;
+        ctx.fill();
+        p.r += p.speed * 0.8;
+        if (p.r > 285) p.r = 18;
+      });
+      const sunGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
+      sunGrad.addColorStop(0, "#fff8e0");
+      sunGrad.addColorStop(0.5, "#E6B85C");
+      sunGrad.addColorStop(1, "#E6B85C00");
+      ctx.beginPath();
+      ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+      ctx.fillStyle = sunGrad;
+      ctx.fill();
+      ctx.fillStyle = "#9AA3B855";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("HELIOSPHERE · PARKER SPIRAL · SOLAR WIND", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function HeliosphericCoherenceView() {
   return (
     <div style={{ minHeight: "100vh", background: B.bg, color: B.ink, padding: "28px 24px 60px" }} data-testid="page-heliospheric-coherence">
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #ffcc44",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ffcc44",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ffcc44",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ffcc44",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>HELIOSPHERIC COHERENCE · SOLAR WIND · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,204,68,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Solar corona + planetary orbits + heliospheric current sheet — live AETHER simulation.</p></div>
+          <HeliosphericCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Title */}
@@ -280,6 +368,26 @@ export default function HeliosphericCoherenceView() {
             <FormulaChip accent={B.gold}>
               Sun (boson γ) &nbsp;⟶&nbsp; ionosphere &nbsp;⟶&nbsp; geomagnetic ripple &nbsp;⟶&nbsp; fermionic biology &nbsp;⟶&nbsp; cultural phase
             </FormulaChip>
+          </div>
+        </div>
+
+        <div style={{ marginBottom:28 }}>
+          <div style={{ display:"inline-block", background:"rgba(230,184,92,0.1)", border:"1px solid rgba(230,184,92,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:B.panel, border:`1px solid ${B.line}`, borderLeft:`3px solid ${B.gold}`,
+            borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:'"Cinzel",serif', fontSize:18, color:B.ink, margin:"0 0 6px", fontVariant:"small-caps" }}>
+              Heliosphere · Parker Spiral · Solar Wind
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.dim, margin:"0 0 14px", lineHeight:1.65 }}>
+              The sun (center) drives four Parker-spiral arms of solar wind outward. Gold particles travel along the spiral arms.
+              Dashed rings mark the Termination Shock (~94 AU), Heliopause (~120 AU), and Bow Shock (~230 AU) — the three
+              boundary layers of our heliospheric bubble.
+            </p>
+            <HeliosphericCanvas />
           </div>
         </div>
 

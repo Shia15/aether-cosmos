@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const C = {
@@ -448,6 +448,43 @@ function MultiCycleLifeEnergy() {
   );
 }
 
+function FibCalCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const fibs = [1,1,2,3,5,8,13,21,34,55,89,144];
+    const maxF = 144;
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,W,H);
+      const bw = W/(fibs.length+1);
+      fibs.forEach((f,i)=>{
+        const bh = (f/maxF)*(H-30)*( 0.85+0.15*Math.sin(t*0.04+i*0.5));
+        const x = bw*(i+0.5);
+        const hue = 180+i*12;
+        const alpha = Math.floor(180+60*Math.sin(t*0.03+i*0.4)).toString(16).padStart(2,"0");
+        ctx.fillStyle=`hsl(${hue},70%,55%)${alpha}`;
+        ctx.fillRect(x-bw*0.35, H-bh-18, bw*0.7, bh);
+        ctx.fillStyle=`hsl(${hue},70%,75%)`;
+        ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(String(f), x, H-bh-22);
+      });
+      ctx.textAlign="left";
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("FIBONACCI CALENDAR · φ SPIRAL · 1 1 2 3 5 8 13 21 34 55 89 144 · AETHER", 12, 14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function FibonacciCalendarPage() {
   const [tab, setTab] = useState<"calendar"|"mathematics"|"history"|"aether"|"world">("calendar");
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null);
@@ -458,6 +495,13 @@ export default function FibonacciCalendarPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(10,8,2,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FIBONACCI CALENDAR · φ SPIRAL · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Fibonacci bars 1–144 animated — the live AETHER Fibonacci calendar simulation.</p></div>
+          <FibCalCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="border-b border-gold-900/30 px-6 py-4 sticky top-0 z-20"
         style={{ background: C.panel + "ee", borderColor: C.gold + "30" }}>

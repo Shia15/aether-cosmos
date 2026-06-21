@@ -379,6 +379,44 @@ function ReactionDiagram() {
 /* ------------------------------------------------------------------ */
 const SERIES_MAX = 240;
 
+function PhotosynthesisHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const electrons: {x:number;y:number;progress:number;col:string}[] = [];
+    const chain=[{x:100,y:72},{x:250,y:40},{x:400,y:72},{x:550,y:40},{x:700,y:72},{x:850,y:40}];
+    for(let i=0;i<6;i++) electrons.push({x:0,y:0,progress:i/6,col:["#2ef0d8","#44cc77","#c9a84c","#44aaff","#44cc77","#2ef0d8"][i]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<chain.length-1;i++){
+        ctx.beginPath();ctx.moveTo(chain[i].x,chain[i].y);ctx.lineTo(chain[i+1].x,chain[i+1].y);ctx.strokeStyle="rgba(68,204,119,0.2)";ctx.lineWidth=1;ctx.stroke();
+      }
+      chain.forEach(n=>{
+        ctx.beginPath();ctx.arc(n.x,n.y,10,0,Math.PI*2);ctx.fillStyle="rgba(44,204,100,0.15)";ctx.fill();ctx.strokeStyle="rgba(44,204,100,0.5)";ctx.lineWidth=0.8;ctx.stroke();
+      });
+      electrons.forEach(e=>{
+        e.progress=(e.progress+0.004)%1;
+        const seg=Math.floor(e.progress*(chain.length-1));
+        const frac=e.progress*(chain.length-1)-seg;
+        const a=chain[Math.min(seg,chain.length-1)],b=chain[Math.min(seg+1,chain.length-1)];
+        const ex=a.x+(b.x-a.x)*frac,ey=a.y+(b.y-a.y)*frac;
+        ctx.beginPath();ctx.arc(ex,ey,5,0,Math.PI*2);ctx.fillStyle=e.col+"cc";ctx.fill();
+      });
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PHOTOSYNTHESIS SPARK · ELECTRON TRANSPORT · CHLOROPLAST · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhotosynthesisSparkPage() {
   const gridRef = useRef<Grid>(createGrid());
   const layersTotalRef = useRef(0);
@@ -476,6 +514,13 @@ export default function PhotosynthesisSparkPage() {
 
   return (
     <div data-testid="photosynthesis-spark-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
+      <div style={{flexShrink:0,margin:"-40px -32px 20px"}}>
+        <div style={{padding:"8px 32px"}}><div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 32px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PHOTOSYNTHESIS SPARK · ELECTRON TRANSPORT · CHLOROPLAST · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 electrons flowing through the ETC — the live AETHER photosynthesis simulation.</p></div>
+          <PhotosynthesisHeaderCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Hero */}

@@ -7,7 +7,7 @@ import dynamicAdaptive from "@assets/4B792D20-1118-4E06-B9A1-77FD1FDAEB3D_178144
 import solarNeural1 from "@assets/DE78871E-EA85-4C52-BB6F-1645DBB84DD7_1781446780853.png";
 import solarNeural2 from "@assets/533761B4-974D-4AE4-AA14-06CF1286A280_1781446780853.png";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TABS = [
   { id: "healing",   label: "Coherent Healing" },
@@ -17,6 +17,89 @@ const TABS = [
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
+
+const CD_B = {
+  bg:"#070918", ink:"#E7ECF7", dim:"#9AA3B8", panel:"rgba(255,255,255,0.04)",
+  line:"rgba(255,255,255,0.10)", gold:"#E6B85C", cyan:"#7CD7FF", violet:"#B49CFF", rose:"#F49AB6",
+};
+
+function CoherenceWaveCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 240;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#070918"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const midY = H / 2;
+      const halfW = W / 2;
+      const sigma0 = 30 + 15 * Math.sin(t * 0.005);
+      const spread = 1 + (t * 0.008) % 3;
+      for (let side = 0; side < 2; side++) {
+        const xOffset = side * halfW;
+        const sigmaEff = side === 0 ? sigma0 : sigma0 * spread;
+        const color = side === 0 ? CD_B.cyan : CD_B.rose;
+        const label = side === 0 ? "COHERENT" : "DECOHERENT";
+        ctx.fillStyle = color + "55";
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.fillText(label, xOffset + 10, 18);
+        ctx.beginPath();
+        for (let x = 0; x < halfW; x++) {
+          const relX = x - halfW / 2;
+          const envelope = Math.exp(-(relX * relX) / (2 * sigmaEff * sigmaEff));
+          const wave = Math.sin((x / halfW) * Math.PI * 8 - t * 0.06);
+          const y = midY + wave * 80 * envelope;
+          if (x === 0) ctx.moveTo(xOffset + x, y); else ctx.lineTo(xOffset + x, y);
+        }
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+        ctx.beginPath();
+        for (let x = 0; x < halfW; x++) {
+          const relX = x - halfW / 2;
+          const envelope = Math.exp(-(relX * relX) / (2 * sigmaEff * sigmaEff));
+          const y = midY - envelope * 80;
+          if (x === 0) ctx.moveTo(xOffset + x, y); else ctx.lineTo(xOffset + x, y);
+        }
+        ctx.beginPath();
+        for (let x = 0; x < halfW; x++) {
+          const relX = x - halfW / 2;
+          const envelope = Math.exp(-(relX * relX) / (2 * sigmaEff * sigmaEff));
+          const yTop = midY - envelope * 80;
+          const yBot = midY + envelope * 80;
+          if (x === 0) { ctx.moveTo(xOffset + x, yTop); } else { ctx.lineTo(xOffset + x, yTop); }
+          if (x === halfW - 1) {
+            for (let rx = halfW - 1; rx >= 0; rx--) {
+              const rrelX = rx - halfW / 2;
+              const renv = Math.exp(-(rrelX * rrelX) / (2 * sigmaEff * sigmaEff));
+              ctx.lineTo(xOffset + rx, midY + renv * 80);
+            }
+          }
+        }
+        ctx.fillStyle = color + "11";
+        ctx.fill();
+      }
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(halfW, 0); ctx.lineTo(halfW, H); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+      ctx.fillStyle = CD_B.dim + "66";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("QUANTUM COHERENCE vs DECOHERENCE · GAUSSIAN WAVE PACKET", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
 
 export default function CoherenceDecoherencePage() {
   const [active, setActive] = useState<TabId>("healing");
@@ -36,6 +119,26 @@ export default function CoherenceDecoherencePage() {
           <p style={{ color: "#94a3b8", fontSize: "1rem", margin: 0, maxWidth: 680 }}>
             From cellular resonance to universal information archives — how coherence shapes healing, consciousness, and the structure of reality across every scale.
           </p>
+        </div>
+      </div>
+
+      <div style={{ padding:"0 2rem 1.5rem", maxWidth:1100, margin:"0 auto" }}>
+        <div style={{ display:"inline-block", background:"rgba(124,215,255,0.08)", border:"1px solid rgba(124,215,255,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:CD_B.cyan, textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:CD_B.panel, border:`1px solid ${CD_B.line}`, borderLeft:`3px solid ${CD_B.cyan}`,
+          borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:'"Cinzel",serif', fontSize:18, color:CD_B.ink, margin:"0 0 6px", fontVariant:"small-caps" }}>
+            Quantum Coherence vs Decoherence · Gaussian Wave Packet
+          </h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:CD_B.dim, margin:"0 0 14px", lineHeight:1.65 }}>
+            Left (cyan): a tight coherent Gaussian wave packet — well-defined position and phase. Right (rose):
+            the same packet after environmental interaction — spread wider, phase randomized. The dividing line
+            is the decoherence boundary; the Gaussian envelope fills in as quantum information leaks to the environment.
+          </p>
+          <CoherenceWaveCanvas />
         </div>
       </div>
 

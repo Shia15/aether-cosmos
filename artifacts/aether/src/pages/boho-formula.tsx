@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Leaf, Compass, Feather, Sparkles, Flame, Sun, type LucideIcon } from "lucide-react";
 import bohoRocket     from "@assets/image_1778100676889.png";
 import bohoLogo       from "@assets/ChatGPT_Image_Apr_25,_2026,_05_37_33_PM_1777153057484.png";
@@ -184,6 +185,66 @@ const PALETTE = [
   { name: "Ink",        hex: B.ink,        meaning: "clarity · the line drawn",       tone: "deep coffee" },
 ];
 
+function BohoFormulaCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const petals = [
+      { label:"WILD\nWOOD", col:"#c9a84c", angle:0 },
+      { label:"MOON\nWATER", col:"#c4b5fd", angle:Math.PI*2/6 },
+      { label:"ROSE\nFIELD", col:"#f9a8d4", angle:Math.PI*4/6 },
+      { label:"EARTH\nCLAY", col:"#d97706", angle:Math.PI*6/6 },
+      { label:"STAR\nDUST", col:"#fcd34d", angle:Math.PI*8/6 },
+      { label:"LEAF\nMOSS", col:"#34d399", angle:Math.PI*10/6 },
+    ];
+    const R=95;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(12,3,25,0.16)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<petals.length;i++) {
+        const a=petals[i],b=petals[(i+1)%petals.length];
+        const ax=cx+Math.cos(a.angle)*R, ay=cy+Math.sin(a.angle)*R;
+        const bx=cx+Math.cos(b.angle)*R, by=cy+Math.sin(b.angle)*R;
+        const g=ctx.createLinearGradient(ax,ay,bx,by);
+        g.addColorStop(0,a.col+"44"); g.addColorStop(1,b.col+"44");
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+        const pkt=(t*0.01+i*0.3)%1;
+        const px=ax+(bx-ax)*pkt, py=ay+(by-ay)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+      }
+      petals.forEach((p,i)=>{
+        const dx=cx+Math.cos(p.angle)*R, dy=cy+Math.sin(p.angle)*R;
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.05);
+        const g=ctx.createRadialGradient(dx,dy,0,dx,dy,16*pulse);
+        g.addColorStop(0,p.col+"cc"); g.addColorStop(0.5,p.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(dx,dy,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=p.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=p.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=p.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        p.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,dx,dy+18*pulse+li*9));
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,14);
+      gc.addColorStop(0,"#fdf6e3ee"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,12+2*Math.sin(t*0.06),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#fdf6e3"; ctx.shadowBlur=22; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(201,168,76,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BOHO FORMULA · WILD WOOD · MOON WATER · ROSE FIELD · EARTH CLAY · STAR DUST · LEAF MOSS",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BohoFormulaPage() {
   return (
     <div
@@ -191,6 +252,25 @@ export default function BohoFormulaPage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="boho-formula-page"
     >
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#c9a84c", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(12,3,25,0.9)", border:"1px solid rgba(201,168,76,0.1)",
+          borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#fdf6e3", margin:"0 0 6px" }}>
+            Boho Formula · Wild Wood · Moon Water · Rose Field · Earth Clay · Star Dust · Leaf Moss
+          </h2>
+          <p style={{ fontFamily:"monospace", fontSize:12, color:"rgba(230,200,150,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six boho essence nodes (Wild Wood/gold · Moon Water/violet · Rose Field/pink · Earth Clay/amber · Star Dust/yellow
+            · Leaf Moss/teal) in a hexagonal ring with energy packets flowing between them — the living AETHER boho
+            elemental formula map.
+          </p>
+          <BohoFormulaCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes bf-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes bf-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(38px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

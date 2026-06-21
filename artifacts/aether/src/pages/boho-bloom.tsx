@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 
 // ── Story pages ───────────────────────────────────────────────────────────────
@@ -435,6 +435,52 @@ function EndPage() {
 
 // ── Main ───────────────────────────────────────────────────────────────────────
 
+function BohoBloomCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const petals = 8;
+    const rings = [
+      { r:90, col:"#f9a8d4", petals:8 },
+      { r:58, col:"#c4b5fd", petals:6 },
+      { r:32, col:"#fcd34d", petals:5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(10,0,20,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      rings.forEach((ring,ri)=>{
+        for (let p=0;p<ring.petals;p++) {
+          const ang=(p/ring.petals)*Math.PI*2+t*0.006*(ri%2===0?1:-1);
+          const px=cx+Math.cos(ang)*ring.r, py=cy+Math.sin(ang)*ring.r;
+          const pulse=1+0.12*Math.sin(t*0.04+p+ri*2);
+          const g=ctx.createRadialGradient(px,py,0,px,py,12*pulse);
+          g.addColorStop(0,ring.col+"dd"); g.addColorStop(0.5,ring.col+"55"); g.addColorStop(1,"transparent");
+          ctx.beginPath(); ctx.arc(px,py,12*pulse,0,Math.PI*2);
+          ctx.fillStyle=g; ctx.shadowColor=ring.col; ctx.shadowBlur=16*pulse; ctx.fill(); ctx.shadowBlur=0;
+        }
+        ctx.beginPath(); ctx.arc(cx,cy,ring.r,0,Math.PI*2);
+        ctx.strokeStyle=ring.col+"22"; ctx.lineWidth=0.8; ctx.stroke();
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,18);
+      gc.addColorStop(0,"#fef3c7ee"); gc.addColorStop(0.6,"#fcd34d88"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,16+2*Math.sin(t*0.06),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#fcd34d"; ctx.shadowBlur=24; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(249,168,212,0.45)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BOHO BLOOM · PETAL MANDALA · 3-RING MANDALA · ROSE/VIOLET/GOLD · LIVING BLOOM FIELD",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BohoBloomPage() {
   const [page, setPage] = useState(0);
   const [fading, setFading] = useState(false);
@@ -472,6 +518,25 @@ export default function BohoBloomPage() {
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start",
       padding: "16px 12px 32px", fontFamily: "'Nunito', 'Quicksand', cursive",
     }}>
+      <div style={{ width:"100%", maxWidth:1100, marginBottom:20 }}>
+        <div style={{ display:"inline-block", background:"rgba(249,168,212,0.07)", border:"1px solid rgba(249,168,212,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#f9a8d4", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(10,0,30,0.9)", border:"1px solid rgba(249,168,212,0.12)",
+          borderLeft:"3px solid #f9a8d4", borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"'Nunito','Quicksand',cursive", fontSize:18, color:"#fdf2f8", margin:"0 0 6px" }}>
+            Boho Bloom · Petal Mandala · 3-Ring Mandala · Rose/Violet/Gold · Living Bloom Field
+          </h2>
+          <p style={{ fontFamily:"'Nunito','Quicksand',cursive", fontSize:12, color:"rgba(240,180,220,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Three concentric petal rings (outer/rose-8 · mid/violet-6 · inner/gold-5) rotating in alternating directions,
+            each petal pulsing with radial glow — the living AETHER Boho Bloom mandala, a digital garden in perpetual bloom.
+          </p>
+          <BohoBloomCanvas />
+        </div>
+      </div>
+
       <style>{`
         @keyframes bloom-pulse { from{transform:scale(1); filter:brightness(1);} to{transform:scale(1.06); filter:brightness(1.15);} }
         @keyframes star-twinkle { from{opacity:0.3; transform:scale(0.8);} to{opacity:1; transform:scale(1.1);} }

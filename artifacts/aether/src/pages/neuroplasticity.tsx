@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import imgFoundationalLayer from "@assets/b0238d9b-2d7f-4378-818d-76a8e6f8623c_1777221801707.png";
 
@@ -410,11 +410,110 @@ function ContentPanel({ section }: { section: Section }) {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
+function NeuroplasticityCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 280;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    const RNG = (seed: number) => { let s = seed; return () => { s = (s * 16807 + 0) % 2147483647; return (s - 1) / 2147483646; }; };
+    const rng = RNG(42);
+    const N = 28;
+    const nodes = Array.from({ length: N }, (_, i) => ({
+      x: 30 + rng() * (W - 60),
+      y: 30 + rng() * (H - 60),
+      r: 5 + rng() * 5,
+      color: ["#eab308","#3b82f6","#8b5cf6"][i % 3],
+      phase: rng() * Math.PI * 2,
+    }));
+    const edges: [number,number,number][] = [];
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 160) edges.push([i, j, d]);
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#030510"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      edges.forEach(([i, j, d]) => {
+        const ni = nodes[i], nj = nodes[j];
+        const strength = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * 0.02 + ni.phase + nj.phase));
+        const alpha = strength * (1 - d / 160);
+        ctx.beginPath(); ctx.moveTo(ni.x, ni.y); ctx.lineTo(nj.x, nj.y);
+        ctx.strokeStyle = `rgba(180,140,255,${alpha * 0.55})`;
+        ctx.lineWidth = alpha * 1.8; ctx.stroke();
+      });
+      nodes.forEach((n) => {
+        const pulse = 0.6 + 0.4 * Math.sin(t * 0.04 + n.phase);
+        const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 2.2);
+        grd.addColorStop(0, n.color);
+        grd.addColorStop(1, n.color + "00");
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = grd; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x, n.y, n.r * 0.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff44"; ctx.fill();
+      });
+      ctx.fillStyle = "rgba(234,179,8,0.4)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("NEURAL NETWORK · SYNAPTIC PLASTICITY · EXERCISE/DIET/SLEEP NODES", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function NeuroplasticityHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const synapses: {x:number;y:number;tx:number;ty:number;progress:number;col:string}[] = [];
+    for(let i=0;i<16;i++) synapses.push({x:Math.random()*W,y:Math.random()*H,tx:Math.random()*W,ty:Math.random()*H,progress:Math.random(),col:["#c084fc","#2ef0d8","#9966ff","#44aaff"][Math.floor(Math.random()*4)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,5,20,0.3)"; ctx.fillRect(0,0,W,H);
+      synapses.forEach(s=>{
+        s.progress=(s.progress+0.006)%1;
+        ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.tx,s.ty);ctx.strokeStyle=s.col+"22";ctx.lineWidth=0.5;ctx.stroke();
+        const bx=s.x+(s.tx-s.x)*s.progress,by=s.y+(s.ty-s.y)*s.progress;
+        ctx.beginPath();ctx.arc(bx,by,4,0,Math.PI*2);ctx.fillStyle=s.col+"cc";ctx.fill();
+        ctx.beginPath();ctx.arc(s.x,s.y,5,0,Math.PI*2);ctx.fillStyle=s.col+"44";ctx.fill();
+        ctx.beginPath();ctx.arc(s.tx,s.ty,5,0,Math.PI*2);ctx.fillStyle=s.col+"44";ctx.fill();
+      });
+      ctx.fillStyle="rgba(192,132,252,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NEUROPLASTICITY · SYNAPSE GROWTH · HEBBIAN LEARNING · NEURAL REWIRING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NeuroplasticityView() {
   const [selected, setSelected] = useState<Section>(null);
 
   return (
     <div style={{ minHeight: "100%", display: "flex", flexDirection: "column", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c084fc",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c084fc",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(3,5,20,0.8)",borderLeft:"3px solid #c084fc",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c084fc",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEUROPLASTICITY · SYNAPSE GROWTH · HEBBIAN LEARNING · NEURAL REWIRING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(192,132,252,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>16 traveling synapse signals — the live AETHER neuroplasticity simulation.</p></div>
+          <NeuroplasticityHeaderCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(192,132,252,0.1)", padding: "12px 28px 10px", flexShrink: 0 }}>
@@ -427,6 +526,26 @@ export default function NeuroplasticityView() {
         <p style={{ fontSize: 11, color: "rgba(200,195,240,0.45)", margin: "3px 0 0", letterSpacing: "0.04em" }}>
           Multi-factor Venn model · BDNF · IGF-1 · SIRT1 · Coherence Attractor
         </p>
+      </div>
+
+      <div style={{ padding:"10px 28px 14px", borderBottom:"1px solid rgba(192,132,252,0.08)" }}>
+        <div style={{ display:"inline-block", background:"rgba(192,132,252,0.08)", border:"1px solid rgba(192,132,252,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#c084fc", textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(192,132,252,0.12)",
+          borderLeft:"3px solid #c084fc", borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e0d8ff", margin:"0 0 6px" }}>
+            Neural Network · Synaptic Plasticity · Exercise / Diet / Sleep
+          </h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,195,240,0.55)", margin:"0 0 14px", lineHeight:1.65 }}>
+            28 neural nodes color-coded by input modality: gold (Exercise/BDNF), blue (Diet/IGF-1), violet (Sleep/SIRT1).
+            Synaptic connections pulse at Hebbian-style strengths — nearby nodes with synchronized phases reinforce their
+            bond. This is the cross-factor plasticity model: all three inputs share a common network topology.
+          </p>
+          <NeuroplasticityCanvas />
+        </div>
       </div>
 
       {/* Body */}

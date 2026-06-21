@@ -241,6 +241,37 @@ function FogletCanvas({ density, bioActivity, calcRate, porosity, simMode }:
   );
 }
 
+function FogletHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const particles: {x:number;y:number;vx:number;vy:number;r:number;col:string}[] = [];
+    for (let i=0;i<80;i++) particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*0.4,vy:(Math.random()-.5)*0.2,r:1+Math.random()*3,col:i<40?"rgba(31,168,212,0.7)":"rgba(210,190,150,0.6)"});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      particles.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
+        const glow=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*3);
+        glow.addColorStop(0,p.col); glow.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r*3,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle=p.col; ctx.fill();
+      });
+      ctx.fillStyle="rgba(31,168,212,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("FOGLET SANDSTONE · BIO-CALCIFICATION · FOGLET SWARM · MINERAL SUBSTRATE · AETHER",12,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function FogletSandstonePage() {
   const [density,     setDensity]     = useState(700);
   const [bioActivity, setBioActivity] = useState(55);
@@ -250,6 +281,13 @@ export default function FogletSandstonePage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #1fa8d4",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#1fa8d4",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #1fa8d4",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#1fa8d4",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FOGLET SANDSTONE · BIO-CALCIFICATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(31,168,212,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Foglet swarm particles drifting through mineral substrate — live AETHER simulation.</p></div>
+          <FogletHeaderCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#080503 0%,#060402 50%,#020408 100%)",

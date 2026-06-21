@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -404,15 +404,60 @@ function IntegratedSensoriumGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function ImplicateCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 155;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<12;i++){
+        const phase=t*0.015+i*(Math.PI*2/12);
+        const r=20+i*5;
+        const alpha=0.08+0.1*Math.sin(t*0.02+i*0.5);
+        ctx.beginPath(); ctx.arc(cx,cy,r,phase,phase+Math.PI*1.5);
+        ctx.strokeStyle=`rgba(46,240,216,${alpha})`; ctx.lineWidth=1; ctx.stroke();
+        const endX=cx+r*Math.cos(phase+Math.PI*1.5),endY=cy+r*Math.sin(phase+Math.PI*1.5);
+        ctx.beginPath(); ctx.arc(endX,endY,2,0,Math.PI*2); ctx.fillStyle="rgba(46,240,216,0.5)"; ctx.fill();
+      }
+      for(let i=0;i<6;i++){
+        const a=t*0.012+i*(Math.PI/3);
+        const r2=70+15*Math.sin(t*0.018+i);
+        ctx.beginPath(); ctx.arc(cx+r2*Math.cos(a),cy+r2*Math.sin(a),4,0,Math.PI*2);
+        ctx.fillStyle=`rgba(201,168,76,${0.6+0.4*Math.sin(t*0.03+i)})`; ctx.fill();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("IMPLICATE ORDER · BOHM · ENFOLDED WHOLENESS · EXPLICATE UNFOLD · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ImplicateOrderPage() {
   return (
     <div
       data-testid="page-implicate-order"
       style={{
+
         background: B.bg, color: B.ink, minHeight: "100vh",
         padding: "40px 32px 80px", fontFamily: "Inter, sans-serif",
       }}
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>IMPLICATE ORDER · BOHM · ENFOLDED WHOLENESS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 spiraling arcs + 6 orbiting nodes — the live AETHER implicate order simulation.</p></div>
+          <ImplicateCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>

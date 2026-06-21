@@ -152,6 +152,97 @@ const GROUP_COLORS: Record<Group, string> = {
 
 type ViewId = "mindmap" | "shells" | "dof";
 
+function ShellSpiralCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 360;
+  const SHELLS = [
+    { color:"#2dd4bf", name:"DM", k:0.10 },
+    { color:"#5eead4", name:"GM", k:0.12 },
+    { color:"#d4a843", name:"AM", k:0.14 },
+    { color:"#f97316", name:"HM", k:0.16 },
+    { color:"#8b5cf6", name:"QM", k:0.18 },
+    { color:"#f472b6", name:"LM", k:0.20 },
+    { color:"#22d3ee", name:"BM", k:0.22 },
+    { color:"#a3e635", name:"CM", k:0.24 },
+    { color:"#fb923c", name:"SM", k:0.26 },
+    { color:"#e879f9", name:"ΩM", k:0.28 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#06090f"; ctx.fillRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const rotOffset = tRef.current * 0.003;
+      SHELLS.forEach((s, i) => {
+        const turns = 3.2;
+        const pts: [number, number][] = [];
+        for (let step = 0; step <= 600; step++) {
+          const frac = step / 600;
+          const theta = frac * turns * Math.PI * 2 + rotOffset;
+          const r = Math.exp(s.k * theta) * 1.8;
+          pts.push([cx + r * Math.cos(theta - i * 0.22), cy + r * Math.sin(theta - i * 0.22)]);
+        }
+        const alpha = 0.55 + 0.35 * Math.sin(tRef.current * 0.02 + i * 0.7);
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let p = 1; p < pts.length; p++) ctx.lineTo(pts[p][0], pts[p][1]);
+        ctx.strokeStyle = s.color + Math.round(alpha * 255).toString(16).padStart(2,"0");
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        const last = pts[pts.length - 1];
+        ctx.fillStyle = s.color;
+        ctx.beginPath();
+        ctx.arc(last[0], last[1], 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = s.color;
+        ctx.font = "9px 'Space Mono', monospace";
+        ctx.fillText(s.name, last[0] + 5, last[1] + 3);
+      });
+      ctx.fillStyle = "#9AA3B8";
+      ctx.font = "9px 'Space Mono', monospace";
+      ctx.fillText("SHELLS · MATHEMATICAL MEANS · LOGARITHMIC SPIRALS", 12, H - 10);
+      tRef.current += 1;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function ShellsMindMapHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<60;i++){
+        const angle=i*0.52+t*0.008;
+        const r=i*1.2;
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.55;
+        ctx.beginPath();ctx.arc(x,y,1.5+i*0.012,0,Math.PI*2);ctx.fillStyle=`rgba(201,168,76,${0.1+i*0.008})`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SHELLS · MIND MAP · FIBONACCI · SPIRAL · GOLDEN RATIO · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ShellsMindMapView() {
   const [view, setView] = useState<ViewId>("mindmap");
   const [a, setA] = useState(3);
@@ -222,6 +313,13 @@ export default function ShellsMindMapView() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: '"DM Mono", monospace' }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SHELLS · MIND MAP · FIBONACCI · SPIRAL · GOLDEN RATIO · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Golden spiral shell — the live AETHER shells mind map simulation.</p></div>
+          <ShellsMindMapHeaderCanvas />
+        </div>
+      </div>
       {/* HERO */}
       <header className="text-center px-6 pt-12 pb-8 relative overflow-hidden">
         <div aria-hidden className="absolute inset-x-0 -top-32 mx-auto pointer-events-none"
@@ -247,6 +345,25 @@ export default function ShellsMindMapView() {
           </div>
         </div>
       </header>
+
+      <div className="px-6 pb-6" style={{ maxWidth: 920, margin: "0 auto", width: "100%" }}>
+        <div style={{ display:"inline-block", background:"rgba(45,212,191,0.08)", border:"1px solid rgba(45,212,191,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:C.teal, textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:C.card, border:`1px solid rgba(45,212,191,0.12)`, borderLeft:`3px solid ${C.teal}`,
+          borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:'"Cormorant Garamond",serif', fontSize:18, color:C.text, margin:"0 0 6px" }}>
+            Logarithmic Spirals · All 10 Mathematical Shells
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:C.text2, margin:"0 0 14px", lineHeight:1.65 }}>
+            Each shell is a logarithmic spiral r = e^(k·θ) with a different growth constant k. They rotate slowly,
+            offset by their shell index — like a nautilus cross-section revealing all ten mathematical means at once.
+          </p>
+          <ShellSpiralCanvas />
+        </div>
+      </div>
 
       {/* TABS */}
       <div className="sticky top-0 z-30 flex justify-center gap-0 border-b overflow-x-auto"

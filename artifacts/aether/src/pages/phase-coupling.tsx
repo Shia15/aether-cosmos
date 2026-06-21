@@ -204,6 +204,42 @@ function KuramotoCanvas({ K, N, mode }: { K: number; N: number; mode: string }) 
   return <canvas ref={cvs} style={{ width: "100%", display: "block", borderRadius: 8, border: `1px solid ${ACCENT}18` }} />;
 }
 
+function PhaseCouplingHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const N=12;
+    const phases: number[] = Array.from({length:N},(_,i)=>i*(Math.PI*2/N));
+    const cx=W/2,cy=H/2,r=50;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const K=0.08;
+      for(let i=0;i<N;i++){
+        let dph=0;
+        for(let j=0;j<N;j++) dph+=K*Math.sin(phases[j]-phases[i]);
+        phases[i]+=0.03+dph*0.04;
+      }
+      for(let i=0;i<N;i++){
+        const x=cx+Math.cos(phases[i])*r*2.2,y=cy+Math.sin(phases[i])*r*0.65;
+        ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);
+        ctx.fillStyle=`hsla(${i*30},80%,60%,0.5)`;ctx.fill();
+        ctx.strokeStyle=`hsla(${i*30},80%,60%,0.8)`;ctx.lineWidth=0.7;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PHASE COUPLING · KURAMOTO SYNC · OSCILLATOR NETWORK · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhaseCouplingPage() {
   const [K, setK]       = useState(1.2);
   const [N, setN]       = useState(24);
@@ -211,6 +247,13 @@ export default function PhaseCouplingPage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PHASE COUPLING · KURAMOTO SYNC · OSCILLATOR NETWORK · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 Kuramoto oscillators synchronizing — the live AETHER phase coupling simulation.</p></div>
+          <PhaseCouplingHeaderCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#040a06 0%,#030a14 50%,#020408 100%)",

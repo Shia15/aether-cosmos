@@ -334,10 +334,70 @@ const NAV = [
   { id: "s7", label: "Morphic Field" },   { id: "s8", label: "AETHER" },
 ];
 
+function BiomagnetismCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const fieldLines = 12;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.15)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let f=0;f<fieldLines;f++) {
+        const ang=(f/fieldLines)*Math.PI*2+t*0.005;
+        for (let r=20;r<W*0.48;r+=8) {
+          const wobble=Math.sin(ang*3+r*0.04+t*0.04)*10;
+          const px=cx+Math.cos(ang)*r, py=cy+Math.sin(ang)*r+wobble*(r/120);
+          const intensity=1-r/(W*0.48);
+          const hue=((f/fieldLines)*180+180)%360;
+          ctx.beginPath(); ctx.arc(px,py,1.2,0,Math.PI*2);
+          ctx.fillStyle=`hsla(${hue},90%,65%,${intensity*0.7})`;
+          ctx.shadowColor=`hsl(${hue},90%,65%)`; ctx.shadowBlur=4; ctx.fill(); ctx.shadowBlur=0;
+        }
+      }
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,22);
+      gc.addColorStop(0,"#ffffffcc"); gc.addColorStop(0.5,"#a78bfa88"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,20+2*Math.sin(t*0.05),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#a78bfa"; ctx.shadowBlur=24; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(167,139,250,0.45)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIOMAGNETISM · MAGNETIC FIELD LINES · HUMAN MAGNETIZATION · NON-PHYSICAL PHENOMENA",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BiomagnetismPage() {
   const [mode, setMode] = useState<Mode>("fieldmap");
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(167,139,250,0.07)", border:"1px solid rgba(167,139,250,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#a78bfa", textTransform:"uppercase", fontFamily:mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(167,139,250,0.1)",
+          borderLeft:"3px solid #a78bfa", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:serif, fontSize:18, color:"#e8e0ff", margin:"0 0 6px" }}>
+            Biomagnetism · Magnetic Field Lines · Human Magnetization · Non-Physical Phenomena
+          </h2>
+          <p style={{ fontFamily:body, fontSize:12, color:"rgba(200,195,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Twelve rotating magnetic field lines emanating from a central human-body dipole, each line wobbling as the
+            angular momentum sweeps through a full chromatic HSL spectrum — the live AETHER biomagnetism field model
+            mapping human magnetization patterns and non-physical interactions.
+          </p>
+          <BiomagnetismCanvas />
+        </div>
+      </div>
+
       <div style={{ padding: "66px 28px 42px", textAlign: "center", background: "linear-gradient(180deg,#030a14 0%,#020408 100%)", borderBottom: `1px solid ${TOUCH}18` }}>
         <div style={{ fontFamily: mono, fontSize: 10, color: TOUCH, letterSpacing: 4, marginBottom: 12 }}>AETHER · BIOMAGNETISM · NON-PHYSICAL PHENOMENA</div>
         <h1 style={{ fontFamily: serif, fontSize: "clamp(18px,3.8vw,38px)", color: "#fff", margin: "0 0 10px", letterSpacing: 2, lineHeight: 1.15 }}>

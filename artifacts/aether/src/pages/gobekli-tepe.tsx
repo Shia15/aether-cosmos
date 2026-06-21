@@ -177,6 +177,44 @@ function drawEngine(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+function GobekliCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    const pillars: {x:number;y:number;r:number}[] = [];
+    for (let i=0;i<12;i++) { const a=(i/12)*Math.PI*2; pillars.push({x:W/2+Math.cos(a)*120,y:H/2+Math.sin(a)*55,r:8}); }
+    pillars.push({x:W/2-30,y:H/2,r:12},{x:W/2+30,y:H/2,r:12});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<12;i++){
+        const pa=pillars[i],pb=pillars[(i+1)%12];
+        const pls=0.3+0.3*Math.sin(t*0.02+i*0.5);
+        ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y);
+        ctx.strokeStyle=`rgba(212,168,67,${pls})`; ctx.lineWidth=1; ctx.stroke();
+      }
+      pillars.forEach((p,i)=>{
+        const pls=0.6+0.4*Math.sin(t*0.025+i*0.7);
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${pls*0.8})`; ctx.fill();
+        ctx.strokeStyle=`rgba(212,168,67,${pls})`; ctx.lineWidth=1; ctx.stroke();
+      });
+      const sunX=W/2+Math.cos(t*0.012)*80,sunY=40+Math.sin(t*0.012)*15;
+      ctx.beginPath(); ctx.arc(sunX,sunY,8,0,Math.PI*2); ctx.fillStyle="rgba(201,168,76,0.8)"; ctx.fill();
+      ctx.fillStyle="rgba(212,168,67,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GÖBEKLI TEPE · ENCLOSURE D · PILLAR RING · SOLAR ALIGNMENT · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GobekliTepePage() {
   const [tab, setTab] = useState<"engine"|"physics"|"computation">("engine");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -216,6 +254,13 @@ export default function GobekliTepePage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #d4a843",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#d4a843",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #d4a843",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#d4a843",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GÖBEKLI TEPE · PILLAR RING · SOLAR ALIGNMENT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(212,168,67,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Twelve-pillar enclosure D with solar transit — the live AETHER Göbekli Tepe simulation.</p></div>
+          <GobekliCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="border-b border-amber-900/30 px-6 py-4 sticky top-0 z-20"
         style={{ background: C.panel + "ee" }}>

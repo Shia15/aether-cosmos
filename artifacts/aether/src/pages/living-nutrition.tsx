@@ -314,9 +314,54 @@ function GrowthGridSim() {
   );
 }
 
+function LivingNutritionCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const nutrients=[
+      {label:"Zn",col:"#2ef0d8"},{label:"Mg",col:"#9966ff"},{label:"Fe",col:"#c9a84c"},
+      {label:"B12",col:"#ff4477"},{label:"K",col:"#44aaff"},{label:"Ca",col:"#44cc77"},
+    ];
+    const nodes=nutrients.map((n,i)=>({...n,x:W*(i+0.8)/7,y:H*0.5,vy:(Math.random()-0.5)*0.5}));
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach((a,i)=>{
+        a.y+=a.vy+Math.sin(t*0.02+i)*0.3; a.vy*=0.99;
+        if(a.y<20)a.vy=0.5; if(a.y>H-20)a.vy=-0.5;
+        nodes.slice(i+1).forEach(b=>{
+          const d=Math.hypot(a.x-b.x,a.y-b.y);
+          if(d<160){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(255,255,255,${(1-d/160)*0.06})`;ctx.lineWidth=0.5;ctx.stroke();}
+        });
+        const pls=0.8+0.2*Math.sin(t*0.035+i);
+        ctx.beginPath();ctx.arc(a.x,a.y,14*pls,0,Math.PI*2);ctx.fillStyle=a.col+"55";ctx.fill();
+        ctx.strokeStyle=a.col+"88";ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle=a.col;ctx.font="bold 9px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(a.label,a.x,a.y+3);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("LIVING NUTRITION · MINERAL FLOW · BIOAVAILABILITY · COHERENT DIET · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function LivingNutritionPage() {
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #1fa8d4",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#1fa8d4",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #1fa8d4",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#1fa8d4",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LIVING NUTRITION · MINERAL FLOW · BIOAVAILABILITY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(31,168,212,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 mineral nodes (Zn Mg Fe B12 K Ca) in coherent drift — live AETHER nutrition simulation.</p></div>
+          <LivingNutritionCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#020a04 0%,#030e10 50%,#020408 100%)",

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight, RotateCcw, Sunrise } from "lucide-react";
 import eggsLineup from "@assets/ChatGPT_Image_Apr_25,_2026,_04_58_54_PM_1777150792841.png";
@@ -319,6 +319,42 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
   );
 }
 
+function TerraformSunriseHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      const progress=(Math.sin(t*0.015)*0.5+0.5);
+      const skyR=Math.round(2+progress*20),skyG=Math.round(4+progress*30),skyB=Math.round(8+progress*40);
+      ctx.fillStyle=`rgba(${skyR},${skyG},${skyB},0.1)`;ctx.fillRect(0,0,W,H);
+      const sx=W*0.5,sy=H-20-progress*70;
+      const sunR=18+4*Math.sin(t*0.03);
+      const grd=ctx.createRadialGradient(sx,sy,0,sx,sy,sunR*3);
+      grd.addColorStop(0,"rgba(255,180,60,0.8)");grd.addColorStop(0.4,"rgba(255,120,30,0.2)");grd.addColorStop(1,"rgba(255,60,10,0)");
+      ctx.fillStyle=grd;ctx.fillRect(sx-sunR*3,sy-sunR*3,sunR*6,sunR*6);
+      ctx.beginPath();ctx.arc(sx,sy,sunR,0,Math.PI*2);ctx.fillStyle="rgba(255,200,80,0.9)";ctx.fill();
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=4){
+        const y=H-8+4*Math.sin(x*0.05+t*0.03);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle="rgba(30,60,30,0.4)";ctx.fill();
+      ctx.fillStyle="rgba(255,160,40,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("TERRAFORM SUNRISE · PLANETARY ENGINEERING · TERRAFORMING · NEW DAWN · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function TerraformSunrisePage() {
   const [agentKey, setAgentKey] = useState<AgentKey | null>(null);
   const [grid, setGrid] = useState<(BiomeKey | null)[]>(() => Array(CELLS).fill(null));
@@ -358,6 +394,13 @@ export default function TerraformSunrisePage() {
   return (
     <div data-testid="terraform-sunrise-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TERRAFORM SUNRISE · PLANETARY ENGINEERING · TERRAFORMING · NEW DAWN · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Animated sunrise + terrain — the live AETHER terraform simulation.</p></div>
+            <TerraformSunriseHeaderCanvas />
+          </div>
+        </div>
 
         {/* Hero */}
         <div style={{ marginBottom: 22 }}>

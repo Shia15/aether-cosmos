@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import img_unifiedLang from "@assets/9FBE865E-F140-4465-B288-2F0A1946B597_1781446726264.png";
 import img_calligraphyAlpha from "@assets/09ACA4A4-A258-4D5C-ACDB-91B90CFE8198_1781446726264.png";
 import img_compoundCurves from "@assets/29D9BA8E-F00A-4748-A728-1B193429B39E_1781446726264.png";
@@ -511,11 +511,49 @@ function HandTab() {
   );
 }
 
+function MotionLanguageCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const glyphs="AΩ∂∫ΦΨΘΛΣΔαβγδεζ".split("");
+    const streams: {x:number;y:number;vy:number;glyph:string;col:string;opacity:number}[] = [];
+    for(let i=0;i<18;i++) streams.push({x:Math.random()*W,y:Math.random()*H,vy:0.8+Math.random()*1.5,glyph:glyphs[Math.floor(Math.random()*glyphs.length)],col:["#2ef0d8","#9966ff","#a78bfa","#c9a84c"][Math.floor(Math.random()*4)],opacity:0.4+Math.random()*0.5});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      streams.forEach(s=>{
+        s.y+=s.vy; if(s.y>H+20){s.y=-20;s.x=Math.random()*W;s.glyph=glyphs[Math.floor(Math.random()*glyphs.length)];}
+        if(t%40===0)s.glyph=glyphs[Math.floor(Math.random()*glyphs.length)];
+        ctx.font=`bold 14px 'DM Mono',monospace`;ctx.fillStyle=s.col+Math.round(s.opacity*255).toString(16).padStart(2,"0");
+        ctx.textAlign="center";ctx.fillText(s.glyph,s.x,s.y);ctx.textAlign="left";
+        ctx.beginPath();ctx.moveTo(s.x,s.y-10);ctx.lineTo(s.x,s.y-40);ctx.strokeStyle=s.col+"22";ctx.lineWidth=0.5;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(167,139,250,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("MOTION LANGUAGE · PROPULSION · CALLIGRAPHY · UNIFIED GRAMMAR · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MotionLanguagePage() {
   const [tab, setTab] = useState("alphabet");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui,sans-serif" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #a78bfa",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#a78bfa",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #a78bfa",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#a78bfa",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MOTION LANGUAGE · PROPULSION · CALLIGRAPHY · UNIFIED GRAMMAR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(167,139,250,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 falling glyph streams — the live AETHER motion language simulation.</p></div>
+          <MotionLanguageCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1rem" }}>
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
           <h1 style={{ fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 900, background: "linear-gradient(135deg,#a78bfa,#06b6d4,#22c55e,#f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: "0 0 0.5rem" }}>

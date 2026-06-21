@@ -300,6 +300,43 @@ function LayerCanvas({ t, loopClosure }: { t: number; loopClosure: number }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
+function CucaClosedLoopCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,8,18,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for(let i=0;i<3;i++){
+        const r=30+i*22, speed=0.015+i*0.008;
+        const x=cx+r*Math.cos(t*speed+i*2), y=cy+r*Math.sin(t*speed*0.7+i*2);
+        const g=ctx.createRadialGradient(x,y,0,x,y,10);
+        const col=i===0?"#2ef0d8":i===1?"#9966ff":"#44cc77";
+        g.addColorStop(0,col+"aa"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=col+"1a"; ctx.lineWidth=1; ctx.stroke();
+      }
+      const r2=80; const ang2=t*0.008;
+      const feedbackPts=[[cx+r2*Math.cos(ang2),cy+r2*Math.sin(ang2)],[cx+r2*Math.cos(ang2+Math.PI*2/3),cy+r2*Math.sin(ang2+Math.PI*2/3)],[cx+r2*Math.cos(ang2+Math.PI*4/3),cy+r2*Math.sin(ang2+Math.PI*4/3)]];
+      ctx.beginPath(); ctx.moveTo(feedbackPts[0][0],feedbackPts[0][1]); ctx.lineTo(feedbackPts[1][0],feedbackPts[1][1]); ctx.lineTo(feedbackPts[2][0],feedbackPts[2][1]); ctx.closePath();
+      ctx.strokeStyle="rgba(46,240,216,0.12)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CUCA CLOSED LOOP · MORPHOGENETIC FEEDBACK · GYROID · BIO-HYBRID SKIN · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CucaClosedLoopPage() {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const tickRef     = useRef(0);
@@ -447,6 +484,18 @@ export default function CucaClosedLoopPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden" }}>
+      <div style={{ padding:"16px 24px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,8,18,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            CUCA Closed Loop · Morphogenetic Feedback · Gyroid · Bio-Hybrid Skin · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Three-orbit feedback loop with rotating triangular coherence scaffold — the live AETHER CUCA morphogenetic closed-loop simulation.
+          </p>
+          <CucaClosedLoopCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ padding: "6px 16px", borderBottom: "1px solid rgba(0,255,136,0.1)", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>

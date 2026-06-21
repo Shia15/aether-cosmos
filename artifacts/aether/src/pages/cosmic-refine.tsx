@@ -22,6 +22,50 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
 
 type DMParticle = { x: number; y: number; vx: number; vy: number; m: number };
 
+function CosmicRefineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const pts: {ang:number,r:number,phase:number,col:string}[]=[];
+    for(let i=0;i<24;i++) pts.push({ ang:i*(Math.PI*2/24), r:60+Math.random()*20, phase:Math.random()*Math.PI*2, col:`hsl(${220+i*6},70%,60%)` });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      ctx.beginPath();
+      pts.forEach((p,i)=>{
+        const psi=0.5+0.5*Math.sin(t*0.03+p.phase);
+        const r=p.r*(0.8+0.2*psi);
+        const x=cx+r*Math.cos(p.ang), y=cy+r*Math.sin(p.ang);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.closePath();
+      ctx.strokeStyle="rgba(46,240,216,0.3)"; ctx.lineWidth=1.5; ctx.stroke();
+      pts.forEach(p=>{
+        const psi=0.5+0.5*Math.sin(t*0.03+p.phase);
+        const r=p.r*(0.8+0.2*psi);
+        const x=cx+r*Math.cos(p.ang), y=cy+r*Math.sin(p.ang);
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      });
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,18);
+      g.addColorStop(0,"rgba(46,240,216,0.5)"); g.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,16,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COSMIC REFINE · SPECTRAL ANALYSIS · ELEMENT SYNTHESIS · STELLAR REFINEMENT · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CosmicRefinePage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("hubble");
@@ -568,6 +612,18 @@ export default function CosmicRefinePage() {
 
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Cosmic Refine · Spectral Analysis · Element Synthesis · Stellar Refinement · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            24-point morphing spectral polygon pulsing and breathing around a teal coherence core — the live AETHER cosmic refinement simulation.
+          </p>
+          <CosmicRefineCanvas />
+        </div>
+      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · cosmology refinement · hubble · CMB · inflation · dark matter

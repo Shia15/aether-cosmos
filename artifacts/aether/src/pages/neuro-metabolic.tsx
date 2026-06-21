@@ -921,9 +921,48 @@ function Card({ col, eyebrow, title, body: bd }: { col:string; eyebrow:string; t
 /* ══════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════ */
+function NeuroMetabolicHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const molecules: {x:number;y:number;vx:number;vy:number;col:string;r:number}[] = [];
+    for(let i=0;i<24;i++) molecules.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.6,vy:(Math.random()-0.5)*0.6,col:["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff"][Math.floor(Math.random()*5)],r:3+Math.random()*5});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      molecules.forEach((m,i)=>{
+        m.x=(m.x+m.vx+W)%W; m.y=(m.y+m.vy+H)%H;
+        molecules.slice(i+1).forEach(n=>{
+          const d=Math.hypot(n.x-m.x,n.y-m.y);
+          if(d<60){ctx.beginPath();ctx.moveTo(m.x,m.y);ctx.lineTo(n.x,n.y);ctx.strokeStyle=m.col+"22";ctx.lineWidth=0.4;ctx.stroke();}
+        });
+        const pls=0.85+0.15*Math.sin(t*0.05+i);
+        ctx.beginPath();ctx.arc(m.x,m.y,m.r*pls,0,Math.PI*2);ctx.fillStyle=m.col+"55";ctx.fill();ctx.strokeStyle=m.col+"99";ctx.lineWidth=0.6;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NEURO-METABOLIC · REWARD CIRCUIT · METABOLIC WAVE · NEURO-IMMUNE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NeuroMetabolicPage() {
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEURO-METABOLIC · REWARD CIRCUIT · METABOLIC WAVE · NEURO-IMMUNE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>24 metabolic molecules in live drift — the AETHER neuro-metabolic simulation.</p></div>
+          <NeuroMetabolicHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"56px 24px 32px",
         background:`radial-gradient(ellipse 80% 60% at 50% 0%,

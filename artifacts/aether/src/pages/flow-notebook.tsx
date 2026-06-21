@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 
 type IlluKind = "blank" | "meetflow" | "question" | "thread" | "hardpage" | "mapfill" | "share" | "invite";
@@ -541,6 +541,45 @@ function EndPage() {
   );
 }
 
+function FlowNotebookCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 150;
+    const W = canvas.width, H = canvas.height;
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle="rgba(248,244,236,0.15)"; ctx.fillRect(0,0,W,H);
+      const lines = 5;
+      for (let i=0; i<lines; i++) {
+        const y = H*(0.2+i*0.16);
+        const ink = 0.3+0.7*Math.sin(t*0.025+i*0.7);
+        ctx.beginPath();
+        for (let px=0; px<W; px++) {
+          const wave = Math.sin(px*0.025+t*0.02+i*1.2)*8+Math.sin(px*0.008+t*0.015)*5;
+          const yy = y+wave*ink;
+          px===0?ctx.moveTo(px,yy):ctx.lineTo(px,yy);
+        }
+        ctx.strokeStyle=`rgba(100,80,50,${0.15+0.35*ink})`; ctx.lineWidth=1; ctx.stroke();
+      }
+      const notes=[{x:80,y:55,col:"#9966ff"},{x:320,y:80,col:"#2ef0d8"},{x:600,y:45,col:"#c9a84c"},{x:820,y:70,col:"#ff4477"}];
+      notes.forEach(n=>{
+        const pls=0.8+0.2*Math.sin(t*0.04+n.x*0.01);
+        ctx.beginPath(); ctx.arc(n.x,n.y,5*pls,0,Math.PI*2);
+        ctx.fillStyle=n.col+"cc"; ctx.fill();
+      });
+      ctx.fillStyle="rgba(100,80,50,0.35)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("FLOW NOTEBOOK · MEET FLOW · THREAD · HARD PAGE · MAP FILL · AETHER",12,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function FlowNotebookPage() {
   const [page, setPage] = useState(0);
   const [fading, setFading] = useState(false);
@@ -583,6 +622,14 @@ export default function FlowNotebookPage() {
         @keyframes star-twinkle { from{opacity:0.3; transform:scale(0.8);} to{opacity:1; transform:scale(1.1);} }
         @keyframes cb-fade-in { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
       `}</style>
+
+      <div style={{width:"100%",maxWidth:720,flexShrink:0,marginBottom:16}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(1,8,16,0.9)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FLOW NOTEBOOK · MEET FLOW · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Animated ink lines and page-flow nodes — the live AETHER notebook simulation.</p></div>
+          <FlowNotebookCanvas />
+        </div>
+      </div>
 
       <div style={{ width: "100%", maxWidth: 720, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <Link href="/aether-childrens-realm" style={{

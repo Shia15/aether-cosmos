@@ -26,6 +26,56 @@ interface ExciState { amp: number[]; phase: number[]; }
 interface ProtonPkt { x: number; e: number; alive: boolean; tunneled: boolean; }
 interface LogEntry { ts: string; mode: string; msg: string; col: string; }
 
+function BiomimeticCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const sites = 7;
+    const cx=W/2;
+    const nodes = Array.from({length:sites},(_, i)=>({
+      x: cx-((sites-1)/2)*110+i*110, y:H/2,
+      col:["#2ef0d8","#a78bfa","#f59e0b","#34d399","#60a5fa","#f472b6","#ff8844"][i],
+      label:["PHOTONIC","EXCITONIC","VIBRONIC","TUNNELING","COHERENCE","DECOHERE","HARVEST"][i],
+    }));
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<nodes.length-1;i++) {
+        const a=nodes[i],b=nodes[i+1];
+        const pkt=(t*0.015+i*0.3)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,3,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=9; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+      }
+      nodes.forEach((n,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+i*0.9);
+        const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,16*pulse);
+        g.addColorStop(0,n.col+"cc"); g.addColorStop(0.5,n.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=n.col; ctx.shadowBlur=16*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=n.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=n.col; ctx.font="bold 6.5px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+20*pulse);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIOMIMETIC QUANTUM · PHOTONIC · EXCITONIC · VIBRONIC · TUNNELING · COHERENCE → HARVEST",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BiomimeticQuantumPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef({
@@ -246,6 +296,26 @@ export default function BiomimeticQuantumPage() {
   return (
     <div className="min-h-screen p-6 md:p-10 font-mono text-sm" style={{ background: C.bg, color: C.text }} data-testid="page-biomimetic-quantum">
       <div className="max-w-7xl mx-auto">
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:C.photon, textTransform:"uppercase", fontFamily:"inherit", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(2,4,8,0.88)", border:"1px solid rgba(46,240,216,0.1)",
+            borderLeft:`3px solid ${C.photon}`, borderRadius:10, padding:20 }}>
+            <h2 className="font-mono" style={{ fontSize:18, color:C.text, margin:"0 0 6px" }}>
+              Biomimetic Quantum · Photonic → Excitonic → Vibronic → Tunneling → Coherence → Harvest
+            </h2>
+            <p className="font-mono" style={{ fontSize:12, color:"rgba(150,240,230,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Seven quantum biology process nodes (Photonic/teal · Excitonic/violet · Vibronic/amber · Tunneling/teal
+              · Coherence/blue · Decoherence/rose · Harvest/orange) in a linear cascade with photon coupling packets
+              streaming — the live biomimetic quantum energy-harvest pipeline.
+            </p>
+            <BiomimeticCanvas />
+          </div>
+        </div>
+
         <header className="mb-6">
           <div className="text-xs tracking-[0.4em] uppercase mb-2" style={{ color: C.photon }}>
             Biomimetic Quantum Computing

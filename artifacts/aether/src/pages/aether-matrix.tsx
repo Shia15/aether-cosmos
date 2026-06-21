@@ -473,6 +473,62 @@ function SH({ n, title, sub, col = TEAL }: { n: string; title: string; sub: stri
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function MatrixCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const nodes: {x:number;y:number;col:string;label:string;phase:number;vx:number;vy:number}[] = [];
+    const labels=["ENTROPY","COHERENCE","KURAMOTO","SIGIL","Φ(E,S)","K·FIELD","MNESIS","ALETHEIA"];
+    const cols=["#ff4477","#2ef0d8","#9966ff","#c9a84c","#44aaff","#44cc77","#c084fc","#f472b6"];
+    for (let i=0;i<8;i++) {
+      nodes.push({ x:80+Math.random()*(W-160), y:40+Math.random()*(H-80), col:cols[i], label:labels[i],
+        phase:Math.random()*Math.PI*2, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.3 });
+    }
+    const links: [number,number][] = [[0,4],[1,4],[2,4],[3,4],[4,5],[4,6],[4,7],[0,2],[1,3]];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      nodes.forEach(n=>{
+        n.x+=n.vx; n.y+=n.vy;
+        if (n.x<50||n.x>W-50) n.vx*=-1;
+        if (n.y<30||n.y>H-30) n.vy*=-1;
+      });
+      links.forEach(([a,b])=>{
+        const na=nodes[a],nb=nodes[b];
+        const g=ctx.createLinearGradient(na.x,na.y,nb.x,nb.y);
+        g.addColorStop(0,na.col+"44"); g.addColorStop(1,nb.col+"44");
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+        const flow=(t*0.014+(a+b)*0.3)%1;
+        const px=na.x+(nb.x-na.x)*flow, py=na.y+(nb.y-na.y)*flow;
+        ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+      });
+      nodes.forEach(n=>{
+        const pulse=1+0.1*Math.sin(t*0.04+n.phase);
+        const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,16*pulse);
+        g.addColorStop(0,n.col+"cc"); g.addColorStop(0.5,n.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=n.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=n.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+18*pulse);
+      });
+      ctx.fillStyle="rgba(153,102,255,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER CREATIVE MATRIX · Φ(E,S) = K · KURAMOTO FIELD · SIGIL CRYSTALLIZATION",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherMatrixPage() {
   const [input,     setInput]    = useState("");
   const [analysis,  setAnalysis] = useState<Analysis | null>(null);
@@ -503,6 +559,26 @@ export default function AetherMatrixPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{ padding:"16px 24px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(153,102,255,0.08)", border:"1px solid rgba(153,102,255,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:VIO, textTransform:"uppercase", fontFamily:mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,7,14,0.85)", border:"1px solid rgba(153,102,255,0.12)",
+          borderLeft:`3px solid ${VIO}`, borderRadius:10, padding:20, marginBottom:12 }}>
+          <h2 style={{ fontFamily:serif, fontSize:18, color:"#fff", margin:"0 0 6px" }}>
+            AETHER Creative Matrix · Φ(E,S) = K · Kuramoto Field · Sigil Crystallization
+          </h2>
+          <p style={{ fontFamily:body, fontSize:12, color:`${TEAL}88`, margin:"0 0 14px", lineHeight:1.65 }}>
+            Eight floating concept nodes (Entropy · Coherence · Kuramoto · Sigil · Φ(E,S) · K·Field · Mnesis · Aletheia)
+            drifting in slow orbital motion with flow-packet links — the living AETHER generative matrix
+            topology with each node's isomorphism field pulsing in phase.
+          </p>
+          <MatrixCanvas />
+        </div>
+      </div>
+
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 32px",
         background:`radial-gradient(ellipse 80% 60% at 50% 0%, ${VIO}09, ${TEAL}04, transparent)` }}>

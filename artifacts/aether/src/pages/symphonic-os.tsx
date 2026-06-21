@@ -44,6 +44,36 @@ interface Sig { x: number; y: number; vx: number; vy: number; layer: number; lif
 interface LogEntry { ts: string; layer: string; msg: string; col: string; }
 type Viz = "torus" | "tetra" | "wave";
 
+function SymphonicOSHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const bars=40;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let b=0;b<bars;b++){
+        const x=b/bars*W;
+        const h=(H*0.5)*Math.abs(Math.sin(b*0.3+t*0.06)+0.3*Math.sin(b*0.7+t*0.04));
+        const alpha=0.1+0.2*(h/(H*0.5));
+        const col=b%3===0?"#9966ff":b%3===1?"#2ef0d8":"#c9a84c";
+        ctx.fillStyle=col+Math.round(alpha*255).toString(16).padStart(2,"0");
+        ctx.fillRect(x+1,H/2-h/2,W/bars-2,h);
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SYMPHONIC OS · HARMONIC FIELD · RESONANCE · ORCHESTRATED COMPUTE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SymphonicOSPage() {
   const aqRef    = useRef<HTMLCanvasElement>(null);
   const torusRef = useRef<HTMLCanvasElement>(null);
@@ -274,6 +304,13 @@ export default function SymphonicOSPage() {
   return (
     <div data-testid="sym-os-root" className="min-h-screen p-6"
          style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SYMPHONIC OS · HARMONIC FIELD · RESONANCE · ORCHESTRATED COMPUTE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>40 harmonic frequency bars — the live AETHER symphonic OS simulation.</p></div>
+          <SymphonicOSHeaderCanvas />
+        </div>
+      </div>
 
       {/* HEADER */}
       <div className="border-b pb-5 mb-6 flex items-end justify-between gap-4 flex-wrap" style={{ borderColor: C.border2 }}>

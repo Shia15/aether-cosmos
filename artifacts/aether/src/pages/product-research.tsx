@@ -26,6 +26,44 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
   { key: "risks",       label: "Risk Register", sym: "▼", col: C.rose },
 ];
 
+function ProductResearchHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes: {x:number;y:number;r:number;phase:number;col:string;label:string}[]=[
+      {x:450,y:72,r:20,phase:0,col:"#2ef0d8",label:"AETHER"},
+      {x:200,y:40,r:12,phase:1,col:"#c9a84c",label:"MARKET"},
+      {x:700,y:40,r:12,phase:2,col:"#9966ff",label:"COMPETE"},
+      {x:150,y:110,r:10,phase:3,col:"#44cc77",label:"USERS"},
+      {x:350,y:115,r:10,phase:4,col:"#44aaff",label:"TRENDS"},
+      {x:550,y:115,r:10,phase:5,col:"#ff4477",label:"GAPS"},
+      {x:750,y:110,r:10,phase:6,col:"#c9a84c",label:"OPPS"},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.slice(1).forEach(n=>{
+        ctx.beginPath();ctx.moveTo(nodes[0].x,nodes[0].y);ctx.lineTo(n.x,n.y);ctx.strokeStyle=n.col+"22";ctx.lineWidth=0.5;ctx.stroke();
+      });
+      nodes.forEach(n=>{
+        const pls=0.85+0.15*Math.sin(t*0.04+n.phase);
+        ctx.beginPath();ctx.arc(n.x,n.y,n.r*pls,0,Math.PI*2);ctx.fillStyle=n.col+"22";ctx.fill();ctx.strokeStyle=n.col+"66";ctx.lineWidth=0.7;ctx.stroke();
+        ctx.fillStyle=n.col;ctx.font="5px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(n.label,n.x,n.y+2);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PRODUCT RESEARCH · MARKET MAP · OPPORTUNITY GRAPH · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ProductResearchPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("profile");
@@ -452,6 +490,13 @@ export default function ProductResearchPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PRODUCT RESEARCH · MARKET MAP · OPPORTUNITY GRAPH · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>7 market nodes — the live AETHER product research simulation.</p></div>
+          <ProductResearchHeaderCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[10px] tracking-[0.4em] uppercase mb-2" style={{ color: C.muted }}>
           AETHER · PRODUCT RESEARCH ENGINE · APRIL 2026

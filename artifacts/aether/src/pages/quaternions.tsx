@@ -196,6 +196,40 @@ function drawSlerpCanvas(ctx:CanvasRenderingContext2D,W:number,H:number,t:number
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+function QuaternionsHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const axes=[{col:"#ff4477",label:"i"},{col:"#2ef0d8",label:"j"},{col:"#c9a84c",label:"k"}];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      axes.forEach((ax,i)=>{
+        const angle=i/3*Math.PI*2+t*0.02;
+        const r=55;
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.5;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle=ax.col+"88";ctx.lineWidth=1.5;ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle=ax.col+"33";ctx.fill();ctx.strokeStyle=ax.col+"aa";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle=ax.col;ctx.font="bold 9px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(ax.label,x,y+3);ctx.textAlign="left";
+      });
+      for(let ring=1;ring<=3;ring++){
+        ctx.beginPath();ctx.arc(cx,cy,ring*18,0,Math.PI*2);ctx.strokeStyle=`rgba(153,102,255,${0.04+ring*0.03})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("QUATERNIONS · i · j · k · 4D ROTATION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QuaternionsPage() {
   const [tab, setTab] = useState<"burst"|"gimbal"|"algebra"|"slerp">("burst");
 
@@ -306,7 +340,13 @@ export default function QuaternionsPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{background:"#030514"}}>
-
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUATERNIONS · i · j · k · 4D ROTATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>3 rotating quaternion axes — the live AETHER quaternion simulation.</p></div>
+          <QuaternionsHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="border-b border-purple-900/40 px-6 py-4 sticky top-0 z-20" style={{background:"#030514ee"}}>
         <p className="text-[10px] tracking-[0.3em] text-purple-400/50 font-['Cinzel',serif] mb-0.5">

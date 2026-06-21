@@ -404,12 +404,47 @@ const NAV = [
   { id: "s7", label: "AETHER" },
 ];
 
+function TimeProcessingHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      [40,28,16].forEach((r,i)=>{
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(201,168,76,${0.06+i*0.04})`;ctx.lineWidth=0.4;ctx.stroke();
+        const handAngle=t*0.04*(i+1)-Math.PI/2;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(handAngle)*r,cy+Math.sin(handAngle)*r);ctx.strokeStyle=`rgba(201,168,76,${0.5-i*0.1})`;ctx.lineWidth=0.8-i*0.1;ctx.stroke();
+      });
+      const tickW=t*2%W;
+      ctx.beginPath();ctx.moveTo(tickW,20);ctx.lineTo(tickW,H-20);ctx.strokeStyle="rgba(201,168,76,0.12)";ctx.lineWidth=0.5;ctx.stroke();
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("TIME PROCESSING · TEMPORAL COHERENCE · CLOCK · CHRONON FIELD · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function TimeProcessingPage() {
   const [mode, setMode] = useState<Mode>("lattice");
 
   return (
     <div style={{ background: BG0, minHeight: "100vh", fontFamily: body, color: PALE }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TIME PROCESSING · TEMPORAL COHERENCE · CLOCK · CHRONON FIELD · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>3 concentric clocks + scanning tick — the live AETHER time processing simulation.</p></div>
+          <TimeProcessingHeaderCanvas />
+        </div>
+      </div>
       {/* ── HERO ─────────────────────────────────────────────────────── */}
       <div style={{ position: "relative", overflow: "hidden" }}>
         <div style={{

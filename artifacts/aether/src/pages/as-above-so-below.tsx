@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgIndex from "@assets/ChatGPT_Image_Apr_26,_2026,_02_27_06_PM_1777228044497.png";
@@ -87,10 +88,91 @@ const IMPACTS = [
   { c: B.amber,  k: "Tunguska airburst (1908 CE)", v: "Canonical low-density airburst · widespread forest flattening, no crater" },
 ];
 
+function AsAboveSoBelowCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2;
+    const above = [
+      { label:"SUN", col:"#fbbf24", x:W*0.18, y:H*0.28, r:20 },
+      { label:"PLANETS", col:"#a78bfa", x:W*0.36, y:H*0.25, r:15 },
+      { label:"STARS", col:"#93c5fd", x:W*0.54, y:H*0.28, r:13 },
+      { label:"COSMOS", col:"#c9a84c", x:W*0.72, y:H*0.25, r:12 },
+    ];
+    const below = [
+      { label:"EARTH", col:"#34d399", x:W*0.18, y:H*0.75, r:20 },
+      { label:"OCEANS", col:"#22d3ee", x:W*0.36, y:H*0.78, r:15 },
+      { label:"LIFE", col:"#f472b6", x:W*0.54, y:H*0.75, r:13 },
+      { label:"HUMAN", col:"#ff4477", x:W*0.72, y:H*0.78, r:12 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,5,18,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2);
+      ctx.strokeStyle="rgba(201,168,76,0.15)"; ctx.lineWidth=1; ctx.stroke();
+      for (let i=0;i<4;i++) {
+        const a=above[i],b=below[i];
+        const mirror=(t*0.012+i*0.4)%1;
+        const py=a.y+(b.y-a.y)*mirror;
+        ctx.beginPath(); ctx.arc(a.x,py,3,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"33"); g.addColorStop(0.5,"rgba(201,168,76,0.2)"); g.addColorStop(1,b.col+"33");
+        ctx.strokeStyle=g; ctx.lineWidth=0.8; ctx.stroke();
+      }
+      [...above,...below].forEach(n=>{
+        const pulse=1+0.08*Math.sin(t*0.035+n.x*0.005);
+        const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*2*pulse);
+        g.addColorStop(0,n.col+"cc"); g.addColorStop(0.5,n.col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=n.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=n.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        const isAbove=above.includes(n);
+        ctx.fillText(n.label,n.x,n.y+(isAbove?-n.r*pulse-5:n.r*pulse+11));
+      });
+      ctx.fillStyle="rgba(201,168,76,0.4)"; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("AS ABOVE",cx*0.44,H/2-8); ctx.fillText("SO BELOW",cx*0.44,H/2+16);
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AS ABOVE · SO BELOW · HERMETIC PRINCIPLE · MACRO↔MICRO RESONANCE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AsAboveSoBelowPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="as-above-so-below-page">
       <div className="max-w-5xl mx-auto">
+
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.gold, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(5,5,18,0.88)", border:"1px solid rgba(201,168,76,0.1)",
+            borderLeft:`3px solid ${B.gold}`, borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+              As Above · So Below · Hermetic Principle · Macro↔Micro Resonance Mirror
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Four celestial nodes above (Sun/gold · Planets/violet · Stars/blue · Cosmos/gold) mirrored below by
+              four earthly nodes (Earth/green · Oceans/cyan · Life/rose · Human/red) with vertical resonance link streams
+              crossing the golden horizon — the hermetic principle made live.
+            </p>
+            <AsAboveSoBelowCanvas />
+          </div>
+        </div>
 
         <header className="mb-10">
           <div className="text-[10.5px] uppercase tracking-[0.32em] mb-2"

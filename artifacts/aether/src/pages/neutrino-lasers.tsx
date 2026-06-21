@@ -91,9 +91,54 @@ const APPS = [
   { c: B.violet, k: "Global 'Golden Dome' monitoring",   v: "A speculative planetary-scale health monitoring layer using neutrino-class probes" },
 ];
 
+import { useEffect, useRef } from "react";
+
+function NeutrinoLasersCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const beams: {y:number;speed:number;col:string;width:number}[] = [];
+    for(let i=0;i<8;i++) beams.push({y:15+i*16,speed:1.5+Math.random()*2.5,col:["#2ef0d8","#9966ff","#44aaff","#c9a84c"][Math.floor(Math.random()*4)],width:0.5+Math.random()});
+    let px=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      beams.forEach((b,i)=>{
+        const offset=(px+i*57)%W;
+        const trail=120;
+        ctx.beginPath();
+        ctx.moveTo((offset-trail+W)%W,b.y);
+        ctx.lineTo(offset,b.y);
+        const grad=ctx.createLinearGradient((offset-trail+W)%W,0,offset,0);
+        grad.addColorStop(0,"transparent");grad.addColorStop(1,b.col+"cc");
+        ctx.strokeStyle=grad;ctx.lineWidth=b.width;ctx.stroke();
+        ctx.beginPath();ctx.arc(offset,b.y,2.5,0,Math.PI*2);ctx.fillStyle=b.col;ctx.fill();
+      });
+      px=(px+1.2)%W;
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("NEUTRINO LASERS · COHERENT PARTICLE BEAM · WEAK-FORCE LASING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function NeutrinoLasersPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="neutrino-lasers-page">
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEUTRINO LASERS · COHERENT PARTICLE BEAM · WEAK-FORCE LASING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 particle beams with gradient trails — the live AETHER neutrino laser simulation.</p></div>
+          <NeutrinoLasersCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

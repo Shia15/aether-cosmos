@@ -477,6 +477,54 @@ function Sl({ label, val, min, max, step, col, fmt, onChange }: {
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function UnderstandingStrandHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const nodes=12;
+      for(let i=0;i<nodes;i++){
+        const frac=i/(nodes-1);
+        const x=30+frac*(W-60);
+        const y1=cy()+30*Math.sin(frac*Math.PI*3+t*0.04);
+        const y2=cy()-30*Math.sin(frac*Math.PI*3+t*0.04);
+        ctx.beginPath();ctx.arc(x,y1,3,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.5)";ctx.fill();
+        ctx.beginPath();ctx.arc(x,y2,3,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.5)";ctx.fill();
+        if(i%2===0){
+          ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.strokeStyle="rgba(201,168,76,0.25)";ctx.lineWidth=0.8;ctx.stroke();
+        }
+      }
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=3){
+        const frac=x/W;
+        const y=cy()+30*Math.sin(frac*Math.PI*3+t*0.04);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle="rgba(46,240,216,0.3)";ctx.lineWidth=0.8;ctx.stroke();
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=3){
+        const frac=x/W;
+        const y=cy()-30*Math.sin(frac*Math.PI*3+t*0.04);
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle="rgba(153,102,255,0.3)";ctx.lineWidth=0.8;ctx.stroke();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UNDERSTANDING STRAND · DNA HELIX · KNOWLEDGE THREADING · BASE PAIRS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+      function cy(){return H/2;}
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UnderstandingStrandPage() {
   const [params, setParams] = useState<Params>({
     alpha: 0.12, beta: 0.08, gamma: 0.6, tau: 180, speed: 1, Dc: 0.25,
@@ -495,6 +543,13 @@ export default function UnderstandingStrandPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UNDERSTANDING STRAND · DNA HELIX · KNOWLEDGE THREADING · BASE PAIRS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12-node double helix + cross-links — the live AETHER understanding strand simulation.</p></div>
+          <UnderstandingStrandHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 80% 60% at 50% 0%, ${BLUE}08, ${TEAL}04, transparent)` }}>

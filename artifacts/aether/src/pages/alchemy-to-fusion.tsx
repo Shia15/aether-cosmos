@@ -938,6 +938,60 @@ function TritiumLoopGlyph() {
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
 
+function AlchemyCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const stages = [
+      { label:"PRIMA\nMATERIA", col:"#78350f", x:W*0.12 },
+      { label:"CALCINATION", col:"#dc2626", x:W*0.26 },
+      { label:"DISSOLUTION", col:"#2563eb", x:W*0.40 },
+      { label:"SEPARATION", col:"#16a34a", x:W*0.54 },
+      { label:"CONJUNCTION", col:"#9333ea", x:W*0.68 },
+      { label:"DISTILLATION", col:"#0891b2", x:W*0.82 },
+      { label:"COAGULATION\n(FUSION)", col:"#c9a84c", x:W*0.94 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,4,2,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<stages.length-1;i++) {
+        const a=stages[i],b=stages[i+1];
+        const g=ctx.createLinearGradient(a.x,H/2,b.x,H/2);
+        g.addColorStop(0,a.col+"77"); g.addColorStop(1,b.col+"77");
+        ctx.beginPath(); ctx.moveTo(a.x,H/2); ctx.lineTo(b.x,H/2);
+        ctx.strokeStyle=g; ctx.lineWidth=2; ctx.stroke();
+        const pkt=(t*0.01+i*0.45)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,3,0,Math.PI*2);
+        const pc=ctx.createRadialGradient(px,H/2,0,px,H/2,5);
+        pc.addColorStop(0,"#fff"); pc.addColorStop(1,b.col);
+        ctx.fillStyle=pc; ctx.shadowColor="#fff"; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+      }
+      stages.forEach((s,si)=>{
+        const pulse=1+0.1*Math.sin(t*0.03+si*0.9);
+        const g=ctx.createRadialGradient(s.x,H/2,0,s.x,H/2,18*pulse);
+        g.addColorStop(0,s.col+"cc"); g.addColorStop(0.6,s.col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(s.x,H/2,16*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=18*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=s.col; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,s.x,H/2+22*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(201,168,76,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("ALCHEMY TO FUSION · 7 ALCHEMICAL STAGES · PRIMA MATERIA → COAGULATION",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AlchemyToFusionPage() {
   return (
     <div
@@ -945,6 +999,25 @@ export default function AlchemyToFusionPage() {
       data-testid="page-alchemy-to-fusion"
     >
       <div style={{ maxWidth: 1080, margin: "0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#c9a84c", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(5,4,2,0.85)", border:"1px solid rgba(201,168,76,0.1)",
+            borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#f5f0e0", margin:"0 0 6px" }}>
+              Alchemy to Fusion · 7 Alchemical Stages · Prima Materia → Coagulation
+            </h2>
+            <p style={{ fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Seven alchemical transmutation stages (Prima Materia/brown · Calcination/red · Dissolution/blue · Separation/green
+              · Conjunction/violet · Distillation/cyan · Coagulation/gold) with alchemical photon packets streaming
+              between them — the full sequence from raw matter to nuclear fusion.
+            </p>
+            <AlchemyCanvas />
+          </div>
+        </div>
 
         {/* HEADER */}
         <header style={{ marginBottom: 36 }}>

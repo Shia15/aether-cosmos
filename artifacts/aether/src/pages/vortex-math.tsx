@@ -34,6 +34,44 @@ function digRoot(n: number): number {
   return r === 0 ? 9 : r;
 }
 
+function VortexMathHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const vmap=[1,2,4,8,7,5,1];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const r=50;
+      for(let n=1;n<=9;n++){
+        const angle=(n-1)/9*Math.PI*2-Math.PI/2;
+        const x=cx+r*Math.cos(angle),y=cy+r*Math.sin(angle)*0.6;
+        ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.4)";ctx.fill();
+        ctx.fillStyle="rgba(153,102,255,0.25)";ctx.font="8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(String(n),x,y+3);ctx.textAlign="left";
+      }
+      for(let i=0;i<vmap.length-1;i++){
+        const a1=(vmap[i]-1)/9*Math.PI*2-Math.PI/2;
+        const a2=(vmap[i+1]-1)/9*Math.PI*2-Math.PI/2;
+        const x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1)*0.6;
+        const x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2)*0.6;
+        const pulse=0.4+0.4*Math.sin(t*0.04+i);
+        ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=`rgba(153,102,255,${pulse*0.5})`;ctx.lineWidth=0.8;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("VORTEX MATH · DIGITAL ROOT · BASE-9 DOUBLING · RODIN COIL · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function VortexMathPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("double");
@@ -551,6 +589,13 @@ export default function VortexMathPage() {
 
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>VORTEX MATH · DIGITAL ROOT · BASE-9 DOUBLING · RODIN COIL · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Rodin 1-2-4-8-7-5 chord pattern in a base-9 wheel — the live AETHER vortex math simulation.</p></div>
+          <VortexMathHeaderCanvas />
+        </div>
+      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · vortex math · 3·6·9 / 7·8·9 / 144 · digital roots mod 9

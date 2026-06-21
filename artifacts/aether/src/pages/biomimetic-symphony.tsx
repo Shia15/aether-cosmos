@@ -122,6 +122,64 @@ function drawQBio(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+function BiomimeticSymphonyCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const instruments = [
+      { label:"MYCO\nDRUM", col:"#c9a84c", angle:0 },
+      { label:"NEURAL\nHARP", col:"#a78bfa", angle:Math.PI/3 },
+      { label:"LEAF\nFLUTE", col:"#34d399", angle:2*Math.PI/3 },
+      { label:"SEA\nPIANO", col:"#22d3ee", angle:Math.PI },
+      { label:"PLASMA\nBASS", col:"#f472b6", angle:4*Math.PI/3 },
+      { label:"CELL\nSYNTH", col:"#2ef0d8", angle:5*Math.PI/3 },
+    ];
+    const R=96;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,8,14,0.16)"; ctx.fillRect(0,0,W,H);
+      t++;
+      ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+      ctx.strokeStyle="rgba(46,240,216,0.1)"; ctx.lineWidth=1; ctx.stroke();
+      for (let i=0;i<instruments.length;i++) {
+        const a=instruments[i],b=instruments[(i+1)%instruments.length];
+        const ax=cx+Math.cos(a.angle)*R, ay=cy+Math.sin(a.angle)*R;
+        const bx=cx+Math.cos(b.angle)*R, by=cy+Math.sin(b.angle)*R;
+        const g=ctx.createLinearGradient(ax,ay,bx,by);
+        g.addColorStop(0,a.col+"44"); g.addColorStop(1,b.col+"44");
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+        const pkt=(t*0.012+i*0.3)%1;
+        const px=ax+(bx-ax)*pkt, py=ay+(by-ay)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+      }
+      instruments.forEach((inst,i)=>{
+        const dx=cx+Math.cos(inst.angle)*R, dy=cy+Math.sin(inst.angle)*R;
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.0);
+        const g=ctx.createRadialGradient(dx,dy,0,dx,dy,16*pulse);
+        g.addColorStop(0,inst.col+"cc"); g.addColorStop(0.5,inst.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(dx,dy,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=inst.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=inst.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=inst.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        inst.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,dx,dy+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(46,240,216,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIOMIMETIC SYMPHONY · MYCO DRUM · NEURAL HARP · LEAF FLUTE · SEA PIANO · PLASMA BASS · CELL SYNTH",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BiomimeticSymphonyPage() {
   const [tab, setTab] = useState<"bio" | "qbio" | "symphony" | "outlook">("bio");
 
@@ -179,6 +237,25 @@ export default function BiomimeticSymphonyPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
+      <div className="px-6 pt-4">
+        <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#2ef0d8", textTransform:"uppercase", fontFamily:"'Cinzel',serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,8,14,0.9)", border:"1px solid rgba(46,240,216,0.12)",
+          borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:14 }}>
+          <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#d0fff8", margin:"0 0 6px" }}>
+            Biomimetic Symphony · Myco Drum · Neural Harp · Leaf Flute · Sea Piano · Plasma Bass · Cell Synth
+          </h2>
+          <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:12, color:"rgba(150,240,230,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six bio-instrument nodes (Myco Drum/gold · Neural Harp/violet · Leaf Flute/teal · Sea Piano/cyan · Plasma Bass/rose
+            · Cell Synth/mint) in a hexagonal ring with photon coupling packets streaming between each pair —
+            the living AETHER biomimetic orchestra, nature as music.
+          </p>
+          <BiomimeticSymphonyCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div className="border-b border-teal-900/30 px-6 py-4 sticky top-0 z-20"

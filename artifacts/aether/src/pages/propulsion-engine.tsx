@@ -145,6 +145,46 @@ const SYMBOLS = [
   { sym: "∂", name: "Partial", val: "∂/∂ξ", role: "D8 coordinate derivative — the rate of change of the entire 7D field configuration along the wave path. Travel is differentiation, not translation." },
 ];
 
+import { useEffect, useRef } from "react";
+
+function PropulsionHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const particles: {x:number;y:number;vx:number;vy:number;life:number;maxLife:number}[]=[];
+    const emit=()=>{
+      const cx=W*0.25,cy=H/2;
+      particles.push({x:cx,y:cy,vx:-(3+Math.random()*4),vy:(Math.random()-0.5)*2,life:0,maxLife:40+Math.random()*20});
+    };
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      if(t%4===0) emit();
+      const cx=W*0.25,cy=H/2;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy-40);ctx.lineTo(cx+120,cy);ctx.lineTo(cx,cy+40);ctx.closePath();
+      ctx.fillStyle="rgba(153,102,255,0.15)";ctx.fill();ctx.strokeStyle="rgba(153,102,255,0.5)";ctx.lineWidth=0.8;ctx.stroke();
+      for(let i=particles.length-1;i>=0;i--){
+        const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.life++;
+        if(p.life>p.maxLife){particles.splice(i,1);continue;}
+        const alpha=1-p.life/p.maxLife;
+        const r=Math.round(255*alpha),g=Math.round(100*alpha),b=0;
+        ctx.beginPath();ctx.arc(p.x,p.y,2+alpha*3,0,Math.PI*2);ctx.fillStyle=`rgba(${r},${g},${b},${alpha})`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PROPULSION ENGINE · THRUST · EXHAUST PLUME · ELECTROMAGNETIC · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PropulsionEnginePage() {
   const [activeTab, setActiveTab] = useState<"all" | "nano" | "land" | "air" | "sea" | "space" | "warp">("all");
   const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -157,6 +197,13 @@ export default function PropulsionEnginePage() {
     <div style={{ minHeight: "100vh", background: `radial-gradient(ellipse at top, #040d1c 0%, ${C.void} 60%)`,
       color: C.text, fontFamily: "'Outfit', system-ui, sans-serif",
       padding: "3rem 1.5rem 6rem" }}>
+      <div style={{flexShrink:0,margin:"-3rem -1.5rem 20px"}}>
+        <div style={{padding:"8px 24px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 24px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PROPULSION ENGINE · THRUST · EXHAUST PLUME · ELECTROMAGNETIC · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live exhaust plume — the AETHER propulsion engine simulation.</p></div>
+          <PropulsionHeaderCanvas />
+        </div>
+      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Mono&display=swap');`}</style>
 
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>

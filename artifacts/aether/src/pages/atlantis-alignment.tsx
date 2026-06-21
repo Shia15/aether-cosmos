@@ -234,6 +234,57 @@ function drawAntikythera(ctx: CanvasRenderingContext2D, W: number, H: number, t:
   ctx.fillStyle = "rgba(212,169,78,0.3)"; ctx.fillText("BRONZE GEARS · ZODIAC RING · SUN/MOON POSITION · ECLIPSE PREDICTION", cx, H - 8);
 }
 
+function AtlantisCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const platoCx=W*0.30, richatCx=W*0.68;
+    const rings = [
+      { r:90, col:"#c9a84c", label:"OUTER\nRING" },
+      { r:62, col:"#2ef0d8", label:"WATER\nRING" },
+      { r:38, col:"#a78bfa", label:"INNER\nRING" },
+      { r:18, col:"#ff4477", label:"CORE" },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,3,12,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      [platoCx,richatCx].forEach((ccx,ci)=>{
+        rings.forEach((ring,ri)=>{
+          const pulse=1+0.05*Math.sin(t*0.025+ri*0.8+(ci===1?Math.PI:0));
+          ctx.beginPath(); ctx.arc(ccx,cy,ring.r*pulse,0,Math.PI*2);
+          ctx.strokeStyle=ring.col+(ri===0?"99":"55"); ctx.lineWidth=ri===0?2:1;
+          ctx.shadowColor=ring.col; ctx.shadowBlur=(ri===0?16:8)*pulse; ctx.stroke(); ctx.shadowBlur=0;
+          if (ri===0) {
+            ctx.fillStyle=ring.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+            ring.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,ccx,cy-ring.r*pulse-5+li*9));
+          }
+        });
+        ctx.fillStyle=ci===0?"#c9a84c":"#2ef0d8";
+        ctx.font="bold 8px 'Cinzel',serif"; ctx.textAlign="center";
+        ctx.fillText(ci===0?"PLATO'S\nATLANTIS":"RICHAT\nSTRUCTURE",ccx,cy+rings[0].r*1.12+22);
+      });
+      const link=(t*0.01)%1;
+      const lx=platoCx+(richatCx-platoCx)*link;
+      ctx.beginPath(); ctx.arc(lx,cy,3,0,Math.PI*2);
+      ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+      ctx.beginPath(); ctx.moveTo(platoCx,cy); ctx.lineTo(richatCx,cy);
+      ctx.strokeStyle="rgba(201,168,76,0.3)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle="rgba(201,168,76,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("ATLANTIS ALIGNMENT · PLATO'S CITY PLAN vs RICHAT STRUCTURE · MAURITANIA",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AtlantisAlignmentPage() {
   const [tab, setTab] = useState<"timeline"|"meltwater"|"antikythera"|"convergence"|"sahara">("timeline");
   const [hover, setHover] = useState<number | null>(null);
@@ -257,6 +308,26 @@ export default function AtlantisAlignmentPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-12" style={{ background: C.bg }}>
+      <div className="px-6 pt-4">
+        <div style={{ display:"inline-block", background:"rgba(201,168,76,0.07)", border:"1px solid rgba(201,168,76,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:C.gold, textTransform:"uppercase", fontFamily:"'Cinzel',serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(5,3,12,0.9)", border:"1px solid rgba(201,168,76,0.12)",
+          borderLeft:`3px solid ${C.gold}`, borderRadius:10, padding:20, marginBottom:14 }}>
+          <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#f5ead0", margin:"0 0 6px" }}>
+            Atlantis Alignment · Plato's City Plan vs Richat Structure · Mauritania
+          </h2>
+          <p style={{ fontFamily:"'Raleway',sans-serif", fontSize:12, color:"rgba(200,185,140,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Two concentric ring systems side by side — left: Plato's city plan (Outer/gold · Water/teal · Inner/violet · Core/rose),
+            right: Richat Structure (mirrored phase), with a golden alignment link packet streaming between them — the live
+            Atlantis–Richat geometric correspondence.
+          </p>
+          <AtlantisCanvas />
+        </div>
+      </div>
+
       {/* Header */}
       <div className="border-b px-6 py-4 sticky top-0 z-20" style={{ background: C.panel + "ee", borderColor: C.gold + "25" }}>
         <p className="text-[10px] tracking-[0.3em] font-['Cinzel',serif] mb-0.5" style={{ color: C.gold + "55" }}>

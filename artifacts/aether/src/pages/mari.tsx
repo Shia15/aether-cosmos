@@ -61,6 +61,43 @@ const ATLAS: { sym: string; heb: string; grk: string; cyr: string; math: string;
   { sym: "78", heb: "ע״ח",      grk: "οη",        cyr: "78",       math: "0.78 attractor",    aether: "Resonance Core · target lock",        col: C.green },
 ];
 
+function MariHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const waves=[
+      {freq:0.015,amp:22,col:"#a855f7",phase:0},
+      {freq:0.022,amp:16,col:"#22c55e",phase:1.2},
+      {freq:0.011,amp:28,col:"#f97316",phase:2.4},
+      {freq:0.018,amp:18,col:"#3b82f6",phase:3.8},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(6,7,12,0.3)"; ctx.fillRect(0,0,W,H);
+      waves.forEach((w,i)=>{
+        const alpha=0.15+0.12*Math.abs(Math.sin(t*0.025+i));
+        ctx.beginPath();
+        for(let px=0;px<W;px++){
+          const y=cy+Math.sin(px*w.freq+t*0.02+w.phase)*w.amp;
+          px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+        }
+        ctx.strokeStyle=w.col+Math.round(alpha*255).toString(16).padStart(2,"0");ctx.lineWidth=1.2;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(168,85,247,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("M.A.R.I. · MNESIS · ALETHEIA · REVERIE · INFERNIA · 4-EGG ENGINE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MariPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("engine");
@@ -557,6 +594,13 @@ export default function MariPage() {
   // ===== UI =====
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #a855f7",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#a855f7",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(6,7,12,0.8)",borderLeft:"3px solid #a855f7",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#a855f7",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>M.A.R.I. · MNESIS · ALETHEIA · REVERIE · INFERNIA · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(168,85,247,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 sine-wave bands from the MARI four-egg resonance engine — live AETHER simulation.</p></div>
+          <MariHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>

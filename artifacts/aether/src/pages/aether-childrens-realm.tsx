@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 
 type Book = {
@@ -61,6 +61,62 @@ const BOOKS: Book[] = [
 
 type Sparkle = { id: number; left: number; delay: number; size: number };
 
+function ChildrensRealmCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const books = [
+      { x:W*0.15, y:H*0.5, col:"#ff69b4", label:"Computer\nBrains", phase:0.0 },
+      { x:W*0.35, y:H*0.5, col:"#a78bfa", label:"Boho\nBloom", phase:1.2 },
+      { x:W*0.55, y:H*0.5, col:"#00ffcc", label:"Zoom the\nZipper", phase:2.1 },
+      { x:W*0.75, y:H*0.5, col:"#fbbf24", label:"Flow\nNotebook", phase:0.7 },
+    ];
+    const stars:{x:number;y:number;r:number;phase:number}[]=[];
+    for (let i=0;i<60;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*2,phase:Math.random()*Math.PI*2});
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(10,0,31,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      stars.forEach(s=>{
+        const a=0.4+0.4*Math.sin(t*0.03+s.phase);
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill();
+      });
+      books.forEach((b,i)=>{
+        const pulse=1+0.12*Math.sin(t*0.04+b.phase);
+        const g=ctx.createRadialGradient(b.x,b.y,4,b.x,b.y,32*pulse);
+        g.addColorStop(0,b.col+"cc"); g.addColorStop(0.5,b.col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.rect(b.x-18*pulse, b.y-24*pulse, 36*pulse, 48*pulse);
+        ctx.fillStyle=g; ctx.shadowColor=b.col; ctx.shadowBlur=22*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=b.col; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=b.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        b.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,b.x,b.y-4+li*11));
+        if (i<books.length-1) {
+          const b2=books[i+1];
+          const pkt=(t*0.018+i*0.6)%1;
+          const px=b.x+(b2.x-b.x)*pkt, py=b.y+(b2.y-b.y)*pkt;
+          ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+          ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+          const g2=ctx.createLinearGradient(b.x,b.y,b2.x,b2.y);
+          g2.addColorStop(0,b.col+"55"); g2.addColorStop(1,b2.col+"55");
+          ctx.beginPath(); ctx.moveTo(b.x,b.y); ctx.lineTo(b2.x,b2.y);
+          ctx.strokeStyle=g2; ctx.lineWidth=1; ctx.stroke();
+        }
+      });
+      ctx.fillStyle="rgba(255,105,180,0.45)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER CHILDREN'S REALM · LEARNING IN LAYERS · IMAGINATION → KNOWLEDGE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherChildrensRealmPage() {
   const [sparkles, setSparkles] = useState<Sparkle[]>([]);
 
@@ -98,6 +154,26 @@ export default function AetherChildrensRealmPage() {
       fontFamily: "'Comic Sans MS', 'Quicksand', cursive",
       overflow: "hidden",
     }}>
+      <div style={{ padding:"16px 24px 0", position:"relative", zIndex:2 }}>
+        <div style={{ display:"inline-block", background:"rgba(255,105,180,0.08)", border:"1px solid rgba(255,105,180,0.28)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#ff69b4", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(10,0,31,0.85)", border:"1px solid rgba(255,105,180,0.15)",
+          borderLeft:"3px solid #ff69b4", borderRadius:10, padding:20, marginBottom:8 }}>
+          <h2 style={{ fontFamily:"'Comic Sans MS',cursive", fontSize:18, color:"#fff", margin:"0 0 6px" }}>
+            AETHER Children's Realm · Four Books · Imagination → Knowledge
+          </h2>
+          <p style={{ fontFamily:"'Comic Sans MS',cursive", fontSize:12, color:"rgba(255,200,230,0.55)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Four glowing book-shaped nodes (Computer Brains/rose · Boho Bloom/violet · Zoom the Zipper/mint
+            · Flow Notebook/gold) connected by photon link streams against a twinkling star field — the living
+            AETHER children's library constellation.
+          </p>
+          <ChildrensRealmCanvas />
+        </div>
+      </div>
+
       <style>{`
         @keyframes glow-title {
           from { text-shadow: 0 0 20px #ff69b4, 0 0 40px #ff69b4; }

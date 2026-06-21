@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -195,6 +195,66 @@ function TangledMatSvg() {
   );
 }
 
+function DiamondLatticeCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 280;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    const COLS = 18, ROWS = 8;
+    const dx = W / COLS, dy = H / ROWS;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#070918"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const offset = row % 2 === 0 ? 0 : dx / 2;
+          const x = col * dx + offset;
+          const y = row * dy + dy / 2;
+          const phase = t * 0.02 + col * 0.3 + row * 0.5;
+          const pulse = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(phase));
+          const r = 5 + 2 * Math.sin(phase);
+          const isBond = (col + row) % 3 === 0;
+          const color = isBond ? B.cyan : B.gold;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fillStyle = color + Math.round(pulse * 255).toString(16).padStart(2, "0");
+          ctx.fill();
+          if (col < COLS - 1) {
+            const nx = col * dx + dx + offset;
+            const alpha = Math.round(pulse * 100).toString(16).padStart(2, "0");
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, y);
+            ctx.strokeStyle = B.line + alpha;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+          if (row < ROWS - 1) {
+            const noffset = (row + 1) % 2 === 0 ? 0 : dx / 2;
+            const nx2 = col * dx + noffset;
+            const ny2 = (row + 1) * dy + dy / 2;
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx2, y + dy);
+            ctx.strokeStyle = B.line + "44";
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.fillStyle = B.dim + "77";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("DIAMOND NANOTHREAD LATTICE · HEXAGONAL CRYSTAL STRUCTURE", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function DiamondNanothreadsPage() {
   return (
     <div style={{ minHeight: "100vh", background: B.bg, color: B.ink, padding: "32px 24px 80px" }}>
@@ -211,6 +271,26 @@ export default function DiamondNanothreadsPage() {
           <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13.5, color: B.dim, lineHeight: 1.65, maxWidth: 820, margin: 0 }}>
             A reading on what changes when carbon is forced into one dimension. From a <em>graphene</em> sheet rolled into a hollow tube, to a fully sp³-bonded thread grown a different way (high-pressure compression of small organic molecules), the material story is short and clean — the manufacturing story is long and stubborn.
           </p>
+        </div>
+
+        <div style={{ marginBottom:28 }}>
+          <div style={{ display:"inline-block", background:"rgba(124,215,255,0.1)", border:"1px solid rgba(124,215,255,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.cyan, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:B.panel, border:`1px solid ${B.line}`, borderLeft:`3px solid ${B.gold}`,
+            borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:'"Cinzel",serif', fontSize:18, color:B.ink, margin:"0 0 6px", fontVariant:"small-caps" }}>
+              Diamond Nanothread Lattice · Hexagonal Crystal Structure
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.dim, margin:"0 0 14px", lineHeight:1.65 }}>
+              18×8 hexagonal lattice with alternating-offset rows (the staggered structure of sp³ diamond bonding).
+              Nodes pulse between gold (carbon) and cyan (bond junction) types; bonds vibrate. This is what the
+              1D thread looks like in cross-section — a diamond unit cell stretched into a wire.
+            </p>
+            <DiamondLatticeCanvas />
+          </div>
         </div>
 
         {/* §01 — Family */}

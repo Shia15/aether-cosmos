@@ -459,6 +459,69 @@ function renderFrame(ctx:CanvasRenderingContext2D, s:SimState){
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+function AquariumCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const chips = [
+      { label:"PHOTON\nINTEGRATOR", col:"#00d4ff", x:W*0.12, y:H*0.5 },
+      { label:"NEURAL\nMESH", col:"#a78bfa", x:W*0.28, y:H*0.5 },
+      { label:"MEMBRANE\nGATE", col:"#34d399", x:W*0.44, y:H*0.5 },
+      { label:"QUANTUM\nSAMPLER", col:"#f59e0b", x:W*0.60, y:H*0.5 },
+      { label:"DISPLAY\nAQUARIUM", col:"#ec4899", x:W*0.76, y:H*0.5 },
+      { label:"COHERENCE\nOUT", col:"#2ef0d8", x:W*0.90, y:H*0.5 },
+    ];
+    const fish:{x:number;y:number;col:string;speed:number;dir:number;phase:number}[]=[];
+    for (let i=0;i<15;i++) fish.push({
+      x:Math.random()*W, y:60+Math.random()*(H-120), col:chips[i%chips.length].col,
+      speed:0.5+Math.random(), dir:Math.random()<0.5?1:-1, phase:Math.random()*Math.PI*2,
+    });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(1,8,24,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      fish.forEach(f=>{
+        f.x+=f.speed*f.dir;
+        if (f.x>W+20) f.x=-20; if (f.x<-20) f.x=W+20;
+        const wiggle=Math.sin(t*0.15+f.phase)*4;
+        ctx.beginPath(); ctx.arc(f.x,f.y+wiggle,3,0,Math.PI*2);
+        ctx.fillStyle=f.col+"88"; ctx.shadowColor=f.col; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      });
+      for (let i=0;i<chips.length-1;i++) {
+        const a=chips[i],b=chips[i+1];
+        const pkt=(t*0.015+i*0.5)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"44"); g.addColorStop(1,b.col+"44");
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      }
+      chips.forEach((c,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.1);
+        const g=ctx.createRadialGradient(c.x,c.y,0,c.x,c.y,16*pulse);
+        g.addColorStop(0,c.col+"bb"); g.addColorStop(0.5,c.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(c.x,c.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=c.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=c.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=c.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        c.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,c.x,c.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(0,212,255,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AQUARIUM CHIP · VISIBLE INTELLIGENCE · PHOTON INTEGRATOR · NEURAL MESH",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AquariumChipPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -542,6 +605,26 @@ export default function AquariumChipPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{background:"#020b18"}}>
+
+      <div className="px-6 pt-4">
+        <div style={{ display:"inline-block", background:"rgba(0,212,255,0.07)", border:"1px solid rgba(0,212,255,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#00d4ff", textTransform:"uppercase", fontFamily:"'Cinzel',serif", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(1,8,24,0.9)", border:"1px solid rgba(0,212,255,0.1)",
+          borderLeft:"3px solid #00d4ff", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Aquarium Chip · Visible Intelligence · Photon Integrator → Coherence Out
+          </h2>
+          <p style={{ fontFamily:"Raleway,sans-serif", fontSize:12, color:"rgba(150,210,230,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six chip-stage nodes (Photon Integrator/cyan · Neural Mesh/violet · Membrane Gate/teal · Quantum Sampler/amber
+            · Display Aquarium/rose · Coherence Out/mint) with 15 luminous "fish" swimming the field and photon coupling
+            packets streaming between stages — the aquarium chip as a visible biological-optical processor.
+          </p>
+          <AquariumCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div className="border-b border-cyan-900/30 px-6 py-4 sticky top-0 z-20" style={{background:"#010810ee"}}>

@@ -67,6 +67,7 @@ import HypercomputationView from "@/pages/hypercomputation";
 import FerroDriveView from "@/pages/ferrodrive";
 import CLACoupledFieldsView from "@/pages/cla-coupled-fields";
 import CancerCoherenceView from "@/pages/cancer-coherence";
+import CancerDynamicsView from "@/pages/cancer-dynamics";
 import BiomimeticQuantumView from "@/pages/biomimetic-quantum";
 import ClosedLoopCoherenceView from "@/pages/closed-loop-coherence";
 import PhiHOTView from "@/pages/phi-hot";
@@ -372,6 +373,7 @@ function Router() {
         <Route path="/ferrodrive" component={FerroDriveView} />
         <Route path="/cla-coupled-fields" component={CLACoupledFieldsView} />
         <Route path="/cancer-coherence" component={CancerCoherenceView} />
+        <Route path="/cancer-dynamics" component={CancerDynamicsView} />
         <Route path="/biomimetic-quantum" component={BiomimeticQuantumView} />
         <Route path="/closed-loop-coherence" component={ClosedLoopCoherenceView} />
         <Route path="/phi-hot" component={PhiHOTView} />

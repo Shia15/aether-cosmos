@@ -91,6 +91,52 @@ function drawSeedMap(c: HTMLCanvasElement, re: Float32Array, im: Float32Array, t
   ctx.textAlign = "center"; ctx.fillText(`${count} seeds / ${SZ}`, W / 2, H - 6);
 }
 
+function FabricationCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const cols = 18, rows = 4;
+    const sx = W / (cols + 1), sy = H / (rows + 1);
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "rgb(2,8,18)"; ctx.fillRect(0, 0, W, H);
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const phase = (c + r * cols) / (cols * rows);
+          const wave = Math.sin(t * 0.04 - phase * Math.PI * 4);
+          const active = wave > 0.3;
+          const x = sx * (c + 1), y = sy * (r + 1);
+          if (active) {
+            for (let dc = -1; dc <= 1; dc++) for (let dr = -1; dr <= 1; dr++) {
+              if ((dc === 0) !== (dr === 0)) {
+                const nx = sx * (c + 1 + dc), ny = sy * (r + 1 + dr);
+                if (nx > 0 && nx < W && ny > 0 && ny < H) {
+                  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny);
+                  ctx.strokeStyle = "rgba(46,240,216,0.12)"; ctx.lineWidth = 0.8; ctx.stroke();
+                }
+              }
+            }
+          }
+          const a = 0.3 + 0.7 * Math.max(0, wave);
+          ctx.beginPath(); ctx.arc(x, y, active ? 3 : 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = active ? `rgba(46,240,216,${a})` : "rgba(68,170,255,0.2)"; ctx.fill();
+        }
+      }
+      ctx.fillStyle = "rgba(46,240,216,0.25)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("FABRICATION · FIELD DYNAMICS · STRUCTURE CRYSTALLIZATION · AETHER", 12, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function Fabrication() {
   const computeRef = useRef<HTMLCanvasElement>(null);
   const fabricRef  = useRef<HTMLCanvasElement>(null);
@@ -168,6 +214,14 @@ export default function Fabrication() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, fontFamily: "'Courier New', monospace", overflow: "hidden" }}>
+      <div style={{ flexShrink:0, padding:"12px 12px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:10 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,8,18,0.95)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:14, marginBottom:10 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:15, color:"#e0f8ff", margin:"0 0 5px" }}>Fabrication · Field Dynamics · Structure Crystallization · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:"rgba(46,240,216,0.35)", margin:"0 0 10px", lineHeight:1.65 }}>18×4 lattice nodes crystallizing in traveling waves — the live AETHER fabrication simulation.</p>
+          <FabricationCanvas />
+        </div>
+      </div>
       {/* HEADER */}
       <div style={{ padding: "10px 16px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>

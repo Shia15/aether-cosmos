@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import {
   Orbit, Telescope, Sparkles, Atom, Globe, Clock, Compass, BookOpen,
   Rocket, Satellite, Sigma, Waves, Zap,
@@ -370,6 +371,72 @@ function CometSigil() {
   );
 }
 
+function Atlas3ICanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const domains = [
+      { label:"INTELLIGENCE", col:"#a78bfa", angle:-Math.PI/2, r:96 },
+      { label:"INTEGRATION", col:"#2ef0d8", angle:-Math.PI/2+Math.PI*2/3, r:96 },
+      { label:"INSIGHT", col:"#c9a84c", angle:-Math.PI/2+Math.PI*4/3, r:96 },
+    ];
+    const orbits = [
+      { r:32, col:"#60a5fa", speed:0.025 },
+      { r:56, col:"#f472b6", speed:-0.018 },
+      { r:80, col:"#34d399", speed:0.013 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,6,18,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<3;i++) {
+        const a=domains[i],b=domains[(i+1)%3];
+        const ax=cx+Math.cos(a.angle)*a.r, ay=cy+Math.sin(a.angle)*a.r;
+        const bx=cx+Math.cos(b.angle)*b.r, by=cy+Math.sin(b.angle)*b.r;
+        const g=ctx.createLinearGradient(ax,ay,bx,by);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(ax,ay); ctx.lineTo(bx,by);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+      }
+      orbits.forEach((o,oi)=>{
+        const ang=t*o.speed;
+        const px=cx+Math.cos(ang)*o.r, py=cy+Math.sin(ang)*o.r;
+        ctx.beginPath(); ctx.arc(px,py,4,0,Math.PI*2);
+        ctx.fillStyle=o.col; ctx.shadowColor=o.col; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(cx,cy,o.r,0,Math.PI*2);
+        ctx.strokeStyle=o.col+"22"; ctx.lineWidth=0.8; ctx.stroke();
+      });
+      domains.forEach(d=>{
+        const dx=cx+Math.cos(d.angle)*d.r, dy=cy+Math.sin(d.angle)*d.r;
+        const pulse=1+0.08*Math.sin(t*0.04+d.angle);
+        const g=ctx.createRadialGradient(dx,dy,0,dx,dy,20*pulse);
+        g.addColorStop(0,d.col+"cc"); g.addColorStop(0.5,d.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(dx,dy,18*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=d.col; ctx.shadowBlur=18*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=d.col; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=d.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        const ldir=Math.cos(d.angle)>0?1:-1;
+        ctx.fillText(d.label,dx+ldir*28,dy+4);
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,16);
+      gc.addColorStop(0,"#ffffffcc"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#fff"; ctx.shadowBlur=20; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(167,139,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("ATLAS-3I · INTELLIGENCE · INTEGRATION · INSIGHT · TRI-DOMAIN SYNTHESIS",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function Atlas3IPage() {
   return (
     <div
@@ -377,6 +444,26 @@ export default function Atlas3IPage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="atlas-3i-page"
     >
+      <div style={{ padding:"20px 24px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(167,139,250,0.07)", border:"1px solid rgba(167,139,250,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#a78bfa", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,6,18,0.88)", border:"1px solid rgba(167,139,250,0.12)",
+          borderLeft:"3px solid #a78bfa", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e8e0ff", margin:"0 0 6px" }}>
+            Atlas-3I · Intelligence · Integration · Insight · Tri-Domain Synthesis
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(200,195,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Three tri-domain vertices (Intelligence/violet · Integration/teal · Insight/gold) in an equilateral triangle with three
+            orbiting resonance probes at 32/56/80px radii and a bright synthesis core at center — the Atlas-3I tri-domain
+            intelligence framework made live.
+          </p>
+          <Atlas3ICanvas />
+        </div>
+      </div>
+
       <style>{`
         @keyframes atl-breathe { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes atl-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-26px,0); } 100% { transform: translate3d(0,0,0); } }

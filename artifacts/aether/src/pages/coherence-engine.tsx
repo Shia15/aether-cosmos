@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgEngine from "@assets/ChatGPT_Image_Apr_26,_2026,_02_30_07_PM_1777228209576.png";
@@ -84,9 +85,71 @@ const PROBES = [
   { c: B.amber,  k: "Charge-to-mass ratio", v: "BASE compared p and p̄ at 10⁻¹¹; consistent with CPT symmetry to that precision" },
 ];
 
+function CoherenceEngineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const nodes=[
+      { label:"INGEST", col:"#2ef0d8", ang:0, r:80 },
+      { label:"PATTERN", col:"#9966ff", ang:Math.PI*0.4, r:80 },
+      { label:"SYNTH", col:"#c9a84c", ang:Math.PI*0.8, r:80 },
+      { label:"COHERE", col:"#44aaff", ang:Math.PI*1.2, r:80 },
+      { label:"OUTPUT", col:"#44cc77", ang:Math.PI*1.6, r:80 },
+    ];
+    const flows: {from:number,to:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,8,20,0.2)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      if(tick%18===0&&flows.length<14) flows.push({ from:tick%5, to:(tick+2)%5, t:0 });
+      for(let i=flows.length-1;i>=0;i--){
+        const f=flows[i]; f.t+=0.025;
+        const a=nodes[f.from], b=nodes[f.to];
+        const ax=cx+a.r*Math.cos(a.ang), ay=cy+a.r*Math.sin(a.ang);
+        const bx=cx+b.r*Math.cos(b.ang), by=cy+b.r*Math.sin(b.ang);
+        const px=ax+(bx-ax)*f.t, py=ay+(by-ay)*f.t;
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(f.t>=1) flows.splice(i,1);
+      }
+      nodes.forEach((n,i)=>{
+        const x=cx+n.r*Math.cos(n.ang), y=cy+n.r*Math.sin(n.ang);
+        if(i<nodes.length-1){ const b=nodes[i+1]; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(cx+b.r*Math.cos(b.ang),cy+b.r*Math.sin(b.ang)); ctx.strokeStyle=n.col+"22"; ctx.lineWidth=1; ctx.stroke(); }
+        ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2);
+        ctx.fillStyle=n.col; ctx.shadowColor=n.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,x,y+22);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COHERENCE ENGINE · INGEST → PATTERN → SYNTH → COHERE → OUTPUT · AETHER CRYSTALLIZATION MODEL",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CoherenceEnginePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="coherence-engine-page">
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Coherence Engine · Ingest · Pattern · Synth · Cohere · Output · Crystallization Model
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five engine nodes (Ingest/teal · Pattern/violet · Synth/gold · Cohere/blue · Output/green) with live coherence packets flowing through the AETHER crystallization pipeline.
+          </p>
+          <CoherenceEngineCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

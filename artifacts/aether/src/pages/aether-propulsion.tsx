@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import img_vortexRingPink from "@assets/93D0C2CE-9414-417D-A672-9A0F1F33B556_1781446652782.png";
 import img_vortexRingBlue from "@assets/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781446652782.png";
 import img_bubbleDynamics from "@assets/0502F370-FA89-4126-942E-B5741F1E0BB1_1781446652782.png";
@@ -584,12 +584,109 @@ function QuantumTab() {
   );
 }
 
+function VortexRingCanvas() {
+  const ref = React.useRef<HTMLCanvasElement>(null);
+  const rafRef = React.useRef(0);
+  React.useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const rings = [
+      { cx: W*0.18, cy: H*0.5, rx: 68, ry: 26, color:"#f472b6", phase: 0.0, speed: 0.012 },
+      { cx: W*0.40, cy: H*0.5, rx: 72, ry: 28, color:"#a78bfa", phase: 1.1, speed: 0.010 },
+      { cx: W*0.62, cy: H*0.5, rx: 66, ry: 24, color:"#06b6d4", phase: 2.2, speed: 0.014 },
+      { cx: W*0.82, cy: H*0.5, rx: 70, ry: 26, color:"#22c55e", phase: 0.7, speed: 0.011 },
+    ];
+    const particles: {x:number;y:number;vx:number;vy:number;life:number;maxLife:number;col:string}[] = [];
+    for (let i=0;i<60;i++) {
+      const ri = rings[i%rings.length];
+      const ang = Math.random()*Math.PI*2;
+      particles.push({ x:ri.cx+Math.cos(ang)*ri.rx*0.9, y:ri.cy+Math.sin(ang)*ri.ry*0.9,
+        vx:(Math.random()-0.5)*1.8, vy:(Math.random()-0.5)*1.4, life:Math.random()*120, maxLife:120, col:ri.color });
+    }
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(4,7,14,0.22)";
+      ctx.fillRect(0,0,W,H);
+      t++;
+      rings.forEach(r => {
+        const pulse = 1 + 0.09*Math.sin(t*r.speed*3 + r.phase);
+        const g = ctx.createRadialGradient(r.cx,r.cy,2,r.cx,r.cy,r.rx*pulse*0.9);
+        g.addColorStop(0,"rgba(255,255,255,0)"); g.addColorStop(0.75,"rgba(255,255,255,0)");
+        g.addColorStop(0.85,r.color+"88"); g.addColorStop(1,"rgba(0,0,0,0)");
+        ctx.save(); ctx.scale(1, r.ry/r.rx*pulse);
+        ctx.beginPath(); ctx.ellipse(r.cx, r.cy*(r.rx/(r.ry*pulse)), r.rx*pulse, r.rx*pulse, 0,0,Math.PI*2);
+        ctx.strokeStyle = r.color; ctx.lineWidth = 2.5 + 1.5*Math.sin(t*r.speed*2+r.phase);
+        ctx.shadowColor = r.color; ctx.shadowBlur = 18*pulse; ctx.stroke();
+        ctx.restore();
+        ctx.beginPath();
+        for (let a=0;a<Math.PI*2;a+=0.08) {
+          const drift = 0.12*Math.sin(a*4+t*r.speed*5+r.phase);
+          const px = r.cx + Math.cos(a)*(r.rx*pulse+drift*12);
+          const py = r.cy + Math.sin(a)*(r.ry*pulse+drift*6);
+          a===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py);
+        }
+        ctx.strokeStyle = r.color+"44"; ctx.lineWidth = 1; ctx.shadowBlur = 0; ctx.stroke();
+      });
+      particles.forEach(p => {
+        p.x+=p.vx; p.y+=p.vy; p.vy*=0.98; p.life--;
+        if (p.life<=0) { const ri=rings[Math.floor(Math.random()*rings.length)]; const ang=Math.random()*Math.PI*2;
+          p.x=ri.cx+Math.cos(ang)*ri.rx*0.9; p.y=ri.cy+Math.sin(ang)*ri.ry*0.9;
+          p.vx=(Math.random()-0.5)*1.8; p.vy=(Math.random()-0.5)*1.4; p.life=p.maxLife; p.col=ri.color; }
+        const a = p.life/p.maxLife;
+        ctx.beginPath(); ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
+        ctx.fillStyle = p.col+(Math.floor(a*200).toString(16).padStart(2,"0")); ctx.fill();
+      });
+      rings.forEach((r,i) => {
+        if (i<rings.length-1) {
+          const r2=rings[i+1]; const prog=(Math.sin(t*0.018+i*1.2)+1)/2;
+          const px=r.cx+(r2.cx-r.cx)*prog, py=H*0.5;
+          ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+          ctx.fillStyle="#ffffff88"; ctx.shadowColor="#fff"; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        }
+      });
+      const labels=[["VORTEX","#f472b6",W*0.18],["DARK\nMATTER","#a78bfa",W*0.40],["FTL\nFIELD","#06b6d4",W*0.62],["QUANTUM\nINFO","#22c55e",W*0.82]];
+      labels.forEach(([l,c,x])=>{
+        ctx.fillStyle=c as string; ctx.font="bold 9px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.shadowColor=c as string; ctx.shadowBlur=6;
+        (l as string).split("\n").forEach((ln,li)=>ctx.fillText(ln,x as number,H-28+li*13));
+        ctx.shadowBlur=0;
+      });
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherPropulsionPage() {
   const [tab, setTab] = useState("engine");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui,sans-serif" }}>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1rem" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(244,114,182,0.08)", border:"1px solid rgba(244,114,182,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#f472b6", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(4,7,14,0.8)", border:"1px solid rgba(244,114,182,0.12)",
+            borderLeft:"3px solid #f472b6", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e2e8f0", margin:"0 0 6px" }}>
+              AETHER Propulsion · Vortex-Ring Engine · Four Physics Domains
+            </h2>
+            <p style={{ fontFamily:"system-ui,sans-serif", fontSize:12, color:"rgba(200,210,255,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Four toroidal vortex rings (Vortex/rose · Dark Matter/violet · FTL Field/cyan · Quantum Info/green)
+              pulsing and breathing with particle streams flowing between them — the AETHER propulsion physics synthesis
+              visualized as living oscillating rings across all energy domains.
+            </p>
+            <VortexRingCanvas />
+          </div>
+        </div>
+
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
           <h1 style={{ fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 900, background: "linear-gradient(135deg,#f472b6,#a78bfa,#06b6d4,#22c55e)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: "0 0 0.5rem" }}>
             AETHER Propulsion & Physics Synthesis

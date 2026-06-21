@@ -397,6 +397,51 @@ function drawEye(canvas: HTMLCanvasElement, stage: typeof STAGES[0], t: number) 
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────
+function EyeEvolutionCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 180;
+    const W = canvas.width, H = canvas.height;
+    const stages = [
+      { cx: W * 0.1, r: 14, col: "#44aaff", label: "PATCH" },
+      { cx: W * 0.28, r: 18, col: "#2ef0d8", label: "CUP" },
+      { cx: W * 0.46, r: 22, col: "#c9a84c", label: "PINHOLE" },
+      { cx: W * 0.64, r: 26, col: "#9966ff", label: "LENS" },
+      { cx: W * 0.82, r: 30, col: "#ff4477", label: "FOVEA" },
+    ];
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "rgb(2,8,18)"; ctx.fillRect(0, 0, W, H);
+      for (let i = 0; i < stages.length - 1; i++) {
+        const a = stages[i], b = stages[i + 1];
+        ctx.beginPath(); ctx.moveTo(a.cx, H / 2); ctx.lineTo(b.cx, H / 2);
+        ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1; ctx.stroke();
+      }
+      stages.forEach((s, i) => {
+        const pls = 0.85 + 0.15 * Math.sin(t * 0.04 + i * 0.8);
+        const rings = i + 1;
+        for (let r = rings; r >= 1; r--) {
+          ctx.beginPath(); ctx.arc(s.cx, H / 2, s.r * pls * (r / rings), 0, Math.PI * 2);
+          ctx.strokeStyle = s.col + (r === rings ? "cc" : "33"); ctx.lineWidth = r === rings ? 1.5 : 0.8; ctx.stroke();
+        }
+        ctx.fillStyle = "#000"; ctx.beginPath(); ctx.arc(s.cx, H / 2, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = s.col; ctx.font = "8px 'DM Mono',monospace"; ctx.textAlign = "center";
+        ctx.fillText(s.label, s.cx, H / 2 + s.r + 14); ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(68,170,255,0.3)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("EYE EVOLUTION · 600 MILLION YEARS · PHOTORECEPTIVE PATCH → FOVEA · AETHER", 14, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function EyeEvolutionPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef   = useRef(0);
@@ -444,6 +489,14 @@ export default function EyeEvolutionPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11 }}>
+      <div style={{ flexShrink:0, padding:"12px 12px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #44aaff", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#44aaff", fontFamily:"'DM Mono',monospace", marginBottom:10 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,8,18,0.95)", border:"1px solid rgba(68,170,255,0.12)", borderLeft:"3px solid #44aaff", borderRadius:10, padding:14, marginBottom:10 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:15, color:"#e0f8ff", margin:"0 0 5px" }}>Eye Evolution · 600 Million Years · Photoreceptive Patch → Fovea · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:"rgba(68,170,255,0.35)", margin:"0 0 10px", lineHeight:1.65 }}>Five stages (PATCH · CUP · PINHOLE · LENS · FOVEA) with pulsing concentric rings — the live AETHER eye evolution simulation.</p>
+          <EyeEvolutionCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BRD}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 16 }}>

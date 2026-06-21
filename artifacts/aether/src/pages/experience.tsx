@@ -197,6 +197,52 @@ function Egg({
 }
 
 // ── Main Experience Page ──────────────────────────────────────────────────────
+function ExperienceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 160;
+    const W = canvas.width, H = canvas.height;
+    const agents = [
+      { x: W * 0.15, y: H * 0.5, col: "#2ef0d8", label: "SENSE" },
+      { x: W * 0.35, y: H * 0.5, col: "#c9a84c", label: "FRAME" },
+      { x: W * 0.55, y: H * 0.5, col: "#9966ff", label: "REFLECT" },
+      { x: W * 0.75, y: H * 0.5, col: "#ff4477", label: "ACT" },
+    ];
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#000c18"; ctx.fillRect(0, 0, W, H);
+      for (let i = 0; i < agents.length - 1; i++) {
+        const a = agents[i], b = agents[i + 1];
+        const pulse = (t * 0.015 + i * 0.25) % 1;
+        const px = a.x + (b.x - a.x) * pulse, py = a.y + (b.y - a.y) * pulse;
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = a.col; ctx.fill();
+      }
+      agents.forEach((ag, i) => {
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.05 + i);
+        ctx.beginPath(); ctx.arc(ag.x, ag.y, 18 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = ag.col + "22"; ctx.fill();
+        ctx.beginPath(); ctx.arc(ag.x, ag.y, 12, 0, Math.PI * 2);
+        ctx.fillStyle = ag.col; ctx.fill();
+        ctx.fillStyle = "#fff"; ctx.font = "8px 'DM Mono',monospace"; ctx.textAlign = "center";
+        ctx.fillText(ag.label, ag.x, ag.y + 28); ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(46,240,216,0.25)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("EXPERIENCE · SMART ANIMATE · FRAME FLOW · AGENT RELAY · AETHER", 12, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function ExperiencePage() {
   const [frame, setFrame] = useState<Frame>("landing");
   const [selected, setSelected] = useState<typeof CORE[0] | null>(null);
@@ -294,6 +340,14 @@ export default function ExperiencePage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
+      <div style={{ flexShrink:0, padding:"16px 16px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(0,12,24,0.95)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:16, marginBottom:12 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:16, color:"#e0f8ff", margin:"0 0 6px" }}>Experience · Smart Animate · Frame Flow · Agent Relay · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(46,240,216,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Four agent nodes (SENSE · FRAME · REFLECT · ACT) with live signal pulses — the live AETHER experience simulation.</p>
+          <ExperienceCanvas />
+        </div>
+      </div>
 
       {/* ── Header bar ───────────────────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-8 py-6 border-b border-border/20 flex items-center justify-between">

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import imgDoctrine from "@assets/3c946795-be6d-49c9-8cd5-9bfe1985d7eb_1777222328204.png";
 import imgSeparation from "@assets/ChatGPT_Image_Apr_26,_2026,_12_54_29_PM_1777222471368.png";
 
@@ -31,9 +32,56 @@ const SEPARATION_LANES = [
     detail: "When a driver matches a system's natural frequency, energy transfers efficiently. The word 'resonance' on AETHER means that physical phenomenon, not a vibe-match." },
 ];
 
+function MotionDoctrineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const particles: {x:number;y:number;vx:number;vy:number;life:number;col:string}[] = [];
+    const spawn=()=>{
+      const side=Math.floor(Math.random()*4);
+      let x=0,y=0,vx=0,vy=0;
+      if(side===0){x=Math.random()*W;y=0;vy=1+Math.random()*2;}
+      else if(side===1){x=W;y=Math.random()*H;vx=-(1+Math.random()*2);}
+      else if(side===2){x=Math.random()*W;y=H;vy=-(1+Math.random()*2);}
+      else{x=0;y=Math.random()*H;vx=1+Math.random()*2;}
+      particles.push({x,y,vx,vy,life:1,col:["#2ef0d8","#9966ff","#c9a84c","#44aaff"][Math.floor(Math.random()*4)]});
+    };
+    for(let i=0;i<20;i++)spawn();
+    const draw=()=>{
+      ctx.fillStyle="rgba(8,12,24,0.3)"; ctx.fillRect(0,0,W,H);
+      if(Math.random()<0.3)spawn();
+      for(let i=particles.length-1;i>=0;i--){
+        const p=particles[i];
+        p.x+=p.vx;p.y+=p.vy;p.life-=0.008;
+        if(p.life<=0||p.x<-10||p.x>W+10||p.y<-10||p.y>H+10){particles.splice(i,1);continue;}
+        ctx.beginPath();ctx.arc(p.x,p.y,2+p.life*3,0,Math.PI*2);ctx.fillStyle=p.col+Math.round(p.life*200).toString(16).padStart(2,"0");ctx.fill();
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*8,p.y-p.vy*8);ctx.strokeStyle=p.col+Math.round(p.life*100).toString(16).padStart(2,"0");ctx.lineWidth=0.8;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("MOTION DOCTRINE · SEPARATION · DRIFT FIELD · IMPULSE VECTOR · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MotionDoctrineView() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(8,12,24,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MOTION DOCTRINE · SEPARATION · DRIFT FIELD · IMPULSE VECTOR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Impulse particles with drift vectors — the live AETHER motion doctrine simulation.</p></div>
+          <MotionDoctrineCanvas />
+        </div>
+      </div>
       <style>{`@keyframes md-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.md-fade{animation:md-fade .55s ease-out both}@media(prefers-reduced-motion:reduce){.md-fade{animation:none}}`}</style>
 
       <div className="max-w-5xl mx-auto px-7 py-10 space-y-12">

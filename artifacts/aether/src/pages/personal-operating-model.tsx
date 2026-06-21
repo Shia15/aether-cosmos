@@ -93,9 +93,58 @@ const FUNCTIONS = [
   { c: B.violet, domain: "Strategy",     scope: "Organizations",                     effect: "Applies pressure at the highest leverage points" },
 ];
 
+import { useEffect, useRef } from "react";
+
+function PersonalOSCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes: {x:number;y:number;label:string;col:string;phase:number}[] = [
+      {x:150,y:72,label:"MISSION",col:"#2ef0d8",phase:0},
+      {x:300,y:40,label:"VALUES",col:"#c9a84c",phase:1},
+      {x:300,y:105,label:"SYSTEMS",col:"#9966ff",phase:2},
+      {x:500,y:72,label:"FOCUS",col:"#44aaff",phase:3},
+      {x:650,y:40,label:"ENERGY",col:"#44cc77",phase:4},
+      {x:650,y:105,label:"OUTPUT",col:"#ff4477",phase:5},
+      {x:800,y:72,label:"IMPACT",col:"#c9a84c",phase:6},
+    ];
+    const edges=[[0,1],[0,2],[1,3],[2,3],[3,4],[3,5],[4,6],[5,6]];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      edges.forEach(([a,b])=>{
+        ctx.beginPath();ctx.moveTo(nodes[a].x,nodes[a].y);ctx.lineTo(nodes[b].x,nodes[b].y);
+        ctx.strokeStyle="rgba(46,240,216,0.15)";ctx.lineWidth=0.6;ctx.stroke();
+      });
+      nodes.forEach(n=>{
+        const pls=0.8+0.2*Math.sin(t*0.04+n.phase);
+        ctx.beginPath();ctx.arc(n.x,n.y,12*pls,0,Math.PI*2);ctx.fillStyle=n.col+"22";ctx.fill();ctx.strokeStyle=n.col+"88";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle=n.col;ctx.font="bold 7px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(n.label,n.x,n.y+3);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PERSONAL OPERATING MODEL · MISSION · VALUES · SYSTEMS · IMPACT · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PersonalOperatingModelPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="personal-operating-model-page">
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-16,marginRight:-16}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PERSONAL OPERATING MODEL · MISSION · VALUES · SYSTEMS · IMPACT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>7 live OS nodes — the AETHER personal operating model simulation.</p></div>
+          <PersonalOSCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

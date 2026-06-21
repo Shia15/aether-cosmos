@@ -3,7 +3,7 @@ import cucaEquation from "@assets/IMG_1999_1781448388514.png";
 import integralTypes from "@assets/IMG_1998_1781448388514.jpeg";
 import atomicGeometry from "@assets/A66C4D09-0C1D-4F7A-96A5-446A7204E678_1781448388514.png";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const TABS = [
   { id: "geometry",  label: "Sacred Geometry Forms" },
@@ -14,11 +14,140 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
+function SacredGeometryCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 420;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const cx = W*0.38, cy = H/2;
+    const PHI = 1.6180339887;
+    let t = 0;
+
+    const drawCircle = (x:number,y:number,r:number,alpha:number,hue:number) => {
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.strokeStyle=`hsla(${hue},85%,65%,${alpha})`; ctx.lineWidth=0.8; ctx.stroke();
+    };
+
+    const draw = () => {
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,W,H);
+
+      const seedR = 56+3*Math.sin(t*0.02);
+      const pulse = 0.7+0.3*Math.sin(t*0.025);
+
+      drawCircle(cx,cy,seedR,0.55*pulse,43);
+      for (let i=0;i<6;i++){
+        const a=i/6*Math.PI*2;
+        drawCircle(cx+seedR*Math.cos(a),cy+seedR*Math.sin(a),seedR,0.35*pulse,43+i*8);
+      }
+      drawCircle(cx,cy,seedR*2,0.2*pulse,50);
+      drawCircle(cx,cy,seedR*3,0.12*pulse,45);
+
+      let r=seedR*0.35;
+      let fx=cx, fy=cy;
+      for (let i=0;i<13;i++){
+        ctx.beginPath(); ctx.arc(fx+r,fy,r,Math.PI,Math.PI*2);
+        ctx.strokeStyle=`rgba(201,168,76,${0.6*Math.pow(0.85,i)})`; ctx.lineWidth=1.2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(fx+r*2,fy-r,r,Math.PI*0.5,Math.PI*1.5);
+        ctx.strokeStyle=`rgba(201,168,76,${0.5*Math.pow(0.85,i)})`; ctx.lineWidth=1.0; ctx.stroke();
+        const nx=fx+r*2, ny=fy-r, nr=r*PHI;
+        fx=nx; fy=ny; r=nr;
+        if(r>320) break;
+      }
+
+      const spiral = (s:number)=>{
+        ctx.beginPath();
+        let sr=0.5;
+        for (let a=0;a<14*Math.PI;a+=0.04){
+          const px=cx-seedR*1.8+sr*Math.cos(a+t*0.01);
+          const py=cy+sr*Math.sin(a+t*0.01);
+          a<0.04?ctx.moveTo(px,py):ctx.lineTo(px,py);
+          sr*=Math.pow(PHI,0.04/Math.PI);
+        }
+        ctx.strokeStyle=`rgba(201,168,76,${s})`; ctx.lineWidth=1.5; ctx.stroke();
+      };
+      spiral(0.5);
+
+      const rx=W*0.68, ry=cy;
+      let rw=160, rh=rw/PHI;
+      for (let i=0;i<6;i++){
+        ctx.strokeStyle=`rgba(201,168,76,${0.45-i*0.06})`; ctx.lineWidth=0.7;
+        ctx.strokeRect(rx-rw/2,ry-rh/2,rw,rh);
+        const nr=rh, nh=rh/PHI;
+        rw=nr; rh=nh;
+      }
+      ctx.fillStyle="rgba(201,168,76,0.4)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("φ = 1.618…",rx,ry+88);
+
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="7.5px 'Space Mono',monospace";
+      ctx.fillText("SEED OF LIFE",cx,cy+seedR*2+18); ctx.textAlign="left";
+      const fibNums=[1,1,2,3,5,8,13,21,34,55];
+      fibNums.forEach((n,i)=>{
+        ctx.fillStyle=`rgba(201,168,76,${0.3+0.05*i})`;
+        ctx.font="7px 'Space Mono',monospace";
+        ctx.fillText(n.toString(),W*0.62+i*22,H-18);
+      });
+      ctx.fillStyle="rgba(201,168,76,0.25)"; ctx.font="7px 'Space Mono',monospace";
+      ctx.fillText("FIBONACCI",W*0.62,H-6);
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
+function SacredGeometryMathHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<6;i++){
+        const angle=i/6*Math.PI*2+t*0.01;
+        const r=55;
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.55;
+        ctx.beginPath();ctx.arc(x,y,r*0.95,0,Math.PI*2);ctx.strokeStyle=`rgba(201,168,76,${0.06+i*0.015})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,55,0,Math.PI*2);ctx.strokeStyle="rgba(201,168,76,0.2)";ctx.lineWidth=0.8;ctx.stroke();
+      for(let i=0;i<6;i++){
+        const a=i/6*Math.PI*2+t*0.01,r=55;
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r*0.55);ctx.strokeStyle="rgba(201,168,76,0.06)";ctx.lineWidth=0.4;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SACRED GEOMETRY · FLOWER OF LIFE · VESICA PISCIS · MATH · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SacredGeometryMathPage() {
   const [active, setActive] = useState<TabId>("geometry");
 
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SACRED GEOMETRY · FLOWER OF LIFE · VESICA PISCIS · MATH · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6-fold flower of life petals — the live AETHER sacred geometry simulation.</p></div>
+          <SacredGeometryMathHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #1c1209 50%, #0f172a 100%)", borderBottom: "1px solid #92400e", padding: "2.5rem 2rem 2rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
@@ -32,6 +161,26 @@ export default function SacredGeometryMathPage() {
           <p style={{ color: "#94a3b8", fontSize: "1rem", margin: 0, maxWidth: 680 }}>
             From the Sierpiński triangle to the CUCA plant wave equation — the mathematical language underlying AETHER's crystallization model, from atomic geometry to integral calculus.
           </p>
+        </div>
+      </div>
+
+      <div style={{ padding:"1.5rem 2rem 0", maxWidth:1100, margin:"0 auto" }}>
+        <div style={{ display:"inline-block", background:"rgba(245,158,11,0.1)", border:"1px solid rgba(245,158,11,0.3)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#fde68a", textTransform:"uppercase", marginBottom:"1rem" }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(245,158,11,0.2)",
+          borderLeft:"3px solid #f59e0b", borderRadius:14, padding:"1.5rem", marginBottom:"1.5rem" }}>
+          <h2 style={{ fontSize:"1.2rem", fontWeight:700, color:"#fde68a", margin:"0 0 0.35rem" }}>
+            Sacred Geometry · Seed of Life + φ Spiral
+          </h2>
+          <p style={{ color:"#94a3b8", fontSize:"0.82rem", margin:"0 0 1rem", lineHeight:1.65 }}>
+            Left: Seed of Life — the 7-circle genesis pattern (6 petals + center) underlying the Flower of Life.
+            Center: the golden-ratio φ spiral that emerges from Fibonacci rectangle subdivision.
+            Right: nested φ rectangles converging to the golden ratio 1.618….
+          </p>
+          <SacredGeometryCanvas />
         </div>
       </div>
 

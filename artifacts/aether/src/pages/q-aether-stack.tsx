@@ -96,9 +96,53 @@ const PERF = [
   { c: B.rose,   k: "Readout SNR",      v: "Interference readout signal-to-noise high enough to extract per-shot phase shifts within the coherence window" },
 ];
 
+import { useEffect, useRef } from "react";
+
+function QAetherStackHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const layers=[
+      {label:"Q-LAYER 5",y:18,col:"#9966ff",w:700},
+      {label:"Q-LAYER 4",y:44,col:"#2ef0d8",w:560},
+      {label:"Q-LAYER 3",y:70,col:"#c9a84c",w:420},
+      {label:"Q-LAYER 2",y:96,col:"#44cc77",w:280},
+      {label:"Q-LAYER 1",y:122,col:"#44aaff",w:140},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      layers.forEach((l,i)=>{
+        const pulse=0.85+0.15*Math.sin(t*0.04+i*0.7);
+        const x=(W-l.w*pulse)/2;
+        ctx.fillStyle=l.col+"18";ctx.fillRect(x,l.y-8,l.w*pulse,16);
+        ctx.strokeStyle=l.col+"66";ctx.lineWidth=0.6;ctx.strokeRect(x,l.y-8,l.w*pulse,16);
+        ctx.fillStyle=l.col;ctx.font="6px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(l.label,W/2,l.y+2);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("Q-AETHER STACK · QUANTUM LAYERS · COHERENCE STACK · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QAetherStackPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="q-aether-stack-page">
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-16,marginRight:-16}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>Q-AETHER STACK · QUANTUM LAYERS · COHERENCE STACK · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 quantum coherence layers — the live AETHER Q-stack simulation.</p></div>
+          <QAetherStackHeaderCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

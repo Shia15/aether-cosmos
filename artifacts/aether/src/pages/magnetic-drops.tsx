@@ -263,6 +263,10 @@ export default function MagneticDropsPage() {
     <div ref={rootRef} style={{ width: "100%", height: "100%", position: "relative", overflow: "hidden", background: "#050810" }}>
       <canvas ref={canvasRef} style={{ position: "absolute", inset: 0 }} />
 
+      <div style={{ position: "absolute", top: 8, left: 12, zIndex: 20, pointerEvents: "none" }}>
+        <div style={{display:"inline-block",border:"1px solid rgba(91,164,245,0.6)",padding:"3px 10px",fontSize:9,letterSpacing:"0.2em",color:"rgba(91,164,245,0.8)",fontFamily:"'DM Mono',monospace",marginBottom:6}}>LIVE SIMULATION</div>
+        <div style={{ fontFamily: "'DM Mono',monospace", fontSize: "0.6rem", letterSpacing: 3, color: "rgba(91,164,245,0.5)" }}>MAGNETIC DROPS · OSCILLATING FERROFLUID · AETHER</div>
+      </div>
       {/* Title overlay */}
       <div style={{ position: "absolute", top: 16, left: 20, zIndex: 10, pointerEvents: "none" }}>
         <div style={{ fontFamily: "'Cinzel',serif", fontSize: "0.78rem", fontWeight: 700, letterSpacing: 6, color: "rgba(91,164,245,0.55)" }}>AETHER</div>

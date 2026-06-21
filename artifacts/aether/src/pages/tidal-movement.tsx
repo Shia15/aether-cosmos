@@ -517,12 +517,52 @@ const NAV = [
   { id: "s7", label: "AETHER" },
 ];
 
+function TidalMovementHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      for(let wave=0;wave<4;wave++){
+        const phase=wave*0.4;
+        const amp=18+wave*6;
+        const baseY=H*0.5+wave*8;
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=3){
+          const y=baseY+amp*Math.sin(x*0.015+t*0.025+phase)+amp*0.4*Math.sin(x*0.03+t*0.04-phase);
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        const alpha=0.08+0.06*(4-wave)/4;
+        ctx.strokeStyle=`rgba(68,170,255,${alpha+0.05})`;ctx.lineWidth=0.8;ctx.stroke();
+        ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fillStyle=`rgba(30,80,160,${alpha})`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("TIDAL MOVEMENT · LUNAR PULL · WAVE DYNAMICS · OCEAN COHERENCE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function TidalMovementPage() {
   const [mode, setMode] = useState<Mode>("harmonics");
 
   return (
     <div style={{ background: BG0, minHeight: "100vh", fontFamily: body, color: PALE }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TIDAL MOVEMENT · LUNAR PULL · WAVE DYNAMICS · OCEAN COHERENCE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 layered tidal waves — the live AETHER tidal movement simulation.</p></div>
+          <TidalMovementHeaderCanvas />
+        </div>
+      </div>
       {/* ── HERO ── */}
       <div style={{ position: "relative", overflow: "hidden" }}>
         <div style={{

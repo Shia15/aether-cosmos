@@ -31,6 +31,54 @@ const T_SPIKE_MN = 0.10;            // thrust per peak (mN nominal)
 const T_FLOW_MN = 4.0;              // bulk peristaltic thrust (mN)
 const PHI = 1.6180339887498949;
 
+function FerroModesCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(11,12,15,0.3)"; ctx.fillRect(0, 0, W, H);
+      const half = W / 2;
+      ctx.beginPath();
+      for (let px = 0; px < half; px++) {
+        const x = px / half;
+        const spike = Math.pow(Math.sin(x * Math.PI * 10 + t * 0.05), 12) * 55;
+        const y = H * 0.6 - spike;
+        px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+      }
+      ctx.lineTo(half, H); ctx.lineTo(0, H); ctx.closePath();
+      const g1 = ctx.createLinearGradient(0, 0, 0, H);
+      g1.addColorStop(0, "rgba(153,102,255,0.7)"); g1.addColorStop(1, "rgba(153,102,255,0)");
+      ctx.fillStyle = g1; ctx.fill();
+      ctx.fillStyle = "rgba(153,102,255,0.5)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("SPIKE MODE", 12, 14);
+      ctx.beginPath();
+      for (let px = half; px < W; px++) {
+        const x = (px - half) / half;
+        const flow = Math.sin(x * Math.PI * 4 - t * 0.03) * 35 + Math.sin(x * Math.PI * 9 - t * 0.05) * 10;
+        const y = H * 0.55 - flow;
+        px === half ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(half, H); ctx.closePath();
+      const g2 = ctx.createLinearGradient(half, 0, W, 0);
+      g2.addColorStop(0, "rgba(46,240,216,0.7)"); g2.addColorStop(1, "rgba(46,240,216,0.3)");
+      ctx.fillStyle = g2; ctx.fill();
+      ctx.fillStyle = "rgba(46,240,216,0.5)"; ctx.textAlign = "right";
+      ctx.fillText("FLOW MODE", W - 12, 14); ctx.textAlign = "left";
+      ctx.beginPath(); ctx.moveTo(half, 0); ctx.lineTo(half, H);
+      ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function FerroModesPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("spike");
@@ -654,6 +702,14 @@ export default function FerroModesPage() {
   // ===== UI =====
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{ marginBottom:20 }}>
+        <div style={{ display:"inline-block", border:"1px solid #9966ff", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#9966ff", fontFamily:"'DM Mono',monospace", marginBottom:14 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(11,12,15,0.95)", border:"1px solid rgba(153,102,255,0.12)", borderLeft:"3px solid #9966ff", borderRadius:10, padding:18, marginBottom:14 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:17, color:"#e0f8ff", margin:"0 0 6px" }}>Ferro Modes · Spike Mode · Flow Mode · Two-Mode Hardware · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(153,102,255,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Left half SPIKE MODE (sharp ferrofluid peaks) vs right half FLOW MODE (smooth peristaltic waves) — the live AETHER ferrofluid simulation.</p>
+          <FerroModesCanvas />
+        </div>
+      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · ferrofluid · two-mode hardware · spike & flow

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -274,6 +274,38 @@ function OrganSystemReadinessGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function ThreeRsRealityHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const labels=["REDUCE","REUSE","RECYCLE"];
+    const cols=["#2ef0d8","#44cc77","#c9a84c"];
+    const cx=[W*0.25,W*0.5,W*0.75];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      labels.forEach((lb,i)=>{
+        const r=28+8*Math.sin(t*0.04+i*2.1);
+        const x=cx[i],y=H/2;
+        ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.strokeStyle=cols[i]+"44";ctx.lineWidth=1;ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,r-6,0,Math.PI*2);ctx.fillStyle=cols[i]+"10";ctx.fill();
+        ctx.fillStyle=cols[i]+"88";ctx.font="8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(lb,x,y+3);ctx.textAlign="left";
+        if(i<2){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(cx[i+1]-r,y);ctx.strokeStyle=cols[i]+"33";ctx.lineWidth=0.5;ctx.stroke();}
+      });
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("THREE Rs REALITY · REDUCE · REUSE · RECYCLE · CIRCULAR ECONOMY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ThreeRsRealityPage() {
   return (
     <div
@@ -284,6 +316,13 @@ export default function ThreeRsRealityPage() {
       }}
     >
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>THREE Rs REALITY · REDUCE · REUSE · RECYCLE · CIRCULAR ECONOMY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Reduce / Reuse / Recycle pulse rings — the live AETHER circular economy simulation.</p></div>
+            <ThreeRsRealityHeaderCanvas />
+          </div>
+        </div>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 3, marginBottom: 8 }}>

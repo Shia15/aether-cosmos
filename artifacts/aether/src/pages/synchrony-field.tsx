@@ -519,6 +519,42 @@ function Tog({ label, on, col, onToggle }: { label: string; on: boolean; col: st
 /* ══════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════ */
+function SynchronyFieldHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const osc=12;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<osc;i++){
+        const angle=i/osc*Math.PI*2;
+        const r=50+15*Math.sin(t*0.03+i*0.5);
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.6;
+        ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=`rgba(46,240,216,${0.4+0.4*Math.sin(t*0.05+i*0.5)})`;ctx.fill();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle="rgba(46,240,216,0.06)";ctx.lineWidth=0.3;ctx.stroke();
+        for(let j=i+1;j<osc;j++){
+          const a2=j/osc*Math.PI*2,r2=50+15*Math.sin(t*0.03+j*0.5);
+          const x2=cx+Math.cos(a2)*r2,y2=cy+Math.sin(a2)*r2*0.6;
+          const sync=Math.abs(Math.sin(t*0.03+i*0.5)-Math.sin(t*0.03+j*0.5));
+          if(sync<0.2){ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x2,y2);ctx.strokeStyle=`rgba(46,240,216,${0.1-sync*0.4})`;ctx.lineWidth=0.3;ctx.stroke();}
+        }
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SYNCHRONY FIELD · PHASE LOCKING · ENTRAINMENT · COHERENT OSCILLATION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SynchronyFieldPage() {
   const [nAgents,      setN]       = useState(6);
   const [K,            setK]       = useState(1.4);
@@ -547,6 +583,13 @@ export default function SynchronyFieldPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SYNCHRONY FIELD · PHASE LOCKING · ENTRAINMENT · COHERENT OSCILLATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 phase-locking oscillators — the live AETHER synchrony field simulation.</p></div>
+          <SynchronyFieldHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 70% 50% at 50% 0%, ${TEAL}09, transparent)` }}>

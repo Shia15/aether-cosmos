@@ -587,6 +587,48 @@ function LiveAgentField() {
 
 // ─── Main Pipeline page ───────────────────────────────────────────────────────
 
+function PipelineHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const stages=[
+      {label:"MNĒSIS",x:100,col:"#9966ff"},
+      {label:"INFERNIA",x:300,col:"#2ef0d8"},
+      {label:"ALETHEIA",x:500,col:"#c9a84c"},
+      {label:"REVERIE",x:700,col:"#44cc77"},
+    ];
+    const tokens: {x:number;y:number;stage:number;progress:number}[]=[];
+    for(let i=0;i<6;i++) tokens.push({x:0,y:H/2,stage:0,progress:i/6});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      ctx.beginPath();stages.forEach((s,i)=>{i===0?ctx.moveTo(s.x,H/2):ctx.lineTo(s.x,H/2);});ctx.strokeStyle="rgba(46,240,216,0.1)";ctx.lineWidth=1;ctx.stroke();
+      stages.forEach(s=>{
+        ctx.beginPath();ctx.arc(s.x,H/2,16,0,Math.PI*2);ctx.fillStyle=s.col+"22";ctx.fill();ctx.strokeStyle=s.col+"66";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.fillStyle=s.col;ctx.font="6px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(s.label,s.x,H/2+3);ctx.textAlign="left";
+      });
+      tokens.forEach(tk=>{
+        tk.progress=(tk.progress+0.003)%1;
+        const si=Math.floor(tk.progress*(stages.length-1));
+        const fr=tk.progress*(stages.length-1)-si;
+        const sa=stages[Math.min(si,stages.length-1)],sb=stages[Math.min(si+1,stages.length-1)];
+        const x=sa.x+(sb.x-sa.x)*fr,y=H/2+(Math.sin(t*0.08+si*1.5))*22;
+        ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=sa.col+"cc";ctx.fill();
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PIPELINE · CRYSTALLIZATION ENGINE · MNĒSIS → REVERIE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PipelinePage() {
   const [inputText, setInputText] = useState("");
   const [result, setResult] = useState<PipelineResult | null>(null);
@@ -616,6 +658,13 @@ export default function PipelinePage() {
 
   return (
     <div className="h-full overflow-y-auto px-8 py-8 space-y-8">
+      <div style={{flexShrink:0,marginBottom:20,marginLeft:-32,marginRight:-32,marginTop:-32}}>
+        <div style={{padding:"8px 32px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 32px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PIPELINE · CRYSTALLIZATION ENGINE · MNĒSIS → REVERIE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4-stage crystallization flow — the live AETHER pipeline simulation.</p></div>
+          <PipelineHeaderCanvas />
+        </div>
+      </div>
       <div>
         <div className="font-mono text-xs text-primary tracking-[0.3em] mb-3 uppercase">AETHER Crystallization Runtime v1.0</div>
         <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground mb-4">Live Pipeline</h1>

@@ -338,6 +338,44 @@ const VIDEO_DURATIONS: { sec: number; label: string }[] = [
   { sec: 8, label: "8s" },
 ];
 
+function SparkleTextHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const sparks: {x:number;y:number;life:number;maxLife:number;col:string;vx:number;vy:number}[]=[];
+    const addSpark=()=>{
+      const cols=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff","#ffffff"];
+      sparks.push({x:W*0.1+Math.random()*W*0.8,y:H*0.1+Math.random()*H*0.8,life:1,maxLife:1,col:cols[Math.floor(Math.random()*cols.length)],vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*2});
+    };
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      if(Math.random()>0.6) addSpark();
+      for(let i=sparks.length-1;i>=0;i--){
+        const s=sparks[i];
+        s.x+=s.vx;s.y+=s.vy;s.life-=0.02;
+        if(s.life<=0){sparks.splice(i,1);continue;}
+        const size=5*s.life;
+        ctx.save();ctx.translate(s.x,s.y);
+        for(let arm=0;arm<4;arm++){
+          ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-size);ctx.strokeStyle=s.col+Math.round(s.life*255).toString(16).padStart(2,"0");ctx.lineWidth=0.8;ctx.stroke();
+        }
+        ctx.restore();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SPARKLE STUDIO · SHIMMER · TEXTURE · PARTICLE ART · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SparkleTextPage() {
   const [text, setText] = useState("AETHER");
   const [size, setSize] = useState(140);
@@ -916,6 +954,13 @@ export default function SparkleTextPage() {
       color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPARKLE STUDIO · SHIMMER · TEXTURE · PARTICLE ART · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live 4-arm sparkle particles — the AETHER sparkle studio simulation.</p></div>
+          <SparkleTextHeaderCanvas />
+        </div>
+      </div>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');
 

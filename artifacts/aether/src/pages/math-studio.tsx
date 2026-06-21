@@ -344,6 +344,38 @@ function escHtml(s: string): string {
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
+function MathStudioCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const PHI=(1+Math.sqrt(5))/2;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,8,18,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<80;i++){
+        const a=i*PHI*Math.PI*2;
+        const r=Math.sqrt(i)*9+Math.sin(t*0.02+i*0.1)*4;
+        const x=cx+r*Math.cos(a),y=cy+r*Math.sin(a)*0.55;
+        const hue=i*137.5+t*0.5;
+        const bright=0.4+0.4*Math.sin(t*0.025+i*0.15);
+        ctx.beginPath();ctx.arc(x,y,2+bright,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${Math.round(100+bright*155)},${Math.round(200+bright*55)},255,${bright})`;ctx.fill();
+      }
+      ctx.fillStyle="rgba(100,200,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("MATH STUDIO · PHI SPIRAL · FIBONACCI LATTICE · PRIME ALGEBRA · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MathStudioPage() {
   const bgRef = useRef<HTMLCanvasElement>(null);
   usePhiBg(bgRef);
@@ -570,6 +602,13 @@ export default function MathStudioPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11, position: "relative" }}>
+      <div style={{flexShrink:0,position:"relative",zIndex:10}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #64c8ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#64c8ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,8,18,0.8)",borderLeft:"3px solid #64c8ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#64c8ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MATH STUDIO · PHI SPIRAL · FIBONACCI LATTICE · PRIME ALGEBRA · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(100,200,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>80-point Fibonacci spiral — the live AETHER math studio simulation.</p></div>
+          <MathStudioCanvas />
+        </div>
+      </div>
 
       {/* Fibonacci background */}
       <canvas ref={bgRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0 }} />

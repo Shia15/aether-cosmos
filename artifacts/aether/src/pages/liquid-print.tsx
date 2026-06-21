@@ -25,6 +25,44 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
 
 type Gate = { kind: "AND" | "OR" | "NOT" | "XOR" | "NAND"; col: string; phase: number };
 
+function LiquidPrintCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const cols=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff"];
+    const draw=()=>{
+      ctx.fillStyle="rgba(6,7,12,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<5;i++){
+        const phase=t*0.018+i*(Math.PI*2/5);
+        const x=W*0.5+Math.cos(phase)*180;
+        const y=H*0.5+Math.sin(phase)*35;
+        const r=12+8*Math.abs(Math.sin(t*0.025+i));
+        const gr=ctx.createRadialGradient(x,y,0,x,y,r*2.5);
+        gr.addColorStop(0,cols[i]+"55");gr.addColorStop(1,cols[i]+"00");
+        ctx.beginPath();ctx.arc(x,y,r*2.5,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+        ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=cols[i]+"66";ctx.fill();
+        if(i>0){
+          const prev=i-1; const pp=t*0.018+(i-1)*(Math.PI*2/5);
+          const px=W*0.5+Math.cos(pp)*180,py=H*0.5+Math.sin(pp)*35;
+          ctx.beginPath();ctx.moveTo(px,py);ctx.quadraticCurveTo(W/2,H/2,x,y);
+          ctx.strokeStyle=cols[i]+"33";ctx.lineWidth=1;ctx.stroke();
+        }
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("LIQUID PRINT · BIO-HYBRID INK · SUBSTRATE DEPOSITION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function LiquidPrintPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("gel");
@@ -648,6 +686,13 @@ export default function LiquidPrintPage() {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(6,7,12,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LIQUID PRINT · BIO-HYBRID INK · SUBSTRATE DEPOSITION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 orbiting ink blobs — the live AETHER liquid print deposition simulation.</p></div>
+          <LiquidPrintCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes lp-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes lp-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

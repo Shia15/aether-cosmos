@@ -560,10 +560,53 @@ const STACK = [
 ];
 
 /* ── Page ──────────────────────────────────── */
+function PhiCellularHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const PHI=1.6180339887;
+    const cells: {x:number;y:number;phase:number}[] = [];
+    for(let i=0;i<20;i++){
+      const angle=i*PHI*Math.PI*2;
+      const r=8+i*4;
+      cells.push({x:W/2+Math.cos(angle)*r*2.2,y:H/2+Math.sin(angle)*r*0.65,phase:i*0.4});
+    }
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      cells.forEach((c,i)=>{
+        c.phase+=0.03;
+        const pls=0.7+0.3*Math.sin(c.phase);
+        const sz=6+i*0.4;
+        ctx.beginPath();ctx.arc(c.x,c.y,sz*pls,0,Math.PI*2);
+        ctx.fillStyle=`hsla(${(i*PHI*60)%360},70%,60%,0.4)`;ctx.fill();
+        ctx.strokeStyle=`hsla(${(i*PHI*60)%360},80%,70%,0.6)`;ctx.lineWidth=0.6;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("φ-CELLULAR · GOLDEN RATIO CELL DIVISION · PHI GROWTH · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhiCellularPage() {
   const [mode, setMode] = useState<Mode>("lattice");
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>φ-CELLULAR · GOLDEN RATIO CELL DIVISION · PHI GROWTH · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>20 phi-spiral cells — the live AETHER phi-cellular simulation.</p></div>
+          <PhiCellularHeaderCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{

@@ -614,6 +614,58 @@ function Sl({ label, val, min, max, step, col, fmt, onChange }: {
   );
 }
 
+function CavityComputerCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 240;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const modes=[
+      { n:1, col:"#2ef0d8" },{ n:2, col:"#9966ff" },
+      { n:3, col:"#c9a84c" },{ n:4, col:"#ff4477" },
+    ];
+    const photons: {x:number,y:number,vx:number,vy:number,col:string,life:number}[]=[];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      ctx.beginPath(); ctx.arc(cx,cy,90,0,Math.PI*2);
+      ctx.strokeStyle="rgba(46,240,216,0.12)"; ctx.lineWidth=40; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,90,0,Math.PI*2);
+      ctx.strokeStyle="rgba(46,240,216,0.08)"; ctx.lineWidth=1; ctx.stroke();
+      modes.forEach((m,i)=>{
+        const ang=t*0.02+i*(Math.PI/2);
+        const r=70+10*Math.sin(t*0.05*m.n);
+        const x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
+        ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2);
+        ctx.fillStyle=m.col; ctx.shadowColor=m.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        if(Math.random()<0.08) photons.push({ x, y, vx:(Math.random()-0.5)*3, vy:(Math.random()-0.5)*3, col:m.col, life:40 });
+      });
+      for(let i=photons.length-1;i>=0;i--){
+        const p=photons[i];
+        p.x+=p.vx; p.y+=p.vy; p.life--;
+        ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2);
+        ctx.fillStyle=p.col+(Math.floor(p.life*6).toString(16).padStart(2,"0"));
+        ctx.fill();
+        if(p.life<=0) photons.splice(i,1);
+      }
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,20+4*Math.sin(t*0.08));
+      g.addColorStop(0,"#2ef0d8cc"); g.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,20+4*Math.sin(t*0.08),0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CAVITY COMPUTER · OPTICAL CAVITY · CAVITY QED · PHOTON MODES · QUANTUM COMPUTING · AETHER",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
@@ -625,6 +677,25 @@ export default function CavityComputerPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:TEAL, textTransform:"uppercase", fontFamily:mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)",
+          borderLeft:`3px solid ${TEAL}`, borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'Space Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Cavity Computer · Optical Cavity · Cavity QED · Photon Modes · Quantum Computing
+          </h2>
+          <p style={{ fontFamily:mono, fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Four photon modes (teal · violet · gold · rose) orbiting the optical cavity in a quantum-dot pattern,
+            with spontaneous photon emission bursts radiating outward and a pulsing core — the live AETHER
+            cavity QED quantum computing simulation.
+          </p>
+          <CavityComputerCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 80% 60% at 50% 0%, ${TEAL}07, ${VIO}04, transparent)` }}>

@@ -592,6 +592,43 @@ function Sl({ label, val, min, max, step, col, fmt, onChange }: {
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function PhotonEmissionHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const photons: {x:number;y:number;vx:number;vy:number;col:string;life:number;maxLife:number}[] = [];
+    const emit=()=>{
+      const cx=W*0.35,cy=H*0.5;
+      const angle=(Math.random()-0.5)*Math.PI*0.6;
+      photons.push({x:cx,y:cy,vx:Math.cos(angle)*3,vy:Math.sin(angle)*1.5,col:["#ff4477","#ff8800","#ffdd00","#2ef0d8"][Math.floor(Math.random()*4)],life:0,maxLife:50+Math.random()*30});
+    };
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      if(t%8===0) emit();
+      for(let i=photons.length-1;i>=0;i--){
+        const p=photons[i];
+        p.x+=p.vx;p.y+=p.vy;p.life++;
+        if(p.life>p.maxLife){photons.splice(i,1);continue;}
+        const alpha=1-p.life/p.maxLife;
+        ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle=p.col+Math.round(alpha*255).toString(16).padStart(2,"0");ctx.fill();
+        ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle=p.col+Math.round(alpha*80).toString(16).padStart(2,"0");ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(W*0.35,H*0.5,18,0,Math.PI*2);ctx.fillStyle="rgba(255,68,119,0.2)";ctx.fill();ctx.strokeStyle="rgba(255,68,119,0.5)";ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle="rgba(255,68,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("PHOTON EMISSION · BLACKBODY RADIATION · THERMAL SPECTRUM · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PhotonEmissionPage() {
   const [T_body, setT_body] = useState(310);
   const [T_room, setT_room] = useState(293);
@@ -602,6 +639,13 @@ export default function PhotonEmissionPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #ff4477",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ff4477",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ff4477",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ff4477",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PHOTON EMISSION · BLACKBODY RADIATION · THERMAL SPECTRUM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,68,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live photon emission from thermal source — the AETHER photon emission simulation.</p></div>
+          <PhotonEmissionHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"52px 24px 28px",
         background:`radial-gradient(ellipse 70% 50% at 50% 0%, ${AMB}06, ${TEAL}04, transparent)` }}>

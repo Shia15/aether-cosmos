@@ -1,8 +1,46 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import singleStepImg from "@assets/IMG_1462_1777522469652.jpeg";
 import branchTreeImg from "@assets/IMG_1467_1777522469652.jpeg";
+
+function EniacCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 220;
+    const ctx = canvas.getContext("2d")!;
+    const pts: { x:number; y:number; col:string }[] = [];
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      if(tick%3===0&&pts.length<400){
+        const t=Math.random()*Math.PI*2, r=Math.random()*80;
+        pts.push({ x:350+r*Math.cos(t), y:110+r*Math.sin(t)*0.6, col:Math.random()<0.5?"#E6B85C":"#7CD7FF" });
+      }
+      ctx.clearRect(0,0,700,220);
+      ctx.fillStyle="#070918"; ctx.fillRect(0,0,700,220);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(230,184,92,0.08)";
+      ctx.fillText("ENIAC MONTE CARLO · RANDOM SAMPLING · PROBABILISTIC COMPUTATION · AETHER",10,14);
+      pts.forEach(p=>{
+        ctx.beginPath(); ctx.arc(p.x,p.y,1.5,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.globalAlpha=0.7; ctx.fill(); ctx.globalAlpha=1;
+      });
+      ctx.beginPath(); ctx.ellipse(350,110,80,48,0,0,Math.PI*2);
+      ctx.strokeStyle="rgba(230,184,92,0.3)"; ctx.lineWidth=1; ctx.stroke();
+      const inside=pts.filter(p=>{ const dx=(p.x-350)/80, dy=(p.y-110)/48; return dx*dx+dy*dy<=1; });
+      const pi=4*(inside.length/Math.max(pts.length,1));
+      ctx.fillStyle="#E6B85C"; ctx.font="12px 'DM Mono',monospace";
+      ctx.fillText(`π ≈ ${pi.toFixed(4)}  (n=${pts.length})`,20,200);
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
 
 const B = {
   bg: "#070918",
@@ -267,6 +305,18 @@ function MonteCarloHistoriesGlyph() {
 export default function EniacMonteCarloPage() {
   return (
     <div data-testid="page-eniac-monte-carlo" style={{ background: B.bg, minHeight: "100vh", padding: "32px 28px", color: B.ink }}>
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #E6B85C", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#E6B85C", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(7,9,24,0.95)", border:"1px solid rgba(230,184,92,0.15)", borderLeft:"3px solid #E6B85C", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            ENIAC Monte Carlo · π Estimation · Random Sampling · Neutron Transport · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(230,184,92,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Live Monte Carlo π estimation — random points sampled inside/outside an ellipse — the live AETHER probabilistic computation simulation.
+          </p>
+          <EniacCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Header */}

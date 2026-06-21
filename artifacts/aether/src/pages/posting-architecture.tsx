@@ -405,6 +405,47 @@ function Wings({ color, className = "" }: { color: string; className?: string })
   );
 }
 
+import { useEffect, useRef } from "react";
+
+function PostingArchHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const layers: {label:string;y:number;col:string;nodes:number}[] = [
+      {label:"STRATEGY",y:22,col:"#9966ff",nodes:2},
+      {label:"CONTENT",y:52,col:"#2ef0d8",nodes:4},
+      {label:"FORMAT",y:82,col:"#c9a84c",nodes:6},
+      {label:"PUBLISH",y:112,col:"#44cc77",nodes:8},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      layers.forEach((l,li)=>{
+        const spacing=W/(l.nodes+1);
+        for(let n=0;n<l.nodes;n++){
+          const x=spacing*(n+1);
+          const pls=0.8+0.2*Math.sin(t*0.04+n*0.7+li);
+          ctx.beginPath();ctx.arc(x,l.y,8*pls,0,Math.PI*2);ctx.fillStyle=l.col+"33";ctx.fill();ctx.strokeStyle=l.col+"77";ctx.lineWidth=0.6;ctx.stroke();
+          if(li>0){
+            const prev=layers[li-1];const px=W/(prev.nodes+1)*(Math.floor(n*prev.nodes/l.nodes)+1);
+            ctx.beginPath();ctx.moveTo(x,l.y);ctx.lineTo(px,prev.y);ctx.strokeStyle=l.col+"22";ctx.lineWidth=0.4;ctx.stroke();
+          }
+        }
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("POSTING ARCHITECTURE · CONTENT STRATEGY · DISTRIBUTION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function PostingArchitecturePage() {
   return (
     <div
@@ -412,6 +453,13 @@ export default function PostingArchitecturePage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="posting-architecture-page"
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>POSTING ARCHITECTURE · CONTENT STRATEGY · DISTRIBUTION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4-layer content architecture — the live AETHER posting architecture simulation.</p></div>
+          <PostingArchHeaderCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes pa-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes pa-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(36px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

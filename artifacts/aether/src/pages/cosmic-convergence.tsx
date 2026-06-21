@@ -184,6 +184,43 @@ const MESSENGERS = [
     biology: "Circadian rhythms in reproductive cycles partially mediated by melatonin (which is disrupted during geomagnetic events). Some evidence for heightened birth clustering near magnetic quiet periods following storms." },
 ];
 
+function CosmicConvergenceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const streams: {x:number,vy:number,col:string,t:number}[]=[];
+    for(let i=0;i<30;i++) streams.push({ x:Math.random()*W, vy:0.5+Math.random()*1.5, col:`hsl(${Math.random()*60+180},75%,60%)`, t:Math.random()*H });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(1,3,10,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      streams.forEach(s=>{
+        s.t+=s.vy; if(s.t>H) s.t=0;
+        const dx=cx-s.x, dy=cy-s.t;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        const pull=Math.min(1,80/Math.max(dist,1));
+        s.x+=dx*pull*0.02;
+        ctx.beginPath(); ctx.arc(s.x,s.t,1.5,0,Math.PI*2);
+        ctx.fillStyle=s.col; ctx.globalAlpha=0.5+pull*0.5; ctx.fill(); ctx.globalAlpha=1;
+      });
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,30+10*Math.sin(t*0.04));
+      g.addColorStop(0,"rgba(201,168,76,0.6)"); g.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,30,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+      ctx.fillStyle="rgba(201,168,76,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COSMIC CONVERGENCE · PARTICLE STREAMS · GALACTIC ATTRACTOR · AETHER FIELD COLLAPSE",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CosmicConvergencePage() {
   const [tab, setTab] = useState<"convergence"|"heliobiology"|"synchronicities"|"tracker">("convergence");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -202,6 +239,18 @@ export default function CosmicConvergencePage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #c9a84c", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c9a84c", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(201,168,76,0.15)", borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Cosmic Convergence · Particle Streams · Galactic Attractor · AETHER Field Collapse
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(201,168,76,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Thirty chromatic particle streams converging toward a golden galactic attractor — the live AETHER cosmic field collapse simulation.
+          </p>
+          <CosmicConvergenceCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div className="border-b px-6 py-4 sticky top-0 z-20" style={{ background: C.panel + "ee", borderColor: C.gold + "25" }}>
         <p className="text-[10px] tracking-[0.3em] font-['Cinzel',serif] mb-0.5" style={{ color: C.gold + "55" }}>

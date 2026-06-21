@@ -20,6 +20,39 @@ const TABS: { key: TabKey; label: string; sym: string; col: string }[] = [
   { key: "charge",     label: "Charge Balance",    sym: "±",  col: C.green },
 ];
 
+function SpinVacuumHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<12;i++){
+        const angle=i/12*Math.PI*2+t*0.02;
+        const r=40+15*Math.sin(t*0.05+i*0.5);
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.5;
+        ctx.save();ctx.translate(x,y);
+        ctx.beginPath();ctx.moveTo(0,-5);ctx.lineTo(0,5);ctx.strokeStyle="rgba(46,240,216,0.6)";ctx.lineWidth=0.8;ctx.stroke();
+        ctx.beginPath();ctx.arc(0,0,2,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.5)";ctx.fill();
+        ctx.restore();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle="rgba(46,240,216,0.04)";ctx.lineWidth=0.3;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(cx,cy,8,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.3)";ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SPIN VACUUM · TORSION FIELD · ZERO POINT SPIN · VACUUM FLUCTUATION · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SpinVacuumPage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<TabKey>("persistent");
@@ -538,6 +571,13 @@ export default function SpinVacuumPage() {
 
   return (
     <div className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "ui-sans-serif, system-ui" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPIN VACUUM · TORSION FIELD · ZERO POINT SPIN · VACUUM FLUCTUATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 orbital spin states — the live AETHER spin vacuum simulation.</p></div>
+          <SpinVacuumHeaderCanvas />
+        </div>
+      </div>
       <header className="mb-6">
         <div className="text-[10px] tracking-[0.4em] uppercase" style={{ color: C.muted }}>
           AETHER · SPIN-VACUUM HARDWARE · {new Date().toLocaleString("en-US", { month: "long", year: "numeric" }).toUpperCase()}

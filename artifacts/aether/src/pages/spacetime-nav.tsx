@@ -704,6 +704,39 @@ function Tbl({ headers, rows, accent = MNESIS }:
 /* ════════════════════════════════════════════════════════
    PAGE
 ════════════════════════════════════════════════════════ */
+function SpacetimeNavHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const stars: {x:number;y:number;r:number;phase:number}[]=[];
+    for(let i=0;i<60;i++) stars.push({x:Math.random()*W,y:Math.random()*H,r:0.5+Math.random()*1.5,phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      stars.forEach(s=>{
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*(0.7+0.3*Math.sin(t*0.05+s.phase)),0,Math.PI*2);ctx.fillStyle="rgba(255,255,255,0.5)";ctx.fill();
+      });
+      for(let ring=1;ring<=3;ring++){
+        ctx.beginPath();ctx.arc(cx,cy,ring*28,0,Math.PI*2);ctx.strokeStyle=`rgba(46,240,216,${0.06+ring*0.03})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+      const navAngle=t*0.02;
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(navAngle)*55,cy+Math.sin(navAngle)*40);ctx.strokeStyle="rgba(46,240,216,0.5)";ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(cx,cy,6,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.8)";ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SPACETIME NAV · WARP DRIVE · NAVIGATION MESH · TEMPORAL DRIFT · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SpacetimeNavPage() {
   const [navState, setNavState] = useState<NavState>("DOCKED");
   const [coreMode, setCoreMode] = useState<CoreMode>("CLARITY");
@@ -762,7 +795,13 @@ export default function SpacetimeNavPage() {
 
   return (
     <div style={{ background: BG_DEEP, minHeight: "100vh", fontFamily: body, color: TEXT_L }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPACETIME NAV · WARP DRIVE · NAVIGATION MESH · TEMPORAL DRIFT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Star field + rotating nav compass — the live AETHER spacetime navigation simulation.</p></div>
+          <SpacetimeNavHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{
         padding: "60px 28px 40px", textAlign: "center",

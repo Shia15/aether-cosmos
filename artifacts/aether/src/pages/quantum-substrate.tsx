@@ -244,6 +244,43 @@ function drawKnot(canvas: HTMLCanvasElement, t: number, knotType: KnotType) {
 const KNOT_TYPES: KnotType[] = ["trefoil", "figure8", "torus", "cinquefoil"];
 const MAT_SIZES = [3, 4, 5];
 
+function QuantumSubstrateHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const layers=[
+      {y:20,col:"#2ef0d8",label:"QUANTUM LAYER",w:800},
+      {y:52,col:"#9966ff",label:"SUBSTRATE MESH",w:620},
+      {y:84,col:"#c9a84c",label:"FIELD LAYER",w:440},
+      {y:116,col:"#44cc77",label:"BASE SUBSTRATE",w:260},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      layers.forEach((l,i)=>{
+        const pulse=0.88+0.12*Math.sin(t*0.035+i*0.9);
+        const x=(W-l.w*pulse)/2;
+        for(let seg=0;seg<Math.round(l.w*pulse/18);seg++){
+          const sx=x+seg*18,alpha=0.08+0.08*Math.sin(t*0.04+seg*0.3+i);
+          ctx.fillStyle=l.col+Math.round(alpha*255).toString(16).padStart(2,"0");ctx.fillRect(sx,l.y-7,16,14);
+        }
+        ctx.strokeStyle=l.col+"55";ctx.lineWidth=0.6;ctx.strokeRect(x,l.y-7,l.w*pulse,14);
+        ctx.fillStyle=l.col;ctx.font="5.5px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(l.label,W/2,l.y+2.5);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("QUANTUM SUBSTRATE · FIELD LAYERS · MESH COHERENCE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QuantumSubstratePage() {
   const diagRef = useRef<HTMLCanvasElement>(null);
   const knotRef = useRef<HTMLCanvasElement>(null);
@@ -300,6 +337,13 @@ export default function QuantumSubstratePage() {
 
   return (
     <div style={{ minHeight: "100%", background: C.bg, color: C.white, fontFamily: "'DM Mono',monospace", overflowY: "auto" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM SUBSTRATE · FIELD LAYERS · MESH COHERENCE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 pulsing mesh layers — the live AETHER quantum substrate simulation.</p></div>
+          <QuantumSubstrateHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(0,229,192,0.1)", padding: "2rem 2.5rem 1.5rem" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.35em", color: C.teal, textTransform: "uppercase", marginBottom: 8 }}>

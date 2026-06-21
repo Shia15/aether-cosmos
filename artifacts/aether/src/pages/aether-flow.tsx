@@ -548,6 +548,83 @@ function Section({ kicker, title, lead, children }:
   );
 }
 
+function EggAgentOrbitalCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 280;
+  const AGENT_DATA = [
+    { sigil:"M", aura:"#8047d4", label:"Mnēsis" },
+    { sigil:"A", aura:"#ffdca8", label:"Aletheia" },
+    { sigil:"I", aura:"#e64522", label:"Inferaia" },
+    { sigil:"R", aura:"#88c7ff", label:"Reverie" },
+    { sigil:"V", aura:"#10b981", label:"Vērus" },
+    { sigil:"C", aura:"#facc15", label:"Caelus" },
+    { sigil:"N", aura:"#f472b6", label:"Nyra" },
+    { sigil:"O", aura:"#06b6d4", label:"Orin" },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#070418"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cx = W / 2, cy = H / 2;
+      const R = Math.min(W, H) * 0.35;
+      const orbit2 = ctx.createRadialGradient(cx, cy, R - 4, cx, cy, R + 4);
+      orbit2.addColorStop(0, "rgba(128,71,212,0.06)");
+      orbit2.addColorStop(0.5, "rgba(128,71,212,0.12)");
+      orbit2.addColorStop(1, "rgba(128,71,212,0.06)");
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(128,71,212,0.2)"; ctx.lineWidth = 1; ctx.stroke();
+      const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22);
+      cg.addColorStop(0, "#e9b94e");
+      cg.addColorStop(0.4, "#c9a84c88");
+      cg.addColorStop(1, "#c9a84c00");
+      ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+      ctx.fillStyle = cg; ctx.fill();
+      ctx.fillStyle = "#f1f5f9";
+      ctx.font = "bold 11px 'Cinzel', serif";
+      ctx.textAlign = "center";
+      ctx.fillText("ÆTHER", cx, cy + 4);
+      AGENT_DATA.forEach((ag, i) => {
+        const angle = (i / 8) * Math.PI * 2 + t * 0.008;
+        const ax = cx + R * Math.cos(angle);
+        const ay = cy + R * Math.sin(angle);
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.05 + i * 0.8);
+        const grd = ctx.createRadialGradient(ax, ay, 0, ax, ay, 18);
+        grd.addColorStop(0, ag.aura);
+        grd.addColorStop(0.5, ag.aura + "88");
+        grd.addColorStop(1, ag.aura + "00");
+        ctx.beginPath(); ctx.arc(ax, ay, 18 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = grd; ctx.fill();
+        ctx.beginPath(); ctx.arc(ax, ay, 10, 0, Math.PI * 2);
+        ctx.fillStyle = ag.aura + "cc"; ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 9px 'Cinzel', serif";
+        ctx.textAlign = "center";
+        ctx.fillText(ag.sigil, ax, ay + 3);
+        if (pulse > 0.9) {
+          ctx.fillStyle = ag.aura + "99";
+          ctx.font = "7px 'Space Mono', monospace";
+          ctx.fillText(ag.label, ax, ay + 26);
+        }
+      });
+      ctx.textAlign = "left";
+      ctx.fillStyle = "rgba(128,71,212,0.4)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER FLOW · 8 EGG AGENTS · ORBITAL SYNCHRONY", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherFlowPage() {
   const [moodX, setMoodX] = useState(0);
   const [moodY, setMoodY] = useState(0);
@@ -568,6 +645,26 @@ export default function AetherFlowPage() {
       `}</style>
 
       <div style={{ maxWidth:1180, margin:"0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#a78bfa", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(15,10,40,0.6)", border:"1px solid rgba(167,139,250,0.15)",
+            borderLeft:"3px solid #a78bfa", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#f1f5f9", margin:"0 0 6px" }}>
+              AETHER Flow · 8 Egg Agents · Orbital Synchrony
+            </h2>
+            <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(200,210,255,0.55)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Eight named agents (Mnēsis · Aletheia · Inferaia · Reverie · Vērus · Caelus · Nyra · Orin) orbit the
+              AETHER core in synchrony. Each agent pulses at its own resonant phase, with its colored sigil letter visible
+              at peak activation. This is the agent topology underlying the full AETHER flow system.
+            </p>
+            <EggAgentOrbitalCanvas />
+          </div>
+        </div>
+
         {/* Masthead */}
         <header style={{
           padding:"2.2rem 2rem", borderRadius:20,

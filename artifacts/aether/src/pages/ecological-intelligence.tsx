@@ -1,6 +1,64 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+function EcoIntelCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 220;
+    const ctx = canvas.getContext("2d")!;
+    const nodes = [
+      { x:100, y:110, label:"OAK",    col:"#2dd4bf" },
+      { x:220, y:60,  label:"PINE",   col:"#4ade80" },
+      { x:340, y:140, label:"MYCO",   col:"#c084fc" },
+      { x:460, y:70,  label:"FUNGI",  col:"#fbbf24" },
+      { x:580, y:130, label:"ALGAE",  col:"#60a5fa" },
+    ];
+    const edges = [[0,2],[1,2],[2,3],[2,4],[3,4]];
+    const packets: { edge:number; t:number; col:string }[] = [];
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      ctx.clearRect(0,0,700,220);
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,700,220);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(45,212,191,0.08)";
+      ctx.fillText("ECOLOGICAL INTELLIGENCE · MYCORRHIZAL NETWORK · AETHER",10,14);
+      if(tick%18===0&&packets.length<10) {
+        const ei=Math.floor(Math.random()*edges.length);
+        packets.push({ edge:ei, t:Math.random(), col:nodes[edges[ei][0]].col });
+      }
+      edges.forEach(([a,b])=>{
+        const na=nodes[a], nb=nodes[b];
+        ctx.beginPath(); ctx.moveTo(na.x,na.y); ctx.lineTo(nb.x,nb.y);
+        ctx.strokeStyle="rgba(45,212,191,0.12)"; ctx.lineWidth=1; ctx.stroke();
+      });
+      for(let i=packets.length-1;i>=0;i--){
+        const p=packets[i]; p.t+=0.015;
+        const [a,b]=edges[p.edge]; const na=nodes[a], nb=nodes[b];
+        const px=na.x+(nb.x-na.x)*p.t, py=na.y+(nb.y-na.y)*p.t;
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.globalAlpha=0.8; ctx.fill(); ctx.globalAlpha=1;
+        if(p.t>=1) packets.splice(i,1);
+      }
+      nodes.forEach(n=>{
+        const glow=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,20);
+        glow.addColorStop(0,n.col+"55"); glow.addColorStop(1,"transparent");
+        ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(n.x,n.y,20,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,8,0,Math.PI*2);
+        ctx.fillStyle=n.col; ctx.fill();
+        ctx.fillStyle="#e0f8ff"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+22); ctx.textAlign="left";
+      });
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 const C = {
   teal:   "#2dd4bf",
   gold:   "#f2bf65",
@@ -226,6 +284,18 @@ export default function EcologicalIntelligencePage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2dd4bf", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2dd4bf", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(45,212,191,0.1)", borderLeft:"3px solid #2dd4bf", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Ecological Intelligence · Mycorrhizal Network · Bio-Signal Flow · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(45,212,191,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five forest nodes (Oak · Pine · Myco · Fungi · Algae) exchanging live nutrient packets — the live AETHER mycorrhizal intelligence simulation.
+          </p>
+          <EcoIntelCanvas />
+        </div>
+      </div>
 
       {/* Header */}
       <div className="border-b border-green-900/30 px-6 py-4 sticky top-0 z-20"

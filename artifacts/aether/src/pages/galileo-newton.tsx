@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   Sigma, Compass, Anchor, MoveDown, Wind, Ship, BookOpen, Scale,
   Telescope, Activity, Orbit, Atom,
@@ -593,6 +594,42 @@ function ParabolaComposition() {
 
 /* ─────────── PAGE ─────────── */
 
+function GalileoCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const pendulum = {cx:W*0.25,cy:30,len:100};
+    const orbit = {cx:W*0.7,cy:H/2,r:60};
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      const pAngle=Math.sin(t*0.025)*Math.PI*0.35;
+      const bx=pendulum.cx+Math.sin(pAngle)*pendulum.len;
+      const by=pendulum.cy+Math.cos(pAngle)*pendulum.len;
+      ctx.beginPath(); ctx.moveTo(pendulum.cx,pendulum.cy); ctx.lineTo(bx,by);
+      ctx.strokeStyle="rgba(201,168,76,0.6)"; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(pendulum.cx,pendulum.cy,3,0,Math.PI*2); ctx.fillStyle="#c9a84c"; ctx.fill();
+      ctx.beginPath(); ctx.arc(bx,by,10,0,Math.PI*2); ctx.fillStyle="rgba(201,168,76,0.8)"; ctx.fill();
+      ctx.beginPath(); ctx.arc(orbit.cx,orbit.cy,8,0,Math.PI*2); ctx.fillStyle="#c9a84c"; ctx.fill();
+      const oAngle=t*0.02;
+      const ox=orbit.cx+orbit.r*Math.cos(oAngle),oy=orbit.cy+orbit.r*Math.sin(oAngle);
+      ctx.beginPath(); ctx.arc(orbit.cx,orbit.cy,orbit.r,0,Math.PI*2);
+      ctx.strokeStyle="rgba(68,170,255,0.2)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(ox,oy,7,0,Math.PI*2); ctx.fillStyle="#44aaff"; ctx.fill();
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("GALILEO · NEWTON · PENDULUM · ORBITAL MECHANICS · GRAVITY · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function GalileoNewtonPage() {
   return (
     <div
@@ -600,6 +637,13 @@ export default function GalileoNewtonPage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="galileo-newton-page"
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.85)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GALILEO · NEWTON · PENDULUM · ORBIT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Galileo pendulum + Newtonian orbital mechanics — live AETHER physics simulation.</p></div>
+          <GalileoCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes gn-breathe { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes gn-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(34px,-20px,0); } 100% { transform: translate3d(0,0,0); } }

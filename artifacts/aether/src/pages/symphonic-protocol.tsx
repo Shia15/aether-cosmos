@@ -48,6 +48,42 @@ interface Burst   { x: number; y: number; r: number; maxR: number; t: number; co
 interface MycEdge { a: number; b: number; }
 interface LogEntry { ts: string; layer: string; msg: string; col: string; }
 
+function SymphonicProtocolHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes=8;
+    const pts: {x:number;y:number;active:boolean;phase:number}[]=[];
+    for(let i=0;i<nodes;i++) pts.push({x:60+i*(W-120)/nodes,y:H/2+40*Math.sin(i*0.8),active:false,phase:i*0.4});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<nodes-1;i++){
+        const a=pts[i],b=pts[i+1];
+        const sig=0.4+0.4*Math.sin(t*0.05+a.phase);
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(153,102,255,${sig*0.4})`;ctx.lineWidth=1+sig;ctx.stroke();
+      }
+      pts.forEach((p,i)=>{
+        const pulse=0.5+0.5*Math.sin(t*0.07+p.phase);
+        ctx.beginPath();ctx.arc(p.x,p.y,5+pulse*4,0,Math.PI*2);ctx.fillStyle=`rgba(153,102,255,${0.15+pulse*0.2})`;ctx.fill();
+        ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle="rgba(153,102,255,0.8)";ctx.fill();
+        const sig=Math.floor(t*0.1+i)%2===0?"1":"0";
+        ctx.fillStyle="rgba(153,102,255,0.3)";ctx.font="8px 'DM Mono',monospace";ctx.fillText(sig,p.x+8,p.y-8);
+      });
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SYMPHONIC PROTOCOL · SIGNAL MESH · HARMONIC ROUTING · RESONANT BUS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SymphonicProtocolPage() {
   const aqRef = useRef<HTMLCanvasElement>(null);
   const sfRef = useRef<HTMLCanvasElement>(null);
@@ -324,6 +360,13 @@ export default function SymphonicProtocolPage() {
   return (
     <div data-testid="protocol-root" className="min-h-screen p-6 relative"
          style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
+      <div style={{flexShrink:0,marginBottom:20,position:"relative",zIndex:1}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SYMPHONIC PROTOCOL · SIGNAL MESH · HARMONIC ROUTING · RESONANT BUS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8-node signal chain — the live AETHER symphonic protocol simulation.</p></div>
+          <SymphonicProtocolHeaderCanvas />
+        </div>
+      </div>
       <canvas ref={sfRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 0, opacity: 0.6 }} />
       <div className="relative" style={{ zIndex: 1 }}>
 

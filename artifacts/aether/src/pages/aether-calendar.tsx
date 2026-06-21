@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import calendarImg from "@assets/IMG_1762_1778363853862.jpeg";
 import capricornImg from "@assets/IMG_1759_1778363853862.jpeg";
 import greatYearImg from "@assets/IMG_1763_1778364001395.jpeg";
@@ -414,6 +414,64 @@ function GreatYearCanvas() {
 
 type Flower = { id: string; text: string; seededAt: string; date: string };
 
+function LunarCalendarCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx = W/2, cy = H/2;
+    const months = 13;
+    const monthColors = ["#c9a84c","#2ef0d8","#9966ff","#ff4477","#44aaff","#44cc77","#f472b6","#c9a84c","#2ef0d8","#9966ff","#ff4477","#44aaff","#44cc77"];
+    const moonPhases = [0,0.25,0.5,0.75,1,0.75,0.5,0.25,0,0.25,0.5,0.75,1];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<months;i++) {
+        const ang = (i/months)*Math.PI*2 - Math.PI/2;
+        const orbitR = 108;
+        const mx = cx + Math.cos(ang)*orbitR, my = cy + Math.sin(ang)*orbitR;
+        const pulse = 1+0.08*Math.sin(t*0.04+i*0.7);
+        const col = monthColors[i];
+        const g=ctx.createRadialGradient(mx,my,0,mx,my,12*pulse);
+        g.addColorStop(0,col+"cc"); g.addColorStop(0.6,col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(mx,my,10*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        const phase=moonPhases[i];
+        ctx.beginPath(); ctx.arc(mx,my,5,0,Math.PI*2); ctx.fillStyle="#ffffff88"; ctx.fill();
+        if (phase>0) {
+          ctx.beginPath(); ctx.arc(mx,my,5,-Math.PI/2,Math.PI/2);
+          ctx.fillStyle=phase<0.5?"#ffffff":"transparent"; ctx.fill();
+        }
+        ctx.fillStyle=col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(`M${i+1}`,mx,my+18);
+      }
+      const spiral=(Math.sin(t*0.008)+1)/2*Math.PI*2;
+      for (let a=0;a<spiral;a+=0.2) {
+        const r=3+a*3; const sx=cx+Math.cos(a-Math.PI/2)*r, sy=cy+Math.sin(a-Math.PI/2)*r;
+        ctx.beginPath(); ctx.arc(sx,sy,1,0,Math.PI*2);
+        ctx.fillStyle=`rgba(201,168,76,${0.3*(1-a/(Math.PI*6))})`; ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(cx,cy,18,0,Math.PI*2);
+      ctx.fillStyle="#c9a84c33"; ctx.strokeStyle="#c9a84c"; ctx.lineWidth=2;
+      ctx.shadowColor="#c9a84c"; ctx.shadowBlur=20; ctx.stroke(); ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="#c9a84c"; ctx.font="bold 8px 'Cinzel',serif"; ctx.textAlign="center";
+      ctx.fillText("☀", cx, cy+3);
+      ctx.beginPath(); ctx.arc(cx,cy,108,0,Math.PI*2);
+      ctx.strokeStyle="rgba(201,168,76,0.1)"; ctx.lineWidth=1; ctx.stroke();
+      ctx.fillStyle="rgba(201,168,76,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("13-MONTH CALENDAR · 28-DAY MOONS · 26,000-YEAR GREAT YEAR",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AetherCalendarPage() {
   const [tab, setTab] = useState<"moons"|"portal"|"greatyear"|"protocol"|"personal"|"bodyrhythm"|"timelines">("moons");
   const [selectedMoon, setSelectedMoon] = useState<number>(11);
@@ -446,6 +504,25 @@ export default function AetherCalendarPage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1280, margin:"0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(201,168,76,0.08)", border:"1px solid rgba(201,168,76,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#c9a84c", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(4,7,14,0.8)", border:"1px solid rgba(201,168,76,0.12)",
+            borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#fff5e0", margin:"0 0 6px" }}>
+              AETHER Calendar · 13-Month Lunar · 28-Day Moons · 26,000-Year Great Year
+            </h2>
+            <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(200,190,150,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+              13 moon nodes orbiting a golden sun core on a circular field, each labeled M1–M13 with phase markers.
+              A golden Fibonacci spiral breathes outward from the center — the living 13-month AETHER calendar
+              encoding a complete lunar year with great-year tracking.
+            </p>
+            <LunarCalendarCanvas />
+          </div>
+        </div>
 
         {/* Header */}
         <header style={{

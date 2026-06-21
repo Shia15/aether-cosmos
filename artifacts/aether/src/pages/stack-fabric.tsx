@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgStack1 from "@assets/ChatGPT_Image_Apr_26,_2026,_01_34_55_PM_1777224898821.png";
@@ -106,10 +107,123 @@ const APPS = [
   { c: B.rose,    l: "Scientific Sim" },
 ];
 
+function StackFabricCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    const LAYERS = [
+      { label:"L5 · Application", color:"#b48cff", yFrac:0.10 },
+      { label:"L4 · Transport",   color:"#7be4ea", yFrac:0.28 },
+      { label:"L3 · Coherence",   color:"#e9b94e", yFrac:0.46 },
+      { label:"L2 · Substrate",   color:"#7be59f", yFrac:0.64 },
+      { label:"L1 · Physical",    color:"#7cc8ff", yFrac:0.82 },
+    ];
+    type Packet = { x:number; fromY:number; toY:number; color:string; speed:number; t:number };
+    const packets: Packet[] = [];
+    function spawnPacket() {
+      const from = Math.floor(Math.random() * LAYERS.length);
+      const to = from > 0 ? from - 1 : from + 1;
+      packets.push({
+        x: 90 + Math.random() * (W - 110),
+        fromY: LAYERS[from].yFrac * H,
+        toY: LAYERS[to].yFrac * H,
+        color: LAYERS[from].color,
+        speed: 0.015 + Math.random() * 0.025,
+        t: 0,
+      });
+    }
+    for (let i = 0; i < 8; i++) spawnPacket();
+    let spawnTimer = 0;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#06080f"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      LAYERS.forEach((l) => {
+        const y = l.yFrac * H;
+        const pulse = 0.12 + 0.08 * Math.sin(t * 0.03 + l.yFrac * 6);
+        ctx.beginPath(); ctx.moveTo(85, y); ctx.lineTo(W - 4, y);
+        ctx.strokeStyle = l.color + Math.round(pulse * 255).toString(16).padStart(2,"0");
+        ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = l.color + "cc";
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.fillText(l.label, 4, y + 3);
+      });
+      spawnTimer++;
+      if (spawnTimer > 28) { spawnPacket(); spawnTimer = 0; }
+      for (let i = packets.length - 1; i >= 0; i--) {
+        const p = packets[i];
+        p.t += p.speed;
+        if (p.t >= 1) { packets.splice(i, 1); continue; }
+        const y = p.fromY + (p.toY - p.fromY) * p.t;
+        const grd = ctx.createRadialGradient(p.x, y, 0, p.x, y, 6);
+        grd.addColorStop(0, p.color);
+        grd.addColorStop(1, p.color + "00");
+        ctx.beginPath(); ctx.arc(p.x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = grd; ctx.fill();
+      }
+      ctx.fillStyle = "#7be4ea33";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("STACK FABRIC · L1–L5 PROTOCOL LAYERS · PACKET ROUTING", 90, H - 8);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function StackFabricHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const layers=6;
+    const cols=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff","#44cc77"];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let l=0;l<layers;l++){
+        const y=15+l*(H-20)/layers;
+        const offset=20*Math.sin(t*0.02+l*0.6);
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=6){
+          const wy=y+offset*Math.sin(x*0.02+t*0.03+l);
+          x===0?ctx.moveTo(x,wy):ctx.lineTo(x,wy);
+        }
+        ctx.strokeStyle=cols[l]+"55";ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle=cols[l]+"08";
+        ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("STACK FABRIC · LAYERED SYSTEMS · PROTOCOL MESH · COHERENT STACK · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function StackFabricPage() {
   return (
     <div className="min-h-screen w-full" style={{ background: B.bg }}>
       <main className="max-w-5xl mx-auto px-6 md:px-10 py-12 md:py-16" data-testid="stack-fabric-page">
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>STACK FABRIC · LAYERED SYSTEMS · PROTOCOL MESH · COHERENT STACK · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 layered wave stacks — the live AETHER stack fabric simulation.</p></div>
+            <StackFabricHeaderCanvas />
+          </div>
+        </div>
         {/* HEADER */}
         <header className="mb-12">
           <div className="text-[10.5px] uppercase tracking-[0.36em]"
@@ -134,6 +248,26 @@ export default function StackFabricPage() {
             <Chip c={B.green}  l="Wi-Fi 7 / UWB / Optical / CXL" />
             <Chip c={B.violet} l="Magnetic propulsion loop" />
             <Chip c={B.blue}   l="Hybrid SoC · FPGA + DSP" />
+          </div>
+
+          <div style={{ marginTop:24 }}>
+            <div style={{ display:"inline-block", background:"rgba(123,228,234,0.1)", border:"1px solid rgba(123,228,234,0.3)",
+              borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+              color:B.cyan, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+              Live Simulation
+            </div>
+            <div style={{ background:B.panel, border:`1px solid ${B.border}`, borderLeft:`3px solid ${B.cyan}`,
+              borderRadius:10, padding:20 }}>
+              <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+                Stack Fabric · L1–L5 Protocol Layers · Packet Routing
+              </h2>
+              <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.muted, margin:"0 0 14px", lineHeight:1.65 }}>
+                Five horizontal protocol bands (L1 Physical → L5 Application). Glowing packets spawn and travel
+                between adjacent layers — upward (data arriving) or downward (commands dispatching). Each layer
+                pulses at its own phase. This is the moment-to-moment cross-layer handshake in the Stack Fabric.
+              </p>
+              <StackFabricCanvas />
+            </div>
           </div>
 
           <div className="mt-6 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>

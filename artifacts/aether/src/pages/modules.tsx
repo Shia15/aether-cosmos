@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   Shuffle,
   Brain,
@@ -112,6 +113,47 @@ const MODULES: Mod[] = [
   },
 ];
 
+function ModulesCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const modules=[
+      {x:W*0.12,y:H*0.5,col:"#2ef0d8",label:"EIE"},
+      {x:W*0.28,y:H*0.35,col:"#9966ff",label:"MEM"},
+      {x:W*0.44,y:H*0.6,col:"#c9a84c",label:"INT"},
+      {x:W*0.60,y:H*0.38,col:"#ff4477",label:"RES"},
+      {x:W*0.76,y:H*0.55,col:"#44aaff",label:"SYN"},
+      {x:W*0.88,y:H*0.42,col:"#44cc77",label:"OUT"},
+    ];
+    const edges=[[0,1],[1,2],[2,3],[3,4],[4,5],[0,3],[1,4]];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,7,16,0.3)"; ctx.fillRect(0,0,W,H);
+      edges.forEach(([a,b])=>{
+        const ma=modules[a],mb=modules[b];
+        const pulse=0.04+0.05*Math.abs(Math.sin(t*0.02+a));
+        ctx.beginPath();ctx.moveTo(ma.x,ma.y);ctx.lineTo(mb.x,mb.y);ctx.strokeStyle=`rgba(255,255,255,${pulse})`;ctx.lineWidth=0.5;ctx.stroke();
+      });
+      modules.forEach((m,i)=>{
+        const pls=0.8+0.2*Math.sin(t*0.04+i);
+        ctx.beginPath();ctx.arc(m.x,m.y,16*pls,0,Math.PI*2);ctx.fillStyle=m.col+"44";ctx.fill();
+        ctx.strokeStyle=m.col+"88";ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle=m.col;ctx.font="bold 9px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(m.label,m.x,m.y+3);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("MODULES · EIE · MEMORY · INTEGRATIONS · RESONANCE · SYNTHESIS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ModulesPage() {
   return (
     <div
@@ -119,6 +161,13 @@ export default function ModulesPage() {
       style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="modules-page"
     >
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(5,7,16,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MODULES · EIE · MEMORY · INTEGRATIONS · RESONANCE · SYNTHESIS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 connected AETHER modules in live resonance — the AETHER modules simulation.</p></div>
+          <ModulesCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes md-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes md-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

@@ -262,6 +262,69 @@ const TABS = [
 ] as const;
 type TabId = typeof TABS[number]["id"];
 
+function IntakeFlowCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const STAGES = [
+    { label:"Ingest",      col:"#44aaff", x:0.1 },
+    { label:"Parse",       col:"#9966ff", x:0.26 },
+    { label:"Embed",       col:"#2ef0d8", x:0.42 },
+    { label:"Cluster",     col:"#44cc77", x:0.58 },
+    { label:"Cohere",      col:"#c9a84c", x:0.74 },
+    { label:"Crystallize", col:"#ff4477", x:0.90 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#040a1a"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cy = H / 2;
+      for (let i = 0; i < STAGES.length - 1; i++) {
+        const a = STAGES[i], b = STAGES[i+1];
+        const ax = a.x * W, bx = b.x * W;
+        const flowProgress = (t * 0.008 + i * 0.3) % 1;
+        const dotX = ax + (bx - ax) * flowProgress;
+        const grad = ctx.createLinearGradient(ax, cy, bx, cy);
+        grad.addColorStop(0, a.col + "55");
+        grad.addColorStop(1, b.col + "55");
+        ctx.beginPath(); ctx.moveTo(ax, cy); ctx.lineTo(bx, cy);
+        ctx.strokeStyle = grad; ctx.lineWidth = 2; ctx.stroke();
+        const dg = ctx.createRadialGradient(dotX, cy, 0, dotX, cy, 5);
+        dg.addColorStop(0, "#fff"); dg.addColorStop(1, a.col + "00");
+        ctx.beginPath(); ctx.arc(dotX, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = dg; ctx.fill();
+      }
+      STAGES.forEach((s, i) => {
+        const sx = s.x * W;
+        const pulse = 0.65 + 0.35 * Math.sin(t * 0.04 + i * 1.1);
+        const g = ctx.createRadialGradient(sx, cy, 0, sx, cy, 22 * pulse);
+        g.addColorStop(0, s.col + "cc"); g.addColorStop(0.4, s.col + "44"); g.addColorStop(1, s.col + "00");
+        ctx.beginPath(); ctx.arc(sx, cy, 22 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(sx, cy, 11, 0, Math.PI * 2);
+        ctx.fillStyle = s.col + "99"; ctx.fill();
+        ctx.fillStyle = s.col;
+        ctx.font = "8px 'Space Mono', monospace"; ctx.textAlign = "center";
+        ctx.fillText(s.label, sx, cy + 36);
+        ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(46,240,216,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AETHER INTAKE · DOCUMENT PIPELINE · INGEST→PARSE→EMBED→CLUSTER→COHERE→CRYSTALLIZE", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AetherIntakeView() {
   const [tab, setTab] = useState<TabId>("capture");
   const [DB, setDB] = useState<ArchivedNode[]>(() => {
@@ -647,6 +710,26 @@ export default function AetherIntakeView() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div style={{ padding:"16px 32px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(45,212,191,0.08)", border:"1px solid rgba(45,212,191,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:C.teal, textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(4,10,26,0.8)", border:"1px solid rgba(45,212,191,0.12)",
+          borderLeft:`3px solid ${C.teal}`, borderRadius:10, padding:20, marginBottom:8 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#dde4f0", margin:"0 0 6px" }}>
+            AETHER Intake · Document Pipeline · Ingest→Parse→Embed→Cluster→Cohere→Crystallize
+          </h2>
+          <p style={{ fontFamily:"Raleway,sans-serif", fontSize:12, color:"rgba(200,215,240,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six pipeline stages with animated flow packets traveling between them in real time. Each stage pulses at
+            its own resonant phase. White photon dots stream between stages as data in motion — the living document
+            intake process from raw capture to crystallized knowledge node.
+          </p>
+          <IntakeFlowCanvas />
+        </div>
+      </div>
 
       {/* Breadcrumb */}
       <div className="px-8 pt-8 pb-4">

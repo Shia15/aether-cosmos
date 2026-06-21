@@ -727,6 +727,57 @@ function GradientCanvas() {
 /* ═══════════════════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════════════════ */
+function BioluminescenceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const species = [
+      { label:"DINOFLAGELLATE", col:"#00ffaa", x:W*0.10, y:H*0.5 },
+      { label:"ANGLERFISH", col:"#0088ff", x:W*0.23, y:H*0.5 },
+      { label:"FIREFLY", col:"#ffee00", x:W*0.36, y:H*0.5 },
+      { label:"DEEP SEA\nJELLY", col:"#ff44ff", x:W*0.49, y:H*0.5 },
+      { label:"MUSHROOM\nGLOW", col:"#88ff44", x:W*0.62, y:H*0.5 },
+      { label:"PLANKTON\nFIELD", col:"#44ffee", x:W*0.75, y:H*0.5 },
+      { label:"BIO\nSPECTRUM", col:"#ff8844", x:W*0.89, y:H*0.5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(0,2,6,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<species.length-1;i++) {
+        const a=species[i],b=species[i+1];
+        const pkt=(t*0.014+i*0.4)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      }
+      species.forEach((s,i)=>{
+        const pulse=1+0.12*Math.sin(t*0.05+i*1.3);
+        const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,18*pulse);
+        g.addColorStop(0,s.col+"ee"); g.addColorStop(0.4,s.col+"66"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(s.x,s.y,15*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=20*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=s.col; ctx.font="bold 6px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,s.x,s.y+20*pulse+li*8));
+      });
+      ctx.fillStyle="rgba(0,255,170,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIOLUMINESCENCE SPECTRUM · DINOFLAGELLATE · ANGLERFISH · FIREFLY · JELLY · MUSHROOM · PLANKTON",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BioluminescenceSpectrumPage() {
   const [tab, setTab]           = useState<CanvasTab>("spectrum");
   const [activeChannel, setActiveChannel] = useState(6); // NanoLuc teal default
@@ -762,6 +813,25 @@ export default function BioluminescenceSpectrumPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT, fontFamily:mono, overflowY:"auto" }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(0,255,170,0.06)", border:"1px solid rgba(0,255,170,0.2)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#00ffaa", textTransform:"uppercase", fontFamily:mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(0,2,6,0.92)", border:"1px solid rgba(0,255,170,0.1)",
+          borderLeft:"3px solid #00ffaa", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:mono, fontSize:18, color:"#d0ffe8", margin:"0 0 6px" }}>
+            Bioluminescence Spectrum · 7 Species · Dinoflagellate → Plankton Field → Bio Spectrum
+          </h2>
+          <p style={{ fontFamily:mono, fontSize:12, color:"rgba(150,240,200,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Seven bioluminescent species nodes (Dinoflagellate/lime · Anglerfish/blue · Firefly/yellow · Deep-Sea Jelly/magenta
+            · Mushroom Glow/green · Plankton Field/cyan · Bio Spectrum/orange) with chromatic glow pulses and photon coupling
+            streams — the living bioluminescence spectrum across Earth's creatures.
+          </p>
+          <BioluminescenceCanvas />
+        </div>
+      </div>
 
       {/* ── HEADER ── */}
       <div style={{ padding:"12px 20px 10px", borderBottom:`1px solid ${BORDER}`,

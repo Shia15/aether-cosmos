@@ -413,13 +413,61 @@ function Card2({ col, ey, knot, title, bd }: { col:string; ey:string; knot:strin
 /* ══════════════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════════════ */
+function TaitKnotsHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const n=7,d=3;
+      ctx.beginPath();
+      for(let i=0;i<=360;i++){
+        const theta=i*Math.PI/180;
+        const r=50*Math.cos(d/n*theta);
+        const x=cx+r*Math.cos(theta);
+        const y=cy+r*Math.sin(theta)*0.6+5*Math.sin(t*0.04+theta);
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle="rgba(153,102,255,0.5)";ctx.lineWidth=1.2;ctx.stroke();
+      const n2=5,d2=2;
+      ctx.beginPath();
+      for(let i=0;i<=360;i++){
+        const theta=i*Math.PI/180;
+        const r=35*Math.cos(d2/n2*theta);
+        const x=cx+r*Math.cos(theta+t*0.015);
+        const y=cy+r*Math.sin(theta+t*0.015)*0.6;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle="rgba(46,240,216,0.4)";ctx.lineWidth=0.8;ctx.stroke();
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("TAIT KNOTS · TOPOLOGY · KNOT INVARIANT · CROSSING NUMBER · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function TaitKnotsPage() {
   const [selIdx, setSelIdx] = useState(-1);
   const sel = selIdx >= 0 ? KNOTS[selIdx] : null;
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TAIT KNOTS · TOPOLOGY · KNOT INVARIANT · CROSSING NUMBER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live {7,3} and {5,2} torus knots — the AETHER topology simulation.</p></div>
+          <TaitKnotsHeaderCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"56px 24px 32px",
         background:`radial-gradient(ellipse 80% 55% at 50% 0%,

@@ -52,6 +52,65 @@ function regimeFor(x: number): { name: string; col: string; desc: string } {
 
 interface LogEntry { ts: string; tag: string; msg: string; col: string; }
 
+function CancerCoherenceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const nodes = [
+      { label:"CANCER\nCELL", col:"#ef4444", angle:-Math.PI/2, r:105 },
+      { label:"COHERENCE\nFIELD", col:"#2ef0d8", angle:-Math.PI/2+Math.PI*2/6, r:105 },
+      { label:"METABOLIC\nSHIFT", col:"#f59e0b", angle:-Math.PI/2+Math.PI*4/6, r:105 },
+      { label:"APOPTOSIS\nGATE", col:"#a78bfa", angle:-Math.PI/2+Math.PI*6/6, r:105 },
+      { label:"IMMUNE\nSENSOR", col:"#34d399", angle:-Math.PI/2+Math.PI*8/6, r:105 },
+      { label:"PHI\nRATIO", col:"#c9a84c", angle:-Math.PI/2+Math.PI*10/6, r:105 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.16)"; ctx.fillRect(0,0,W,H);
+      t++;
+      nodes.forEach((s,i)=>{
+        const a=nodes[(i+1)%nodes.length];
+        const sx=cx+Math.cos(s.angle)*s.r, sy=cy+Math.sin(s.angle)*s.r;
+        const ax=cx+Math.cos(a.angle)*a.r, ay=cy+Math.sin(a.angle)*a.r;
+        const pkt=(t*0.01+i*0.4)%1;
+        const px=sx+(ax-sx)*pkt, py=sy+(ay-sy)*pkt;
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(sx,sy,ax,ay);
+        g.addColorStop(0,s.col+"44"); g.addColorStop(1,a.col+"44");
+        ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ax,ay);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      });
+      nodes.forEach((s,i)=>{
+        const dx=cx+Math.cos(s.angle)*s.r, dy=cy+Math.sin(s.angle)*s.r;
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.05);
+        const g=ctx.createRadialGradient(dx,dy,0,dx,dy,14*pulse);
+        g.addColorStop(0,s.col+"cc"); g.addColorStop(0.5,s.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(dx,dy,12*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=s.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,dx,dy+16*pulse+li*9));
+      });
+      const gc=ctx.createRadialGradient(cx,cy,0,cx,cy,14);
+      gc.addColorStop(0,"#2ef0d8cc"); gc.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,12+2*Math.sin(t*0.05),0,Math.PI*2);
+      ctx.fillStyle=gc; ctx.shadowColor="#2ef0d8"; ctx.shadowBlur=20; ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle="rgba(46,240,216,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CANCER COHERENCE · CANCER CELL · COHERENCE FIELD · METABOLIC SHIFT · APOPTOSIS · IMMUNE · PHI",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CancerCoherencePage() {
   const [tab, setTab] = useState<Tab>("classifier");
   const [xVal, setXVal] = useState(1.5);
@@ -129,6 +188,26 @@ export default function CancerCoherencePage() {
   return (
     <div className="min-h-screen p-6 md:p-10 font-mono text-sm" style={{ background: C.bg, color: C.text }} data-testid="page-cancer-coherence">
       <div className="max-w-7xl mx-auto">
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:C.phi, textTransform:"uppercase", fontFamily:"inherit", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(4,7,14,0.88)", border:"1px solid rgba(46,240,216,0.1)",
+            borderLeft:`3px solid ${C.phi}`, borderRadius:10, padding:20 }}>
+            <h2 className="font-mono" style={{ fontSize:18, color:C.text, margin:"0 0 6px" }}>
+              Cancer Coherence · Cancer Cell · Coherence Field · Metabolic Shift · Apoptosis · Immune · Phi
+            </h2>
+            <p className="font-mono" style={{ fontSize:12, color:"rgba(150,240,230,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Six cancer-coherence nodes (Cancer Cell/red · Coherence Field/teal · Metabolic Shift/amber · Apoptosis Gate/violet
+              · Immune Sensor/teal · Phi Ratio/gold) in a hexagonal ring with coherence flow packets circulating —
+              the live AETHER cancer coherence mapping system.
+            </p>
+            <CancerCoherenceCanvas />
+          </div>
+        </div>
+
         <header className="mb-6">
           <div className="text-xs tracking-[0.4em] uppercase mb-2" style={{ color: C.phi }}>
             φ-AETHER · Coherent Oncology Brief · March 2026

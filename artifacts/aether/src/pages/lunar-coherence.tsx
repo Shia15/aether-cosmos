@@ -167,6 +167,45 @@ const btn = (col: string): React.CSSProperties => ({
   letterSpacing:1.5, textTransform:"uppercase", cursor:"pointer",
 });
 
+function LunarCoherenceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W*0.15,cy=H*0.5;
+    const earthCx=W*0.5,earthCy=H*0.5;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,16,0.3)"; ctx.fillRect(0,0,W,H);
+      const tide=Math.sin(t*0.015);
+      for(let i=0;i<5;i++){
+        const yr=earthCy+tide*(12+i*8);
+        const alpha=0.04+0.06*Math.abs(tide);
+        ctx.beginPath();
+        for(let px=0;px<W;px++){
+          const y=yr+Math.sin(px*0.02+t*0.02)*6;
+          px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+        }
+        ctx.strokeStyle=`rgba(167,139,250,${alpha})`; ctx.lineWidth=0.8; ctx.stroke();
+      }
+      const moonAngle=t*0.008;
+      const moonX=earthCx+80*Math.cos(moonAngle),moonY=earthCy+40*Math.sin(moonAngle);
+      ctx.beginPath();ctx.arc(earthCx,earthCy,14,0,Math.PI*2);ctx.fillStyle="rgba(30,100,220,0.6)";ctx.fill();
+      ctx.beginPath();ctx.arc(moonX,moonY,7,0,Math.PI*2);ctx.fillStyle="rgba(220,220,200,0.85)";ctx.fill();
+      ctx.beginPath();ctx.moveTo(earthCx,earthCy);ctx.lineTo(moonX,moonY);ctx.strokeStyle="rgba(167,139,250,0.15)";ctx.lineWidth=0.5;ctx.stroke();
+      ctx.fillStyle="rgba(167,139,250,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("LUNAR COHERENCE · TIDE ENVELOPE · MOON CYCLE · GRAVITATIONAL COUPLING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function LunarCoherencePage() {
   return (
     <div data-testid="page-lunar-coherence" style={{
@@ -175,6 +214,13 @@ export default function LunarCoherencePage() {
       color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #a78bfa",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#a78bfa",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,16,0.8)",borderLeft:"3px solid #a78bfa",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#a78bfa",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LUNAR COHERENCE · TIDE ENVELOPE · MOON CYCLE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(167,139,250,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Earth–Moon orbit with 5 tidal sine bands — the live AETHER lunar coherence simulation.</p></div>
+          <LunarCoherenceCanvas />
+        </div>
+      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import {
   FlaskConical, FlaskRound, Calculator, Sigma, Egg, Network,
@@ -5,6 +6,53 @@ import {
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
+
+function EnginesSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    canvas.width = 700; canvas.height = 220;
+    const ctx = canvas.getContext("2d")!;
+    const engines = [
+      { x:100, y:110, label:"MEMBRANE",  col:"#c9a84c" },
+      { x:220, y:60,  label:"GRAVITY",   col:"#9966ff" },
+      { x:340, y:150, label:"PHOTON",    col:"#44aaff" },
+      { x:460, y:60,  label:"IMMUNE",    col:"#44cc77" },
+      { x:580, y:110, label:"SIGNAL",    col:"#ff4477" },
+    ];
+    let tick = 0;
+    const loop = () => {
+      tick++;
+      ctx.clearRect(0,0,700,220);
+      ctx.fillStyle="#F4EDE0"; ctx.fillRect(0,0,700,220);
+      ctx.font="9px 'DM Mono',monospace";
+      ctx.fillStyle="rgba(58,45,26,0.18)";
+      ctx.fillText("ENGINES · COMPUTE SUBSTRATE · SIGNAL FLOW · AETHER",10,14);
+      engines.forEach((e,i)=> engines.forEach((f,j)=>{
+        if(j<=i) return;
+        ctx.beginPath(); ctx.moveTo(e.x,e.y); ctx.lineTo(f.x,f.y);
+        ctx.strokeStyle="rgba(124,100,60,0.12)"; ctx.lineWidth=0.8; ctx.stroke();
+      }));
+      engines.forEach((e,i)=>{
+        const pulse=0.75+0.25*Math.sin(tick*0.04+i*1.2);
+        const glow=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,22);
+        glow.addColorStop(0,e.col+"44"); glow.addColorStop(1,"transparent");
+        ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(e.x,e.y,22,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(e.x,e.y,9*pulse,0,Math.PI*2);
+        ctx.fillStyle=e.col+"bb"; ctx.fill();
+        ctx.beginPath(); ctx.arc(e.x,e.y,6,0,Math.PI*2);
+        ctx.fillStyle=e.col; ctx.fill();
+        ctx.fillStyle="#3A2D1A"; ctx.font="8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(e.label,e.x,e.y+25); ctx.textAlign="left";
+      });
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
 
 const B = {
   bg:        "#F4EDE0",
@@ -249,6 +297,18 @@ export default function EnginesPage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="engines-page"
     >
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #c9a84c", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c9a84c", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.85)", border:"1px solid rgba(201,168,76,0.15)", borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#3A2D1A", margin:"0 0 6px" }}>
+            Engines · Membrane · Gravity · Photon · Immune · Signal · Compute Substrate · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(58,45,26,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five engine nodes with live pulsing and cross-connections on the AETHER parchment substrate.
+          </p>
+          <EnginesSimCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes eng-breathe { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes eng-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(36px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

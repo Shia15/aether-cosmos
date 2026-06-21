@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import { Link } from "wouter";
 import {
   ANCHORS, pickToday, pickIdea, generateCaption, isoDate,
@@ -72,6 +72,45 @@ function deployUrl(p: Platform, text: string): string | null {
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
+function SocialDeployHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const platforms=[
+      {x:150,col:"#000000",bg:"#1da1f2",label:"X"},
+      {x:300,col:"#000000",bg:"#c13584",label:"IG"},
+      {x:450,col:"#000000",bg:"#0a66c2",label:"LI"},
+      {x:600,col:"#000000",bg:"#444444",label:"TH"},
+    ];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      platforms.forEach((p,i)=>{
+        const pls=0.9+0.1*Math.sin(t*0.04+i*0.8);
+        const r=22*pls;
+        ctx.beginPath();ctx.arc(p.x,H/2,r,0,Math.PI*2);ctx.fillStyle=p.bg+"44";ctx.fill();ctx.strokeStyle=p.bg+"cc";ctx.lineWidth=0.7;ctx.stroke();
+        ctx.fillStyle=p.bg;ctx.font="bold 9px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(p.label,p.x,H/2+3);ctx.textAlign="left";
+        const beams=3;
+        for(let b=0;b<beams;b++){
+          const angle=(b/beams)*Math.PI*2+t*0.02+i;
+          const x2=p.x+Math.cos(angle)*60,y2=H/2+Math.sin(angle)*35;
+          ctx.beginPath();ctx.moveTo(p.x,H/2);ctx.lineTo(x2,y2);ctx.strokeStyle=p.bg+Math.round(0.04*255).toString(16).padStart(2,"0");ctx.lineWidth=0.4;ctx.stroke();
+        }
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SOCIAL DEPLOY · CALM COMPANY OS · CONTENT ENGINE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SocialDeployPage() {
   const [today] = useState(() => new Date());
   const [state, setState] = useState<DeployState>({});
@@ -187,6 +226,13 @@ export default function SocialDeployPage() {
       background:"radial-gradient(ellipse at top, rgba(167,139,250,0.10), rgba(2,6,23,0.95) 50%, rgba(2,6,23,1))",
       padding:"3rem 1.5rem", color:"#e5e7eb",
       fontFamily:"system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SOCIAL DEPLOY · CALM COMPANY OS · CONTENT ENGINE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 platform beam nodes — the live AETHER social deploy simulation.</p></div>
+          <SocialDeployHeaderCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
 
         {/* Header */}

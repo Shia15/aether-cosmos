@@ -60,6 +60,63 @@ interface LoopState {
 
 interface LogEntry { ts: string; tag: string; msg: string; col: string; }
 
+function ClosedLoopCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 220;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const domains=[
+      { label:"ROBOT", col:"#2ef0d8", ang:0 },
+      { label:"ENV", col:"#c9a84c", ang:Math.PI*0.5 },
+      { label:"CONTAM", col:"#ff4477", ang:Math.PI },
+      { label:"AUTO", col:"#9966ff", ang:Math.PI*1.5 },
+    ];
+    const r=72;
+    const signals: {from:number,to:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(4,7,14,0.18)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle="rgba(46,240,216,0.08)"; ctx.lineWidth=1; ctx.stroke();
+      if(tick%20===0) signals.push({ from:Math.floor(Math.random()*4), to:Math.floor(Math.random()*4), t:0 });
+      for(let i=signals.length-1;i>=0;i--){
+        const s=signals[i]; s.t+=0.025;
+        const a=domains[s.from], b=domains[s.to];
+        const ax=cx+r*Math.cos(a.ang), ay=cy+r*Math.sin(a.ang);
+        const bx=cx+r*Math.cos(b.ang), by=cy+r*Math.sin(b.ang);
+        const px=ax+(bx-ax)*s.t, py=ay+(by-ay)*s.t;
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(s.t>=1) signals.splice(i,1);
+      }
+      domains.forEach(d=>{
+        const x=cx+r*Math.cos(d.ang), y=cy+r*Math.sin(d.ang);
+        ctx.beginPath(); ctx.arc(x,y,14+2*Math.sin(tick*0.05),0,Math.PI*2);
+        ctx.fillStyle=d.col+"22"; ctx.fill();
+        ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2);
+        ctx.fillStyle=d.col; ctx.shadowColor=d.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=d.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(d.label,x,y+24);
+      });
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,14);
+      g.addColorStop(0,"#2ef0d8aa"); g.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,cy,12+2*Math.sin(tick*0.07),0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CLOSED-LOOP COHERENCE · ROBOT · ENV · CONTAM · AUTO · PID CROSS-DOMAIN CONTROL · AETHER",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function ClosedLoopCoherencePage() {
   const cvRef = useRef<HTMLCanvasElement>(null);
   const stRef = useRef({
@@ -314,6 +371,18 @@ export default function ClosedLoopCoherencePage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text }} data-testid="page-closed-loop-coherence">
+      <div style={{ padding:"24px 32px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Closed-Loop Coherence · Robot · Env · Contam · Auto · PID Cross-Domain Control
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Four domain nodes (Robot/teal · Env/gold · Contam/rose · Auto/violet) exchanging coherence signals in a closed PID loop — the live AETHER cross-domain control simulation.
+          </p>
+          <ClosedLoopCanvas />
+        </div>
+      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[11px] tracking-[0.45em] uppercase" style={{ color: C.muted }}>
           AETHER · CLOSED-LOOP COHERENCE SYSTEM · APRIL 2026

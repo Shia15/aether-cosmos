@@ -280,6 +280,44 @@ function initialNodes(): Node[] {
   return Array.from({ length: N }, () => ({ state: Math.random() }));
 }
 
+function LogicFlowersCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const petals=6;
+    const flowerCenters=[{x:W*0.2,y:H*0.5},{x:W*0.5,y:H*0.5},{x:W*0.8,y:H*0.5}];
+    const cols=["#2ef0d8","#9966ff","#c9a84c"];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      flowerCenters.forEach((fc,fi)=>{
+        const rot=t*0.01+fi*(Math.PI/3);
+        const r=18+6*Math.sin(t*0.03+fi);
+        for(let p=0;p<petals;p++){
+          const angle=(p/petals)*Math.PI*2+rot;
+          const px=fc.x+r*Math.cos(angle),py=fc.y+r*Math.sin(angle);
+          const gr=ctx.createRadialGradient(px,py,0,px,py,r*0.8);
+          gr.addColorStop(0,cols[fi]+"66");gr.addColorStop(1,cols[fi]+"00");
+          ctx.beginPath();ctx.arc(px,py,r*0.7,0,Math.PI*2);ctx.fillStyle=gr;ctx.fill();
+        }
+        ctx.beginPath();ctx.arc(fc.x,fc.y,8+3*Math.sin(t*0.04+fi),0,Math.PI*2);ctx.fillStyle=cols[fi]+"cc";ctx.fill();
+        const boolLabel=["AND","OR","XOR"][fi];
+        ctx.fillStyle=cols[fi];ctx.font="8px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(boolLabel,fc.x,fc.y+r+14);ctx.textAlign="left";
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("LOGIC FLOWERS · BOOLEAN ALGEBRA · AND / OR / XOR · PETAL GATE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function LogicFlowersPage() {
   const [nodes, setNodes]       = useState<Node[]>(() => initialNodes());
   const [coupling, setCoupling] = useState(0.9);
@@ -340,6 +378,13 @@ export default function LogicFlowersPage() {
 
   return (
     <div data-testid="logic-flowers-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LOGIC FLOWERS · BOOLEAN ALGEBRA · AND / OR / XOR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>3 rotating petal-gate flowers — the live AETHER logic flower simulation.</p></div>
+          <LogicFlowersCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Hero */}

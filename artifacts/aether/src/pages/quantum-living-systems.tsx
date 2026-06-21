@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -451,9 +451,163 @@ function TauStrip() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function QuantumTunnelingCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 380;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const BARRIER_X = W*0.54;
+    const BARRIER_W = 22;
+    const BARRIER_H = 260;
+    const BARRIER_TOP = (H-BARRIER_H)/2;
+
+    interface Packet { x:number; vx:number; sigma:number; amplitude:number; phase:number; reflected:boolean; transmitted:boolean; done:boolean }
+    let packets: Packet[] = [];
+    let spawnT = 0;
+
+    const spawn = () => {
+      packets.push({ x:60, vx:2.8, sigma:28, amplitude:1, phase:0, reflected:false, transmitted:false, done:false });
+    };
+    spawn();
+
+    let t = 0;
+
+    const gaussian = (x:number,mu:number,sigma:number) => Math.exp(-0.5*((x-mu)/sigma)**2);
+
+    const draw = () => {
+      ctx.fillStyle="#070918"; ctx.fillRect(0,0,W,H);
+
+      for (let x=0;x<W;x+=2){
+        const E=0.18;
+        ctx.fillStyle=`rgba(14,165,233,${E*0.3})`; ctx.fillRect(x,0,2,H);
+      }
+
+      const barGrd=ctx.createLinearGradient(BARRIER_X,0,BARRIER_X+BARRIER_W,0);
+      barGrd.addColorStop(0,"rgba(242,160,7,0.0)"); barGrd.addColorStop(0.3,"rgba(242,160,7,0.6)");
+      barGrd.addColorStop(0.7,"rgba(242,160,7,0.6)"); barGrd.addColorStop(1,"rgba(242,160,7,0.0)");
+      ctx.fillStyle=barGrd; ctx.fillRect(BARRIER_X,BARRIER_TOP,BARRIER_W,BARRIER_H);
+      ctx.strokeStyle="rgba(242,160,7,0.7)"; ctx.lineWidth=1;
+      ctx.strokeRect(BARRIER_X,BARRIER_TOP,BARRIER_W,BARRIER_H);
+      ctx.fillStyle="rgba(242,160,7,0.6)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("POTENTIAL",BARRIER_X+BARRIER_W/2,BARRIER_TOP-8);
+      ctx.fillText("BARRIER",BARRIER_X+BARRIER_W/2,BARRIER_TOP-0);
+      ctx.textAlign="left";
+
+      spawnT++;
+      if (spawnT>260&&packets.length<4){ spawn(); spawnT=0; }
+
+      for (let i=packets.length-1;i>=0;i--){
+        const p=packets[i];
+        p.x+=p.vx; p.phase+=0.18;
+
+        const hitL=p.x+p.sigma*1.5 > BARRIER_X;
+        const hitR=p.x > BARRIER_X+BARRIER_W;
+
+        if (hitL&&!hitR&&!p.transmitted){
+          const tunnelP=0.35;
+          if (!p.reflected){
+            p.reflected=true;
+            packets.push({x:p.x,vx:-p.vx*0.85,sigma:p.sigma,amplitude:Math.sqrt(1-tunnelP)*p.amplitude,phase:p.phase,reflected:true,transmitted:false,done:false});
+          }
+          p.transmitted=true;
+          p.amplitude*=Math.sqrt(tunnelP);
+        }
+
+        if (hitR) p.vx=Math.abs(p.vx)*0.98;
+
+        const points:number[]=[];
+        for (let xi=0;xi<W;xi+=3){
+          const g=gaussian(xi,p.x,p.sigma);
+          const wave=g*Math.cos(p.phase+(xi-p.x)*0.12);
+          points.push(xi,H/2+wave*60*p.amplitude);
+        }
+
+        const col=p.reflected?"rgba(244,63,94,":"rgba(124,215,255,";
+        ctx.beginPath();
+        for (let pi=0;pi<points.length;pi+=2){
+          pi===0?ctx.moveTo(points[pi],points[pi+1]):ctx.lineTo(points[pi],points[pi+1]);
+        }
+        ctx.strokeStyle=col+`${0.7*p.amplitude})`; ctx.lineWidth=1.5; ctx.stroke();
+
+        const maxG=gaussian(p.x,p.x,p.sigma);
+        for (let xi=0;xi<W;xi+=3){
+          const g=gaussian(xi,p.x,p.sigma)*p.amplitude;
+          if(g>0.02){
+            ctx.fillStyle=col+`${g*0.25})`; ctx.fillRect(xi,H/2-g*65,3,g*130);
+          }
+        }
+
+        if (p.x>W+80||p.x<-80){ packets.splice(i,1); }
+      }
+
+      const pX=W*0.72, pY=H-75;
+      ctx.fillStyle="rgba(124,215,255,0.6)"; ctx.font="7.5px 'Space Mono',monospace";
+      ctx.fillText("→ INCIDENT / TRANSMITTED",pX,pY);
+      ctx.fillStyle="rgba(244,63,94,0.6)";
+      ctx.fillText("← REFLECTED",pX,pY+16);
+      ctx.fillStyle="rgba(242,160,7,0.5)";
+      ctx.fillText("▓ BARRIER V₀",pX,pY+32);
+      ctx.fillStyle="rgba(200,220,240,0.4)";
+      ctx.fillText("TUNNELING P ≈ 35%",pX,pY+48);
+
+      ctx.fillStyle="rgba(124,215,255,0.25)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("QUANTUM TUNNELING · WAVE PACKET THROUGH POTENTIAL BARRIER · LIVING SYSTEMS EXPLOIT THIS",W/2,H-10);
+      ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
+function QuantumLivingSystemsHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const cells: {x:number;y:number;r:number;phase:number;col:string}[]=[];
+    for(let i=0;i<18;i++) cells.push({x:25+i*50,y:H/2+(Math.random()-0.5)*60,r:10+Math.random()*8,phase:Math.random()*Math.PI*2,col:["#44cc77","#2ef0d8","#c9a84c"][Math.floor(Math.random()*3)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      cells.forEach((c,i)=>{
+        if(i>0){
+          const p=cells[i-1];ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(c.x,c.y);ctx.strokeStyle="rgba(68,204,119,0.12)";ctx.lineWidth=0.5;ctx.stroke();
+        }
+        const pls=0.85+0.15*Math.sin(t*0.04+c.phase);
+        ctx.beginPath();ctx.arc(c.x,c.y,c.r*pls,0,Math.PI*2);ctx.fillStyle=c.col+"22";ctx.fill();ctx.strokeStyle=c.col+"66";ctx.lineWidth=0.7;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("QUANTUM LIVING SYSTEMS · BIO-QUANTUM · COHERENCE · LIFE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QuantumLivingSystemsView() {
   return (
     <div style={{ minHeight: "100vh", background: B.bg, color: B.ink, padding: "28px 24px 60px" }} data-testid="page-quantum-living-systems">
+      <div style={{flexShrink:0,margin:"-28px -24px 20px"}}>
+        <div style={{padding:"8px 24px"}}><div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 24px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM LIVING SYSTEMS · BIO-QUANTUM · COHERENCE · LIFE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 quantum biological cells — the live AETHER quantum living systems simulation.</p></div>
+          <QuantumLivingSystemsHeaderCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Title */}
@@ -494,6 +648,26 @@ export default function QuantumLivingSystemsView() {
             information-as-substrate, Lamarckian environmental coupling, the DNA Piano metaphor, the nano-thermodynamic motor's
             quantum aspect, and any cross-domain pipeline analogy are presented as <span style={{ color: B.violet }}>working hypotheses</span> —
             not established results. Interpret accordingly.
+          </div>
+        </div>
+
+        <div style={{ marginBottom:32 }}>
+          <div style={{ display:"inline-block", background:"rgba(180,156,255,0.1)", border:"1px solid rgba(180,156,255,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:B.violet, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:B.panel, border:`1px solid ${B.line}`, borderLeft:`3px solid ${B.violet}`,
+            borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:'"Cinzel",serif', fontSize:18, color:B.ink, margin:"0 0 6px", fontVariant:"small-caps" }}>
+              Quantum Tunneling · Wave Packet Through Potential Barrier
+            </h2>
+            <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.dim, margin:"0 0 14px", lineHeight:1.65 }}>
+              Living systems exploit quantum tunneling for enzyme catalysis and photosynthetic energy transfer.
+              Watch a Gaussian wave packet encounter a potential barrier: ~35% tunnels through (cyan), ~65% reflects (red).
+              This is not metaphor — birds navigate using electron spin tunneling in cryptochrome proteins.
+            </p>
+            <QuantumTunnelingCanvas />
           </div>
         </div>
 

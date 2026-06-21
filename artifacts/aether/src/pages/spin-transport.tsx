@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import img_framework1 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_26_54_AM_1781429635909.png";
 import img_framework2 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_26_58_AM_1781429635912.png";
 import img_architecture from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_40_AM_1781429635922.png";
@@ -10,6 +11,139 @@ import img_math_scale from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_32_AM_1781
 import img_marble from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_49_AM_1781429635924.png";
 import img_liquid_water from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_52_AM_1781429635924.png";
 import img_coherence_factor from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_35_AM_1781429662714.png";
+
+function SpinTransportCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 420;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const cx = W * 0.42, cy = H / 2;
+    const R = 130;
+
+    interface Particle { angle: number; speed: number; spin: 1|-1 }
+    const particles: Particle[] = Array.from({length:28}, (_,i) => ({
+      angle: (i/28)*Math.PI*2,
+      speed: (i%2===0 ? 1 : -1) * 0.022,
+      spin:  (i%2===0 ? 1 : -1) as 1|-1,
+    }));
+
+    interface Port { angle: number; state: boolean; timer: number }
+    const ports: Port[] = [0, Math.PI/2, Math.PI, 3*Math.PI/2].map(a => ({
+      angle: a, state: true, timer: Math.round(80 + Math.random()*140),
+    }));
+
+    const NV_N = 7;
+    let t = 0;
+
+    const draw = () => {
+      ctx.fillStyle = "#020617"; ctx.fillRect(0, 0, W, H);
+
+      const bg = ctx.createRadialGradient(cx,cy,0,cx,cy,R+60);
+      bg.addColorStop(0,"rgba(124,58,237,0.06)"); bg.addColorStop(1,"transparent");
+      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+      for (let i=0;i<18;i++){
+        const a=i/18*Math.PI*2;
+        ctx.beginPath();
+        ctx.moveTo(cx+(R-18)*Math.cos(a), cy+(R-18)*Math.sin(a));
+        ctx.lineTo(cx+(R+18)*Math.cos(a), cy+(R+18)*Math.sin(a));
+        ctx.strokeStyle="rgba(99,102,241,0.10)"; ctx.lineWidth=0.7; ctx.stroke();
+      }
+
+      const tubeGrd = ctx.createRadialGradient(cx,cy,R-14,cx,cy,R+14);
+      tubeGrd.addColorStop(0,"rgba(124,58,237,0.18)");
+      tubeGrd.addColorStop(0.5,"rgba(14,165,233,0.22)");
+      tubeGrd.addColorStop(1,"rgba(124,58,237,0.10)");
+      ctx.beginPath();
+      ctx.arc(cx,cy,R+14,0,Math.PI*2); ctx.arc(cx,cy,R-14,0,Math.PI*2,true);
+      ctx.fillStyle=tubeGrd; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx,cy,R+14,0,Math.PI*2);
+      ctx.strokeStyle="rgba(124,58,237,0.3)"; ctx.lineWidth=0.8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,R-14,0,Math.PI*2); ctx.stroke();
+
+      for (const p of ports) {
+        p.timer--;
+        if (p.timer<=0){p.state=!p.state; p.timer=90+Math.round(Math.random()*150);}
+        const px=cx+R*Math.cos(p.angle), py=cy+R*Math.sin(p.angle);
+        ctx.beginPath(); ctx.arc(px,py,11,0,Math.PI*2);
+        ctx.fillStyle = p.state ? "rgba(16,185,129,0.75)" : "rgba(71,85,105,0.4)";
+        ctx.fill();
+        ctx.strokeStyle = p.state ? "#10b981" : "#475569";
+        ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle = p.state ? "#ecfdf5" : "#64748b";
+        ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(p.state?"ON":"OFF", px, py+20);
+        ctx.textAlign="left";
+      }
+
+      for (const p of particles) {
+        p.angle += p.speed;
+        const px=cx+R*Math.cos(p.angle), py=cy+R*Math.sin(p.angle);
+        const col = p.spin===1 ? [167,139,250] : [45,212,191];
+        const ahead=p.angle+p.spin*0.35;
+        ctx.beginPath(); ctx.arc(cx+R*Math.cos(ahead),cy+R*Math.sin(ahead),4,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${col},0.15)`; ctx.fill();
+        ctx.beginPath(); ctx.arc(px,py,5.5,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${col},0.9)`; ctx.fill();
+        ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${col},0.18)`; ctx.fill();
+      }
+
+      for (let i=0;i<NV_N;i++){
+        for (let j=0;j<NV_N;j++){
+          const ix=cx-24+i*8, iy=cy-24+j*8;
+          const ph=(i*1.618+j)*0.9+t*0.025;
+          ctx.beginPath(); ctx.arc(ix,iy,2.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(${99+Math.round(55*Math.sin(ph))},${102+Math.round(100*Math.cos(ph))},241,0.65)`;
+          ctx.fill();
+        }
+      }
+      ctx.fillStyle="rgba(200,216,224,0.3)"; ctx.font="7px 'Space Mono',monospace";
+      ctx.textAlign="center"; ctx.fillText("φ NV LATTICE",cx,cy+34); ctx.textAlign="left";
+
+      ctx.font="8.5px 'Space Mono',monospace";
+      ctx.fillStyle="rgba(167,139,250,0.75)";
+      ctx.fillText("↑ SPIN UP · CLOCKWISE",cx+R+22,cy-10);
+      ctx.fillStyle="rgba(45,212,191,0.75)";
+      ctx.fillText("↓ SPIN DOWN · CCW",cx+R+22,cy+10);
+
+      const coh=0.969+0.008*Math.sin(t*0.04);
+      const ent=0.021-0.005*Math.sin(t*0.04);
+      const mX=W*0.72, mY=50, mW=W*0.23;
+      ctx.fillStyle="rgba(200,216,224,0.5)"; ctx.font="7.5px 'Space Mono',monospace";
+      ctx.fillText(`PHASE ALIGNMENT: ${(coh*100).toFixed(1)}%`, mX, mY);
+      ctx.strokeStyle="#7c3aed44"; ctx.lineWidth=1; ctx.strokeRect(mX,mY+4,mW,8);
+      ctx.fillStyle=`rgba(167,139,250,${0.5+0.3*Math.sin(t*0.06)})`;
+      ctx.fillRect(mX,mY+4,mW*coh,8);
+      ctx.fillStyle="rgba(200,216,224,0.5)"; ctx.font="7.5px 'Space Mono',monospace";
+      ctx.fillText(`ENTROPY LEAKAGE: ${(ent*100).toFixed(1)}%`, mX, mY+22);
+      ctx.strokeStyle="#f43f5e44"; ctx.lineWidth=1; ctx.strokeRect(mX,mY+26,mW,8);
+      ctx.fillStyle="rgba(244,63,94,0.55)";
+      ctx.fillRect(mX,mY+26,mW*ent*8,8);
+      ctx.fillStyle="rgba(200,216,224,0.5)";
+      ctx.fillText(`COHERENCE Φc: ${coh.toFixed(3)}`, mX, mY+44);
+      ctx.fillText(`RESISTANCE: ZERO`, mX, mY+60);
+      ctx.fillText(`ENERGY LOSS: ZERO`, mX, mY+74);
+      ctx.fillText(`T₂ BOOST: ×1.618φ`, mX, mY+88);
+
+      ctx.fillStyle="rgba(200,216,224,0.35)"; ctx.font="7.5px 'Space Mono',monospace";
+      ctx.textAlign="center";
+      ctx.fillText("PERSISTENT SPIN CURRENT · VACUUM-STATE PORTS · ZERO DISSIPATION", cx, H-12);
+      ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
 
 const SECTIONS = [
   {
@@ -90,10 +224,52 @@ const SECTIONS = [
   },
 ];
 
+function SpinTransportHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const channels=5;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let ch=0;ch<channels;ch++){
+        const y=20+ch*(H-20)/channels;
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=4){
+          const spin=Math.sin(x*0.04+t*0.05+ch*0.7);
+          const wave=y+spin*12;
+          x===0?ctx.moveTo(x,wave):ctx.lineTo(x,wave);
+        }
+        ctx.strokeStyle=["#2ef0d8","#9966ff","#c9a84c","#44aaff","#44cc77"][ch]+"77";ctx.lineWidth=0.8;ctx.stroke();
+        const px=((t*2+ch*120)%W);
+        const spinY=y+Math.sin(px*0.04+t*0.05+ch*0.7)*12;
+        ctx.beginPath();ctx.arc(px,spinY,3,0,Math.PI*2);ctx.fillStyle=["#2ef0d8","#9966ff","#c9a84c","#44aaff","#44cc77"][ch]+"cc";ctx.fill();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SPIN TRANSPORT · SPINTRONICS · MAGNON · ELECTRON SPIN · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SpinTransportPage() {
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "2rem 1.5rem" }}>
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPIN TRANSPORT · SPINTRONICS · MAGNON · ELECTRON SPIN · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 spin-polarized wave channels — the live AETHER spin transport simulation.</p></div>
+            <SpinTransportHeaderCanvas />
+          </div>
+        </div>
 
         <div style={{ textAlign: "center", marginBottom: "3rem", padding: "2rem 1rem" }}>
           <div style={{
@@ -143,6 +319,27 @@ export default function SpinTransportPage() {
                 <div style={{ fontSize: "0.7rem", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em" }}>{stat.label}</div>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div style={{ marginBottom:"2rem" }}>
+          <div style={{ display:"inline-block", background:"#7c3aed22", border:"1px solid #7c3aed44",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#a78bfa", textTransform:"uppercase", marginBottom:"1rem" }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"#0a0f1e", border:"1px solid #7c3aed33", borderLeft:"3px solid #7c3aed",
+            borderRadius:14, padding:"1.5rem" }}>
+            <h2 style={{ fontSize:"1.3rem", fontWeight:700, color:"#f8fafc", margin:"0 0 0.35rem" }}>
+              Persistent Spin Current · Vacuum-State Port Simulation
+            </h2>
+            <p style={{ color:"#94a3b8", fontSize:"0.85rem", margin:"0 0 1rem", lineHeight:1.65 }}>
+              28 spin-polarized particles circulate in a closed toroidal ring — spin-up (violet) clockwise,
+              spin-down (teal) counter-clockwise — with zero resistance and zero energy dissipation.
+              Four vacuum-state ports toggle ON/OFF via local field control. φ-NV diamond lattice at center.
+              Real-time coherence Φc and entropy leakage meters shown right.
+            </p>
+            <SpinTransportCanvas />
           </div>
         </div>
 

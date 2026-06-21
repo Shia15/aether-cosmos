@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgBoat         from "@assets/ChatGPT_Image_Apr_26,_2026,_01_45_14_PM_1777225527845.png";
@@ -108,10 +109,81 @@ const MATERIALS_LAND = [
   { c: B.rust,      l: "Iron-tannin sealant" },
 ];
 
+function BioEngineCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const systems = [
+      { label:"PHOTOSYNTHESIS\nENGINE", col:"#34d399", x:W*0.12, y:H*0.5 },
+      { label:"NEURAL\nCOHERENCE", col:"#a78bfa", x:W*0.28, y:H*0.5 },
+      { label:"QUANTUM\nBIOLOGY", col:"#2ef0d8", x:W*0.44, y:H*0.5 },
+      { label:"MYCELIUM\nNETWORK", col:"#c9a84c", x:W*0.60, y:H*0.5 },
+      { label:"PLASMOID\nFIELD", col:"#f472b6", x:W*0.76, y:H*0.5 },
+      { label:"BIO\nSYNTHESIS", col:"#60a5fa", x:W*0.91, y:H*0.5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<systems.length-1;i++) {
+        const a=systems[i],b=systems[i+1];
+        const pkt=(t*0.014+i*0.45)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"44"); g.addColorStop(1,b.col+"44");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      }
+      systems.forEach((s,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.1);
+        const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,16*pulse);
+        g.addColorStop(0,s.col+"cc"); g.addColorStop(0.5,s.col+"44"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(s.x,s.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=s.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,s.x,s.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(52,211,153,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIO ENGINE · PHOTOSYNTHESIS · NEURAL COHERENCE · QUANTUM BIOLOGY · PLASMOID FIELD",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BioEnginePage() {
   return (
     <div className="min-h-screen w-full" style={{ background: B.bg }}>
       <main className="max-w-5xl mx-auto px-6 md:px-10 py-12 md:py-16" data-testid="bio-engine-page">
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(52,211,153,0.07)", border:"1px solid rgba(52,211,153,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#34d399", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(2,4,8,0.88)", border:"1px solid rgba(52,211,153,0.1)",
+            borderLeft:"3px solid #34d399", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"'Cinzel',serif", fontSize:18, color:"#d0f8e8", margin:"0 0 6px" }}>
+              Bio Engine · Photosynthesis · Neural Coherence · Quantum Biology · Plasmoid Field
+            </h2>
+            <p style={{ fontFamily:"monospace", fontSize:12, color:"rgba(150,230,200,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Six biological engine systems (Photosynthesis/teal · Neural Coherence/violet · Quantum Biology/mint
+              · Mycelium Network/gold · Plasmoid Field/rose · Bio Synthesis/blue) with energy packets streaming
+              sequentially — the living AETHER bio-engine architecture.
+            </p>
+            <BioEngineCanvas />
+          </div>
+        </div>
+
         {/* HEADER */}
         <header className="mb-12">
           <div className="text-[10.5px] uppercase tracking-[0.36em]"

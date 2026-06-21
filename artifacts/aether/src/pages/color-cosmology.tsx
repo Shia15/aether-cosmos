@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgCosmology  from "@assets/ChatGPT_Image_Apr_26,_2026,_02_27_38_PM_1777228060678.png";
@@ -101,9 +102,58 @@ const IRO = [
   { c: B.amber,  k: "Kachiro · 褐色 (kachiiro)", v: "Indigo black — the deep dyed colour worn for stamina and discipline" },
 ];
 
+function ColorCosmologyCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const stars: {x:number,y:number,r:number,col:string,t:number}[]=[];
+    for(let i=0;i<60;i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*2+0.5, col:`hsl(${Math.random()*360},70%,80%)`, t:Math.random()*Math.PI*2 });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(1,2,6,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      stars.forEach(s=>{
+        s.t+=0.02; const a=0.4+0.6*Math.abs(Math.sin(s.t));
+        ctx.globalAlpha=a; ctx.fillStyle=s.col;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+      });
+      ctx.globalAlpha=1;
+      for(let i=0;i<4;i++){
+        const r=20+i*22, psi=0.5+0.5*Math.sin(t*0.04-i*0.5);
+        const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        g.addColorStop(0,`hsla(${200+i*30},80%,60%,${psi*0.4})`); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+      }
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COLOR COSMOLOGY · CHROMATIC UNIVERSE · PHOTON SPECTRUM · STELLAR COHERENCE · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function ColorCosmologyPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="color-cosmology-page">
+      <div style={{ marginBottom:24 }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Color Cosmology · Chromatic Universe · Photon Spectrum · Stellar Coherence · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Twinkling star field with pulsing chromatic nebula core — the live AETHER colour cosmology stellar simulation.
+          </p>
+          <ColorCosmologyCanvas />
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto">
 
         <header className="mb-10">

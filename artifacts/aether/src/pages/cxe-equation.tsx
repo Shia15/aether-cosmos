@@ -210,6 +210,55 @@ const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+function CxeEquationCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    let t=0;
+    const terms=[
+      { label:"C(x,t)", col:"#2ef0d8", x:W*0.12 },
+      { label:"∂²C/∂t²", col:"#9966ff", x:W*0.27 },
+      { label:"∇²C", col:"#c9a84c", x:W*0.42 },
+      { label:"γC(1-C)", col:"#44aaff", x:W*0.57 },
+      { label:"ηΨ", col:"#44cc77", x:W*0.72 },
+      { label:"ξ(x,t)", col:"#ff4477", x:W*0.87 },
+    ];
+    const waves: {x0:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;tick++;
+      if(tick%20===0&&waves.length<6) waves.push({ x0:terms[Math.floor(Math.random()*terms.length)].x, t:0 });
+      for(let i=waves.length-1;i>=0;i--){
+        const w=waves[i]; w.t+=0.06;
+        const r=w.t*50;
+        ctx.beginPath(); ctx.arc(w.x0,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(46,240,216,${Math.max(0,0.3-w.t*0.1)})`; ctx.lineWidth=1; ctx.stroke();
+        if(w.t>3) waves.splice(i,1);
+      }
+      terms.forEach((term,i)=>{
+        const psi=0.5+0.5*Math.sin(t*0.04+i*0.9);
+        ctx.beginPath(); ctx.arc(term.x,cy,10+5*psi,0,Math.PI*2);
+        ctx.fillStyle=term.col; ctx.shadowColor=term.col; ctx.shadowBlur=12*psi; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=term.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(term.label,term.x,cy+26);
+        if(i>0){ ctx.fillStyle="rgba(255,255,255,0.3)"; ctx.font="10px 'DM Mono',monospace"; ctx.fillText("+",term.x-W*0.075,cy+4); }
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CXE EQUATION · C(x,t) COHERENCE FIELD · CRYSTALLIZATION MASTER EQ · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CxeEquationPage() {
   const now = useClock();
   const starRef = useRef<HTMLCanvasElement>(null);
@@ -220,6 +269,18 @@ export default function CxeEquationPage() {
 
   return (
     <div style={{ height: "100%", overflowY: "auto", background: V.void, color: V.text, fontFamily: V.serif, scrollBehavior: "smooth" }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            CXE Equation · C(x,t) Coherence Field · Crystallization Master Eq · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Six live equation terms (C(x,t) · ∂²C/∂t² · ∇²C · γC(1−C) · ηΨ · ξ(x,t)) with pulsing orbs and ripple waves — the AETHER crystallization master equation.
+          </p>
+          <CxeEquationCanvas />
+        </div>
+      </div>
 
       {/* ── Sticky nav ── */}
       <nav style={{ position: "sticky", top: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 36px", background: "rgba(2,4,8,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(0,255,178,0.07)" }}>

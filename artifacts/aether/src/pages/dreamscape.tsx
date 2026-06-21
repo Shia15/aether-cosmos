@@ -61,6 +61,43 @@ function polar(cx: number, cy: number, r: number, angleDeg: number) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
+function DreamscapeSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2, cy=H/2;
+    const stars: {x:number,y:number,r:number,ph:number,col:string}[]=[];
+    for(let i=0;i<60;i++) stars.push({ x:Math.random()*W,y:Math.random()*H,r:0.5+Math.random()*2,ph:Math.random()*Math.PI*2,col:`hsl(${200+Math.random()*80},70%,70%)` });
+    const morphs: {x:number,y:number,r:number,col:string,vx:number,vy:number}[]=[];
+    const MORPH_COLS=["rgba(153,102,255,0.6)","rgba(102,153,255,0.6)","rgba(102,204,255,0.6)","rgba(200,150,255,0.6)","rgba(100,200,220,0.6)"];
+    for(let i=0;i<5;i++) morphs.push({ x:W*(0.1+i*0.2),y:cy+((i%2)-.5)*40,r:18+Math.random()*12,col:MORPH_COLS[i],vx:(Math.random()-.5)*0.3,vy:(Math.random()-.5)*0.15 });
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(14,12,28,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      stars.forEach(s=>{ const a=0.3+0.5*Math.sin(t*0.04+s.ph); ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=s.col; ctx.globalAlpha=a; ctx.fill(); ctx.globalAlpha=1; });
+      morphs.forEach(m=>{
+        m.x+=m.vx; m.y+=m.vy;
+        if(m.x<0||m.x>W) m.vx*=-1;
+        if(m.y<H*0.2||m.y>H*0.8) m.vy*=-1;
+        const g=ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,m.r);
+        g.addColorStop(0,m.col); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(m.x,m.y,m.r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+      });
+      ctx.fillStyle="rgba(153,102,255,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left"; ctx.globalAlpha=1;
+      ctx.fillText("DREAMSCAPE · SUBCONSCIOUS FIELD · MORPHIC FORMS · STELLAR DRIFT · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function DreamscapePage() {
   const [hovered, setHovered] = useState<{ label: string; detail: string } | null>(null);
   const [activeOverlays, setActiveOverlays] = useState<Set<string>>(new Set(["feedback"]));
@@ -85,7 +122,20 @@ export default function DreamscapePage() {
   const circadianAngle = (tick * 0.15) % 360;
 
   return (
-    <div className="h-full flex overflow-hidden bg-[#0E0C1C]">
+    <div className="h-full flex flex-col overflow-hidden bg-[#0E0C1C]">
+      <div style={{ flexShrink:0, padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Dreamscape · AETHER Living Architecture · Crystallization Model · MNĒSIS · INFERNIA
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Concentric orbit rings (Core · MNĒSIS · INFERNIA · ALETHEIA · REVERIE) with live orbiting nodes — the live AETHER dreamscape simulation.
+          </p>
+          <DreamscapeSimCanvas />
+        </div>
+      </div>
+      <div className="flex-1 flex overflow-hidden">
 
       {/* ── Canvas ── */}
       <div className="flex-1 relative flex items-center justify-center overflow-hidden">
@@ -452,6 +502,7 @@ export default function DreamscapePage() {
           <Eye className="w-3.5 h-3.5" />
         </button>
       )}
+      </div>
     </div>
   );
 }

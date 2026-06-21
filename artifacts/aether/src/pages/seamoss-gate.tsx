@@ -357,6 +357,37 @@ const AETHER_CHAIN = [
 ];
 
 /* ══════════ MAIN PAGE ══════════ */
+function SeamossGateHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let x=0;x<W;x+=16){
+        const h=20+30*Math.abs(Math.sin(x*0.02+t*0.02));
+        const alpha=0.3+0.3*Math.abs(Math.sin(x*0.03+t*0.015));
+        ctx.fillStyle=`rgba(68,204,119,${alpha*0.4})`;ctx.fillRect(x,H-h,12,h);
+        ctx.beginPath();
+        for(let seg=0;seg<4;seg++){
+          const bx=x+6+Math.sin(seg*1.5+t*0.03)*4,by=H-h-seg*10;
+          ctx.beginPath();ctx.arc(bx,by,3,0,Math.PI*2);ctx.fillStyle=`rgba(68,204,119,${alpha*0.6})`;ctx.fill();
+        }
+      }
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SEAMOSS GATE · ALGAE BIOREACTOR · PHOTOSYNTHESIS · SUBSTRATE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SeamossGatePage() {
   const [mode, setMode] = useState<GateMode>("threshold");
   const [activeIon, setActiveIon] = useState(0);
@@ -382,7 +413,13 @@ export default function SeamossGatePage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT, fontFamily:mono, overflowY:"auto" }}>
-
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SEAMOSS GATE · ALGAE BIOREACTOR · PHOTOSYNTHESIS · SUBSTRATE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Living algae strands — the live AETHER seamoss gate simulation.</p></div>
+          <SeamossGateHeaderCanvas />
+        </div>
+      </div>
       {/* ── HEADER ── */}
       <div style={{ padding:"12px 20px 10px", borderBottom:`1px solid ${BORDER}`,
         background:"rgba(2,8,4,0.98)", position:"sticky", top:0, zIndex:20 }}>

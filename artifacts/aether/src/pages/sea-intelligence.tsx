@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import img_seaStickiesChem from "@assets/1799B4B6-40B2-4826-951E-0D27306C29DE_1781446652782.png";
 import img_seaStickiesArch from "@assets/28393E2A-94FD-4D2D-B14B-9149635B90E3_1781446652782.png";
 import img_reefCoherence from "@assets/1BF38BF4-92BE-40E4-8045-2750B6500AB8_1781446652782.png";
@@ -370,12 +370,156 @@ function BiolumTab() {
   );
 }
 
+function BioluminescenceCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 380;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+
+    interface Plankton { x:number; y:number; vx:number; vy:number; glow:number; r:number; hue:number }
+    const N = 160;
+    const plankton: Plankton[] = Array.from({length:N}, ()=>({
+      x: Math.random()*W, y: 40+Math.random()*(H-100),
+      vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.2,
+      glow: 0, r: 1.5+Math.random()*2, hue: 170+Math.random()*40,
+    }));
+
+    interface Coral { x:number; h:number; col:string }
+    const corals: Coral[] = Array.from({length:14}, (_,i)=>({
+      x: (i+0.5)/14*W, h: 18+Math.random()*30,
+      col: ["#0e7490","#0891b2","#06b6d4","#22d3ee","#2dd4bf"][i%5],
+    }));
+
+    let waveX = -200;
+    let waveActive = false;
+    let waveTimer = 80;
+    let t = 0;
+
+    const draw = () => {
+      const oceanGrd=ctx.createLinearGradient(0,0,0,H);
+      oceanGrd.addColorStop(0,"#020c1a"); oceanGrd.addColorStop(1,"#010810");
+      ctx.fillStyle=oceanGrd; ctx.fillRect(0,0,W,H);
+
+      waveTimer--;
+      if (waveTimer<=0&&!waveActive){ waveActive=true; waveX=-50; waveTimer=200+Math.random()*150; }
+      if (waveActive){ waveX+=3.5; if(waveX>W+100){ waveActive=false; } }
+
+      for (const p of plankton) {
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+        if(p.y<20||p.y>H-60){ p.vy*=-1; }
+        p.vx+=(Math.random()-0.5)*0.04; p.vy+=(Math.random()-0.5)*0.02;
+        p.vx=Math.max(-0.8,Math.min(0.8,p.vx)); p.vy=Math.max(-0.4,Math.min(0.4,p.vy));
+
+        if (waveActive&&Math.abs(p.x-waveX)<60){ p.glow=Math.min(1,p.glow+0.15); }
+        p.glow=Math.max(0,p.glow-0.008);
+
+        const g=p.glow;
+        if (g>0.05){
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r+5*g,0,Math.PI*2);
+          ctx.fillStyle=`hsla(${p.hue},100%,65%,${g*0.15})`; ctx.fill();
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle=`hsla(${p.hue},100%,75%,${0.3+g*0.7})`; ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle=`rgba(6,182,212,${0.08+g*0.1})`; ctx.fill();
+        }
+      }
+
+      if (waveActive){
+        const wGrd=ctx.createLinearGradient(waveX-60,0,waveX+60,0);
+        wGrd.addColorStop(0,"transparent"); wGrd.addColorStop(0.5,"rgba(6,182,212,0.04)"); wGrd.addColorStop(1,"transparent");
+        ctx.fillStyle=wGrd; ctx.fillRect(waveX-60,0,120,H);
+      }
+
+      for (let c=0;c<corals.length;c++){
+        const cr=corals[c];
+        const pulse=0.7+0.3*Math.sin(t*0.04+c*0.8);
+        ctx.strokeStyle=cr.col+Math.round(pulse*200).toString(16).padStart(2,"0");
+        ctx.lineWidth=2; ctx.beginPath();
+        ctx.moveTo(cr.x,H-30);
+        const branchH=cr.h*pulse;
+        ctx.lineTo(cr.x,H-30-branchH); ctx.stroke();
+        for (let b=-1;b<=1;b+=2){
+          ctx.beginPath(); ctx.moveTo(cr.x,H-30-branchH*0.5);
+          ctx.lineTo(cr.x+b*12,H-30-branchH*0.78); ctx.stroke();
+        }
+        ctx.beginPath(); ctx.arc(cr.x,H-30-branchH,3*pulse,0,Math.PI*2);
+        ctx.fillStyle=cr.col+Math.round(pulse*180).toString(16).padStart(2,"0"); ctx.fill();
+      }
+
+      const seamGrd=ctx.createLinearGradient(0,H-32,0,H);
+      seamGrd.addColorStop(0,"rgba(8,40,80,0.8)"); seamGrd.addColorStop(1,"rgba(5,20,50,1)");
+      ctx.fillStyle=seamGrd; ctx.fillRect(0,H-32,W,32);
+
+      ctx.fillStyle="rgba(100,200,220,0.3)"; ctx.font="7px 'Space Mono',monospace";
+      ctx.textAlign="center";
+      ctx.fillText("BIOLUMINESCENT PLANKTON · DISTURBANCE WAVE TRIGGERS LIGHT EMISSION · CORAL POLYPS PULSING",W/2,H-14);
+      ctx.textAlign="left";
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />;
+}
+
+function SeaIntelligenceHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const fish: {x:number;y:number;speed:number;phase:number;col:string}[]=[];
+    for(let i=0;i<14;i++) fish.push({x:Math.random()*W,y:20+Math.random()*(H-40),speed:0.4+Math.random()*0.6,phase:Math.random()*Math.PI*2,col:["#2ef0d8","#44aaff","#44cc77"][Math.floor(Math.random()*3)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let wave=0;wave<4;wave++){
+        ctx.beginPath();
+        for(let x=0;x<=W;x+=4){
+          const y=H*0.3+wave*22+15*Math.sin(x*0.015+t*0.02+wave*0.8);
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=`rgba(68,170,255,${0.04+wave*0.025})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      fish.forEach(f=>{
+        f.x+=f.speed; if(f.x>W+10) f.x=-10;
+        const y=f.y+8*Math.sin(t*0.04+f.phase);
+        ctx.beginPath();ctx.ellipse(f.x,y,8,4,0,0,Math.PI*2);ctx.fillStyle=f.col+"55";ctx.fill();ctx.strokeStyle=f.col+"99";ctx.lineWidth=0.5;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SEA INTELLIGENCE · OCEAN COGNITION · MARINE COHERENCE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SeaIntelligencePage() {
   const [tab, setTab] = useState("coral");
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui,sans-serif" }}>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1rem" }}>
+        <div style={{flexShrink:0,padding:"8px 0 0"}}>
+          <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SEA INTELLIGENCE · OCEAN COGNITION · MARINE COHERENCE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>14 marine organisms + 4 wave layers — the live AETHER sea intelligence simulation.</p></div>
+            <SeaIntelligenceHeaderCanvas />
+          </div>
+        </div>
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
           <h1 style={{ fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 900, background: "linear-gradient(135deg,#06b6d4,#22c55e,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: "0 0 0.5rem" }}>
             AETHER Ocean Intelligence
@@ -386,6 +530,26 @@ export default function SeaIntelligencePage() {
           <p style={{ color: "#64748b", maxWidth: 620, margin: "0 auto", lineHeight: 1.7, fontSize: "0.9rem" }}>
             From robotic reef-restoration machines and coherence-networked seed modules, to self-powered bioluminescent cameras that see the invisible light of the living ocean — AETHER&apos;s ocean intelligence systems transform nature&apos;s engineering into scalable ecological technology.
           </p>
+        </div>
+
+        <div style={{ marginBottom:"2rem" }}>
+          <div style={{ display:"inline-block", background:"rgba(6,182,212,0.1)", border:"1px solid rgba(6,182,212,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#22d3ee", textTransform:"uppercase", marginBottom:"1rem" }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(6,182,212,0.18)",
+            borderLeft:"3px solid #06b6d4", borderRadius:14, padding:"1.5rem" }}>
+            <h2 style={{ fontSize:"1.2rem", fontWeight:700, color:"#f8fafc", margin:"0 0 0.35rem" }}>
+              Bioluminescent Plankton · Deep Ocean Simulation
+            </h2>
+            <p style={{ color:"#94a3b8", fontSize:"0.82rem", margin:"0 0 1rem", lineHeight:1.65 }}>
+              160 bioluminescent plankton drift in the deep ocean. A periodic disturbance wave triggers
+              light emission — the same mechanic AETHER&apos;s sea-milk camera captures at the micro scale.
+              Coral polyps pulse at the seafloor below.
+            </p>
+            <BioluminescenceCanvas />
+          </div>
         </div>
 
         <div style={{ display: "flex", gap: "0.5rem", marginBottom: "2rem", flexWrap: "wrap" }}>

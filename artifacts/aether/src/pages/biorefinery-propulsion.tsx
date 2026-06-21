@@ -232,6 +232,58 @@ function PipelineCanvas({ activeStage, setActive }: { activeStage: number; setAc
 /* ══════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════ */
+function BiorefineryCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const stages = [
+      { label:"BIOMASS\nINPUT", col:"#34d399", x:W*0.10, y:H*0.5 },
+      { label:"FERMENT\nREACTOR", col:"#a78bfa", x:W*0.24, y:H*0.5 },
+      { label:"LIPID\nEXTRACT", col:"#f59e0b", x:W*0.38, y:H*0.5 },
+      { label:"HYDRO\nCRACK", col:"#ef4444", x:W*0.52, y:H*0.5 },
+      { label:"JET\nFUEL", col:"#60a5fa", x:W*0.66, y:H*0.5 },
+      { label:"PLASMA\nTHRUST", col:"#f472b6", x:W*0.80, y:H*0.5 },
+      { label:"BIO\nOUTPUT", col:"#2ef0d8", x:W*0.92, y:H*0.5 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,10,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<stages.length-1;i++) {
+        const a=stages[i],b=stages[i+1];
+        const pkt=(t*0.013+i*0.4)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,H/2,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"55"); g.addColorStop(1,b.col+"55");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5; ctx.stroke();
+      }
+      stages.forEach((s,i)=>{
+        const pulse=1+0.08*Math.sin(t*0.04+i*1.0);
+        const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,16*pulse);
+        g.addColorStop(0,s.col+"cc"); g.addColorStop(0.5,s.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(s.x,s.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=s.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,s.x,s.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(52,211,153,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BIOREFINERY PROPULSION · BIOMASS → FERMENT → LIPID → HYDROCRACK → JET → PLASMA → OUTPUT",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BiorefineryPropulsionPage() {
   const [activeStage, setActiveStage] = useState(0);
   const stage = STAGES[activeStage];
@@ -254,6 +306,25 @@ export default function BiorefineryPropulsionPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT, fontFamily:mono, overflowY:"auto" }}>
+      <div style={{ padding:"16px 20px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(52,211,153,0.07)", border:"1px solid rgba(52,211,153,0.22)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#34d399", textTransform:"uppercase", fontFamily:mono, marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,4,10,0.9)", border:"1px solid rgba(52,211,153,0.1)",
+          borderLeft:"3px solid #34d399", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:mono, fontSize:18, color:"#d0f8e8", margin:"0 0 6px" }}>
+            Biorefinery Propulsion · Biomass → Ferment → Lipid → Hydrocrack → Jet → Plasma → Output
+          </h2>
+          <p style={{ fontFamily:mono, fontSize:12, color:"rgba(150,230,200,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Seven biorefinery process stages (Biomass Input/teal · Ferment Reactor/violet · Lipid Extract/amber
+            · Hydrocrack/red · Jet Fuel/blue · Plasma Thrust/rose · Bio Output/mint) with propellant flow packets
+            streaming through the full pipeline — the living biorefinery-to-propulsion chain.
+          </p>
+          <BiorefineryCanvas />
+        </div>
+      </div>
 
       {/* ── HEADER ── */}
       <div style={{

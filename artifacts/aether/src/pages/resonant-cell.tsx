@@ -23,6 +23,39 @@ const HUES = [170, 200, 260, 170, 180, 200, 260, 170, 200, 180, 170];
 
 type StarP = { x: number; y: number; r: number; ph: number; sp: number };
 
+function ResonantCellHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let shell=1;shell<=4;shell++){
+        const r=shell*24+Math.sin(t*0.025+shell)*6;
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(68,204,119,${0.06+shell*0.04})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      for(let i=0;i<8;i++){
+        const angle=i/8*Math.PI*2+t*0.018;
+        const r=55+12*Math.sin(t*0.04+i*0.7);
+        const x=cx+Math.cos(angle)*r,y=cy+Math.sin(angle)*r*0.55;
+        ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle="rgba(68,204,119,0.4)";ctx.fill();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle="rgba(68,204,119,0.06)";ctx.lineWidth=0.4;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(68,204,119,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("RESONANT CELL · CELLULAR RESONANCE · BIO-HARMONIC · FIELD COUPLING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ResonantCellPage() {
   const [cur, setCur] = useState(1);
   const curRef = useRef(1);
@@ -101,8 +134,15 @@ export default function ResonantCellPage() {
 
   return (
     <div className="relative w-full overflow-hidden"
-         style={{ height: "100vh", background: C.navy, color: C.text, fontFamily: FONTS }}
+         style={{ minHeight: "100vh", background: C.navy, color: C.text, fontFamily: FONTS }}
          data-testid="resonant-cell">
+      <div style={{flexShrink:0,position:"relative",zIndex:10,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>RESONANT CELL · CELLULAR RESONANCE · BIO-HARMONIC · FIELD COUPLING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 shells + 8 orbital resonance points — the live AETHER resonant cell simulation.</p></div>
+          <ResonantCellHeaderCanvas />
+        </div>
+      </div>
       {/* SLIDES */}
       <Slide n={1} cur={cur} setBg={setBg(0)}>
         <div className="content-pad" style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", height: "100%" }}>

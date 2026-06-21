@@ -582,6 +582,38 @@ function PlasmaMixer() {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
+function SubstrateSynthesisHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const nodes: {r:number;angle:number;speed:number;col:string}[]=[];
+    for(let i=0;i<9;i++) nodes.push({r:20+i*10,angle:i*0.7,speed:0.008+i*0.003,col:["#2ef0d8","#9966ff","#c9a84c","#44cc77","#44aaff"][i%5]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      nodes.forEach((n,i)=>{
+        n.angle+=n.speed;
+        const x=cx+Math.cos(n.angle)*n.r*2.2,y=cy+Math.sin(n.angle)*n.r*0.8;
+        ctx.beginPath();ctx.arc(cx,cy,n.r*2.2,0,Math.PI*2);ctx.strokeStyle=n.col+"11";ctx.lineWidth=0.3;ctx.stroke();
+        ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle=n.col+"22";ctx.lineWidth=0.4;ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fillStyle=n.col+"99";ctx.fill();
+        if(i>0){const p=nodes[i-1];const px=cx+Math.cos(p.angle)*p.r*2.2,py=cy+Math.sin(p.angle)*p.r*0.8;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(px,py);ctx.strokeStyle=n.col+"15";ctx.lineWidth=0.3;ctx.stroke();}
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SUBSTRATE SYNTHESIS · CRYSTAL GROWTH · LAYER DEPOSITION · BIO-FILM · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SubstrateSynthesisPage() {
   const totalAt180 = useMemo(() => CONDITIONS.reduce((s, c) => s + c.total180, 0), []);
   return (
@@ -591,6 +623,13 @@ export default function SubstrateSynthesisPage() {
       color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SUBSTRATE SYNTHESIS · CRYSTAL GROWTH · LAYER DEPOSITION · BIO-FILM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>9-node orbital synthesis chain — the live AETHER substrate synthesis simulation.</p></div>
+          <SubstrateSynthesisHeaderCanvas />
+        </div>
+      </div>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');
       `}</style>

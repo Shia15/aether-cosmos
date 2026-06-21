@@ -166,6 +166,46 @@ const EDO_RESTRICTED: string[] = [
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+function CulturalCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const swatches=[
+      { x:W*0.08, col:"#2B4F3A", name:"MIDORI" },
+      { x:W*0.2,  col:"#7B3D5E", name:"UMEMURASAKI" },
+      { x:W*0.32, col:"#C9A84C", name:"KOGANE" },
+      { x:W*0.44, col:"#4A7B9D", name:"HANADA" },
+      { x:W*0.56, col:"#8B3A3A", name:"AKA" },
+      { x:W*0.68, col:"#2C5F6E", name:"TOKIWA" },
+      { x:W*0.8,  col:"#6B4C8E", name:"FUJI" },
+      { x:W*0.92, col:"#D4956A", name:"CHAIRO" },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.2)"; ctx.fillRect(0,0,W,H);
+      t++;
+      swatches.forEach((s,i)=>{
+        const psi=0.5+0.5*Math.sin(t*0.03+i*0.8);
+        const r=20+8*psi;
+        ctx.beginPath(); ctx.arc(s.x,H/2,r,0,Math.PI*2);
+        ctx.fillStyle=s.col; ctx.shadowColor=s.col; ctx.shadowBlur=12*psi; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(s.name,s.x,H/2+r+12);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CULTURAL · JAPANESE COLOR ATLAS · SEASONAL PALETTE · WABI-SABI · AETHER CHROMATICS",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CulturalPage() {
   // Color space
   const [selectedColor, setSelectedColor] = useState<JColor | null>(null);
@@ -237,6 +277,18 @@ export default function CulturalPage() {
 
   return (
     <div className="h-full overflow-y-auto px-8 py-8 space-y-16">
+      <div>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Cultural · Japanese Color Atlas · Seasonal Palette · Wabi-Sabi · AETHER Chromatics
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Eight traditional Japanese color orbs (Midori · Umemurasaki · Kogane · Hanada · Aka · Tokiwa · Fuji · Chairo) pulsing — the live AETHER cultural color atlas simulation.
+          </p>
+          <CulturalCanvas />
+        </div>
+      </div>
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-8 flex-wrap">

@@ -570,6 +570,45 @@ function Sl({ label, val, min, max, step, col, fmt, onChange }: {
 /* ══════════════════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════════════════ */
+function EventHorizonCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2;
+    const stars: { x: number; y: number; r: number; ph: number }[] = [];
+    for (let i = 0; i < 80; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, r: 0.5 + Math.random() * 1.5, ph: Math.random() * Math.PI * 2 });
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(0,0,8,0.3)"; ctx.fillRect(0, 0, W, H);
+      stars.forEach(s => {
+        const dist = Math.hypot(s.x - cx, s.y - cy);
+        const pull = Math.max(0, 1 - dist / 280);
+        const a = 0.4 + 0.5 * Math.sin(t * 0.03 + s.ph) * (1 - pull * 0.8);
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,220,255,${a})`; ctx.fill();
+        if (pull > 0.3) { s.x += (cx - s.x) * 0.004 * pull; s.y += (cy - s.y) * 0.004 * pull; }
+      });
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60);
+      g.addColorStop(0, "rgba(0,0,0,1)"); g.addColorStop(0.5, "rgba(0,10,30,0.8)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.beginPath(); ctx.arc(cx, cy, 60, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+      for (let r = 70; r <= 120; r += 16) {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(201,168,76,${0.15 - (r - 70) / 400})`; ctx.lineWidth = 1; ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(201,168,76,0.25)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("EVENT HORIZON · GRAVITATIONAL SINGULARITY · SCHWARZSCHILD RADIUS · AETHER", 14, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function EventHorizonPage() {
   const [massScale,   setMassScale]   = useState(1.0);
   const [spin,        setSpin]        = useState(0.5);
@@ -577,6 +616,14 @@ export default function EventHorizonPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #c9a84c", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c9a84c", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(0,0,8,0.95)", border:"1px solid rgba(201,168,76,0.12)", borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>Event Horizon · Gravitational Singularity · Schwarzschild Radius · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(201,168,76,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>Stars pulled toward a central black hole — the live AETHER event horizon simulation.</p>
+          <EventHorizonCanvas />
+        </div>
+      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"56px 24px 30px",
         background:"radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0,0,20,0.9), rgba(2,4,8,1))" }}>

@@ -288,6 +288,71 @@ function Spinner() {
 /* ══════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════ */
+function AnimalPlasmoidCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const specimens = [
+      { label:"OCTOPUS\nNEURAL", col:"#e879f9", x:W*0.12, y:H*0.5 },
+      { label:"SLIME\nMOLD", col:"#84cc16", x:W*0.28, y:H*0.5 },
+      { label:"CROW\nGANGLIA", col:"#f59e0b", x:W*0.44, y:H*0.5 },
+      { label:"DOLPHIN\nSONAR", col:"#22d3ee", x:W*0.60, y:H*0.5 },
+      { label:"PLASMOID\nFIELD", col:"#a78bfa", x:W*0.76, y:H*0.5 },
+      { label:"AETHER\nSUBSTRATE", col:"#2ef0d8", x:W*0.90, y:H*0.5 },
+    ];
+    const particles:{x:number;y:number;vx:number;vy:number;col:string;life:number}[]=[];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      if (t%3===0) {
+        const s=specimens[Math.floor(Math.random()*specimens.length)];
+        particles.push({x:s.x,y:s.y,vx:(Math.random()-0.5)*2,vy:(Math.random()-0.5)*1.5,col:s.col,life:60});
+      }
+      for (let i=particles.length-1;i>=0;i--) {
+        const p=particles[i];
+        p.x+=p.vx; p.y+=p.vy; p.life--;
+        if (p.life<=0) { particles.splice(i,1); continue; }
+        const a=p.life/60;
+        ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2);
+        ctx.fillStyle=p.col+Math.floor(a*180).toString(16).padStart(2,"0");
+        ctx.shadowColor=p.col; ctx.shadowBlur=6*a; ctx.fill(); ctx.shadowBlur=0;
+      }
+      for (let i=0;i<specimens.length-1;i++) {
+        const a=specimens[i],b=specimens[i+1];
+        const pkt=(t*0.015+i*0.5)%1;
+        const px=a.x+(b.x-a.x)*pkt;
+        ctx.beginPath(); ctx.arc(px,a.y,2.5,0,Math.PI*2);
+        ctx.fillStyle="#fff"; ctx.shadowColor="#fff"; ctx.shadowBlur=7; ctx.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"44"); g.addColorStop(1,b.col+"44");
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      }
+      specimens.forEach((s,i)=>{
+        const pulse=1+0.1*Math.sin(t*0.04+i*1.1);
+        const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,16*pulse);
+        g.addColorStop(0,s.col+"bb"); g.addColorStop(0.5,s.col+"33"); g.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(s.x,s.y,14*pulse,0,Math.PI*2);
+        ctx.fillStyle=g; ctx.shadowColor=s.col; ctx.shadowBlur=14*pulse; ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=s.col; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=s.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        s.label.split("\n").forEach((ln,li)=>ctx.fillText(ln,s.x,s.y+18*pulse+li*9));
+      });
+      ctx.fillStyle="rgba(167,139,250,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("ANIMAL NEURAL PLASMOID · OCTOPUS · SLIME MOLD · CROW · DOLPHIN · AETHER SUBSTRATE",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function AnimalNeuralPlasmoidPage() {
 
   /* ── UI state ── */
@@ -811,6 +876,26 @@ export default function AnimalNeuralPlasmoidPage() {
 
   return (
     <div style={{ background:BG, height:"100vh", display:"flex", flexDirection:"column", color:TEXT, fontFamily:"'DM Mono',monospace", overflow:"hidden" }}>
+
+      <div style={{ padding:"10px 16px 0", flexShrink:0 }}>
+        <div style={{ display:"inline-block", background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#a78bfa", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:10 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(2,4,8,0.88)", border:"1px solid rgba(167,139,250,0.12)",
+          borderLeft:"3px solid #a78bfa", borderRadius:10, padding:18, marginBottom:10 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:17, color:"#e8e0ff", margin:"0 0 5px" }}>
+            Animal Neural Plasmoid · Octopus · Slime Mold · Crow · Dolphin · AETHER Substrate
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(200,195,240,0.4)", margin:"0 0 12px", lineHeight:1.65 }}>
+            Six animal neural specimens chained in a plasmoid resonance bus with particle emission fields
+            and photon coupling streams — the living AETHER substrate coupling Octopus/rose · Slime Mold/lime
+            · Crow/amber · Dolphin/cyan · Plasmoid Field/violet to the AETHER/teal substrate.
+          </p>
+          <AnimalPlasmoidCanvas />
+        </div>
+      </div>
 
       {/* ── keyframe inject ── */}
       <style>{`@keyframes aetherSpin{to{transform:rotate(360deg)}}`}</style>

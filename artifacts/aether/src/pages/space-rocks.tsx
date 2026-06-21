@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 type EventType = "impact" | "airburst" | "magnetic" | "cataclysm" | "civil" | "planet";
@@ -151,16 +151,238 @@ function EventCard({ ev, idx }: { ev: typeof EVENTS[0]; idx: number }) {
   );
 }
 
+function AsteroidImpactCanvas() {
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const [mode, setMode] = useState<"dense"|"comet">("dense");
+  const modeRef = useRef<"dense"|"comet">("dense");
+  useEffect(() => { modeRef.current = mode; }, [mode]);
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const W = 900, H = 460;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d")!;
+    const cx = W/2, ey = H*0.82;
+    const ER = 90;
+
+    interface Particle { x:number; y:number; vx:number; vy:number; life:number; r:number; col:string }
+    let particles: Particle[] = [];
+
+    let phase: "fly"|"impact"|"pause" = "fly";
+    let oy = 0, phaseT = 0;
+    let fragments: {x:number;y:number;vx:number;vy:number;r:number;life:number}[] = [];
+
+    const reset = () => {
+      oy = 0; phaseT = 0; phase = "fly"; particles = []; fragments = [];
+    };
+    reset();
+
+    let t = 0;
+    const ATMO_Y = ey - ER - 50;
+
+    const draw = () => {
+      const m = modeRef.current;
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,W,H);
+
+      for (let i=0;i<50;i++){
+        const sx=(i*137.5)%W, sy=(i*73.1)%H;
+        ctx.beginPath(); ctx.arc(sx,sy,0.6+((i*31)%10)/10,0,Math.PI*2);
+        ctx.fillStyle="rgba(200,220,240,0.35)"; ctx.fill();
+      }
+
+      const atmoGrd=ctx.createRadialGradient(cx,ey,ER,cx,ey,ER+65);
+      atmoGrd.addColorStop(0,"rgba(56,132,255,0.22)"); atmoGrd.addColorStop(1,"transparent");
+      ctx.beginPath(); ctx.arc(cx,ey,ER+65,0,Math.PI*2); ctx.fillStyle=atmoGrd; ctx.fill();
+
+      const earthGrd=ctx.createRadialGradient(cx-25,ey-25,10,cx,ey,ER);
+      earthGrd.addColorStop(0,"#3b82f6"); earthGrd.addColorStop(0.5,"#1d4ed8"); earthGrd.addColorStop(1,"#1e3a8a");
+      ctx.beginPath(); ctx.arc(cx,ey,ER,0,Math.PI*2); ctx.fillStyle=earthGrd; ctx.fill();
+
+      ctx.strokeStyle="rgba(56,132,255,0.4)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(cx,ey,ER+32,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,ey,ER+52,0,Math.PI*2);
+      ctx.strokeStyle="rgba(56,132,255,0.15)"; ctx.stroke();
+
+      ctx.fillStyle="rgba(100,180,255,0.08)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("ATMOSPHERE",cx,ey-ER-58); ctx.textAlign="left";
+
+      if (phase==="fly") {
+        phaseT++;
+        const speed = m==="dense" ? 4.5 : 3.8;
+        oy = phaseT * speed;
+
+        const ax=cx+40-oy*0.25, ay=oy;
+        const r = m==="dense" ? 12 : 16;
+
+        if (m==="comet" && ay > ATMO_Y - 20) {
+          const fragCount=Math.min(Math.floor((ay-ATMO_Y+20)/4),12);
+          for (let i=0;i<Math.min(2,fragCount);i++){
+            if (Math.random()>0.5 && fragments.length<30){
+              fragments.push({x:ax,y:ay,vx:(Math.random()-0.5)*4,vy:-Math.random()*2,r:2+Math.random()*4,life:1});
+            }
+          }
+        }
+
+        for (let i=fragments.length-1;i>=0;i--){
+          const f=fragments[i]; f.x+=f.vx; f.y+=f.vy; f.vy+=0.12; f.life-=0.025;
+          if(f.life<=0){fragments.splice(i,1);continue;}
+          ctx.beginPath(); ctx.arc(f.x,f.y,f.r*f.life,0,Math.PI*2);
+          ctx.fillStyle=`rgba(255,180,60,${f.life*0.7})`; ctx.fill();
+        }
+
+        const inAtmo = ay > ATMO_Y;
+        const disintegrate = m==="comet" && inAtmo && fragments.length>5;
+
+        if (!disintegrate){
+          const col = m==="dense" ? ["#ef4444","#b91c1c"] : ["#fb923c","#ea580c"];
+          ctx.beginPath(); ctx.arc(ax,ay,r,0,Math.PI*2);
+          ctx.fillStyle=col[0]; ctx.fill();
+          if (m==="dense"){
+            ctx.beginPath(); ctx.ellipse(ax,ay-8,4,7,0,0,Math.PI*2);
+            ctx.fillStyle="#fca5a5"; ctx.fill();
+          }
+          const trailLen=m==="dense"?60:80;
+          const trailGrd=ctx.createLinearGradient(ax,ay,ax-oy*0.25*0.3,ay-trailLen);
+          trailGrd.addColorStop(0,col[0]+"cc"); trailGrd.addColorStop(1,"transparent");
+          ctx.fillStyle=trailGrd; ctx.fillRect(ax-4,ay-trailLen,8,trailLen);
+        }
+
+        const hitY = ey - ER + 8;
+        const explodeY = ATMO_Y + 10;
+        if (m==="dense"&&ay>hitY){ phase="impact"; phaseT=0; }
+        if (m==="comet"&&disintegrate&&ay>explodeY){ phase="impact"; phaseT=0; }
+      }
+
+      if (phase==="impact") {
+        phaseT++;
+        const ex=cx+40, iy=m==="dense"?ey-ER+6:ATMO_Y+10;
+        const blastR=Math.min(phaseT*4,m==="dense"?80:120);
+        const blastGrd=ctx.createRadialGradient(ex,iy,0,ex,iy,blastR);
+        blastGrd.addColorStop(0,m==="dense"?"rgba(255,120,30,0.9)":"rgba(255,200,80,0.7)");
+        blastGrd.addColorStop(0.5,m==="dense"?"rgba(255,60,10,0.5)":"rgba(255,150,40,0.4)");
+        blastGrd.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(ex,iy,blastR,0,Math.PI*2); ctx.fillStyle=blastGrd; ctx.fill();
+
+        if (m==="dense"&&phaseT<20){
+          for (let i=0;i<3;i++){
+            particles.push({x:ex,y:iy,vx:(Math.random()-0.5)*8,vy:-Math.random()*6,life:1,r:2+Math.random()*4,col:"rgba(255,100,20,"});
+          }
+        }
+        for (let i=particles.length-1;i>=0;i--){
+          const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.15; p.life-=0.02;
+          if(p.life<=0){particles.splice(i,1);continue;}
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
+          ctx.fillStyle=p.col+p.life+")"; ctx.fill();
+        }
+
+        ctx.fillStyle="rgba(200,216,224,0.75)"; ctx.font="11px 'Space Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(m==="dense"?"SURFACE IMPACT · CRATER FORMED":"AIRBURST · NO CRATER", cx, 40);
+        ctx.font="8px 'Space Mono',monospace"; ctx.fillStyle="rgba(200,216,224,0.5)";
+        ctx.fillText(m==="dense"?"Dense iron: ~6 g/cm³ · Passed through atmosphere intact":"Low-density comet: ~0.3 g/cm³ · Fragmented & detonated above surface", cx, 56);
+        ctx.textAlign="left";
+        if (phaseT>120){ phase="pause"; phaseT=0; }
+      }
+
+      if (phase==="pause"){
+        phaseT++;
+        if (phaseT>80) reset();
+      }
+
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+
+    rafRef.current=requestAnimationFrame(draw);
+    return ()=>cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <div>
+      <div style={{ display:"flex", gap:"0.75rem", marginBottom:"0.75rem", flexWrap:"wrap" }}>
+        {[{k:"dense",label:"Dense Iron Meteorite · ~6 g/cm³ · Surface Crater"},{k:"comet",label:"Light Comet · ~0.3 g/cm³ · Atmospheric Airburst"}].map(o=>(
+          <button key={o.k} onClick={()=>setMode(o.k as "dense"|"comet")}
+            style={{ padding:"0.4rem 1rem", border:"1px solid"+(mode===o.k?"#e03030":"#334155"),
+              borderRadius:6, background:mode===o.k?"rgba(224,48,48,0.15)":"transparent",
+              color:mode===o.k?"#fca5a5":"#94a3b8", fontSize:"0.78rem", cursor:"pointer" }}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+      <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:10 }} />
+    </div>
+  );
+}
+
+function SpaceRocksHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const rocks: {x:number;y:number;vx:number;vy:number;r:number;angle:number;spin:number;col:string}[]=[];
+    for(let i=0;i<16;i++) rocks.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.8,vy:(Math.random()-0.5)*0.8,r:4+Math.random()*10,angle:Math.random()*Math.PI*2,spin:(Math.random()-0.5)*0.03,col:["#c9a84c","#9966ff","#ff4477","#44aaff"][Math.floor(Math.random()*4)]});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      rocks.forEach(r=>{
+        r.x+=r.vx; r.y+=r.vy; r.angle+=r.spin;
+        if(r.x<-20) r.x=W+20; if(r.x>W+20) r.x=-20;
+        if(r.y<-20) r.y=H+20; if(r.y>H+20) r.y=-20;
+        ctx.save();ctx.translate(r.x,r.y);ctx.rotate(r.angle);
+        ctx.beginPath();
+        for(let i=0;i<6;i++){const a=i/6*Math.PI*2,rd=r.r*(0.7+0.3*Math.sin(i*1.7));ctx.lineTo(Math.cos(a)*rd,Math.sin(a)*rd);}
+        ctx.closePath();ctx.fillStyle=r.col+"22";ctx.fill();ctx.strokeStyle=r.col+"66";ctx.lineWidth=0.6;ctx.stroke();ctx.restore();
+      });
+      ctx.fillStyle="rgba(201,168,76,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("SPACE ROCKS · ASTEROIDS · COHERENT CATASTROPHISM · IMPACT · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function SpaceRocksPage() {
   let currentEra = -1;
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-8 max-w-5xl mx-auto">
+      <div style={{flexShrink:0,marginBottom:16}}>
+        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPACE ROCKS · ASTEROIDS · COHERENT CATASTROPHISM · IMPACT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>16 spinning asteroids — the live AETHER space rocks simulation.</p></div>
+          <SpaceRocksHeaderCanvas />
+        </div>
+      </div>
       <div className="space-y-2">
         <div className="font-mono text-xs text-amber-400/50 uppercase tracking-[0.25em]">AETHER · Coherent Catastrophism</div>
         <h1 className="font-serif text-4xl text-foreground">Rocks from Space Have Been<br />Reshaping <span className="text-amber-400 italic">Everything</span></h1>
         <p className="font-mono text-xs text-muted-foreground/60 max-w-3xl leading-relaxed mt-3">
           For 780,000 years, space rocks, magnetic field shifts, and planetary cycles have been quietly shaping Earth's climate, ending civilizations, and triggering the birth of new ones. No jargon, no PhD required.
         </p>
+      </div>
+
+      <div style={{ marginBottom:"2rem" }}>
+        <div style={{ display:"inline-block", background:"rgba(224,48,48,0.12)", border:"1px solid rgba(224,48,48,0.3)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#fca5a5", textTransform:"uppercase", marginBottom:"1rem" }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(224,48,48,0.2)",
+          borderLeft:"3px solid #e03030", borderRadius:14, padding:"1.5rem" }}>
+          <h2 style={{ fontSize:"1.2rem", fontWeight:700, color:"#f8fafc", margin:"0 0 0.35rem",
+            fontFamily:"'Cinzel',serif" }}>
+            Impactor Trajectory Simulator
+          </h2>
+          <p style={{ color:"#94a3b8", fontSize:"0.82rem", margin:"0 0 1rem", lineHeight:1.65 }}>
+            Toggle between a dense iron meteorite (~6 g/cm³) that punches through the atmosphere and
+            strikes the surface, versus a light cometary body (~0.3 g/cm³) that fragments and detonates
+            mid-air. This is the core density principle that explains craters vs. airbursts.
+          </p>
+          <AsteroidImpactCanvas />
+        </div>
       </div>
 
       {/* Quick explainer */}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ── Constants ─────────────────────────────────────────────────────────────
@@ -661,12 +661,72 @@ const TABS: { id: Tab; label: string; icon: string; desc: string }[] = [
   { id: "genetics",    label: "Punnett Square",  icon: "🧩", desc: "Trait inheritance" },
 ];
 
+function BloodDNACanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 260;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(5,0,8,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      for (let i=0;i<40;i++) {
+        const x=cx+Math.sin(i*0.8+t*0.02)*180;
+        const y=H*0.3+Math.cos(i*0.8)*60;
+        const col=i%3===0?"#ef4444":i%3===1?"#a78bfa":"#2ef0d8";
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=col; ctx.shadowColor=col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if (i<39) {
+          const x2=cx+Math.sin((i+1)*0.8+t*0.02)*180;
+          const y2=H*0.3+Math.cos((i+1)*0.8)*60;
+          ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x2,y2);
+          ctx.strokeStyle=col+"44"; ctx.lineWidth=1; ctx.stroke();
+        }
+        const xm=cx+Math.sin(i*0.8+Math.PI+t*0.02)*180;
+        const ym=H*0.72+Math.cos(i*0.8)*50;
+        const col2=i%4===0?"#f472b6":i%4===1?"#60a5fa":i%4===2?"#34d399":"#c9a84c";
+        ctx.beginPath(); ctx.arc(xm,ym,2.5,0,Math.PI*2);
+        ctx.fillStyle=col2; ctx.shadowColor=col2; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+      }
+      ctx.fillStyle="rgba(239,68,68,0.4)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("BLOOD DNA LAB · BLOOD TYPE · HELIX STRUCTURE · GENOMIC SEQUENCING · COHERENCE ANALYSIS",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function BloodDNALabPage() {
   const [tab, setTab] = useState<Tab>("dna");
 
   return (
     <div data-testid="page-blood-dna-lab" className="min-h-screen bg-background px-4 pb-16">
-      <div className="max-w-3xl mx-auto pt-10 space-y-8">
+      <div className="max-w-3xl mx-auto pt-6 space-y-8">
+        <div>
+          <div style={{ display:"inline-block", background:"rgba(239,68,68,0.07)", border:"1px solid rgba(239,68,68,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#ef4444", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(5,0,8,0.9)", border:"1px solid rgba(239,68,68,0.1)",
+            borderLeft:"3px solid #ef4444", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"monospace", fontSize:18, color:"#ffe8e8", margin:"0 0 6px" }}>
+              Blood DNA Lab · Double Helix · Blood Type · Genomic Sequencing · Coherence Analysis
+            </h2>
+            <p style={{ fontFamily:"monospace", fontSize:12, color:"rgba(230,150,150,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Two animated DNA helix strands oscillating across the canvas — the upper strand (blood/red · neural/violet · coherence/teal)
+              and lower strand (rose · blue · teal · gold base pairs) forming the live AETHER Blood DNA
+              Laboratory helix structure visualization.
+            </p>
+            <BloodDNACanvas />
+          </div>
+        </div>
 
         {/* Header */}
         <div className="space-y-2">

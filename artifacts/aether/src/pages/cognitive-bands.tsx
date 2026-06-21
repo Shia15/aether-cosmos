@@ -506,12 +506,63 @@ const NAV = [
 ];
 
 /* ── Page ──────────────────────────────────── */
+function CogBandsSimCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 220;
+    const W = canvas.width, H = canvas.height;
+    const bands=[
+      { label:"DELTA", col:"#9966ff", freq:0.5, amp:28, y:H*0.18 },
+      { label:"THETA", col:"#2ef0d8", freq:1.2, amp:22, y:H*0.36 },
+      { label:"ALPHA", col:"#44aaff", freq:2.5, amp:18, y:H*0.54 },
+      { label:"BETA",  col:"#c9a84c", freq:5,   amp:14, y:H*0.72 },
+      { label:"GAMMA", col:"#ff4477", freq:10,  amp:10, y:H*0.90 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,14,0.18)"; ctx.fillRect(0,0,W,H);
+      t++;
+      bands.forEach(b=>{
+        ctx.beginPath();
+        for(let x=0;x<W;x+=3){
+          const y=b.y+b.amp*Math.sin(x*b.freq*0.008+t*b.freq*0.025);
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=b.col+"cc"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle=b.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="left";
+        ctx.fillText(b.label,6,b.y+3);
+      });
+      ctx.fillStyle="rgba(153,102,255,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COGNITIVE BANDS · DELTA · THETA · ALPHA · BETA · GAMMA · AETHER BRAINWAVE FIELD",14,10);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CognitiveBandsPage() {
   const [mode, setMode] = useState<Mode>("bands");
   const [hoverBand, setHoverBand] = useState<string | null>(null);
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #9966ff", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#9966ff", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,2,14,0.9)", border:"1px solid rgba(153,102,255,0.1)", borderLeft:"3px solid #9966ff", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#ece0ff", margin:"0 0 6px" }}>
+            Cognitive Bands · Delta · Theta · Alpha · Beta · Gamma · AETHER Brainwave Field
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(153,102,255,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five EEG frequency bands (Delta/violet · Theta/teal · Alpha/blue · Beta/gold · Gamma/rose) animated as live sine waves — the AETHER cognitive brainwave field simulation.
+          </p>
+          <CogBandsSimCanvas />
+        </div>
+      </div>
 
       {/* Hero */}
       <div style={{

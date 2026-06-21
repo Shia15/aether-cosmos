@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 
 const T = {
@@ -209,6 +209,50 @@ const SIG_NODES = [
   { dot: "♾️", label: "Replication\nPropagation", color: T.red },
 ];
 
+function ClcsArchCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 220;
+    const W = canvas.width, H = canvas.height;
+    const layers=[
+      { label:"L1 SENSOR", col:"#2ef0d8", y:H*0.15 },
+      { label:"L2 PATTERN", col:"#9966ff", y:H*0.32 },
+      { label:"L3 SYNTH", col:"#c9a84c", y:H*0.5 },
+      { label:"L4 ABSTRACT", col:"#44aaff", y:H*0.68 },
+      { label:"L5 COHERENCE", col:"#44cc77", y:H*0.85 },
+    ];
+    const packets: {x:number,fromY:number,toY:number,t:number,col:string}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,6,14,0.18)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      layers.forEach((l,i)=>{
+        ctx.beginPath(); ctx.moveTo(40,l.y); ctx.lineTo(W-40,l.y);
+        ctx.strokeStyle=l.col+"33"; ctx.lineWidth=1; ctx.stroke();
+        ctx.fillStyle=l.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="left";
+        ctx.fillText(l.label,8,l.y+3);
+        if(tick%25===i*5&&packets.length<20&&i<layers.length-1) packets.push({ x:80+Math.random()*(W-160), fromY:l.y, toY:layers[i+1].y, t:0, col:l.col });
+      });
+      for(let i=packets.length-1;i>=0;i--){
+        const p=packets[i]; p.t+=0.03;
+        const py=p.fromY+(p.toY-p.fromY)*p.t;
+        ctx.beginPath(); ctx.arc(p.x,py,3,0,Math.PI*2);
+        ctx.fillStyle=p.col; ctx.shadowColor=p.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(p.t>=1) packets.splice(i,1);
+      }
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CLCS · L1 SENSOR → L2 PATTERN → L3 SYNTH → L4 ABSTRACT → L5 COHERENCE · AETHER ARCHITECTURE",14,12);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function ClcsArchitecturePage() {
   useEffect(() => {
     const id = "clcs-fonts";
@@ -224,10 +268,23 @@ export default function ClcsArchitecturePage() {
     <div data-testid="page-clcs-architecture" style={{
       background: T.bg, color: T.text, fontFamily: T.mono,
       minHeight: "100vh", position: "relative",
+
       backgroundImage: `linear-gradient(rgba(10,240,255,0.03) 1px, transparent 1px),
                         linear-gradient(90deg, rgba(10,240,255,0.03) 1px, transparent 1px)`,
       backgroundSize: "40px 40px",
     }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            CLCS Architecture · L1 Sensor · L2 Pattern · L3 Synth · L4 Abstract · L5 Coherence
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Five CLCS architecture layers with coherence packets flowing downward — the live AETHER crystallization stack simulation.
+          </p>
+          <ClcsArchCanvas />
+        </div>
+      </div>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 32px 64px" }}>
 
         {/* HEADER */}

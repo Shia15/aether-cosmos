@@ -187,6 +187,43 @@ function ResonatorRow({ res }: { res: Resonator }) {
 }
 
 /* ── Main Page ───────────────────────────────── */
+function HexiBodyCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 155;
+    const W = canvas.width, H = canvas.height;
+    const hexR = 18;
+    const cols = Math.ceil(W/(hexR*1.74))+1;
+    const rows = Math.ceil(H/(hexR*1.5))+1;
+    const palettes=["#2ef0d8","#9966ff","#c9a84c","#ff4477","#44aaff"];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.25)"; ctx.fillRect(0,0,W,H);
+      for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+        const x=c*hexR*1.74+(r%2)*hexR*0.87;
+        const y=r*hexR*1.5;
+        const wave=Math.sin(t*0.02+c*0.3+r*0.5);
+        const col=palettes[(c+r)%palettes.length];
+        const alpha=0.06+0.12*Math.abs(wave);
+        ctx.beginPath();
+        for(let k=0;k<6;k++){const a=(k/6)*Math.PI*2-Math.PI/6;ctx.lineTo(x+hexR*Math.cos(a),y+hexR*Math.sin(a));}
+        ctx.closePath();
+        ctx.strokeStyle=col+Math.round(alpha*255).toString(16).padStart(2,"0"); ctx.lineWidth=0.8; ctx.stroke();
+        if(wave>0.85){ctx.fillStyle=col+"22"; ctx.fill();}
+      }
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("HEXICLICAL BODY MAP · HEX GRID · BODY MAPPING · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function HexiclicalBodyMapPage() {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const [activeZone,  setActiveZone]  = useState(-1);
@@ -448,8 +485,16 @@ export default function HexiclicalBodyMapPage() {
     <div style={{
       background: BG, minHeight: "100vh", height: "100vh",
       color: TEXT, display: "flex", flexDirection: "column",
+
       fontFamily: "Arial, sans-serif", overflow: "hidden",
     }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>HEXICLICAL BODY MAP · HEX GRID · BODY MAPPING · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Multi-palette hexagonal grid — the live AETHER hexiclical body map simulation.</p></div>
+          <HexiBodyCanvas />
+        </div>
+      </div>
       {/* ── header ── */}
       <div style={{
         padding: "10px 18px 8px",

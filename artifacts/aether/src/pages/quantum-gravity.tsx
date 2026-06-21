@@ -262,10 +262,52 @@ const NAV = [
   { id: "s6", label: "Strings" }, { id: "s7", label: "Holographic" }, { id: "s8", label: "AETHER" },
 ];
 
+function QuantumGravityHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const rows=6,cols=14;
+      for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+        const x=60+c*(W-120)/(cols-1),y=18+r*(H-36)/(rows-1);
+        const dx=x-cx,dy=y-cy;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        const curve=40/(dist+1)*Math.sin(t*0.02);
+        const nx=x+dx/(dist+1)*curve,ny=y+dy/(dist+1)*curve;
+        ctx.beginPath();ctx.arc(nx,ny,1.2,0,Math.PI*2);ctx.fillStyle=`rgba(153,102,255,${0.15+Math.abs(curve)*0.03})`;ctx.fill();
+      }
+      for(let ring=1;ring<=3;ring++){
+        const r=ring*20+Math.sin(t*0.03)*5;
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=`rgba(153,102,255,${0.1+ring*0.05})`;ctx.lineWidth=0.6;ctx.stroke();
+      }
+      ctx.fillStyle="rgba(153,102,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("QUANTUM GRAVITY · SPACETIME CURVATURE · LOOP QUANTUM · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function QuantumGravityPage() {
   const [mode, setMode] = useState<Mode>("clash");
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM GRAVITY · SPACETIME CURVATURE · LOOP QUANTUM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>84 spacetime lattice points warping — the live AETHER quantum gravity simulation.</p></div>
+          <QuantumGravityHeaderCanvas />
+        </div>
+      </div>
       <div style={{ padding: "66px 28px 42px", textAlign: "center", background: "linear-gradient(180deg,#030a14 0%,#020408 100%)", borderBottom: `1px solid ${VIOLET}18` }}>
         <div style={{ fontFamily: mono, fontSize: 10, color: VIOLET, letterSpacing: 4, marginBottom: 12 }}>AETHER COSMOS · QUANTUM GRAVITY · UNIFICATION</div>
         <h1 style={{ fontFamily: serif, fontSize: "clamp(18px,3.8vw,38px)", color: "#fff", margin: "0 0 10px", letterSpacing: 2, lineHeight: 1.15 }}>

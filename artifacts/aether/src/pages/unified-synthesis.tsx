@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import refImg from "@assets/image_(27)_1778042504322.jpg";
 
@@ -204,6 +204,43 @@ const LADDER: (string|React.ReactNode)[][] = [
   ["9", "Cosmological",        "Solar wind / cosmic rays", "R = Φ × N × σ",                    "φ-lock coherence output",                  "Pythagoras / Russell",<Tag kind="hyp" />],
 ];
 
+function UnifiedSynthesisHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const layers=5;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      for(let l=0;l<layers;l++){
+        const frac=l/layers;
+        const r=15+l*14+5*Math.sin(t*0.04+l*0.7);
+        const col=["#2ef0d8","#9966ff","#c9a84c","#44aaff","#44cc77"][l];
+        ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle=col+"44";ctx.lineWidth=0.8;ctx.stroke();
+        const dotAngle=t*0.03*(l+1);
+        const dx=cx+r*Math.cos(dotAngle),dy=cy+r*Math.sin(dotAngle)*0.55;
+        ctx.beginPath();ctx.arc(dx,dy,3,0,Math.PI*2);ctx.fillStyle=col+"99";ctx.fill();
+        ctx.fillStyle=col+"44";ctx.font="7px 'DM Mono',monospace";ctx.textAlign="center";
+        ctx.fillText(["L1","L2","L3","L4","L5"][l],cx+r*1.15*Math.cos(dotAngle+0.2),cy+r*0.55*Math.sin(dotAngle+0.2)*1.1+3);
+        ctx.textAlign="left";
+        void frac;
+      }
+      ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle="rgba(255,255,255,0.6)";ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UNIFIED SYNTHESIS · LAYER CONVERGENCE · CRYSTALLIZATION · COHERENT MERGE · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UnifiedSynthesisPage() {
   useEffect(() => {
     const id = "unified-synthesis-fonts";
@@ -219,6 +256,13 @@ export default function UnifiedSynthesisPage() {
       background: T.parchment, color: T.ink, fontFamily: T.serif,
       fontSize: 17, lineHeight: 1.7, minHeight: "100vh", width: "100%",
     }}>
+      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:20}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UNIFIED SYNTHESIS · LAYER CONVERGENCE · CRYSTALLIZATION · COHERENT MERGE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 orbital synthesis layers L1-L5 — the live AETHER unified synthesis simulation.</p></div>
+          <UnifiedSynthesisHeaderCanvas />
+        </div>
+      </div>
       {/* MASTHEAD */}
       <div style={{
         background: T.parchment, color: T.ink,

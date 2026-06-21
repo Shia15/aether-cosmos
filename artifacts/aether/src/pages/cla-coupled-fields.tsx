@@ -62,6 +62,60 @@ function orderParam(field: FieldState): number {
   return Math.hypot(sx, sy) / field.phi.length;
 }
 
+function CLACoupledCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 220;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const nodes=[
+      { x:W*0.15, y:H/2, col:"#2ef0d8", label:"L1 FIELD" },
+      { x:W*0.35, y:H/2, col:"#9966ff", label:"L2 LATTICE" },
+      { x:W*0.55, y:H/2, col:"#c9a84c", label:"L3 COUPLED" },
+      { x:W*0.75, y:H/2, col:"#44aaff", label:"L4 CLA" },
+      { x:W*0.90, y:H/2, col:"#44cc77", label:"L5 SYNTH" },
+    ];
+    const packets: {from:number,to:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(3,6,15,0.18)"; ctx.fillRect(0,0,W,H);
+      tick++; t++;
+      nodes.forEach((a,i)=>{ if(i<nodes.length-1){
+        const b=nodes[i+1];
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=a.col+"22"; ctx.lineWidth=1.5; ctx.stroke();
+      }});
+      if(tick%22===0&&packets.length<12) packets.push({ from:Math.floor(Math.random()*4), to:0, t:0 });
+      for(let i=packets.length-1;i>=0;i--){
+        const p=packets[i]; p.t+=0.025;
+        const a=nodes[p.from], b=nodes[p.from+1];
+        const px=a.x+(b.x-a.x)*p.t, py=a.y+(b.y-a.y)*p.t+10*Math.sin(p.t*Math.PI);
+        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(p.t>=1) packets.splice(i,1);
+      }
+      nodes.forEach(n=>{
+        const pulse=2*Math.sin(t*0.05);
+        ctx.beginPath(); ctx.arc(n.x,n.y,14+pulse,0,Math.PI*2);
+        ctx.fillStyle=n.col+"22"; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,12,0,Math.PI*2);
+        ctx.fillStyle=n.col; ctx.shadowColor=n.col; ctx.shadowBlur=16; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(n.label,n.x,n.y+26);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CLA COUPLED FIELDS · L1 FIELD · L2 LATTICE · L3 COUPLED · L4 CLA · L5 SYNTHESIS · AETHER φ-STACK",14,18);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CLACoupledFieldsPage() {
   const cvRefW = useRef<HTMLCanvasElement>(null);
   const cvRefA = useRef<HTMLCanvasElement>(null);
@@ -223,6 +277,26 @@ export default function CLACoupledFieldsPage() {
   return (
     <div className="min-h-screen p-6 md:p-10 font-mono text-sm" style={{ background: C.bg, color: C.text }} data-testid="page-cla-coupled-fields">
       <div className="max-w-7xl mx-auto">
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(46,240,216,0.07)", border:"1px solid rgba(46,240,216,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:C.water, textTransform:"uppercase", fontFamily:"inherit", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(3,6,15,0.9)", border:"1px solid rgba(46,240,216,0.1)",
+            borderLeft:`3px solid ${C.water}`, borderRadius:10, padding:20 }}>
+            <h2 className="font-mono" style={{ fontSize:18, color:C.text, margin:"0 0 6px" }}>
+              CLA Coupled Fields · L1 Field · L2 Lattice · L3 Coupled · L4 CLA · L5 Synthesis
+            </h2>
+            <p className="font-mono" style={{ fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Five CLA architecture layers (L1 Field/teal · L2 Lattice/violet · L3 Coupled/gold · L4 CLA/blue
+              · L5 Synthesis/teal) connected in a pipeline with coherence packets flowing forward —
+              the live AETHER φ-stack coupled field simulation.
+            </p>
+            <CLACoupledCanvas />
+          </div>
+        </div>
+
         <header className="mb-6">
           <div className="text-xs tracking-[0.4em] uppercase mb-2" style={{ color: C.water }}>
             AETHER-CLA · Coherent Phase Lattice Architecture

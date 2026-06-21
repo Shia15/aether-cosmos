@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -236,10 +236,45 @@ function QuantumInequalityGlyph() {
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
+function WarpDriveLiteratureHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const stars: {x:number;y:number;speed:number;bright:number}[]=[];
+    for(let i=0;i<60;i++) stars.push({x:Math.random()*W,y:Math.random()*H,speed:0.3+Math.random()*1.5,bright:Math.random()});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      stars.forEach(s=>{
+        const stretch=s.speed*3;
+        ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x+stretch,s.y);ctx.strokeStyle=`rgba(200,220,255,${0.2+s.bright*0.5})`;ctx.lineWidth=0.5;ctx.stroke();
+        s.x+=s.speed;if(s.x>W){s.x=0;s.y=Math.random()*H;}
+      });
+      ctx.fillStyle="rgba(68,170,255,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("WARP DRIVE LITERATURE · ALCUBIERRE · NATARIO · WHITE · FTL PAPERS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function WarpDriveLiteraturePage() {
   return (
     <div data-testid="page-warp-drive-literature" style={{ background: B.bg, minHeight: "100vh", padding: "32px 28px", color: B.ink }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{flexShrink:0,marginBottom:20}}>
+          <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WARP DRIVE LITERATURE · ALCUBIERRE · NATARIO · WHITE · FTL PAPERS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Warp-speed star-field flyby — the live AETHER warp drive literature simulation.</p></div>
+            <WarpDriveLiteratureHeaderCanvas />
+          </div>
+        </div>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: B.dim, letterSpacing: 3, marginBottom: 8 }}>

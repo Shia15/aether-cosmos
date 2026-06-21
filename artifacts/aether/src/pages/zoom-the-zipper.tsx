@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 
 type IlluKind = "zoom" | "toomanydeas" | "crash" | "pip" | "slowbuild" | "invention" | "share" | "trophy";
@@ -453,6 +453,38 @@ function EndPage() {
   );
 }
 
+function ZoomTheZipperHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cy=H/2;
+    let t=0;
+    const teeth=20;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      const zipX=((t*2)%(W+100))-50;
+      for(let i=0;i<teeth;i++){
+        const x=20+i*(W-40)/teeth;
+        const open=zipX<x?1:0;
+        const gap=open*20;
+        ctx.beginPath();ctx.moveTo(x,cy-gap);ctx.lineTo(x-8,cy-gap-10);ctx.lineTo(x+8,cy-gap-10);ctx.closePath();ctx.fillStyle=open?"rgba(46,240,216,0.3)":"rgba(46,240,216,0.5)";ctx.fill();
+        ctx.beginPath();ctx.moveTo(x,cy+gap);ctx.lineTo(x-8,cy+gap+10);ctx.lineTo(x+8,cy+gap+10);ctx.closePath();ctx.fillStyle=open?"rgba(153,102,255,0.3)":"rgba(153,102,255,0.5)";ctx.fill();
+      }
+      ctx.beginPath();ctx.arc(zipX,cy,8,0,Math.PI*2);ctx.fillStyle="rgba(201,168,76,0.7)";ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("ZOOM THE ZIPPER · CHILDREN'S LEARNING · FASTENER MECHANICS · FINE MOTOR · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function ZoomTheZipperPage() {
   const [page, setPage] = useState(0);
   const [fading, setFading] = useState(false);
@@ -490,6 +522,13 @@ export default function ZoomTheZipperPage() {
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start",
       padding: "16px 12px 32px", fontFamily: "'Nunito', 'Quicksand', cursive",
     }}>
+      <div style={{flexShrink:0,width:"100%",marginBottom:16}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>ZOOM THE ZIPPER · CHILDREN'S LEARNING · FASTENER MECHANICS · FINE MOTOR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Animated zipper teeth opening with gold slider — the live AETHER zoom-the-zipper simulation.</p></div>
+          <ZoomTheZipperHeaderCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes zoom-bob { from{transform:translateY(0) scale(1);} to{transform:translateY(-10px) scale(1.05);} }
         @keyframes zoom-speed { from{transform:translateX(-100%); opacity:0;} to{transform:translateX(200%); opacity:0.6;} }

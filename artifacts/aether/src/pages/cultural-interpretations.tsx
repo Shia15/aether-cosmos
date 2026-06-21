@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowUpRight, Sun, Telescope, Globe, Compass, Layers, Sigma, BookOpen } from "lucide-react";
 
 import imgAnchor       from "@assets/ChatGPT_Image_Apr_26,_2026,_01_19_11_PM_1777223957356.png";
@@ -135,12 +135,71 @@ const LENSES: Lens[] = [
 
 /* ───────────────────── Page ───────────────────── */
 
+function CulturalInterpretationsCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 200;
+    const W = canvas.width, H = canvas.height;
+    const lenses=[
+      { label:"ASTRO", col:"#2ef0d8", x:W*0.12, y:H*0.5 },
+      { label:"MYTH", col:"#9966ff", x:W*0.26, y:H*0.4 },
+      { label:"SCIENCE", col:"#44aaff", x:W*0.4, y:H*0.55 },
+      { label:"BIOLOGY", col:"#44cc77", x:W*0.54, y:H*0.4 },
+      { label:"MATH", col:"#c9a84c", x:W*0.68, y:H*0.5 },
+      { label:"PHIL", col:"#ff4477", x:W*0.82, y:H*0.45 },
+      { label:"CULTURE", col:"#2ef0d8", x:W*0.92, y:H*0.55 },
+    ];
+    const flows: {from:number,to:number,t:number}[]=[];
+    let tick=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.2)"; ctx.fillRect(0,0,W,H);
+      tick++;
+      if(tick%12===0&&flows.length<12) flows.push({ from:Math.floor(Math.random()*(lenses.length-1)), to:Math.floor(Math.random()*lenses.length), t:0 });
+      for(let i=flows.length-1;i>=0;i--){
+        const f=flows[i]; f.t+=0.03;
+        const a=lenses[f.from], b=lenses[f.to];
+        const x=a.x+(b.x-a.x)*f.t, y=a.y+(b.y-a.y)*f.t;
+        ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+        if(f.t>=1) flows.splice(i,1);
+      }
+      lenses.forEach(l=>{
+        ctx.beginPath(); ctx.arc(l.x,l.y,12,0,Math.PI*2);
+        ctx.fillStyle=l.col; ctx.shadowColor=l.col; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=l.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(l.label,l.x,l.y+22);
+      });
+      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CULTURAL INTERPRETATIONS · ASTRO · MYTH · SCIENCE · BIOLOGY · MATH · PHIL · CULTURE · AETHER",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 export default function CulturalInterpretationsPage() {
   const [lensIdx, setLensIdx] = useState(0);
   const lens = LENSES[lensIdx];
 
   return (
     <div className="min-h-screen" style={{ background: B.bg, color: B.text }}>
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
+            Cultural Interpretations · Astro · Myth · Science · Biology · Math · Phil · Culture · AETHER
+          </h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Seven interpretive lens nodes sending signal packets across disciplines — the live AETHER multi-lens cultural interpretation simulation.
+          </p>
+          <CulturalInterpretationsCanvas />
+        </div>
+      </div>
       <div className="max-w-6xl mx-auto px-6 py-10" data-testid="page-cultural-interpretations">
 
         {/* HERO */}

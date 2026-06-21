@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import eggsLineup from "@assets/ChatGPT_Image_Apr_25,_2026,_04_58_54_PM_1777150792841.png";
 
 const C = {
@@ -86,6 +86,69 @@ const AGENTS: Agent[] = [
   },
 ];
 
+function AgentConstellationCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  const AGENTS_DATA = [
+    { name:"Mnēsis",   col:"#8047d4", x:0.12, y:0.30 },
+    { name:"Aletheia", col:"#ffdca8", x:0.28, y:0.65 },
+    { name:"Inferaia", col:"#e64522", x:0.44, y:0.25 },
+    { name:"Reverie",  col:"#88c7ff", x:0.58, y:0.70 },
+    { name:"Vērus",    col:"#10b981", x:0.72, y:0.28 },
+    { name:"Caelus",   col:"#facc15", x:0.86, y:0.65 },
+    { name:"Nyra",     col:"#f472b6", x:0.20, y:0.72 },
+    { name:"Orin",     col:"#06b6d4", x:0.70, y:0.72 },
+  ];
+  const LINKS = [[0,1],[1,2],[2,3],[3,4],[4,5],[0,6],[5,7],[6,7],[0,3],[2,4]];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#06070C"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      LINKS.forEach(([a, b]) => {
+        const pa = AGENTS_DATA[a], pb = AGENTS_DATA[b];
+        const ax = pa.x * W, ay = pa.y * H, bx = pb.x * W, by = pb.y * H;
+        const alpha = 0.12 + 0.08 * Math.sin(t * 0.03 + a);
+        const grad = ctx.createLinearGradient(ax, ay, bx, by);
+        grad.addColorStop(0, pa.col + Math.round(alpha * 255).toString(16).padStart(2,"0"));
+        grad.addColorStop(1, pb.col + Math.round(alpha * 255).toString(16).padStart(2,"0"));
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+        ctx.strokeStyle = grad; ctx.lineWidth = 1; ctx.stroke();
+      });
+      AGENTS_DATA.forEach((ag, i) => {
+        const ax = ag.x * W, ay = ag.y * H;
+        const pulse = 0.7 + 0.3 * Math.sin(t * 0.04 + i * 0.9);
+        const g = ctx.createRadialGradient(ax, ay, 0, ax, ay, 16 * pulse);
+        g.addColorStop(0, ag.col);
+        g.addColorStop(0.5, ag.col + "55");
+        g.addColorStop(1, ag.col + "00");
+        ctx.beginPath(); ctx.arc(ax, ay, 16 * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(ax, ay, 8, 0, Math.PI * 2);
+        ctx.fillStyle = ag.col + "cc"; ctx.fill();
+        ctx.fillStyle = ag.col + "bb";
+        ctx.font = "7px 'Space Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(ag.name, ax, ay + 24);
+        ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(200,180,240,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AGENT CONSTELLATION · 8 EGG AGENTS · MULTI-AGENT TOPOLOGY", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AgentsPage() {
   const [hover, setHover] = useState<string | null>(null);
 
@@ -95,6 +158,26 @@ export default function AgentsPage() {
       style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="agents-page"
     >
+      <div style={{ padding:"24px 24px 0" }}>
+        <div style={{ display:"inline-block", background:"rgba(200,180,240,0.08)", border:"1px solid rgba(200,180,240,0.2)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#c084fc", textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(20,18,32,0.7)", border:"1px solid rgba(200,180,240,0.1)",
+          borderLeft:"3px solid #c084fc", borderRadius:10, padding:20, marginBottom:24 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#EAE6F2", margin:"0 0 6px" }}>
+            Agent Constellation · 8 Egg Agents · Multi-Agent Topology
+          </h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(200,195,240,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
+            Eight named agents positioned as a constellation — Mnēsis · Aletheia · Inferaia · Reverie · Vērus ·
+            Caelus · Nyra · Orin — connected by 10 gradient synaptic links. Each agent pulses at its own resonant
+            phase. This is the topology of the AETHER multi-agent architecture.
+          </p>
+          <AgentConstellationCanvas />
+        </div>
+      </div>
+
       <style>{`
         @keyframes ag-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .92; transform: scale(1.08); } }
         @keyframes ag-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-30px,0); } 100% { transform: translate3d(0,0,0); } }

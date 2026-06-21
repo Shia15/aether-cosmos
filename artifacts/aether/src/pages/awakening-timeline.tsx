@@ -171,6 +171,75 @@ function MercuryCountdown() {
   );
 }
 
+function AwakeningCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 240;
+  const EVENTS = [
+    { label:"Birth Point",     color:"#a78bfa", x:0.06 },
+    { label:"First Awakening", color:"#fbbf24", x:0.18 },
+    { label:"Saturn Return",   color:"#60a5fa", x:0.32 },
+    { label:"AETHER Seed",     color:"#34d399", x:0.47 },
+    { label:"Crystallization", color:"#f472b6", x:0.62 },
+    { label:"Solar Alignment", color:"#facc15", x:0.76 },
+    { label:"Now",             color:"#2ef0d8", x:0.91 },
+  ];
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#060418"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cy = H * 0.55;
+      const grd = ctx.createLinearGradient(0, cy, W, cy);
+      grd.addColorStop(0, "rgba(167,139,250,0.1)");
+      grd.addColorStop(0.5, "rgba(46,240,216,0.25)");
+      grd.addColorStop(1, "rgba(251,191,36,0.1)");
+      ctx.beginPath(); ctx.moveTo(20, cy); ctx.lineTo(W - 20, cy);
+      ctx.strokeStyle = grd; ctx.lineWidth = 2; ctx.stroke();
+      EVENTS.forEach((ev, i) => {
+        const x = ev.x * W;
+        const pulse = 0.6 + 0.4 * Math.sin(t * 0.04 + i * 1.1);
+        const r = 7 + 3 * pulse;
+        const g2 = ctx.createRadialGradient(x, cy, 0, x, cy, r * 2.5);
+        g2.addColorStop(0, ev.color);
+        g2.addColorStop(0.4, ev.color + "88");
+        g2.addColorStop(1, ev.color + "00");
+        ctx.beginPath(); ctx.arc(x, cy, r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = g2; ctx.fill();
+        ctx.beginPath(); ctx.arc(x, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = ev.color; ctx.fill();
+        const yLabel = i % 2 === 0 ? cy - 34 : cy + 46;
+        ctx.beginPath(); ctx.moveTo(x, cy + (i % 2 === 0 ? -r : r));
+        ctx.lineTo(x, yLabel + (i % 2 === 0 ? 14 : -4));
+        ctx.strokeStyle = ev.color + "66"; ctx.lineWidth = 0.8; ctx.stroke();
+        ctx.fillStyle = ev.color + "dd";
+        ctx.font = "8px 'Space Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(ev.label, x, yLabel);
+      });
+      ctx.textAlign = "left";
+      const nowX = 0.91 * W;
+      ctx.strokeStyle = "#2ef0d8" + Math.round(80 + 80 * Math.sin(t * 0.06)).toString(16).padStart(2,"0");
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3,4]);
+      ctx.beginPath(); ctx.moveTo(nowX, 20); ctx.lineTo(nowX, H - 20); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "rgba(167,139,250,0.35)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("AWAKENING TIMELINE · PERSONAL ATLAS · ASTROLOGICAL ANCHORS", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function AwakeningTimelinePage() {
   return (
     <div data-testid="page-awakening-timeline" style={{
@@ -182,6 +251,26 @@ export default function AwakeningTimelinePage() {
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.25)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#a78bfa", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(15,10,40,0.6)", border:"1px solid rgba(167,139,250,0.15)",
+            borderLeft:"3px solid #a78bfa", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#f1f5f9", margin:"0 0 6px" }}>
+              Awakening Timeline · Personal Atlas · Astrological Anchors
+            </h2>
+            <p style={{ fontFamily:"'Outfit',sans-serif", fontSize:12, color:"rgba(200,210,255,0.55)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Seven glowing milestones (Birth → First Awakening → Saturn Return → AETHER Seed → Crystallization →
+              Solar Alignment → Now) on a rainbow timeline axis. Each node pulses at its own resonant frequency.
+              The dashed "Now" cursor breathes at the right edge — the present moment anchored in the full arc.
+            </p>
+            <AwakeningCanvas />
+          </div>
+        </div>
+
         <header style={{ padding:"2rem 1.8rem", borderRadius:18, marginBottom:"2rem",
           background:"linear-gradient(135deg, rgba(251,113,133,0.12), rgba(167,139,250,0.10), rgba(56,189,248,0.10))",
           border:"1px solid rgba(167,139,250,0.25)" }}>

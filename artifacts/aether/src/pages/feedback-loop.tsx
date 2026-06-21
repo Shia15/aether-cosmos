@@ -70,6 +70,50 @@ function OutcomeSparkline({ history }: { history: number[] }) {
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
+function FeedbackLoopCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 170;
+    const W = canvas.width, H = canvas.height;
+    const cx = W / 2, cy = H / 2;
+    const loops = [
+      { r: 70, col: "#c084fc", speed: 0.012, label: "PASSIVE" },
+      { r: 50, col: "#2ef0d8", speed: -0.018, label: "ACTIVE" },
+      { r: 30, col: "#c9a84c", speed: 0.025, label: "SYMBOLIC" },
+    ];
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle = "rgba(3,5,20,0.25)"; ctx.fillRect(0, 0, W, H);
+      loops.forEach(l => {
+        ctx.beginPath(); ctx.arc(cx, cy, l.r, 0, Math.PI * 2);
+        ctx.strokeStyle = l.col + "33"; ctx.lineWidth = 1; ctx.stroke();
+        const angle = t * l.speed;
+        const px = cx + l.r * Math.cos(angle), py = cy + l.r * Math.sin(angle);
+        ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fillStyle = l.col; ctx.fill();
+        const trail = 8;
+        for (let i = 1; i <= trail; i++) {
+          const a2 = angle - i * 0.18 * Math.sign(l.speed);
+          const tx2 = cx + l.r * Math.cos(a2), ty2 = cy + l.r * Math.sin(a2);
+          ctx.beginPath(); ctx.arc(tx2, ty2, 3 * (1 - i / trail), 0, Math.PI * 2);
+          ctx.fillStyle = l.col + Math.floor(80 * (1 - i / trail)).toString(16).padStart(2, "0"); ctx.fill();
+        }
+        ctx.fillStyle = l.col + "99"; ctx.font = "8px 'DM Mono',monospace"; ctx.textAlign = "center";
+        ctx.fillText(l.label, px, py - 10); ctx.textAlign = "left";
+      });
+      ctx.fillStyle = "rgba(192,132,252,0.3)"; ctx.font = "9px 'DM Mono',monospace";
+      ctx.fillText("FEEDBACK LOOP · PASSIVE · ACTIVE · SYMBOLIC · INTEGRATION · AETHER", 12, 14);
+      t++; rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 export default function FeedbackLoopView() {
   const [mode, setMode] = useState<FeedbackMode>("Passive");
   const [signalCapture, setSignalCapture] = useState(true);
@@ -126,6 +170,14 @@ export default function FeedbackLoopView() {
 
   return (
     <div style={{ height: "100%", overflowY: "auto", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif" }}>
+      <div style={{ padding:"16px 16px 0" }}>
+        <div style={{ display:"inline-block", border:"1px solid #c084fc", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c084fc", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>LIVE SIMULATION</div>
+        <div style={{ background:"rgba(3,5,20,0.95)", border:"1px solid rgba(192,132,252,0.12)", borderLeft:"3px solid #c084fc", borderRadius:10, padding:16, marginBottom:12 }}>
+          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:16, color:"#e0f8ff", margin:"0 0 6px" }}>Feedback Loop · Passive · Active · Symbolic · Integration · AETHER</h2>
+          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(192,132,252,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Three concentric orbital loops (PASSIVE · ACTIVE · SYMBOLIC) with tracer pulses — the live AETHER feedback simulation.</p>
+          <FeedbackLoopCanvas />
+        </div>
+      </div>
 
       {/* ── Page header ─────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid rgba(196,181,253,0.12)", padding: "18px 32px 14px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", background: "rgba(3,5,20,0.9)" }}>

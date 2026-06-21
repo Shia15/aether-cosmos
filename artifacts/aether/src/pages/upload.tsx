@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useListDocuments, useDeleteDocument } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListDocumentsQueryKey } from "@workspace/api-client-react";
@@ -308,6 +308,40 @@ function analyzeContent(
   return { layer, docType, source, tags: tags.slice(0, 6) };
 }
 
+function UploadHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    const cx=W/2,cy=H/2;
+    let t=0;
+    const packets: {x:number;y:number;progress:number;speed:number}[]=[];
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      if(Math.random()<0.04) packets.push({x:cx-80+Math.random()*160,y:H-10,progress:0,speed:0.008+Math.random()*0.006});
+      for(let i=packets.length-1;i>=0;i--){
+        const p=packets[i];
+        p.progress+=p.speed;
+        const py=H-10-(H-20)*p.progress;
+        ctx.beginPath();ctx.arc(p.x,py,2.5,0,Math.PI*2);ctx.fillStyle=`rgba(46,240,216,${0.5-p.progress*0.3})`;ctx.fill();
+        if(p.progress>=1){ctx.beginPath();ctx.arc(p.x,20,5+Math.random()*8,0,Math.PI*2);ctx.fillStyle="rgba(46,240,216,0.15)";ctx.fill();packets.splice(i,1);}
+      }
+      ctx.beginPath();ctx.roundRect(cx-50,H-25,100,18,4);ctx.strokeStyle="rgba(46,240,216,0.3)";ctx.lineWidth=0.8;ctx.stroke();
+      const pct=((t*0.3)%100)/100;
+      ctx.beginPath();ctx.roundRect(cx-50,H-25,100*pct,18,4);ctx.fillStyle="rgba(46,240,216,0.08)";ctx.fill();
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("UPLOAD · DOCUMENT INGESTION · KNOWLEDGE INTAKE · AETHER OS BATCH · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function UploadPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -540,6 +574,13 @@ export default function UploadPage() {
 
   return (
     <div className="h-full overflow-y-auto px-8 py-8 space-y-8">
+      <div style={{flexShrink:0}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden",marginBottom:16}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UPLOAD · DOCUMENT INGESTION · KNOWLEDGE INTAKE · AETHER OS BATCH · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Packet stream + progress bar — the live AETHER upload ingestion simulation.</p></div>
+          <UploadHeaderCanvas />
+        </div>
+      </div>
       {/* Header */}
       <div>
         <div className="font-mono text-xs text-primary tracking-[0.3em] mb-3 uppercase">

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import imgKiller   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_00_23_PM_1777222826075.png";
 import imgInBlood  from "@assets/ChatGPT_Image_Apr_26,_2026,_01_00_51_PM_1777222853833.png";
 import imgSafetyA  from "@assets/ChatGPT_Image_Apr_26,_2026,_01_01_25_PM_1777222887442.png";
@@ -64,9 +65,53 @@ const FACTS: { tag: string; line: string; src: string; col: string }[] = [
     src: "WHO/CDC/EMA standing surveillance" },
 ];
 
+function MrnaCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const bases=["A","U","G","C"];
+    const colors={A:"#2ef0d8",U:"#ff4477",G:"#c9a84c",C:"#9966ff"};
+    const codons: {x:number;y:number;b1:string;b2:string;b3:string;vx:number}[] = [];
+    for(let i=0;i<14;i++) codons.push({x:i*65+20,y:H*0.5+(Math.random()-0.5)*30,b1:bases[Math.floor(Math.random()*4)],b2:bases[Math.floor(Math.random()*4)],b3:bases[Math.floor(Math.random()*4)],vx:-(0.3+Math.random()*0.4)});
+    const draw=()=>{
+      ctx.fillStyle="rgba(8,12,24,0.3)"; ctx.fillRect(0,0,W,H);
+      ctx.beginPath();ctx.moveTo(0,H*0.5);ctx.lineTo(W,H*0.5);ctx.strokeStyle="rgba(46,240,216,0.08)";ctx.lineWidth=0.5;ctx.stroke();
+      codons.forEach(c=>{
+        c.x+=c.vx; if(c.x<-40)c.x=W+40;
+        const pls=0.85+0.15*Math.sin(t*0.04+c.x*0.02);
+        [c.b1,c.b2,c.b3].forEach((b,i)=>{
+          const bx=c.x+i*12,by=c.y;
+          const col=colors[b as keyof typeof colors];
+          ctx.beginPath();ctx.arc(bx,by,5*pls,0,Math.PI*2);ctx.fillStyle=col+"66";ctx.fill();ctx.strokeStyle=col+"99";ctx.lineWidth=0.7;ctx.stroke();
+          ctx.fillStyle=col;ctx.font="bold 7px 'DM Mono',monospace";ctx.textAlign="center";ctx.fillText(b,bx,by+2);ctx.textAlign="left";
+        });
+        ctx.beginPath();ctx.moveTo(c.x-5,c.y);ctx.lineTo(c.x+38,c.y);ctx.strokeStyle="rgba(46,240,216,0.1)";ctx.lineWidth=0.4;ctx.stroke();
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("mRNA READINGS · CODON STREAM · A·U·G·C BASE PAIRS · PROTEIN SYNTHESIS · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function MrnaReadingsPage() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
+      <div style={{flexShrink:0}}>
+        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
+        <div style={{margin:"0 12px 20px",background:"rgba(8,12,24,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>mRNA READINGS · CODON STREAM · A·U·G·C · PROTEIN SYNTHESIS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>14 drifting codons in AUGC base pairs — the live AETHER mRNA simulation.</p></div>
+          <MrnaCanvas />
+        </div>
+      </div>
       <style>{`@keyframes mr-fade { from { opacity:0; transform: translateY(6px) } to { opacity:1; transform: none } }
         .mr-fade { animation: mr-fade 0.55s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .mr-fade { animation: none; } }`}</style>

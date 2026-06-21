@@ -8,6 +8,7 @@ import gravityAccel from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_28_PM_178137
 import cellQuantum from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_33_PM_1781376123447.png";
 import pinkFrogDrive from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_38_PM_1781376123448.png";
 import plateHull from "@assets/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781376123449.png";
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 
 const C = {
@@ -184,12 +185,131 @@ const MOTORS = [
     guf: "D6 Conscious quantum routing. Proof that biology operates in D6 regime at ambient temperature." },
 ];
 
+function NanobotHelixCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#010408"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const cy = H / 2;
+      const RUNGS = 28;
+      const rungSpacing = W / RUNGS;
+      for (let i = 0; i <= RUNGS; i++) {
+        const x = i * rungSpacing;
+        const phase = (i / RUNGS) * Math.PI * 4 - t * 0.04;
+        const y1 = cy + Math.sin(phase) * 80;
+        const y2 = cy + Math.sin(phase + Math.PI) * 80;
+        ctx.strokeStyle = "rgba(46,240,216,0.25)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
+        const a1 = 0.6 + 0.4 * Math.sin(phase + t * 0.05);
+        ctx.beginPath();
+        ctx.arc(x, y1, 4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(46,240,216,${a1})`;
+        ctx.fill();
+        const a2 = 0.6 + 0.4 * Math.sin(phase + Math.PI + t * 0.05);
+        ctx.beginPath();
+        ctx.arc(x, y2, 4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(74,159,212,${a2})`;
+        ctx.fill();
+      }
+      ctx.beginPath();
+      for (let x = 0; x <= W; x++) {
+        const phase = (x / W) * Math.PI * 4 - t * 0.04;
+        const y = cy + Math.sin(phase) * 80;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "#1fd4c8cc";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.beginPath();
+      for (let x = 0; x <= W; x++) {
+        const phase = (x / W) * Math.PI * 4 - t * 0.04 + Math.PI;
+        const y = cy + Math.sin(phase) * 80;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "#4a9fd4cc";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      const px = (t * 3) % W;
+      const pphi = (px / W) * Math.PI * 4 - t * 0.04;
+      const py = cy + Math.sin(pphi) * 80;
+      const pg = ctx.createRadialGradient(px, py, 0, px, py, 10);
+      pg.addColorStop(0, "#c9a84c");
+      pg.addColorStop(1, "#c9a84c00");
+      ctx.beginPath();
+      ctx.arc(px, py, 10, 0, Math.PI * 2);
+      ctx.fillStyle = pg;
+      ctx.fill();
+      ctx.fillStyle = "#1fd4c855";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("STRING NANOBOT · DNA HELIX · MOLECULAR MOTOR", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
+function StringNanobotHeaderCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 145;
+    const W = canvas.width, H = canvas.height;
+    let t=0;
+    const bots: {x:number;y:number;vx:number;vy:number;phase:number}[]=[];
+    for(let i=0;i<12;i++) bots.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,phase:Math.random()*Math.PI*2});
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.3)"; ctx.fillRect(0,0,W,H);
+      bots.forEach((b,i)=>{
+        b.x+=b.vx; b.y+=b.vy;
+        if(b.x<0||b.x>W) b.vx*=-1;
+        if(b.y<0||b.y>H) b.vy*=-1;
+        const col=["#2ef0d8","#9966ff","#c9a84c","#44aaff"][i%4];
+        const pulse=0.5+0.5*Math.sin(t*0.08+b.phase);
+        ctx.beginPath();ctx.arc(b.x,b.y,3+pulse*2,0,Math.PI*2);ctx.strokeStyle=col+"88";ctx.lineWidth=0.6;ctx.stroke();
+        ctx.beginPath();ctx.arc(b.x,b.y,1.5,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+        bots.forEach((b2,j)=>{
+          if(j<=i) return;
+          const dx=b2.x-b.x,dy=b2.y-b.y,dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist<80){ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b2.x,b2.y);ctx.strokeStyle=col+Math.round((1-dist/80)*30).toString(16).padStart(2,"0");ctx.lineWidth=0.4;ctx.stroke();}
+        });
+      });
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="9px 'DM Mono',monospace";
+      ctx.fillText("STRING NANOBOT · MOLECULAR MACHINE · NANO-ASSEMBLY · FIELD CRAWLER · AETHER",14,14);
+      t++; rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
+}
+
 export default function StringNanobotPage() {
   return (
     <div style={{ minHeight: "100vh",
       background: `radial-gradient(ellipse at top, #040d1c 0%, ${C.void} 65%)`,
       color: C.text, fontFamily: "'Outfit', system-ui, sans-serif",
       padding: "3rem 1.5rem 6rem" }}>
+      <div style={{flexShrink:0,marginBottom:20}}>
+        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
+        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>STRING NANOBOT · MOLECULAR MACHINE · NANO-ASSEMBLY · FIELD CRAWLER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 nano-bots with particle links — the live AETHER string nanobot simulation.</p></div>
+          <StringNanobotHeaderCanvas />
+        </div>
+      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Mono&display=swap');`}</style>
 
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -225,6 +345,26 @@ export default function StringNanobotPage() {
             ))}
           </div>
         </header>
+
+        <div style={{ marginBottom:"2rem" }}>
+          <div style={{ display:"inline-block", background:"rgba(31,212,200,0.1)", border:"1px solid rgba(31,212,200,0.3)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:C.teal, textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:C.panel, border:`1px solid rgba(31,212,200,0.18)`, borderLeft:`3px solid ${C.teal}`,
+            borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#f1f5f9", margin:"0 0 6px" }}>
+              String Nanobot · DNA Helix · Molecular Motor
+            </h2>
+            <p style={{ fontFamily:"system-ui,sans-serif", fontSize:12, color:"#94a3b8", margin:"0 0 14px", lineHeight:1.65 }}>
+              Teal strand (spider silk chassis) and blue strand (ATP synthase motor) intertwine as a DNA double helix at
+              3–5 nm scale. A gold payload particle (quantum coherent chlorophyll drive) travels along the upper strand.
+              Teal cross-rungs represent gap junction bridges. Simulated at molecular-motor timescale.
+            </p>
+            <NanobotHelixCanvas />
+          </div>
+        </div>
 
         {/* ── I. AETHER BIOMOLECULAR SYNTHESIS ── */}
         <Kicker kicker="I · AETHER Biomolecular Synthesis System"

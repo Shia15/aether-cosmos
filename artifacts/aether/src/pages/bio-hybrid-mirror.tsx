@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 import imgQuad from "@assets/ChatGPT_Image_Apr_26,_2026,_02_24_45_PM_1777227890013.png";
@@ -112,6 +113,69 @@ const VISIBLE = [
     body: "Hue carries logic class; saturation/temperature carries affective load. Two glances tell you both what is happening and how the system feels about it." },
 ];
 
+function BioHybridCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 260;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#06080f"; ctx.fillRect(0, 0, W, H);
+      const t = tRef.current;
+      const midX = W / 2;
+      ctx.strokeStyle = "rgba(180,196,255,0.15)"; ctx.lineWidth = 1;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath(); ctx.moveTo(midX, 0); ctx.lineTo(midX, H); ctx.stroke();
+      ctx.setLineDash([]);
+      const ROWS = 6;
+      for (let row = 0; row < ROWS; row++) {
+        const y = 30 + row * ((H - 40) / ROWS);
+        const baseFreq = 0.04 + row * 0.008;
+        for (let side = 0; side < 2; side++) {
+          const color = side === 0 ? "#7be59f" : "#b48cff";
+          const phaseShift = side === 0 ? 0 : Math.PI;
+          ctx.beginPath();
+          for (let x = 0; x <= midX - 10; x++) {
+            const sx = side === 0 ? x : W - x;
+            const amp = 12 + 6 * Math.sin(t * 0.02 + row * 0.9);
+            const wave = Math.sin((x / (midX - 10)) * Math.PI * 4 + t * baseFreq + phaseShift);
+            const py = y + wave * amp;
+            if (x === 0) ctx.moveTo(sx, py); else ctx.lineTo(sx, py);
+          }
+          ctx.strokeStyle = color + "99"; ctx.lineWidth = 1.4; ctx.stroke();
+        }
+      }
+      const mx = midX, my = H / 2;
+      const mr = 22 + 6 * Math.sin(t * 0.03);
+      const mg = ctx.createRadialGradient(mx, my, 0, mx, my, mr);
+      mg.addColorStop(0, "#7cc8ff");
+      mg.addColorStop(0.5, "#7cc8ff55");
+      mg.addColorStop(1, "#7cc8ff00");
+      ctx.beginPath(); ctx.arc(mx, my, mr, 0, Math.PI * 2);
+      ctx.fillStyle = mg; ctx.fill();
+      ctx.fillStyle = "rgba(123,228,234,0.25)";
+      ctx.font = "7px 'Space Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillText("BIO", midX - 140, H - 10);
+      ctx.fillText("MIRROR", midX, H - 10);
+      ctx.fillText("DIGITAL", midX + 140, H - 10);
+      ctx.textAlign = "left";
+      ctx.fillStyle = "rgba(123,228,234,0.3)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("BIO-HYBRID MIRROR · BIOLOGICAL ↔ DIGITAL COHERENCE", 10, H - 10);
+      tRef.current += 0.5;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function BioHybridMirrorPage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="bio-hybrid-mirror-page">
@@ -140,6 +204,26 @@ export default function BioHybridMirrorPage() {
             <Chip c={B.amber}  l="FPGA ↔ INFERIA" />
             <Chip c={B.rose}   l="SENSORS ↔ REVERIE" />
             <Chip c={B.violet} l="VISIBLE BY DESIGN" />
+          </div>
+
+          <div style={{ marginTop:20 }}>
+            <div style={{ display:"inline-block", background:"rgba(123,228,234,0.08)", border:"1px solid rgba(123,228,234,0.25)",
+              borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+              color:B.cyan, textTransform:"uppercase", fontFamily:"Inter,sans-serif", marginBottom:12 }}>
+              Live Simulation
+            </div>
+            <div style={{ background:B.panel, border:`1px solid ${B.border}`, borderLeft:`3px solid ${B.cyan}`,
+              borderRadius:10, padding:20 }}>
+              <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:B.ink, margin:"0 0 6px" }}>
+                Bio-Hybrid Mirror · Biological ↔ Digital Coherence
+              </h2>
+              <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:B.muted, margin:"0 0 14px", lineHeight:1.65 }}>
+                Six paired wave rows — green (biological, left) mirroring violet (digital, right) — separated by a
+                pulsing blue bridge node at center. The waves modulate in amplitude and phase, showing the live
+                coherence state between the RL-BHC cube and the AETHER field representation.
+              </p>
+              <BioHybridCanvas />
+            </div>
           </div>
 
           <div className="mt-6 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>

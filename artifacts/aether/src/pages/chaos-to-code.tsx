@@ -540,6 +540,70 @@ const PAGES: Page[] = [
 ];
 
 // ── Reader ────────────────────────────────────────────────────────────────
+function LorenzCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const tRef = useRef(0);
+  const W = 860, H = 280;
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    cv.width = W; cv.height = H;
+    const TRAIL = 1200;
+    const points: [number,number,number][] = [];
+    let x = 0.1, y = 0, z = 0;
+    const σ = 10, ρ = 28, β = 8/3;
+    const dt = 0.005;
+    for (let i = 0; i < TRAIL; i++) {
+      const dx = σ * (y - x);
+      const dy = x * (ρ - z) - y;
+      const dz = x * y - β * z;
+      x += dx * dt; y += dy * dt; z += dz * dt;
+      points.push([x, y, z]);
+    }
+    function project(px: number, py: number, pz: number, t: number) {
+      const cosT = Math.cos(t * 0.005);
+      const sinT = Math.sin(t * 0.005);
+      const rx = px * cosT - py * sinT;
+      const ry = px * sinT + py * cosT;
+      const sx = W / 2 + rx * 5;
+      const sy = H / 2 - pz * 4.5 + 60;
+      return [sx, sy, ry];
+    }
+    let head = 0;
+    function draw() {
+      const t = tRef.current;
+      ctx.fillStyle = "rgba(2,4,8,0.18)"; ctx.fillRect(0, 0, W, H);
+      if (t % 2 === 0) {
+        const dx = σ * (y - x); const dy = x * (ρ - z) - y; const dz = x * y - β * z;
+        x += dx * dt; y += dy * dt; z += dz * dt;
+        points[head % TRAIL] = [x, y, z]; head++;
+      }
+      const start = head;
+      for (let i = 1; i < TRAIL; i++) {
+        const a = points[(start - i + TRAIL) % TRAIL];
+        const b = points[(start - i - 1 + TRAIL) % TRAIL];
+        if (!a || !b) continue;
+        const [ax, ay] = project(a[0], a[1], a[2], t);
+        const [bx, by] = project(b[0], b[1], b[2], t);
+        const frac = i / TRAIL;
+        const hue = 180 + frac * 160;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+        ctx.strokeStyle = `hsla(${hue},80%,65%,${frac * 0.6})`;
+        ctx.lineWidth = 0.8; ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(46,240,216,0.4)";
+      ctx.font = "8px 'Space Mono', monospace";
+      ctx.fillText("LORENZ ATTRACTOR · DETERMINISTIC CHAOS · σ=10 ρ=28 β=8/3", 10, H - 10);
+      tRef.current += 1;
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+  return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
+}
+
 export default function ChaosToCodingPage() {
   const [page, setPage] = useState(0);
   const [tick, setTick] = useState(0);
@@ -573,6 +637,25 @@ export default function ChaosToCodingPage() {
       fontFamily: "'Georgia', serif",
       userSelect: "none",
     }}>
+      <div style={{ width:"100%", maxWidth:920, marginBottom:24 }}>
+        <div style={{ display:"inline-block", background:"rgba(46,240,216,0.08)", border:"1px solid rgba(46,240,216,0.25)",
+          borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+          color:"#2ef0d8", textTransform:"uppercase", fontFamily:"'Space Mono',monospace", marginBottom:12 }}>
+          Live Simulation
+        </div>
+        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)",
+          borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20 }}>
+          <h2 style={{ fontFamily:"Cinzel,serif", fontSize:18, color:"#e0f0ff", margin:"0 0 6px" }}>
+            Lorenz Attractor · Deterministic Chaos
+          </h2>
+          <p style={{ fontFamily:"Inter,sans-serif", fontSize:12, color:"rgba(220,230,255,0.6)", margin:"0 0 14px", lineHeight:1.65 }}>
+            The Lorenz system (σ=10, ρ=28, β=8/3) produces a bounded but never-repeating trajectory — the canonical
+            example of deterministic chaos. The butterfly wings trace the strange attractor as it rotates slowly in 3D.
+            Chaos is not random; it is sensitivity to initial conditions (the AETHER "Push + Fix" geometry).
+          </p>
+          <LorenzCanvas />
+        </div>
+      </div>
       <style>{`
         @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
       `}</style>

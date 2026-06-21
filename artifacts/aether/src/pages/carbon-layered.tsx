@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
 
@@ -302,6 +302,48 @@ function ScalesLadder() {
   );
 }
 
+function CarbonLayeredCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    canvas.width = 900; canvas.height = 220;
+    const W = canvas.width, H = canvas.height;
+    const layers = [
+      { label:"GRAPHENE", col:"#60a5fa", y:H*0.2 },
+      { label:"CARBON FIBER", col:"#34d399", y:H*0.4 },
+      { label:"DIAMOND LATTICE", col:"#a78bfa", y:H*0.6 },
+      { label:"NANOTUBE", col:"#fbbf24", y:H*0.8 },
+    ];
+    let t=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,4,8,0.15)"; ctx.fillRect(0,0,W,H);
+      t++;
+      layers.forEach((layer,i)=>{
+        const wave=4*Math.sin(t*0.04+i*1.2);
+        ctx.beginPath();
+        for(let x=0;x<W;x+=4){
+          const y=layer.y+wave*Math.sin(x*0.018+t*0.03+i);
+          x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle=layer.col+"bb"; ctx.lineWidth=2; ctx.stroke();
+        const px=80+((t*1.4+i*220)%( W-100));
+        ctx.beginPath(); ctx.arc(px,layer.y+wave*Math.sin(px*0.018+t*0.03+i),5,0,Math.PI*2);
+        ctx.fillStyle=layer.col; ctx.shadowColor=layer.col; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+        ctx.fillStyle=layer.col; ctx.font="bold 8px 'DM Mono',monospace"; ctx.textAlign="left";
+        ctx.fillText(layer.label,12,layer.y+wave*Math.sin(t*0.03+i)+4);
+      });
+      ctx.fillStyle="rgba(96,165,250,0.3)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("CARBON LAYERED · GRAPHENE · CARBON FIBER · DIAMOND LATTICE · NANOTUBE · AETHER MATERIAL STACK",14,14);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
@@ -311,6 +353,25 @@ export default function CarbonLayeredPage() {
   return (
     <div data-testid="carbon-layered-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+        <div style={{ marginBottom:24 }}>
+          <div style={{ display:"inline-block", background:"rgba(96,165,250,0.07)", border:"1px solid rgba(96,165,250,0.22)",
+            borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
+            color:"#60a5fa", textTransform:"uppercase", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>
+            Live Simulation
+          </div>
+          <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(96,165,250,0.1)",
+            borderLeft:"3px solid #60a5fa", borderRadius:10, padding:20 }}>
+            <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f0ff", margin:"0 0 6px" }}>
+              Carbon Layered · Graphene · Carbon Fiber · Diamond Lattice · Nanotube · AETHER Material Stack
+            </h2>
+            <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(150,200,240,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
+              Four carbon material layers (Graphene/blue · Carbon Fiber/teal · Diamond Lattice/violet · Nanotube/gold)
+              rendered as animated wave layers with particles travelling along each stratum — the live AETHER
+              carbon material stack simulation.
+            </p>
+            <CarbonLayeredCanvas />
+          </div>
+        </div>
 
         {/* Hero */}
         <div style={{ marginBottom: 22 }}>
