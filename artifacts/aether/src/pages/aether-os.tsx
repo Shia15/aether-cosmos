@@ -412,10 +412,10 @@ export default function AetherOS() {
   }, []);
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(3,5,20)", overflow: "hidden", position: "relative" }}>
-      <canvas ref={bgRef} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.4, pointerEvents: "none" }} />
+    <div style={{ minHeight: "100%", display: "flex", flexDirection: "column", background: "rgb(3,5,20)", position: "relative" }}>
+      <canvas ref={bgRef} style={{ position: "fixed", inset: 0, width: "100%", height: "100%", opacity: 0.4, pointerEvents: "none", zIndex: 0 }} />
 
-      <div style={{ padding:"16px 28px 0", flexShrink:0 }}>
+      <div style={{ padding:"16px 28px 0", flexShrink:0, position:"relative", zIndex:1 }}>
         <div style={{ display:"inline-block", background:"rgba(251,191,36,0.06)", border:"1px solid rgba(251,191,36,0.2)",
           borderRadius:8, padding:"0.3rem 1rem", fontSize:"0.7rem", letterSpacing:"0.2em",
           color:"#fbbf24", textTransform:"uppercase", fontFamily:"monospace", marginBottom:12 }}>
@@ -436,7 +436,7 @@ export default function AetherOS() {
       </div>
 
       {/* HEADER */}
-      <div style={{ padding: "20px 28px 16px", borderBottom: "1px solid rgba(251,191,36,0.12)", flexShrink: 0, position: "relative" }}>
+      <div style={{ padding: "20px 28px 16px", borderBottom: "1px solid rgba(251,191,36,0.12)", flexShrink: 0, position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
           <h1 style={{ fontFamily: "Cinzel, serif", fontSize: 22, letterSpacing: 8, color: "#fbbf24", fontWeight: 700, margin: 0 }}>
             AETHER <span style={{ color: "rgba(251,191,36,0.5)", fontWeight: 300 }}>OS</span>
@@ -455,7 +455,7 @@ export default function AetherOS() {
       </div>
 
       {/* MAIN GRID */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px 20px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, alignContent: "start", position: "relative" }}>
+      <div style={{ padding: "16px 20px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, alignContent: "start", position: "relative", zIndex: 1 }}>
         {ENVIRONMENTS.map(env => (
           <EnvCard
             key={env.id}
@@ -467,7 +467,7 @@ export default function AetherOS() {
       </div>
 
       {/* STRATEGIC CLARITY FOOTER */}
-      <div style={{ padding: "12px 28px", borderTop: "1px solid rgba(251,191,36,0.1)", flexShrink: 0, display: "flex", gap: 32, position: "relative" }}>
+      <div style={{ padding: "12px 28px", borderTop: "1px solid rgba(251,191,36,0.1)", flexShrink: 0, display: "flex", gap: 32, position: "relative", zIndex: 1 }}>
         <div>
           <div style={{ fontSize: 8, letterSpacing: 3, color: "rgba(255,100,100,0.5)", textTransform: "uppercase", fontFamily: "monospace", marginBottom: 4 }}>✗ NOT BUILDING</div>
           {["A car company", "A wellness app", "A dashboard"].map(s => (
