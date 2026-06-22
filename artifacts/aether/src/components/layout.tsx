@@ -136,6 +136,7 @@ const NAV_ITEMS = [
   { href: "/energetic-field-sim", label: "Energetic Field Simulator · Predicted Space · Scalar Wave · Coherence · Divergence", icon: Atom },
   { href: "/chocolate-tempering", label: "Chocolate Tempering · Cocoa Butter Crystal Axis · Form V · DP Coherence · Bloom Differential", icon: Atom },
   { href: "/chladni-freeze", label: "Chladni Acoustic Patterns · Freezing Differential · Nodal Lines · Crystal Growth · Acoustic Crystallisation", icon: Atom },
+  { href: "/incommensurable", label: "Incommensurable Measures · Deceptive Practices · Anthyphairesis · Lissajous · Convergents · Irrational Numbers", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
