@@ -404,6 +404,15 @@ function NavRow({
   );
 }
 
+const SIDEBAR_MIN   = 52;   // icon-only rail
+const SIDEBAR_SNAP  = 140;  // snap threshold — below this → collapse to rail
+const SIDEBAR_FULL  = 256;  // default expanded
+const SIDEBAR_MAX   = 440;
+
+function loadSidebarWidth(): number {
+  try { const v = localStorage.getItem("aether.sidebarWidth"); return v ? Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, +v)) : SIDEBAR_FULL; } catch { return SIDEBAR_FULL; }
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { data: health } = useHealthCheck();
@@ -413,6 +422,42 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
+
+  /* ── Sidebar resize ── */
+  const [sidebarWidth, setSidebarWidth] = useState<number>(loadSidebarWidth);
+  const dragRef = useRef<{ startX: number; startW: number } | null>(null);
+  const sidebarCollapsed = sidebarWidth <= SIDEBAR_SNAP;
+
+  const onHandlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    (e.target as Element).setPointerCapture(e.pointerId);
+    dragRef.current = { startX: e.clientX, startW: sidebarWidth };
+  }, [sidebarWidth]);
+
+  const onHandlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    const delta = e.clientX - dragRef.current.startX;
+    const raw   = dragRef.current.startW + delta;
+    const clamped = raw < SIDEBAR_SNAP ? SIDEBAR_MIN : Math.max(SIDEBAR_SNAP + 1, Math.min(SIDEBAR_MAX, raw));
+    setSidebarWidth(clamped);
+  }, []);
+
+  const onHandlePointerUp = useCallback(() => {
+    if (!dragRef.current) return;
+    dragRef.current = null;
+    setSidebarWidth(prev => {
+      try { localStorage.setItem("aether.sidebarWidth", String(prev)); } catch { /* */ }
+      return prev;
+    });
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarWidth(prev => {
+      const next = prev <= SIDEBAR_SNAP ? SIDEBAR_FULL : SIDEBAR_MIN;
+      try { localStorage.setItem("aether.sidebarWidth", String(next)); } catch { /* */ }
+      return next;
+    });
+  }, []);
 
   /* ── Screenshot ── */
   const [shotState, setShotState] = useState<"idle" | "busy" | "done">("idle");
@@ -599,9 +644,60 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden selection:bg-primary selection:text-primary-foreground">
 
-      {/* ── Desktop sidebar (always visible ≥ md) ── */}
-      <aside className="hidden md:flex w-64 border-r border-border bg-sidebar flex-col shrink-0">
-        {sidebarContent}
+      {/* ── Desktop sidebar with pull bar ── */}
+      <aside
+        className="hidden md:flex flex-col shrink-0 bg-sidebar border-r border-border relative"
+        style={{ width: sidebarWidth, transition: dragRef.current ? "none" : "width 0.18s ease" }}
+      >
+        {/* Collapsed icon-rail */}
+        {sidebarCollapsed ? (
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", height:"100%", paddingTop:14, paddingBottom:14, gap:6 }}>
+            {/* Logo icon */}
+            <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(46,240,216,0.08)", border:"1px solid rgba(46,240,216,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:"#2ef0d8", marginBottom:8 }}>
+              <Cpu style={{ width:16, height:16 }} />
+            </div>
+            {/* Expand toggle */}
+            <button
+              onClick={toggleSidebar}
+              title="Expand sidebar"
+              style={{ width:32, height:32, borderRadius:6, background:"rgba(46,240,216,0.06)", border:"1px solid rgba(46,240,216,0.15)", display:"flex", alignItems:"center", justifyContent:"center", color:"#2ef0d8", cursor:"pointer" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="5,3 9,7 5,11" />
+              </svg>
+            </button>
+            {/* Status dot */}
+            <div style={{ width:6, height:6, borderRadius:"50%", background: isHealthy ? "#2ef0d8" : "#ef4444", marginTop:"auto", marginBottom:4 }} />
+          </div>
+        ) : (
+          sidebarContent
+        )}
+
+        {/* ── Pull / drag handle ── */}
+        <div
+          onPointerDown={onHandlePointerDown}
+          onPointerMove={onHandlePointerMove}
+          onPointerUp={onHandlePointerUp}
+          onPointerCancel={onHandlePointerUp}
+          onDoubleClick={toggleSidebar}
+          title="Drag to resize · Double-click to collapse"
+          style={{
+            position:"absolute", right:0, top:0, bottom:0, width:6,
+            cursor:"col-resize", zIndex:10,
+            display:"flex", alignItems:"center", justifyContent:"center",
+          }}
+        >
+          {/* Visible grip line */}
+          <div style={{
+            width:2, height:"100%", maxHeight:64,
+            borderRadius:2,
+            background:"rgba(46,240,216,0.22)",
+            transition:"background 0.15s",
+          }}
+            onMouseEnter={e => (e.currentTarget.style.background="rgba(46,240,216,0.55)")}
+            onMouseLeave={e => (e.currentTarget.style.background="rgba(46,240,216,0.22)")}
+          />
+        </div>
       </aside>
 
       {/* ── Mobile drawer overlay ── */}
