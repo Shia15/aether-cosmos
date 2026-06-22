@@ -1422,6 +1422,235 @@ function MagneticReconCanvas() {
   );
 }
 
+/* ── AtomicPressureCanvas ─────────────────────────────── */
+function AtomicPressureCanvas() {
+  const cvs = useRef<HTMLCanvasElement>(null);
+  const raf  = useRef(0);
+
+  useEffect(() => {
+    const canvas = cvs.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    function hr(h: string): string {
+      const n = parseInt(h.replace("#",""), 16);
+      return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+    }
+
+    const resize = () => {
+      const p = canvas.parentElement!;
+      canvas.width  = Math.max(p.clientWidth, 480);
+      canvas.height = 520;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const PHASEDEFS = [
+      { minBar: 0,        name: "LIQUID",  col: "#1fa8d4", spacing: 1.00, motion: 1.00 },
+      { minBar: 2200,     name: "ICE III", col: "#5ab8e0", spacing: 0.83, motion: 0.30 },
+      { minBar: 5600,     name: "ICE V",   col: "#90d0f0", spacing: 0.71, motion: 0.14 },
+      { minBar: 10500,    name: "ICE VI",  col: "#c0e8f8", spacing: 0.60, motion: 0.06 },
+      { minBar: 22000,    name: "ICE VII", col: "#ddf4ff", spacing: 0.47, motion: 0.022},
+      { minBar: 2500000,  name: "ICE X",   col: "#ffffff",  spacing: 0.33, motion: 0.005},
+    ];
+
+    const EARTH_LAYERS = [
+      { y0:0.000, y1:0.072, name:"OCEAN",       sub:"0–11 km",      col:"#0a2235" },
+      { y0:0.072, y1:0.140, name:"CRUST",        sub:"11–35 km",     col:"#4a3528" },
+      { y0:0.140, y1:0.395, name:"UPPER MANTLE", sub:"35–250 km",    col:"#7a4e20" },
+      { y0:0.395, y1:0.645, name:"LOWER MANTLE", sub:"250–2891 km",  col:"#5a3010" },
+      { y0:0.645, y1:0.818, name:"OUTER CORE",   sub:"Fe-Ni liquid", col:"#b88820" },
+      { y0:0.818, y1:1.000, name:"INNER CORE",   sub:"Fe solid",     col:"#d4a030" },
+    ];
+
+    const LOG_MAX = 6.561;
+    const barAt   = (f: number) => Math.pow(10, f * LOG_MAX);
+    const fracAt  = (b: number) => Math.log10(Math.max(1, b)) / LOG_MAX;
+    const phaseAt = (b: number) => {
+      let ph = PHASEDEFS[0];
+      for (const p of PHASEDEFS) if (b >= p.minBar) ph = p;
+      return ph;
+    };
+
+    const COLS = 5, ROWS = 5;
+    const mols = Array.from({ length: COLS * ROWS }, (_, i) => ({
+      x:   ((i % COLS) + 0.5) / COLS + (Math.random()-0.5)*0.06,
+      y:   (Math.floor(i / COLS) + 0.5) / ROWS + (Math.random()-0.5)*0.06,
+      vx:  (Math.random()-0.5)*0.004,
+      vy:  (Math.random()-0.5)*0.004,
+      rot: Math.random() * Math.PI * 2,
+    }));
+
+    let probe = 0, dir = 1, t = 0, foldFlash = 0, lastPhase = "";
+
+    const draw = () => {
+      t++;
+      probe = Math.max(0, Math.min(1, probe + dir * 0.00035));
+      if (probe >= 1) dir = -1;
+      if (probe <= 0) dir =  1;
+
+      const bar   = barAt(probe);
+      const phase = phaseAt(bar);
+      if (phase.name !== lastPhase) { foldFlash = 1.0; lastPhase = phase.name; }
+      foldFlash = Math.max(0, foldFlash - 0.022);
+
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = "#010810"; ctx.fillRect(0, 0, W, H);
+
+      const EW = Math.min(Math.round(W * 0.22), 185);
+      const GW = Math.min(Math.round(W * 0.14), 108);
+      const MX = EW + GW;
+      const MW = W - MX;
+      const pY = probe * H;
+
+      /* ── EARTH COLUMN ── */
+      EARTH_LAYERS.forEach(l => {
+        const yA = l.y0 * H, yB = l.y1 * H;
+        const g = ctx.createLinearGradient(0, 0, EW, 0);
+        const rgb = hr(l.col);
+        g.addColorStop(0, `rgba(${rgb},0.95)`);
+        g.addColorStop(1, `rgba(${rgb},0.55)`);
+        ctx.fillStyle = g; ctx.fillRect(0, yA, EW, yB - yA + 1);
+        ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.fillRect(0, yB, EW, 1);
+        const mY = (yA + yB) / 2;
+        ctx.font = `5.5px ${mono}`; ctx.textAlign = "left";
+        ctx.fillStyle = "rgba(255,255,255,0.6)"; ctx.fillText(l.name, 5, mY - 4);
+        ctx.font = `4.5px ${mono}`; ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.fillText(l.sub, 5, mY + 5);
+        const p0 = barAt(l.y0);
+        const ps = p0 < 999 ? `${p0.toFixed(0)} bar` : p0 < 1e6 ? `${(p0/1e3).toFixed(0)} kbar` : `${(p0/1e6).toFixed(2)} Mbar`;
+        ctx.font = `4px ${mono}`; ctx.fillStyle = "rgba(201,168,76,0.45)"; ctx.fillText(ps, 5, yA + 9);
+      });
+      ctx.beginPath(); ctx.arc(EW - 9, pY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(46,240,216,${0.6+Math.sin(t*0.10)*0.3})`; ctx.fill();
+      ctx.strokeStyle = "rgba(46,240,216,0.18)"; ctx.lineWidth = 1; ctx.setLineDash([2,4]);
+      ctx.beginPath(); ctx.moveTo(0, pY); ctx.lineTo(EW, pY); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = `bold 6px ${mono}`; ctx.textAlign = "center";
+      ctx.fillStyle = ACCENT; ctx.fillText("SURFACE", EW/2, 9);
+      ctx.fillStyle = GOLD;   ctx.fillText("CORE", EW/2, H - 4);
+      ctx.fillStyle = "rgba(26,48,80,0.8)"; ctx.fillRect(EW, 0, 1, H);
+
+      /* ── PRESSURE GAUGE ── */
+      const GX = EW;
+      ctx.fillStyle = "#020c1a"; ctx.fillRect(GX, 0, GW, H);
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0,    "rgba(31,168,212,0.13)");
+      bg.addColorStop(0.55, "rgba(201,168,76,0.13)");
+      bg.addColorStop(1,    "rgba(220,150,30,0.15)");
+      ctx.fillStyle = bg; ctx.fillRect(GX, 0, GW, pY);
+
+      PHASEDEFS.forEach((ph, i) => {
+        if (i === 0) return;
+        const fy = fracAt(ph.minBar) * H;
+        if (fy < 0 || fy > H) return;
+        const near  = Math.abs(pY - fy) < 28;
+        const alpha = near ? 0.88 : 0.28;
+        ctx.strokeStyle = `rgba(${hr(ph.col)},${alpha})`;
+        ctx.lineWidth = near ? 1.5 : 0.8; ctx.setLineDash([3,5]);
+        ctx.beginPath(); ctx.moveTo(GX, fy); ctx.lineTo(GX+GW, fy); ctx.stroke(); ctx.setLineDash([]);
+        ctx.font = `4.8px ${mono}`; ctx.textAlign = "center"; ctx.fillStyle = `rgba(${hr(ph.col)},${alpha*0.9})`;
+        ctx.fillText(ph.name, GX+GW/2, fy - 3);
+        const bL = ph.minBar >= 1e6 ? `${(ph.minBar/1e6).toFixed(2)}M` : ph.minBar >= 1000 ? `${(ph.minBar/1000).toFixed(0)}k` : `${ph.minBar}`;
+        ctx.font = `4px ${mono}`; ctx.fillText(bL+" bar", GX+GW/2, fy+8);
+        if (near) { ctx.font = `4.5px ${mono}`; ctx.fillStyle = `rgba(${hr(ph.col)},0.55)`; ctx.fillText("◈ FOLD", GX+GW/2, fy+18); }
+      });
+      const readY = pY < 36 ? pY + 40 : pY - 12;
+      const barFmt = bar < 1000 ? `${bar.toFixed(1)} bar` : bar < 1e6 ? `${(bar/1000).toFixed(1)} kbar` : `${(bar/1e6).toFixed(2)} Mbar`;
+      ctx.font = `bold 7px ${mono}`; ctx.fillStyle = phase.col; ctx.textAlign = "center";
+      ctx.fillText(barFmt, GX+GW/2, readY);
+      ctx.font = `5px ${mono}`; ctx.fillStyle = "rgba(180,210,230,0.45)";
+      ctx.fillText(`${(probe*6371).toFixed(0)} km`, GX+GW/2, readY + 11);
+      ctx.fillStyle = "rgba(26,48,80,0.7)"; ctx.fillRect(MX-1, 0, 1, H);
+
+      if (foldFlash > 0.05) {
+        ctx.fillStyle = `rgba(${hr(phase.col)},${foldFlash*0.13})`; ctx.fillRect(GX, 0, GW+MW, H);
+        if (foldFlash > 0.55) {
+          ctx.font = `bold 8px ${mono}`; ctx.fillStyle = `rgba(${hr(phase.col)},${foldFlash*0.9})`;
+          ctx.textAlign = "center";
+          ctx.fillText(`DIMENSIONAL FOLD · ${phase.name}`, MX+MW/2, H/2-6);
+          ctx.font = `5.5px ${mono}`; ctx.fillStyle = `rgba(${hr(phase.col)},${foldFlash*0.55})`;
+          ctx.fillText("PHASE TRANSITION · MOLECULAR GEOMETRY SHIFT", MX+MW/2, H/2+9);
+        }
+      }
+
+      /* ── MOLECULAR PANEL ── */
+      const mbg = ctx.createLinearGradient(MX, 0, W, H);
+      mbg.addColorStop(0, "#010810"); mbg.addColorStop(1, `rgba(${hr(phase.col)},0.04)`);
+      ctx.fillStyle = mbg; ctx.fillRect(MX, 0, MW, H);
+
+      const sp = phase.spacing, mo = phase.motion;
+
+      mols.forEach((m, i) => {
+        const col = i % COLS, row = Math.floor(i / COLS);
+        const tx = 0.5 + ((col+0.5)/COLS - 0.5)*sp;
+        const ty = 0.5 + ((row+0.5)/ROWS - 0.5)*sp;
+        m.vx += (tx-m.x)*(1-mo)*0.12 + (Math.random()-0.5)*mo*0.008;
+        m.vy += (ty-m.y)*(1-mo)*0.12 + (Math.random()-0.5)*mo*0.008;
+        m.vx *= 0.86; m.vy *= 0.86;
+        m.x = Math.max(0.02, Math.min(0.98, m.x + m.vx));
+        m.y = Math.max(0.02, Math.min(0.98, m.y + m.vy));
+        m.rot += (Math.random()-0.5)*mo*0.08;
+      });
+
+      const HB = 0.30 * sp;
+      ctx.setLineDash([3,5]); ctx.lineWidth = 0.7;
+      for (let i = 0; i < mols.length; i++) {
+        for (let j = i+1; j < mols.length; j++) {
+          const dx = mols[j].x - mols[i].x, dy = mols[j].y - mols[i].y;
+          const d  = Math.sqrt(dx*dx + dy*dy);
+          if (d < HB) {
+            const a = (1-d/HB)*(0.18+0.70*(1-mo))*0.7;
+            ctx.strokeStyle = `rgba(${hr(phase.col)},${a})`;
+            ctx.beginPath(); ctx.moveTo(MX+mols[i].x*MW, mols[i].y*H); ctx.lineTo(MX+mols[j].x*MW, mols[j].y*H); ctx.stroke();
+          }
+        }
+      }
+      ctx.setLineDash([]);
+
+      const OH = 52.25 * Math.PI / 180;
+      mols.forEach(m => {
+        const px = MX + m.x*MW, py = m.y*H;
+        const sc = (MW * 0.11 / COLS) * (0.45 + 0.55*sp);
+        const og = ctx.createRadialGradient(px-sc*0.2, py-sc*0.2, sc*0.04, px, py, sc*0.54);
+        og.addColorStop(0, "rgba(255,100,50,0.96)"); og.addColorStop(1, "rgba(160,28,4,0.88)");
+        ctx.beginPath(); ctx.arc(px, py, sc*0.54, 0, Math.PI*2); ctx.fillStyle = og; ctx.fill();
+        for (const sgn of [-1, 1] as const) {
+          const hx = Math.sin(sgn*OH + m.rot)*sc*0.96;
+          const hy = -Math.cos(sgn*OH + m.rot)*sc*0.96;
+          ctx.strokeStyle = "rgba(220,220,255,0.25)"; ctx.lineWidth = sc*0.11;
+          ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px+hx, py+hy); ctx.stroke();
+          const hg = ctx.createRadialGradient(px+hx-sc*0.08, py+hy-sc*0.08, sc*0.02, px+hx, py+hy, sc*0.31);
+          hg.addColorStop(0, "rgba(255,255,255,0.98)"); hg.addColorStop(1, "rgba(180,205,255,0.78)");
+          ctx.beginPath(); ctx.arc(px+hx, py+hy, sc*0.31, 0, Math.PI*2); ctx.fillStyle = hg; ctx.fill();
+        }
+      });
+
+      if (mo < 0.42) {
+        const axA = (0.42 - mo) * 0.9;
+        ctx.strokeStyle = `rgba(${hr(phase.col)},${axA})`; ctx.lineWidth = 0.8; ctx.setLineDash([5,9]);
+        ctx.beginPath(); ctx.moveTo(MX+MW/2, H*0.05); ctx.lineTo(MX+MW/2, H*0.95); ctx.stroke(); ctx.setLineDash([]);
+        ctx.font = `4.5px ${mono}`; ctx.fillStyle = `rgba(${hr(phase.col)},${axA*0.55})`;
+        ctx.textAlign = "left"; ctx.fillText("C-AXIS", MX+MW/2+5, H*0.07+8);
+      }
+
+      ctx.font = `bold 8px ${mono}`; ctx.fillStyle = phase.col; ctx.textAlign = "center";
+      ctx.fillText(phase.name, MX+MW/2, 16);
+      ctx.font = `5px ${mono}`; ctx.fillStyle = "rgba(170,195,215,0.28)";
+      ctx.fillText("H\u2082O MOLECULAR STRUCTURE \u00B7 FOLDED DIMENSIONAL CAUSALITY", MX+MW/2, H-7);
+
+      raf.current = requestAnimationFrame(draw);
+    };
+
+    raf.current = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", resize); };
+  }, []);
+
+  return (
+    <div style={{ position:"relative", borderRadius:10, overflow:"hidden", border:`1px solid ${ACCENT}20`, background:"#010810" }}>
+      <canvas ref={cvs} style={{ display:"block", width:"100%" }} />
+    </div>
+  );
+}
+
 /* ── Page ─────────────────────────────────────────────────── */
 function WaterTransportHeaderCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -1542,6 +1771,37 @@ export default function WaterTransportPage() {
             {mode === "flow" && (
               <span style={{ fontFamily: mono, fontSize: 10, color: ACCENT }}>Current carries low-density objects; high-density stones sink and slow</span>
             )}
+          </div>
+        </div>
+
+        {/* ── ATOMIC PRESSURE SIMULATION ── */}
+        <div style={{ marginTop: 44 }}>
+          <div style={{ fontFamily: mono, fontSize: 9, color: ACCENT, letterSpacing: 3, marginBottom: 6 }}>LIVE SIMULATION · ATOMIC STRUCTURE</div>
+          <h2 style={{ fontFamily: "'Cinzel',serif", fontSize: 22, color: "#fff", margin: "0 0 4px", letterSpacing: 1 }}>
+            H₂O Atomic Structure · Bar Pressure Through Earth
+          </h2>
+          <div style={{ fontFamily: body, fontSize: 14, color: DIM, marginBottom: 14 }}>
+            Folded dimensional causality — water molecule geometry shifts as pressure increases through each
+            Earth layer. Each phase transition is a dimensional fold: the same H₂O formula inhabits a
+            structurally different reality. Probe descends from ocean surface (1 bar) through crust, mantle,
+            and into the core (3.64 Mbar). Watch the C-axis emerge as molecules lock into ice lattice order.
+          </div>
+          <div style={{ height: 1, background: `linear-gradient(90deg, ${ACCENT}60, transparent)`, marginBottom: 16 }} />
+          <AtomicPressureCanvas />
+          <div style={{ display: "flex", gap: 20, marginTop: 10, flexWrap: "wrap" }}>
+            {[
+              { col: "#1fa8d4", label: "LIQUID · 1–2,200 bar · disordered, Brownian motion" },
+              { col: "#5ab8e0", label: "ICE III · 2,200–5,600 bar · rhombohedral lattice" },
+              { col: "#90d0f0", label: "ICE V · 5,600–10,500 bar · monoclinic, 28 mol/cell" },
+              { col: "#c0e8f8", label: "ICE VI · 10,500–22,000 bar · tetragonal body-centred" },
+              { col: "#ddf4ff", label: "ICE VII · 22 kbar–2.5 Mbar · cubic, H-disordered" },
+              { col: "#ffffff",  label: "ICE X · >2.5 Mbar · symmetric H-bonds, densest" },
+            ].map(s => (
+              <div key={s.col} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ width: 8, height: 8, borderRadius: 2, background: s.col, flexShrink: 0 }} />
+                <span style={{ fontFamily: mono, fontSize: 9, color: `${s.col}aa`, letterSpacing: 0.5 }}>{s.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
