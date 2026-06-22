@@ -284,6 +284,7 @@ import EnergeticFieldSimPage from "@/pages/energetic-field-sim";
 import ChocolateTemperingPage from "@/pages/chocolate-tempering";
 import ChladniFreezePage from "@/pages/chladni-freeze";
 import IncommensurablePage from "@/pages/incommensurable";
+import FireworkCoherencePage from "@/pages/firework-coherence";
 
 const queryClient = new QueryClient();
 
@@ -571,6 +572,7 @@ function Router() {
         <Route path="/chocolate-tempering" component={ChocolateTemperingPage} />
         <Route path="/chladni-freeze" component={ChladniFreezePage} />
         <Route path="/incommensurable" component={IncommensurablePage} />
+        <Route path="/firework-coherence" component={FireworkCoherencePage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
