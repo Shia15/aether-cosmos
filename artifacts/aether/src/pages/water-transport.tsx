@@ -965,11 +965,14 @@ function OrigamiDroneCanvas() {
       const dFrac = (t.current * 0.006) % 1;
       const dTh   = dFrac * Math.PI * 2;
       const dPos  = lemni(dTh, a, cx, cy);
-      const isWater = dPos.x < cx;
+      // isWater: left lobe = θ ∈ (π/2, 3π/2), where cos(θ) < 0 → x < cx
+      const isWater = dTh > Math.PI / 2 && dTh < 3 * Math.PI / 2;
 
-      // Expansion factor — smooth sine envelope peaking in water zone
-      const normX  = (dPos.x - (cx - a)) / (2 * a); // 0=left edge, 1=right edge
-      const expand = Math.max(0, Math.sin(normX * Math.PI));
+      // Expansion factor — driven by phase angle, not x-position.
+      // Peaks (1.0) at θ=π (centre of water lobe), zero at θ=0/2π (centre of underground lobe).
+      // This gives a smooth 0 → 0.5 → 1 → 0.5 → 0 profile across the full ∞ loop
+      // with no peak or discontinuity at the event-horizon crossings (θ=π/2, θ=3π/2).
+      const expand = 0.5 - 0.5 * Math.cos(dTh);
       drawDrone(dPos.x, dPos.y, expand, isWater);
 
       // Ghost drones at 1/3 and 2/3 phase offsets (trail effect)
@@ -977,9 +980,8 @@ function OrigamiDroneCanvas() {
         const gFrac = (dFrac + offset) % 1;
         const gTh   = gFrac * Math.PI * 2;
         const gPos  = lemni(gTh, a, cx, cy);
-        const gWater = gPos.x < cx;
-        const gX     = (gPos.x - (cx - a)) / (2 * a);
-        const gExp   = Math.max(0, Math.sin(gX * Math.PI)) * 0.5;
+        const gWater = gTh > Math.PI / 2 && gTh < 3 * Math.PI / 2;
+        const gExp   = (0.5 - 0.5 * Math.cos(gTh)) * 0.5;
         ctx.globalAlpha = 0.25;
         drawDrone(gPos.x, gPos.y, gExp, gWater);
         ctx.globalAlpha = 1.0;
