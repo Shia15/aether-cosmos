@@ -441,6 +441,385 @@ function ImplicateCanvas() {
   return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
 }
 
+/* ------------------------------------------------------------------ */
+/*  §05 — Sensory Bottleneck Live Canvas                               */
+/* ------------------------------------------------------------------ */
+const CHAN_SIM = [
+  { name:"VISIBLE LIGHT", col:"#7CD7FF", human:0.28, openAt:0.00 },
+  { name:"COLOR 3→16",    col:"#B49CFF", human:0.25, openAt:0.08 },
+  { name:"POLARIZATION",  col:"#F2A007", human:0.01, openAt:0.38 },
+  { name:"HEARING",       col:"#E6B85C", human:0.42, openAt:0.12 },
+  { name:"ELECTRIC",      col:"#7CE0B0", human:0.01, openAt:0.48 },
+  { name:"MAGNETIC",      col:"#F49AB6", human:0.01, openAt:0.55 },
+  { name:"THERMAL IR",    col:"#FF8A5C", human:0.03, openAt:0.42 },
+  { name:"OLFACTORY",     col:"#E8E2F2", human:0.36, openAt:0.22 },
+];
+// which brain node each channel targets
+const CHAN_NODE = [1, 2, 9, 3, 4, 6, 0, 5];
+const BNODES_SIM = [
+  { label:"Thalamus",    rx:0.12, ry:0.50 },
+  { label:"V1 / V2",    rx:0.28, ry:0.17 },
+  { label:"MT",         rx:0.44, ry:0.27 },
+  { label:"A1 / A2",   rx:0.26, ry:0.81 },
+  { label:"S1",         rx:0.52, ry:0.57 },
+  { label:"Olfactory",  rx:0.18, ry:0.89 },
+  { label:"Hippocampus",rx:0.64, ry:0.63 },
+  { label:"PFC",        rx:0.84, ry:0.30 },
+  { label:"Amygdala",   rx:0.57, ry:0.80 },
+  { label:"Sup. Coll.", rx:0.38, ry:0.44 },
+  { label:"ACC",        rx:0.75, ry:0.22 },
+  { label:"Insula",     rx:0.70, ry:0.72 },
+];
+const BEDGES_SIM = [
+  [0,1],[0,3],[0,4],[0,9],[1,2],[1,9],[2,6],[2,10],
+  [3,5],[3,8],[4,6],[4,9],[5,8],[6,7],[6,8],[7,10],[9,0],[10,7],[11,6],[11,8],
+];
+const CHAN_COLORS = CHAN_SIM.map(c => c.col);
+
+function SensoryBottleneckCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current;
+    if (!cv) return;
+    const CH = 340;
+    let CW = Math.max(cv.offsetWidth, 500);
+    const PR = window.devicePixelRatio || 1;
+    cv.width  = CW * PR;
+    cv.height = CH * PR;
+    cv.style.height = CH + "px";
+    const ctx = cv.getContext("2d")!;
+    ctx.scale(PR, PR);
+
+    // Zones (fraction of CW)
+    const Z_CH  = 0.27;  // channel panel right edge
+    const Z_NK  = 0.40;  // neck right edge / brain left
+    const Z_BR  = 0.80;  // brain right / field left
+
+    // Node activations + field
+    const NC = BNODES_SIM.length;
+    const FROWS = 8, FCOLS = 5;
+    const nodeAct    = new Float32Array(NC);
+    const fieldAct   = new Float32Array(FROWS * FCOLS);
+
+    type P = { x:number; y:number; vx:number; vy:number; chanIdx:number; alpha:number;
+               phase:"chan"|"neck"|"brain" };
+    const pool: P[] = [];
+    const MAX_P = 220;
+    let spawnTick = 0;
+
+    let frame = 0;
+    let raf = 0;
+    const CYCLE = 1000;  // frames per full cycle
+
+    const draw = () => {
+      frame = (frame + 1) % CYCLE;
+      // smooth 0→1 over first 680 frames, hold at 1
+      const smooth = frame < 680 ? frame / 680 : 1;
+
+      ctx.clearRect(0, 0, CW, CH);
+
+      // === BACKGROUND ===
+      ctx.fillStyle = "#070918";
+      ctx.fillRect(0, 0, CW, CH);
+
+      // === ZONE DIVIDERS ===
+      ctx.save();
+      ctx.setLineDash([3, 6]);
+      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.lineWidth = 1;
+      [Z_CH, Z_NK, Z_BR].forEach(z => {
+        ctx.beginPath(); ctx.moveTo(CW*z, 0); ctx.lineTo(CW*z, CH); ctx.stroke();
+      });
+      ctx.restore();
+
+      // === ZONE LABELS ===
+      ctx.fillStyle = "rgba(154,163,184,0.45)";
+      ctx.font = "7.5px Inter,sans-serif";
+      const labels = [
+        { t:"SENSORY CHANNELS",  x:CW*0.01  },
+        { t:"BOTTLENECK",        x:CW*0.278 },
+        { t:"BRAIN NETWORK",     x:CW*0.41  },
+        { t:"COHERENCE FIELD",   x:CW*0.815 },
+      ];
+      labels.forEach(l => ctx.fillText(l.t, l.x, 11));
+
+      // === PHASE LABEL ===
+      const phase = smooth < 0.12 ? "PHASE I  · HUMAN CHANNELS ACTIVE"
+                  : smooth < 0.40 ? "PHASE II · BOTTLENECK SMOOTHING"
+                  : smooth < 0.70 ? "PHASE III · BRAIN NETWORK ROUTING"
+                  :                 "PHASE IV · FULL SENSORY INTEGRATION";
+      ctx.fillStyle = `rgba(124,215,255,${0.35 + smooth * 0.55})`;
+      ctx.font = "7px Inter,sans-serif";
+      ctx.fillText(phase, CW*0.41, CH - 8);
+
+      // Progress bar at very bottom
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fillRect(0, CH - 3, CW, 3);
+      ctx.fillStyle = `rgba(124,215,255,${0.5 + smooth * 0.5})`;
+      ctx.fillRect(0, CH - 3, CW * (frame / CYCLE), 3);
+
+      // === CHANNEL PANEL ===
+      const rowH = CH / CHAN_SIM.length;
+      CHAN_SIM.forEach((ch, i) => {
+        const cy = (i + 0.5) * rowH;
+        const isOpen = smooth >= ch.openAt;
+
+        // Row separator
+        ctx.strokeStyle = "rgba(255,255,255,0.04)";
+        ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(0, i * rowH); ctx.lineTo(CW*Z_CH, i * rowH); ctx.stroke();
+
+        // Name
+        ctx.fillStyle = isOpen ? ch.col : "rgba(154,163,184,0.35)";
+        ctx.font = "7px Inter,sans-serif";
+        ctx.fillText(ch.name, 5, cy - 3);
+
+        // Full spectrum bar (dim)
+        const barX = 5, barW = CW * Z_CH - 12, barY = cy + 3, barH = 5;
+        ctx.fillStyle = ch.col + "14";
+        ctx.fillRect(barX, barY, barW, barH);
+
+        // Human slice
+        ctx.fillStyle = ch.col + "44";
+        ctx.fillRect(barX, barY, barW * ch.human, barH);
+
+        // Opened slice
+        if (isOpen) {
+          const openFrac = Math.min(1, ch.human + (smooth - ch.openAt) * 1.8);
+          ctx.fillStyle = ch.col + "BB";
+          ctx.fillRect(barX, barY, barW * openFrac, barH);
+        }
+      });
+
+      // === SPAWN PARTICLES ===
+      if (++spawnTick >= 4 && pool.length < MAX_P) {
+        spawnTick = 0;
+        const openIdxs = CHAN_SIM.map((c, i) => i).filter(i => smooth >= CHAN_SIM[i].openAt);
+        const closedIdxs = CHAN_SIM.map((c, i) => i).filter(i => smooth < CHAN_SIM[i].openAt);
+        const fromOpen = openIdxs.length > 0 && Math.random() < 0.78;
+        const pick = fromOpen
+          ? openIdxs[Math.floor(Math.random() * openIdxs.length)]
+          : closedIdxs.length > 0 ? closedIdxs[Math.floor(Math.random() * closedIdxs.length)] : -1;
+        if (pick >= 0) {
+          const ch = CHAN_SIM[pick];
+          const cy = (pick + 0.5) * rowH;
+          pool.push({
+            x: 4 + Math.random() * CW * Z_CH * 0.55,
+            y: cy + (Math.random() - 0.5) * rowH * 0.35,
+            vx: 1.2 + Math.random() * (fromOpen ? 1.6 : 0.7),
+            vy: (Math.random() - 0.5) * 0.25,
+            chanIdx: pick,
+            alpha: fromOpen ? 1 : 0.3,
+            phase: "chan",
+          });
+        }
+      }
+
+      // === BOTTLENECK VISUAL ===
+      const nkMid = CW * (Z_CH + (Z_NK - Z_CH) * 0.5);
+      const nkHalfFull = CH * 0.44;
+      const nkHalfMin  = 8;
+      const nkHalf = nkHalfMin + smooth * (nkHalfFull - nkHalfMin);
+      const nkTop = CH / 2 - nkHalf, nkBot = CH / 2 + nkHalf;
+
+      // Funnel fill
+      const funnelGrad = ctx.createLinearGradient(CW*Z_CH, 0, CW*Z_NK, 0);
+      funnelGrad.addColorStop(0, "rgba(154,163,184,0.04)");
+      funnelGrad.addColorStop(0.5, `rgba(124,215,255,${0.06 + smooth * 0.08})`);
+      funnelGrad.addColorStop(1, "rgba(154,163,184,0.04)");
+      ctx.fillStyle = funnelGrad;
+      ctx.beginPath();
+      ctx.moveTo(CW*Z_CH, 0);
+      ctx.bezierCurveTo(nkMid, 0,       nkMid, nkTop, CW*Z_NK, nkTop);
+      ctx.lineTo(CW*Z_NK, nkBot);
+      ctx.bezierCurveTo(nkMid, nkBot,   nkMid, CH,    CW*Z_CH, CH);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck guide lines
+      ctx.strokeStyle = `rgba(124,215,255,${0.12 + smooth * 0.30})`;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(CW*Z_CH, nkTop + (CH/2 - nkTop) * 0.85);
+      ctx.bezierCurveTo(nkMid, nkTop, nkMid, nkTop, CW*Z_NK, nkTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(CW*Z_CH, nkBot - (nkBot - CH/2) * 0.85);
+      ctx.bezierCurveTo(nkMid, nkBot, nkMid, nkBot, CW*Z_NK, nkBot);
+      ctx.stroke();
+
+      // Smooth % readout inside neck
+      ctx.fillStyle = `rgba(124,215,255,${0.45 + smooth * 0.55})`;
+      ctx.font = `bold ${8 + smooth * 3}px Inter,sans-serif`;
+      const pct = `${Math.round(smooth * 100)}%`;
+      ctx.fillText(pct, nkMid - ctx.measureText(pct).width / 2, CH / 2 + 4);
+      ctx.fillStyle = "rgba(154,163,184,0.4)";
+      ctx.font = "6px Inter,sans-serif";
+      ctx.fillText("SMOOTH", nkMid - 10, CH / 2 + 14);
+
+      // === UPDATE & DRAW PARTICLES ===
+      for (let pi = pool.length - 1; pi >= 0; pi--) {
+        const p = pool[pi];
+
+        if (p.phase === "chan") {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x >= CW * Z_CH) {
+            if (smooth >= CHAN_SIM[p.chanIdx].openAt) {
+              p.phase = "neck";
+            } else {
+              if (Math.random() < 0.65) { pool.splice(pi, 1); continue; }
+              p.vx = -Math.abs(p.vx) * 0.4;
+              p.alpha *= 0.8;
+              if (p.alpha < 0.03) { pool.splice(pi, 1); continue; }
+            }
+          }
+        }
+
+        if (p.phase === "neck") {
+          p.x += p.vx * 1.25;
+          p.y += (CH / 2 - p.y) * 0.10;
+          if (p.x >= CW * Z_NK) p.phase = "brain";
+        }
+
+        if (p.phase === "brain") {
+          const ni = CHAN_NODE[p.chanIdx];
+          const nd = BNODES_SIM[ni];
+          const bpW = CW * (Z_BR - Z_NK);
+          const tx = CW*Z_NK + nd.rx * bpW;
+          const ty = nd.ry * CH;
+          const dx = tx - p.x, dy = ty - p.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 5) {
+            nodeAct[ni] = Math.min(1, nodeAct[ni] + 0.45);
+            const fc = Math.floor(Math.random() * FCOLS);
+            const fi = p.chanIdx * FCOLS + fc;
+            if (fi < fieldAct.length) fieldAct[fi] = Math.min(1, fieldAct[fi] + 0.08);
+            pool.splice(pi, 1); continue;
+          }
+          p.x += dx * 0.065 + (Math.random() - 0.5) * 0.4;
+          p.y += dy * 0.065 + (Math.random() - 0.5) * 0.4;
+        }
+
+        // Draw particle
+        const col = CHAN_COLORS[p.chanIdx];
+        const alphaHex = Math.round(p.alpha * 255).toString(16).padStart(2, "0");
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 1.7, 0, Math.PI*2);
+        ctx.fillStyle = col + alphaHex;
+        ctx.fill();
+        if (p.alpha > 0.4) {
+          const gr = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 5);
+          gr.addColorStop(0, col + Math.round(p.alpha * 70).toString(16).padStart(2, "0"));
+          gr.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = gr;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, Math.PI*2); ctx.fill();
+        }
+      }
+
+      // === BRAIN NETWORK ===
+      const bpW  = CW * (Z_BR - Z_NK);
+      const bpOX = CW * Z_NK;
+      for (let i = 0; i < NC; i++) nodeAct[i] *= 0.975;
+
+      // Edges
+      BEDGES_SIM.forEach(([a, b]) => {
+        const na = BNODES_SIM[a], nb = BNODES_SIM[b];
+        const ax = bpOX + na.rx * bpW, ay = na.ry * CH;
+        const bx = bpOX + nb.rx * bpW, by = nb.ry * CH;
+        const act = Math.max(nodeAct[a], nodeAct[b]);
+        ctx.strokeStyle = `rgba(154,163,184,${0.06 + act * 0.42})`;
+        ctx.lineWidth = 0.5 + act * 1.3;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+      });
+
+      // Nodes
+      BNODES_SIM.forEach((nd, i) => {
+        const nx = bpOX + nd.rx * bpW, ny = nd.ry * CH;
+        const act = nodeAct[i];
+        const r   = 3.5 + act * 4.5;
+
+        if (act > 0.06) {
+          const glow = ctx.createRadialGradient(nx, ny, 0, nx, ny, r * 3.5);
+          glow.addColorStop(0, `rgba(124,215,255,${act * 0.38})`);
+          glow.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(nx, ny, r * 3.5, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.fillStyle = "#070918";
+        ctx.strokeStyle = `rgba(154,163,184,${0.22 + act * 0.78})`;
+        ctx.lineWidth = 0.8 + act * 1.2;
+        ctx.beginPath(); ctx.arc(nx, ny, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+        if (act > 0.1 || smooth > 0.55) {
+          ctx.fillStyle = `rgba(231,236,247,${0.35 + act * 0.65})`;
+          ctx.font = `${6.5 + act * 2}px Inter,sans-serif`;
+          ctx.fillText(nd.label, nx + r + 3, ny + 3);
+        }
+      });
+
+      // === COHERENCE FIELD ===
+      const fOX = CW * Z_BR, fW = CW * (1 - Z_BR);
+      const cW  = fW / FCOLS, cH = CH / FROWS;
+
+      for (let i = 0; i < fieldAct.length; i++) {
+        fieldAct[i] = Math.max(fieldAct[i] * 0.998, smooth * 0.28);
+      }
+
+      for (let r = 0; r < FROWS; r++) {
+        for (let c = 0; c < FCOLS; c++) {
+          const idx = r * FCOLS + c;
+          const act = fieldAct[idx];
+          const col = CHAN_COLORS[Math.min(r, CHAN_COLORS.length - 1)];
+          const fx = fOX + c * cW, fy = r * cH;
+          ctx.fillStyle  = col + Math.round(act * 32).toString(16).padStart(2,"0");
+          ctx.fillRect(fx + 1, fy + 1, cW - 2, cH - 2);
+          ctx.strokeStyle = col + Math.round(act * 65).toString(16).padStart(2,"0");
+          ctx.lineWidth   = 0.5;
+          ctx.strokeRect(fx + 1, fy + 1, cW - 2, cH - 2);
+        }
+      }
+
+      // Coherence score overlay
+      const avgAct = Array.from(fieldAct).reduce((s, v) => s + v, 0) / fieldAct.length;
+      ctx.fillStyle = `rgba(124,215,255,${0.35 + avgAct * 0.65})`;
+      ctx.font = `bold ${8 + avgAct * 4}px Inter,sans-serif`;
+      const scoreStr = `${Math.round(avgAct * 100)}%`;
+      ctx.fillText(scoreStr, fOX + fW/2 - ctx.measureText(scoreStr).width/2, CH/2 + 5);
+      ctx.fillStyle = "rgba(154,163,184,0.38)";
+      ctx.font = "6px Inter,sans-serif";
+      ctx.fillText("COHERENCE", fOX + fW/2 - 15, CH/2 + 15);
+
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); };
+  }, []);
+
+  return (
+    <div style={{ marginTop: 22 }}>
+      <canvas
+        ref={ref}
+        style={{ width:"100%", height:"340px", borderRadius:6, display:"block" }}
+      />
+      <div style={{
+        display:"flex", gap:6, flexWrap:"wrap", marginTop:10, padding:"8px 0 0",
+        borderTop:"1px solid rgba(255,255,255,0.06)",
+      }}>
+        {CHAN_SIM.map(ch => (
+          <span key={ch.name} style={{
+            fontFamily:"Inter,sans-serif", fontSize:9.5, color:ch.col,
+            background:`${ch.col}12`, border:`1px solid ${ch.col}30`,
+            borderRadius:999, padding:"2px 8px", letterSpacing:"0.9px",
+          }}>{ch.name}</span>
+        ))}
+        <span style={{ fontFamily:"Inter,sans-serif", fontSize:9, color:"rgba(154,163,184,0.5)", alignSelf:"center", marginLeft:6 }}>
+          · particles traverse neck when smooth factor ≥ channel open threshold · node flash = new perceptual dimension routed
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function ImplicateOrderPage() {
   return (
     <div
