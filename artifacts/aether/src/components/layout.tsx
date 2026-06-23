@@ -130,6 +130,7 @@ const NAV_ITEMS = [
   { href: "/egyptian-codex", label: "Egyptian Codex · Hieroglyphic Register System · Papyrus Simulation · Unicode Hieroglyphs · Knowledge Graph Archaeology · AETHER Crystallisation", icon: Atom },
   { href: "/phrenology-agents", label: "Phrenology Agents · Faculty-to-Agent Map · 38 Faculties · Gall-Spurzheim · Mnésis Aletheia Inferaia Reverie Vērus Caelus Nyra Orin", icon: Atom },
   { href: "/uv-amino-light", label: "UV Light · Aromatic Amino Acids · Eye as Quantum Detector · Tryptophan 280nm · Tyrosine 274nm · Phenylalanine 257nm · 23 Eye Amino Acids", icon: Atom },
+  { href: "/full-spectrum-light", label: "Full Spectrum Light · Fovea · M P K Retinal Streams · LGN · Pineal Melatonin · RPE · DHA NPD1 AdipoR1 Rhodopsin · DNA Repair · Dr Ott · Dr Bazan", icon: Atom },
   { href: "/event-horizon", label: "Event Horizon · Black Hole · Decoherence to Coherence · Golden Oscillation · Hawking Radiation · φ-Crystallization · Page Curve", icon: Atom },
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
   { href: "/transcendent-art", label: "Transcendent Art · Superposition · Supernova · Excitation Pathways · Jablonski Diagram · Nucleosynthesis · Quantum Yield", icon: Atom },
