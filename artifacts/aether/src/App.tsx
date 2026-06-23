@@ -281,6 +281,8 @@ import PrismPrinciplePage from "@/pages/prism-principle";
 import RegulatoryDepthPage from "@/pages/regulatory-depth";
 import AntimatterWavePage from "@/pages/antimatter-wave";
 import CognitiveArchitecturePage from "@/pages/cognitive-architecture";
+import WorldHarmonyArchetypePage from "@/pages/world-harmony-archetype";
+import FluidComputerPage from "@/pages/fluid-computer";
 import AgentMappingPage from "@/pages/agent-mapping";
 import EventHorizonPage from "@/pages/event-horizon";
 import PhotonEmissionPage from "@/pages/photon-emission";
@@ -587,6 +589,8 @@ function Router() {
         <Route path="/regulatory-depth" component={RegulatoryDepthPage} />
         <Route path="/antimatter-wave" component={AntimatterWavePage} />
         <Route path="/cognitive-architecture" component={CognitiveArchitecturePage} />
+        <Route path="/world-harmony-archetype" component={WorldHarmonyArchetypePage} />
+        <Route path="/fluid-computer" component={FluidComputerPage} />
         <Route path="/motor-cortex" component={MotorCortexPage} />
         <Route path="/liquid-print-math" component={LiquidPrintMathPage} />
         <Route path="/optical-hull-sim" component={OpticalHullSimPage} />

@@ -349,6 +349,8 @@ const NAV_ITEMS = [
   { href: "/grand-unified-framework", label: "Grand Unified Framework · 500D Stacked Rings · 8D Warp Drive · Φ-Coherence · PEEPT", icon: Atom },
   { href: "/warp-bubble-engine",     label: "Warp Bubble Engine · Twisted Zipper Drive · Φ-Modulated Warp Simulation", icon: Atom },
   { href: "/water-transport",        label: "Water Transport · Stone & Objects · Buoyancy · Acoustic · Ancient Megalith · ψ_water", icon: Atom },
+  { href: "/world-harmony-archetype", label: "World Harmony Archetype · Plasma Coherence Engine · Architectural Compute · □⊗⌒⊗⟨⟩ · Fractal Dimension Reduction", icon: Atom },
+  { href: "/fluid-computer", label: "Open-Air Fluid Computer · FaceTime Fabric Engine · Plasmodium Bubble · Laser Matrix · ∂Φ/∂t + F|∇Φ| = 0 · DC Solar · Liquid Cooling · 16-bit ADC", icon: Atom },
   { href: "/solar-architecture",     label: "Solar Architecture · Water-Resistant · Sun-Angled · Forward-Facing Structures", icon: Atom },
   { href: "/spacetime-nav",          label: "Spacetime Navigation Engine · AETHER Core UI · Dimensional Traversal", icon: Atom },
   { href: "/water-density",          label: "Water Density Dynamics · Gradient Field · Chladni · Emergent Spacetime · Quaternion Framework", icon: Atom },
