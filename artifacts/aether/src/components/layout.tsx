@@ -138,6 +138,7 @@ const NAV_ITEMS = [
   { href: "/motor-cortex", label: "Motor Cortex · Hand Knob · M1 · Omega Sign · Utah Electrode Array · BCI · Somatotopic Map · Homunculus · Corticospinal Tract · Neuroprosthetics · Brain-Computer Interface", icon: Atom },
   { href: "/liquid-print-math", label: "Liquid Print · Mathematical Framework · Rheology · Ostwald-de Waele · Hagen-Poiseuille · Drude Model · Michaelis-Menten · Strand Displacement · Bio-Electronic Stack · Impedance", icon: Atom },
   { href: "/optical-hull-sim", label: "Optical Hull · Plate-Switching · Full System Simulation · Scale Hierarchy · Metasurface · Moth-Eye · Compound Eye · Utah Array · Directed Energy · Interplanetary Beamer · CaCO3", icon: Atom },
+  { href: "/black-hole-framework", label: "Black Hole · Complete Mathematical Framework · Schwarzschild · Kerr · Hawking Radiation · Bekenstein-Hawking Entropy · Information Paradox · Page Curve · Golden Ratio", icon: Atom },
   { href: "/agent-mapping", label: "AETHER Agent Mapping · M.A.R.I. · 8 Agents · Archetypes · Emotional Signatures · Modules · Runtime Switching · Mnēsis Aletheia Inferaia Reverie Vērus Caelus Nyra Orin", icon: Atom },
   { href: "/event-horizon", label: "Event Horizon · Black Hole · Decoherence to Coherence · Golden Oscillation · Hawking Radiation · φ-Crystallization · Page Curve", icon: Atom },
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
