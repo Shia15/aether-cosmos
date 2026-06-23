@@ -110,6 +110,7 @@ import PinealMossVisionPage from "@/pages/pineal-moss-vision";
 import QuantumRingdownBiocyclesPage from "@/pages/quantum-ringdown-biocycles";
 import Manifold26DPage from "@/pages/manifold-26d";
 import QueenBeeDiapausePage from "@/pages/queen-bee-diapause";
+import NematicBeeFotonPage from "@/pages/nematic-bee-foton";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -486,6 +487,7 @@ function Router() {
         <Route path="/quantum-ringdown-biocycles" component={QuantumRingdownBiocyclesPage} />
         <Route path="/manifold-26d" component={Manifold26DPage} />
         <Route path="/queen-bee-diapause" component={QueenBeeDiapausePage} />
+        <Route path="/nematic-bee-foton" component={NematicBeeFotonPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
