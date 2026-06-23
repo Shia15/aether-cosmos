@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
 
 /* ── palette ─────────────────────────────────────── */
 const BG   = "#010408";
@@ -323,21 +323,20 @@ export default function QuantumComputerPage(){
   const [circuit, setCircuit]       = useState<Circuit>(emptyCircuit());
   const [selected, setSelected]     = useState<GateName>('H');
   const [result, setResult]         = useState<C[]|null>(null);
-  const [running, setRunning]       = useState(false);
   const [lastRun, setLastRun]       = useState<{entropy:number;fidelity:number;dominant:string}|null>(null);
 
+  const circuitRef = useRef(circuit);
+  useLayoutEffect(()=>{ circuitRef.current=circuit; },[circuit]);
+
   const handleRun = useCallback(()=>{
-    setRunning(true);
-    setTimeout(()=>{
-      const state=runCircuit(circuit);
-      setResult(state);
-      const entropy=entEntropy(state);
-      const fidelity=circuitFidelity(state);
-      const dom=state.reduce((mi,s,i)=>cabs2(s)>cabs2(state[mi])?i:mi,0);
-      setLastRun({entropy,fidelity,dominant:basisLabel(dom)});
-      setRunning(false);
-    },60);
-  },[circuit]);
+    const c = circuitRef.current;
+    const state = runCircuit(c);
+    setResult(state);
+    const entropy = entEntropy(state);
+    const fidelity = circuitFidelity(state);
+    const dom = state.reduce((mi,s,i)=>cabs2(s)>cabs2(state[mi])?i:mi,0);
+    setLastRun({entropy,fidelity,dominant:basisLabel(dom)});
+  },[]);
 
   const handleCell=useCallback((q:number,step:number)=>{
     setCircuit(prev=>{
@@ -516,19 +515,19 @@ export default function QuantumComputerPage(){
               </div>
 
               <div style={{display:'flex',gap:8,marginTop:12}}>
-                <button onClick={handleRun} disabled={running}
+                <button type="button" onClick={handleRun}
                   style={{fontFamily:MN,fontSize:9,padding:'7px 18px',cursor:'pointer',borderRadius:3,letterSpacing:1,
-                    background:`rgba(31,212,200,0.15)`,border:`1px solid ${TEAL}88`,color:TEAL,
-                    opacity:running?0.5:1}}>
-                  {running?'RUNNING…':'▶ RUN CIRCUIT'}
+                    background:`rgba(31,212,200,0.18)`,border:`2px solid ${TEAL}cc`,color:TEAL,fontWeight:700,
+                    boxShadow:`0 0 8px ${TEAL}44`}}>
+                  ▶ RUN CIRCUIT
                 </button>
-                <button onClick={handleClear}
+                <button type="button" onClick={handleClear}
                   style={{fontFamily:MN,fontSize:9,padding:'7px 14px',cursor:'pointer',borderRadius:3,letterSpacing:1,
-                    background:'rgba(0,0,0,0.3)',border:`1px solid rgba(31,212,200,0.2)`,color:DIM}}>
+                    background:'rgba(0,0,0,0.3)',border:`1px solid rgba(31,212,200,0.25)`,color:DIM}}>
                   CLEAR
                 </button>
                 <div style={{flex:1,fontFamily:MN,fontSize:8,color:DIM,display:'flex',alignItems:'center',paddingLeft:8}}>
-                  {result?'State computed — Bloch spheres updated':'No results yet'}
+                  {result?`✓ State computed · ${result.filter(a=>cabs2(a)>0.0001).length} non-zero amplitudes`:'Place gates above then click ▶ RUN CIRCUIT'}
                 </div>
               </div>
             </div>

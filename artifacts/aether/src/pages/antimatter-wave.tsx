@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import imgQuarks   from "@assets/image_1782210457403.png";
 import imgDirac    from "@assets/antimatter_dirac.jpg";
 import imgSModel   from "@assets/antimatter_standard_model.jpg";
@@ -147,6 +147,243 @@ function TimeWaveCanvas() {
 }
 
 /* ─────────────────────────────────────────────── */
+/* Annihilation Energy Calculator canvas */
+function AnnihilationCanvas({ massGrams }: { massGrams: number }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  const massRef = useRef(massGrams);
+  massRef.current = massGrams;
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 700; cv.height = 200;
+    const W = cv.width, H = cv.height;
+    let t = 0;
+    type Particle = { x: number; y: number; vx: number; vy: number; col: string; r: number; isMatter: boolean };
+    const particles: Particle[] = [];
+    for (let i = 0; i < 18; i++) {
+      particles.push({ x: 40 + Math.random() * (W / 2 - 80), y: 30 + Math.random() * (H - 60), vx: 0.6 + Math.random() * 0.8, vy: (Math.random() - 0.5) * 1.2, col: TEAL, r: 5 + Math.random() * 3, isMatter: true });
+      particles.push({ x: W - 40 - Math.random() * (W / 2 - 80), y: 30 + Math.random() * (H - 60), vx: -0.6 - Math.random() * 0.8, vy: (Math.random() - 0.5) * 1.2, col: RED, r: 5 + Math.random() * 3, isMatter: false });
+    }
+    type Flash = { x: number; y: number; r: number; alpha: number };
+    const flashes: Flash[] = [];
+    const draw = () => {
+      ctx.fillStyle = "rgba(3,5,7,0.22)"; ctx.fillRect(0, 0, W, H);
+      const m = massRef.current;
+      const E_J = 2 * m * 0.001 * 9e16;
+      const E_TNT = E_J / 4.184e9;
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.y < p.r || p.y > H - p.r) p.vy *= -1;
+        if (p.isMatter && p.x > W / 2) p.vx = -Math.abs(p.vx);
+        if (!p.isMatter && p.x < W / 2) p.vx = Math.abs(p.vx);
+        if (p.isMatter && p.x < p.r) p.vx = Math.abs(p.vx);
+        if (!p.isMatter && p.x > W - p.r) p.vx = -Math.abs(p.vx);
+      });
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          if (particles[i].isMatter === particles[j].isMatter) continue;
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 22) {
+            flashes.push({ x: (particles[i].x + particles[j].x) / 2, y: (particles[i].y + particles[j].y) / 2, r: 6, alpha: 1 });
+            particles[i].x = 40 + Math.random() * (W / 2 - 80); particles[i].y = 30 + Math.random() * (H - 60);
+            particles[j].x = W - 40 - Math.random() * (W / 2 - 80); particles[j].y = 30 + Math.random() * (H - 60);
+          }
+        }
+      }
+      flashes.forEach((f, idx) => {
+        const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r * 3);
+        g.addColorStop(0, `rgba(255,230,80,${f.alpha})`);
+        g.addColorStop(0.5, `rgba(255,100,30,${f.alpha * 0.5})`);
+        g.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        f.r += 4; f.alpha -= 0.06;
+        if (f.alpha <= 0) flashes.splice(idx, 1);
+      });
+      particles.forEach(p => {
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 2.5);
+        g.addColorStop(0, p.col + "bb"); g.addColorStop(1, p.col + "00");
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = p.col; ctx.fill();
+        ctx.fillStyle = "#000"; ctx.font = `${p.isMatter ? 6 : 7}px Space Mono`; ctx.textAlign = "center";
+        ctx.fillText(p.isMatter ? "e⁻" : "e⁺", p.x, p.y + 2);
+      });
+      ctx.strokeStyle = "rgba(200,200,200,0.1)"; ctx.lineWidth = 1.5; ctx.setLineDash([5, 5]);
+      ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = TEAL + "88"; ctx.font = `8px ${MN}`; ctx.textAlign = "center";
+      ctx.fillText("MATTER", W / 4, 16); ctx.fillStyle = RED + "88";
+      ctx.fillText("ANTIMATTER", 3 * W / 4, 16);
+      ctx.fillStyle = GOLD; ctx.font = `9px ${MN}`; ctx.textAlign = "left";
+      const tntStr = E_TNT > 1e6 ? `${(E_TNT / 1e6).toFixed(2)} Mt TNT` : E_TNT > 1e3 ? `${(E_TNT / 1e3).toFixed(2)} kt TNT` : `${E_TNT.toFixed(2)} t TNT`;
+      ctx.fillText(`E = 2mc² = ${E_J.toExponential(2)} J = ${tntStr}`, 8, H - 10);
+      t++; raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 4, display: "block" }} />;
+}
+
+/* ─────────────────────────────────────────────── */
+/* CP Violation / Baryon Asymmetry canvas */
+function CPViolationCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 900; cv.height = 200;
+    const W = cv.width, H = cv.height;
+    let t = 0;
+    const TOTAL = 1_000_000_001;
+    const draw = () => {
+      ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+      const tNorm = Math.min(1, t / 300);
+      const matterN = Math.round(TOTAL * tNorm);
+      const antimatterN = Math.round((TOTAL - 1) * tNorm);
+      const surplus = matterN - antimatterN;
+      const barW = (W - 80) / 2 - 10;
+      const maxH = H - 60;
+      const mFrac = matterN / TOTAL, aFrac = antimatterN / TOTAL;
+      const mH = mFrac * maxH, aH = aFrac * maxH;
+      const gM = ctx.createLinearGradient(40, H - 40 - mH, 40, H - 40);
+      gM.addColorStop(0, TEAL + "22"); gM.addColorStop(1, TEAL + "66");
+      ctx.fillStyle = gM; ctx.fillRect(40, H - 40 - mH, barW, mH);
+      ctx.strokeStyle = TEAL + "88"; ctx.lineWidth = 1.5;
+      ctx.strokeRect(40, H - 40 - mH, barW, mH);
+      const gA = ctx.createLinearGradient(W / 2 + 10, H - 40 - aH, W / 2 + 10, H - 40);
+      gA.addColorStop(0, RED + "22"); gA.addColorStop(1, RED + "66");
+      ctx.fillStyle = gA; ctx.fillRect(W / 2 + 10, H - 40 - aH, barW, aH);
+      ctx.strokeStyle = RED + "88"; ctx.lineWidth = 1.5;
+      ctx.strokeRect(W / 2 + 10, H - 40 - aH, barW, aH);
+      ctx.fillStyle = TEAL; ctx.font = `10px ${OR}`; ctx.textAlign = "center";
+      ctx.fillText("MATTER", 40 + barW / 2, H - 24);
+      ctx.fillText(`${matterN.toLocaleString()}`, 40 + barW / 2, H - 12);
+      ctx.fillStyle = RED;
+      ctx.fillText("ANTIMATTER", W / 2 + 10 + barW / 2, H - 24);
+      ctx.fillText(`${antimatterN.toLocaleString()}`, W / 2 + 10 + barW / 2, H - 12);
+      ctx.fillStyle = GOLD; ctx.font = `8px ${MN}`; ctx.textAlign = "left";
+      ctx.fillText("CP VIOLATION · BIG BANG ASYMMETRY", 8, 18);
+      ctx.font = `9px ${MN}`;
+      ctx.fillText(`Surplus: +${surplus} matter particle${surplus !== 1 ? "s" : ""} per billion pairs`, 8, 34);
+      if (tNorm > 0.6) {
+        ctx.fillStyle = GOLD; ctx.font = `8px ${MN}`;
+        ctx.fillText("Annihilation: 10⁹ pairs → pure photons", 8, 50);
+        ctx.fillStyle = TEAL + "cc"; ctx.font = `9px ${OR}`;
+        ctx.fillText("← This tiny excess = all stars, planets, life", 8, 66);
+      }
+      const arrowX = W - 60, arrowY = H / 2;
+      const surplusFrac = (mH - aH);
+      if (surplusFrac > 0.5) {
+        ctx.fillStyle = GOLD + "88";
+        ctx.fillRect(arrowX - 4, arrowY - surplusFrac / 2, 8, surplusFrac);
+        ctx.fillStyle = GOLD; ctx.font = `8px ${MN}`; ctx.textAlign = "center";
+        ctx.fillText("Δ", arrowX, arrowY - surplusFrac / 2 - 4);
+        ctx.fillText("≈1ppb", arrowX, arrowY + surplusFrac / 2 + 12);
+      }
+      t++; raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 4, display: "block" }} />;
+}
+
+/* ─────────────────────────────────────────────── */
+/* PET Scanner simulation canvas */
+function PETScannerCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 900; cv.height = 240;
+    const W = cv.width, H = cv.height;
+    let t = 0;
+    const cx = W / 2, cy = H / 2;
+    const ringR = 100;
+    const nDet = 24;
+    type Gamma = { x: number; y: number; vx: number; vy: number; alpha: number; paired: boolean };
+    const gammas: Gamma[] = [];
+    type Emission = { x: number; y: number; age: number };
+    const emissions: Emission[] = [];
+    let nextEmit = 0;
+    const detectors = Array.from({ length: nDet }, (_, i) => {
+      const angle = (i / nDet) * Math.PI * 2;
+      return { x: cx + Math.cos(angle) * ringR, y: cy + Math.sin(angle) * ringR, lit: 0 };
+    });
+    const draw = () => {
+      ctx.fillStyle = "rgba(3,5,7,0.3)"; ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = `rgba(46,240,216,0.12)`; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, ringR, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, ringR + 10, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(100,200,180,0.06)`; ctx.lineWidth = 8; ctx.stroke();
+      detectors.forEach((det, i) => {
+        const lit = det.lit > 0;
+        const g = ctx.createRadialGradient(det.x, det.y, 0, det.x, det.y, 9);
+        g.addColorStop(0, lit ? GRN + "cc" : TEAL + "33"); g.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(det.x, det.y, 9, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(det.x, det.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = lit ? GRN : TEAL + "44"; ctx.fill();
+        if (det.lit > 0) det.lit--;
+      });
+      const bodyR = 44;
+      ctx.beginPath(); ctx.ellipse(cx, cy, bodyR, bodyR * 1.4, 0, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,150,80,0.07)`; ctx.fill();
+      ctx.strokeStyle = AMB + "22"; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = AMB + "55"; ctx.font = `7px ${MN}`; ctx.textAlign = "center";
+      ctx.fillText("TISSUE", cx, cy - bodyR * 1.4 - 6);
+      if (t > nextEmit) {
+        const angle = Math.random() * Math.PI * 2;
+        const er = Math.random() * bodyR * 0.9;
+        const ex = cx + Math.cos(angle) * er, ey = cy + Math.sin(angle) * er;
+        emissions.push({ x: ex, y: ey, age: 0 });
+        const backAngle = Math.random() * Math.PI * 2;
+        const speed = 3.5;
+        gammas.push({ x: ex, y: ey, vx: Math.cos(backAngle) * speed, vy: Math.sin(backAngle) * speed, alpha: 1, paired: true });
+        gammas.push({ x: ex, y: ey, vx: -Math.cos(backAngle) * speed, vy: -Math.sin(backAngle) * speed, alpha: 1, paired: true });
+        nextEmit = t + 18 + Math.floor(Math.random() * 20);
+      }
+      emissions.forEach((e, idx) => {
+        e.age++;
+        const ga = Math.max(0, 1 - e.age / 12);
+        const g = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 8);
+        g.addColorStop(0, `rgba(255,100,50,${ga})`); g.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(e.x, e.y, 8, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        if (e.age > 12) emissions.splice(idx, 1);
+      });
+      gammas.forEach((g2, idx) => {
+        g2.x += g2.vx; g2.y += g2.vy;
+        g2.alpha -= 0.018;
+        const dist = Math.sqrt((g2.x - cx) ** 2 + (g2.y - cy) ** 2);
+        if (dist > ringR - 5 && dist < ringR + 18) {
+          const angle = Math.atan2(g2.y - cy, g2.x - cx);
+          const detIdx = Math.round((angle / (Math.PI * 2) + 1) * nDet) % nDet;
+          if (detIdx >= 0 && detIdx < detectors.length) detectors[detIdx].lit = 12;
+          const g = ctx.createRadialGradient(g2.x, g2.y, 0, g2.x, g2.y, 10);
+          g.addColorStop(0, `rgba(255,230,60,${Math.min(g2.alpha, 0.8)})`); g.addColorStop(1, "transparent");
+          ctx.beginPath(); ctx.arc(g2.x, g2.y, 10, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        }
+        const trail = ctx.createLinearGradient(g2.x - g2.vx * 5, g2.y - g2.vy * 5, g2.x, g2.y);
+        trail.addColorStop(0, "transparent");
+        trail.addColorStop(1, GOLD + Math.round(g2.alpha * 180).toString(16).padStart(2, "0"));
+        ctx.strokeStyle = trail; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(g2.x - g2.vx * 5, g2.y - g2.vy * 5); ctx.lineTo(g2.x, g2.y); ctx.stroke();
+        if (g2.alpha <= 0 || dist > ringR + 20) gammas.splice(idx, 1);
+      });
+      ctx.fillStyle = GOLD; ctx.font = `8px ${MN}`; ctx.textAlign = "left";
+      ctx.fillText("PET SCANNER · β⁺ DECAY → POSITRON → ANNIHILATION → 2γ AT 511 keV · COINCIDENCE DETECTION", 8, H - 10);
+      t++; raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf.current);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 4, display: "block" }} />;
+}
+
+/* ─────────────────────────────────────────────── */
 /* Standard Model particle grid */
 const QUARKS = [
   { name:"up",      charge:"+2/3", mass:"2.2 MeV",    gen:1, col:RED   },
@@ -179,6 +416,7 @@ function ParticleCard({ name, charge, mass, col }: { name:string; charge:string;
 
 /* ─────────────────────────────────────────────── */
 export default function AntimatterWavePage() {
+  const [massGrams, setMassGrams] = useState(0.25);
   const card = (col=TEAL): React.CSSProperties => ({
     background:"rgba(0,0,0,0.42)", border:`1px solid ${col}22`, borderRadius:4, padding:"12px 16px",
   });
@@ -226,6 +464,40 @@ export default function AntimatterWavePage() {
         <div style={{ ...card(VIO), marginBottom:14 }}>
           <div style={secLabel}>Time as Wave · Matter (teal) + Antimatter (red) riding the temporal field · CPT mirror (dashed) · Annihilation flashes at contact</div>
           <TimeWaveCanvas />
+        </div>
+
+        {/* Annihilation energy calculator */}
+        <div style={{ ...card(ORG), marginBottom:14 }}>
+          <div style={secLabel}>Live simulation · E=2mc² · matter (teal) + antimatter (red) collision · annihilation flashes · energy yield calculator · adjust mass to scale yield</div>
+          <h2 style={h2(ORG)}>Annihilation Energy · E = 2mc² · 100% Mass Conversion</h2>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 280px", gap:14, alignItems:"start" }}>
+            <div>
+              <AnnihilationCanvas massGrams={massGrams} />
+              <div style={{ marginTop:8 }}>
+                <label style={{ fontFamily:MN, fontSize:8, color:ORG }}>
+                  Antimatter mass: <strong style={{ color:TEAL }}>{massGrams.toFixed(3)} g</strong>
+                  &nbsp;+&nbsp; equal matter mass = total <strong style={{ color:GOLD }}>{(massGrams*2).toFixed(3)} g annihilated</strong>
+                </label>
+                <input type="range" min={0.001} max={5} step={0.001} value={massGrams}
+                  onChange={e=>setMassGrams(Number(e.target.value))}
+                  style={{ width:"100%", accentColor:ORG, margin:"8px 0" }} />
+              </div>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+              {[
+                { col:ORG,  l:"Energy (Joules)", v:`${(2*massGrams*0.001*9e16).toExponential(3)} J` },
+                { col:GOLD, l:"TNT equivalent", v:(()=>{const t2=2*massGrams*0.001*9e16/4.184e9; return t2>1e6?`${(t2/1e6).toFixed(3)} Mt`:t2>1e3?`${(t2/1e3).toFixed(3)} kt`:`${t2.toFixed(2)} t`;})() },
+                { col:RED,  l:"Hiroshima (15 kt)", v:`${((2*massGrams*0.001*9e16/4.184e9)/15000).toFixed(4)}×` },
+                { col:VIO,  l:"Efficiency vs fission", v:"~1000× (0.1% → 100%)" },
+                { col:TEAL, l:"CERN annual output", v:"~10 nanograms/year" },
+              ].map(({col,l,v})=>(
+                <div key={l} style={{ background:`${col}0d`, border:`1px solid ${col}33`, borderRadius:3, padding:"7px 10px" }}>
+                  <div style={{ fontFamily:MN, fontSize:7, color:DIM, letterSpacing:1 }}>{l}</div>
+                  <div style={{ fontFamily:OR, fontSize:11, color:col, fontWeight:700 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Dirac + Standard Model */}
@@ -420,6 +692,26 @@ export default function AntimatterWavePage() {
               ))}
             </div>
             <img src={imgSpine2} alt="Spine fluid wave art" style={{ width:"100%", borderRadius:4, display:"block" }} />
+          </div>
+        </div>
+
+        {/* CP Violation / Baryon Asymmetry canvas */}
+        <div style={{ ...card(VIO), marginBottom:14 }}>
+          <div style={secLabel}>CP violation · baryon asymmetry · Big Bang · 1 in 10⁹ matter surplus · animated build-up · why the universe exists</div>
+          <h2 style={h2(VIO)}>Why We Exist · CP Violation &amp; the 1-in-a-Billion Asymmetry</h2>
+          <CPViolationCanvas />
+          <div style={{ ...body, fontSize:10.5, marginTop:8, maxWidth:860 }}>
+            If the Big Bang produced exactly equal matter and antimatter, mutual annihilation would have left only photons. CP violation — a tiny asymmetry in how the weak force treats particles vs antiparticles — left <strong style={{color:VIO}}>1 extra matter particle per billion pairs</strong>. All observable matter — every star, planet, atom in your body — is that surplus. The animated bars show matter building up to exactly 1,000,000,001 while antimatter reaches 1,000,000,000.
+          </div>
+        </div>
+
+        {/* PET Scanner simulation */}
+        <div style={{ ...card(GRN), marginBottom:14 }}>
+          <div style={secLabel}>Live PET scanner · β⁺ decay · positron emission · e⁺+e⁻ annihilation → 2γ at 511 keV · coincidence detection ring · medical antimatter</div>
+          <h2 style={h2(GRN)}>PET Scanner · Antimatter Medicine in Action</h2>
+          <PETScannerCanvas />
+          <div style={{ ...body, fontSize:10.5, marginTop:8, maxWidth:860 }}>
+            Radiotracer (e.g. ¹⁸F-FDG) undergoes <strong style={{color:GRN}}>β⁺ decay</strong> inside your tissue. The emitted positron travels 1–3 mm before meeting an electron — annihilating to produce <strong style={{color:GOLD}}>two 511 keV gamma photons</strong> travelling in exactly opposite directions (conservation of momentum). A ring of scintillator detectors (shown) records both photons simultaneously — coincidence detection narrows the annihilation point to a line. Rotating geometry + computer reconstruction produces the 3D metabolic map. Green detector lights = coincidence pair detected.
           </div>
         </div>
 
