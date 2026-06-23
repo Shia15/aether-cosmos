@@ -153,6 +153,7 @@ const NAV_ITEMS = [
   { href: "/incommensurable", label: "Incommensurable Measures · Deceptive Practices · Anthyphairesis · Lissajous · Convergents · Irrational Numbers", icon: Atom },
   { href: "/firework-coherence", label: "Ψ-Coherence Fireworks · Light Fragmentation · Smoke Density · Beer-Lambert Opacity · Decoherent Particalization", icon: Atom },
   { href: "/osmotic-pressure", label: "Osmotic Pressure · Ion Gradients · Na⁺/K⁺ Pump · Sodium Storage · Protein Folding Depth · Membrane Enzymes · Fish Pressure Chemistry", icon: Atom },
+  { href: "/non-terrestrial", label: "Non-Terrestrial Officers · Gary McKinnon · David Grusch · Project Stargate · Remote Viewing · Deep Water Submarine · UAP/USO Registry", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },

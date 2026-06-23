@@ -300,6 +300,7 @@ import ChladniFreezePage from "@/pages/chladni-freeze";
 import IncommensurablePage from "@/pages/incommensurable";
 import FireworkCoherencePage from "@/pages/firework-coherence";
 import OsmoticPressurePage from "@/pages/osmotic-pressure";
+import NonTerrestrialPage from "@/pages/non-terrestrial";
 
 const queryClient = new QueryClient();
 
@@ -603,6 +604,7 @@ function Router() {
         <Route path="/incommensurable" component={IncommensurablePage} />
         <Route path="/firework-coherence" component={FireworkCoherencePage} />
         <Route path="/osmotic-pressure" component={OsmoticPressurePage} />
+        <Route path="/non-terrestrial" component={NonTerrestrialPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
