@@ -132,6 +132,8 @@ const NAV_ITEMS = [
   { href: "/uv-amino-light", label: "UV Light · Aromatic Amino Acids · Eye as Quantum Detector · Tryptophan 280nm · Tyrosine 274nm · Phenylalanine 257nm · 23 Eye Amino Acids", icon: Atom },
   { href: "/full-spectrum-light", label: "Full Spectrum Light · Fovea · M P K Retinal Streams · LGN · Pineal Melatonin · RPE · DHA NPD1 AdipoR1 Rhodopsin · DNA Repair · Dr Ott · Dr Bazan", icon: Atom },
   { href: "/prism-principle", label: "Prism Principle · Emergent Unity · Regulatory Depth · Epigenetics · Alternative Splicing · ncRNA · 5-Element OS · 4A Protocol · Launch Sequence", icon: Atom },
+  { href: "/regulatory-depth", label: "Regulatory Depth · Epigenetic Switches · DNA Methylation · Histone Modification · Alternative Splicing · ncRNA · microRNA · lncRNA · Cross-System Feedback", icon: Atom },
+  { href: "/agent-mapping", label: "AETHER Agent Mapping · M.A.R.I. · 8 Agents · Archetypes · Emotional Signatures · Modules · Runtime Switching · Mnēsis Aletheia Inferaia Reverie Vērus Caelus Nyra Orin", icon: Atom },
   { href: "/event-horizon", label: "Event Horizon · Black Hole · Decoherence to Coherence · Golden Oscillation · Hawking Radiation · φ-Crystallization · Page Curve", icon: Atom },
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
   { href: "/transcendent-art", label: "Transcendent Art · Superposition · Supernova · Excitation Pathways · Jablonski Diagram · Nucleosynthesis · Quantum Yield", icon: Atom },
