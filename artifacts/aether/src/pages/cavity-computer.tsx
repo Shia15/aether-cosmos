@@ -587,6 +587,384 @@ function RecursiveCanvas({ R }: { R: number }) {
   );
 }
 
+/* ══════════════════════════════════════════════════════
+   LASER SELECTIVE SOLDERING · NODE BUILDER
+   Gantry laser heats solder pads through state machine:
+   UNSOLDERED → HEATING → LIQUID → COOLING → SOLDERED
+══════════════════════════════════════════════════════ */
+function LaserSolderCanvas() {
+  const ref   = useRef<HTMLCanvasElement>(null);
+  const raf   = useRef(0);
+  const [pwr,  setPwr]  = useState(1.0);
+  const [auto, setAuto] = useState(true);
+  const pwrRef  = useRef(1.0);
+  const autoRef = useRef(true);
+  useEffect(()=>{ pwrRef.current  = pwr;  }, [pwr]);
+  useEffect(()=>{ autoRef.current = auto; }, [auto]);
+
+  useEffect(()=>{
+    const cv = ref.current; if(!cv) return;
+    const W=900, H=500; cv.width=W; cv.height=H;
+    const ctx = cv.getContext("2d")!;
+
+    /* ── PCB layout ──────────────────────────────── */
+    const BX=30, BY=100, BW=620, BH=370;
+    const COLS=7, ROWS=5, NP=COLS*ROWS;
+    const PAD_R=15;
+    const T_ROOM=25, T_LIQ=183, T_SOL=175;
+
+    const pads = Array.from({length:NP},(_,i)=>({
+      id:i,
+      x: BX + (i%COLS + 0.65) / COLS * BW,
+      y: BY + (Math.floor(i/COLS) + 0.6) / ROWS * BH,
+    }));
+
+    /* deterministic trace map */
+    const traces: {a:number;b:number}[] = [];
+    const seed = (n:number) => (n*2654435761)%4294967296/4294967296;
+    for(let r=0;r<ROWS;r++)
+      for(let c=0;c<COLS-1;c++)
+        if(seed(r*20+c) > 0.28) traces.push({a:r*COLS+c, b:r*COLS+c+1});
+    for(let r=0;r<ROWS-1;r++)
+      for(let c=0;c<COLS;c++)
+        if(seed(100+r*7+c) > 0.45) traces.push({a:r*COLS+c, b:(r+1)*COLS+c});
+
+    /* ── State arrays ────────────────────────────── */
+    const temps   = new Float32Array(NP).fill(T_ROOM);
+    // 0=UNSOLDERED 1=HEATING 2=LIQUID 3=COOLING 4=SOLDERED
+    const states  = new Uint8Array(NP);
+    const flow    = new Float32Array(NP); // solder flow 0→1
+
+    /* ── Laser head state ────────────────────────── */
+    let headX = BX + BW/2;
+    let targetId = -1;
+    let phase: "SEEK"|"MOVE"|"HEAT"|"DONE"|"COMPLETE" = "SEEK";
+    let completedJoints = 0;
+    let totalJoints = 0;
+
+    /* ── Particles ───────────────────────────────── */
+    type HP = {x:number;y:number;vx:number;vy:number;life:number;ml:number};
+    const hps: HP[] = [];
+
+    /* ── Helpers ─────────────────────────────────── */
+    const findNext = () => {
+      let best=-1, bestD=Infinity;
+      for(const p of pads){
+        if(states[p.id]!==0) continue;
+        const d=Math.abs(p.x-headX);
+        if(d<bestD){bestD=d;best=p.id;}
+      }
+      return best;
+    };
+
+    let t=0;
+    const draw = ()=>{
+      const P = pwrRef.current;
+      const AUTO = autoRef.current;
+      t++;
+
+      /* ── State machine ───────────────────────── */
+      if(AUTO){
+        if(phase==="SEEK"||phase==="DONE"){
+          targetId=findNext();
+          phase = targetId>=0 ? "MOVE" : "COMPLETE";
+        }
+        if(phase==="MOVE"&&targetId>=0){
+          const tx=pads[targetId].x;
+          const dx=tx-headX;
+          if(Math.abs(dx)<3){headX=tx; phase="HEAT"; states[targetId]=1;}
+          else headX+=Math.sign(dx)*Math.min(4,Math.abs(dx));
+        }
+        if(phase==="HEAT"&&targetId>=0){
+          const id=targetId;
+          // Heat-up: dT = P * rate * (T_LIQ - T) + constant injection
+          temps[id] = Math.min(T_LIQ+60, temps[id]+P*(0.018*(T_LIQ-temps[id]+5)+10));
+          if(states[id]===1&&temps[id]>=T_LIQ) states[id]=2;
+          if(states[id]===2){
+            flow[id] = Math.min(1, flow[id]+0.015*P);
+            if(t%3===0) hps.push({
+              x:pads[id].x+(Math.random()-0.5)*24,
+              y:pads[id].y+(Math.random()-0.5)*12,
+              vx:(Math.random()-0.5)*1.2, vy:-1.5-Math.random()*2,
+              life:40, ml:40,
+            });
+            if(flow[id]>=1){ states[id]=3; phase="DONE"; }
+          }
+        }
+      }
+
+      /* ── Cool all pads ───────────────────────── */
+      for(let i=0;i<NP;i++){
+        if(i===targetId&&phase==="HEAT") continue;
+        if(temps[i]>T_ROOM) temps[i]=Math.max(T_ROOM, temps[i]-0.8);
+        if(states[i]===3&&temps[i]<=T_SOL){
+          states[i]=4; completedJoints++; totalJoints++;
+        }
+      }
+
+      /* ── Particle update ─────────────────────── */
+      for(let i=hps.length-1;i>=0;i--){
+        const p=hps[i];
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.06; p.life--;
+        if(p.life<=0) hps.splice(i,1);
+      }
+
+      /* ════ DRAW ════════════════════════════════ */
+      ctx.fillStyle="#020408"; ctx.fillRect(0,0,W,H);
+
+      /* PCB substrate */
+      const pcbGrd=ctx.createLinearGradient(BX,BY,BX+BW,BY+BH);
+      pcbGrd.addColorStop(0,"#0b1c0b"); pcbGrd.addColorStop(1,"#0e200e");
+      ctx.fillStyle=pcbGrd; ctx.fillRect(BX,BY,BW,BH);
+      ctx.strokeStyle="rgba(46,180,60,0.18)"; ctx.lineWidth=1;
+      ctx.strokeRect(BX,BY,BW,BH);
+
+      /* PCB grid */
+      ctx.setLineDash([2,8]); ctx.strokeStyle="rgba(40,80,40,0.22)"; ctx.lineWidth=0.4;
+      for(let gx=BX;gx<=BX+BW;gx+=22){
+        ctx.beginPath();ctx.moveTo(gx,BY);ctx.lineTo(gx,BY+BH);ctx.stroke();
+      }
+      for(let gy=BY;gy<=BY+BH;gy+=22){
+        ctx.beginPath();ctx.moveTo(BX,gy);ctx.lineTo(BX+BW,gy);ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      /* Silkscreen label */
+      ctx.fillStyle="rgba(255,255,255,0.06)"; ctx.font="10px 'Space Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("AETHER-PCB-35 REV.A",BX+8,BY+14);
+
+      /* Traces */
+      for(const tr of traces){
+        const pa=pads[tr.a], pb=pads[tr.b];
+        const bothDone = states[tr.a]===4&&states[tr.b]===4;
+        const anyHot   = states[tr.a]>=1&&states[tr.a]<=3 || states[tr.b]>=1&&states[tr.b]<=3;
+        ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y);
+        if(bothDone){
+          ctx.strokeStyle="rgba(201,168,76,0.55)";
+          ctx.lineWidth=2; ctx.shadowColor=GOLD; ctx.shadowBlur=6;
+        } else if(anyHot){
+          ctx.strokeStyle="rgba(255,150,30,0.3)"; ctx.lineWidth=1.5; ctx.shadowBlur=0;
+        } else {
+          ctx.strokeStyle="rgba(120,140,120,0.12)"; ctx.lineWidth=1; ctx.shadowBlur=0;
+        }
+        ctx.stroke(); ctx.shadowBlur=0;
+      }
+
+      /* Heat bloom (per pad) */
+      for(const p of pads){
+        const temp=temps[p.id];
+        if(temp>T_ROOM+15){
+          const heat=(temp-T_ROOM)/(T_LIQ+60-T_ROOM);
+          const br=PAD_R*(2+heat*3);
+          const hg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,br);
+          const al=Math.min(0.55, heat*0.65);
+          hg.addColorStop(0,`rgba(255,110,10,${al})`);
+          hg.addColorStop(0.5,`rgba(255,50,5,${al*0.5})`);
+          hg.addColorStop(1,"transparent");
+          ctx.fillStyle=hg; ctx.beginPath();ctx.arc(p.x,p.y,br,0,Math.PI*2);ctx.fill();
+        }
+      }
+
+      /* Pads */
+      for(const p of pads){
+        const st=states[p.id], temp=temps[p.id];
+        /* Colours */
+        let padCol=GOLD;
+        if(st===1) padCol=`hsl(${55-45*(temp-T_ROOM)/(T_LIQ-T_ROOM)},90%,55%)`;
+        if(st===2) padCol="#d8d0c0"; // liquid silver
+        if(st===3) padCol="#c0b8a8"; // cooling
+        if(st===4) padCol="#b8b0a0"; // solidified
+
+        /* Glow */
+        if(st>=1&&st<=3){ctx.shadowColor=st===2?"#ffffff":AMB;ctx.shadowBlur=st===2?18:10;}
+
+        /* Pad disc */
+        ctx.fillStyle=padCol;
+        ctx.beginPath(); ctx.arc(p.x,p.y,PAD_R,0,Math.PI*2); ctx.fill();
+
+        /* Solder flow fill */
+        if(st===2||st===3){
+          ctx.fillStyle=`rgba(210,205,195,${flow[p.id]*0.95})`;
+          ctx.beginPath();ctx.arc(p.x,p.y,PAD_R*0.9,0,Math.PI*2);ctx.fill();
+          /* Ripple on liquid */
+          if(st===2){
+            const rr=PAD_R*0.6*(0.6+0.4*Math.sin(t*0.3+p.id));
+            ctx.beginPath();ctx.arc(p.x,p.y,rr,0,Math.PI*2);
+            ctx.strokeStyle=`rgba(255,255,255,0.25)`;ctx.lineWidth=1.5;ctx.stroke();
+          }
+        }
+
+        ctx.shadowBlur=0;
+
+        /* Ring */
+        ctx.beginPath();ctx.arc(p.x,p.y,PAD_R,0,Math.PI*2);
+        ctx.strokeStyle=st===4?"rgba(201,168,76,0.7)":"rgba(90,110,90,0.35)";
+        ctx.lineWidth=1.5; ctx.stroke();
+        /* Centre drill hole */
+        ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
+        ctx.fillStyle="#050d05"; ctx.fill();
+
+        /* Temp readout above hot pads */
+        if(temp>T_ROOM+30&&st<4){
+          ctx.fillStyle=st===2?"rgba(255,255,200,0.9)":"rgba(255,180,80,0.7)";
+          ctx.font="9px 'Space Mono',monospace"; ctx.textAlign="center";
+          ctx.fillText(`${temp.toFixed(0)}°`,p.x,p.y-PAD_R-5);
+        }
+      }
+
+      /* Heat particles */
+      for(const p of hps){
+        const a=p.life/p.ml;
+        ctx.fillStyle=`rgba(255,160,30,${a*0.75})`;
+        ctx.beginPath();ctx.arc(p.x,p.y,2.2*a,0,Math.PI*2);ctx.fill();
+      }
+
+      /* ── Gantry rail ─────────────────────────── */
+      /* Rail beam */
+      ctx.strokeStyle="rgba(100,130,160,0.35)"; ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(BX-8,BY-30);ctx.lineTo(BX+BW+8,BY-30);ctx.stroke();
+      /* Rail highlights */
+      ctx.strokeStyle="rgba(180,210,240,0.2)"; ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(BX-8,BY-33);ctx.lineTo(BX+BW+8,BY-33);ctx.stroke();
+
+      /* Laser head carriage */
+      const HW=48, HH=36;
+      const hLeft=headX-HW/2, hTop=BY-30-HH/2;
+      ctx.fillStyle="#1a2a3a";
+      ctx.beginPath();ctx.roundRect(hLeft,hTop,HW,HH,5);ctx.fill();
+      ctx.strokeStyle="rgba(68,170,255,0.4)"; ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.roundRect(hLeft,hTop,HW,HH,5);ctx.stroke();
+      /* Aperture glow */
+      const apY=hTop+HH;
+      const apGrd=ctx.createRadialGradient(headX,apY,0,headX,apY,10);
+      apGrd.addColorStop(0,"rgba(255,80,20,0.9)"); apGrd.addColorStop(1,"transparent");
+      ctx.fillStyle=apGrd; ctx.beginPath();ctx.arc(headX,apY,10,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle="rgba(255,80,20,0.95)";
+      ctx.beginPath();ctx.arc(headX,apY,3.5,0,Math.PI*2);ctx.fill();
+      /* Head label */
+      ctx.fillStyle="rgba(68,170,255,0.5)"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("LASER",headX,hTop+12);ctx.fillText("HEAD",headX,hTop+22);
+
+      /* Beam (HEAT phase) */
+      if(phase==="HEAT"&&targetId>=0){
+        const tp=pads[targetId];
+        /* Outer glow beam */
+        ctx.beginPath();ctx.moveTo(headX,apY);ctx.lineTo(tp.x,tp.y);
+        ctx.strokeStyle=`rgba(255,60,10,${0.25+0.15*Math.sin(t*0.4)})`;
+        ctx.lineWidth=8; ctx.shadowColor="#ff4400"; ctx.shadowBlur=20; ctx.stroke(); ctx.shadowBlur=0;
+        /* Core beam */
+        ctx.beginPath();ctx.moveTo(headX,apY);ctx.lineTo(tp.x,tp.y);
+        ctx.strokeStyle=`rgba(255,200,50,${0.7+0.2*Math.sin(t*0.3)})`;
+        ctx.lineWidth=2; ctx.shadowColor="#ffff00"; ctx.shadowBlur=8; ctx.stroke(); ctx.shadowBlur=0;
+        /* Spot */
+        const sr=5+2*Math.sin(t*0.35);
+        ctx.beginPath();ctx.arc(tp.x,tp.y,sr,0,Math.PI*2);
+        ctx.fillStyle="rgba(255,255,180,0.95)"; ctx.shadowColor="#fff"; ctx.shadowBlur=16;
+        ctx.fill(); ctx.shadowBlur=0;
+      } else if(phase==="MOVE"&&targetId>=0){
+        /* Dim travel beam */
+        const tp=pads[targetId];
+        ctx.beginPath();ctx.moveTo(headX,apY);ctx.lineTo(tp.x,tp.y);
+        ctx.strokeStyle="rgba(255,60,10,0.15)"; ctx.lineWidth=1.5; ctx.stroke();
+      }
+
+      /* ── HUD (right panel) ───────────────────── */
+      const HX=BX+BW+16, HY=BY, HW2=W-HX-8, HH2=BH;
+      ctx.fillStyle="rgba(1,4,12,0.85)"; ctx.fillRect(HX,HY,HW2,HH2);
+      ctx.strokeStyle="rgba(46,240,216,0.15)"; ctx.lineWidth=1; ctx.strokeRect(HX,HY,HW2,HH2);
+
+      /* HUD Header */
+      ctx.fillStyle=TEAL; ctx.font="bold 12px 'Space Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("LASER SOLDER",HX+10,HY+20);
+      ctx.fillStyle=DIM; ctx.font="9px 'Space Mono',monospace";
+      ctx.fillText("NODE BUILDER",HX+10,HY+33);
+      ctx.strokeStyle=`${TEAL}20`; ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(HX+10,HY+40);ctx.lineTo(HX+HW2-10,HY+40);ctx.stroke();
+
+      /* Status rows */
+      const hRows:[string,string,string][]=[
+        ["PHASE", phase,
+          phase==="HEAT"?AMB:phase==="COMPLETE"?GRN:phase==="MOVE"?BLUE:TEAL],
+        ["JOINTS",`${completedJoints}/${NP}`, GRN],
+        ["POWER", `${(pwrRef.current*100).toFixed(0)}%`, AMB],
+        ["TARGET",targetId>=0?`PAD-${String(targetId).padStart(2,"0")}`:"--",VIO],
+        ["TEMP",  targetId>=0?`${temps[targetId].toFixed(0)}°C`:"--", ROSE],
+        ["TRACES",`${traces.filter(tr=>states[tr.a]===4&&states[tr.b]===4).length}/${traces.length}`,GOLD],
+      ];
+      hRows.forEach(([lbl,val,col],i)=>{
+        const ry=HY+50+i*40;
+        ctx.fillStyle="rgba(255,255,255,0.04)"; ctx.fillRect(HX+10,ry,HW2-20,30);
+        ctx.fillStyle=`${col}70`; ctx.font="8px 'Space Mono',monospace"; ctx.textAlign="left";
+        ctx.fillText(lbl,HX+16,ry+11);
+        ctx.fillStyle=col; ctx.font="bold 13px 'Space Mono',monospace";
+        ctx.fillText(val,HX+16,ry+26);
+      });
+
+      /* Progress bar */
+      const prog=completedJoints/NP;
+      const barY2=HY+HH2-60, barW=HW2-20;
+      ctx.fillStyle="rgba(46,240,216,0.08)"; ctx.fillRect(HX+10,barY2,barW,10);
+      ctx.fillStyle=prog>=1?GRN:TEAL; ctx.shadowColor=TEAL; ctx.shadowBlur=5;
+      ctx.fillRect(HX+10,barY2,barW*prog,10); ctx.shadowBlur=0;
+      ctx.fillStyle=TEAL; ctx.font="9px 'Space Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText(`${(prog*100).toFixed(0)}% COMPLETE`,HX+10,barY2+24);
+      if(prog>=1){
+        ctx.fillStyle=GRN; ctx.font="bold 11px 'Space Mono',monospace";
+        ctx.shadowColor=GRN; ctx.shadowBlur=10;
+        ctx.fillText("✓ ALL JOINTS SOLDERED",HX+10,barY2+40);
+        ctx.shadowBlur=0;
+      }
+
+      /* Temperature scale */
+      const scaleX=HX+HW2-22, scaleY=HY+50, scaleH=210;
+      ctx.strokeStyle="rgba(46,240,216,0.1)"; ctx.lineWidth=1;
+      ctx.strokeRect(scaleX,scaleY,12,scaleH);
+      for(let si=0;si<scaleH;si++){
+        const frac=1-si/scaleH;
+        const r=Math.floor(255*Math.min(1,frac*2));
+        const g=Math.floor(255*Math.min(1,(1-frac)*2));
+        ctx.fillStyle=`rgb(${r},${g},0)`;
+        ctx.fillRect(scaleX,scaleY+si,12,1);
+      }
+      [25,183,250].forEach(tval=>{
+        const sy=scaleY+scaleH-(tval-25)/(280-25)*scaleH;
+        ctx.strokeStyle="rgba(255,255,255,0.3)"; ctx.lineWidth=0.7;
+        ctx.beginPath();ctx.moveTo(scaleX-4,sy);ctx.lineTo(scaleX+12,sy);ctx.stroke();
+        ctx.fillStyle="rgba(255,255,255,0.4)"; ctx.font="8px 'Space Mono',monospace"; ctx.textAlign="right";
+        ctx.fillText(`${tval}°`,scaleX-6,sy+3);
+      });
+
+      /* Page title bar */
+      ctx.fillStyle="rgba(46,240,216,0.3)"; ctx.font="10px 'Space Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("LASER SELECTIVE SOLDERING · NODE CONNECTOR · PCB ASSEMBLY AUTOMATION",BX,BY-46);
+
+      raf.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return()=>cancelAnimationFrame(raf.current);
+  },[]);
+
+  return (
+    <div>
+      <canvas ref={ref} style={{width:"100%",height:"auto",display:"block",borderRadius:8}}/>
+      <div style={{display:"flex",gap:"2rem",flexWrap:"wrap",padding:"0.75rem 0 0",alignItems:"center"}}>
+        <label style={{display:"flex",flexDirection:"column",gap:3,fontSize:"0.75rem",fontFamily:"'Space Mono',monospace",color:AMB,width:220}}>
+          <span>Laser Power: {(pwr*100).toFixed(0)}%</span>
+          <input type="range" min={0.3} max={2.5} step={0.1} value={pwr}
+            onChange={e=>setPwr(+e.target.value)} style={{accentColor:AMB}}/>
+        </label>
+        <button
+          onClick={()=>setAuto(m=>!m)}
+          style={{fontFamily:"'Space Mono',monospace",fontSize:11,padding:"6px 14px",borderRadius:5,
+            cursor:"pointer",border:`1px solid ${auto?GRN:DIM}50`,
+            background:`${auto?GRN:DIM}12`,color:auto?GRN:DIM,letterSpacing:1}}>
+          AUTO: {auto?"ON":"OFF"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ── UI helpers ──────────────────────────────────────── */
 function SH({ n, title, sub, col = TEAL }: { n: string; title: string; sub: string; col?: string }) {
   return (
@@ -972,6 +1350,56 @@ export default function CavityComputerPage() {
               </blockquote>
             </div>
           ))}
+        </div>
+
+        {/* Section VII: Laser Solder Node Builder */}
+        <SH n="VII" title="Laser Selective Soldering · Node Connection Builder"
+          sub="Gantry laser traces a PCB, heating each pad through UNSOLDERED → HEATING → LIQUID → COOLING → SOLDERED · heat diffusion + solder flow simulation"
+          col={AMB} />
+        <div style={{ display:"flex", gap:20, flexWrap:"wrap", alignItems:"flex-start" }}>
+          <div style={{ flex:"1 1 640px" }}>
+            <LaserSolderCanvas />
+            <div style={{ fontFamily:mono, fontSize:8, color:DIM, marginTop:6, lineHeight:1.8 }}>
+              GANTRY = laser head moves along the X rail, seeking nearest unsoldered pad  ·
+              BEAM = infrared laser (940 nm class) focused to 50 µm spot  ·
+              HEAT BLOOM = temperature field T(x,y,t) rising above liquidus 183°C  ·
+              SILVER DISC = liquid solder (Sn63/Pb37 eutectic) flowing and wetting pad  ·
+              GOLD TRACES = live circuit connections formed between soldered pads  ·
+              TEMP READOUT = per-pad temperature while heating  ·
+              SCALE BAR (right) = 25°C (green) → 183°C liquidus → 250°C (red)
+            </div>
+          </div>
+          <div style={{ flex:"0 0 230px", display:"flex", flexDirection:"column", gap:12 }}>
+            <div style={{ background:`${AMB}07`, border:`1px solid ${AMB}22`, borderRadius:8, padding:"14px 16px" }}>
+              <div style={{ fontFamily:mono, fontSize:9, color:AMB, letterSpacing:1, marginBottom:12 }}>
+                SOLDERING PHYSICS
+              </div>
+              {[
+                ["dT/dt = α∇²T + Q_laser/ρc","Heat equation: laser energy Q heats pad of density ρ and heat capacity c. Diffuses into substrate at thermal diffusivity α = κ/ρc."],
+                ["T_liquidus = 183°C (Sn63/Pb37)","Eutectic solder: single transition temperature. Solid → liquid instantly at 183°C. No mushy zone — cleanest joint."],
+                ["Q = P·A·(1−R) / r²","Laser energy Q at pad: power P × absorption A × (1 − reflectivity R), divided by spot area r². Higher P = faster dwell."],
+                ["t_solder ≈ κ·(T_liq − T_room) / P","Dwell time to reach liquidus. High power = short dwell = less thermal spread = cleaner joint. Typical: 50–200 ms."],
+                ["Wetting: γ_SL < γ_SV","Surface energy condition for solder wetting: solid-liquid interface energy γ_SL must be less than solid-vapour γ_SV. Flux removes oxides to enable this."],
+              ].map(([eq,desc])=>(
+                <div key={eq as string} style={{ marginBottom:10, borderBottom:`1px solid ${AMB}15`, paddingBottom:8 }}>
+                  <div style={{ fontFamily:mono, fontSize:9, color:AMB, marginBottom:3 }}>{eq}</div>
+                  <div style={{ fontFamily:body, fontSize:12, color:DIM, lineHeight:1.65 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ background:`${ROSE}07`, border:`1px solid ${ROSE}20`, borderRadius:8, padding:"12px 14px" }}>
+              <div style={{ fontFamily:mono, fontSize:8, color:ROSE, letterSpacing:1, marginBottom:8 }}>
+                CAVITY COMPUTER CONNECTION
+              </div>
+              <div style={{ fontFamily:body, fontSize:12, color:DIM, lineHeight:1.75 }}>
+                The laser solder builder IS the physical constructor of the packet-switching network in Section II.
+                Each soldered joint completes a filament connection. The laser's gantry path is itself a BFS
+                traversal — it seeks the nearest unsoldered node, exactly as Dijkstra routes packets.
+                Heat diffusion ∂T/∂t = α∇²T is the parabolic PDE twin of the elliptic Poisson
+                equation ∇²ψ = −ω in Section I. Both are solved by iterative spatial averaging.
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
