@@ -319,6 +319,7 @@ const NAV_ITEMS = [
   { href: "/psilocybin-water-octopus", label: "Psilocybin Filter · Carbon Egg C₇₀ · H₂O Octopus · Blue Blood · Haemocyanin vs Haemoglobin · Agentic Architecture", icon: Microscope },
   { href: "/pineal-moss-vision",       label: "Pineal Gland · Fibonacci Chip · Vertebrate Vision · Moss Simulation · Water Potency · Solar Plasma · Space-Time Navigation", icon: Brain },
   { href: "/quantum-ringdown-biocycles", label: "QNM Ringdown · Plant-Butterfly Quantum · Floral Scent Tunneling · π Biological Cycles · Cancer Phase Decoherence", icon: Atom },
+  { href: "/manifold-26d", label: "26-Dimensional Manifold · Molecular Dynamics · 日本色 Japanese Color · Greek Numerals · Bosonic String · Leech Lattice Λ₂₄", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
