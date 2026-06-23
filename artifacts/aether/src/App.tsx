@@ -301,6 +301,7 @@ import IncommensurablePage from "@/pages/incommensurable";
 import FireworkCoherencePage from "@/pages/firework-coherence";
 import OsmoticPressurePage from "@/pages/osmotic-pressure";
 import NonTerrestrialPage from "@/pages/non-terrestrial";
+import PropulsionDynamicsPage from "@/pages/propulsion-dynamics";
 
 const queryClient = new QueryClient();
 
@@ -605,6 +606,7 @@ function Router() {
         <Route path="/firework-coherence" component={FireworkCoherencePage} />
         <Route path="/osmotic-pressure" component={OsmoticPressurePage} />
         <Route path="/non-terrestrial" component={NonTerrestrialPage} />
+        <Route path="/propulsion-dynamics" component={PropulsionDynamicsPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
