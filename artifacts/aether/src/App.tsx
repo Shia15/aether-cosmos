@@ -272,6 +272,7 @@ import AetherMatrixPage from "@/pages/aether-matrix";
 import UnderstandingStrandPage from "@/pages/understanding-strand";
 import GravitationalFieldPage from "@/pages/gravitational-field";
 import CavityComputerPage from "@/pages/cavity-computer";
+import QuantumComputerPage from "@/pages/quantum-computer";
 import EventHorizonPage from "@/pages/event-horizon";
 import PhotonEmissionPage from "@/pages/photon-emission";
 import TranscendentArtPage from "@/pages/transcendent-art";
@@ -560,6 +561,7 @@ function Router() {
         <Route path="/understanding-strand" component={UnderstandingStrandPage} />
         <Route path="/gravitational-field" component={GravitationalFieldPage} />
         <Route path="/cavity-computer" component={CavityComputerPage} />
+        <Route path="/quantum-computer" component={QuantumComputerPage} />
         <Route path="/event-horizon" component={EventHorizonPage} />
         <Route path="/photon-emission" component={PhotonEmissionPage} />
         <Route path="/transcendent-art" component={TranscendentArtPage} />
