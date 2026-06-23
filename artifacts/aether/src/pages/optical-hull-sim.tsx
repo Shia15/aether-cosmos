@@ -1,22 +1,33 @@
 import { useEffect, useRef, useState } from "react";
 
 /* ── palette ──────────────────────────────────── */
-const BG   = "#02030a";
-const MN   = "'Space Mono',monospace";
-const OR   = "'Orbitron',sans-serif";
-const DIM  = "#2a3550";
+const BG  = "#02030a";
+const MN  = "'Space Mono',monospace";
+const OR  = "'Orbitron',sans-serif";
+const DIM = "#2a3550";
 
-/* ── plate mode definitions ───────────────────── */
+function ha(hex: string, a: number) {
+  if (hex === "#0a1020") return `rgba(10,16,32,${a.toFixed(2)})`;
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a.toFixed(2)})`;
+}
+function lerp(a: number, b: number, t: number) { return a + (b-a)*t; }
+function lerpHex(h1: string, h2: string, t: number) {
+  const c1=[parseInt(h1.slice(1,3),16),parseInt(h1.slice(3,5),16),parseInt(h1.slice(5,7),16)];
+  const c2=[parseInt(h2.slice(1,3),16),parseInt(h2.slice(3,5),16),parseInt(h2.slice(5,7),16)];
+  return "#"+c1.map((v,i)=>Math.round(lerp(v,c2[i],t)).toString(16).padStart(2,"0")).join("");
+}
+
+/* ── plate modes ──────────────────────────────── */
 const MODES = [
-  { name:"Beam Receive",  short:"RECV", col:"#3b82f6", glow:"#3b82f6", desc:"Captures EM / photovoltaic harvest" },
-  { name:"Beam Steer",    short:"STEER",col:"#f59e0b", glow:"#f59e0b", desc:"Phase-conjugate beam redirection" },
-  { name:"Thermal Emit",  short:"THERM",col:"#ef4444", glow:"#ef4444", desc:"Selective IR emission · heat balance" },
-  { name:"Stealth / Absorb",short:"BLCK",col:"#1e2a3a", glow:"#0a1020",desc:"Broadband absorption · EM blackout" },
-  { name:"LIDAR / Sense", short:"LIDAR",col:"#10b981", glow:"#10b981", desc:"Active ranging · environment map" },
-  { name:"Comms",         short:"COMMS",col:"#a78bfa", glow:"#a78bfa", desc:"Directional optical link · tight-beam" },
+  { short:"RECV",  col:"#3b82f6", glow:"#3b82f6", name:"Beam Receive"     },
+  { short:"STEER", col:"#f59e0b", glow:"#f59e0b", name:"Beam Steer"       },
+  { short:"THERM", col:"#ef4444", glow:"#ef4444", name:"Thermal Emit"     },
+  { short:"BLCK",  col:"#1e2a3a", glow:"#0a1020", name:"Stealth / Absorb" },
+  { short:"LIDAR", col:"#10b981", glow:"#10b981", name:"LIDAR / Sense"    },
+  { short:"COMMS", col:"#a78bfa", glow:"#a78bfa", name:"Comms"            },
 ] as const;
 
-/* ── global hull modes ── */
 type HullMode = "NOMINAL"|"STEALTH"|"BEAM"|"THERMAL"|"COMMS"|"SCAN";
 const HULL_MODES: { key: HullMode; col: string; dist: number[] }[] = [
   { key:"NOMINAL",  col:"#1fd4c8", dist:[0.28,0.22,0.18,0.10,0.12,0.10] },
@@ -27,43 +38,124 @@ const HULL_MODES: { key: HullMode; col: string; dist: number[] }[] = [
   { key:"SCAN",     col:"#10b981", dist:[0.07,0.08,0.06,0.06,0.60,0.13] },
 ];
 
-/* ── scale levels ─────────────────────────────── */
-const SCALES = [
-  { level:"Atomic",               size:"~0.2 nm",     col:"#60a5fa", n:0  },
-  { level:"Nanostructure",        size:"100–300 nm",   col:"#34d399", n:1  },
-  { level:"Metasurface",          size:"0.5–5 μm",    col:"#a78bfa", n:2  },
-  { level:"Ommatidium Lens",      size:"10–50 μm",    col:"#fbbf24", n:3  },
-  { level:"Waveguide Core",       size:"5–20 μm",     col:"#34d399", n:4  },
-  { level:"Artif. Ommatidium",    size:"20–100 μm",   col:"#f97316", n:5  },
-  { level:"Compound-Eye Cluster", size:"1–10 mm",     col:"#ef4444", n:6  },
-  { level:"Full Compound Eye",    size:"1–20 cm",     col:"#ec4899", n:7  },
-  { level:"Laser Aperture Array", size:"10 cm–10 m",  col:"#f43f5e", n:8  },
-  { level:"Directed Energy",      size:"1–100 m",     col:"#a78bfa", n:9  },
-  { level:"Orbital Array",        size:"100 m–10 km", col:"#818cf8", n:10 },
-  { level:"Interplanetary Beamer",size:"10–1000 km",  col:"#c4b5fd", n:11 },
+/* ── scale hierarchy data ─────────────────────── */
+const SCALE_DATA = [
+  {
+    n: 1, col:"#60a5fa",
+    level:"Atomic",                 size:"~0.2 nm",
+    feature:"Silicon crystal lattice",
+    desc1:"Si diamond-cubic unit cell a = 0.543 nm. Nearest-neighbour: 0.235 nm.",
+    desc2:"All solid-state photonics begin here. EM interaction → quantum mechanics.",
+    eq:   "E = ℏ²k²/2m*   [effective-mass dispersion in band structure]",
+    ref:  "Kittel, Introduction to Solid State Physics, 8th ed. (2004) · Ashcroft & Mermin (1976)",
+  },
+  {
+    n: 2, col:"#34d399",
+    level:"Nanostructure",           size:"100–300 nm",
+    feature:"Moth-eye anti-reflection pillars",
+    desc1:"SiO₂ pillars at 200 nm pitch create GRIN index n: 1.0 → 3.5 over height h.",
+    desc2:"Suppresses Fresnel reflection <0.2 % across 300–1000 nm broadband window.",
+    eq:   "n_eff(z) = n_air + (n_Si−n_air)·(z/h)^α   [GRIN profile, α≈0.6]",
+    ref:  "Wilson & Hutley, Optica Acta 29(7), 1982 · Dewan et al., Adv. Opt. Mat. 2012",
+  },
+  {
+    n: 3, col:"#a78bfa",
+    level:"Metasurface",             size:"0.5–5 μm",
+    feature:"Huygens resonator unit cells",
+    desc1:"Electric + magnetic Mie modes overlap → 0–2π phase coverage, near-unity T.",
+    desc2:"Enables flat optics: lenses, holograms, waveplates without refractive bulk.",
+    eq:   "φ(r) = (2π/λ)·[√(f²+r²) − f]   [Fresnel lens phase profile]",
+    ref:  "Yu & Capasso, Nature Mater. 13, 139–150 (2014) · Decker et al., Adv. Opt. Mat. 2015",
+  },
+  {
+    n: 4, col:"#fbbf24",
+    level:"Ommatidium Lens",         size:"10–50 μm",
+    feature:"Individual corneal microlens",
+    desc1:"Biconvex facet (n≈1.52) focuses onto rhabdom waveguide. Dragonfly: 28 μm Ø.",
+    desc2:"Acceptance angle Δφ ≈ λ/D. 10,000–30,000 facets per compound eye.",
+    eq:   "1/f = (n−1)·(1/R₁ − 1/R₂)   [Lensmaker's equation]",
+    ref:  "Land & Nilsson, Animal Eyes, 2nd ed., OUP (2012)",
+  },
+  {
+    n: 5, col:"#34d399",
+    level:"Waveguide Core",          size:"5–20 μm",
+    feature:"Light confinement channel",
+    desc1:"Step-index core n₁=1.48, clad n₂=1.46 guides via total internal reflection.",
+    desc2:"Single-mode condition: V = (2πa/λ)·NA < 2.405. SMF-28 core: 8 μm @ 1550 nm.",
+    eq:   "NA = √(n₁²−n₂²)   ·   V = (2πa/λ)·NA < 2.405",
+    ref:  "Saleh & Teich, Fundamentals of Photonics, Wiley (2007)",
+  },
+  {
+    n: 6, col:"#f97316",
+    level:"Artificial Ommatidium",   size:"20–100 μm",
+    feature:"Stacked optical + detector cell",
+    desc1:"Microlens + photonic-crystal waveguide + Si photodiode in 50 μm³ stacked cube.",
+    desc2:"Photonic bandgap confines in-band. Responsivity R = η·qλ/hc [A/W].",
+    eq:   "R = η·qλ/hc   [detector responsivity, A/W]",
+    ref:  "Jeong et al., Nature Mater. 5, 454–460 (2006) · Ko et al., Nature 454 (2008)",
+  },
+  {
+    n: 7, col:"#ef4444",
+    level:"Compound-Eye Cluster",    size:"1–10 mm",
+    feature:"Curved lens sub-array",
+    desc1:"7–37 ommatidia on curved substrate. Dragonfly: 30,000 facets, 270° panorama.",
+    desc2:"Combined FOV = Δφ × N_rows. Angular res. per facet: Δφ ≈ λ/d_facet.",
+    eq:   "D_eff = N^½·d_single   [sparse aperture equivalent diameter]",
+    ref:  "Sheng et al., JOSA A 30(8), 2013 · Duparré & Wippermann, Analyst (2012)",
+  },
+  {
+    n: 8, col:"#ec4899",
+    level:"Full Compound-Eye Optic", size:"1–20 cm",
+    feature:"Hemispherical curved optical surface",
+    desc1:"256-ommatidium Si compound eye on elastic hemispherical substrate. FOV: 180°.",
+    desc2:"Mimics mantis-shrimp 4-quadrant retina + polarisation. Solid angle Ω = 2π sr.",
+    eq:   "Ω = 2π·(1−cosθ)   [solid angle, steradians]",
+    ref:  "Ko et al., Nature 454, 748–753 (2008) · Song et al., Nature Electronics (2020)",
+  },
+  {
+    n: 9, col:"#f43f5e",
+    level:"Laser Aperture Array",    size:"10 cm – 10 m",
+    feature:"Coherent phased emitter field",
+    desc1:"N apertures phase-locked via OPLL. Irradiance ∝ N² (coherent addition).",
+    desc2:"DARPA JDPA target: 100 kW combined at 1 km. Phase error budget: λ/16 rms.",
+    eq:   "I_total = N²·I₀·sinc²(NΔφ/2π)   [coherent array irradiance]",
+    ref:  "Fan et al., Opt. Lett. 44(8), 2019 · McNaught et al., SPIE 7195 (2009)",
+  },
+  {
+    n:10, col:"#a78bfa",
+    level:"Directed Energy System",  size:"1 – 100 m",
+    feature:"Space-based beam-forming platform",
+    desc1:"Diffraction-limited spot: r = 1.22λR/D at range R. Scales with aperture D.",
+    desc2:"Starshot: 4 m Ø, 100 GW burst → 1 GW/m² at 1 km lightsail.",
+    eq:   "r_spot = 1.22λR/D   [Airy-disk radius at range R]",
+    ref:  "Lubin, JBIS 69 (2016) · Kulkarni et al., Acta Astronautica (2018)",
+  },
+  {
+    n:11, col:"#818cf8",
+    level:"Orbital Laser Array",     size:"100 m – 10 km",
+    feature:"Distributed aperture synthesis",
+    desc1:"Inter-satellite baseline B → θ_res = λ/B (VLBI analogue from orbit).",
+    desc2:"Path-length stability ≤ λ/8 = 190 nm at 1550 nm via laser metrology.",
+    eq:   "θ_res = λ/B   [VLBI-analogue angular resolution]",
+    ref:  "ESA Blackbeard/OISL concept (2022) · Fridlund, Proc. SPIE 4852 (2004)",
+  },
+  {
+    n:12, col:"#c4b5fd",
+    level:"Interplanetary Beamer",   size:"10 – 1,000 km",
+    feature:"Solar-system propulsion infrastructure",
+    desc1:"10 km aperture array in Earth orbit drives 4 m lightsail to 0.2c in ~10 min.",
+    desc2:"Required: ~100 GW CW. Min size: D_min = 2.44λL/d (L = 1 AU, d = sail).",
+    eq:   "a = 2P/(Mc)   [radiation-pressure acceleration on reflective sail]",
+    ref:  "Lubin, JBIS 69 (2016) · Manchester & Loeb, ApJ 837, L2 (2017)",
+  },
 ];
 
-function ha(hex: string, a: number) {
-  return hex + Math.round(a * 255).toString(16).padStart(2, "0");
-}
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
-function lerpHex(h1: string, h2: string, t: number) {
-  const c1 = [parseInt(h1.slice(1,3),16),parseInt(h1.slice(3,5),16),parseInt(h1.slice(5,7),16)];
-  const c2 = [parseInt(h2.slice(1,3),16),parseInt(h2.slice(3,5),16),parseInt(h2.slice(5,7),16)];
-  return `#${c1.map((v,i)=>Math.round(lerp(v,c2[i],t)).toString(16).padStart(2,"0")).join("")}`;
-}
-
-/* ── Plate type ── */
+/* ══════════════ HULL CANVAS ══════════════ */
 type Plate = {
-  cx: number; cy: number;
-  mode: number; target: number;
-  progress: number; delay: number;
-  brightness: number;
+  cx:number; cy:number; mode:number; target:number;
+  progress:number; delay:number; brightness:number;
 };
 
-/* ══════════════════════════════════════════════════
-   CANVAS 1 — OPTICAL HULL
-══════════════════════════════════════════════════ */
 function HullCanvas({ modeRef }: { modeRef: React.MutableRefObject<HullMode> }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const raf = useRef(0);
@@ -73,663 +165,614 @@ function HullCanvas({ modeRef }: { modeRef: React.MutableRefObject<HullMode> }) 
     const ctx = canvas.getContext("2d")!;
     const W = canvas.width, H = canvas.height;
 
-    // Build hex grid (flat-top, R=22)
     const R = 22;
-    const xStep = R * 1.5;
-    const yStep = R * Math.sqrt(3);
+    const xStep = R * 1.5, yStep = R * Math.sqrt(3);
     const plates: Plate[] = [];
+    const COLS = Math.ceil(W / xStep) + 2, ROWS = Math.ceil(H / yStep) + 2;
 
-    const COLS = Math.ceil(W / xStep) + 2;
-    const ROWS = Math.ceil(H / yStep) + 2;
-
-    for (let col = 0; col < COLS; col++) {
+    for (let col = 0; col < COLS; col++)
       for (let row = 0; row < ROWS; row++) {
         const cx = col * xStep - R * 0.5;
         const cy = row * yStep + (col % 2) * yStep * 0.5 - yStep * 0.5;
-        if (cx < -R || cx > W + R || cy < -R || cy > H + R) continue;
+        if (cx < -R || cx > W+R || cy < -R || cy > H+R) continue;
         const m = Math.floor(Math.random() * 6);
-        plates.push({ cx, cy, mode: m, target: m, progress: 1, delay: 0, brightness: 0.5 + Math.random() * 0.5 });
+        plates.push({ cx, cy, mode:m, target:m, progress:1, delay:0, brightness:0.5+Math.random()*0.5 });
       }
-    }
 
-    // Stars background (pre-render)
-    const stars: [number,number,number][] = Array.from({length:120}, () =>
+    const stars: [number,number,number][] = Array.from({length:120}, ()=>
       [Math.random()*W, Math.random()*H, Math.random()]);
 
-    let t = 0;
-    let lastMode: HullMode = "NOMINAL";
-    let beams: { x1:number,y1:number,x2:number,y2:number,life:number,col:string }[] = [];
-    let signals: { x:number,y:number,r:number,col:string }[] = [];
+    let t = 0, lastMode: HullMode = "NOMINAL";
+    let beams: {x1:number;y1:number;x2:number;y2:number;life:number;col:string}[] = [];
+    let signals: {x:number;y:number;r:number;col:string}[] = [];
 
-    function drawHex(cx: number, cy: number, r: number) {
+    function drawHex(cx:number, cy:number, r:number) {
       ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const a = (Math.PI / 3) * i;
-        const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
+      for (let i=0;i<6;i++){const a=(Math.PI/3)*i;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));}
       ctx.closePath();
     }
 
-    function reassignTargets(key: HullMode) {
-      const hm = HULL_MODES.find(m => m.key === key)!;
-      const dist = hm.dist;
-      const cumul = dist.reduce((acc, v, i) => [...acc, (acc[i-1]??0)+v], [] as number[]);
-      plates.forEach((p, pi) => {
-        const r = Math.random();
-        let t2 = 0;
-        for (let i = 0; i < 6; i++) { if (r < cumul[i]) { t2 = i; break; } }
-        p.target = t2;
-        p.progress = 0;
-        p.delay = Math.floor(Math.random() * 90 + pi % 30);
+    function reassign(key: HullMode) {
+      const hm = HULL_MODES.find(m=>m.key===key)!;
+      const cumul = hm.dist.reduce((acc,v,i)=>[...acc,(acc[i-1]??0)+v],[] as number[]);
+      plates.forEach((p,pi)=>{
+        const rv=Math.random(); let t2=0;
+        for(let i=0;i<6;i++){if(rv<cumul[i]){t2=i;break;}}
+        p.target=t2; p.progress=0; p.delay=Math.floor(Math.random()*90+pi%30);
       });
     }
-
-    reassignTargets("NOMINAL");
+    reassign("NOMINAL");
 
     function frame() {
       t++;
-
-      // Mode change detection
       const curMode = modeRef.current;
-      if (curMode !== lastMode) {
-        lastMode = curMode;
-        reassignTargets(curMode);
+      if (curMode !== lastMode) { lastMode=curMode; reassign(curMode); }
+
+      plates.forEach(p=>{
+        if(p.delay>0){p.delay--;return;}
+        if(p.progress<1){ p.progress=Math.min(1,p.progress+0.025); if(p.progress>=1)p.mode=p.target; }
+        p.brightness=0.55+0.45*Math.abs(Math.sin(t*0.022+p.cx*0.01));
+      });
+
+      if(t%18===0){ const gs=plates.filter(p=>(p.progress<1?p.target:p.mode)===1); if(gs.length){const s=gs[~~(Math.random()*gs.length)],tt=plates[~~(Math.random()*plates.length)];beams.push({x1:s.cx,y1:s.cy,x2:tt.cx,y2:tt.cy,life:40,col:"#f59e0b"});}}
+      if(t%28===0){ const ps=plates.filter(p=>(p.progress<1?p.target:p.mode)===5); if(ps.length){const s=ps[~~(Math.random()*ps.length)];signals.push({x:s.cx,y:s.cy,r:0,col:"#a78bfa"});}}
+      beams=beams.filter(b=>b.life-->0);
+      signals=signals.filter(s=>(s.r+=2.5)<90);
+
+      ctx.fillStyle="#010309"; ctx.fillRect(0,0,W,H);
+      stars.forEach(([sx,sy,sv])=>{ ctx.fillStyle=`rgba(160,200,255,${0.2+sv*0.4})`; ctx.fillRect(sx,sy,sv<0.5?1:1.5,sv<0.5?1:1.5); });
+
+      plates.forEach(p=>{
+        const m1=MODES[p.mode],m2=MODES[p.target];
+        const col=p.progress<1?lerpHex(m1.col,m2.col,p.progress):m1.col;
+        const glow=p.progress<1?lerpHex(m1.glow,m2.glow,p.progress):m1.glow;
+        const bri=p.brightness, act=p.progress<1;
+
+        drawHex(p.cx,p.cy,R-1.5); ctx.fillStyle="#010309"; ctx.fill();
+        drawHex(p.cx,p.cy,R-3);
+        ctx.fillStyle=ha(col,0.12+bri*0.20);
+        if(glow!=="#0a1020"){ctx.shadowColor=glow;ctx.shadowBlur=act?14:5+bri*9;}
+        ctx.fill(); ctx.shadowBlur=0;
+        ctx.strokeStyle=ha(col,0.30+bri*0.35); ctx.lineWidth=0.8+(act?1.2:0); ctx.stroke();
+        ctx.beginPath(); ctx.arc(p.cx,p.cy,3.5,0,Math.PI*2);
+        ctx.fillStyle=ha(col,0.60+bri*0.35); ctx.fill();
+      });
+
+      beams.forEach(b=>{ const a=b.life/40; ctx.save(); ctx.strokeStyle=ha(b.col,a*0.7); ctx.lineWidth=1.5*a; ctx.shadowColor=b.col; ctx.shadowBlur=8*a; ctx.beginPath(); ctx.moveTo(b.x1,b.y1); ctx.lineTo(b.x2,b.y2); ctx.stroke(); ctx.shadowBlur=0; ctx.restore(); });
+      signals.forEach(s=>{ const a=1-s.r/90; ctx.strokeStyle=ha(s.col,a*0.55); ctx.lineWidth=1.5*a; ctx.shadowColor=s.col; ctx.shadowBlur=8*a; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.stroke(); ctx.shadowBlur=0; });
+
+      // AI HUD
+      const hx=W-210,hy=14,hm=HULL_MODES.find(m=>m.key===curMode)!;
+      ctx.fillStyle="rgba(1,3,10,0.78)"; ctx.fillRect(hx,hy,196,102);
+      ctx.strokeStyle=ha(hm.col,0.4); ctx.lineWidth=1; ctx.strokeRect(hx,hy,196,102);
+      ctx.fillStyle=hm.col; ctx.font=`bold 11px ${OR}`; ctx.textAlign="left"; ctx.fillText("AI CONTROLLER",hx+10,hy+18);
+      ctx.font=`10px ${MN}`; ctx.fillStyle="rgba(180,210,240,0.6)";
+      ctx.fillText(`mode:     ${curMode}`,hx+10,hy+34);
+      ctx.fillText(`plates:   ${plates.length}`,hx+10,hy+48);
+      const sw=plates.filter(p=>p.progress<1).length;
+      ctx.fillStyle=sw>0?"#fbbf24":"#22c55e";
+      ctx.fillText(`switching: ${sw}`,hx+10,hy+62);
+      ctx.fillStyle="rgba(180,210,240,0.45)";
+      ctx.fillText(`t = ${t.toString().padStart(7,"0")}`,hx+10,hy+76);
+      ctx.fillStyle=ha(hm.col,0.22); ctx.fillRect(hx,hy+96,Math.min(196,(t%300)/300*196),6);
+
+      if(curMode==="SCAN"||curMode==="NOMINAL"){
+        const sa=(t*0.03)%(Math.PI*2);
+        ctx.save(); ctx.strokeStyle=ha("#10b981",0.14); ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(W*0.5,H*0.5); ctx.lineTo(W*0.5+Math.cos(sa)*180,H*0.5+Math.sin(sa)*180); ctx.stroke(); ctx.restore();
       }
 
-      // Advance plate transitions
-      plates.forEach(p => {
-        if (p.delay > 0) { p.delay--; return; }
-        if (p.progress < 1) {
-          p.progress = Math.min(1, p.progress + 0.025);
-          if (p.progress >= 1) p.mode = p.target;
-        }
-        p.brightness = 0.55 + 0.45 * Math.abs(Math.sin(t * 0.02 + p.cx * 0.01));
-      });
+      ctx.fillStyle="rgba(1,3,10,0.74)"; ctx.fillRect(0,H-26,W,26);
+      ctx.strokeStyle=ha("#1fd4c8",0.10); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(0,H-26); ctx.lineTo(W,H-26); ctx.stroke();
+      const mc=[0,1,2,3,4,5].map(m=>plates.filter(p=>p.mode===m).length);
+      let bx=12;
+      MODES.forEach((m,i)=>{ ctx.fillStyle=ha(m.col,0.75); ctx.font=`10px ${MN}`; ctx.textAlign="left"; ctx.fillText(`${m.short}: ${mc[i]}`,bx,H-9); bx+=90; });
 
-      // Spawn beam lines from gold plates
-      if (t % 18 === 0) {
-        const gold = plates.filter(p => (p.progress < 1 ? p.target : p.mode) === 1);
-        if (gold.length > 0) {
-          const src = gold[Math.floor(Math.random() * gold.length)];
-          const tgt = plates[Math.floor(Math.random() * plates.length)];
-          beams.push({ x1:src.cx, y1:src.cy, x2:tgt.cx, y2:tgt.cy, life:40, col:"#f59e0b" });
-        }
-      }
-      // Purple comms bursts
-      if (t % 30 === 0) {
-        const purp = plates.filter(p => (p.progress < 1 ? p.target : p.mode) === 5);
-        if (purp.length > 0) {
-          const src = purp[Math.floor(Math.random() * purp.length)];
-          signals.push({ x:src.cx, y:src.cy, r:0, col:"#a78bfa" });
-        }
-      }
-      beams  = beams.filter(b => b.life-- > 0);
-      signals = signals.filter(s => (s.r += 2.5) < 90);
-
-      // ── Draw ──
-      ctx.fillStyle = "#010309";
-      ctx.fillRect(0, 0, W, H);
-
-      // Stars
-      stars.forEach(([sx, sy, sv]) => {
-        ctx.fillStyle = `rgba(160,200,255,${0.2 + sv * 0.4})`;
-        ctx.fillRect(sx, sy, sv < 0.5 ? 1 : 1.5, sv < 0.5 ? 1 : 1.5);
-      });
-
-      // Hull plates
-      plates.forEach(p => {
-        const displayMode = p.progress < 1 ? p.mode : p.mode;
-        const m1 = MODES[p.mode], m2 = MODES[p.target];
-        const col = p.progress < 1 ? lerpHex(m1.col, m2.col, p.progress) : m1.col;
-        const glow = p.progress < 1 ? lerpHex(m1.glow, m2.glow, p.progress) : m1.glow;
-        const bri = p.brightness;
-        const activating = p.progress < 1;
-
-        // Gap border
-        drawHex(p.cx, p.cy, R - 1.5);
-        ctx.fillStyle = "#010309";
-        ctx.fill();
-
-        // Plate fill
-        drawHex(p.cx, p.cy, R - 3);
-        const alpha = 0.12 + bri * 0.20;
-        ctx.fillStyle = ha(col, alpha);
-        if (glow !== "#0a1020") {
-          ctx.shadowColor = glow;
-          ctx.shadowBlur  = activating ? 14 : 5 + bri * 9;
-        }
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // Edge highlight
-        ctx.strokeStyle = ha(col, 0.30 + bri * 0.35);
-        ctx.lineWidth   = 0.8 + (activating ? 1.2 : 0);
-        ctx.stroke();
-
-        // Mode indicator dot
-        ctx.beginPath();
-        ctx.arc(p.cx, p.cy, 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = ha(col, 0.60 + bri * 0.35);
-        ctx.fill();
-      });
-
-      // Beam lines
-      beams.forEach(b => {
-        const a = b.life / 40;
-        ctx.save();
-        ctx.strokeStyle = ha(b.col, a * 0.7);
-        ctx.lineWidth   = 1.5 * a;
-        ctx.shadowColor = b.col; ctx.shadowBlur = 8 * a;
-        ctx.beginPath(); ctx.moveTo(b.x1, b.y1); ctx.lineTo(b.x2, b.y2); ctx.stroke();
-        ctx.shadowBlur = 0; ctx.restore();
-      });
-
-      // Comms signals
-      signals.forEach(s => {
-        const a = 1 - s.r / 90;
-        ctx.strokeStyle = ha(s.col, a * 0.55);
-        ctx.lineWidth   = 1.5 * a;
-        ctx.shadowColor = s.col; ctx.shadowBlur = 8 * a;
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.stroke();
-        ctx.shadowBlur = 0;
-      });
-
-      // AI Controller HUD (top-right)
-      const hudX = W - 210, hudY = 14;
-      ctx.fillStyle = "rgba(1,3,10,0.75)";
-      ctx.fillRect(hudX, hudY, 196, 100);
-      ctx.strokeStyle = ha(HULL_MODES.find(m=>m.key===curMode)!.col, 0.4);
-      ctx.lineWidth = 1; ctx.strokeRect(hudX, hudY, 196, 100);
-      ctx.fillStyle = HULL_MODES.find(m=>m.key===curMode)!.col;
-      ctx.font = `bold 11px ${OR}`; ctx.textAlign = "left";
-      ctx.fillText("AI CONTROLLER", hudX+10, hudY+18);
-      ctx.font = `10px ${MN}`;
-      ctx.fillStyle = "rgba(180,210,240,0.6)";
-      ctx.fillText(`mode:  ${curMode}`, hudX+10, hudY+36);
-      ctx.fillText(`plates: ${plates.length}`, hudX+10, hudY+50);
-      const trans = plates.filter(p=>p.progress<1).length;
-      ctx.fillStyle = trans > 0 ? "#fbbf24" : "#22c55e";
-      ctx.fillText(`switching: ${trans}`, hudX+10, hudY+64);
-      ctx.fillStyle = "rgba(180,210,240,0.45)";
-      ctx.fillText(`t = ${t.toString().padStart(6,"0")}`, hudX+10, hudY+80);
-      const modeBar = Math.min(196, (t % 300) / 300 * 196);
-      ctx.fillStyle = ha(HULL_MODES.find(m=>m.key===curMode)!.col, 0.25);
-      ctx.fillRect(hudX, hudY+96, modeBar, 4);
-
-      // LIDAR sweep (green plates active)
-      if (curMode === "SCAN" || curMode === "NOMINAL") {
-        const sweepAngle = (t * 0.03) % (Math.PI * 2);
-        ctx.save();
-        ctx.strokeStyle = ha("#10b981", 0.15);
-        ctx.lineWidth = 1.5;
-        const sweepLen = 200;
-        ctx.beginPath();
-        ctx.moveTo(W * 0.5, H * 0.5);
-        ctx.lineTo(W * 0.5 + Math.cos(sweepAngle) * sweepLen, H * 0.5 + Math.sin(sweepAngle) * sweepLen);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // Status bar (bottom)
-      ctx.fillStyle = "rgba(1,3,10,0.72)";
-      ctx.fillRect(0, H - 26, W, 26);
-      ctx.strokeStyle = ha("#1fd4c8", 0.12);
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, H-26); ctx.lineTo(W, H-26); ctx.stroke();
-
-      const modesCount = [0,1,2,3,4,5].map(m => plates.filter(p=>p.mode===m).length);
-      let bx = 12;
-      MODES.forEach((md, i) => {
-        ctx.fillStyle = ha(md.col, 0.75);
-        ctx.font = `10px ${MN}`; ctx.textAlign = "left";
-        ctx.fillText(`${md.short}: ${modesCount[i]}`, bx, H - 9);
-        bx += 90;
-      });
-
-      raf.current = requestAnimationFrame(frame);
+      raf.current=requestAnimationFrame(frame);
     }
-
     frame();
-    return () => cancelAnimationFrame(raf.current);
+    return ()=>cancelAnimationFrame(raf.current);
   }, []);
 
-  return (
-    <canvas ref={ref} width={1100} height={500}
-      style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }} />
-  );
+  return <canvas ref={ref} width={1100} height={500} style={{width:"100%",height:"auto",display:"block",borderRadius:6}} />;
 }
 
-/* ══════════════════════════════════════════════════
-   CANVAS 2 — SCALE HIERARCHY
-══════════════════════════════════════════════════ */
-function ScaleCanvas() {
+/* ══════════════ SCALE HIERARCHY CANVAS ══════════════ */
+function ScaleHierarchyCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
   const raf = useRef(0);
+  const STRIP = 92;
 
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
     const W = canvas.width, H = canvas.height;
+    const VX = W - 270, VW = 265; // visualization column
     let t = 0;
 
-    // Log-scale ruler constants
-    // 0.2nm = 0.2e-9 → log10 = -9.7
-    // 10,000km = 1e10m → log10 = 10
-    const LOG_MIN = -10, LOG_MAX = 10;
-    const PANEL_W = 260, PANEL_H = 95;
-    const COLS = 4, ROWS = 3;
-    const PAD_X = (W - COLS * PANEL_W) / (COLS + 1);
-    const PAD_Y = 14;
-
-    // Characteristic log values for each level
-    const SCALE_LOG = [-9.7, -7.5, -6.3, -5, -5.3, -4.7, -3, -1.5, -0.5, 1, 3, 5];
-
-    function drawLevel(n: number, x: number, y: number, pw: number, ph: number, active: boolean) {
-      const sc = SCALES[n];
-      const pulse = 0.5 + 0.5 * Math.sin(t * 0.04 + n * 0.6);
-      const col = sc.col;
-
-      // Panel bg
-      ctx.fillStyle = active ? ha(col, 0.10) : ha(col, 0.04);
-      ctx.strokeStyle = active ? ha(col, 0.55) : ha(col, 0.18);
-      ctx.lineWidth = active ? 1.5 : 1;
-      ctx.beginPath(); ctx.roundRect(x, y, pw, ph, 5); ctx.fill(); ctx.stroke();
-
-      // Left accent
-      ctx.fillStyle = ha(col, active ? 0.8 : 0.3);
-      ctx.fillRect(x, y, 4, ph);
-
-      // Characteristic illustration in upper area
-      const ix = x + 14, iy = y + 8, iw = pw - 28, ih = ph - 32;
-      const icx = ix + iw / 2, icy = iy + ih / 2;
-
+    function drawVis(n: number, vx: number, vy: number, vw: number, vh: number, col: string, pulse: number) {
       ctx.save();
-      ctx.beginPath(); ctx.rect(ix, iy, iw, ih);
-      ctx.clip();
+      ctx.beginPath(); ctx.rect(vx, vy, vw, vh); ctx.clip();
+      const cx = vx + vw/2, cy = vy + vh/2;
 
       if (n === 0) {
-        // Atomic: crystal lattice dots
-        const sp = 10;
-        ctx.fillStyle = ha(col, 0.55 + pulse * 0.35);
-        for (let dx = 0; dx < iw; dx += sp)
-          for (let dy = 0; dy < ih; dy += sp) {
-            ctx.beginPath(); ctx.arc(ix+dx+sp/2, iy+dy+sp/2, 2, 0, Math.PI*2); ctx.fill();
+        // Crystal lattice — animated breathing dots
+        const sp = 14;
+        for (let dx = 0; dx < vw; dx += sp)
+          for (let dy = 0; dy < vh; dy += sp) {
+            const beat = 0.5 + 0.5*Math.sin(t*0.04 + dx*0.2 + dy*0.15);
+            ctx.fillStyle = ha(col, 0.35 + beat*0.45);
+            ctx.beginPath(); ctx.arc(vx+dx+sp/2, vy+dy+sp/2, 2.5+beat*1.2, 0, Math.PI*2); ctx.fill();
           }
-      } else if (n === 1) {
-        // Nanostructure: moth-eye pillars
-        const sp = 8;
-        for (let dx = 0; dx < iw; dx += sp) {
-          const ph2 = ih * (0.4 + 0.3 * Math.sin(t*0.05 + dx * 0.3));
-          ctx.fillStyle = ha(col, 0.35 + pulse * 0.3);
-          ctx.fillRect(ix + dx + 1, iy + ih - ph2, sp - 2, ph2);
-          ctx.fillStyle = ha(col, 0.7);
-          ctx.beginPath(); ctx.ellipse(ix+dx+sp/2, iy+ih-ph2, sp*0.4, 2.5, 0, 0, Math.PI*2); ctx.fill();
-        }
-      } else if (n === 2) {
-        // Metasurface: resonator grid
-        const sp = 11;
-        for (let dx = 0; dx < iw; dx += sp)
-          for (let dy = 0; dy < ih; dy += sp) {
-            ctx.strokeStyle = ha(col, 0.4 + pulse * 0.3); ctx.lineWidth = 0.8;
-            ctx.strokeRect(ix+dx+1.5, iy+dy+1.5, sp-3, sp-3);
-            ctx.strokeStyle = ha(col, 0.6);
-            ctx.beginPath(); ctx.moveTo(ix+dx+sp/2,iy+dy+2.5); ctx.lineTo(ix+dx+sp/2,iy+dy+sp-2.5); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(ix+dx+2.5,iy+dy+sp/2); ctx.lineTo(ix+dx+sp-2.5,iy+dy+sp/2); ctx.stroke();
+        // Bond lines
+        ctx.strokeStyle = ha(col, 0.12); ctx.lineWidth = 0.5;
+        for (let dx = sp; dx < vw; dx += sp)
+          for (let dy = 0; dy < vh; dy += sp) {
+            ctx.beginPath(); ctx.moveTo(vx+dx-sp+sp/2, vy+dy+sp/2); ctx.lineTo(vx+dx+sp/2, vy+dy+sp/2); ctx.stroke();
+            if (dy > 0) { ctx.beginPath(); ctx.moveTo(vx+dx+sp/2, vy+dy-sp+sp/2); ctx.lineTo(vx+dx+sp/2, vy+dy+sp/2); ctx.stroke(); }
           }
-      } else if (n === 3) {
-        // Ommatidium: concentric lens rings
-        ctx.strokeStyle = ha(col, 0.6 + pulse * 0.3); ctx.lineWidth = 1.2;
-        for (let r = 4; r < ih * 0.6; r += 5) {
-          ctx.beginPath(); ctx.arc(icx, icy, r, 0, Math.PI*2); ctx.stroke();
+      }
+      else if (n === 1) {
+        // Moth-eye pillars — vertical bars with rounded caps
+        const nPil = Math.floor(vw / 10);
+        for (let i = 0; i < nPil; i++) {
+          const px = vx + i*(vw/nPil) + (vw/nPil)*0.5;
+          const ph = vh*(0.35 + 0.35*Math.sin(t*0.05 + i*0.4));
+          const alpha = 0.3 + pulse*0.4;
+          ctx.fillStyle = ha(col, alpha);
+          ctx.fillRect(px-3, vy+vh-ph, 6, ph);
+          ctx.shadowColor = col; ctx.shadowBlur = 6*pulse;
+          ctx.fillStyle = ha(col, 0.75);
+          ctx.beginPath(); ctx.ellipse(px, vy+vh-ph, 3.5, 2.5, 0, 0, Math.PI*2); ctx.fill();
+          ctx.shadowBlur = 0;
         }
-        ctx.fillStyle = ha(col, 0.7); ctx.beginPath(); ctx.arc(icx, icy, 3, 0, Math.PI*2); ctx.fill();
-      } else if (n === 4) {
-        // Waveguide: parallel channels
-        const nch = 6;
-        for (let i = 0; i < nch; i++) {
-          const cy2 = iy + (ih/(nch+1))*(i+1);
-          const light = 0.4 + 0.5 * Math.sin(t*0.06 + i*0.8);
-          ctx.fillStyle = ha(col, light);
-          ctx.fillRect(ix, cy2-2, iw, 4);
-          // Light pulse dot
-          const px = ix + ((t*2 + i*30) % iw);
-          ctx.fillStyle = ha(col, 0.9); ctx.shadowColor = col; ctx.shadowBlur = 6;
-          ctx.beginPath(); ctx.arc(px, cy2, 2.5, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
+        // Incident light rays
+        for (let i = 0; i < nPil; i+=2) {
+          const px = vx + i*(vw/nPil) + (vw/nPil)*0.5;
+          ctx.strokeStyle = ha(col, 0.20); ctx.lineWidth = 1;
+          ctx.setLineDash([3,4]);
+          ctx.beginPath(); ctx.moveTo(px, vy+2); ctx.lineTo(px, vy+vh*0.25); ctx.stroke();
+          ctx.setLineDash([]);
         }
-      } else if (n === 5) {
-        // Artificial ommatidium: hex cell
-        const hR = Math.min(iw, ih) * 0.38;
-        for (let i = 0; i < 6; i++) {
-          const ang = (Math.PI/3)*i;
-          const hx = icx + hR * Math.cos(ang), hy = icy + hR * Math.sin(ang);
-          ctx.strokeStyle = ha(col, 0.4 + pulse*0.3); ctx.lineWidth=0.9;
-          ctx.beginPath(); ctx.moveTo(icx,icy); ctx.lineTo(hx,hy); ctx.stroke();
-          ctx.fillStyle = ha(col, 0.55); ctx.beginPath(); ctx.arc(hx,hy,4,0,Math.PI*2); ctx.fill();
+      }
+      else if (n === 2) {
+        // Metasurface — resonator cross grid
+        const sp = 13;
+        for (let dx = 0; dx < vw; dx += sp)
+          for (let dy = 0; dy < vh; dy += sp) {
+            const px = vx+dx+sp/2, py = vy+dy+sp/2;
+            const a = 0.3+pulse*0.35;
+            ctx.strokeStyle = ha(col, a); ctx.lineWidth = 0.8;
+            ctx.strokeRect(px-4, py-4, 8, 8);
+            ctx.strokeStyle = ha(col, a+0.2); ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(px-3,py); ctx.lineTo(px+3,py); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(px,py-3); ctx.lineTo(px,py+3); ctx.stroke();
+          }
+        // Phase wavefront indicator
+        ctx.strokeStyle = ha(col, 0.3+pulse*0.3); ctx.lineWidth = 1.5;
+        ctx.setLineDash([5,3]);
+        ctx.beginPath(); ctx.moveTo(vx, vy+vh*0.5); ctx.lineTo(vx+vw, vy+vh*0.5); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      else if (n === 3) {
+        // Ommatidium lens — concentric rings + pupil
+        for (let r = 4; r < vh*0.52; r += 6) {
+          ctx.strokeStyle = ha(col, 0.25+pulse*0.3*(1-r/(vh*0.55))); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
         }
-        ctx.strokeStyle = ha(col, 0.7); ctx.lineWidth = 1.5;
-        for (let r2 = 3; r2 <= hR*0.6; r2+=4) {
-          ctx.beginPath(); ctx.arc(icx,icy,r2,0,Math.PI*2); ctx.stroke();
+        ctx.shadowColor = col; ctx.shadowBlur = 12*pulse;
+        ctx.fillStyle = ha(col, 0.65+pulse*0.3);
+        ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+        // Focal point below
+        const fy = cy + 22;
+        ctx.strokeStyle = ha(col, 0.22); ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(cx-12,cy+10); ctx.lineTo(cx,fy); ctx.moveTo(cx+12,cy+10); ctx.lineTo(cx,fy); ctx.stroke();
+      }
+      else if (n === 4) {
+        // Waveguide — light pulses in parallel channels
+        const nCh = 5;
+        for (let i = 0; i < nCh; i++) {
+          const cy2 = vy + (vh/(nCh+1))*(i+1);
+          ctx.fillStyle = ha(col, 0.25+0.15*Math.sin(t*0.06+i*0.8));
+          ctx.fillRect(vx, cy2-3, vw, 6);
+          ctx.strokeStyle = ha(col, 0.4); ctx.lineWidth = 0.6; ctx.strokeRect(vx, cy2-3, vw, 6);
+          // Pulse dot
+          const ppx = vx + ((t*2.5 + i*40) % vw);
+          ctx.shadowColor = col; ctx.shadowBlur = 10;
+          ctx.fillStyle = ha(col, 0.9);
+          ctx.beginPath(); ctx.arc(ppx, cy2, 3, 0, Math.PI*2); ctx.fill();
+          ctx.shadowBlur = 0;
         }
-      } else if (n === 6) {
-        // Compound-eye cluster: hex array
-        const hR2 = 9, sep = 20;
-        const offsets: [number,number][] = [[0,0],[sep,0],[-sep,0],[sep/2,-sep*0.86],[-sep/2,-sep*0.86],[sep/2,sep*0.86],[-sep/2,sep*0.86]];
-        offsets.forEach(([ox,oy]) => {
-          const hx = icx+ox, hy = icy+oy;
-          ctx.strokeStyle = ha(col, 0.5 + pulse*0.3); ctx.lineWidth = 1;
+      }
+      else if (n === 5) {
+        // Artificial ommatidium — hex cell with rings
+        const hR = Math.min(vw, vh)*0.35;
+        ctx.strokeStyle = ha(col, 0.5+pulse*0.3); ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for(let i=0;i<6;i++){const a=(Math.PI/3)*i;const px=cx+hR*Math.cos(a),py=cy+hR*Math.sin(a);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
+        ctx.closePath(); ctx.stroke();
+        for (let r = 4; r < hR*0.7; r += 7) {
+          ctx.strokeStyle = ha(col, 0.3+pulse*0.25); ctx.lineWidth = 0.9;
+          ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+        }
+        ctx.shadowColor=col; ctx.shadowBlur=8*pulse;
+        ctx.fillStyle=ha(col, 0.7); ctx.beginPath(); ctx.arc(cx,cy,3.5,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+      }
+      else if (n === 6) {
+        // Compound-eye cluster — 7 hex cells
+        const offsets: [number,number][] = [[0,0],[22,0],[-22,0],[11,-19],[-11,-19],[11,19],[-11,19]];
+        offsets.forEach(([ox,oy])=>{
+          const hx2=cx+ox, hy2=cy+oy, hr=9;
+          ctx.strokeStyle=ha(col,0.45+pulse*0.3); ctx.lineWidth=1;
           ctx.beginPath();
-          for(let i=0;i<6;i++){const a=(Math.PI/3)*i;const nx=hx+hR2*Math.cos(a),ny=hy+hR2*Math.sin(a);if(i===0)ctx.moveTo(nx,ny);else ctx.lineTo(nx,ny);}
+          for(let i=0;i<6;i++){const a=(Math.PI/3)*i;const px=hx2+hr*Math.cos(a),py=hy2+hr*Math.sin(a);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}
           ctx.closePath(); ctx.stroke();
-          ctx.beginPath(); ctx.arc(hx,hy,2.5,0,Math.PI*2); ctx.fillStyle=ha(col,0.6); ctx.fill();
+          ctx.fillStyle=ha(col,0.3+pulse*0.2); ctx.fill();
+          ctx.fillStyle=ha(col,0.6); ctx.beginPath(); ctx.arc(hx2,hy2,2,0,Math.PI*2); ctx.fill();
         });
-      } else if (n === 7) {
-        // Full compound eye: curved hemisphere silhouette
-        ctx.strokeStyle = ha(col, 0.5 + pulse*0.25); ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(icx, icy+8, ih*0.5, -Math.PI, 0); ctx.stroke();
-        // hex facets on surface
-        for (let i = -3; i <= 3; i++) {
-          const ang = i * 0.25;
-          const sr = ih * 0.5;
-          const fx = icx + sr * Math.sin(ang), fy = icy + 8 - sr * Math.cos(ang);
-          ctx.fillStyle = ha(col, 0.35); ctx.beginPath(); ctx.arc(fx,fy,4,0,Math.PI*2); ctx.fill();
+      }
+      else if (n === 7) {
+        // Full compound eye — hemisphere
+        ctx.strokeStyle=ha(col,0.45+pulse*0.25); ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(cx, cy+8, vh*0.44, -Math.PI, 0); ctx.stroke();
+        // Facets on surface
+        for (let i=-4;i<=4;i++){
+          const ang=i*0.22;
+          const sr=vh*0.44;
+          const fx=cx+sr*Math.sin(ang), fy=cy+8-sr*Math.cos(ang);
+          ctx.fillStyle=ha(col,0.4+pulse*0.25);
+          ctx.beginPath(); ctx.arc(fx,fy,4.5,0,Math.PI*2); ctx.fill();
         }
-      } else if (n === 8) {
-        // Laser aperture array: multiple rings
-        const rs = [6, 14, 22, 30];
-        rs.forEach(r2 => {
-          ctx.strokeStyle = ha(col, 0.4 + pulse*0.4); ctx.lineWidth = r2 < 15 ? 2.5 : 1.5;
-          ctx.beginPath(); ctx.arc(icx, icy, r2, 0, Math.PI*2); ctx.stroke();
-          // rotating phasors
-          const pa = t * 0.04 + r2 * 0.1;
-          ctx.fillStyle = ha(col, 0.7);
-          ctx.beginPath(); ctx.arc(icx+r2*Math.cos(pa), icy+r2*Math.sin(pa), 2.5, 0, Math.PI*2); ctx.fill();
+        // FOV arc
+        ctx.strokeStyle=ha(col,0.15); ctx.lineWidth=0.8;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.arc(cx,cy+8,vh*0.44+18,-Math.PI,0); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle=ha(col,0.3); ctx.font=`9px ${MN}`; ctx.textAlign="center";
+        ctx.fillText("180° FOV", cx, vy+vh-4);
+      }
+      else if (n === 8) {
+        // Laser aperture array — nested rings + phase markers
+        const rs = [8, 18, 28, 38];
+        rs.forEach((r,ri)=>{
+          ctx.strokeStyle=ha(col,0.35+pulse*0.3); ctx.lineWidth=ri===0?2.5:1.5;
+          ctx.shadowColor=col; ctx.shadowBlur=ri===0?10*pulse:4*pulse;
+          ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+          ctx.shadowBlur=0;
+          // rotating phasor
+          const pa=t*0.05+ri*0.7;
+          ctx.fillStyle=ha(col,0.8); ctx.beginPath(); ctx.arc(cx+r*Math.cos(pa),cy+r*Math.sin(pa),2.5,0,Math.PI*2); ctx.fill();
         });
-      } else if (n === 9) {
-        // Directed energy: platform + beam
-        ctx.fillStyle = ha(col, 0.25); ctx.fillRect(icx-iw*0.4, icy, iw*0.8, ih*0.35);
-        ctx.strokeStyle = ha(col, 0.5); ctx.lineWidth = 1;
-        ctx.strokeRect(icx-iw*0.4, icy, iw*0.8, ih*0.35);
+        // Coherent beam out
+        ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=16*pulse;
+        ctx.strokeStyle=ha(col,0.55+pulse*0.35); ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx,vy+2); ctx.stroke();
+        ctx.shadowBlur=0; ctx.restore();
+      }
+      else if (n === 9) {
+        // Directed energy — platform + beam
+        ctx.fillStyle=ha(col,0.18); ctx.strokeStyle=ha(col,0.45); ctx.lineWidth=1.2;
+        ctx.beginPath(); ctx.roundRect(cx-45,cy,90,20,3); ctx.fill(); ctx.stroke();
+        // Solar panels
+        ctx.fillStyle=ha(col,0.12); ctx.strokeStyle=ha(col,0.3); ctx.lineWidth=0.8;
+        ctx.fillRect(cx-80,cy+5,28,10); ctx.strokeRect(cx-80,cy+5,28,10);
+        ctx.fillRect(cx+52,cy+5,28,10); ctx.strokeRect(cx+52,cy+5,28,10);
         // Beam
-        ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 10;
-        ctx.strokeStyle = ha(col, 0.6 + pulse*0.35); ctx.lineWidth = 2 + pulse*1.5;
-        ctx.beginPath(); ctx.moveTo(icx, icy); ctx.lineTo(icx, iy); ctx.stroke();
-        ctx.shadowBlur = 0; ctx.restore();
-      } else if (n === 10) {
-        // Orbital array: small spacecraft cluster
-        const sats: [number,number][] = [[icx,icy],[icx-35,icy-15],[icx+35,icy-15],[icx-20,icy+25],[icx+20,icy+25]];
-        sats.forEach(([sx,sy], si) => {
-          ctx.fillStyle = ha(col, 0.35); ctx.fillRect(sx-7,sy-3,14,6);
-          ctx.fillStyle = ha(col, 0.5); ctx.fillRect(sx-3,sy-5,6,10);
-          if (si > 0) {
-            ctx.save(); ctx.strokeStyle = ha(col, 0.2 + pulse*0.15); ctx.lineWidth = 0.7;
-            ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(icx,icy); ctx.lineTo(sx,sy); ctx.stroke();
+        ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=14*pulse;
+        ctx.strokeStyle=ha(col,0.55+pulse*0.4); ctx.lineWidth=2.5+pulse*1.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx,vy+2); ctx.stroke();
+        ctx.shadowBlur=0; ctx.restore();
+        // Range text
+        ctx.fillStyle=ha(col,0.35); ctx.font=`9px ${MN}`; ctx.textAlign="center";
+        ctx.fillText("↑ beam", cx, vy+12);
+      }
+      else if (n === 10) {
+        // Orbital array — 5 satellites in formation
+        const sats: [number,number][] = [[cx,cy],[cx-38,cy-16],[cx+38,cy-16],[cx-22,cy+24],[cx+22,cy+24]];
+        const orbAng = t*0.007;
+        sats.forEach(([sx,sy],si)=>{
+          const ox = si>0 ? Math.cos(orbAng+si)*4 : 0;
+          const oy = si>0 ? Math.sin(orbAng+si)*4 : 0;
+          const nx=sx+ox, ny=sy+oy;
+          // Body
+          ctx.fillStyle=ha(col,0.3); ctx.fillRect(nx-7,ny-3,14,6);
+          // Panels
+          ctx.fillStyle=ha(col,0.18); ctx.fillRect(nx-14,ny-2,6,4); ctx.fillRect(nx+8,ny-2,6,4);
+          ctx.strokeStyle=ha(col,0.4); ctx.lineWidth=0.6;
+          ctx.strokeRect(nx-14,ny-2,6,4); ctx.strokeRect(nx+8,ny-2,6,4);
+          // Link
+          if(si>0){
+            ctx.save(); ctx.strokeStyle=ha(col,0.18+pulse*0.15); ctx.lineWidth=0.8;
+            ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(sats[0][0],sats[0][1]); ctx.lineTo(nx,ny); ctx.stroke();
             ctx.setLineDash([]); ctx.restore();
           }
         });
-      } else if (n === 11) {
-        // Interplanetary: planet + beam
-        const pr = ih * 0.38;
-        ctx.strokeStyle = ha(col, 0.4); ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(ix+pr+4, icy, pr, 0, Math.PI*2); ctx.stroke();
-        ctx.fillStyle = ha(col, 0.08); ctx.fill();
-        // rings
-        ctx.strokeStyle = ha(col, 0.25); ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.ellipse(ix+pr+4, icy, pr*1.5, pr*0.25, 0, 0, Math.PI*2); ctx.stroke();
-        // beam to right
-        ctx.save(); ctx.shadowColor = col; ctx.shadowBlur = 12;
-        ctx.strokeStyle = ha(col, 0.55 + pulse*0.35); ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(ix+pr*2+8, icy); ctx.lineTo(ix+iw, icy); ctx.stroke();
-        ctx.shadowBlur = 0; ctx.restore();
+      }
+      else if (n === 11) {
+        // Interplanetary — planet with rings + beam
+        const pr = vh*0.36;
+        ctx.strokeStyle=ha(col,0.4); ctx.lineWidth=1.5;
+        const px2 = vx + pr + 12;
+        ctx.beginPath(); ctx.arc(px2,cy,pr,0,Math.PI*2); ctx.stroke();
+        ctx.fillStyle=ha(col,0.07); ctx.fill();
+        // Rings
+        ctx.strokeStyle=ha(col,0.22); ctx.lineWidth=0.9;
+        ctx.beginPath(); ctx.ellipse(px2,cy,pr*1.6,pr*0.22,0,0,Math.PI*2); ctx.stroke();
+        // Beam
+        ctx.save(); ctx.shadowColor=col; ctx.shadowBlur=18*pulse;
+        ctx.strokeStyle=ha(col,0.55+pulse*0.4); ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(px2+pr+4,cy); ctx.lineTo(vx+vw,cy); ctx.stroke();
+        ctx.shadowBlur=0; ctx.restore();
+        // Lightsail at right
+        ctx.strokeStyle=ha(col,0.55); ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(vx+vw-12,cy-12); ctx.lineTo(vx+vw-12,cy+12); ctx.stroke();
+        ctx.fillStyle=ha(col,0.35); ctx.font=`9px ${MN}`; ctx.textAlign="center";
+        ctx.fillText("~0.2c", vx+vw-6, cy-16);
       }
 
       ctx.restore();
-
-      // Level label + size
-      ctx.fillStyle = active ? col : ha(col, 0.65);
-      ctx.font = `${active ? "bold " : ""}11px ${MN}`; ctx.textAlign = "left";
-      ctx.fillText(sc.level, x+8, y+ph-17);
-      ctx.fillStyle = ha(col, 0.45); ctx.font = `10px ${MN}`;
-      ctx.fillText(sc.size, x+8, y+ph-5);
-
-      // Log position indicator (small dot in bottom-right)
-      ctx.fillStyle = ha(col, 0.55 + (active ? pulse*0.4 : 0));
-      ctx.font = `9px ${MN}`; ctx.textAlign = "right";
-      ctx.fillText(`L${n+1}`, x+pw-6, y+ph-5);
-    }
-
-    function drawScaleRuler() {
-      // Log scale ruler at the very bottom
-      const ry = H - 38, rh = 10;
-      const rw = W - 24;
-      const rx = 12;
-
-      // Background
-      ctx.fillStyle = "rgba(0,0,0,0.4)";
-      ctx.fillRect(rx-2, ry-14, rw+4, 52);
-      ctx.strokeStyle = ha("#1fd4c8", 0.12);
-      ctx.lineWidth = 1;
-      ctx.strokeRect(rx-2, ry-14, rw+4, 52);
-
-      // Gradient ruler bar
-      const grad = ctx.createLinearGradient(rx, 0, rx+rw, 0);
-      SCALES.forEach((sc, i) => {
-        const frac = (SCALE_LOG[i] - LOG_MIN) / (LOG_MAX - LOG_MIN);
-        grad.addColorStop(Math.max(0, Math.min(1, frac)), ha(sc.col, 0.7));
-      });
-      ctx.fillStyle = grad;
-      ctx.fillRect(rx, ry, rw, rh);
-      ctx.strokeStyle = ha("#1fd4c8", 0.15); ctx.lineWidth = 1;
-      ctx.strokeRect(rx, ry, rw, rh);
-
-      // Decade ticks
-      for (let dec = LOG_MIN; dec <= LOG_MAX; dec += 2) {
-        const fx = rx + (dec - LOG_MIN) / (LOG_MAX - LOG_MIN) * rw;
-        ctx.strokeStyle = ha("#60a5fa", 0.3); ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(fx, ry); ctx.lineTo(fx, ry+rh); ctx.stroke();
-        ctx.fillStyle = ha("#b0c8e8", 0.45); ctx.font = `9px ${MN}`; ctx.textAlign = "center";
-        const labmap: {[k:number]:string} = {"-10":"0.1nm","-8":"10nm","-6":"1μm","-4":"100μm","-2":"1cm","0":"1m","2":"100m","4":"10km","6":"1Mm","8":"100Mm","10":"10Gm"};
-        if (labmap[dec]) ctx.fillText(labmap[dec], fx, ry+rh+12);
-      }
-
-      // Scale markers on ruler
-      const activeLevel = Math.floor(t / 120) % 12;
-      SCALES.forEach((sc, i) => {
-        const fx = rx + (SCALE_LOG[i] - LOG_MIN) / (LOG_MAX - LOG_MIN) * rw;
-        const act = i === activeLevel;
-        ctx.fillStyle = act ? sc.col : ha(sc.col, 0.5);
-        if (act) { ctx.shadowColor = sc.col; ctx.shadowBlur = 10; }
-        ctx.beginPath(); ctx.arc(fx, ry + rh * 0.5, act ? 5 : 3, 0, Math.PI*2); ctx.fill();
-        ctx.shadowBlur = 0;
-      });
-
-      // Ruler label
-      ctx.fillStyle = ha("#1fd4c8", 0.35); ctx.font = `9px ${MN}`; ctx.textAlign = "right";
-      ctx.fillText("← sub-atomic", rx + rw * 0.15, ry - 4);
-      ctx.textAlign = "left";
-      ctx.fillText("interplanetary →", rx + rw * 0.82, ry - 4);
-      ctx.textAlign = "center";
-      ctx.fillStyle = ha("#1fd4c8", 0.45); ctx.font = `bold 9px ${MN}`;
-      ctx.fillText("LOGARITHMIC SCALE  ·  0.2 nm → 10,000 km  ·  21 decades", rx + rw/2, ry - 4);
     }
 
     function frame() {
       t++;
-      ctx.fillStyle = "#010309";
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle="#01030a"; ctx.fillRect(0,0,W,H);
 
-      const activeLevel = Math.floor(t / 120) % 12;
+      const activeLevel = Math.floor(t/160) % 12;
 
-      // Draw 4×3 grid of panels
-      SCALES.forEach((_, n) => {
-        const col2 = n % COLS;
-        const row2 = Math.floor(n / COLS);
-        const x = PAD_X + col2 * (PANEL_W + PAD_X);
-        const y = PAD_Y + row2 * (PANEL_H + 8);
-        drawLevel(n, x, y, PANEL_W, PANEL_H, n === activeLevel);
+      SCALE_DATA.forEach((d, n) => {
+        const y = n * STRIP;
+        const col = d.col;
+        const active = n === activeLevel;
+        const pulse = 0.5 + 0.5*Math.sin(t*0.035 + n*0.65);
+
+        // Strip background
+        ctx.fillStyle = ha(col, active ? 0.09 : 0.03);
+        ctx.fillRect(0, y, W, STRIP-1);
+
+        // Separator
+        ctx.fillStyle = ha(col, 0.06);
+        ctx.fillRect(0, y+STRIP-1, W, 1);
+
+        // Left accent bar
+        ctx.fillStyle = ha(col, active ? 0.9+pulse*0.1 : 0.35);
+        if (active) { ctx.shadowColor=col; ctx.shadowBlur=8; }
+        ctx.fillRect(0, y, 5, STRIP-1);
+        ctx.shadowBlur=0;
+
+        // Level number badge
+        ctx.fillStyle = ha(col, active ? 0.8 : 0.35);
+        ctx.font = `bold 18px ${OR}`;
+        ctx.textAlign = "left";
+        ctx.fillText(`L${d.n.toString().padStart(2,"0")}`, 12, y+24);
+
+        // Level name
+        ctx.fillStyle = active ? col : ha(col, 0.65);
+        ctx.font = `bold 14px ${OR}`;
+        ctx.fillText(d.level, 12, y+42);
+
+        // Size badge
+        ctx.fillStyle = ha(col, active ? 0.65 : 0.4);
+        ctx.font = `10px ${MN}`;
+        ctx.fillText(d.size, 12, y+56);
+
+        // Feature label
+        ctx.fillStyle = ha(col, 0.45);
+        ctx.font = `10px ${MN}`;
+        ctx.fillText(`↳ ${d.feature}`, 12, y+70);
+
+        // Descriptions (starting after level label column)
+        const TXT_X = 200;
+        ctx.fillStyle = "rgba(190,210,235,0.70)";
+        ctx.font = `11px ${MN}`;
+        ctx.fillText(d.desc1, TXT_X, y+18);
+        ctx.fillStyle = "rgba(190,210,235,0.55)";
+        ctx.fillText(d.desc2, TXT_X, y+33);
+
+        // Equation
+        ctx.fillStyle = ha(col, 0.60);
+        ctx.font = `11px ${MN}`;
+        ctx.fillText(d.eq, TXT_X, y+52);
+
+        // Reference
+        ctx.fillStyle = "rgba(120,150,185,0.38)";
+        ctx.font = `10px ${MN}`;
+        ctx.fillText(d.ref, TXT_X, y+68);
+
+        // Viz separator line
+        ctx.strokeStyle = ha(col, 0.10); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(VX-1, y+4); ctx.lineTo(VX-1, y+STRIP-5); ctx.stroke();
+
+        // Visualization
+        drawVis(n, VX+4, y+4, VW-8, STRIP-10, col, pulse);
+
+        // Active glow border
+        if (active) {
+          ctx.strokeStyle = ha(col, 0.35);
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(0, y, W, STRIP-1);
+        }
       });
 
-      drawScaleRuler();
+      // Log-scale ruler at very bottom
+      const ry = H - 36, rh = 10, rx = 12, rw = W - 24;
+      ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fillRect(rx-4, ry-20, rw+8, 56);
+      ctx.strokeStyle = ha("#1fd4c8", 0.10); ctx.lineWidth=1; ctx.strokeRect(rx-4,ry-20,rw+8,56);
 
-      // Current level callout
-      const sc = SCALES[activeLevel];
-      ctx.fillStyle = ha(sc.col, 0.8); ctx.font = `bold 12px ${MN}`; ctx.textAlign = "center";
-      ctx.fillText(`↑ active level: L${activeLevel+1} · ${sc.level} · ${sc.size}`, W/2, H - 56);
+      const grad = ctx.createLinearGradient(rx,0,rx+rw,0);
+      const logVals = [-9.7,-7.5,-6.3,-5,-5.3,-4.7,-3,-1.5,-0.5,1,3,5];
+      const LOG_MIN=-10, LOG_MAX=5;
+      SCALE_DATA.forEach((d,i)=>{
+        const frac = (logVals[i]-LOG_MIN)/(LOG_MAX-LOG_MIN);
+        grad.addColorStop(Math.max(0,Math.min(1,frac)), ha(d.col, 0.65));
+      });
+      ctx.fillStyle = grad; ctx.fillRect(rx, ry, rw, rh);
+      ctx.strokeStyle = ha("#1fd4c8", 0.15); ctx.lineWidth=1; ctx.strokeRect(rx,ry,rw,rh);
+
+      const decLabs: {[k:number]:string} = {"-10":"0.1nm","-8":"10nm","-6":"1μm","-4":"100μm","-2":"1cm","0":"1m","2":"100m","4":"10km"};
+      for (let dec=LOG_MIN; dec<=LOG_MAX; dec+=2) {
+        const fx = rx+(dec-LOG_MIN)/(LOG_MAX-LOG_MIN)*rw;
+        ctx.strokeStyle=ha("#60a5fa",0.25); ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(fx,ry); ctx.lineTo(fx,ry+rh); ctx.stroke();
+        if (decLabs[dec]) { ctx.fillStyle=ha("#b0c8e8",0.40); ctx.font=`9px ${MN}`; ctx.textAlign="center"; ctx.fillText(decLabs[dec],fx,ry+rh+12); }
+      }
+
+      // Scale markers
+      SCALE_DATA.forEach((d,i)=>{
+        const fx = rx+(logVals[i]-LOG_MIN)/(LOG_MAX-LOG_MIN)*rw;
+        const act = i===activeLevel;
+        ctx.shadowColor=d.col; ctx.shadowBlur=act?12:0;
+        ctx.fillStyle=ha(d.col,act?0.95:0.5);
+        ctx.beginPath(); ctx.arc(fx,ry+rh*0.5,act?6:3.5,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+      });
+
+      ctx.fillStyle=ha("#1fd4c8",0.40); ctx.font=`bold 9px ${MN}`; ctx.textAlign="center";
+      ctx.fillText("LOGARITHMIC SCALE  ·  ~0.2 nm → 1,000 km  ·  21 decades", rx+rw/2, ry-8);
+      ctx.fillStyle=ha(SCALE_DATA[activeLevel].col,0.65); ctx.font=`9px ${MN}`;
+      ctx.fillText(`⬤ active: L${activeLevel+1} · ${SCALE_DATA[activeLevel].level}  ${SCALE_DATA[activeLevel].size}`, rx+rw/2, ry+rh+24);
 
       raf.current = requestAnimationFrame(frame);
     }
-
     frame();
-    return () => cancelAnimationFrame(raf.current);
+    return ()=>cancelAnimationFrame(raf.current);
   }, []);
 
   return (
-    <canvas ref={ref} width={1100} height={460}
-      style={{ width: "100%", height: "auto", display: "block", borderRadius: 6 }} />
+    <canvas ref={ref} width={1100} height={STRIP*12+52}
+      style={{width:"100%",height:"auto",display:"block",borderRadius:6}} />
   );
 }
 
-/* ══════════════════════════════════════════════════
-   MAIN PAGE
-══════════════════════════════════════════════════ */
+/* ══════════════ PAGE ══════════════ */
 export default function OpticalHullSimPage() {
   const [hullMode, setHullMode] = useState<HullMode>("NOMINAL");
   const modeRef = useRef<HullMode>("NOMINAL");
-
   const setMode = (m: HullMode) => { setHullMode(m); modeRef.current = m; };
 
-  const panel = (col = "#1fd4c8"): React.CSSProperties => ({
-    background: ha(col, 0.04), border: `1px solid ${ha(col, 0.18)}`,
-    borderRadius: 6, padding: 0, overflow: "hidden",
-  });
-  const body: React.CSSProperties = { fontSize: 11.5, color: "rgba(200,210,228,0.7)", lineHeight: 1.7 };
+  const curHM = HULL_MODES.find(m=>m.key===hullMode)!;
+
+  const body: React.CSSProperties = { fontSize:11.5, color:"rgba(200,210,228,0.7)", lineHeight:1.7 };
   const secLbl: React.CSSProperties = {
-    fontFamily: MN, fontSize: 8, letterSpacing: "0.22em", color: DIM,
-    textTransform: "uppercase", marginBottom: 8, paddingBottom: 4,
-    borderBottom: "1px solid rgba(31,212,200,0.08)",
+    fontFamily:MN, fontSize:8, letterSpacing:"0.22em", color:DIM,
+    textTransform:"uppercase", marginBottom:8, paddingBottom:4,
+    borderBottom:"1px solid rgba(31,212,200,0.08)",
   };
 
-  const curHM = HULL_MODES.find(m => m.key === hullMode)!;
-
   return (
-    <div style={{ minHeight: "100%", background: BG, color: "#d4e4f4",
-      fontFamily: "'Rajdhani',sans-serif", overflowY: "auto" }}>
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "16px 20px" }}>
+    <div style={{minHeight:"100%",background:BG,color:"#d4e4f4",fontFamily:"'Rajdhani',sans-serif",overflowY:"auto"}}>
+      <div style={{maxWidth:1160,margin:"0 auto",padding:"16px 20px"}}>
 
-        {/* ── Title ── */}
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ display: "inline-block", border: "1px solid #1fd4c855",
-            padding: "3px 10px", fontSize: 9, letterSpacing: "0.2em",
-            fontFamily: MN, color: "#1fd4c8", marginBottom: 8, borderRadius: 2 }}>
+        {/* Title */}
+        <div style={{marginBottom:14}}>
+          <div style={{display:"inline-block",border:"1px solid #1fd4c855",
+            padding:"3px 10px",fontSize:9,letterSpacing:"0.2em",
+            fontFamily:MN,color:"#1fd4c8",marginBottom:8,borderRadius:2}}>
             AETHER · OPTICAL HULL · FULL SYSTEM SIMULATION
           </div>
-          <h1 style={{ fontFamily: OR, fontSize: 24, color: "#fff",
-            margin: "0 0 6px", letterSpacing: 2, textShadow: "0 0 24px #1fd4c855" }}>
+          <h1 style={{fontFamily:OR,fontSize:24,color:"#fff",
+            margin:"0 0 6px",letterSpacing:2,textShadow:"0 0 24px #1fd4c855"}}>
             Plate-Switching Optical Hull · Full System
           </h1>
-          <p style={{ ...body, margin: "0 0 10px", maxWidth: 900 }}>
-            A live hex-tile spacecraft hull where each plate independently switches between
-            six optical modes under <strong style={{ color: "#1fd4c8" }}>AI controller</strong> command.
-            Below: a 12-level <strong style={{ color: "#a78bfa" }}>scale hierarchy</strong> — from silicon
-            lattice (0.2 nm) through moth-eye nanostructures, metasurfaces, compound-eye optics,
-            directed-energy platforms, and orbital laser arrays — spanning 21 decades of scale.
+          <p style={{...body,margin:"0 0 10px",maxWidth:900}}>
+            Live hex-tile spacecraft hull with six switchable plate modes under{" "}
+            <strong style={{color:"#1fd4c8"}}>AI controller</strong> command, followed by the complete{" "}
+            <strong style={{color:"#a78bfa"}}>Scale Hierarchy</strong> — all 12 levels from atomic
+            lattice spacing (0.2 nm) through moth-eye nanostructures, Huygens metasurfaces, compound-eye
+            optics, directed-energy platforms, and orbital laser arrays to the interplanetary beamer (10–1000 km) —
+            each with governing equation, description, and scientific reference.
           </p>
 
-          {/* ── Hull mode selector ── */}
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {HULL_MODES.map(hm => (
-              <button key={hm.key} onClick={() => setMode(hm.key)}
+          {/* Mode buttons */}
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:4}}>
+            {HULL_MODES.map(hm=>(
+              <button key={hm.key} onClick={()=>setMode(hm.key)}
                 style={{
-                  fontFamily: MN, fontSize: 11, letterSpacing: "0.15em",
-                  padding: "5px 14px", borderRadius: 3, cursor: "pointer",
-                  border: `1px solid ${hm.key === hullMode ? ha(hm.col, 0.8) : ha(hm.col, 0.25)}`,
-                  background: hm.key === hullMode ? ha(hm.col, 0.14) : ha(hm.col, 0.04),
-                  color: hm.key === hullMode ? hm.col : ha(hm.col, 0.55),
-                  boxShadow: hm.key === hullMode ? `0 0 18px ${ha(hm.col, 0.3)}` : "none",
+                  fontFamily:MN,fontSize:11,letterSpacing:"0.15em",
+                  padding:"5px 14px",borderRadius:3,cursor:"pointer",
+                  border:`1px solid ${hm.key===hullMode?ha(hm.col,0.8):ha(hm.col,0.25)}`,
+                  background:hm.key===hullMode?ha(hm.col,0.14):ha(hm.col,0.04),
+                  color:hm.key===hullMode?hm.col:ha(hm.col,0.55),
+                  boxShadow:hm.key===hullMode?`0 0 18px ${ha(hm.col,0.3)}`:"none",
                 }}>
                 {hm.key}
               </button>
             ))}
-            <div style={{ fontFamily: MN, fontSize: 10, color: ha(curHM.col, 0.5),
-              display: "flex", alignItems: "center", marginLeft: 8 }}>
-              ● {curHM.key} mode active
-            </div>
+            <span style={{fontFamily:MN,fontSize:10,color:ha(curHM.col,0.5),display:"flex",alignItems:"center",marginLeft:8}}>
+              ● {curHM.key} active
+            </span>
           </div>
         </div>
 
-        {/* ── Hull Canvas ── */}
-        <div style={{ ...panel(curHM.col), marginBottom: 12 }}>
-          <div style={{ padding: "6px 14px", borderBottom: `1px solid ${ha(curHM.col, 0.12)}`,
-            display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {/* Hull canvas */}
+        <div style={{background:ha(curHM.col,0.04),border:`1px solid ${ha(curHM.col,0.18)}`,borderRadius:6,overflow:"hidden",marginBottom:10}}>
+          <div style={{padding:"6px 14px",borderBottom:`1px solid ${ha(curHM.col,0.12)}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <div>
-              <span style={{ fontFamily: OR, fontSize: 10, color: curHM.col, letterSpacing: 1 }}>
-                OPTICAL HULL · PLATE ARRAY
-              </span>
-              <span style={{ fontFamily: MN, fontSize: 9, color: DIM, marginLeft: 12 }}>
-                Live hex-tile simulation · AI controller · {MODES.length} plate modes
+              <span style={{fontFamily:OR,fontSize:10,color:curHM.col,letterSpacing:1}}>OPTICAL HULL · PLATE ARRAY</span>
+              <span style={{fontFamily:MN,fontSize:9,color:DIM,marginLeft:12}}>
+                Live hex-tile simulation · AI controller · {MODES.length} plate modes · click mode to switch
               </span>
             </div>
-            <div style={{ display: "flex", gap: 14 }}>
-              {MODES.map((m, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.col }} />
-                  <span style={{ fontFamily: MN, fontSize: 9, color: ha(m.col, 0.6) }}>{m.short}</span>
+            <div style={{display:"flex",gap:14}}>
+              {MODES.map((m,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:5}}>
+                  <div style={{width:8,height:8,borderRadius:"50%",background:m.col}}/>
+                  <span style={{fontFamily:MN,fontSize:9,color:ha(m.col,0.6)}}>{m.short}</span>
                 </div>
               ))}
             </div>
           </div>
-          <HullCanvas modeRef={modeRef} />
+          <HullCanvas modeRef={modeRef}/>
         </div>
 
-        {/* ── Plate layer stack ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6, marginBottom: 12 }}>
+        {/* Plate layer strip */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:6,marginBottom:14}}>
           {[
-            { n:1, name:"Moth-Eye",    col:"#60a5fa", role:"Anti-reflection" },
-            { n:2, name:"Metasurface", col:"#a78bfa", role:"Phase shaping" },
-            { n:3, name:"Chromogenic", col:"#10b981", role:"Mode switching" },
-            { n:4, name:"Photodetect",  col:"#fbbf24", role:"State sensing" },
-            { n:5, name:"Actuation",   col:"#f97316", role:"6-axis motion" },
-            { n:6, name:"Thermal Mgmt",col:"#ef4444", role:"Heat spread" },
-            { n:7, name:"Structural",  col:"#64748b", role:"SiC / CarbonFibre" },
-          ].map(({ n, name, col, role }) => (
-            <div key={n} style={{
-              background: ha(col, 0.06), border: `1px solid ${ha(col, 0.22)}`,
-              borderRadius: 4, padding: "7px 8px",
-            }}>
-              <div style={{ fontFamily: MN, fontSize: 9, color: ha(col, 0.5), marginBottom: 3 }}>L{n}</div>
-              <div style={{ fontFamily: OR, fontSize: 9, color: col, letterSpacing: 0.5, marginBottom: 3 }}>{name}</div>
-              <div style={{ fontFamily: MN, fontSize: 9, color: "rgba(180,200,230,0.5)" }}>{role}</div>
+            {n:1,name:"Moth-Eye",    col:"#60a5fa",role:"Anti-reflection",    detail:"100–300 nm pillars, GRIN n: 1→3.5"},
+            {n:2,name:"Metasurface", col:"#a78bfa",role:"Wavefront phase",    detail:"Sub-λ Huygens resonators, 0–2π"},
+            {n:3,name:"Chromogenic", col:"#10b981",role:"Mode switching",     detail:"Liquid-crystal / electrochromic"},
+            {n:4,name:"Photodetect", col:"#fbbf24",role:"State sensing",      detail:"Phase · amplitude · polarisation"},
+            {n:5,name:"Actuation",   col:"#f97316",role:"6-axis motion",      detail:"Piezo / MEMS, ms response"},
+            {n:6,name:"Thermal Mgmt",col:"#ef4444",role:"Heat spread",        detail:"Graphene + microfluidic cooling"},
+            {n:7,name:"Structural",  col:"#64748b",role:"Strength / debris",  detail:"Carbon-fibre / SiC matrix"},
+          ].map(({n,name,col,role,detail})=>(
+            <div key={n} style={{background:ha(col,0.06),border:`1px solid ${ha(col,0.22)}`,borderRadius:4,padding:"7px 8px"}}>
+              <div style={{fontFamily:MN,fontSize:9,color:ha(col,0.45),marginBottom:2}}>L{n}</div>
+              <div style={{fontFamily:OR,fontSize:9,color:col,letterSpacing:0.5,marginBottom:2}}>{name}</div>
+              <div style={{fontFamily:MN,fontSize:9,color:"rgba(180,200,230,0.55)",marginBottom:2}}>{role}</div>
+              <div style={{fontFamily:MN,fontSize:8,color:ha(col,0.35)}}>{detail}</div>
             </div>
           ))}
         </div>
 
-        {/* ── Scale Hierarchy Canvas ── */}
-        <div style={{ ...panel("#a78bfa"), marginBottom: 12 }}>
-          <div style={{ padding: "6px 14px", borderBottom: "1px solid rgba(167,139,250,0.15)" }}>
-            <span style={{ fontFamily: OR, fontSize: 10, color: "#a78bfa", letterSpacing: 1 }}>
-              SCALE HIERARCHY · 12 LEVELS
-            </span>
-            <span style={{ fontFamily: MN, fontSize: 9, color: DIM, marginLeft: 12 }}>
-              0.2 nm → 10,000 km  ·  21 decades  ·  animated level focus
-            </span>
+        {/* Scale hierarchy header */}
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8}}>
+          <div style={{fontFamily:OR,fontSize:13,color:"#a78bfa",letterSpacing:2}}>
+            SCALE HIERARCHY
           </div>
-          <ScaleCanvas />
+          <div style={{fontFamily:MN,fontSize:9,color:DIM}}>
+            12 levels · Atomic → Interplanetary · ~0.2 nm to 10,000 km · 21 decades
+          </div>
+          <div style={{flex:1,height:1,background:"linear-gradient(to right,rgba(167,139,250,0.3),transparent)"}}/>
         </div>
 
-        {/* ── Adaptive modes + science ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+        {/* Scale canvas */}
+        <div style={{background:"rgba(167,139,250,0.03)",border:"1px solid rgba(167,139,250,0.14)",borderRadius:6,overflow:"hidden",marginBottom:14}}>
+          <ScaleHierarchyCanvas/>
+        </div>
+
+        {/* Adaptive modes */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:6}}>
           {[
-            { col:"#1fd4c8", title:"Adaptive Control Loop",
-              body:"Onboard processor reads plate state (photodetector layer) 1000×/sec. AI model computes optimal plate assignments based on: thermal load, beam geometry, threat signature, comms direction. Propagation delay <2 ms hull-wide." },
-            { col:"#f59e0b", title:"Phase-Conjugate Beam Steering",
-              body:"Gold plates use the optical phase-conjugation principle: incoming wavefront is time-reversed and re-emitted with corrected phase. Enables tracking of moving targets at closure rates >1000 m/s without mechanical gimbal movement." },
-            { col:"#a78bfa", title:"CaCO₃ Crystal Formation",
-              body:"Hull plates grow from rapid crystallisation of calcium carbonate under pulsed UV + thermal cycling. Geological processes (millions of years) compressed to hours via controlled supersaturation, nucleation seeds, and banded deposition." },
-          ].map(({ col, title, body: b }) => (
-            <div key={title} style={{
-              background: ha(col, 0.04), border: `1px solid ${ha(col, 0.18)}`,
-              borderRadius: 4, padding: "10px 12px",
-            }}>
+            {col:"#1fd4c8",title:"Adaptive Control Loop",
+             body:"Onboard processor reads plate state (photodetector layer) 1000×/sec. AI model computes optimal plate assignments based on thermal load, beam geometry, threat signature, and comms direction. Propagation delay <2 ms hull-wide."},
+            {col:"#f59e0b",title:"Phase-Conjugate Beam Steering",
+             body:"Gold (STEER) plates use the optical phase-conjugation principle: incoming wavefront is time-reversed and re-emitted with corrected phase. Tracks moving targets at closure rates >1000 m/s without mechanical gimbal."},
+            {col:"#a78bfa",title:"CaCO₃ Rapid Formation",
+             body:"Hull plates grow from rapid crystallisation of calcium carbonate under pulsed UV + thermal cycling. Geological processes (millions of years) compressed to hours via controlled supersaturation, nucleation seeds, and banded deposition."},
+          ].map(({col,title,body:b})=>(
+            <div key={title} style={{background:ha(col,0.04),border:`1px solid ${ha(col,0.18)}`,borderRadius:4,padding:"10px 12px"}}>
               <div style={secLbl}>{title}</div>
               <div style={body}>{b}</div>
             </div>
