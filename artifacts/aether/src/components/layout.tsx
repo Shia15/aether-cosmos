@@ -155,6 +155,7 @@ const NAV_ITEMS = [
   { href: "/osmotic-pressure", label: "Osmotic Pressure · Ion Gradients · Na⁺/K⁺ Pump · Sodium Storage · Protein Folding Depth · Membrane Enzymes · Fish Pressure Chemistry", icon: Atom },
   { href: "/non-terrestrial", label: "Non-Terrestrial Officers · Gary McKinnon · David Grusch · Project Stargate · Remote Viewing · Deep Water Submarine · UAP/USO Registry", icon: Atom },
   { href: "/propulsion-dynamics", label: "Propulsion Dynamics · Jet Engine Mass Flow · Raptor FFSC · Newton 3rd Law · Bio-Liquid ISRU · Mars Sabatier · Lunar Electrolysis · Jupiter Water Velocity", icon: Atom },
+  { href: "/polymer-biobreak", label: "Polymer to Monomer · Enzymatic Chain Scission · Plastic-Eating Microbes · PETase · Bio-Refinery · Fossil Fuel Drugs · P450 Pathway", icon: Atom },
   { href: "/experience",  label: "Experience",  icon: Sparkles },
   { href: "/dreamscape", label: "Dreamscape",  icon: Orbit },
   { href: "/simulation", label: "Simulation",  icon: Telescope },
