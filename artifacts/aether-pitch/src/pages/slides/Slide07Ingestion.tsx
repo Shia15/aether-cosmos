@@ -1,0 +1,79 @@
+export default function Slide07Ingestion() {
+  return (
+    <div style={{ width: "100vw", height: "100vh", overflow: "hidden", backgroundColor: "#1A1B26", fontFamily: "'Inter', sans-serif", display: "flex", color: "#C0CAF5", position: "relative" }}>
+      <div style={{ width: "22vw", height: "100vh", borderRight: "1px solid rgba(255,255,255,0.05)", padding: "4vh 2.5vw", display: "flex", flexDirection: "column", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.8vw", marginBottom: "5vh" }}>
+          <div style={{ width: "1.4vw", height: "1.4vw", backgroundColor: "#7AA2F7", borderRadius: "0.25vw" }} />
+          <div style={{ fontSize: "1.1vw", fontWeight: 700, color: "#FFFFFF", letterSpacing: "0.04em" }}>AETHER</div>
+        </div>
+        <div style={{ fontSize: "0.75vw", fontWeight: 600, color: "#565F89", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5vh" }}>Overview</div>
+        <div style={{ fontSize: "0.9vw", color: "#C0CAF5", opacity: 0.45, marginBottom: "3.5vh" }}>AETHER · Problem · Crystallization</div>
+        <div style={{ fontSize: "0.75vw", fontWeight: 600, color: "#565F89", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5vh" }}>Architecture</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.2vh", marginBottom: "3.5vh" }}>
+          <div style={{ fontSize: "0.9vw", color: "#C0CAF5", opacity: 0.45 }}>Knowledge Graph</div>
+          <div style={{ fontSize: "0.9vw", color: "#C0CAF5", opacity: 0.45 }}>M.A.R.I. Agents</div>
+          <div style={{ fontSize: "0.9vw", color: "#C0CAF5", opacity: 0.45 }}>Cognitive Functions</div>
+          <div style={{ fontSize: "0.9vw", color: "#7AA2F7", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.6vw" }}>
+            <span style={{ width: "3px", height: "1.1vw", backgroundColor: "#7AA2F7", borderRadius: "2px", marginLeft: "-2.5vw", flexShrink: 0 }} />
+            Document Ingestion
+          </div>
+        </div>
+        <div style={{ fontSize: "0.75vw", fontWeight: 600, color: "#565F89", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5vh" }}>Simulators</div>
+        <div style={{ fontSize: "0.75vw", fontWeight: 600, color: "#565F89", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5vh", marginTop: "2vh" }}>Products</div>
+        <div style={{ fontSize: "0.75vw", fontWeight: 600, color: "#565F89", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1.5vh", marginTop: "2vh" }}>Investment</div>
+        <div style={{ marginTop: "auto", fontSize: "0.75vw", color: "#565F89" }}>v1.0 · 2026</div>
+      </div>
+      <div style={{ flex: 1, padding: "6vh 4vw", display: "flex", flexDirection: "column" }}>
+        <div style={{ fontSize: "0.9vw", color: "#7AA2F7", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600, marginBottom: "2vh" }}>Architecture</div>
+        <h1 style={{ fontSize: "3.5vw", fontWeight: 700, color: "#FFFFFF", margin: "0 0 1.5vh 0", letterSpacing: "-0.02em" }}>AI-Powered Document Ingestion</h1>
+        <p style={{ fontSize: "1.2vw", color: "#9AA5CE", lineHeight: 1.6, maxWidth: "42vw", margin: "0 0 3.5vh 0" }}>
+          AETHER OS Batch Intake: any document enters the coherence pipeline. Claude extracts structure, titles, and conceptual nodes. Output: positioned knowledge — not a search index.
+        </p>
+        <div style={{ display: "flex", gap: "3vw" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "1vw", fontWeight: 600, color: "#FFFFFF", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "0.8vh", marginBottom: "2vh" }}>POST /aether/v1/ingest</div>
+            <div style={{ backgroundColor: "#16161E", borderRadius: "0.4vw", padding: "2vh 1.8vw", border: "1px solid rgba(255,255,255,0.05)", fontFamily: "'DM Mono', monospace", fontSize: "0.9vw", lineHeight: 1.75 }}>
+              <div style={{ color: "#C0CAF5" }}>{"{"}</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"file"</span>: <span style={{ color: "#9ECE6A" }}>"lecture_notes.pdf"</span>,</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"type"</span>: <span style={{ color: "#9ECE6A" }}>"pdf"</span>,</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"agent"</span>: <span style={{ color: "#9ECE6A" }}>"claude-sonnet"</span>,</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"mode"</span>: <span style={{ color: "#9ECE6A" }}>"batch_intake"</span></div>
+              <div style={{ color: "#C0CAF5" }}>{"}"}</div>
+            </div>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "0.8vh", marginBottom: "2vh" }}>
+              <div style={{ fontSize: "1vw", fontWeight: 600, color: "#FFFFFF" }}>Graph Output</div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.4vw" }}>
+                <div style={{ width: "0.5vw", height: "0.5vw", backgroundColor: "#9ECE6A", borderRadius: "50%" }} />
+                <div style={{ fontSize: "0.85vw", fontFamily: "'DM Mono', monospace", color: "#9ECE6A" }}>crystallised</div>
+              </div>
+            </div>
+            <div style={{ backgroundColor: "#16161E", borderRadius: "0.4vw", padding: "2vh 1.8vw", border: "1px solid rgba(255,255,255,0.05)", fontFamily: "'DM Mono', monospace", fontSize: "0.9vw", lineHeight: 1.75 }}>
+              <div style={{ color: "#C0CAF5" }}>{"{"}</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"nodes_added"</span>: <span style={{ color: "#FF9E64" }}>23</span>,</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"title"</span>: <span style={{ color: "#9ECE6A" }}>"Regulatory Depth · Epigenetics"</span>,</div>
+              <div style={{ paddingLeft: "1.5vw", backgroundColor: "rgba(158,206,106,0.1)", margin: "0.4vh -1.8vw", padding: "0.3vh 1.5vw" }}><span style={{ color: "#7AA2F7" }}>"coherence"</span>: <span style={{ color: "#FF9E64" }}>0.91</span>,</div>
+              <div style={{ paddingLeft: "1.5vw" }}><span style={{ color: "#7AA2F7" }}>"gaps"</span>: <span style={{ color: "#9ECE6A" }}>["histone_code"]</span></div>
+              <div style={{ color: "#C0CAF5" }}>{"}"}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{ marginTop: "3vh", display: "flex", gap: "1.5vw" }}>
+          <div style={{ flex: 1, backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "0.4vw", padding: "1.5vh 1.5vw" }}>
+            <div style={{ fontSize: "1vw", color: "#9ECE6A", fontWeight: 600, marginBottom: "0.4vh" }}>Input formats</div>
+            <div style={{ fontSize: "0.9vw", color: "#9AA5CE" }}>PDF · image · handwritten note · URL · plain text</div>
+          </div>
+          <div style={{ flex: 1, backgroundColor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "0.4vw", padding: "1.5vh 1.5vw" }}>
+            <div style={{ fontSize: "1vw", color: "#7AA2F7", fontWeight: 600, marginBottom: "0.4vh" }}>Powered by</div>
+            <div style={{ fontSize: "0.9vw", color: "#9AA5CE" }}>Anthropic Claude · Replit AI proxy · CLCS pipeline</div>
+          </div>
+        </div>
+        <div style={{ marginTop: "auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ fontSize: "0.9vw", color: "#565F89", fontWeight: 600 }}>07</div>
+          <div style={{ fontSize: "0.8vw", color: "#565F89" }}>AETHER Knowledge System, Inc.</div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/aether-pitch/"
+title = "AETHER Pitch Deck"
+version = "1.0.0"
+id = "artifacts/aether-pitch"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/aether-pitch/" ]
+localPort = 18776
+
+[services.development]
+run = "pnpm --filter @workspace/aether-pitch run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/aether-pitch", "run", "build" ]
+publicDir = "artifacts/aether-pitch/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18776"
+BASE_PATH = "/aether-pitch/"
