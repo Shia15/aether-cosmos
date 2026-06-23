@@ -14,6 +14,7 @@ const V = {
   rust:  "#C1440E",
   photon:"#00FFBB",
   shock: "#FFDD22",
+  fire:  "#FF6622",
   safe:  "#44CC77",
   dim:   "#2A3050",
   ink:   "#B8CCE8",
@@ -641,6 +642,644 @@ function MSDDControlCanvas() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
+   CANVAS 4 · Space Vacuum · Stellar Radiation · High-Energy Entropy States
+   ───────────────────────────────────────────────────────────────────────── */
+function SpaceVacuumRadiationCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(()=>{
+    const cv=ref.current; if(!cv) return;
+    const CH=460, PR=window.devicePixelRatio||1;
+    const CW=Math.max(cv.offsetWidth,520);
+    cv.width=CW*PR; cv.height=CH*PR; cv.style.height=CH+"px";
+    const ctx=cv.getContext("2d")!; ctx.scale(PR,PR);
+    let frame=0, raf=0;
+
+    /* Stellar classes: name, T(K), L(L☉), color, radius */
+    const STARS=[
+      {n:"O",T:40000,L:1e6,col:"#9BB8FF",r:7},{n:"B",T:20000,L:1e4,col:"#AACCFF",r:5.5},
+      {n:"A",T:9000, L:80,  col:"#EEF0FF",r:4},{n:"F",T:7000, L:5,   col:"#FFFAEE",r:3.2},
+      {n:"G",T:5778, L:1,   col:"#FFE880",r:2.8,sun:true},{n:"K",T:4500,L:0.2,col:"#FFAA55",r:2.3},
+      {n:"M",T:3000, L:0.01,col:"#FF6633",r:1.8},
+    ] as {n:string;T:number;L:number;col:string;r:number;sun?:boolean}[];
+
+    /* Radiation bands */
+    const BANDS=[
+      {label:"GAMMA / X-RAY",col:"#FF22AA",xMin:0,  xMax:0.07,lethal:true},
+      {label:"EUV",          col:"#CC44FF",xMin:0.07,xMax:0.13,lethal:true},
+      {label:"UV",           col:"#8844FF",xMin:0.13,xMax:0.22,lethal:false},
+      {label:"VISIBLE",      col:"#44CCFF",xMin:0.22,xMax:0.42,lethal:false},
+      {label:"INFRARED",     col:"#FF8833",xMin:0.42,xMax:0.65,lethal:false},
+      {label:"MICROWAVE/RADIO",col:"#44FF88",xMin:0.65,xMax:0.88,lethal:false},
+    ];
+
+    /* Cosmic ray particles */
+    const RAYS:Array<{x:number;y:number;vx:number;vy:number;energy:number;col:string;deflected:boolean;life:number}>=[];
+    for(let i=0;i<28;i++){
+      RAYS.push({x:Math.random()*CW*0.44,y:-20-Math.random()*200,vx:(Math.random()-0.5)*0.8,
+        vy:1.2+Math.random()*1.8,energy:Math.random(),
+        col:Math.random()<0.3?"#FF4477":Math.random()<0.5?"#9966FF":"#4488FF",
+        deflected:false,life:Math.random()*200});
+    }
+    /* Tardigrade hit flashes */
+    const HITS:Array<{x:number;y:number;age:number;max:number}>=[];
+    const tardX=CW*0.32, tardY=330;
+
+    const draw=()=>{
+      ctx.clearRect(0,0,CW,CH);
+      /* bg */
+      const bg=ctx.createRadialGradient(CW*0.22,CH*0.35,0,CW*0.22,CH*0.35,CW*0.55);
+      bg.addColorStop(0,"#070A18"); bg.addColorStop(1,"#04060E");
+      ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+
+      /* ── LEFT PANEL: H-R Diagram ── */
+      const HR_W=CW*0.44, HR_H=CH-80;
+      const HR_X=30, HR_Y=40;
+      ctx.strokeStyle="#2A3050"; ctx.lineWidth=0.5;
+      ctx.strokeRect(HR_X,HR_Y,HR_W-60,HR_H-40);
+      ctx.fillStyle="#3A4060"; ctx.font=`8px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("H-R DIAGRAM · TEMPERATURE vs LUMINOSITY",HR_X+(HR_W-60)/2,HR_Y-8);
+
+      /* Axes labels */
+      ctx.fillStyle="#5A7090"; ctx.font=`7px ${V.mono}`; ctx.textAlign="center";
+      const tLabels=["40K","20K","10K","5K","3K"];
+      tLabels.forEach((t,i)=>{
+        const px=HR_X+10+(HR_W-80)*i/(tLabels.length-1);
+        ctx.fillText(t,px,HR_Y+HR_H-28);
+      });
+      ctx.save(); ctx.translate(HR_X-4,HR_Y+HR_H/2-40); ctx.rotate(-Math.PI/2);
+      ctx.fillText("LUMINOSITY (L☉)",0,0); ctx.restore();
+
+      /* Stars on H-R */
+      STARS.forEach((s,i)=>{
+        const tx=(s.T-3000)/(40000-3000);
+        const px=HR_X+10+(HR_W-80)*(1-tx*0.85);
+        const ly=Math.log10(Math.max(s.L,0.001)+1)/(Math.log10(1e6+1));
+        const py=HR_Y+HR_H-44-(HR_H-70)*ly;
+        const pulse=0.85+0.15*Math.sin(frame*0.04+i*1.2);
+        const grd=ctx.createRadialGradient(px,py,0,px,py,s.r*3*pulse);
+        grd.addColorStop(0,s.col+"FF"); grd.addColorStop(0.4,s.col+"88"); grd.addColorStop(1,s.col+"00");
+        ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(px,py,s.r*3*pulse,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=s.col; ctx.beginPath(); ctx.arc(px,py,s.r*pulse,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=s.col; ctx.font=`7px ${V.mono}`; ctx.textAlign="left";
+        if(s.sun) ctx.fillStyle=V.gold;
+        ctx.fillText(s.n+(s.sun?" ☀":""),px+s.r+2,py+3);
+        /* radiation spike for hot stars */
+        if(s.T>8000){
+          const spk=(s.T-8000)/32000;
+          ctx.strokeStyle=s.col+"44"; ctx.lineWidth=spk*12;
+          ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(HR_X,py-20); ctx.stroke();
+        }
+      });
+      /* Main sequence band */
+      ctx.strokeStyle="#FFFFFF08"; ctx.lineWidth=18;
+      ctx.beginPath();
+      STARS.forEach((s,i)=>{
+        const tx=(s.T-3000)/(40000-3000);
+        const px=HR_X+10+(HR_W-80)*(1-tx*0.85);
+        const ly=Math.log10(Math.max(s.L,0.001)+1)/(Math.log10(1e6+1));
+        const py=HR_Y+HR_H-44-(HR_H-70)*ly;
+        if(i===0)ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }); ctx.stroke();
+      /* Solar label */
+      ctx.fillStyle=V.gold; ctx.font=`6.5px ${V.mono}`;
+      ctx.fillText("☀ SUN  T=5778K  L=1L☉",HR_X+8,HR_Y+HR_H-52);
+
+      /* ── RIGHT PANEL: Cosmic Ray Shower + Tardigrade ── */
+      const RP_X=CW*0.47, RP_W=CW*0.5;
+      ctx.fillStyle="#3A4060"; ctx.font=`8px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("SPACE VACUUM · COSMIC RAY SHOWER · TARDIGRADE SURVIVAL",RP_X+RP_W*0.5,HR_Y-8);
+
+      /* magnetic field lines (deflecting some rays) */
+      ctx.strokeStyle=V.blue+"22"; ctx.lineWidth=0.8;
+      for(let k=0;k<6;k++){
+        const my=80+k*60;
+        ctx.beginPath();
+        ctx.moveTo(RP_X,my);
+        for(let x=0;x<=RP_W;x+=4){
+          ctx.lineTo(RP_X+x,my+Math.sin((x/RP_W)*Math.PI*3+k)*18);
+        }
+        ctx.stroke();
+      }
+      ctx.fillStyle=V.blue+"55"; ctx.font=`6.5px ${V.mono}`; ctx.textAlign="left";
+      ctx.fillText("⟵ B-FIELD SHIELD LINES",RP_X+4,CH-115);
+
+      /* cosmic rays */
+      RAYS.forEach((r,i)=>{
+        r.y+=r.vy; r.x+=r.vx; r.life++;
+        /* magnetic deflection for some particles */
+        if(r.x>RP_X+20 && r.x<RP_X+RP_W-20 && r.energy<0.4){
+          r.vx+=0.06*Math.sin(frame*0.03+i); r.vy-=0.02; r.deflected=true;
+        }
+        if(r.y>CH+20||r.x<RP_X||r.x>RP_X+RP_W){ r.y=-10-Math.random()*100; r.x=RP_X+Math.random()*RP_W; r.life=0; r.deflected=false; }
+        /* hit tardigrade */
+        const dx=r.x-tardX, dy=r.y-tardY;
+        if(Math.sqrt(dx*dx+dy*dy)<18&&r.energy>0.6&&!r.deflected){
+          HITS.push({x:tardX,y:tardY,age:0,max:20}); r.y=-10; r.x=RP_X+Math.random()*RP_W;
+        }
+        /* draw */
+        const alpha=0.5+0.4*r.energy;
+        ctx.strokeStyle=r.col+(Math.floor(alpha*255).toString(16).padStart(2,"0"));
+        ctx.lineWidth=0.8+r.energy;
+        ctx.beginPath(); ctx.moveTo(r.x,r.y); ctx.lineTo(r.x-r.vx*8,r.y-r.vy*8); ctx.stroke();
+        if(r.deflected){
+          ctx.fillStyle=r.col+"88"; ctx.beginPath(); ctx.arc(r.x,r.y,2,0,Math.PI*2); ctx.fill();
+        }
+      });
+
+      /* Tardigrade tun state */
+      const tunPulse=0.9+0.1*Math.sin(frame*0.025);
+      const tgrd=ctx.createRadialGradient(tardX,tardY,0,tardX,tardY,22*tunPulse);
+      tgrd.addColorStop(0,"#8A9860CC"); tgrd.addColorStop(0.5,"#8A986088"); tgrd.addColorStop(1,"#8A986000");
+      ctx.fillStyle=tgrd; ctx.beginPath(); ctx.arc(tardX,tardY,22*tunPulse,0,Math.PI*2); ctx.fill();
+      /* barrel body */
+      ctx.fillStyle="#6A7840"; ctx.strokeStyle=V.green+"AA"; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.ellipse(tardX,tardY,14*tunPulse,10*tunPulse,0,0,Math.PI*2);
+      ctx.fill(); ctx.stroke();
+      /* desiccation rings */
+      ctx.strokeStyle=V.dim+"88"; ctx.lineWidth=0.5;
+      for(let k=1;k<=3;k++){ctx.beginPath(); ctx.ellipse(tardX,tardY,14*tunPulse-k*3.5,10*tunPulse-k*2.5,0,0,Math.PI*2); ctx.stroke();}
+      ctx.fillStyle=V.green; ctx.font=`6.5px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("TARDIGRADE · TUN STATE",tardX,tardY+30);
+      ctx.fillStyle=V.dim; ctx.fillText("570,000 rad tolerance",tardX,tardY+40);
+
+      /* hit flashes */
+      HITS.forEach((h,i)=>{
+        const t=h.age/h.max; h.age++;
+        if(h.age>h.max){ HITS.splice(i,1); return; }
+        ctx.strokeStyle=`rgba(255,200,80,${1-t})`; ctx.lineWidth=2*(1-t);
+        for(let a=0;a<6;a++){
+          const ang=a/6*Math.PI*2+frame*0.1;
+          ctx.beginPath(); ctx.moveTo(h.x+Math.cos(ang)*16,h.y+Math.sin(ang)*12);
+          ctx.lineTo(h.x+Math.cos(ang)*(16+22*t),h.y+Math.sin(ang)*(12+16*t)); ctx.stroke();
+        }
+      });
+
+      /* ── BOTTOM: Radiation Spectrum + Survival Bands ── */
+      const BX=HR_X, BY=CH-72, BH=50;
+      BANDS.forEach((b)=>{
+        const bx=BX+(b.xMin)*(CW-50), bw=(b.xMax-b.xMin)*(CW-50);
+        const grd=ctx.createLinearGradient(bx,0,bx+bw,0);
+        grd.addColorStop(0,b.col+"55"); grd.addColorStop(0.5,b.col+"88"); grd.addColorStop(1,b.col+"55");
+        ctx.fillStyle=grd; ctx.fillRect(bx,BY,bw,BH);
+        ctx.strokeStyle=b.col+"33"; ctx.lineWidth=0.5; ctx.strokeRect(bx,BY,bw,BH);
+        ctx.fillStyle=b.col; ctx.font=`5.8px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText(b.label,bx+bw/2,BY+10);
+        if(b.lethal){ ctx.fillStyle=V.plasma; ctx.fillText("⚠ LETHAL",bx+bw/2,BY+22); }
+        else if(b.label.includes("VISIBLE")){
+          ctx.fillStyle=V.green; ctx.fillText("✓ TARDIGRADE OK",bx+bw/2,BY+22);
+        }
+      });
+      /* Tardigrade survival bracket */
+      ctx.strokeStyle=V.green; ctx.lineWidth=1.5;
+      const svX=BX+(0.13)*(CW-50), svW=(0.65-0.13)*(CW-50);
+      ctx.strokeRect(svX,BY+28,svW,16);
+      ctx.fillStyle=V.green; ctx.font=`6px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("TUN STATE: SURVIVES UV → IR (in tun; active tolerance: visible only)",svX+svW/2,BY+39);
+
+      /* ── Stellar entropy gradient strip (top) ── */
+      const EX=RP_X, EY=CH-72, EW=RP_W;
+      const layers=[
+        {name:"STELLAR CORE",T:"1.5×10⁷ K",col:"#FF2200",w:0.18},
+        {name:"RADIATION ZONE",T:"2×10⁶ K", col:"#FF6600",w:0.22},
+        {name:"CONVECTION ZONE",T:"5×10⁵ K",col:"#FF9933",w:0.22},
+        {name:"PHOTOSPHERE",T:"5,778 K",    col:"#FFE880",w:0.20},
+        {name:"CHROMOSPHERE",T:"20,000 K",  col:"#FFAAFF",w:0.10},
+        {name:"CORONA",T:"1–3×10⁶ K",      col:"#AADDFF",w:0.08},
+      ];
+      let elx=EX;
+      layers.forEach(l=>{
+        const lw=l.w*EW;
+        ctx.fillStyle=l.col+"33"; ctx.fillRect(elx,EY,lw,50);
+        ctx.strokeStyle=l.col+"55"; ctx.lineWidth=0.5; ctx.strokeRect(elx,EY,lw,50);
+        ctx.fillStyle=l.col; ctx.font=`5.5px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText(l.name,elx+lw/2,EY+10); ctx.fillText(l.T,elx+lw/2,EY+21);
+        elx+=lw;
+      });
+      ctx.fillStyle=V.cyan; ctx.font=`5.5px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("⚠ CORONA PARADOX: T(corona) > T(surface) × 300 — unsolved entropy reversal",EX+EW/2,EY+35);
+
+      frame++; raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return()=>cancelAnimationFrame(raf);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"460px",borderRadius:6,display:"block"}}/>;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CANVAS 5 · Bayesian Inference · Life Probability · Evidence Propagation
+   ───────────────────────────────────────────────────────────────────────── */
+function BayesianInferenceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(()=>{
+    const cv=ref.current; if(!cv) return;
+    const CH=460, PR=window.devicePixelRatio||1;
+    const CW=Math.max(cv.offsetWidth,520);
+    cv.width=CW*PR; cv.height=CH*PR; cv.style.height=CH+"px";
+    const ctx=cv.getContext("2d")!; ctx.scale(PR,PR);
+    let frame=0, raf=0;
+
+    /* Scenarios: 4 worlds */
+    const SCENARIOS=[
+      {name:"EARTH · LOAMY SOIL",col:V.safe,
+       ev:{water:0.97,temp:0.90,radiation:0.78,pH:0.88,organics:0.96,magfield:0.95},posterior:0.9997},
+      {name:"MARS · SURFACE",col:V.rust,
+       ev:{water:0.03,temp:0.24,radiation:0.05,pH:0.30,organics:0.08,magfield:0.01},posterior:0.0022},
+      {name:"ENCELADUS · PLUME OCEAN",col:V.photon,
+       ev:{water:0.95,temp:0.55,radiation:0.70,pH:0.75,organics:0.82,magfield:0.20},posterior:0.62},
+      {name:"EUROPA · SUBSURFACE OCEAN",col:V.cyan,
+       ev:{water:0.92,temp:0.60,radiation:0.68,pH:0.72,organics:0.55,magfield:0.28},posterior:0.55},
+    ];
+    const EV_KEYS=["water","temp","radiation","pH","organics","magfield"] as const;
+    const EV_LABELS=["LIQUID WATER","TEMPERATURE","RADIATION SHIELD","pH RANGE","ORGANIC CARBON","MAGNETIC FIELD"];
+    const EV_COLS=[V.blue,V.amb,V.plasma,V.green,V.honey,V.vio];
+    const EV_WEIGHTS=[0.30,0.15,0.15,0.10,0.15,0.15]; /* Bayesian importance weights */
+
+    /* Bayesian network nodes */
+    const PRIOR_X=CW*0.18, PRIOR_Y=90;
+    const EV_X=CW*0.38;
+    const POST_X=CW*0.60, POST_Y=230;
+    const PHASE_DUR=180;
+
+    /* Animated belief particles */
+    const PARTICLES:Array<{x:number;y:number;tx:number;ty:number;t:number;col:string}>=[];
+
+    const spawnParticle=(fromX:number,fromY:number,toX:number,toY:number,col:string)=>{
+      PARTICLES.push({x:fromX,y:fromY,tx:toX,ty:toY,t:0,col});
+    };
+
+    const draw=()=>{
+      ctx.clearRect(0,0,CW,CH);
+      const bg=ctx.createLinearGradient(0,0,0,CH);
+      bg.addColorStop(0,"#04060E"); bg.addColorStop(1,"#070A14");
+      ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+
+      const si=Math.floor(frame/PHASE_DUR)%4;
+      const sf=(frame%PHASE_DUR)/PHASE_DUR;
+      const sc=SCENARIOS[si];
+      const prev=SCENARIOS[(si+3)%4];
+
+      /* lerp toward scenario values */
+      const evNow:{[k:string]:number}={};
+      EV_KEYS.forEach(k=>{ evNow[k]=lerp(prev.ev[k],sc.ev[k],Math.min(sf*2.5,1)); });
+      const posterior=lerp(prev.posterior,sc.posterior,Math.min(sf*2.5,1));
+
+      /* Title */
+      ctx.fillStyle=sc.col; ctx.font=`9px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText(`SCENARIO: ${sc.name}`,CW*0.5,28);
+      ctx.fillStyle=V.dim; ctx.font=`7px ${V.mono}`;
+      ctx.fillText("BAYESIAN NETWORK · P(life | water, temp, radiation, pH, organics, B-field)",CW*0.5,44);
+
+      /* ── DAG Layout ── */
+      /* Prior node */
+      const drawNode=(x:number,y:number,r:number,col:string,label:string,sub:string,val:number)=>{
+        const grd=ctx.createRadialGradient(x,y,0,x,y,r);
+        grd.addColorStop(0,col+"44"); grd.addColorStop(1,col+"08");
+        ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+        /* value arc */
+        ctx.strokeStyle=col; ctx.lineWidth=3; ctx.lineCap="round";
+        ctx.beginPath(); ctx.arc(x,y,r-4,-Math.PI/2,-Math.PI/2+Math.PI*2*val,false); ctx.stroke();
+        ctx.fillStyle=col; ctx.font=`bold 8px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText(label,x,y-4);
+        ctx.font=`6.5px ${V.mono}`; ctx.fillStyle=V.ink;
+        ctx.fillText(sub,x,y+7);
+        ctx.fillStyle=col; ctx.font=`7px ${V.mono}`;
+        ctx.fillText((val*100).toFixed(0)+"%",x,y+r+13);
+      };
+
+      /* Prior node */
+      drawNode(PRIOR_X,PRIOR_Y,24,V.gold,"PRIOR","P(life)=0.01",0.01);
+      ctx.fillStyle=V.gold; ctx.font=`6px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("(1% baseline)",PRIOR_X,PRIOR_Y+50);
+
+      /* Evidence nodes */
+      const evNodeY:number[]=[];
+      EV_KEYS.forEach((k,i)=>{
+        const ny=80+i*58;
+        evNodeY.push(ny);
+        const v=evNow[k];
+        drawNode(EV_X,ny,18,EV_COLS[i],EV_LABELS[i].split(" ")[0]+"\n"+EV_LABELS[i].split(" ").slice(1).join(" "),EV_LABELS[i],v);
+        /* Weight label */
+        ctx.fillStyle=EV_COLS[i]+"88"; ctx.font=`5.5px ${V.mono}`; ctx.textAlign="left";
+        ctx.fillText(`w=${EV_WEIGHTS[i]}`,EV_X+22,ny-6);
+        /* Edge from prior to evidence */
+        ctx.strokeStyle=EV_COLS[i]+"33"; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(PRIOR_X+24,PRIOR_Y+8); ctx.lineTo(EV_X-18,ny); ctx.stroke();
+        /* Edge from evidence to posterior */
+        ctx.strokeStyle=EV_COLS[i]+(v>0.5?"AA":"44"); ctx.lineWidth=0.8+v*2;
+        ctx.beginPath(); ctx.moveTo(EV_X+18,ny); ctx.lineTo(POST_X-32,POST_Y); ctx.stroke();
+      });
+
+      /* Posterior node */
+      const postCol=posterior>0.5?V.safe:posterior>0.1?V.amb:V.plasma;
+      drawNode(POST_X,POST_Y,36,postCol,"POSTERIOR","P(life|e)",posterior);
+      ctx.fillStyle=postCol; ctx.font=`8px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText(posterior>0.9?"HIGH VIABILITY":posterior>0.3?"POSSIBLE":"UNLIKELY",POST_X,POST_Y+52);
+
+      /* ── RIGHT PANEL: Evidence bars + Bayesian update equation ── */
+      const RP=CW*0.68;
+      ctx.fillStyle=V.dim; ctx.font=`7.5px ${V.mono}`; ctx.textAlign="left";
+      ctx.fillText("EVIDENCE PROFILE",RP,60);
+
+      EV_KEYS.forEach((k,i)=>{
+        const v=evNow[k];
+        const bx=RP, by=78+i*46, bw=CW-RP-18, bh=22;
+        ctx.fillStyle=EV_COLS[i]+"11"; ctx.fillRect(bx,by,bw,bh);
+        ctx.fillStyle=EV_COLS[i]+(v>0.5?"CC":"55"); ctx.fillRect(bx,by,bw*v,bh);
+        ctx.strokeStyle=EV_COLS[i]+"44"; ctx.lineWidth=0.5; ctx.strokeRect(bx,by,bw,bh);
+        ctx.fillStyle=EV_COLS[i]; ctx.font=`6px ${V.mono}`; ctx.textAlign="left";
+        ctx.fillText(EV_LABELS[i],bx+3,by+8);
+        ctx.textAlign="right"; ctx.fillText((v*100).toFixed(0)+"%",bx+bw-3,by+8);
+        /* weighted contribution */
+        ctx.fillStyle=V.dim; ctx.font=`5.5px ${V.mono}`; ctx.textAlign="left";
+        ctx.fillText(`contrib: ${(v*EV_WEIGHTS[i]*100).toFixed(2)}%`,bx+3,by+20);
+      });
+
+      /* Bayes theorem display */
+      const eqY=CH-132;
+      ctx.fillStyle=V.dim; ctx.font=`7px ${V.mono}`; ctx.textAlign="left";
+      ctx.fillText("BAYES' THEOREM:",RP,eqY);
+      ctx.fillStyle=V.gold; ctx.font=`7.5px ${V.mono}`;
+      ctx.fillText("P(life|E) ∝ P(E|life) · P(life)",RP,eqY+14);
+      ctx.fillStyle=V.ink+"AA"; ctx.font=`6.5px ${V.mono}`;
+      ctx.fillText(`P(E|life) = Π wᵢ·P(eᵢ|life)`,RP,eqY+27);
+      ctx.fillText(`Prior: 0.0100  |  Likelihood: ${EV_KEYS.reduce((a,k,i)=>a*Math.pow(evNow[k],EV_WEIGHTS[i]),1).toFixed(4)}`,RP,eqY+40);
+      ctx.fillStyle=postCol; ctx.font=`bold 9px ${V.mono}`;
+      ctx.fillText(`Posterior P(life): ${(posterior*100).toFixed(2)}%`,RP,eqY+56);
+
+      /* Scenario cycle indicator */
+      ctx.fillStyle=V.dim; ctx.font=`6px ${V.mono}`; ctx.textAlign="center";
+      const pips=SCENARIOS.map((_,i)=>i===si?"●":"○").join("  ");
+      ctx.fillText(pips,CW*0.5,CH-10);
+      SCENARIOS.forEach((s,i)=>{
+        ctx.fillStyle=i===si?s.col:V.dim+"55";
+        ctx.font=`6px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText(s.name,CW*(0.12+i*0.22),CH-22);
+      });
+
+      /* Spawn belief particles occasionally */
+      if(frame%25===0){
+        EV_KEYS.forEach((k,i)=>{
+          if(Math.random()<evNow[k]){
+            spawnParticle(EV_X+18,evNodeY[i],POST_X-32,POST_Y,EV_COLS[i]);
+          }
+        });
+      }
+      /* Draw particles */
+      PARTICLES.forEach((p,i)=>{
+        p.t+=0.04; const t=p.t;
+        if(t>1){ PARTICLES.splice(i,1); return; }
+        const px=lerp(p.x,p.tx,t), py=lerp(p.y,p.ty,t);
+        ctx.fillStyle=p.col+(Math.floor((1-t)*180).toString(16).padStart(2,"0"));
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fill();
+      });
+
+      frame++; raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return()=>cancelAnimationFrame(raf);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"460px",borderRadius:6,display:"block"}}/>;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CANVAS 6 · Quantitative Finance · MSDD Market Cascade · Vol Surface
+   ───────────────────────────────────────────────────────────────────────── */
+function QuantFinanceCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(()=>{
+    const cv=ref.current; if(!cv) return;
+    const CH=480, PR=window.devicePixelRatio||1;
+    const CW=Math.max(cv.offsetWidth,520);
+    cv.width=CW*PR; cv.height=CH*PR; cv.style.height=CH+"px";
+    const ctx=cv.getContext("2d")!; ctx.scale(PR,PR);
+    let frame=0, raf=0;
+
+    /* Asset classes */
+    const ASSETS=[
+      {name:"EQUITIES",col:"#4488FF",ret:0.08,vol:0.18},{name:"BONDS",col:"#44CC77",ret:0.03,vol:0.06},
+      {name:"COMMODITIES",col:"#FF9933",ret:0.05,vol:0.22},{name:"FX",col:"#9966FF",ret:0.02,vol:0.10},
+      {name:"CRYPTO",col:"#FF6699",ret:0.25,vol:0.80},{name:"REAL ESTATE",col:"#C8A030",ret:0.07,vol:0.14},
+    ];
+    /* Correlation matrix (normal regime) */
+    const CORR_NORMAL:number[][]=[
+      [1.00, 0.15, 0.22, 0.08,-0.12, 0.35],
+      [1.00, 0.00,-0.20,-0.05, 0.10],
+      [1.00, 0.12, 0.08, 0.20],
+      [1.00, 0.05, 0.02],
+      [1.00, 0.04],
+      [1.00],
+    ];
+    const corrNormal=(i:number,j:number)=>{
+      const a=Math.min(i,j),b=Math.max(i,j);
+      return CORR_NORMAL[a][b-a];
+    };
+
+    /* MSDD phases: 0=normal 1=shock 2=msdd 3=alcc 4=recovery */
+    const PHASE_DUR=[200,60,120,80,180];
+    const TOTAL_DUR=PHASE_DUR.reduce((a,b)=>a+b,0);
+    const PHASES=["NORMAL · DIVERSIFIED","SHOCK EVENT · CORRELATION SPIKE","MSDD · SYSTEMIC COLLAPSE","ALCC · AUTOMATED RECOVERY","RECOVERY · REBALANCED"];
+    const PHASE_COLS=[V.safe,V.shock,V.plasma,V.cyan,V.photon];
+
+    /* Vol surface parameters — isometric 3D */
+    const ISO_ANGLE=Math.PI/6;
+    const VOL_SX=CW*0.48, VOL_SY=100;
+    const STRIKES=8, MATURITIES=6;
+    const ISO_CW=160, ISO_CH=90;
+
+    const isoPoint=(xi:number,yi:number,z:number):{x:number,y:number}=>{
+      const ix=(xi/STRIKES)*ISO_CW;
+      const iy=(yi/MATURITIES)*ISO_CH;
+      return {
+        x: VOL_SX + ix*Math.cos(ISO_ANGLE) - iy*Math.cos(Math.PI/3),
+        y: VOL_SY + ix*Math.sin(ISO_ANGLE) + iy*Math.sin(Math.PI/3) - z*80,
+      };
+    };
+
+    /* Portfolio weights (Bayesian posterior) */
+    const weights=[0.28,0.25,0.15,0.12,0.05,0.15];
+    let wTarget=[...weights];
+
+    const draw=()=>{
+      ctx.clearRect(0,0,CW,CH);
+      const bg=ctx.createLinearGradient(0,0,CW,CH);
+      bg.addColorStop(0,"#04060E"); bg.addColorStop(1,"#080C18");
+      ctx.fillStyle=bg; ctx.fillRect(0,0,CW,CH);
+
+      /* Determine phase */
+      const t=frame%TOTAL_DUR;
+      let phase=0, pt=0;
+      let acc=0;
+      for(let i=0;i<PHASE_DUR.length;i++){
+        if(t<acc+PHASE_DUR[i]){ phase=i; pt=(t-acc)/PHASE_DUR[i]; break; }
+        acc+=PHASE_DUR[i];
+      }
+      const phName=PHASES[phase];
+      const phCol=PHASE_COLS[phase];
+
+      /* Correlation factor: 0=normal diversified, 1=all correlated = MSDD collapse */
+      const corrFactor=phase===0?0:phase===1?pt*0.9:phase===2?0.9+pt*0.09:phase===3?0.99-pt*0.7:0.3*(1-pt*0.3);
+      const effCorr=(i:number,j:number)=>lerp(corrNormal(i,j),0.97,corrFactor);
+
+      /* VIX-equivalent: portfolio panic gauge */
+      const vix=lerp(16,92,phase===0?0.05:phase===1?pt*0.85:phase===2?0.85+pt*0.1:phase===3?0.95-pt*0.6:0.35-pt*0.3);
+      const sharpe=lerp(0.45,-2.2,corrFactor);
+      const expectedReturn=(phase<2?0.07:phase===2?-0.18+pt*(-0.10):phase===3?-0.28+pt*0.12:phase===4?-0.16+pt*0.22:0.06);
+      const mdd=lerp(0.12,0.52,corrFactor);
+
+      /* ── LEFT: Asset Correlation Network ── */
+      const NET_R=82, NET_CX=CW*0.22, NET_CY=200;
+      ctx.fillStyle=V.dim; ctx.font=`7.5px ${V.mono}`; ctx.textAlign="center";
+      ctx.fillText("ASSET CORRELATION NETWORK · MSDD MARKET MODEL",NET_CX,38);
+      ctx.fillStyle=phCol+"88"; ctx.font=`7px ${V.mono}`;
+      ctx.fillText(phName,NET_CX,54);
+
+      /* Draw correlation edges */
+      for(let i=0;i<ASSETS.length;i++){
+        for(let j=i+1;j<ASSETS.length;j++){
+          const ai=ASSETS[i], aj=ASSETS[j];
+          const angi=i/ASSETS.length*Math.PI*2-Math.PI/2;
+          const angj=j/ASSETS.length*Math.PI*2-Math.PI/2;
+          const xi=NET_CX+Math.cos(angi)*NET_R, yi=NET_CY+Math.sin(angi)*NET_R;
+          const xj=NET_CX+Math.cos(angj)*NET_R, yj=NET_CY+Math.sin(angj)*NET_R;
+          const ec=effCorr(i,j);
+          const alpha=Math.max(0.1,ec);
+          ctx.strokeStyle=phase<2?`rgba(80,120,200,${alpha*0.8})`:`rgba(255,80,80,${alpha*0.9})`;
+          ctx.lineWidth=0.5+ec*4;
+          ctx.beginPath(); ctx.moveTo(xi,yi); ctx.lineTo(xj,yj); ctx.stroke();
+        }
+      }
+
+      /* ALCC ring when active */
+      if(phase>=3){
+        const rPulse=0.85+0.15*Math.sin(frame*0.08);
+        ctx.strokeStyle=V.cyan+(Math.floor(pt*180).toString(16).padStart(2,"0"));
+        ctx.lineWidth=1.5; ctx.setLineDash([6,4]);
+        ctx.beginPath(); ctx.arc(NET_CX,NET_CY,NET_R+16*rPulse,0,Math.PI*2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle=V.cyan+"66"; ctx.font=`5.5px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText("ALCC REBALANCING LOOP",NET_CX,NET_CY-NET_R-22);
+      }
+
+      /* Asset nodes */
+      ASSETS.forEach((a,i)=>{
+        const ang=i/ASSETS.length*Math.PI*2-Math.PI/2;
+        const cx=NET_CX+Math.cos(ang)*NET_R, cy=NET_CY+Math.sin(ang)*NET_R;
+        const pulse=0.9+0.1*Math.sin(frame*0.05+i*1.1);
+        /* Weight ring */
+        ctx.strokeStyle=a.col+"44"; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(cx,cy,18*wTarget[i]*4*pulse,-Math.PI/2,-Math.PI/2+Math.PI*2,false); ctx.stroke();
+        /* Node */
+        const grd=ctx.createRadialGradient(cx,cy,0,cx,cy,14);
+        grd.addColorStop(0,a.col+"88"); grd.addColorStop(1,a.col+"11");
+        ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle=a.col; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(cx,cy,14,0,Math.PI*2); ctx.stroke();
+        ctx.fillStyle=a.col; ctx.font=`6px ${V.mono}`; ctx.textAlign="center";
+        const labelLines=a.name.split(" ");
+        labelLines.forEach((l,li)=>ctx.fillText(l,cx,cy+(li-0.5*labelLines.length+0.5)*8));
+        /* Weight below node */
+        ctx.fillStyle=V.dim; ctx.font=`5.5px ${V.mono}`;
+        const wx=NET_CX+Math.cos(ang)*(NET_R+30);
+        const wy=NET_CY+Math.sin(ang)*(NET_R+30);
+        ctx.fillText(`${(wTarget[i]*100).toFixed(0)}%`,wx,wy);
+      });
+
+      /* MSDD collapse: draw center singularity */
+      if(phase===2){
+        const colR=20+pt*30;
+        const colGrd=ctx.createRadialGradient(NET_CX,NET_CY,0,NET_CX,NET_CY,colR);
+        colGrd.addColorStop(0,V.plasma+"AA"); colGrd.addColorStop(1,V.plasma+"00");
+        ctx.fillStyle=colGrd; ctx.beginPath(); ctx.arc(NET_CX,NET_CY,colR,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=V.plasma; ctx.font=`7px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText("ρ→1.0",NET_CX,NET_CY+4);
+        ctx.fillText("COLLAPSE",NET_CX,NET_CY+14);
+      }
+
+      /* ── RIGHT: Black-Scholes Vol Surface (Isometric) ── */
+      ctx.fillStyle=V.dim; ctx.font=`7.5px ${V.mono}`; ctx.textAlign="left";
+      ctx.fillText("IMPLIED VOLATILITY SURFACE (BLACK-SCHOLES)",VOL_SX-10,30);
+      ctx.fillStyle=V.dim; ctx.font=`6px ${V.mono}`;
+      ctx.fillText("Strike →  /  Maturity ↗",VOL_SX-10,44);
+
+      for(let yi=0;yi<MATURITIES;yi++){
+        for(let xi=0;xi<STRIKES;xi++){
+          /* BS implied vol: volatility smile + term structure */
+          const moneyness=(xi/STRIKES-0.5)*2; /* -1 to +1 */
+          const tau=0.1+yi/MATURITIES*2;      /* 0.1 to 2.1 years */
+          const smile=0.18+0.12*moneyness*moneyness;
+          const term=0.15/Math.sqrt(tau);
+          const panic=phase>=1?(phase===1?pt*0.6:phase===2?0.6+pt*0.35:phase===3?0.95-pt*0.5:0.45-pt*0.35):0.02;
+          const vol=smile*0.4+term*0.3+0.3*(0.20+panic*0.60)+0.05*Math.sin(frame*0.04+xi*0.5);
+
+          const p00=isoPoint(xi,yi,vol);
+          const p10=isoPoint(xi+1,yi,vol);
+          const p01=isoPoint(xi,yi+1,vol);
+          const p11=isoPoint(xi+1,yi+1,vol);
+
+          /* Fill quad */
+          const volCol=vol<0.25?"#2266AA":vol<0.40?"#44AA66":vol<0.55?"#AAAA22":vol<0.70?"#CC6622":"#CC2244";
+          ctx.fillStyle=volCol+"AA";
+          ctx.beginPath(); ctx.moveTo(p00.x,p00.y); ctx.lineTo(p10.x,p10.y);
+          ctx.lineTo(p11.x,p11.y); ctx.lineTo(p01.x,p01.y); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle="#FFFFFF18"; ctx.lineWidth=0.4; ctx.stroke();
+        }
+      }
+      /* Vol surface legend */
+      const lgX=VOL_SX+ISO_CW+15, lgY=VOL_SY+20;
+      [["<25%",V.blue],["25–40%","#44AA66"],["40–55%","#AAAA22"],["55–70%","#CC6622"],[">70%",V.plasma]].forEach(([l,c],i)=>{
+        ctx.fillStyle=c as string; ctx.fillRect(lgX,lgY+i*14,12,10);
+        ctx.fillStyle=V.ink; ctx.font=`6px ${V.mono}`; ctx.textAlign="left";
+        ctx.fillText(l as string,lgX+15,lgY+i*14+9);
+      });
+
+      /* ── GAUGES ROW ── */
+      const GY=CH-130, GX=CW*0.48, GW=CW*0.5;
+      const gauges=[
+        {label:"VIX",val:vix,min:10,max:100,col:vix>60?V.plasma:vix>35?V.amb:V.safe,fmt:(v:number)=>v.toFixed(0)},
+        {label:"SHARPE",val:sharpe,min:-3,max:2,col:sharpe>0.5?V.safe:sharpe>0?V.amb:V.plasma,fmt:(v:number)=>v.toFixed(2)},
+        {label:"E[R] %/yr",val:expectedReturn*100,min:-30,max:25,col:expectedReturn>0?V.green:V.plasma,fmt:(v:number)=>v.toFixed(1)+"%"},
+        {label:"MAX DD",val:mdd*100,min:0,max:60,col:mdd>0.4?V.plasma:mdd>0.2?V.amb:V.safe,fmt:(v:number)=>v.toFixed(0)+"%"},
+      ];
+      ctx.fillStyle=V.dim; ctx.font=`6.5px ${V.mono}`; ctx.textAlign="left";
+      ctx.fillText("PORTFOLIO RISK METRICS · BAYESIAN POSTERIOR WEIGHTS",GX,GY-10);
+      gauges.forEach((g,i)=>{
+        const gx=GX+(i%2)*(GW/2), gy=GY+Math.floor(i/2)*50;
+        const t2=Math.max(0,Math.min(1,(g.val-g.min)/(g.max-g.min)));
+        ctx.fillStyle=g.col+"11"; ctx.fillRect(gx,gy,GW/2-8,36);
+        ctx.fillStyle=g.col+"44"; ctx.fillRect(gx,gy,Math.max(0,(GW/2-8)*t2),36);
+        ctx.strokeStyle=g.col+"44"; ctx.lineWidth=0.5; ctx.strokeRect(gx,gy,GW/2-8,36);
+        ctx.fillStyle=g.col; ctx.font=`6px ${V.mono}`; ctx.textAlign="left";
+        ctx.fillText(g.label,gx+5,gy+12);
+        ctx.font=`bold 11px ${V.mono}`; ctx.fillText(g.fmt(g.val),gx+5,gy+28);
+      });
+
+      /* Bayesian Portfolio Update display */
+      const BPY=CH-55;
+      ctx.fillStyle=V.dim; ctx.font=`6.5px ${V.mono}`; ctx.textAlign="left";
+      ctx.fillText("BAYESIAN PORTFOLIO WEIGHTS (POSTERIOR) →",CW*0.48,BPY-10);
+      ASSETS.forEach((a,i)=>{
+        const tw=phase<2?weights[i]:phase===2?(weights[i]*(1-pt*0.5)+pt*0.5*(1/ASSETS.length)):phase===4?(1/ASSETS.length*(1-pt)+weights[i]*pt):1/ASSETS.length;
+        wTarget[i]=lerp(wTarget[i],tw,0.05);
+        const bx=CW*0.48+i*(CW*0.52/ASSETS.length);
+        const bh=wTarget[i]*160;
+        ctx.fillStyle=a.col+"55"; ctx.fillRect(bx,BPY+36-bh,CW*0.52/ASSETS.length-4,bh);
+        ctx.strokeStyle=a.col+"88"; ctx.lineWidth=0.5; ctx.strokeRect(bx,BPY+36-bh,CW*0.52/ASSETS.length-4,bh);
+        ctx.fillStyle=a.col; ctx.font=`5.5px ${V.mono}`; ctx.textAlign="center";
+        ctx.fillText(`${(wTarget[i]*100).toFixed(0)}%`,bx+(CW*0.52/ASSETS.length-4)/2,BPY+48);
+        ctx.fillStyle=V.dim; ctx.font=`4.5px ${V.mono}`;
+        ctx.fillText(a.name.split(" ")[0].slice(0,4),bx+(CW*0.52/ASSETS.length-4)/2,BPY+58);
+      });
+
+      frame++; raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return()=>cancelAnimationFrame(raf);
+  },[]);
+  return <canvas ref={ref} style={{width:"100%",height:"480px",borderRadius:6,display:"block"}}/>;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
    PAGE
    ───────────────────────────────────────────────────────────────────────── */
 export default function TardigradeDensityMSDDPage() {
@@ -751,6 +1390,54 @@ export default function TardigradeDensityMSDDPage() {
           {h:"MSDD + FUTURE THREATS",col:V.plasma,d:"Next Tunguska-class event (~2300): forest ecosystem MSDD, tardigrades in tun, 90%+ survive. Chicxulub-repeat (~100My): global photosynthesis MSDD, tardigrades sole survivors for decades. Solar brightening (600My): permanent C3 photosynthesis MSDD — only C4 plants + tardigrades remain. Beyond: tardigrades in Mars/Europa subsurface — last life in solar system."},
           {h:"ALCC TECHNOLOGY",     col:V.cyan,  d:"Near-term (5 yr): CAHS-D-based dry vaccine preservation (no cold chain). 10 yr: synthetic biology transfer to crops. 20 yr: infrastructure ALCC modelled on tardigrade response cycles. 50 yr: space-settlement life-support systems using tardigrade-derived MSDD resistance. 100 yr: engineered tardigrade communities as planetary seed vaults."},
           {h:"NEMATIC + TARDIGRADE",col:V.vio,   d:"LC nematic wing membrane on bee-car (Nematic page) uses director field relaxation identical to CAHS-D protein refolding dynamics — both are order-disorder transitions driven by external field (electric for LC, water for CAHS). Tardigrade-inspired LC actuators: controlled glass-state switching for morphing wing emergency lockdown during atmospheric shock."},
+        ])}
+      </>)}
+
+      {sec("05","Space Vacuum · Stellar Radiation · High-Energy Entropy · Corona Paradox",V.amb,<>
+        {P("Space is not empty — it is a bath of photons, charged particles, and magnetic fields spanning 20 orders of magnitude in energy. The electromagnetic spectrum runs from gamma rays (>10²⁰ Hz, E>400 keV, lethal dose in seconds) through X-ray, EUV, UV, visible light, infrared, microwave, and radio waves. Every star radiates across this full spectrum, weighted by its temperature via Planck's law (peak wavelength λ_max = 2.898×10⁻³/T). The Sun, a G-type main-sequence star at T_eff = 5,778 K, peaks in the visible green (λ=502 nm) — a window that evolution has shaped every photosynthetic organism to exploit. O-type stars at 40,000 K flood the UV and X-ray bands, sterilising any unshielded surface within hours. M-dwarf stars at 3,000 K emit mostly infrared, posing a different hazard: their habitable zones are so close that tidal locking and flare X-ray bursts replace UV as the sterilising agent. The Hertzsprung-Russell diagram encodes this energy landscape: the main sequence from lower-right (M dwarfs, dim, cool, red) to upper-left (O giants, brilliant, hot, blue) is a map of how much high-energy photon flux any potential biosphere must cope with.")}
+        {P("The stellar entropy gradient from core to surface (and beyond) expresses one of astrophysics' deepest unsolved puzzles: the corona paradox. The Sun's visible surface (photosphere) sits at 5,778 K. Above it, the corona — a sparse plasma extending millions of kilometres — reaches 1–3 million K, more than 300× hotter than the surface below it. By the second law of thermodynamics, heat should not flow from cooler to hotter. The leading explanations are Alfvén wave dissipation (magnetohydrodynamic waves carry energy up magnetic field lines and deposit it in the corona through turbulent cascade) and nanoflare heating (explosive magnetic reconnection events in the corona release energy at small scales). The corona's extreme temperature creates the solar wind: a continuous stream of protons, electrons, and alpha particles escaping at 400–800 km/s, which creates the heliosphere, deflects interstellar cosmic rays, and — critically — shapes the radiation environment for every body in the solar system. Earth's magnetic field (25–65 μT) deflects most of this wind into the Van Allen belts, protecting the biosphere. The tardigrade in tun state has survived 570,000 rads — but the question of whether any biology could evolve in a chronically high-radiation environment (like close to a magnetar, emitting 10¹⁵× the Sun's magnetic energy) is open. The canvas simulates the H-R diagram of star classes, animated cosmic ray showers with magnetic deflection, the radiation survival envelope of tardigrade tun vs active states, and the full stellar entropy layering from core to corona.")}
+        <div style={{border:`1px solid ${V.dim}44`,borderRadius:8,padding:2,marginBottom:14}}>
+          <SpaceVacuumRadiationCanvas/>
+        </div>
+        {cards([
+          {h:"STEFAN-BOLTZMANN LAW",  col:V.gold,  d:"L = 4πR²σT⁴. Luminosity scales as T⁴ — doubling T increases radiated power 16×. O stars at 40,000 K emit ~64,000× more power than G stars at 5,778 K. Consequence for life: O-star habitable zones are orders of magnitude further out; by the time a planet forms there, the star may have already left the main sequence. O-star habitable windows for life: <1 million years."},
+          {h:"COSMIC RAY SPECTRUM",   col:V.vio,   d:"Cosmic rays: protons (90%), helium (9%), heavier nuclei+electrons (1%). Energies: 10⁶–10²⁰ eV (ultra-high energy cosmic rays). Flux at Earth surface: ~10⁴ particles/m²/s. Primary cosmic rays reach upper atmosphere; secondary cascade (muons, pions, photons) penetrates to sea level. Tardigrade tun LD50 for radiation: ~570,000 rad vs human LD50: ~400 rad — 1,400× more tolerant."},
+          {h:"SOLAR WIND COMPOSITION",col:V.amb,   d:"Protons: 96%. Alpha particles: 4%. Speed: 400–800 km/s (slow/fast). Particle density at Earth: ~6 protons/cm³. Energy flux: ~2 nW/m². Heliosphere outer boundary (heliopause): ~123 AU. Beyond: local interstellar medium takes over. Voyager 1 crossed heliopause in 2012 — cosmic ray flux increased 3× upon exit."},
+          {h:"CORONA PARADOX",        col:V.rose,  d:"Photosphere: 5,778 K. Chromosphere: 20,000 K. Corona: 1–3×10⁶ K. Temperature INCREASES with altitude — violates naive thermodynamic intuition. Leading mechanisms: Alfvén wave dissipation (MHD wave energy → thermal via turbulence) and nanoflare heating (magnetic reconnection microbursts). Total unsolved since 1939. High entropy state: corona is a low-density extremely hot plasma — high internal energy but also high entropy per particle."},
+          {h:"TARDIGRADE RADIATION",  col:V.cyan,  d:"Mechanism: CAHS-D glass matrix physically stops radical diffusion. In active state: Dsup protein binds DNA directly, preventing double-strand breaks. Reactive oxygen species (ROS) scavenged by catalase/SOD enzymes (3–5× upregulated). IR (ionising radiation) LD50 in tun: 570,000 mGy. In active state: ~3,000 mGy. Space vacuum + cosmic ray exposure for 10 days (Foton-M3 BIOPAN-6): survived."},
+          {h:"STELLAR ENTROPY STATES",col:V.plasma,d:"Core: T=1.5×10⁷K, ρ=150 g/cm³, pressure 2.5×10¹⁶ Pa. Maximum thermal energy density in stable stellar object. Radiation zone: energy transport by photon random walk — mean free path ~2cm, transit time ~170,000 years. Convection zone: buoyant plasma cells. Photosphere: τ=1 optical depth — last scattering surface. Corona: low ρ, extremely high T — high entropy per particle, low total energy."},
+        ])}
+      </>)}
+
+      {sec("06","Bayesian Inference · Life Probability · Evidence Propagation · Soil Chemistry",V.vio,<>
+        {P("Bayesian inference provides the mathematically rigorous framework for updating the probability of life given accumulating evidence. The prior probability P(life) in a new environment begins at ~1% — a generous estimate given that we have confirmed life in exactly one location (Earth) from billions of observed bodies. Each piece of evidence — liquid water activity, temperature range, radiation shielding, pH compatibility, organic carbon availability, magnetic field strength — is incorporated as a conditional likelihood P(evidence | life): the probability of observing that evidence if life were present. Bayes' theorem then states that the posterior probability P(life | evidence) is proportional to the product of all conditional likelihoods multiplied by the prior. Critically, the framework handles dependent evidence correctly — if we already know there is liquid water, the additional information from pH is less informative than if water were absent, because pH is partly determined by water chemistry. The Bayesian network makes these dependencies explicit as directed edges between evidence nodes.")}
+        {P("Applied to soil chemistry, the Bayesian framework reveals why Earth's loamy temperate soil (posterior P(life) ≈ 99.97%) differs so dramatically from Mars surface regolith (posterior ≈ 0.22%) despite both having carbon and silicon chemistry. The critical bottleneck on Mars is not temperature or even radiation — it is liquid water activity (evidence score 0.03 vs 0.97 on Earth). Without liquid water, no enzyme can function, no cell membrane can exist, no chemical gradient can be maintained. The Bayesian network weights water activity at 30% of the total likelihood — the dominant evidence term. pH (range 4.5–7.5 for tardigrades) scores 0.30 on Mars (surface pH ~3.5 + perchlorate) versus 0.88 on Earth. Organics score 0.08 on Mars versus 0.96 on Earth. The compound effect of six sub-optimal evidence terms drives the Mars posterior to 0.22% — marginally above the prior, indicating the surface is weakly hostile rather than absolutely sterile. Enceladus, by contrast, scores 0.95 on water activity (plumes directly sampled), 0.55 on temperature (moderate hydrothermal), 0.70 on radiation shielding (subsurface ice cover), 0.75 on pH (slightly alkaline from carbonate), 0.82 on organics (Cassini detected complex molecules), and 0.20 on magnetic field — driving the posterior to ~62%.")}
+        <div style={{border:`1px solid ${V.dim}44`,borderRadius:8,padding:2,marginBottom:14}}>
+          <BayesianInferenceCanvas/>
+        </div>
+        {cards([
+          {h:"BAYES' THEOREM",        col:V.vio,   d:"P(H|E) = P(E|H)·P(H) / P(E). H=life hypothesis. E=all evidence. P(E|H): likelihood of observing evidence given life is present. P(E)=P(E|H)·P(H)+P(E|¬H)·P(¬H): normalisation (law of total probability). Numerically: P(life|Earth soil)= 0.97·0.88·0.96·0.88·0.96·0.95 × 0.01 / P(E) ≈ 99.97%."},
+          {h:"WATER ACTIVITY aW",     col:V.blue,  d:"aW=1.0 = pure water. Life minimum: aW ≥ 0.605 (some halophiles). Tardigrades active: aW > 0.90. Mars surface: aW < 0.01 (2×10⁻⁴ measured by Curiosity). Mars subsurface brine: aW ~0.55 (seasonal). Enceladus plume: aW ~0.98. Europa ocean: aW ~0.92. aW drives Bayesian weight: 30% of posterior because it gates all biochemistry."},
+          {h:"SOIL pH vs LIFE",       col:V.green, d:"Optimal: 6.0–7.5. Tardigrade tolerance: 4.0–8.5. Mars surface: pH 3.5–4.0 (sulfuric + perchloric acid). Enceladus: pH 8.5–10.5 (Cassini mass spec) — alkaline but not lethal. Europa: pH 7–8 estimated (salt composition). Venus cloud layer at 50km: pH ~0 (H₂SO₄ 80%). Earth ocean average: pH 8.1. Every 1 pH unit outside tolerance: 50% viability reduction in Bayesian likelihood."},
+          {h:"ORGANIC CARBON SCORE",  col:V.honey, d:"Earth loamy soil: 3–8% SOC (soil organic carbon). Enceladus plumes: complex organics with mass >200 Da (Cassini INMS). Europa surface: radiolytic organics (UV + cosmic rays → organics from CO₂ + H₂O). Mars: <0.5% (Viking detection threshold; Perseverance confirmed trace organics 2023). Organic presence raises P(life) Bayesian score: organics=both reactants AND products of biology."},
+          {h:"MAGNETIC FIELD WEIGHT", col:V.amb,   d:"Weight=15% in Bayesian posterior — less critical than water (30%) but important. Role: deflects cosmic rays → reduces radiation dose → reduces DNA mutation rate → allows active metabolism (not just tun). Earth: 25–65 μT. Mars: <0.5 μT (global average). Enceladus: no global field but overlying ice crust shields subsurface. Europa: in Jupiter's magnetosphere — radiation intense at surface but attenuated at depth."},
+          {h:"SOIL MICROBIAL ECOLOGY",col:V.photon,d:"Earth soil: 10⁹ bacteria/g + 10⁸ fungi/g + 10⁵ tardigrades/L. Rhizosphere (root zone): 10–100× higher density. Primary producers (photoautotrophs): foundation. Decomposers (heterotrophs): recycle. Predators (tardigrades, nematodes): regulate bacterial biomass. Remove tardigrades → bacterial monoculture → nitrogen lock-up → plant productivity drop 30–60%. Tardigrade = keystone predator in soil."},
+        ])}
+      </>)}
+
+      {sec("07","Quantitative Finance · MSDD Market Cascade · Black-Scholes Vol Surface · Bayesian Portfolio",V.gold,<>
+        {P("The same mathematical structure that describes Mutual Shared Destructional Decoherence in biological ecosystems applies to financial markets with striking precision. A diversified portfolio is analogous to a multi-node biological network with low inter-node correlation — each asset class (equities, bonds, commodities, foreign exchange, crypto, real estate) behaves semi-independently, so that shocks to one node are absorbed rather than amplified. The pairwise correlation ρᵢⱼ between asset i and asset j plays the same role as the quantum coupling constant κ in the MSDD equation: when ρ is low (normal regime, ρ ≈ 0.1–0.3 between equities and bonds), the system is robust. When a systemic shock hits (2008 financial crisis, COVID March 2020, Black Monday 1987), correlations spike to ρ → 0.9 across all asset pairs simultaneously. This is the financial MSDD event: the collapse of cross-node diversity is autocatalytic. As prices fall, leveraged funds are margin-called, forced to sell across all positions, pushing correlations higher, which triggers more margin calls. The 2008 financial MSDD: equities fell 57%, bonds initially fell (risk-off selling), corporate credit spreads exploded, commodities collapsed, real estate (the original shock node) triggered the cascade. Maximum drawdown: S&P 500 lost 57% peak-to-trough over 17 months.")}
+        {P("The Black-Scholes implied volatility surface provides the market's real-time Bayesian estimate of future uncertainty. For a European option with strike K and expiry T, implied volatility σ_impl(K,T) is the value that makes the Black-Scholes formula equal to the observed market price. In a world with log-normal returns and constant volatility (the original BS assumption), σ_impl would be flat across all strikes and maturities — a flat plane. In reality, the vol surface exhibits a 'smile' (higher implied vol for deep in-the-money and deep out-of-the-money options than at-the-money) and a 'term structure' (short-dated options have higher implied vol during crises, reflecting immediate uncertainty). During MSDD market events, the entire surface shifts up and distorts: the short-dated ATM vol jumps from ~16 (VIX in calm markets) to 80+ (VIX peak in March 2020: 82.7), and the smile steepens as the market prices in fat-tail scenarios. The Bayesian portfolio updating problem — given the current vol surface as prior, new market data as likelihood, what are the posterior optimal weights? — is solved at each rebalancing step using the Markowitz mean-variance framework as a Bayesian normal-normal conjugate update: posterior weights w* = argmax E[R] − (λ/2)·w'Σw, where Σ is the covariance matrix updated from options-implied correlations.")}
+        <div style={{border:`1px solid ${V.dim}44`,borderRadius:8,padding:2,marginBottom:14}}>
+          <QuantFinanceCanvas/>
+        </div>
+        {cards([
+          {h:"MARKOWITZ PORTFOLIO",   col:V.gold,  d:"Modern Portfolio Theory (1952): w* = argmin w'Σw s.t. w'μ ≥ R_target. Efficient frontier: set of (σ,R) portfolios with max R for given σ. Sharpe ratio: S=(E[R]−rf)/σ. Tangency portfolio: max Sharpe. Key insight: diversification reduces σ without reducing E[R] proportionally — free lunch via negative correlation. MSDD destroys this: when ρ→1, Σ has no off-diagonal cancellation; all eigenvalues grow."},
+          {h:"BLACK-SCHOLES MODEL",   col:V.blue,  d:"dS = μS dt + σS dW (geometric Brownian motion). Call price: C = S·N(d₁) − K·e^(−rT)·N(d₂). d₁=[ln(S/K)+(r+σ²/2)T]/(σ√T). d₂=d₁−σ√T. Greek: Δ=∂C/∂S, Γ=∂²C/∂S², Θ=∂C/∂t, Vega=∂C/∂σ. Vol surface σ(K,T) deviates from BS flat-vol assumption: smile (higher vol for OTM puts) + term structure (short-dated vol higher in crisis)."},
+          {h:"VOLATILITY SMILE",      col:V.vio,   d:"Implied vol smile: σ(K) is U-shaped around ATM. Deep OTM puts: high σ_impl (tail risk premium — market prices crash probability above log-normal). Deep OTM calls: high σ_impl (lottery premium). Stochastic vol models (Heston, SABR) reproduce smile. During MSDD (2008, 2020): smile steepens → OTM put σ rises 3–5× → options hedging costs spike → delta-hedging fails → gamma losses compound losses."},
+          {h:"BAYESIAN PORTFOLIO",    col:V.photon,d:"Black-Litterman model: start with CAPM prior (market-cap weights). Update with investor views (likelihood) via Bayes. Posterior: w* = (τΣ)⁻¹(τΣ·w_eq + P'Ω⁻¹Q). τ: scalar for prior confidence. P: views matrix. Ω: view uncertainty. Q: view returns. Result: posterior weights blend equilibrium with private signal in proportion to their relative precision (1/variance). MSDD risk: if views are themselves correlated during panic, posterior collapses to equal-weight."},
+          {h:"FINANCIAL MSDD",        col:V.plasma,d:"Financial MSDD equation: dρᵢⱼ/dt = κ·(1−ρᵢⱼ)·P_stress, where P_stress = portfolio drawdown fraction. Critical threshold: when κ·P_stress > decay_rate, ρ→1 faster than risk management can respond. 2008 timeline: Day 0 (Lehman) → Day 3: ρ_EQ-BOND spikes 0.15→0.85 → Day 10: redemptions force selling → Day 20: all ρ→0.95. ALCC analogue: circuit breakers (trading halts) + central bank liquidity injection = ALCC protection signal."},
+          {h:"ALCC IN FINANCE",       col:V.cyan,  d:"Market ALCC: central banks = COMMAND node. Interest rate cuts + QE = protection signal. Speed: Fed cuts rates in hours (2020). Effectiveness: depends on whether shock is liquidity or solvency crisis. Liquidity MSDD (2020 COVID): ALCC works — markets recovered fully in 5 months. Solvency MSDD (2008): ALCC slower — required TARP + stress tests + 3 years to recover. Tardigrade analogy: CAHS-D works for desiccation (liquidity); cannot prevent hyperthermia (solvency)."},
         ])}
       </>)}
     </div>
