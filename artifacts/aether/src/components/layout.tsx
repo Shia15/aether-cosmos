@@ -313,6 +313,7 @@ const NAV_ITEMS = [
   { href: "/crashout",                label: "Crashout · Brain Dump Journal",              icon: Sparkles },
   { href: "/lunar-coherence",          label: "Lunar Coherence · Tides · Groundwater · Ambient Field", icon: Moon },
   { href: "/lunar-ambient-field",      label: "Lunar Ambient Field · Moon-Phase Tide Engine · Groundwater Coherence · M2 Semi-Diurnal · Spring-Neap Modulation", icon: Moon },
+  { href: "/alchemy-fusion",           label: "Alchemy → Fusion Transmutation · Automated Substrate Synthesis Bridges · Plasmoid β-B · (3,4) Torus Knot · nSpacetime Transversal", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
