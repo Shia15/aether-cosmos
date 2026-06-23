@@ -279,6 +279,7 @@ import UvAminoLightPage from "@/pages/uv-amino-light";
 import FullSpectrumLightPage from "@/pages/full-spectrum-light";
 import PrismPrinciplePage from "@/pages/prism-principle";
 import RegulatoryDepthPage from "@/pages/regulatory-depth";
+import AntimatterWavePage from "@/pages/antimatter-wave";
 import AgentMappingPage from "@/pages/agent-mapping";
 import EventHorizonPage from "@/pages/event-horizon";
 import PhotonEmissionPage from "@/pages/photon-emission";
@@ -575,6 +576,7 @@ function Router() {
         <Route path="/full-spectrum-light" component={FullSpectrumLightPage} />
         <Route path="/prism-principle" component={PrismPrinciplePage} />
         <Route path="/regulatory-depth" component={RegulatoryDepthPage} />
+        <Route path="/antimatter-wave" component={AntimatterWavePage} />
         <Route path="/agent-mapping" component={AgentMappingPage} />
         <Route path="/event-horizon" component={EventHorizonPage} />
         <Route path="/photon-emission" component={PhotonEmissionPage} />
