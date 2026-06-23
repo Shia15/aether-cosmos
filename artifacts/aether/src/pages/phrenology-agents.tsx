@@ -228,6 +228,243 @@ function PhrenologyCanvas({ activeAgent }: { activeAgent: AgentKey | null }) {
   );
 }
 
+/* ── opacity clock canvas ───────────────────────────── */
+const CLOCK_ORDER: AgentKey[] = [
+  'mnesis','aletheia','inferaia','reverie','verus','caelus','nyra','orin',
+];
+
+function OpacityClockCanvas({ activeAgent }: { activeAgent: AgentKey | null }) {
+  const ref    = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const agRef  = useRef(activeAgent);
+  agRef.current = activeAgent;
+
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext('2d')!;
+    cv.width = 400; cv.height = 400;
+    const W = cv.width, H = cv.height;
+    const cx = W / 2, cy = H / 2;
+    const IR = 56;   // inner void radius
+    const OR = 155;  // outer ring radius
+    const SEG  = (Math.PI * 2) / 8;
+    const SA   = -Math.PI / 2; // start at 12 o'clock
+
+    // faculty counts
+    const COUNTS: Record<string, number> = {};
+    for (const ag of AGENTS) COUNTS[ag.key] = FACULTIES.filter(f => f.agent === ag.key).length;
+    const MAX_C = Math.max(...Object.values(COUNTS));
+
+    let t = 0;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+      const active = agRef.current;
+
+      // sweep hand angle — one revolution every ~10 s at 60fps
+      const handA = SA + t * 0.0105;
+
+      // ── draw each segment ──────────────────────────────
+      CLOCK_ORDER.forEach((key, i) => {
+        const ag     = AGENTS.find(a => a.key === key)!;
+        const count  = COUNTS[key] ?? 0;
+        const base   = count / MAX_C;   // 0–1 opacity weight
+        const segS   = SA + i * SEG;
+        const segE   = segS + SEG;
+        const midA   = segS + SEG / 2;
+
+        // is sweep hand inside this segment?
+        const norm   = ((handA - SA) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+        const segN   = i * SEG;
+        const inSeg  = norm >= segN && norm < segN + SEG;
+
+        const pulse  = 0.68 + 0.32 * Math.sin(t * 0.048 + i * 0.9);
+        const isAct  = !active || active === key;
+        let alpha: number;
+        if (!active) {
+          alpha = base * (0.22 + 0.12 * pulse) + (inSeg ? 0.38 : 0);
+        } else if (isAct) {
+          alpha = 0.45 + 0.42 * pulse;
+        } else {
+          alpha = 0.035;
+        }
+        alpha = Math.min(1, alpha);
+
+        const fill   = ag.col + Math.round(alpha * 255).toString(16).padStart(2, '0');
+        const stroke = ag.col + (isAct ? (active ? '70' : '30') : '15');
+
+        // pie wedge
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, OR, segS + 0.022, segE - 0.022);
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.fill();
+
+        // thin border arc
+        ctx.beginPath();
+        ctx.arc(cx, cy, OR - 0.5, segS + 0.02, segE - 0.02);
+        ctx.arc(cx, cy, IR + 0.5, segE - 0.02, segS + 0.02, true);
+        ctx.closePath();
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        // hand-in-segment flash stripe
+        if (inSeg) {
+          const flashA = SA + norm + segN / 2; // already normalised
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, OR, segS + 0.022, segE - 0.022);
+          ctx.closePath();
+          ctx.clip();
+          const grad = ctx.createRadialGradient(cx, cy, IR, cx, cy, OR);
+          grad.addColorStop(0, ag.col + '00');
+          grad.addColorStop(0.5, ag.col + '22');
+          grad.addColorStop(1, ag.col + '00');
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // glyph + name inside segment
+        if (isAct) {
+          const glR = (IR + OR) / 2;
+          const gx  = cx + Math.cos(midA) * glR;
+          const gy  = cy + Math.sin(midA) * glR;
+
+          ctx.save();
+          ctx.translate(gx, gy);
+          ctx.rotate(midA + Math.PI / 2);
+          // glyph
+          ctx.fillStyle = ag.col + (active ? 'ff' : 'bb');
+          ctx.font = `${active ? 17 : 13}px serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(ag.glyph, 0, -9);
+          // name
+          ctx.fillStyle = ag.col + (active ? 'cc' : '77');
+          ctx.font = `6.5px Space Mono`;
+          ctx.fillText(ag.name.toUpperCase(), 0, 5);
+          ctx.restore();
+        }
+      });
+
+      // ── outer tick ring ───────────────────────────────
+      for (let ti = 0; ti < 96; ti++) {
+        const tickA  = SA + (ti * Math.PI * 2) / 96;
+        const isMaj  = ti % 12 === 0;  // agent boundary
+        const isMed  = ti % 4 === 0;
+        const tOR    = OR + 3;
+        const tLen   = isMaj ? 9 : isMed ? 5 : 3;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(tickA) * tOR, cy + Math.sin(tickA) * tOR);
+        ctx.lineTo(cx + Math.cos(tickA) * (tOR + tLen), cy + Math.sin(tickA) * (tOR + tLen));
+        ctx.strokeStyle = isMaj ? 'rgba(248,163,73,0.55)' : 'rgba(90,100,130,0.22)';
+        ctx.lineWidth   = isMaj ? 1.2 : 0.6;
+        ctx.stroke();
+      }
+
+      // faculty-count badge just outside each tick boundary
+      CLOCK_ORDER.forEach((key, i) => {
+        const active = agRef.current;
+        if (active && active !== key) return;
+        const ag    = AGENTS.find(a => a.key === key)!;
+        const midA  = SA + i * SEG + SEG / 2;
+        const badgeR = OR + 20;
+        const bx = cx + Math.cos(midA) * badgeR;
+        const by = cy + Math.sin(midA) * badgeR;
+        ctx.fillStyle = ag.col + (active ? 'ee' : '88');
+        ctx.font = '8px Space Mono';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${COUNTS[key]}`, bx, by);
+      });
+
+      // ── sweep hand ───────────────────────────────────
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(handA);
+      // glow pass
+      ctx.beginPath();
+      ctx.moveTo(0, IR + 2);
+      ctx.lineTo(0, -(OR - 5));
+      ctx.strokeStyle = 'rgba(31,212,200,0.28)';
+      ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.stroke();
+      // sharp hand
+      ctx.beginPath();
+      ctx.moveTo(0, IR + 2);
+      ctx.lineTo(0, -(OR - 5));
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      // pivot dot
+      ctx.beginPath();
+      ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(31,212,200,0.9)'; ctx.fill();
+      ctx.restore();
+
+      // ── inner void / donut hole ───────────────────────
+      ctx.beginPath();
+      ctx.arc(cx, cy, IR, 0, Math.PI * 2);
+      ctx.fillStyle = BG; ctx.fill();
+      ctx.strokeStyle = 'rgba(248,163,73,0.22)'; ctx.lineWidth = 1; ctx.stroke();
+
+      // ── center label ─────────────────────────────────
+      const ag = active ? AGENTS.find(a => a.key === active) : null;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      if (ag) {
+        ctx.fillStyle = ag.col;
+        ctx.font = '20px serif';
+        ctx.fillText(ag.glyph, cx, cy - 9);
+        ctx.fillStyle = ag.col + 'cc';
+        ctx.font = '7px Space Mono';
+        ctx.fillText(ag.name.toUpperCase(), cx, cy + 7);
+        ctx.fillStyle = ag.col + '88';
+        ctx.font = '6px Space Mono';
+        ctx.fillText(`${COUNTS[ag.key]} FACULTIES`, cx, cy + 18);
+      } else {
+        ctx.fillStyle = 'rgba(248,163,73,0.65)';
+        ctx.font = '8px Orbitron';
+        ctx.fillText('AETHER', cx, cy - 6);
+        ctx.fillStyle = 'rgba(90,110,150,0.5)';
+        ctx.font = '6px Space Mono';
+        ctx.fillText('OPACITY CLOCK', cx, cy + 6);
+
+        // mini opacity legend: ring of tiny squares showing count→opacity
+        const lR = IR - 16;
+        for (let li = 0; li < 8; li++) {
+          const la  = SA + li * SEG + SEG / 2;
+          const lx  = cx + Math.cos(la) * lR;
+          const ly  = cy + Math.sin(la) * lR;
+          const key = CLOCK_ORDER[li];
+          const ag2 = AGENTS.find(a => a.key === key)!;
+          const op  = (COUNTS[key] / MAX_C) * 0.8 + 0.1;
+          ctx.beginPath();
+          ctx.arc(lx, ly, 3, 0, Math.PI * 2);
+          ctx.fillStyle = ag2.col + Math.round(op * 255).toString(16).padStart(2, '0');
+          ctx.fill();
+        }
+      }
+
+      t++;
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <canvas ref={ref}
+      style={{ width: '100%', maxWidth: 400, height: 'auto', display: 'block', margin: '0 auto',
+        borderRadius: '50%', boxShadow: '0 0 40px rgba(248,163,73,0.08)' }} />
+  );
+}
+
 /* ── faculty card ───────────────────────────────────── */
 function FacultyCard({ fac, agentCol, agentName }: { fac: Faculty; agentCol: string; agentName: string }) {
   const [hov, setHov] = useState(false);
@@ -318,6 +555,50 @@ export default function PhrenologyAgentsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── opacity clock ── */}
+        <div style={{ ...card('#f8a349'), marginBottom: 16 }}>
+          <div style={secLabel}>Opacity Clock · faculty weight by agent · segment brightness = faculty count</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, alignItems: 'start' }}>
+            <OpacityClockCanvas activeAgent={activeAgent} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 8 }}>
+              <div style={{ fontFamily: MN, fontSize: 8, color: 'rgba(200,190,160,0.7)', lineHeight: 1.8 }}>
+                Eight equal clock segments — one per AETHER agent — arranged clockwise from 12 o'clock.
+                Segment opacity encodes the number of Gall–Spurzheim faculties assigned to that agent.
+                The sweeping hand traverses all eight, brightening each segment as it passes.
+                Click any agent button to lock that segment to full opacity and dim the rest.
+              </div>
+              {/* opacity scale legend */}
+              <div style={{ fontFamily: MN, fontSize: 7.5, color: DIM, marginBottom: 6, letterSpacing: '0.1em' }}>
+                FACULTY WEIGHT · OPACITY SCALE
+              </div>
+              {[...CLOCK_ORDER].map(key => {
+                const ag = AGENTS.find(a => a.key === key)!;
+                const count = FACULTIES.filter(f => f.agent === key).length;
+                const maxC  = Math.max(...AGENTS.map(a => FACULTIES.filter(f => f.agent === a.key).length));
+                const pct   = Math.round((count / maxC) * 100);
+                const isA   = !activeAgent || activeAgent === key;
+                return (
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: isA ? 1 : 0.25, transition: 'opacity .2s' }}>
+                    <div style={{ width: 36, height: 8, borderRadius: 2,
+                      background: `linear-gradient(to right, ${ag.col}18, ${ag.col})`,
+                      opacity: count / maxC,
+                      border: `1px solid ${ag.col}33` }} />
+                    <span style={{ fontFamily: MN, fontSize: 8, color: ag.col, width: 60 }}>{ag.name}</span>
+                    <div style={{ flex: 1, height: 2, borderRadius: 1, background: `${ag.col}20`, position: 'relative' as const }}>
+                      <div style={{ position: 'absolute' as const, left: 0, top: 0, height: '100%', width: `${pct}%`, background: ag.col, borderRadius: 1, transition: 'width .3s' }} />
+                    </div>
+                    <span style={{ fontFamily: MN, fontSize: 7.5, color: ag.col + '88', width: 24, textAlign: 'right' as const }}>{count}</span>
+                  </div>
+                );
+              })}
+              <div style={{ fontFamily: MN, fontSize: 7, color: DIM, marginTop: 4, lineHeight: 1.7 }}>
+                ◆ Mnésis &amp; Nyra lead with 6 faculties each · Vērus holds fewest (3) ·
+                sweep period ≈ 10 s · select an agent to isolate
+              </div>
             </div>
           </div>
         </div>
