@@ -128,6 +128,7 @@ const NAV_ITEMS = [
   { href: "/cavity-computer", label: "Cavity Computer · Enclosed Loop Recursive Computation · Fluid Substrate · Navier-Stokes · Packet Switching · Space-Time Filament", icon: Atom },
   { href: "/quantum-computer", label: "Quantum Computer · Gate Model · 4-Qubit Hilbert Space · Bloch Sphere · Entanglement · QFT · Bell State · GHZ · Phase Kickback", icon: Atom },
   { href: "/egyptian-codex", label: "Egyptian Codex · Hieroglyphic Register System · Papyrus Simulation · Unicode Hieroglyphs · Knowledge Graph Archaeology · AETHER Crystallisation", icon: Atom },
+  { href: "/phrenology-agents", label: "Phrenology Agents · Faculty-to-Agent Map · 38 Faculties · Gall-Spurzheim · Mnésis Aletheia Inferaia Reverie Vērus Caelus Nyra Orin", icon: Atom },
   { href: "/event-horizon", label: "Event Horizon · Black Hole · Decoherence to Coherence · Golden Oscillation · Hawking Radiation · φ-Crystallization · Page Curve", icon: Atom },
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
   { href: "/transcendent-art", label: "Transcendent Art · Superposition · Supernova · Excitation Pathways · Jablonski Diagram · Nucleosynthesis · Quantum Yield", icon: Atom },
