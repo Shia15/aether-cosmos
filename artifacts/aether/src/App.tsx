@@ -107,6 +107,7 @@ import FamilyFieldDynamicsPage from "@/pages/family-field-dynamics";
 import QuantumEyeFieldPage from "@/pages/quantum-eye-field";
 import PsilocybinWaterOctopusPage from "@/pages/psilocybin-water-octopus";
 import PinealMossVisionPage from "@/pages/pineal-moss-vision";
+import QuantumRingdownBiocyclesPage from "@/pages/quantum-ringdown-biocycles";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -480,6 +481,7 @@ function Router() {
         <Route path="/quantum-eye-field" component={QuantumEyeFieldPage} />
         <Route path="/psilocybin-water-octopus" component={PsilocybinWaterOctopusPage} />
         <Route path="/pineal-moss-vision" component={PinealMossVisionPage} />
+        <Route path="/quantum-ringdown-biocycles" component={QuantumRingdownBiocyclesPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
