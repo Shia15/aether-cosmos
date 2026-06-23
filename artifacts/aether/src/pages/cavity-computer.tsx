@@ -597,8 +597,9 @@ function LaserSolderCanvas() {
   const raf   = useRef(0);
   const [pwr,  setPwr]  = useState(1.0);
   const [auto, setAuto] = useState(true);
-  const pwrRef  = useRef(1.0);
-  const autoRef = useRef(true);
+  const pwrRef   = useRef(1.0);
+  const autoRef  = useRef(true);
+  const resetRef = useRef(false);
   useEffect(()=>{ pwrRef.current  = pwr;  }, [pwr]);
   useEffect(()=>{ autoRef.current = auto; }, [auto]);
 
@@ -657,11 +658,27 @@ function LaserSolderCanvas() {
       return best;
     };
 
+    /* ── Reset helper ───────────────────────────── */
+    const doReset = () => {
+      temps.fill(T_ROOM);
+      states.fill(0);
+      flow.fill(0);
+      hps.length = 0;
+      headX = BX + BW/2;
+      targetId = -1;
+      phase = "SEEK";
+      completedJoints = 0;
+      resetRef.current = false;
+    };
+
     let t=0;
     const draw = ()=>{
       const P = pwrRef.current;
       const AUTO = autoRef.current;
       t++;
+
+      /* ── Reset check ─────────────────────────── */
+      if(resetRef.current) doReset();
 
       /* ── State machine ───────────────────────── */
       if(AUTO){
@@ -959,6 +976,13 @@ function LaserSolderCanvas() {
             cursor:"pointer",border:`1px solid ${auto?GRN:DIM}50`,
             background:`${auto?GRN:DIM}12`,color:auto?GRN:DIM,letterSpacing:1}}>
           AUTO: {auto?"ON":"OFF"}
+        </button>
+        <button
+          onClick={()=>{ resetRef.current = true; }}
+          style={{fontFamily:"'Space Mono',monospace",fontSize:11,padding:"6px 14px",borderRadius:5,
+            cursor:"pointer",border:`1px solid ${ROSE}50`,
+            background:`${ROSE}12`,color:ROSE,letterSpacing:1}}>
+          ↺ RESET BOARD
         </button>
       </div>
     </div>
