@@ -125,6 +125,322 @@ function VacuumFlowCanvas() {
   return <canvas ref={ref} style={{ width: "100%", maxWidth: 640, height: 280, display: "block", margin: "0 auto", borderRadius: 8 }} />;
 }
 
+// ── Three Operators of Ptah — Composition Canvas ──────────────────────────────
+function PtahOperatorCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 960; cv.height = 280;
+    const W = cv.width, H = cv.height;
+    let t = 0, raf = 0;
+    const panelW = W / 3;
+    const draw = () => {
+      ctx.fillStyle = "rgba(2,4,8,0.22)"; ctx.fillRect(0, 0, W, H);
+      // ── □ Stable Lattice (left panel) ──
+      const latticeRows = 7, latticeCols = 9;
+      const lx0 = 12, ly0 = 30, lW = panelW - 24, lH = H - 60;
+      const cellX = lW / latticeCols, cellY = lH / latticeRows;
+      for (let r = 0; r <= latticeRows; r++) {
+        for (let c = 0; c <= latticeCols; c++) {
+          const gx = lx0 + c * cellX, gy = ly0 + r * cellY;
+          const distFromCenter = Math.sqrt((c / latticeCols - 0.5) ** 2 + (r / latticeRows - 0.5) ** 2);
+          const phase = Math.sin(t * 0.03 + distFromCenter * 4);
+          const alpha = 0.15 + 0.25 * (1 - distFromCenter * 1.5) * (0.6 + 0.4 * phase);
+          ctx.beginPath(); ctx.arc(gx, gy, 2.5 + phase * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(200,160,48,${Math.max(0, alpha)})`; ctx.fill();
+          if (c < latticeCols) {
+            ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx + cellX, gy);
+            ctx.strokeStyle = `rgba(200,160,48,${Math.max(0, alpha * 0.5)})`; ctx.lineWidth = 0.6; ctx.stroke();
+          }
+          if (r < latticeRows) {
+            ctx.beginPath(); ctx.moveTo(gx, gy); ctx.lineTo(gx, gy + cellY);
+            ctx.strokeStyle = `rgba(200,160,48,${Math.max(0, alpha * 0.5)})`; ctx.lineWidth = 0.6; ctx.stroke();
+          }
+        }
+      }
+      ctx.fillStyle = V.gold; ctx.font = `28px ${V.display}`; ctx.textAlign = "center";
+      ctx.fillText("□", panelW / 2, H - 22);
+      ctx.fillStyle = V.gold + "99"; ctx.font = `7px ${V.mono}`; ctx.textAlign = "center";
+      ctx.fillText("STABLE LATTICE · S*", panelW / 2, 18);
+      ctx.fillText("Manifested base state", panelW / 2, H - 8);
+
+      // panel divider
+      ctx.strokeStyle = "rgba(68,136,255,0.12)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(panelW, 20); ctx.lineTo(panelW, H - 20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(panelW * 2, 20); ctx.lineTo(panelW * 2, H - 20); ctx.stroke();
+
+      // ── ⌒ Cyclic Curvature (middle panel) ──
+      const cx2 = panelW + panelW / 2, cy2 = H / 2;
+      for (let ring = 1; ring <= 5; ring++) {
+        const phase2 = ((t * 0.02 - ring * 0.25) % 1 + 1) % 1;
+        const r2 = Math.max(1, phase2 * 88 + ring * 3);
+        const alpha2 = (1 - phase2) * 0.5;
+        ctx.beginPath(); ctx.arc(cx2, cy2, r2, Math.PI, 0);
+        ctx.strokeStyle = `rgba(0,255,178,${alpha2})`; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx2, cy2 + 20, r2 * 0.7, 0, Math.PI);
+        ctx.strokeStyle = `rgba(68,136,255,${alpha2 * 0.7})`; ctx.lineWidth = 1; ctx.stroke();
+      }
+      // vacuum potential at center
+      const potentialGlow = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, 40);
+      potentialGlow.addColorStop(0, `rgba(0,255,178,${0.08 + 0.06 * Math.sin(t * 0.05)})`);
+      potentialGlow.addColorStop(1, "transparent");
+      ctx.beginPath(); ctx.arc(cx2, cy2, 40, 0, Math.PI * 2); ctx.fillStyle = potentialGlow; ctx.fill();
+      ctx.fillStyle = V.aurora; ctx.font = `28px ${V.display}`; ctx.textAlign = "center";
+      ctx.fillText("⌒", cx2, H - 22);
+      ctx.fillStyle = V.aurora + "99"; ctx.font = `7px ${V.mono}`;
+      ctx.fillText("CYCLIC CURVATURE · ε", cx2, 18);
+      ctx.fillText("Vacuum potential fluctuations", cx2, H - 8);
+
+      // ── ⟨⟩ Vortical Helix (right panel) ──
+      const hcx = panelW * 2 + panelW / 2, hcy = H / 2, hR = 55, hPitch = 22;
+      const pts1: [number, number, number][] = [];
+      const pts2: [number, number, number][] = [];
+      for (let i = 0; i <= 100; i++) {
+        const ang = (i / 100) * Math.PI * 3.5 + t * 0.018;
+        const hx = hcx + hR * Math.cos(ang);
+        const hz = Math.sin(ang);
+        const hy = hcy + (i / 100 - 0.5) * hPitch * 4 - hR * Math.sin(ang) * 0.28;
+        pts1.push([hx, hy, hz]);
+        pts2.push([hcx + hR * Math.cos(ang + Math.PI), hcy + (i / 100 - 0.5) * hPitch * 4 - hR * Math.sin(ang + Math.PI) * 0.28, Math.sin(ang + Math.PI)]);
+      }
+      // rungs
+      for (let i = 0; i < 100; i += 8) {
+        ctx.beginPath(); ctx.moveTo(pts1[i][0], pts1[i][1]); ctx.lineTo(pts2[i][0], pts2[i][1]);
+        ctx.strokeStyle = `rgba(180,200,255,${0.05 + Math.abs(pts1[i][2]) * 0.1})`; ctx.lineWidth = 0.7; ctx.stroke();
+      }
+      ctx.beginPath(); pts1.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+      ctx.strokeStyle = V.blue; ctx.lineWidth = 1.8; ctx.globalAlpha = 0.75; ctx.stroke();
+      ctx.beginPath(); pts2.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+      ctx.strokeStyle = V.aurora; ctx.lineWidth = 1.8; ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.fillStyle = V.blue; ctx.font = `18px ${V.display}`; ctx.textAlign = "center";
+      ctx.fillText("⟨⟩", hcx, H - 22);
+      ctx.fillStyle = V.blue + "99"; ctx.font = `7px ${V.mono}`;
+      ctx.fillText("VORTICAL PROPAGATION · Γ_helix", hcx, 18);
+      ctx.fillText("Dynamic helical flow path", hcx, H - 8);
+
+      // composition label
+      ctx.fillStyle = "rgba(200,160,48,0.55)"; ctx.font = `9px ${V.mono}`; ctx.textAlign = "center";
+      ctx.fillText("FABRIC = □ ⊗ ⌒ ⊗ ⟨⟩", W / 2, H / 2);
+      ctx.fillStyle = "rgba(200,160,48,0.25)"; ctx.font = `7px ${V.mono}`;
+      ctx.fillText("Ptah's three operators compose the minimal grammar of reality", W / 2, H / 2 + 14);
+      t++; raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
+// ── Living Fabric Crystallization Canvas ───────────────────────────────────────
+function LivingFabricCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 960; cv.height = 340;
+    const W = cv.width, H = cv.height;
+    let t = 0, raf = 0;
+
+    // Coherence field grid
+    const GW = 64, GH = 42;
+    const field: number[][] = Array.from({ length: GH }, (_, r) =>
+      Array.from({ length: GW }, (_, c) => 0.1 + 0.2 * Math.random())
+    );
+    const fieldTarget: number[][] = field.map(row => [...row]);
+
+    type Crystal = { x: number; y: number; r: number; col: string; age: number; maxAge: number };
+    const crystals: Crystal[] = [];
+    type CoherenceParticle = { x: number; y: number; vx: number; vy: number; col: string; life: number; r: number };
+    const cParticles: CoherenceParticle[] = [];
+
+    // intelligence clusters — high-coherence stable nodes
+    const clusters = Array.from({ length: 5 }, (_, i) => ({
+      gx: Math.floor(8 + i * 12 + Math.random() * 6),
+      gy: Math.floor(8 + Math.random() * 26),
+      strength: 0.7 + Math.random() * 0.3,
+    }));
+
+    const cellW = W / GW, cellH = H / GH;
+
+    const draw = () => {
+      ctx.fillStyle = "rgba(2,4,8,0.28)"; ctx.fillRect(0, 0, W, H);
+      // Update coherence field with wave propagation
+      for (let r = 1; r < GH - 1; r++) {
+        for (let c = 1; c < GW - 1; c++) {
+          // diffusion + source
+          const laplacian = field[r-1][c] + field[r+1][c] + field[r][c-1] + field[r][c+1] - 4 * field[r][c];
+          const helixSource = 0.002 * Math.sin(t * 0.025 + c * 0.28 + r * 0.34);
+          const clusterBoost = clusters.reduce((acc, cl) => {
+            const d = Math.sqrt((c - cl.gx) ** 2 + (r - cl.gy) ** 2);
+            return acc + cl.strength * Math.exp(-d * 0.5) * 0.008;
+          }, 0);
+          fieldTarget[r][c] = Math.min(1, Math.max(0, field[r][c] + 0.06 * laplacian + helixSource + clusterBoost - 0.0015));
+        }
+      }
+      for (let r = 0; r < GH; r++)
+        for (let c = 0; c < GW; c++)
+          field[r][c] = fieldTarget[r][c];
+
+      // Render field as heat map
+      for (let r = 0; r < GH; r++) {
+        for (let c = 0; c < GW; c++) {
+          const v = field[r][c];
+          const px = c * cellW, py = r * cellH;
+          let col: string;
+          if (v < 0.3)      col = `rgba(20,40,80,${v * 0.8})`;
+          else if (v < 0.6) col = `rgba(${Math.floor(40 + v * 80)},${Math.floor(100 + v * 120)},${Math.floor(150 + v * 80)},${v * 0.7})`;
+          else if (v < 0.85) col = `rgba(0,${Math.floor(180 + v * 70)},${Math.floor(150 + v * 100)},${v * 0.8})`;
+          else               col = `rgba(${Math.floor(200 - v * 100)},255,${Math.floor(200 + v * 55)},${v * 0.95})`;
+          ctx.fillStyle = col; ctx.fillRect(px, py, cellW + 0.5, cellH + 0.5);
+          // crystallization event
+          if (v > 0.92 && Math.random() < 0.003) {
+            crystals.push({ x: px + cellW / 2, y: py + cellH / 2, r: 3, col: ["#00FFB2","#C8A030","#4488FF","#9966ff"][Math.floor(Math.random() * 4)], age: 0, maxAge: 180 + Math.floor(Math.random() * 120) });
+            cParticles.push({ x: px + cellW / 2, y: py + cellH / 2, vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2, col: V.aurora, life: 60, r: 2 });
+          }
+        }
+      }
+
+      // Draw helical flow lines
+      for (let h = 0; h < 4; h++) {
+        const hy = H * (0.15 + h * 0.2);
+        ctx.beginPath();
+        for (let x = 0; x <= W; x += 2) {
+          const y = hy + 18 * Math.sin((x / W) * Math.PI * 6 + t * 0.025 + h * 1.1);
+          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = `rgba(68,136,255,${0.06 + h * 0.015})`; ctx.lineWidth = 1; ctx.stroke();
+      }
+
+      // Crystal structures
+      crystals.forEach((cr, i) => {
+        cr.age++;
+        const alpha = Math.min(1, cr.age / 30) * Math.max(0, 1 - (cr.age - cr.maxAge * 0.7) / (cr.maxAge * 0.3));
+        if (cr.age < cr.maxAge) {
+          // draw 6-pointed crystal
+          const spikes = 6;
+          for (let s = 0; s < spikes; s++) {
+            const ang = (s / spikes) * Math.PI * 2 + cr.age * 0.01;
+            const outerR = cr.r + Math.min(cr.age * 0.15, 12);
+            ctx.beginPath(); ctx.moveTo(cr.x, cr.y);
+            ctx.lineTo(cr.x + Math.cos(ang) * outerR, cr.y + Math.sin(ang) * outerR);
+            ctx.strokeStyle = cr.col + Math.round(alpha * 200).toString(16).padStart(2, "0");
+            ctx.lineWidth = 1.2; ctx.stroke();
+          }
+          ctx.beginPath(); ctx.arc(cr.x, cr.y, cr.r, 0, Math.PI * 2);
+          ctx.fillStyle = cr.col + Math.round(alpha * 180).toString(16).padStart(2, "0"); ctx.fill();
+        } else {
+          crystals.splice(i, 1);
+        }
+      });
+
+      // Coherence particles
+      cParticles.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy; p.life--;
+        const alpha = p.life / 60;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,255,178,${alpha * 0.6})`; ctx.fill();
+        if (p.life <= 0) cParticles.splice(i, 1);
+      });
+
+      // Intelligence cluster halos
+      clusters.forEach(cl => {
+        const px = cl.gx * cellW, py = cl.gy * cellH;
+        const pulse = 0.3 + 0.15 * Math.sin(t * 0.04 + cl.gx);
+        const g = ctx.createRadialGradient(px, py, 0, px, py, cellW * 5);
+        g.addColorStop(0, `rgba(0,255,178,${pulse * 0.25})`);
+        g.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(px, py, cellW * 5, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        ctx.fillStyle = `rgba(0,255,178,${pulse})`; ctx.font = `7px ${V.mono}`; ctx.textAlign = "center";
+        ctx.fillText("INTEL", px, py - cellH * 5 - 4);
+      });
+
+      // Overlay labels
+      ctx.fillStyle = "rgba(0,255,178,0.2)"; ctx.font = `8px ${V.mono}`; ctx.textAlign = "left";
+      ctx.fillText("THE LIVING FABRIC · C(x,t) COHERENCE FIELD · CRYSTALLIZATION EVENTS · INTELLIGENCE CLUSTERS FORMING", 10, 16);
+      ctx.fillStyle = "rgba(200,160,48,0.4)"; ctx.font = `7px ${V.mono}`;
+      ctx.fillText(`t = ${t}  |  crystals: ${crystals.length}  |  C̄ = ${(field.flat().reduce((a,b)=>a+b,0)/(GW*GH)).toFixed(3)}`, 10, H - 8);
+      t++; raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
+// ── Coherence Propagation Through Helix Canvas ─────────────────────────────────
+function CoherencePropagationCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 960; cv.height = 200;
+    const W = cv.width, H = cv.height;
+    let t = 0, raf = 0;
+    type CPulse = { x: number; strength: number; col: string };
+    const pulses: CPulse[] = [
+      { x: 0, strength: 1.0, col: V.aurora },
+      { x: W * 0.3, strength: 0.78, col: V.blue },
+      { x: W * 0.6, strength: 0.55, col: V.gold },
+    ];
+    const draw = () => {
+      ctx.fillStyle = "rgba(2,4,8,0.2)"; ctx.fillRect(0, 0, W, H);
+      const cy = H / 2, helixR = 36, helixPitch = 28;
+      // draw helix backbone
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 2) {
+        const y = cy + helixR * Math.sin((x / helixPitch) * Math.PI * 2 + t * 0.02) * 0.5;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "rgba(68,136,255,0.25)"; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 2) {
+        const y = cy + helixR * Math.sin((x / helixPitch) * Math.PI * 2 + t * 0.02 + Math.PI) * 0.5;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "rgba(0,255,178,0.2)"; ctx.lineWidth = 1.2; ctx.stroke();
+      // coherence pulses travelling along helix
+      pulses.forEach(p => {
+        p.x += 1.4;
+        if (p.x > W + 100) p.x = -50;
+        const coherenceY = cy + helixR * Math.sin((p.x / helixPitch) * Math.PI * 2 + t * 0.02) * 0.5;
+        const g = ctx.createRadialGradient(p.x, coherenceY, 0, p.x, coherenceY, 28 * p.strength);
+        g.addColorStop(0, p.col + Math.round(p.strength * 160).toString(16).padStart(2, "0"));
+        g.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(p.x, coherenceY, 28 * p.strength, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, coherenceY, 5, 0, Math.PI * 2);
+        ctx.fillStyle = p.col; ctx.fill();
+        ctx.fillStyle = p.col + "cc"; ctx.font = `6.5px ${V.mono}`; ctx.textAlign = "center";
+        ctx.fillText(`C=${p.strength.toFixed(2)}`, p.x, coherenceY - 36);
+      });
+      // crystallization nodes where pulses overlap
+      pulses.forEach((p1, i) => {
+        pulses.forEach((p2, j) => {
+          if (i >= j) return;
+          const dist = Math.abs(p1.x - p2.x);
+          if (dist < 60) {
+            const midX = (p1.x + p2.x) / 2;
+            const midY = cy;
+            const overlap = 1 - dist / 60;
+            const gOverlap = ctx.createRadialGradient(midX, midY, 0, midX, midY, 20 * overlap);
+            gOverlap.addColorStop(0, `rgba(200,255,200,${overlap * 0.6})`); gOverlap.addColorStop(1, "transparent");
+            ctx.beginPath(); ctx.arc(midX, midY, 20 * overlap, 0, Math.PI * 2); ctx.fillStyle = gOverlap; ctx.fill();
+            ctx.fillStyle = "rgba(200,255,200,0.8)"; ctx.font = `6px ${V.mono}`; ctx.textAlign = "center";
+            ctx.fillText("CRYSTALLIZE", midX, midY + 28);
+          }
+        });
+      });
+      // labels
+      ctx.fillStyle = "rgba(68,136,255,0.3)"; ctx.font = `7px ${V.mono}`; ctx.textAlign = "center";
+      ctx.fillText("COHERENCE PROPAGATES THROUGH THE LIVING HELICAL MEDIUM · C(x,t) · CRYSTALLIZATION AT CONSTRUCTIVE INTERFERENCE NODES", W / 2, 14);
+      t++; raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
 // ── Section ───────────────────────────────────────────────────────────────────
 function Section({ title, id, children }: { title: string; id?: string; children: React.ReactNode }) {
   return (
@@ -416,6 +732,39 @@ export default function SpacetimeFabricPage() {
             <span style={{ color: V.blue }}>^(−κ·Γ_helix)</span>
             <span style={{ color: V.dim }}>  ←— holds at ALL scales: quantum → DNA → pyramid → galaxy → precession</span>
           </Eq>
+        </Section>
+
+        {/* ── Three Operators of Ptah — Live Canvas ── */}
+        <Section title="7 · THE THREE OPERATORS OF PTAH — ANIMATED COMPOSITION" id="ptah-ops">
+          <p style={{ fontSize: "0.98rem", lineHeight: 1.9, marginBottom: 16, color: "rgba(184,204,232,0.8)" }}>
+            Each of Ptah's three hieroglyphic operators animates a distinct physical regime. Together — via tensor product ⊗ — they compose the complete Fabric grammar. Watch how the <strong style={{ color: V.gold }}>stable lattice (□)</strong> pulses in phase coherence, the <strong style={{ color: V.aurora }}>cyclic curvature (⌒)</strong> radiates expanding semicircle wave fronts from the vacuum, and the <strong style={{ color: V.blue }}>vortical helix (⟨⟩)</strong> rotates — the physical path through which coherence travels.
+          </p>
+          <PtahOperatorCanvas />
+          <div style={{ fontFamily: V.mono, fontSize: "0.46rem", color: V.dim, letterSpacing: 3, textAlign: "center", marginTop: 8 }}>
+            PTAH · □ STABLE LATTICE ⊗ ⌒ CYCLIC CURVATURE ⊗ ⟨⟩ VORTICAL HELIX · THREE-OPERATOR COMPOSITION · FABRIC GRAMMAR
+          </div>
+        </Section>
+
+        {/* ── Coherence Propagation Canvas ── */}
+        <Section title="8 · COHERENCE PROPAGATION THROUGH THE HELICAL MEDIUM" id="propagation">
+          <p style={{ fontSize: "0.98rem", lineHeight: 1.9, marginBottom: 16, color: "rgba(184,204,232,0.8)" }}>
+            Three coherence pulses — each with diminishing amplitude C=1.0, 0.78, 0.55 — travel along the living helix. Where two pulses overlap, constructive interference drives C above the crystallization threshold. A <strong style={{ color: V.aurora }}>crystallization event</strong> fires at every overlap node — the mechanism by which all stable structure forms in the AETHER framework.
+          </p>
+          <CoherencePropagationCanvas />
+          <div style={{ fontFamily: V.mono, fontSize: "0.46rem", color: V.dim, letterSpacing: 3, textAlign: "center", marginTop: 8 }}>
+            C(x,t) PROPAGATION · HELICAL MEDIUM · CONSTRUCTIVE INTERFERENCE → CRYSTALLIZATION NODE · THE FABRIC'S GRAMMAR IN MOTION
+          </div>
+        </Section>
+
+        {/* ── Living Fabric Crystallization ── */}
+        <Section title="9 · THE LIVING FABRIC · ALL COHERENCE PROPAGATES · ALL STRUCTURE CRYSTALLIZES · ALL INTELLIGENCE EMERGES" id="living-fabric">
+          <p style={{ fontSize: "0.98rem", lineHeight: 1.9, marginBottom: 16, color: "rgba(184,204,232,0.8)" }}>
+            The full two-dimensional coherence field C(x,t) — governed by the diffusion-source equation with helical input and five intelligence cluster attractors. Dark regions are decoherent (C ≈ 0). Teal-white regions are fully coherent (C → 1). When C exceeds the crystallization threshold, a six-pointed crystal event fires and decays. The five green halos are <strong style={{ color: V.aurora }}>INTEL</strong> nodes — sustained high-coherence regions where intelligence patterns self-organize.
+          </p>
+          <LivingFabricCanvas />
+          <div style={{ fontFamily: V.mono, fontSize: "0.46rem", color: V.dim, letterSpacing: 3, textAlign: "center", marginTop: 8 }}>
+            LIVING HELICAL MEDIUM · C(x,t) COHERENCE FIELD · CRYSTALLIZATION EVENTS · INTELLIGENCE CLUSTER FORMATION · AETHER FABRIC LAYER 0
+          </div>
         </Section>
 
         {/* ── Conclusion ── */}

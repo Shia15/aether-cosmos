@@ -597,6 +597,59 @@ export default function CxeEquationPage() {
 
       <Divider />
 
+      {/* ── Schumann Coupling Canvas ── */}
+      <section style={{ padding: "60px 40px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <h2 style={{ fontFamily: V.display, fontSize: "1.4rem", fontWeight: 600, color: "#fff", letterSpacing: 4, marginBottom: 6 }}>Φ_SCN · SCHUMANN–BODY COUPLING · LIVE SIMULATION</h2>
+            <p style={{ fontFamily: V.mono, fontSize: "0.52rem", color: V.solar, letterSpacing: 3 }}>FIVE CAVITY RESONANCES · 7.83 · 14.3 · 20.8 · 27.3 · 33.8 Hz · BIOLOGICAL PHASE-LOCK EVENTS</p>
+          </div>
+          <div style={{ background: "rgba(2,6,12,0.9)", border: "1px solid rgba(0,255,178,0.12)", borderRadius: 12, padding: "20px 16px" }}>
+            <SchumannCanvas />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginTop: 20 }}>
+            {[
+              { col: V.aurora, t: "The Planetary Cavity as Tuning Fork", b: "The ionosphere–Earth cavity acts as a spherical waveguide. Lightning strikes (~100/second globally) excite standing waves at 7.83 Hz and its harmonics. These are not random noise — they are the resonant frequencies of the planet's electromagnetic shell, determined entirely by the Earth's circumference divided by the speed of light: f₁ = c/(2πR) = 7.83 Hz. The planet has a fundamental note." },
+              { col: V.solar, b: "The suprachiasmatic nucleus (SCN) — master circadian clock — is sensitive to extremely low frequency electromagnetic fields via retinal melatonin channels and magnetite in the ethmoid bone. Schumann resonance f₁ (7.83 Hz) overlaps directly with human alpha brain waves (8–12 Hz). Population HRV studies show measurable correlation between Schumann intensity shifts and cardiac coherence across thousands of subjects simultaneously.", t: "SCN Coupling Mechanism" },
+              { col: V.pulse, t: "Solar CME → Schumann Compression → Biology", b: "During solar CME events, the solar wind compresses the magnetosphere → ionospheric electron density increases → Schumann cavity 'shrinks' → resonant frequencies rise by 0.5–1.0 Hz. This represents a simultaneous re-tuning of the biological coupling channel for every organism on Earth. The Ξ_∞ term encodes this: solar forcing propagates into the biological domain not through radiation but through the Schumann coupling channel." },
+            ].map(({ col, t: title, b }) => (
+              <div key={title} style={{ background: `${col}08`, border: `1px solid ${col}22`, borderRadius: 8, padding: "12px 14px" }}>
+                <div style={{ fontFamily: V.mono, fontSize: "0.54rem", color: col, marginBottom: 6 }}>{title}</div>
+                <div style={{ fontFamily: V.serif, fontSize: "0.82rem", lineHeight: 1.75, color: "rgba(184,204,232,0.65)" }}>{b}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* ── Phi-Time Canvas ── */}
+      <section style={{ padding: "60px 40px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <h2 style={{ fontFamily: V.display, fontSize: "1.4rem", fontWeight: 600, color: "#fff", letterSpacing: 4, marginBottom: 6 }}>Φ-TIME · t_n = T₀·φⁿ · GOLDEN RATIO SCHEDULING</h2>
+            <p style={{ fontFamily: V.mono, fontSize: "0.52rem", color: V.phi, letterSpacing: 3 }}>INCOMMENSURATE INTERVALS · ZERO RESONANCE LOCK · STABILITY THROUGH IRRATIONALITY</p>
+          </div>
+          <div style={{ background: "rgba(2,6,12,0.9)", border: "1px solid rgba(200,160,48,0.12)", borderRadius: 12, padding: "20px 16px" }}>
+            <PhiTimeCanvas />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 16, marginTop: 20 }}>
+            {[
+              { col: V.phi, t: "Why Irrationality Equals Stability", b: "If two oscillators have a rational frequency ratio p/q, they will phase-lock after at most q cycles — producing catastrophic resonance beating. Golden ratio φ is the 'most irrational' of all irrationals — its continued fraction expansion [1;1,1,1,...] converges most slowly. This means φ-ratio oscillators take the longest possible time to approach any near-resonance — in fact they never truly do. Biology exploits this: heartbeat:breath ≈ 5:2 (φ-approximant), brain oscillations are φ-distributed across frequency bands. The universe schedules its own updates at φ-scaled intervals to prevent global resonance catastrophe." },
+              { col: V.aurora, t: "τ₂₆ as a φ-Harmonic of the Precessional Cycle", b: "The 25,920-year precessional cycle divided by φ¹⁰ = 122.99... gives 210.7 years (Suess cycle, confirmed by ¹⁴C data). Divided by φ¹³ gives 26.02 years — the τ₂₆ term. This is not coincidental: the CXE equation is self-consistent only if the τ₂₆ harmonic is a φ-subdivision of the precessional master cycle. The golden ratio is the temporal grammar of Ω_CXE — the scheduling algorithm that prevents coherence lock across nested timescales from millisecond synaptic firing to 26,000-year civilizational precession." },
+            ].map(({ col, t: title, b }) => (
+              <div key={title} style={{ background: `${col}08`, border: `1px solid ${col}22`, borderRadius: 8, padding: "14px 16px" }}>
+                <div style={{ fontFamily: V.mono, fontSize: "0.54rem", color: col, marginBottom: 8 }}>{title}</div>
+                <div style={{ fontFamily: V.serif, fontSize: "0.86rem", lineHeight: 1.8, color: "rgba(184,204,232,0.65)" }}>{b}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Divider />
+
       {/* ── Footer ── */}
       <footer style={{ borderTop: "1px solid rgba(0,255,178,0.06)", padding: "52px 40px", textAlign: "center", position: "relative", zIndex: 1 }}>
         <div style={{ fontFamily: V.display, fontSize: "1.7rem", fontWeight: 900, letterSpacing: 10, color: "rgba(0,255,178,0.16)", marginBottom: 7 }}>AETHER</div>
@@ -614,6 +667,123 @@ export default function CxeEquationPage() {
       `}</style>
     </div>
   );
+}
+
+// ─── Schumann Body Coupling Canvas ────────────────────────────────────────────
+function SchumannCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 900; cv.height = 260;
+    const W = cv.width, H = cv.height;
+    let t = 0, raf = 0;
+    const FREQS = [
+      { hz: 7.83,  label: "f₁ · 7.83 Hz",  col: V.aurora, bodyHz: "Alpha · SCN input" },
+      { hz: 14.3,  label: "f₂ · 14.3 Hz",  col: V.solar,  bodyHz: "Beta · cortical spindle" },
+      { hz: 20.8,  label: "f₃ · 20.8 Hz",  col: V.atlantis,bodyHz: "Beta · motor" },
+      { hz: 27.3,  label: "f₄ · 27.3 Hz",  col: V.pulse,  bodyHz: "Gamma · binding" },
+      { hz: 33.8,  label: "f₅ · 33.8 Hz",  col: V.phi,    bodyHz: "Gamma · insight" },
+    ];
+    const rowH = (H - 40) / FREQS.length;
+    const waveW = W * 0.62;
+    const draw = () => {
+      ctx.fillStyle = "rgba(2,4,8,0.22)"; ctx.fillRect(0, 0, W, H);
+      FREQS.forEach((f, i) => {
+        const cy = 20 + i * rowH + rowH / 2;
+        const amp = rowH * 0.36;
+        const speed = f.hz * 0.004;
+        // wave
+        ctx.beginPath();
+        for (let x = 0; x <= waveW; x += 1) {
+          const y = cy + amp * Math.sin((x / waveW) * f.hz * 1.1 + t * speed);
+          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = f.col + "bb"; ctx.lineWidth = 1.4; ctx.stroke();
+        // label left
+        ctx.fillStyle = f.col; ctx.font = `7.5px ${V.mono}`; ctx.textAlign = "left";
+        ctx.fillText(f.label, 6, cy - 2);
+        // body coupling right
+        const coupling = 0.4 + 0.5 * Math.abs(Math.sin(t * speed * 1.3 + i));
+        ctx.fillStyle = f.col + "88"; ctx.font = `6.5px ${V.mono}`; ctx.textAlign = "left";
+        ctx.fillText(f.bodyHz, waveW + 14, cy + 4);
+        // coupling bar
+        ctx.fillStyle = "rgba(255,255,255,0.04)"; ctx.fillRect(waveW + 130, cy - 5, 100, 10);
+        ctx.fillStyle = f.col + Math.round(coupling * 200).toString(16).padStart(2, "0");
+        ctx.fillRect(waveW + 130, cy - 5, 100 * coupling, 10);
+        // alignment event
+        if (coupling > 0.88) {
+          ctx.fillStyle = f.col + "55"; ctx.beginPath(); ctx.arc(waveW + 240, cy, 7, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = f.col; ctx.font = `6px ${V.mono}`; ctx.textAlign = "center";
+          ctx.fillText("LOCK", waveW + 240, cy + 3);
+        }
+      });
+      ctx.fillStyle = V.aurora + "22"; ctx.font = `7px ${V.mono}`; ctx.textAlign = "center";
+      ctx.fillText("SCHUMANN RESONANCES · PLANETARY CAVITY · IONOSPHERE–EARTH WAVEGUIDE · Φ_SCN BIOLOGICAL COUPLING", W / 2, H - 5);
+      t++; raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
+}
+
+// ─── Phi-Time Scheduling Canvas ────────────────────────────────────────────────
+function PhiTimeCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    cv.width = 900; cv.height = 200;
+    const W = cv.width, H = cv.height;
+    let t = 0, raf = 0;
+    const PHI = 1.6180339887;
+    const T0 = 1;
+    const N = 18;
+    const phiTimes = Array.from({ length: N }, (_, i) => T0 * Math.pow(PHI, i));
+    const maxT = phiTimes[N - 1];
+    const regularTimes = Array.from({ length: N }, (_, i) => (i + 1) * (maxT / N));
+    const draw = () => {
+      ctx.fillStyle = "rgba(2,4,8,0.22)"; ctx.fillRect(0, 0, W, H);
+      const pad = 40, trackW = W - pad * 2;
+      // Row 1: φ-time (incommensurate)
+      const row1y = H * 0.32;
+      ctx.fillStyle = V.aurora + "55"; ctx.font = `7px ${V.mono}`; ctx.textAlign = "left";
+      ctx.fillText("φ-TIME · t_n = T₀·φⁿ  (INCOMMENSURATE — no resonance lock)", pad, row1y - 14);
+      ctx.strokeStyle = V.aurora + "33"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad, row1y); ctx.lineTo(pad + trackW, row1y); ctx.stroke();
+      phiTimes.forEach((pt, i) => {
+        const x = pad + (pt / maxT) * trackW;
+        const pulse = 0.4 + 0.5 * Math.abs(Math.sin(t * 0.03 + i * PHI));
+        ctx.beginPath(); ctx.arc(x, row1y, 3 + pulse * 3, 0, Math.PI * 2);
+        ctx.fillStyle = V.aurora + Math.round(pulse * 200).toString(16).padStart(2, "0"); ctx.fill();
+        if (i < 6) { ctx.fillStyle = V.aurora + "66"; ctx.font = `5.5px ${V.mono}`; ctx.textAlign = "center"; ctx.fillText(`φ^${i}`, x, row1y - 10); }
+      });
+      // Row 2: regular time (resonance lock)
+      const row2y = H * 0.68;
+      ctx.fillStyle = V.pulse + "55"; ctx.font = `7px ${V.mono}`; ctx.textAlign = "left";
+      ctx.fillText("REGULAR TIME · t_n = n·T₀  (COMMENSURATE — resonance lock, catastrophic beating)", pad, row2y - 14);
+      ctx.strokeStyle = V.pulse + "33"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad, row2y); ctx.lineTo(pad + trackW, row2y); ctx.stroke();
+      regularTimes.forEach((rt, i) => {
+        const x = pad + (rt / maxT) * trackW;
+        const beats = 0.5 + 0.5 * Math.sin(t * 0.05); // resonance beating
+        ctx.beginPath(); ctx.arc(x, row2y, 3 + beats * 5, 0, Math.PI * 2);
+        ctx.fillStyle = V.pulse + Math.round(beats * 180).toString(16).padStart(2, "0"); ctx.fill();
+      });
+      // catastrophic beat flash
+      const beatAlpha = Math.max(0, Math.sin(t * 0.05) * 0.3);
+      ctx.fillStyle = `rgba(255,51,102,${beatAlpha})`;
+      ctx.fillRect(pad, row2y - 22, trackW, 44);
+      // ratio label
+      ctx.fillStyle = V.phi + "99"; ctx.font = `8px ${V.mono}`; ctx.textAlign = "center";
+      ctx.fillText(`Interval ratio: φ = ${PHI.toFixed(6)}... (irrational · no two intervals are commensurate)`, W / 2, H - 8);
+      t++; raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", borderRadius: 8, display: "block" }} />;
 }
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
