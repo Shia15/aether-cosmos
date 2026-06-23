@@ -287,6 +287,7 @@ import PhotonEmissionPage from "@/pages/photon-emission";
 import TranscendentArtPage from "@/pages/transcendent-art";
 import MotorCortexPage from "@/pages/motor-cortex";
 import LiquidPrintMathPage from "@/pages/liquid-print-math";
+import OpticalHullSimPage from "@/pages/optical-hull-sim";
 import NeuroMetabolicPage from "@/pages/neuro-metabolic";
 import EmergenceNetworkPage from "@/pages/emergence-network";
 import PlasmaConfinementPage from "@/pages/plasma-confinement";
@@ -583,6 +584,7 @@ function Router() {
         <Route path="/cognitive-architecture" component={CognitiveArchitecturePage} />
         <Route path="/motor-cortex" component={MotorCortexPage} />
         <Route path="/liquid-print-math" component={LiquidPrintMathPage} />
+        <Route path="/optical-hull-sim" component={OpticalHullSimPage} />
         <Route path="/agent-mapping" component={AgentMappingPage} />
         <Route path="/event-horizon" component={EventHorizonPage} />
         <Route path="/photon-emission" component={PhotonEmissionPage} />
