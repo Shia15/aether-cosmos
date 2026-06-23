@@ -285,6 +285,7 @@ import AgentMappingPage from "@/pages/agent-mapping";
 import EventHorizonPage from "@/pages/event-horizon";
 import PhotonEmissionPage from "@/pages/photon-emission";
 import TranscendentArtPage from "@/pages/transcendent-art";
+import MotorCortexPage from "@/pages/motor-cortex";
 import NeuroMetabolicPage from "@/pages/neuro-metabolic";
 import EmergenceNetworkPage from "@/pages/emergence-network";
 import PlasmaConfinementPage from "@/pages/plasma-confinement";
@@ -579,6 +580,7 @@ function Router() {
         <Route path="/regulatory-depth" component={RegulatoryDepthPage} />
         <Route path="/antimatter-wave" component={AntimatterWavePage} />
         <Route path="/cognitive-architecture" component={CognitiveArchitecturePage} />
+        <Route path="/motor-cortex" component={MotorCortexPage} />
         <Route path="/agent-mapping" component={AgentMappingPage} />
         <Route path="/event-horizon" component={EventHorizonPage} />
         <Route path="/photon-emission" component={PhotonEmissionPage} />

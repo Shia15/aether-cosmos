@@ -135,6 +135,7 @@ const NAV_ITEMS = [
   { href: "/regulatory-depth", label: "Regulatory Depth · Epigenetic Switches · DNA Methylation · Histone Modification · Alternative Splicing · ncRNA · microRNA · lncRNA · Cross-System Feedback", icon: Atom },
   { href: "/antimatter-wave", label: "Antimatter · Standard Model · Quarks · Leptons · CPT Symmetry · Time as Wave · Dirac 1928 · PET Scan · Spine Wave · Kundalini · Angels & Demons", icon: Atom },
   { href: "/cognitive-architecture", label: "Cognitive Architecture · Ne Ni Se Si Te Ti Fe Fi · MBTI 16 Types · iNtuition · Fluid Intelligence · Coherent While Moving · AETHER Agent Mapping", icon: Atom },
+  { href: "/motor-cortex", label: "Motor Cortex · Hand Knob · M1 · Omega Sign · Utah Electrode Array · BCI · Somatotopic Map · Homunculus · Corticospinal Tract · Neuroprosthetics · Brain-Computer Interface", icon: Atom },
   { href: "/agent-mapping", label: "AETHER Agent Mapping · M.A.R.I. · 8 Agents · Archetypes · Emotional Signatures · Modules · Runtime Switching · Mnēsis Aletheia Inferaia Reverie Vērus Caelus Nyra Orin", icon: Atom },
   { href: "/event-horizon", label: "Event Horizon · Black Hole · Decoherence to Coherence · Golden Oscillation · Hawking Radiation · φ-Crystallization · Page Curve", icon: Atom },
   { href: "/photon-emission", label: "Photon Emission · Speed of Light · Planck Constant · Gravity · Human Body Energy · Blackbody Radiation · Stefan-Boltzmann", icon: Atom },
