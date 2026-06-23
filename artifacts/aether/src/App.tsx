@@ -113,6 +113,7 @@ import QueenBeeDiapausePage from "@/pages/queen-bee-diapause";
 import NematicBeeFotonPage from "@/pages/nematic-bee-foton";
 import TunguskaAsteroidTimelinePage from "@/pages/tunguska-asteroid-timeline";
 import TardigradeDensityMSDDPage from "@/pages/tardigrade-density-msdd";
+import CryptobiosisAsuTelomeresPage from "@/pages/cryptobiosis-asu-telomeres";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -492,6 +493,7 @@ function Router() {
         <Route path="/nematic-bee-foton" component={NematicBeeFotonPage} />
         <Route path="/tunguska-asteroid-timeline" component={TunguskaAsteroidTimelinePage} />
         <Route path="/tardigrade-density-msdd" component={TardigradeDensityMSDDPage} />
+        <Route path="/cryptobiosis-asu-telomeres" component={CryptobiosisAsuTelomeresPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
