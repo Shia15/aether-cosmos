@@ -275,6 +275,7 @@ import CavityComputerPage from "@/pages/cavity-computer";
 import QuantumComputerPage from "@/pages/quantum-computer";
 import EgyptianCodexPage from "@/pages/egyptian-codex";
 import PhrenologyAgentsPage from "@/pages/phrenology-agents";
+import UvAminoLightPage from "@/pages/uv-amino-light";
 import EventHorizonPage from "@/pages/event-horizon";
 import PhotonEmissionPage from "@/pages/photon-emission";
 import TranscendentArtPage from "@/pages/transcendent-art";
@@ -566,6 +567,7 @@ function Router() {
         <Route path="/quantum-computer" component={QuantumComputerPage} />
         <Route path="/egyptian-codex" component={EgyptianCodexPage} />
         <Route path="/phrenology-agents" component={PhrenologyAgentsPage} />
+        <Route path="/uv-amino-light" component={UvAminoLightPage} />
         <Route path="/event-horizon" component={EventHorizonPage} />
         <Route path="/photon-emission" component={PhotonEmissionPage} />
         <Route path="/transcendent-art" component={TranscendentArtPage} />
