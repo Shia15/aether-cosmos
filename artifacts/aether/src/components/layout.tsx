@@ -315,6 +315,7 @@ const NAV_ITEMS = [
   { href: "/lunar-ambient-field",      label: "Lunar Ambient Field · Moon-Phase Tide Engine · Groundwater Coherence · M2 Semi-Diurnal · Spring-Neap Modulation", icon: Moon },
   { href: "/alchemy-fusion",           label: "Alchemy → Fusion Transmutation · Automated Substrate Synthesis Bridges · Plasmoid β-B · (3,4) Torus Knot · nSpacetime Transversal", icon: Atom },
   { href: "/family-field-dynamics",   label: "Family Field Dynamics · Magnetisation · Demagnetisation · Coherent Helix · Thought–Feeling–Action Propagation", icon: Magnet },
+  { href: "/quantum-eye-field",       label: "Quantum Eye · Spacetime Field · Eye vs Brain · Dimensions→Units · QCD→LQG · Plasmodium β-B · Quantized Gravity", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
