@@ -103,6 +103,7 @@ import SparkleTextPage from "@/pages/sparkle-text";
 import LunarCoherencePage from "@/pages/lunar-coherence";
 import LunarAmbientFieldPage from "@/pages/lunar-ambient-field";
 import AlchemyFusionPage from "@/pages/alchemy-fusion";
+import FamilyFieldDynamicsPage from "@/pages/family-field-dynamics";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -472,6 +473,7 @@ function Router() {
         <Route path="/lunar-coherence" component={LunarCoherencePage} />
         <Route path="/lunar-ambient-field" component={LunarAmbientFieldPage} />
         <Route path="/alchemy-fusion" component={AlchemyFusionPage} />
+        <Route path="/family-field-dynamics" component={FamilyFieldDynamicsPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
