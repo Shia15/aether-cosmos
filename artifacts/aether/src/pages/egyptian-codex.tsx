@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import paperImg from "@assets/image_1782205801087.jpeg";
 
 /* ── palette — papyrus + AETHER ───────────────────── */
@@ -341,6 +341,227 @@ function GlyphTickerCanvas() {
   return <canvas ref={ref} style={{ width: '100%', height: 'auto', borderRadius: 4, display: 'block' }} />;
 }
 
+/* ── Gardiner sign-list category boundaries ─────────
+   U+13000–U+1342E = 1,071 code points exactly.
+   Start positions are approximate; follow the Unicode
+   Egyptian Hieroglyphs code chart order. ─────────── */
+const GARDINER_CATS = [
+  { start:0x13000, label:"A",  name:"Man and his occupations",         col:"#c9a84c" },
+  { start:0x13041, label:"B",  name:"Woman",                            col:"#f97316" },
+  { start:0x1304A, label:"C",  name:"Anthropomorphic deities",          col:"#8b5cf6" },
+  { start:0x1306D, label:"D",  name:"Parts of the human body",          col:"#1fd4c8" },
+  { start:0x130B9, label:"E",  name:"Mammals",                          col:"#22c55e" },
+  { start:0x130D9, label:"F",  name:"Parts of mammals",                 col:"#84cc16" },
+  { start:0x1310B, label:"G",  name:"Birds",                            col:"#06b6d4" },
+  { start:0x13143, label:"H",  name:"Parts of birds",                   col:"#38bdf8" },
+  { start:0x1314B, label:"I",  name:"Reptiles and amphibians",          col:"#4ade80" },
+  { start:0x1315C, label:"K",  name:"Fish and aquatic animals",         col:"#60a5fa" },
+  { start:0x13165, label:"L",  name:"Invertebrates and lesser animals", col:"#a78bfa" },
+  { start:0x1316C, label:"M",  name:"Trees and plants",                 col:"#34d399" },
+  { start:0x13197, label:"N",  name:"Sky, earth, and water",            col:"#93c5fd" },
+  { start:0x131CA, label:"O",  name:"Buildings and monuments",          col:"#fbbf24" },
+  { start:0x131FB, label:"P",  name:"Ships and boats",                  col:"#fb923c" },
+  { start:0x13208, label:"Q",  name:"Domestic furniture",               col:"#f472b6" },
+  { start:0x1320E, label:"R",  name:"Temple furniture",                 col:"#e879f9" },
+  { start:0x13227, label:"S",  name:"Crowns, dress, and insignia",      col:"#c084fc" },
+  { start:0x13260, label:"T",  name:"Warfare, hunting, and butchery",   col:"#f87171" },
+  { start:0x13279, label:"U",  name:"Agriculture and crafts",           col:"#fb923c" },
+  { start:0x132A4, label:"V",  name:"Rope, fibre, and baskets",         col:"#a3e635" },
+  { start:0x132C4, label:"W",  name:"Stone and ceramic vessels",        col:"#94a3b8" },
+  { start:0x132DB, label:"X",  name:"Loaves and cakes",                 col:"#d4a574" },
+  { start:0x132E3, label:"Y",  name:"Writing, music, and games",        col:"#67e8f9" },
+  { start:0x132E9, label:"Z",  name:"Geometric shapes",                 col:"#e2e8f0" },
+  { start:0x132F5, label:"Aa", name:"Unclassified signs and numerals",  col:"#c9a84c" },
+] as const;
+
+type GCat = typeof GARDINER_CATS[number];
+
+function getCat(cp: number): GCat {
+  let best: GCat = GARDINER_CATS[0];
+  for (const c of GARDINER_CATS) { if (cp >= c.start) best = c; }
+  return best;
+}
+
+/* ── full 1,071-glyph searchable register ────────── */
+function HieroglyphRegister() {
+  const [query,  setQuery]  = useState("");
+  const [catF,   setCatF]   = useState("ALL");
+  const [sz,     setSz]     = useState<"S"|"M"|"L">("M");
+  const [hovCp,  setHovCp]  = useState(-1);
+
+  /* generate all 1,071 glyphs once */
+  const all = useMemo(() =>
+    Array.from({length: 1071}, (_, i) => {
+      const cp  = 0x13000 + i;
+      const cat = getCat(cp);
+      return { char: String.fromCodePoint(cp), cp, cat };
+    }), []);
+
+  const catCounts = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const g of all) m[g.cat.label] = (m[g.cat.label] ?? 0) + 1;
+    return m;
+  }, [all]);
+
+  const shown = useMemo(() => {
+    let g = all;
+    if (catF !== "ALL") g = g.filter(x => x.cat.label === catF);
+    if (query) {
+      const q = query.toLowerCase();
+      g = g.filter(x =>
+        cp5(x.cp).toLowerCase().includes(q) ||
+        x.char === q
+      );
+    }
+    return g;
+  }, [all, catF, query]);
+
+  /* build flat list with category headers injected */
+  type HdrItem = { type:"hdr"; cat:GCat; count:number };
+  type GlItem  = { type:"glyph"; char:string; cp:number; cat:GCat };
+  const items = useMemo((): (HdrItem|GlItem)[] => {
+    const result: (HdrItem|GlItem)[] = [];
+    const showHeaders = catF === "ALL" && !query;
+    let lastLabel = "";
+    for (const g of shown) {
+      if (showHeaders && g.cat.label !== lastLabel) {
+        result.push({ type:"hdr", cat:g.cat, count:catCounts[g.cat.label]??0 });
+        lastLabel = g.cat.label;
+      }
+      result.push({ type:"glyph", char:g.char, cp:g.cp, cat:g.cat });
+    }
+    return result;
+  }, [shown, catF, query, catCounts]);
+
+  const cellPx = sz==="S" ? 42  : sz==="M" ? 58  : 84;
+  const glFs   = sz==="S" ? 19  : sz==="M" ? 28  : 44;
+  const labFs  = sz==="S" ? 5.5 : sz==="M" ? 6.5 : 8;
+
+  const pillBase: React.CSSProperties = {
+    fontFamily:MN, fontSize:8, padding:"3px 9px", borderRadius:12,
+    cursor:"pointer", letterSpacing:0.5, whiteSpace:"nowrap",
+    border:"1px solid transparent", transition:"all .15s",
+  };
+
+  return (
+    <div>
+      {/* ── controls ── */}
+      <div style={{display:"flex", gap:8, flexWrap:"wrap", alignItems:"center", marginBottom:10}}>
+        <input value={query} onChange={e=>setQuery(e.target.value)}
+          placeholder="Search U+130…"
+          style={{fontFamily:MN, fontSize:11, padding:"5px 10px", borderRadius:4, width:170,
+            background:"rgba(0,0,0,0.55)", border:`1px solid ${TEAL}50`, color:TEAL, outline:"none"}} />
+        <span style={{fontFamily:MN, fontSize:9, color:DIM}}>
+          {shown.length.toLocaleString()} / 1,071
+        </span>
+        <div style={{marginLeft:"auto", display:"flex", gap:3}}>
+          {(["S","M","L"] as const).map(s=>(
+            <button key={s} onClick={()=>setSz(s)}
+              style={{...pillBase,
+                borderColor:`${sz===s?GOLD:DIM}40`,
+                background:sz===s?`${GOLD}20`:"transparent",
+                color:sz===s?GOLD:DIM}}>
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── category filter pills ── */}
+      <div style={{display:"flex", flexWrap:"wrap", gap:3, marginBottom:14}}>
+        <button onClick={()=>setCatF("ALL")}
+          style={{...pillBase,
+            borderColor:`${catF==="ALL"?TEAL:DIM}40`,
+            background:catF==="ALL"?`${TEAL}18`:"transparent",
+            color:catF==="ALL"?TEAL:DIM}}>
+          ALL · 1,071
+        </button>
+        {GARDINER_CATS.map(c=>(
+          <button key={c.label} onClick={()=>setCatF(c.label)}
+            style={{...pillBase,
+              borderColor:`${catF===c.label?c.col:DIM}40`,
+              background:catF===c.label?`${c.col}18`:"transparent",
+              color:catF===c.label?c.col:DIM}}>
+            {c.label} · {catCounts[c.label]??0}
+          </button>
+        ))}
+      </div>
+
+      {/* ── glyph grid ── */}
+      <div style={{display:"flex", flexWrap:"wrap", gap:2, alignItems:"flex-start"}}>
+        {items.map((item, idx) => {
+          if (item.type === "hdr") {
+            const c = item.cat;
+            return (
+              <div key={`h-${c.label}`} style={{
+                width:"100%", display:"flex", alignItems:"baseline", gap:10,
+                padding:"10px 0 5px", marginTop: idx===0 ? 0 : 8,
+                borderTop:`1px solid ${c.col}25`}}>
+                <span style={{fontFamily:MN, fontSize:10, color:c.col, fontWeight:700, letterSpacing:2}}>
+                  {c.label}
+                </span>
+                <span style={{fontFamily:MN, fontSize:8.5, color:`${c.col}90`}}>
+                  {c.name}
+                </span>
+                <span style={{fontFamily:MN, fontSize:7.5, color:DIM}}>
+                  · {item.count} signs · U+{c.start.toString(16).toUpperCase().padStart(5,"0")}
+                </span>
+              </div>
+            );
+          }
+          /* glyph cell */
+          const isHov = hovCp === item.cp;
+          const col   = item.cat.col;
+          return (
+            <div key={item.cp}
+              onMouseEnter={()=>setHovCp(item.cp)}
+              onMouseLeave={()=>setHovCp(-1)}
+              title={`${cp5(item.cp)}  ·  Gardiner ${item.cat.label}  ·  ${item.cat.name}`}
+              style={{
+                width:cellPx, textAlign:"center", padding:"5px 2px 3px",
+                background: isHov ? `${col}18` : "rgba(200,185,140,0.04)",
+                border:`1px solid ${isHov ? col+"55" : "rgba(100,100,100,0.1)"}`,
+                borderRadius:3, cursor:"default",
+                transition:"background .1s,border .1s",
+                boxSizing:"border-box", userSelect:"none",
+              } as React.CSSProperties}>
+              <div style={{
+                fontSize:glFs, lineHeight:1.05,
+                color: isHov ? "#fff" : "#d4c89a",
+                filter: isHov ? `drop-shadow(0 0 6px ${col})` : "none",
+                fontFamily:"'Noto Sans Egyptian Hieroglyphs', serif",
+                transition:"color .1s, filter .1s",
+              }}>
+                {item.char}
+              </div>
+              <div style={{
+                fontFamily:MN, fontSize:labFs,
+                color: isHov ? col : DIM,
+                marginTop:2, letterSpacing:0,
+                transition:"color .1s",
+              }}>
+                {cp5(item.cp)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── footer note ── */}
+      <div style={{fontFamily:MN, fontSize:7.5, color:DIM, marginTop:10, lineHeight:1.9}}>
+        Unicode block U+13000–U+1342E · 1,071 code points · Gardiner category boundaries are approximate ·
+        hover any glyph for full codepoint · unassigned positions render as □ or are invisible ·
+        best rendered with <em>Noto Sans Egyptian Hieroglyphs</em> (Google Fonts) or macOS/iOS system fonts
+      </div>
+    </div>
+  );
+}
+
+/* helper: format code point as U+1XXXX */
+function cp5(cp: number): string {
+  return "U+" + cp.toString(16).toUpperCase().padStart(5, "0");
+}
+
 /* ── main page ───────────────────────────────────── */
 export default function EgyptianCodexPage() {
   const card = (col = TEAL): React.CSSProperties => ({
@@ -407,22 +628,10 @@ export default function EgyptianCodexPage() {
           </div>
         </div>
 
-        {/* ── animated glyph stream ── */}
+        {/* ── full hieroglyph register ── */}
         <div style={{ ...card(), marginBottom: 16 }}>
-          <div style={secLabel}>Unicode Egyptian Block Sample · 𓀀–𓐮 · 1,071 characters</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-            {GLYPHS.slice(0, 120).map((g, i) => (
-              <span key={i} title={`U+${(0x13000 + i).toString(16).toUpperCase()}`}
-                style={{ fontSize: 22, lineHeight: 1.2, color: `rgba(200,185,140,${0.3 + 0.5 * ((i % 7) / 7)})`,
-                  cursor: 'default', padding: '0 1px', transition: 'color .15s',
-                  fontFamily: 'serif' }}>
-                {g}
-              </span>
-            ))}
-          </div>
-          <div style={{ fontFamily: MN, fontSize: 8, color: DIM, marginTop: 8 }}>
-            Unicode block U+13000–U+1342E · Gardiner sign list · 24 categories (A: man · B: woman · C: deity · D: body parts · E: mammals · F: reptiles · G: birds · H: insects · I: plants · K: fish · L: invertebrates · M: landscape · N: sky · O: buildings · P: ships · Q: furniture · R: temple · S: regalia · T: weapons · U: tools · V: rope · W: vessels · X: bread · Y: music · Z: geometric)
-          </div>
+          <div style={secLabel}>Unicode Egyptian Block · 𓀀–𓐮 · All 1,071 Characters · Gardiner A–Aa</div>
+          <HieroglyphRegister />
         </div>
 
         {/* ── AETHER register / knowledge model ── */}
