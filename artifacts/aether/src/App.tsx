@@ -101,6 +101,7 @@ import AetherFoundationsPage from "@/pages/aether-foundations";
 import SubstrateSynthesisPage from "@/pages/substrate-synthesis";
 import SparkleTextPage from "@/pages/sparkle-text";
 import LunarCoherencePage from "@/pages/lunar-coherence";
+import LunarAmbientFieldPage from "@/pages/lunar-ambient-field";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -468,6 +469,7 @@ function Router() {
         <Route path="/substrate-synthesis" component={SubstrateSynthesisPage} />
         <Route path="/sparkle-text" component={SparkleTextPage} />
         <Route path="/lunar-coherence" component={LunarCoherencePage} />
+        <Route path="/lunar-ambient-field" component={LunarAmbientFieldPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
