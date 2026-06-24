@@ -115,6 +115,7 @@ import TunguskaAsteroidTimelinePage from "@/pages/tunguska-asteroid-timeline";
 import TardigradeDensityMSDDPage from "@/pages/tardigrade-density-msdd";
 import CryptobiosisAsuTelomeresPage from "@/pages/cryptobiosis-asu-telomeres";
 import MayaQuarksDnaGfpPage from "@/pages/maya-quarks-dna-gfp";
+import HilbertStoragePage from "@/pages/hilbert-storage";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -496,6 +497,7 @@ function Router() {
         <Route path="/tardigrade-density-msdd" component={TardigradeDensityMSDDPage} />
         <Route path="/cryptobiosis-asu-telomeres" component={CryptobiosisAsuTelomeresPage} />
         <Route path="/maya-quarks-dna-gfp" component={MayaQuarksDnaGfpPage} />
+        <Route path="/hilbert-storage" component={HilbertStoragePage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
