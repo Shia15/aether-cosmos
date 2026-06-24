@@ -505,11 +505,11 @@ function MSDDControlCanvas() {
           const cn=(ci+1)%ctrlPos.length;
           const nx=ctrlPos[cn];
           const loopT=(frame*0.04+ci*0.25)%1;
-          const arx=lerp(cp.x,nx.x,loopT), ary=lerp(cp.y,ny.y,loopT);
+          const arx=lerp(cp.x,nx.x,loopT), ary=lerp(cp.y,nx.y,loopT);
           ctx.fillStyle=CTRL[ci].col+"AA";
           ctx.beginPath(); ctx.arc(arx,ary,4,0,Math.PI*2); ctx.fill();
           ctx.strokeStyle=CTRL[ci].col+"44"; ctx.lineWidth=1;
-          ctx.beginPath(); ctx.moveTo(cp.x,cp.y); ctx.lineTo(nx.x,ny.y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(cp.x,cp.y); ctx.lineTo(nx.x,nx.y); ctx.stroke();
         });
         /* signals from ALCC to inner nodes */
         nodePos.forEach((np,ni)=>{
