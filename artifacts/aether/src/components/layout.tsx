@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useUser, useClerk } from "@clerk/react";
 import { useHealthCheck } from "@workspace/api-client-react";
 import { 
   Network, 
@@ -461,6 +462,59 @@ function loadSidebarWidth(): number {
   try { const v = localStorage.getItem("aether.sidebarWidth"); return v ? Math.max(SIDEBAR_MIN, Math.min(SIDEBAR_MAX, +v)) : SIDEBAR_FULL; } catch { return SIDEBAR_FULL; }
 }
 
+function AuthWidget() {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
+  const [, setLocation] = useLocation();
+  if (!isLoaded) return null;
+  if (!isSignedIn) {
+    return (
+      <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(46,240,216,0.08)" }}>
+        <a href="/sign-in" onClick={(e) => { e.preventDefault(); setLocation("/sign-in"); }}
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6,
+            background: "rgba(0,255,178,0.06)", border: "1px solid rgba(0,255,178,0.18)",
+            color: "#00FFB2", fontFamily: "'Space Mono',monospace", fontSize: "0.6rem",
+            letterSpacing: 2, textDecoration: "none", cursor: "pointer" }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          SIGN IN
+        </a>
+      </div>
+    );
+  }
+  const display = user.firstName || user.emailAddresses[0]?.emailAddress || "User";
+  return (
+    <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(46,240,216,0.08)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6,
+        background: "rgba(0,255,178,0.04)", border: "1px solid rgba(0,255,178,0.12)" }}>
+        <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(0,255,178,0.15)",
+          border: "1px solid rgba(0,255,178,0.3)", display: "flex", alignItems: "center",
+          justifyContent: "center", color: "#00FFB2", flexShrink: 0, fontSize: "0.55rem",
+          fontFamily: "'Space Mono',monospace" }}>
+          {(display[0] ?? "?").toUpperCase()}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.55rem", color: "#B8CCE8",
+            letterSpacing: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {display}
+          </div>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.48rem", color: "#3A5060", letterSpacing: 1 }}>SIGNED IN</div>
+        </div>
+        <button onClick={() => signOut({ redirectUrl: "/" })}
+          title="Sign out"
+          style={{ background: "none", border: "none", cursor: "pointer", color: "#3A5060", padding: 2,
+            display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4,
+            flexShrink: 0 }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const { data: health } = useHealthCheck();
@@ -664,6 +718,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
+      <AuthWidget />
       <div className="p-4 border-t border-border shrink-0 flex items-center justify-between gap-2">
         <div className="text-xs font-mono text-muted-foreground/50">AETHER OS v1.2.0</div>
         {/* Screenshot button */}

@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Share+Tech+Mono:wght@400&family=Inter:wght@400;500;600&display=swap');
+@layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
+
+.cl-formFieldInput::placeholder { color: #3A5060; opacity: 1; }
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 

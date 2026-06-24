@@ -1,5 +1,9 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
+import { publishableKeyFromHost } from "@clerk/react/internal";
+import { dark } from "@clerk/themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/layout";
@@ -336,10 +340,141 @@ import PolymerBiobreakPage from "@/pages/polymer-biobreak";
 
 const queryClient = new QueryClient();
 
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const clerkPubKey = publishableKeyFromHost(
+  window.location.hostname,
+  import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
+);
+
+const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+
+function stripBase(path: string): string {
+  return basePath && path.startsWith(basePath)
+    ? path.slice(basePath.length) || "/"
+    : path;
+}
+
+const clerkAppearance = {
+  theme: dark,
+  cssLayerName: "clerk",
+  options: {
+    logoPlacement: "inside" as const,
+    logoLinkUrl: basePath || "/",
+    logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
+  },
+  variables: {
+    colorPrimary: "#00FFB2",
+    colorForeground: "#B8CCE8",
+    colorMutedForeground: "#3A5060",
+    colorDanger: "#FF6699",
+    colorBackground: "#0A0E1A",
+    colorInput: "#06090F",
+    colorInputForeground: "#B8CCE8",
+    colorNeutral: "#2A3050",
+    fontFamily: "'Space Mono', monospace",
+    borderRadius: "4px",
+  },
+  elements: {
+    rootBox: { width: "100%", display: "flex", justifyContent: "center" },
+    cardBox: { background: "#0A0E1A", borderRadius: "8px", width: "440px", maxWidth: "100%", overflow: "hidden", border: "1px solid #2A3050" },
+    card: { boxShadow: "none", background: "transparent" },
+    footer: { boxShadow: "none", background: "transparent" },
+    headerTitle: { color: "#B8CCE8" },
+    headerSubtitle: { color: "#3A5060" },
+    socialButtonsBlockButtonText: { color: "#B8CCE8" },
+    formFieldLabel: { color: "#3A5060" },
+    footerActionLink: { color: "#00FFB2" },
+    footerActionText: { color: "#3A5060" },
+    dividerText: { color: "#3A5060" },
+    identityPreviewEditButton: { color: "#00FFB2" },
+    formFieldSuccessText: { color: "#00FFB2" },
+    alertText: { color: "#B8CCE8" },
+    logoBox: {},
+    logoImage: { height: "40px" as const },
+    socialButtonsBlockButton: { borderColor: "#2A3050", background: "#06090F" },
+    formButtonPrimary: { background: "#00FFB2", color: "#02030A" },
+    formFieldInput: { background: "#06090F", borderColor: "#2A3050", color: "#B8CCE8" },
+    footerAction: {},
+    dividerLine: { background: "#2A3050" },
+    alert: { background: "#0A0E1A", borderColor: "#2A3050" },
+    otpCodeFieldInput: { background: "#06090F", borderColor: "#2A3050" },
+    formFieldRow: {},
+    main: {},
+  },
+};
+
+function SignInPage() {
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+      background: "#02030A", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", zIndex: 9999, overflowY: "auto", padding: "40px 16px" }}>
+      <div style={{ marginBottom: 24, fontFamily: "'Cinzel', serif", fontSize: "1.4rem",
+        color: "#00FFB2", letterSpacing: "0.4em", textAlign: "center" }}>AETHER</div>
+      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+    </div>
+  );
+}
+
+function SignUpPage() {
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+      background: "#02030A", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", zIndex: 9999, overflowY: "auto", padding: "40px 16px" }}>
+      <div style={{ marginBottom: 24, fontFamily: "'Cinzel', serif", fontSize: "1.4rem",
+        color: "#00FFB2", letterSpacing: "0.4em", textAlign: "center" }}>AETHER</div>
+      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+    </div>
+  );
+}
+
+function ClerkQueryClientCacheInvalidator() {
+  const { addListener } = useClerk();
+  const qc = useQueryClient();
+  const prevUserIdRef = useRef<string | null | undefined>(undefined);
+  useEffect(() => {
+    const unsubscribe = addListener(({ user }) => {
+      const userId = user?.id ?? null;
+      if (prevUserIdRef.current !== undefined && prevUserIdRef.current !== userId) {
+        qc.clear();
+      }
+      prevUserIdRef.current = userId;
+    });
+    return unsubscribe;
+  }, [addListener, qc]);
+  return null;
+}
+
+function ClerkProviderWithRoutes() {
+  const [, setLocation] = useLocation();
+  return (
+    <ClerkProvider
+      publishableKey={clerkPubKey}
+      proxyUrl={clerkProxyUrl}
+      appearance={clerkAppearance}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      localization={{
+        signIn: { start: { title: "Welcome to AETHER", subtitle: "Sign in to your knowledge system" } },
+        signUp: { start: { title: "Join AETHER", subtitle: "Create your account to begin" } },
+      }}
+      routerPush={(to) => setLocation(stripBase(to))}
+      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    >
+      <QueryClientProvider client={queryClient}>
+        <ClerkQueryClientCacheInvalidator />
+        <Router />
+      </QueryClientProvider>
+    </ClerkProvider>
+  );
+}
+
 function Router() {
   return (
     <Layout>
       <Switch>
+        <Route path="/sign-in/*?" component={SignInPage} />
+        <Route path="/sign-up/*?" component={SignUpPage} />
         <Route path="/" component={GraphView} />
         <Route path="/architecture" component={ArchitectureView} />
         <Route path="/upload" component={UploadView} />
@@ -677,14 +812,12 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TooltipProvider>
+      <WouterRouter base={basePath}>
+        <ClerkProviderWithRoutes />
+      </WouterRouter>
+      <Toaster />
+    </TooltipProvider>
   );
 }
 
