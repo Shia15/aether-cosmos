@@ -335,6 +335,7 @@ const NAV_ITEMS = [
   { href: "/moon-mars-field", label: "Moon Mourners · Wishbone Landing · Watersplash Ice Mine · Coherent Field Straps · Mars Decoherence · Fabric Array · Mars Crab · Sarcophagi · Iron · Blood · Dust", icon: Atom },
   { href: "/lunar-plant-memory", label: "Lunar Terminator · Levitation · 13 Months · Star Blackbox · 5-Fold Infinite · Plant Memory · Phototropism · Auxin · Shadow · Prediction · Fibonacci", icon: Atom },
   { href: "/plant-electroactivity", label: "Plant Membrane Potential · Ca²⁺ Channels · Venus Flytrap · Mimosa · Sea Slug · Kin Recognition · VOC Network · Willow · Redwood · Mycorrhizal", icon: Atom },
+  { href: "/plant-network", label: "Plant Network · VOC Air Signals · Mycorrhizal Hyphae · Underground Hi-Fi · Anastomosis · Dual Channel · Signal Packets · Willow · Redwood", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
