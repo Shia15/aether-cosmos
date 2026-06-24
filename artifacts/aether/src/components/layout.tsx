@@ -325,6 +325,7 @@ const NAV_ITEMS = [
   { href: "/tunguska-asteroid-timeline", label: "Tunguska 1908 · Asteroid Day 30 June · 4.5 Ga Impact Timeline · Photosynthesis Cascade · FMO Collapse · Bee Extinction · Future Threats", icon: Atom },
   { href: "/tardigrade-density-msdd", label: "Tardigrades · Microscopic Hooks · Soil Chemistry · Planetary Density Dynamics · MSDD · ALCC Control Loop", icon: Microscope },
   { href: "/cryptobiosis-asu-telomeres", label: "Cryptobiosis · Pause on Life · ASU Air Separation · 70% Nitrogen · Telomeres · Hayflick Limit · Cancer · Telomerase", icon: Microscope },
+  { href: "/maya-quarks-dna-gfp", label: "Maya 7 Systems · Full Moon Purge · Cosmic Pause · Up/Down Quarks · Double Helix · EcoRI · GFP Jellyfish · Nucleotide", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
