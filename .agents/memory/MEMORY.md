@@ -1,1 +1,1 @@
-- [Live Simulation grep trap](live-sim-grep-trap.md) — existing blocks use "Live Simulation" mixed-case; always grep case-insensitively (`grep -qi`) to audit coverage.
+- [Babel JSX parse limits](babel-jsx-parse-limits.md) — local type aliases in useEffect + P() strings >1000 chars with em-dashes both cause cascading parse errors in Vite/Babel

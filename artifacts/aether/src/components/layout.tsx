@@ -327,6 +327,7 @@ const NAV_ITEMS = [
   { href: "/cryptobiosis-asu-telomeres", label: "Cryptobiosis · Pause on Life · ASU Air Separation · 70% Nitrogen · Telomeres · Hayflick Limit · Cancer · Telomerase", icon: Microscope },
   { href: "/maya-quarks-dna-gfp", label: "Maya 7 Systems · Full Moon Purge · Cosmic Pause · Up/Down Quarks · Double Helix · EcoRI · GFP Jellyfish · Nucleotide", icon: Atom },
   { href: "/hilbert-storage", label: "Hilbert Space · GR Spacetime · String Theory · Holographic Boundary · HDD Simulation · SSD Wear Leveling · Magnetic Hysteresis", icon: Atom },
+  { href: "/topography-electroset", label: "Topography Fonts · Electroset · Electric Field Type · Multidimensional Cells · Viridis · Green Symbolism · Latin · SPQR", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
