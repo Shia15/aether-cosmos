@@ -463,7 +463,7 @@ function MSDDControlCanvas() {
 
       const {phase,pt}=getPhase(frame);
       const phaseNames=["NORMAL · QUANTUM COHERENCE","⚠ SHOCK EVENT · IMPACT/RADIATION","⚡ MSDD · MUTUAL DECOHERENCE CASCADE","◉ ALCC · AUTOMATED LOOP ACTIVATING","✓ RECOVERY · ADAPTED EQUILIBRIUM"];
-      const phaseColors=[V.green,V.plasma,V.danger,V.cyan,V.photon];
+      const phaseColors=[V.green,V.plasma,V.fire,V.cyan,V.photon];
 
       /* update psi and prot per phase */
       if(phase===0){
