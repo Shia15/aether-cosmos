@@ -120,6 +120,7 @@ import TopographyElectrosetPage from "@/pages/topography-electroset";
 import WebbledPhiCascadePage from "@/pages/webbed-phi-cascade";
 import AetherMetaphysicsPage from "@/pages/aether-metaphysics";
 import PollenClockRootsPage from "@/pages/pollen-clock-roots";
+import LifeGradientPlanetaryPage from "@/pages/life-gradient-planetary";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -506,6 +507,7 @@ function Router() {
         <Route path="/webbed-phi-cascade" component={WebbledPhiCascadePage} />
         <Route path="/aether-metaphysics" component={AetherMetaphysicsPage} />
         <Route path="/pollen-clock-roots" component={PollenClockRootsPage} />
+        <Route path="/life-gradient-planetary" component={LifeGradientPlanetaryPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />

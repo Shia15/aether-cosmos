@@ -331,6 +331,7 @@ const NAV_ITEMS = [
   { href: "/webbed-phi-cascade", label: "Webbed Leg Method · φ-Proportioned Periodic Cellular Array · Thermal Cascade · Fibonacci Phyllotaxis · Kármán Vortex · Lissajous", icon: Atom },
   { href: "/aether-metaphysics", label: "AETHER Metaphysics · Substrate Consciousness · Non-Binary Layers · Falcon · Human · Dolphin · Sandstone · Salt · Basalt · Morse Code · Erosional Patterns", icon: Atom },
   { href: "/pollen-clock-roots", label: "Pollen · Slug · Plant Clock · Root Tips · Saffron · Poppy · Milk Plant · Horologium Florae · Malacophily · Root to Moss to Flower", icon: Atom },
+  { href: "/life-gradient-planetary", label: "Life Gradient · Cell Membrane · Organoids · Mars Impact · Moon Glass Spires · Grand Canyon · Solar Wind · Concretions · Erosion Fascia · Salt Era", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
