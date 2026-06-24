@@ -128,6 +128,7 @@ import PlantNetworkPage from "@/pages/plant-network";
 import MycorrhizalNetworkPage from "@/pages/mycorrhizal-network";
 import MagicC8Page from "@/pages/magic-c8";
 import SlimeMazePage from "@/pages/slime-maze";
+import StellarBrainPage from "@/pages/stellar-brain";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -522,6 +523,7 @@ function Router() {
         <Route path="/mycorrhizal-network" component={MycorrhizalNetworkPage} />
         <Route path="/magic-c8" component={MagicC8Page} />
         <Route path="/slime-maze" component={SlimeMazePage} />
+        <Route path="/stellar-brain" component={StellarBrainPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
