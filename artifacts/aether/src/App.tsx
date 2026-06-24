@@ -126,6 +126,7 @@ import LunarPlantMemoryPage from "@/pages/lunar-plant-memory";
 import PlantElectroactivityPage from "@/pages/plant-electroactivity";
 import PlantNetworkPage from "@/pages/plant-network";
 import MycorrhizalNetworkPage from "@/pages/mycorrhizal-network";
+import MagicC8Page from "@/pages/magic-c8";
 import AwakeningTimelinePage from "@/pages/awakening-timeline";
 import AetherWhyPage from "@/pages/aether-why";
 import BabyRhythmPage from "@/pages/baby-rhythm";
@@ -518,6 +519,7 @@ function Router() {
         <Route path="/plant-electroactivity" component={PlantElectroactivityPage} />
         <Route path="/plant-network" component={PlantNetworkPage} />
         <Route path="/mycorrhizal-network" component={MycorrhizalNetworkPage} />
+        <Route path="/magic-c8" component={MagicC8Page} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />

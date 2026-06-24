@@ -337,6 +337,7 @@ const NAV_ITEMS = [
   { href: "/plant-electroactivity", label: "Plant Membrane Potential · Ca²⁺ Channels · Venus Flytrap · Mimosa · Sea Slug · Kin Recognition · VOC Network · Willow · Redwood · Mycorrhizal", icon: Atom },
   { href: "/plant-network", label: "Plant Network · VOC Air Signals · Mycorrhizal Hyphae · Underground Hi-Fi · Anastomosis · Dual Channel · Signal Packets · Willow · Redwood", icon: Atom },
   { href: "/mycorrhizal-network", label: "Mycorrhizal Network · Live Hyphal Growth · Anastomosis · Hi-Fi Cable · Chemotropism · Signal Packets · Sugar · Phosphorus · Ca²⁺ · Jasmonate · Stress Broadcast", icon: Atom },
+  { href: "/magic-c8", label: "MAGIC C8 · Wood Wide Web · Spectral Analysis · Coherence Clock · Ion Channels · GPCR Cascade · Bacteria · Archaea · Fungi · Slime Mold · Jellyfish · Worms", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
