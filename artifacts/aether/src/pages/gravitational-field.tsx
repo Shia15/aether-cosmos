@@ -260,10 +260,15 @@ function FieldCanvas({ gMult, showForces, showField }:
           const ax = (fx[k] + driftF) / p.m - p.vx * a.damping;
           const ay = (fy[k] + Fg + Fy_restore) / p.m - p.vy * a.damping;
 
-          p.vx += ax * DT;
-          p.vy += ay * DT;
+          if (isFinite(ax)) p.vx += ax * DT;
+          if (isFinite(ay)) p.vy += ay * DT;
           p.x  += p.vx * DT * 40;
           p.y  += p.vy * DT * 40;
+
+          /* Reset to equilibrium if diverged */
+          if (!isFinite(p.x) || !isFinite(p.y) || !isFinite(p.vx) || !isFinite(p.vy)) {
+            p.x = a.x0 + rels[k].dx; p.y = eqY; p.vx = 0; p.vy = 0;
+          }
 
           /* Ground/medium floor */
           if (a.medium === "land" && p.y > GND) {
@@ -367,6 +372,7 @@ function FieldCanvas({ gMult, showForces, showField }:
 
         /* Spring lines */
         for (const [i, j] of a.springs) {
+          if (!isFinite(ps[i].x) || !isFinite(ps[i].y) || !isFinite(ps[j].x) || !isFinite(ps[j].y)) continue;
           const cg = ctx.createLinearGradient(ps[i].x, ps[i].y, ps[j].x, ps[j].y);
           cg.addColorStop(0, `${a.color}70`);
           cg.addColorStop(1, `${a.color}40`);
@@ -398,6 +404,7 @@ function FieldCanvas({ gMult, showForces, showField }:
 
         /* Particles */
         for (const p of ps) {
+          if (!isFinite(p.x) || !isFinite(p.y)) continue;
           const hg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 14);
           hg.addColorStop(0, `${a.color}22`);
           hg.addColorStop(1, `${a.color}00`);
