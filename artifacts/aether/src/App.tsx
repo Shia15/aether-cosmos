@@ -338,6 +338,7 @@ import NonTerrestrialPage from "@/pages/non-terrestrial";
 import PropulsionDynamicsPage from "@/pages/propulsion-dynamics";
 import PolymerBiobreakPage from "@/pages/polymer-biobreak";
 import AtpTransportPage from "@/pages/atp-transport";
+import BorreliaKnotPage from "@/pages/borrelia-knot";
 
 const queryClient = new QueryClient();
 
@@ -661,6 +662,7 @@ function Router() {
         <Route path="/slime-maze" component={SlimeMazePage} />
         <Route path="/stellar-brain" component={StellarBrainPage} />
         <Route path="/atp-transport" component={AtpTransportPage} />
+        <Route path="/borrelia-knot" component={BorreliaKnotPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
