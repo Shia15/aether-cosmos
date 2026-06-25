@@ -337,6 +337,7 @@ import OsmoticPressurePage from "@/pages/osmotic-pressure";
 import NonTerrestrialPage from "@/pages/non-terrestrial";
 import PropulsionDynamicsPage from "@/pages/propulsion-dynamics";
 import PolymerBiobreakPage from "@/pages/polymer-biobreak";
+import AtpTransportPage from "@/pages/atp-transport";
 
 const queryClient = new QueryClient();
 
@@ -659,6 +660,7 @@ function Router() {
         <Route path="/magic-c8" component={MagicC8Page} />
         <Route path="/slime-maze" component={SlimeMazePage} />
         <Route path="/stellar-brain" component={StellarBrainPage} />
+        <Route path="/atp-transport" component={AtpTransportPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />

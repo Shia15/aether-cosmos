@@ -341,6 +341,7 @@ const NAV_ITEMS = [
   { href: "/magic-c8", label: "MAGIC C8 · Wood Wide Web · Spectral Analysis · Coherence Clock · Ion Channels · GPCR Cascade · Bacteria · Archaea · Fungi · Slime Mold · Jellyfish · Worms", icon: Atom },
   { href: "/slime-maze", label: "Physarum Maze · Slime Mold Solver · Colonisation · Dead End Retraction · Hagen-Poiseuille · Flow Optimization · No Brain · Forest Parallel", icon: Atom },
   { href: "/stellar-brain", label: "Stellar Brain · Plutomate ♇ · Neural Core · Symbol Engine · Strange Loop · Self-Reflection · Deep Brain Systems · Brainstem · Amygdala · Hippocampus · Basal Ganglia", icon: Brain },
+  { href: "/atp-transport", label: "ATP · Active Transport · Concentration Gradient · Hydrolysis · ADP Generation · Starburst · Phosphate · Ribose · Adenine · Na⁺ K⁺ Pump · 30.5 kJ/mol", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
