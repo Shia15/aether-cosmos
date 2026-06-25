@@ -202,8 +202,8 @@ function StrandCanvas({
         b.opacity = Math.max(0, b.opacity);
       }
 
-      /* Sub-branch spawning when D < Dc */
-      if (D < p.Dc && !obs) {
+      /* Sub-branch spawning when D < Dc (cap total to prevent stack overflow) */
+      if (D < p.Dc && !obs && branches.current.length < 400) {
         for (const b of branches.current) {
           if (b.subN < 2 && b.curLen > b.maxLen * 0.6 && Math.random() < 0.004) {
             branches.current.push({
@@ -239,7 +239,7 @@ function StrandCanvas({
 
       /* Coherence shell — oval wrapping all branches */
       if (branches.current.length > 0) {
-        const maxR = Math.max(50, ...branches.current.map(b => b.curLen + 30));
+        const maxR = branches.current.reduce((acc, b) => Math.max(acc, b.curLen + 30), 50);
         const shellGrad = ctx.createRadialGradient(CX, CY, maxR * 0.4, CX, CY, maxR * 1.1);
         shellGrad.addColorStop(0, `${BLUE}00`);
         shellGrad.addColorStop(0.7, `${BLUE}${Math.round(D * 12).toString(16).padStart(2, "0")}`);
