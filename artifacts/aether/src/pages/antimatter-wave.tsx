@@ -17,6 +17,7 @@ const RED  = "#ef4444";
 const BLUE = "#3b82f6";
 const PINK = "#ec4899";
 const ORG  = "#f97316";
+const AMB  = "#ff9933";
 const DIM  = "#374858";
 const MN   = "'Space Mono',monospace";
 const OR   = "'Orbitron',sans-serif";
