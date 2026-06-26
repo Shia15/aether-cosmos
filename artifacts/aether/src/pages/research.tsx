@@ -139,10 +139,41 @@ function ResearchHeaderCanvas() {
   return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
 }
 
+const RESEARCH_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  headline: "5Φ-AETHER: Living Systems for Coherent Cancer Detection",
+  description: "Executive brief for the φ-AETHER Research Initiative. Cancer is a coherence failure — a departure from the φ-harmonic self-organized critical attractor of healthy biological tissue. Three core scientific discoveries, a living hardware stack, and a primary crackling-noise universality experiment.",
+  datePublished: "2026-03-01",
+  author: {
+    "@type": "Organization",
+    name: "AETHER Research Initiative",
+    url: "https://aetherlife.co",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "AETHER",
+    url: "https://aetherlife.co",
+  },
+  mainEntityOfPage: "/research",
+  keywords: "cancer detection, phi architecture, Fibonacci processor, biophoton, crackling noise, self-organized criticality, permutation entropy, Hurst exponent",
+  about: [
+    { "@type": "Thing", name: "Cancer detection" },
+    { "@type": "Thing", name: "Fibonacci mathematics" },
+    { "@type": "Thing", name: "Biophoton biosensors" },
+    { "@type": "Thing", name: "Self-organized criticality" },
+  ],
+};
+
 export default function Research() {
   const [activeDiscovery, setActiveDiscovery] = useState<string | null>("rational");
 
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(RESEARCH_SCHEMA) }}
+    />
     <div style={{ height: "100%", overflowY: "auto", background: "rgb(4,3,18)", color: "rgba(255,255,255,0.85)", fontFamily: "'Raleway', 'Georgia', sans-serif" }}>
       <div style={{flexShrink:0}}>
         <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
@@ -313,5 +344,6 @@ export default function Research() {
         </div>
       </div>
     </div>
+    </>
   );
 }

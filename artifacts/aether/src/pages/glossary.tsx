@@ -169,6 +169,22 @@ function GlossaryCanvas() {
   return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
 }
 
+const GLOSSARY_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  name: "The vocabulary of AETHER",
+  description: "Every recurring term across the AETHER knowledge synthesis project — 40 terms across 11 categories: astronomy, astrology, biology, computing, cosmology, mathematics, mythology, numerology, philosophy, substrate, and AETHER itself.",
+  url: "/glossary",
+  hasDefinedTerm: ENTRIES.map((entry) => ({
+    "@type": "DefinedTerm",
+    name: entry.term,
+    description: entry.def,
+    ...(entry.link ? { url: entry.link } : {}),
+    inDefinedTermSet: "/glossary",
+    ...(entry.etym ? { alternateName: entry.etym } : {}),
+  })),
+};
+
 export default function GlossaryPage() {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<Cat | "All">("All");
@@ -201,6 +217,11 @@ export default function GlossaryPage() {
   }, [filtered]);
 
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(GLOSSARY_SCHEMA) }}
+    />
     <div data-testid="page-glossary" style={{
       minHeight:"100vh", width:"100%",
       background:"radial-gradient(ellipse at top, #0c4a6e 0%, #0f172a 50%, #020617 100%)",
@@ -353,5 +374,6 @@ export default function GlossaryPage() {
         </footer>
       </div>
     </div>
+    </>
   );
 }

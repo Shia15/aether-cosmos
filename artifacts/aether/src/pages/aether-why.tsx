@@ -110,8 +110,34 @@ function WhyCanvas() {
   return <canvas ref={cvRef} style={{ width:"100%", height:"auto", display:"block", borderRadius:6 }} />;
 }
 
+const ARTICLE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: "They enable everything — and you only know where you plant.",
+  description: "A founder's letter outlining the AETHER knowledge synthesis system — its origin in recurring cross-domain patterns, the five substrates that enable everything, memory surviving 11,600 years, and the promise to the person who already knew.",
+  datePublished: "2025-11-05T12:22:00",
+  author: {
+    "@type": "Organization",
+    name: "AETHER",
+    url: "https://aetherlife.co",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "AETHER",
+    url: "https://aetherlife.co",
+  },
+  mainEntityOfPage: "/aether-why",
+  keywords: "knowledge synthesis, coherence engine, crystallization model, field interface, awakening",
+  articleSection: "Founders Letter",
+};
+
 export default function AetherWhyPage() {
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(ARTICLE_SCHEMA) }}
+    />
     <div data-testid="page-aether-why" style={{
       minHeight:"100vh", width:"100%",
       background:"radial-gradient(ellipse at top, #1e1b4b 0%, #0f172a 50%, #000 100%)",
@@ -259,5 +285,6 @@ export default function AetherWhyPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
