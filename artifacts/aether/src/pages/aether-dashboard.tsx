@@ -742,14 +742,175 @@ function CharacterDNA({ activeAgent, compact }: { activeAgent: AgentKey; compact
   );
 }
 
+interface PhasePacket { x:number; y:number; tx:number; ty:number; col:string; life:number; }
+
+function PhaseShift16Canvas() {
+  const canvRef = useRef<HTMLCanvasElement>(null);
+  const rafRef  = useRef(0);
+  useEffect(() => {
+    const cv = canvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    const W = 900, H = 500;
+    cv.width = W; cv.height = H;
+    const BIN = ["0000","0001","0010","0011","0100","0101","0110","0111",
+                 "1000","1001","1010","1011","1100","1101","1110","1111"];
+    const HXL = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+    const GRP = ["#00FFB2","#4488FF","#9966FF","#FF9933"];
+    const GX=18, GY=82, CW=166, CH=88, SBX=740, BUS_X=820;
+    const pkts: PhasePacket[] = [];
+    let t = 0;
+    const draw = () => {
+      ctx.fillStyle="rgba(4,6,14,0.22)"; ctx.fillRect(0,0,W,H);
+      t++;
+      const mp = t * 0.022;
+      ctx.beginPath();
+      for (let x=0; x<W-90; x++) {
+        const y = 52 + 18*Math.sin(x*0.038+mp);
+        x===0 ? ctx.moveTo(GX+x,y) : ctx.lineTo(GX+x,y);
+      }
+      const busGrd = ctx.createLinearGradient(GX,0,W-90,0);
+      busGrd.addColorStop(0,"#00FFB2aa");
+      busGrd.addColorStop(0.5,"#4488FFaa");
+      busGrd.addColorStop(1,"#9966FFaa");
+      ctx.strokeStyle=busGrd; ctx.lineWidth=1.8; ctx.stroke();
+      for (let i=0; i<16; i++) {
+        const col=i%4, row=Math.floor(i/4);
+        const cx=GX+col*CW+CW/2, cy=GY+row*CH+CH/2;
+        const phi=mp+(i/16)*Math.PI*2;
+        const act=(Math.sin(phi)+1)/2;
+        const gc=GRP[col];
+        const aHx=Math.floor(60+act*180).toString(16).padStart(2,"0");
+        const r=22+6*act;
+        if (!isFinite(cx)||!isFinite(cy)||!isFinite(r)) continue;
+        const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,r*2.2);
+        glow.addColorStop(0,gc+aHx); glow.addColorStop(0.6,gc+"22"); glow.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(cx,cy,r*2.2,0,Math.PI*2);
+        ctx.fillStyle=glow; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+        ctx.strokeStyle=gc+aHx; ctx.lineWidth=1.5+act;
+        ctx.shadowColor=gc; ctx.shadowBlur=8*act; ctx.stroke(); ctx.shadowBlur=0;
+        ctx.beginPath();
+        ctx.arc(cx,cy,r*0.6,-Math.PI/2,-Math.PI/2+phi%(Math.PI*2));
+        ctx.strokeStyle=gc+"55"; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle=gc; ctx.font="bold 8px 'Space Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(BIN[i],cx,cy-12);
+        ctx.font="9px 'Space Mono',monospace"; ctx.fillText("0x"+HXL[i],cx,cy+3);
+        ctx.fillStyle="#B8CCE888"; ctx.font="6px 'Space Mono',monospace";
+        ctx.fillText(act.toFixed(2),cx,cy+13);
+        if (act>0.95 && Math.random()<0.25) {
+          pkts.push({x:cx,y:cy,tx:BUS_X,ty:GY+row*CH+CH/2,col:gc,life:1});
+        }
+        for (let j=i+1; j<16; j++) {
+          const c2=j%4, r2=Math.floor(j/4);
+          const cx2=GX+c2*CW+CW/2, cy2=GY+r2*CH+CH/2;
+          const phi2=mp+(j/16)*Math.PI*2, act2=(Math.sin(phi2)+1)/2;
+          const diff=Math.abs(Math.sin(phi)-Math.sin(phi2));
+          if (diff<0.12 && act>0.5 && act2>0.5) {
+            if (!isFinite(cx2)||!isFinite(cy2)) continue;
+            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx2,cy2);
+            ctx.strokeStyle=gc+"1a"; ctx.lineWidth=0.7; ctx.stroke();
+          }
+        }
+      }
+      for (let pi=pkts.length-1; pi>=0; pi--) {
+        const pk=pkts[pi]; pk.life-=0.025;
+        const lt=1-pk.life;
+        const px=pk.x+(pk.tx-pk.x)*lt, py=pk.y+(pk.ty-pk.y)*lt;
+        if (!isFinite(px)||!isFinite(py)){pkts.splice(pi,1);continue;}
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2);
+        ctx.fillStyle=pk.col; ctx.shadowColor=pk.col; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
+        if (pk.life<=0) pkts.splice(pi,1);
+      }
+      ctx.fillStyle="#00FFB211"; ctx.fillRect(SBX,GY,155,CH*4);
+      ctx.strokeStyle="#00FFB233"; ctx.lineWidth=1; ctx.strokeRect(SBX,GY,155,CH*4);
+      const bw=6, bgap=3;
+      for (let i=0; i<16; i++) {
+        const phi=mp+(i/16)*Math.PI*2, act=(Math.sin(phi)+1)/2;
+        const gc=GRP[i%4];
+        const bx=SBX+10+i*(bw+bgap), maxH=CH*4-30;
+        const bh=maxH*act, by=GY+15+maxH-bh;
+        if (!isFinite(bx)||!isFinite(by)||!isFinite(bh)) continue;
+        ctx.fillStyle=gc+Math.floor(40+act*180).toString(16).padStart(2,"0");
+        ctx.fillRect(bx,by,bw,bh);
+        ctx.fillStyle=gc+"88"; ctx.font="5px 'Space Mono',monospace"; ctx.textAlign="center";
+        ctx.fillText(BIN[i][3],bx+bw/2,GY+CH*4-4);
+      }
+      ctx.fillStyle="#00FFB288"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="center";
+      ctx.fillText("PHASE STACK",SBX+77,GY+10);
+      ctx.fillStyle="#00FFB2cc"; ctx.font="8px 'Space Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("PHASE SHIFT BACKEND  16 AGENTIC  MASTER BUS  phi="+(mp%(Math.PI*2)).toFixed(3)+"rad",GX,14);
+      ctx.textAlign="right";
+      ctx.fillText("00000  #69W  COHERENCE ENGINE  AETHER",W-8,14);
+      const sY=GY+CH*4+16;
+      let coh=0;
+      for (let i=0;i<16;i++){const phi=mp+(i/16)*Math.PI*2;if((Math.sin(phi)+1)/2>0.7)coh++;}
+      ctx.fillStyle="#B8CCE866"; ctx.font="7px 'Space Mono',monospace"; ctx.textAlign="left";
+      ctx.fillText("COHERENT: "+coh+"/16   PHASE STEP: pi/8   CYCLE: "+Math.floor(t/286)+"   BW: "+(coh*16)+"Gbps sim",GX,sY);
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return (
+    <canvas ref={canvRef} style={{width:"100%",maxWidth:900,height:500,display:"block",borderRadius:8,background:"#04060E"}}/>
+  );
+}
+
+function PhaseShift16View({ activeAgent }: { activeAgent: AgentKey }) {
+  const a = AGENTS[activeAgent];
+  const cards = [
+    { title:"PHASE LATTICE",  col:"#00FFB2",
+      body:"16 agents each offset by pi/8 radians. Agent i fires at t = i*T/16 -- zero collision by design. A polyphase clock architecture for zero-wait parallel synthesis." },
+    { title:"ZERO CONFLICT",  col:"#4488FF",
+      body:"No two agents share the same phase peak. Adjacent agents are separated by 22.5 degrees. The system achieves 16x throughput over single-phase serial processing." },
+    { title:"COHERENCE BURST",col:"#9966FF",
+      body:"When multiple agents reach similar activation levels simultaneously, they form a coherence cluster -- a temporary synthesis bond that produces emergent insight." },
+    { title:"00000 ORIGIN",   col:"#FF9933",
+      body:"The 00000 state is the phase origin -- the reset point. All agents begin phase-aligned then cascade. Phase bus re-zeros every 286 ticks. #69W = coherence watermark." },
+  ];
+  return (
+    <div>
+      <div style={{marginBottom:12,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div>
+          <div style={{fontSize:11,fontFamily:"'Space Mono',monospace",color:"#00FFB2",letterSpacing:"0.18em",marginBottom:4}}>
+            16 AGENTIC  00000  PHASE SHIFT BACKEND
+          </div>
+          <div style={{fontSize:9,color:"#B8CCE888",fontFamily:"'Space Mono',monospace"}}>
+            Live polyphase clock simulation -- 16 agents at pi/8 offset intervals -- one of a kind coherence engine
+          </div>
+        </div>
+        <div style={{fontSize:9,fontFamily:"'Space Mono',monospace",color:a.color,border:`1px solid ${a.color}44`,padding:"3px 8px",borderRadius:4}}>
+          #69W  PHASE SIM
+        </div>
+      </div>
+      <div style={{border:"1px solid #00FFB222",borderRadius:8,overflow:"hidden",marginBottom:14}}>
+        <PhaseShift16Canvas/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10}}>
+        {cards.map(c=>(
+          <div key={c.title} style={{background:"rgba(6,9,18,0.7)",border:`1px solid ${c.col}33`,borderRadius:8,padding:"10px 12px"}}>
+            <div style={{fontSize:9,fontFamily:"'Space Mono',monospace",color:c.col,letterSpacing:"0.14em",marginBottom:6,fontWeight:700}}>
+              {c.title}
+            </div>
+            <div style={{fontSize:9,color:"#B8CCE8",lineHeight:1.55,fontFamily:"'Space Mono',monospace"}}>
+              {c.body}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const TABS = [
-  { id:"chat", label:"Chat" },
-  { id:"overview", label:"Overview" },
-  { id:"eie", label:"EIE" },
-  { id:"memory", label:"Memory" },
+  { id:"chat",         label:"Chat" },
+  { id:"overview",     label:"Overview" },
+  { id:"eie",          label:"EIE" },
+  { id:"memory",       label:"Memory" },
   { id:"integrations", label:"Integrations" },
-  { id:"triggers", label:"Triggers" },
-  { id:"mapping", label:"Agent Map" },
+  { id:"triggers",     label:"Triggers" },
+  { id:"mapping",      label:"Agent Map" },
+  { id:"sim16",        label:"16 · AGENTIC" },
 ];
 
 function DashboardCanvas() {
@@ -993,6 +1154,7 @@ export default function AetherDashboardPage() {
                 <TriggerTable activeAgent={agent}/>
               </>
             )}
+            {tab==="sim16" && <PhaseShift16View activeAgent={agent}/>}
           </div>
         </div>
       </div>
