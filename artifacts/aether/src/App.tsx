@@ -343,6 +343,8 @@ import FloquetPetalsPage from "@/pages/floquet-petals";
 import GutBrainPage from "@/pages/gut-brain";
 import PlanetaryNeuralPage from "@/pages/planetary-neural";
 import StackedRingsPage from "@/pages/stacked-rings";
+import EarthLivingSystemPage from "@/pages/earth-living-system";
+import PortalRestorationPage from "@/pages/portal-restoration";
 
 const queryClient = new QueryClient();
 
@@ -671,6 +673,8 @@ function Router() {
         <Route path="/gut-brain" component={GutBrainPage} />
         <Route path="/planetary-neural" component={PlanetaryNeuralPage} />
         <Route path="/stacked-rings" component={StackedRingsPage} />
+        <Route path="/earth-living-system" component={EarthLivingSystemPage} />
+        <Route path="/portal-restoration" component={PortalRestorationPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />
