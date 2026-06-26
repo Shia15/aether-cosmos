@@ -328,6 +328,174 @@ function OpalCanvas() {
     style={{width:"100%",height:480,display:"block",borderRadius:"0 0 4px 4px"}}/>;
 }
 
+/* ── Pathway Reaction Data ───────────────────────────────────── */
+const PATHWAY_RXNS = [
+  { title:"2H\u2082S + h\u03BD", sub:"\u21922S\u2070+2H\u207A+2e\u207B", col:V.vio,
+    rAtoms:[[0,0,10,V.vio,"S"],[-16,-9,4.5,"#EEE","H"],[16,-9,4.5,"#EEE","H"],[0,-28,6,V.shock,"h\u03BD"]],
+    pAtoms:[[0,-8,8,V.gold,"S\u2070"],[-14,8,3.5,"#EEE","H\u207A"],[14,8,3.5,"#EEE","H\u207A"],[0,20,3,"#4466FF","e\u207B"]] },
+  { title:"S\u2070+O\u2082+H\u2082O", sub:"\u2192H\u2082SO\u2084", col:V.amb,
+    rAtoms:[[0,0,8,V.gold,"S\u2070"],[-20,0,5,V.rose,"O"],[20,0,5,V.rose,"O"],[0,20,6,V.blue,"O"],[-10,30,3.5,"#EEE","H"],[10,30,3.5,"#EEE","H"]],
+    pAtoms:[[0,0,9,V.amb,"S"],[0,-17,5,V.rose,"O"],[17,0,5,V.rose,"O"],[0,17,5,V.rose,"O"],[-17,0,5,V.rose,"O"]] },
+  { title:"SiO\u2082+2H\u2082O", sub:"\u2192Si(OH)\u2084", col:V.blue,
+    rAtoms:[[0,0,8,"#889AAA","Si"],[-14,0,5,V.rose,"O"],[14,0,5,V.rose,"O"],[0,22,6,V.blue,"O"],[-10,32,3.5,"#EEE","H"],[10,32,3.5,"#EEE","H"]],
+    pAtoms:[[0,0,9,V.blue,"Si"],[0,-18,5,V.rose,"OH"],[18,0,5,V.rose,"OH"],[0,18,5,V.rose,"OH"],[-18,0,5,V.rose,"OH"]] },
+  { title:"n Si(OH)\u2084", sub:"\u2192SiO\u2082\u00B7nH\u2082O", col:"#C8B0FF",
+    rAtoms:[[-18,-14,6,V.cyan,"Si"],[18,-14,6,V.cyan,"Si"],[-18,14,6,V.cyan,"Si"],[18,14,6,V.cyan,"Si"],[0,0,4,"#EEE",""]],
+    pAtoms:[[0,0,18,V.opal1,""],[0,0,14,V.opal2,""],[0,0,10,V.opal3,""]] },
+  { title:"SiO\u2082\u00B7nH\u2082O", sub:"\u2192Si+O\u2082", col:V.aurora,
+    rAtoms:[[0,0,16,V.opal1,""],[0,0,12,V.opal2,""],[0,0,8,V.opal3,""]],
+    pAtoms:[[0,-8,9,V.aurora,"Si"],[-5,6,3,V.aurora,""],[5,6,3,V.aurora,""],[-18,4,4.5,V.rose,"O"],[18,4,4.5,V.rose,"O"]] },
+];
+
+/* ── Orbital Particle Seeds ──────────────────────────────────── */
+const mkRng=(seed:number)=>{let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};};
+
+const ORBIT_PARTS = PATHWAY_RXNS.map((_rxn,ri)=>{
+  const rng=mkRng(ri*100+13);
+  return Array.from({length:18},()=>({
+    angle:rng()*Math.PI*2,
+    radius:18+rng()*22,
+    speed:(rng()-0.5)*0.012+0.008,
+    lane: rng()<0.5?"r":"p",
+    molIdx:Math.floor(rng()*3),
+    sz:2.5+rng()*2.5,
+  }));
+});
+
+/* ── Opal Pathway Canvas ─────────────────────────────────────── */
+function OpalPathwayCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(()=>{
+    const cv = ref.current; if(!cv) return;
+    const ctx = cv.getContext("2d")!;
+    const W=cv.width, H=cv.height;
+    let t=0;
+
+    const N=PATHWAY_RXNS.length;
+    const CW=W/N;
+
+    function pulse(i:number){ return Math.max(0,Math.sin(t*0.38+i*1.25))**2; }
+
+    function drawAtoms(atoms:(number|string)[][], cx:number, cy:number, alpha:number){
+      atoms.forEach((atom)=>{
+        const adx=Number(atom[0]),ady=Number(atom[1]),ar=Number(atom[2]);
+        const acol=String(atom[3]),albl=String(atom[4]);
+        if(ar>0){
+          ctx.beginPath(); ctx.arc(cx+adx,cy+ady,ar,0,Math.PI*2);
+          ctx.fillStyle=acol+ha(alpha*220); ctx.fill();
+          if(albl.length>0){
+            ctx.fillStyle=ar>5?"#FFF8":"#0008";
+            ctx.font=`${ar>6?6:5}px ${MONO}`; ctx.textAlign="center";
+            ctx.fillText(albl,cx+adx,cy+ady+2);
+          }
+        }
+      });
+      /* bonds: connect each atom to atom[0] */
+      const [ox,oy]=atoms[0];
+      const a0x=cx+Number(ox), a0y=cy+Number(oy);
+      for(let ai=1;ai<atoms.length;ai++){
+        const bx2=cx+Number(atoms[ai][0]), by2=cy+Number(atoms[ai][1]);
+        const bd=Math.hypot(bx2-a0x,by2-a0y);
+        if(bd>0&&bd<44){
+          ctx.beginPath(); ctx.moveTo(a0x,a0y); ctx.lineTo(bx2,by2);
+          ctx.strokeStyle=String(atoms[ai][3])+"33"; ctx.lineWidth=1; ctx.stroke();
+        }
+      }
+    }
+
+    function drawChamber(i:number){
+      const rxn=PATHWAY_RXNS[i];
+      const col=rxn.col;
+      const x0=CW*i, x1=x0+CW, cx=x0+CW*0.5;
+      const ry=H*0.3, py=H*0.72;
+      const pl=pulse(i);
+
+      /* background */
+      const bgGrd=ctx.createLinearGradient(x0,0,x1,H);
+      bgGrd.addColorStop(0,col+"04"); bgGrd.addColorStop(0.5,col+"0E"); bgGrd.addColorStop(1,col+"04");
+      ctx.fillStyle=bgGrd; ctx.fillRect(x0,0,CW,H);
+
+      /* separator */
+      if(i<N-1){
+        ctx.beginPath(); ctx.moveTo(x1,8); ctx.lineTo(x1,H-8);
+        ctx.strokeStyle=col+"22"; ctx.lineWidth=1; ctx.stroke();
+      }
+
+      /* orbital particles */
+      ORBIT_PARTS[i].forEach(p=>{
+        p.angle+=p.speed;
+        const isR=p.lane==="r";
+        const orbitR=isR ? p.radius*(1-pl*0.85) : p.radius*pl;
+        if(orbitR<0.5) return;
+        const ox=cx+Math.cos(p.angle)*orbitR;
+        const oy=(isR?ry:py)+Math.sin(p.angle)*orbitR*0.45;
+        if(!isFinite(ox)||!isFinite(oy)) return;
+        const pCol=isR ? (rxn.rAtoms[p.molIdx%rxn.rAtoms.length][3] as string)
+                       : (rxn.pAtoms[p.molIdx%rxn.pAtoms.length][3] as string);
+        const palpha=(isR?0.5+0.3*(1-pl):0.5+0.3*pl);
+        ctx.beginPath(); ctx.arc(ox,oy,p.sz,0,Math.PI*2);
+        ctx.fillStyle=pCol+ha(palpha*190); ctx.fill();
+      });
+
+      /* reactant molecule diagram */
+      const rScale=1-pl*0.7;
+      ctx.save(); ctx.translate(cx,ry); ctx.scale(rScale,rScale); ctx.translate(-cx,-ry);
+      drawAtoms(rxn.rAtoms, cx, ry, 0.55+0.3*(1-pl));
+      ctx.restore();
+
+      /* reaction flash + arrow */
+      if(pl>0.2){
+        const fl=(pl-0.2)/0.8;
+        const grd=ctx.createRadialGradient(cx,H*0.5,0,cx,H*0.5,28*fl);
+        grd.addColorStop(0,col+ha(fl*180)); grd.addColorStop(1,col+"00");
+        ctx.beginPath(); ctx.arc(cx,H*0.5,28*fl,0,Math.PI*2);
+        ctx.fillStyle=grd; ctx.fill();
+      }
+      /* down arrow */
+      const arA=0.2+0.6*pl;
+      ctx.beginPath();
+      ctx.moveTo(cx-5,H*0.5-2); ctx.lineTo(cx,H*0.5+8); ctx.lineTo(cx+5,H*0.5-2);
+      ctx.strokeStyle=col+ha(arA*200); ctx.lineWidth=1.5; ctx.stroke();
+
+      /* product molecule diagram */
+      const pScale=0.3+pl*0.7;
+      ctx.save(); ctx.translate(cx,py); ctx.scale(pScale,pScale); ctx.translate(-cx,-py);
+      drawAtoms(rxn.pAtoms, cx, py, pl*0.75);
+      ctx.restore();
+
+      /* energy label top */
+      ctx.fillStyle=col+ha(120+80*pl);
+      ctx.font=`6px ${MONO}`; ctx.textAlign="center";
+      ctx.fillText(i===0?"PHOTON":i===1?"OXIDATION":i===2?"DISSOLUTION":i===3?"POLYMERISATION":"REDUCTION",
+        cx, 13);
+
+      /* equation labels bottom */
+      ctx.fillStyle=col+ha(180); ctx.font=`6px ${MONO}`; ctx.textAlign="center";
+      ctx.fillText(rxn.title, cx, H-20);
+      ctx.fillStyle=col+ha(110); ctx.font=`5.5px ${MONO}`;
+      ctx.fillText(rxn.sub, cx, H-10);
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle=V.bg; ctx.fillRect(0,0,W,H);
+      for(let i=0;i<N;i++) drawChamber(i);
+      /* HUD */
+      ctx.fillStyle=V.vio+"44"; ctx.font=`7px ${MONO}`; ctx.textAlign="left";
+      ctx.fillText("SOLAR OPAL PATHWAY \u00B7 LIVE MOLECULAR SIMULATION",14,14);
+      t+=0.012;
+    }
+
+    function loop(){ draw(); raf.current=requestAnimationFrame(loop); }
+    loop();
+    return()=>cancelAnimationFrame(raf.current);
+  },[]);
+
+  return <canvas ref={ref} width={900} height={280}
+    style={{width:"100%",height:280,display:"block",borderRadius:"0 0 4px 4px"}}/>;
+}
+
 /* ── Chain Stage Data ────────────────────────────────────────── */
 const CHAIN_STAGES = [
   { label:"SOLAR PHOTON",         col:V.shock, sub:"hν · 700–1000 nm near-infrared" },
@@ -689,6 +857,14 @@ export default function OpalGenesisPage() {
                 </div>
               </div>
             ))}
+          </div>
+          {/* ── Pathway Live Simulation ── */}
+          <div style={{marginTop:18,borderRadius:4,overflow:"hidden",border:`1px solid ${V.vio}22`}}>
+            <div style={{padding:"6px 14px",background:V.vio+"0A",fontFamily:MONO,fontSize:8,
+              color:V.vio+"88",letterSpacing:"0.14em"}}>
+              LIVE · MOLECULAR SIMULATION · STAGGERED REACTION PULSES
+            </div>
+            <OpalPathwayCanvas />
           </div>
         </div>
 
