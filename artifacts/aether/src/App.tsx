@@ -415,139 +415,191 @@ const clerkAppearance = {
 };
 
 /* ── Shared auth layout ─────────────────────────────────────────────────── */
+/* ── Auth canvas: module-level types ──────────────── */
+interface AKNode { x:number;y:number;vx:number;vy:number;label:string;col:string;r:number }
+interface AKParticle { ei:number;t:number;spd:number }
+
+const AK_EDGES=[
+  [13,0],[13,2],[13,4],[13,6],[13,8],[13,10],[13,12],[13,14],[13,15],
+  [13,1],[13,3],[13,5],[13,7],[13,9],[13,11],[13,16],[13,17],[13,18],[13,19],
+  [0,1],[0,16],[2,3],[2,15],[4,5],[4,14],[6,7],[6,17],[8,9],[8,18],
+  [10,11],[10,14],[12,15],[1,9],[3,15],[5,19],[7,17],[11,18],[14,15],
+];
+
+function AuthKnowledgeCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  useEffect(()=>{
+    const cv=ref.current; if(!cv) return;
+    const ctx=cv.getContext("2d")!;
+    const W=window.innerWidth||1280, H=window.innerHeight||800;
+    cv.width=W; cv.height=H;
+    const C="#C8A030",T="#00FFB2",G="#44CC77",V="#9966FF",B="#4488FF",A="#FF9933",R="#FF6699";
+    const nodes:AKNode[]=[
+      {x:W*.14,y:H*.22,vx:.22,vy:.14,label:"Cosmology",col:C,r:26},
+      {x:W*.83,y:H*.17,vx:-.17,vy:.18,label:"Plasma Field",col:C,r:20},
+      {x:W*.10,y:H*.55,vx:.18,vy:-.15,label:"Quantum",col:T,r:24},
+      {x:W*.76,y:H*.70,vx:-.14,vy:-.17,label:"Coherence",col:T,r:22},
+      {x:W*.32,y:H*.84,vx:.16,vy:-.2,label:"Biology",col:G,r:24},
+      {x:W*.68,y:H*.13,vx:-.18,vy:.16,label:"Morphogenesis",col:G,r:18},
+      {x:W*.89,y:H*.44,vx:-.2,vy:.14,label:"Mathematics",col:V,r:22},
+      {x:W*.22,y:H*.36,vx:.14,vy:.18,label:"Topology",col:V,r:18},
+      {x:W*.80,y:H*.80,vx:-.16,vy:-.14,label:"MHD",col:B,r:20},
+      {x:W*.44,y:H*.10,vx:.18,vy:.16,label:"Spacetime",col:B,r:21},
+      {x:W*.12,y:H*.76,vx:.17,vy:-.18,label:"Substrate",col:A,r:22},
+      {x:W*.90,y:H*.62,vx:-.15,vy:.2,label:"Crystallisation",col:A,r:24},
+      {x:W*.55,y:H*.87,vx:-.17,vy:-.15,label:"Consciousness",col:R,r:20},
+      {x:W*.50,y:H*.50,vx:.0,vy:.0,label:"AETHER",col:"#ffffff",r:36},
+      {x:W*.30,y:H*.62,vx:.15,vy:.17,label:"DMF",col:A,r:16},
+      {x:W*.65,y:H*.40,vx:-.17,vy:-.14,label:"Wavefunction",col:T,r:16},
+      {x:W*.20,y:H*.14,vx:.16,vy:.2,label:"Egyptian Codex",col:C,r:15},
+      {x:W*.84,y:H*.30,vx:-.14,vy:.18,label:"Sacred Geometry",col:V,r:16},
+      {x:W*.60,y:H*.74,vx:.18,vy:-.16,label:"Neural Field",col:B,r:16},
+      {x:W*.43,y:H*.26,vx:-.16,vy:.17,label:"Synthesis",col:G,r:18},
+    ];
+    const particles:AKParticle[]=Array.from({length:90},(_,i)=>({
+      ei:i%AK_EDGES.length, t:i/90, spd:.0025+Math.random()*.004,
+    }));
+    let fr=0;
+    const draw=()=>{
+      ctx.fillStyle="rgba(2,3,10,0.20)"; ctx.fillRect(0,0,W,H);
+      fr++;
+      for(const n of nodes){
+        if(n.label==="AETHER") continue;
+        n.x+=n.vx; n.y+=n.vy;
+        if(n.x<60||n.x>W-60) n.vx*=-1;
+        if(n.y<50||n.y>H-50) n.vy*=-1;
+      }
+      for(const [ai,bi] of AK_EDGES){
+        const a=nodes[ai],b=nodes[bi];
+        if(!isFinite(a.x)||!isFinite(b.x)) continue;
+        const g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);
+        g.addColorStop(0,a.col+"18"); g.addColorStop(1,b.col+"18");
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle=g; ctx.lineWidth=1; ctx.stroke();
+      }
+      for(const p of particles){
+        p.t=(p.t+p.spd)%1;
+        const [ai,bi]=AK_EDGES[p.ei];
+        const a=nodes[ai],b=nodes[bi];
+        const px=a.x+(b.x-a.x)*p.t, py=a.y+(b.y-a.y)*p.t;
+        if(!isFinite(px)||!isFinite(py)) continue;
+        ctx.beginPath(); ctx.arc(px,py,1.8,0,Math.PI*2);
+        ctx.fillStyle=a.col+"cc";
+        ctx.shadowColor=a.col; ctx.shadowBlur=5; ctx.fill(); ctx.shadowBlur=0;
+      }
+      for(const n of nodes){
+        if(!isFinite(n.x)||!isFinite(n.y)) continue;
+        const pulse=1+0.055*Math.sin(fr*.028+n.r);
+        const grd=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r*2.8*pulse);
+        grd.addColorStop(0,n.col+"3a"); grd.addColorStop(1,"transparent");
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r*2.8*pulse,0,Math.PI*2);
+        ctx.fillStyle=grd; ctx.fill();
+        const cr=ctx.createRadialGradient(n.x-n.r*.3,n.y-n.r*.3,0,n.x,n.y,n.r*pulse);
+        cr.addColorStop(0,n.col+"bb"); cr.addColorStop(1,n.col+"2a");
+        ctx.beginPath(); ctx.arc(n.x,n.y,n.r*pulse,0,Math.PI*2);
+        ctx.fillStyle=cr; ctx.fill();
+        ctx.strokeStyle=n.col+"66"; ctx.lineWidth=1; ctx.stroke();
+        const isC=n.label==="AETHER";
+        ctx.font=isC?`bold 11px 'Space Mono',monospace`:`8px 'Space Mono',monospace`;
+        ctx.fillStyle=isC?"#ffffffee":n.col+"cc";
+        ctx.textAlign="center"; ctx.textBaseline="top";
+        ctx.fillText(n.label,n.x,n.y+n.r*pulse+5);
+      }
+      rafRef.current=requestAnimationFrame(draw);
+    };
+    draw();
+    return()=>cancelAnimationFrame(rafRef.current);
+  },[]);
+  return <canvas ref={ref} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
+}
+
+/* ── Auth layout: full-screen canvas + centered card ─ */
 function AuthLayout({ children, loading }: { children?: ReactNode; loading?: boolean }) {
-  const features = [
-    { icon: "◈", label: "Knowledge Graph", desc: "Crystallise ideas into a living semantic network" },
-    { icon: "⬡", label: "Live Simulations", desc: "MHD, morphogenetic, and plasmoidic canvases" },
-    { icon: "✦", label: "AI Synthesis", desc: "Anthropic-powered document ingestion and analysis" },
-    { icon: "◯", label: "300+ Modules", desc: "Cosmology, biology, mathematics, and beyond" },
+  const domains=[
+    {col:"#C8A030",name:"Cosmic"},
+    {col:"#00FFB2",name:"Quantum"},
+    {col:"#44CC77",name:"Biology"},
+    {col:"#9966FF",name:"Math"},
+    {col:"#4488FF",name:"Physics"},
+    {col:"#FF9933",name:"Substrate"},
+    {col:"#FF6699",name:"Mind"},
   ];
-
-  const pill: React.CSSProperties = {
-    display: "flex", alignItems: "flex-start", gap: 12,
-    background: "rgba(0,255,178,0.04)", border: "1px solid rgba(0,255,178,0.12)",
-    borderRadius: 6, padding: "10px 14px",
-  };
-
   return (
-    <div style={{
-      position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-      background: "#02030A", display: "flex", zIndex: 9999, overflowY: "auto",
-    }}>
+    <div style={{position:"fixed",top:0,left:0,width:"100vw",height:"100vh",
+      background:"#02030A",zIndex:9999,overflow:"hidden"}}>
       <style>{`
-        @keyframes aether-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
-        @keyframes aether-spin { to{transform:rotate(360deg)} }
-        @keyframes aether-fade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes ak-spin{to{transform:rotate(360deg)}}
+        @keyframes ak-fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes ak-glow{0%,100%{box-shadow:0 0 32px rgba(0,255,178,0.10)}50%{box-shadow:0 0 56px rgba(0,255,178,0.22)}}
       `}</style>
 
-      {/* ── Left branding panel ──────────────────────────── */}
-      <div style={{
-        flex: "0 0 420px", display: "flex", flexDirection: "column",
-        justifyContent: "center", padding: "48px 40px",
-        background: "linear-gradient(160deg,#050b14 0%,#020609 60%,#030810 100%)",
-        borderRight: "1px solid rgba(0,255,178,0.08)",
-        position: "relative", overflow: "hidden",
-      }}>
-        {/* aurora glow blobs */}
-        <div style={{
-          position:"absolute", top:-80, left:-60, width:340, height:340,
-          background:"radial-gradient(circle,rgba(0,255,178,0.07) 0%,transparent 70%)",
-          pointerEvents:"none",
-        }}/>
-        <div style={{
-          position:"absolute", bottom:-60, right:-40, width:260, height:260,
-          background:"radial-gradient(circle,rgba(68,136,255,0.06) 0%,transparent 70%)",
-          pointerEvents:"none",
-        }}/>
+      {/* Live knowledge graph background */}
+      <AuthKnowledgeCanvas/>
 
-        {/* wordmark */}
-        <div style={{ animation: "aether-fade .6s ease both", position: "relative" }}>
-          <div style={{
-            fontFamily: "'Cinzel', serif", fontSize: "2.6rem", fontWeight: 600,
-            color: "#00FFB2", letterSpacing: "0.35em", lineHeight: 1,
-            textShadow: "0 0 40px rgba(0,255,178,0.35)",
-          }}>AETHER</div>
-          <div style={{
-            fontFamily: "'Space Mono', monospace", fontSize: 9,
-            color: "rgba(0,255,178,0.55)", letterSpacing: "0.22em",
-            marginTop: 8, marginLeft: 2,
-          }}>KNOWLEDGE SYSTEM · CRYSTALLISATION MODEL</div>
-        </div>
-
-        {/* tagline */}
-        <div style={{
-          marginTop: 28, marginBottom: 32,
-          fontFamily: "'Crimson Pro', serif", fontSize: 17,
-          color: "rgba(184,204,232,0.75)", lineHeight: 1.65,
-          animation: "aether-fade .7s .1s ease both",
-        }}>
-          Synthesise · Discover · Crystallise
-          <br/>
-          <span style={{ fontSize: 14, color: "rgba(184,204,232,0.45)" }}>
-            A living knowledge graph built on the Crystallisation Model of Intelligence
-          </span>
-        </div>
-
-        {/* feature pills */}
-        <div style={{
-          display: "flex", flexDirection: "column", gap: 8,
-          animation: "aether-fade .8s .2s ease both",
-        }}>
-          {features.map(f => (
-            <div key={f.label} style={pill}>
-              <div style={{ fontSize: 16, color: "#00FFB2", lineHeight: 1.2, flexShrink: 0 }}>{f.icon}</div>
-              <div>
-                <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, color: "#00FFB2", letterSpacing: "0.12em", marginBottom: 2 }}>{f.label}</div>
-                <div style={{ fontSize: 12, color: "rgba(184,204,232,0.55)", lineHeight: 1.5 }}>{f.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* version tag */}
-        <div style={{
-          marginTop: "auto", paddingTop: 32,
-          fontFamily: "'Space Mono',monospace", fontSize: 8,
-          color: "rgba(58,80,96,0.8)", letterSpacing: "0.14em",
-          animation: "aether-fade .9s .3s ease both",
-        }}>
-          AETHER OS · PHASE II · SECURE ACCESS
-        </div>
+      {/* Domain legend strip — bottom of screen */}
+      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",
+        display:"flex",gap:14,alignItems:"center",zIndex:2}}>
+        {domains.map(d=>(
+          <div key={d.name} style={{display:"flex",alignItems:"center",gap:5}}>
+            <div style={{width:7,height:7,borderRadius:"50%",background:d.col,boxShadow:`0 0 6px ${d.col}`}}/>
+            <span style={{fontFamily:"'Space Mono',monospace",fontSize:7,
+              color:d.col+"99",letterSpacing:"0.1em"}}>{d.name}</span>
+          </div>
+        ))}
       </div>
 
-      {/* ── Right form panel ────────────────────────────── */}
-      <div style={{
-        flex: 1, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-        padding: "40px 24px", overflowY: "auto",
-      }}>
-        {loading ? (
-          /* Loading placeholder */
-          <div style={{
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
-            animation: "aether-fade .4s ease both",
-          }}>
-            <div style={{
-              width: 36, height: 36,
-              border: "2px solid rgba(0,255,178,0.15)",
-              borderTop: "2px solid #00FFB2",
-              borderRadius: "50%",
-              animation: "aether-spin 1s linear infinite",
-            }}/>
-            <div style={{
-              fontFamily: "'Space Mono',monospace", fontSize: 9,
-              color: "rgba(0,255,178,0.5)", letterSpacing: "0.2em",
-            }}>INITIALISING ···</div>
-            <a href={`${basePath}/sign-in`} style={{
-              marginTop: 8,
-              fontFamily: "'Space Mono',monospace", fontSize: 10,
-              color: "#00FFB2", textDecoration: "none", letterSpacing: "0.14em",
-              border: "1px solid rgba(0,255,178,0.35)", borderRadius: 4,
-              padding: "8px 20px",
-              background: "rgba(0,255,178,0.06)",
-            }}>SIGN IN</a>
+      {/* Centered floating card */}
+      <div style={{position:"absolute",inset:0,display:"flex",
+        alignItems:"center",justifyContent:"center",padding:20,overflowY:"auto",zIndex:2}}>
+        <div style={{
+          width:"100%",maxWidth:440,
+          background:"rgba(4,6,18,0.82)",
+          backdropFilter:"blur(24px)",
+          border:"1px solid rgba(0,255,178,0.18)",
+          borderRadius:12,padding:"32px 32px 28px",
+          animation:"ak-fade .5s ease both, ak-glow 4s ease-in-out infinite",
+        }}>
+          {/* Wordmark */}
+          <div style={{textAlign:"center",marginBottom:6}}>
+            <div style={{fontFamily:"'Cinzel',serif",fontSize:"2rem",fontWeight:600,
+              color:"#00FFB2",letterSpacing:"0.4em",lineHeight:1,
+              textShadow:"0 0 36px rgba(0,255,178,0.45)"}}>AETHER</div>
+            <div style={{fontFamily:"'Space Mono',monospace",fontSize:7.5,
+              color:"rgba(0,255,178,0.45)",letterSpacing:"0.2em",marginTop:6}}>
+              KNOWLEDGE SYSTEM
+            </div>
           </div>
-        ) : children}
+
+          {/* Tagline */}
+          <div style={{textAlign:"center",marginBottom:22,
+            fontFamily:"'Crimson Pro',serif",fontSize:13,
+            color:"rgba(184,204,232,0.55)",letterSpacing:"0.04em"}}>
+            Synthesise · Discover · Crystallise
+          </div>
+
+          {/* Divider */}
+          <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(0,255,178,0.2),transparent)",
+            marginBottom:22}}/>
+
+          {/* Form / loading */}
+          {loading ? (
+            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:18,padding:"16px 0"}}>
+              <div style={{width:32,height:32,border:"2px solid rgba(0,255,178,0.12)",
+                borderTop:"2px solid #00FFB2",borderRadius:"50%",
+                animation:"ak-spin 1s linear infinite"}}/>
+              <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
+                color:"rgba(0,255,178,0.45)",letterSpacing:"0.2em"}}>INITIALISING</div>
+              <a href={`${basePath}/sign-in`}
+                style={{fontFamily:"'Space Mono',monospace",fontSize:9,color:"#00FFB2",
+                  textDecoration:"none",letterSpacing:"0.14em",
+                  border:"1px solid rgba(0,255,178,0.3)",borderRadius:4,
+                  padding:"8px 22px",background:"rgba(0,255,178,0.06)"}}>
+                SIGN IN
+              </a>
+            </div>
+          ) : children}
+        </div>
       </div>
     </div>
   );
