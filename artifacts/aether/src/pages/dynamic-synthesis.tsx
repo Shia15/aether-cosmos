@@ -299,7 +299,7 @@ function MicroLatticeCanvas() {
       ctx.fillStyle="#9966FF66"; ctx.textAlign="left";
       ctx.fillText("Quantum Particles  ·  superposition halos",12,H-10);
       ctx.fillStyle="#FF9933aa"; ctx.textAlign="left";
-      ctx.fillText("Alfven Wave Re-direction",LX-ER*1.4,LY+14);
+      ctx.fillText("Alfven Wave Re-direction",LX-140,LY+14);
       raf.current=requestAnimationFrame(draw);
     };
     draw();
