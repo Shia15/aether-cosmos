@@ -344,6 +344,8 @@ const NAV_ITEMS = [
   { href: "/atp-transport", label: "ATP · Active Transport · Concentration Gradient · Hydrolysis · ADP Generation · Starburst · Phosphate · Ribose · Adenine · Na⁺ K⁺ Pump · 30.5 kJ/mol", icon: Atom },
   { href: "/borrelia-knot", label: "Borrelia Knot · DNA Topology · Trefoil 3₁ · Knot Invariants · Topoisomerase II · Thermal Decoherence · Seizure Threshold · Lyme Neuroborreliosis · Plausibility Radar", icon: Atom },
   { href: "/floquet-petals", label: "Floquet Petals · Toroidal Azimuthal Modes · m=5 6 7 8 9 · Traveling Wave · Standing Wave · Spacetime Shaping · Petal Rings · Chern Number · Quasi-Energy", icon: Atom },
+  { href: "/gut-brain", label: "Gut-Brain Axis · Microbial Neural · Serotonin 90% · Vagus Nerve · Endocrine · Immune · Metabolic · 30 Plants · 3 Fermented · 8hr Sleep · 15hr Fast", icon: Atom },
+  { href: "/planetary-neural", label: "Planetary-Neural Cascade · Solar Wind · Geomagnetic · Ocean Iodine · Thyroid T3 T4 · Brain Development · Goitre Belt · Cognitive Outcomes", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },

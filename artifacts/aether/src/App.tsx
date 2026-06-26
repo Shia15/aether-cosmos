@@ -340,6 +340,8 @@ import PolymerBiobreakPage from "@/pages/polymer-biobreak";
 import AtpTransportPage from "@/pages/atp-transport";
 import BorreliaKnotPage from "@/pages/borrelia-knot";
 import FloquetPetalsPage from "@/pages/floquet-petals";
+import GutBrainPage from "@/pages/gut-brain";
+import PlanetaryNeuralPage from "@/pages/planetary-neural";
 
 const queryClient = new QueryClient();
 
@@ -665,6 +667,8 @@ function Router() {
         <Route path="/atp-transport" component={AtpTransportPage} />
         <Route path="/borrelia-knot" component={BorreliaKnotPage} />
         <Route path="/floquet-petals" component={FloquetPetalsPage} />
+        <Route path="/gut-brain" component={GutBrainPage} />
+        <Route path="/planetary-neural" component={PlanetaryNeuralPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />

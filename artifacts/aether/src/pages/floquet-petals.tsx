@@ -1,4 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import imgFlowerTorus from "@assets/0A85C6B6-CA53-4FCA-80C0-9E198796A05B_1782484195842.png";
+import imgFloquetRef  from "@assets/F428D75C-36D9-4C14-B67B-E499860287E1_1782484195842.png";
+import imgCosmTorus   from "@assets/CEC0967A-23A8-46EC-B61F-31E608A9E932_1782484195842.jpeg";
+import imgFlowerLife  from "@assets/550C9FD6-57FC-4FE5-A59C-6E1FE688844F_1782484195842.jpeg";
+import imgRoseRhod    from "@assets/6091BF3F-D10B-4C80-923E-69A30B98A52D_1782484195842.jpeg";
 
 /* ── palette ───────────────────────────────────────────────── */
 const V = {
@@ -666,6 +671,45 @@ export default function FloquetPetalsPage() {
                 every 2520 base-drive periods
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* reference gallery */}
+        <div style={{ margin:"44px 0 0" }}>
+          <div style={{ borderLeft:`3px solid ${V.plasma}`, paddingLeft:14, marginBottom:16 }}>
+            <div style={{ fontFamily:MONO, fontSize:10, color:V.plasma, letterSpacing:"0.18em" }}>
+              V · VISUAL REFERENCE GALLERY
+            </div>
+            <div style={{ fontFamily:SERIF, fontSize:13, color:V.ink+"66", marginTop:4 }}>
+              Source charts, geometric references, and experimental visualizations
+            </div>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))", gap:12 }}>
+            {([
+              { img:imgFlowerTorus,
+                label:"FLOWER-TORUS WATERFALL", sub:"Rose-curve resonance · Toroidal circulation · Floquet drive H(t+T)=H(t)", col:V.vio },
+              { img:imgFloquetRef,
+                label:"FLOQUET PETAL TOPOLOGIES", sub:"Light intensity cross-sections · Phase maps · Mode spectrum · Nested petal tori", col:V.aurora },
+              { img:imgCosmTorus,
+                label:"TOROIDAL FIELD GEOMETRY", sub:"Cosmometry — field lines circulating through polar axis and equatorial ring", col:V.blue },
+              { img:imgFlowerLife,
+                label:"FLOWER OF LIFE · HEXAGONAL LATTICE", sub:"φm = tan⁻¹(hm/b) · rm = (b²+hm²)^½ · Geometric packing invariants", col:V.gold },
+              { img:imgRoseRhod,
+                label:"RHODONEA · sin(6θ)", sub:"Rose curve polar plot · 12 petals from six-fold harmonic · r = sin(6t)", col:V.rose },
+            ] as const).map(ref2 => (
+              <div key={ref2.label} style={{ background:ref2.col+"0A",
+                border:`1px solid ${ref2.col}33`, borderRadius:4, overflow:"hidden" }}>
+                <img src={ref2.img}
+                  style={{ width:"100%", display:"block", borderBottom:`1px solid ${ref2.col}22` }}
+                  alt={ref2.label}/>
+                <div style={{ padding:"10px 12px" }}>
+                  <div style={{ fontFamily:MONO, fontSize:8, color:ref2.col,
+                    letterSpacing:"0.12em", marginBottom:4 }}>{ref2.label}</div>
+                  <div style={{ fontFamily:SERIF, fontSize:11, color:V.ink+"66",
+                    lineHeight:1.5 }}>{ref2.sub}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
