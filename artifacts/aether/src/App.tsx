@@ -414,27 +414,158 @@ const clerkAppearance = {
   },
 };
 
+/* ── Shared auth layout ─────────────────────────────────────────────────── */
+function AuthLayout({ children, loading }: { children?: ReactNode; loading?: boolean }) {
+  const features = [
+    { icon: "◈", label: "Knowledge Graph", desc: "Crystallise ideas into a living semantic network" },
+    { icon: "⬡", label: "Live Simulations", desc: "MHD, morphogenetic, and plasmoidic canvases" },
+    { icon: "✦", label: "AI Synthesis", desc: "Anthropic-powered document ingestion and analysis" },
+    { icon: "◯", label: "300+ Modules", desc: "Cosmology, biology, mathematics, and beyond" },
+  ];
+
+  const pill: React.CSSProperties = {
+    display: "flex", alignItems: "flex-start", gap: 12,
+    background: "rgba(0,255,178,0.04)", border: "1px solid rgba(0,255,178,0.12)",
+    borderRadius: 6, padding: "10px 14px",
+  };
+
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+      background: "#02030A", display: "flex", zIndex: 9999, overflowY: "auto",
+    }}>
+      <style>{`
+        @keyframes aether-pulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+        @keyframes aether-spin { to{transform:rotate(360deg)} }
+        @keyframes aether-fade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+      `}</style>
+
+      {/* ── Left branding panel ──────────────────────────── */}
+      <div style={{
+        flex: "0 0 420px", display: "flex", flexDirection: "column",
+        justifyContent: "center", padding: "48px 40px",
+        background: "linear-gradient(160deg,#050b14 0%,#020609 60%,#030810 100%)",
+        borderRight: "1px solid rgba(0,255,178,0.08)",
+        position: "relative", overflow: "hidden",
+      }}>
+        {/* aurora glow blobs */}
+        <div style={{
+          position:"absolute", top:-80, left:-60, width:340, height:340,
+          background:"radial-gradient(circle,rgba(0,255,178,0.07) 0%,transparent 70%)",
+          pointerEvents:"none",
+        }}/>
+        <div style={{
+          position:"absolute", bottom:-60, right:-40, width:260, height:260,
+          background:"radial-gradient(circle,rgba(68,136,255,0.06) 0%,transparent 70%)",
+          pointerEvents:"none",
+        }}/>
+
+        {/* wordmark */}
+        <div style={{ animation: "aether-fade .6s ease both", position: "relative" }}>
+          <div style={{
+            fontFamily: "'Cinzel', serif", fontSize: "2.6rem", fontWeight: 600,
+            color: "#00FFB2", letterSpacing: "0.35em", lineHeight: 1,
+            textShadow: "0 0 40px rgba(0,255,178,0.35)",
+          }}>AETHER</div>
+          <div style={{
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            color: "rgba(0,255,178,0.55)", letterSpacing: "0.22em",
+            marginTop: 8, marginLeft: 2,
+          }}>KNOWLEDGE SYSTEM · CRYSTALLISATION MODEL</div>
+        </div>
+
+        {/* tagline */}
+        <div style={{
+          marginTop: 28, marginBottom: 32,
+          fontFamily: "'Crimson Pro', serif", fontSize: 17,
+          color: "rgba(184,204,232,0.75)", lineHeight: 1.65,
+          animation: "aether-fade .7s .1s ease both",
+        }}>
+          Synthesise · Discover · Crystallise
+          <br/>
+          <span style={{ fontSize: 14, color: "rgba(184,204,232,0.45)" }}>
+            A living knowledge graph built on the Crystallisation Model of Intelligence
+          </span>
+        </div>
+
+        {/* feature pills */}
+        <div style={{
+          display: "flex", flexDirection: "column", gap: 8,
+          animation: "aether-fade .8s .2s ease both",
+        }}>
+          {features.map(f => (
+            <div key={f.label} style={pill}>
+              <div style={{ fontSize: 16, color: "#00FFB2", lineHeight: 1.2, flexShrink: 0 }}>{f.icon}</div>
+              <div>
+                <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 9, color: "#00FFB2", letterSpacing: "0.12em", marginBottom: 2 }}>{f.label}</div>
+                <div style={{ fontSize: 12, color: "rgba(184,204,232,0.55)", lineHeight: 1.5 }}>{f.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* version tag */}
+        <div style={{
+          marginTop: "auto", paddingTop: 32,
+          fontFamily: "'Space Mono',monospace", fontSize: 8,
+          color: "rgba(58,80,96,0.8)", letterSpacing: "0.14em",
+          animation: "aether-fade .9s .3s ease both",
+        }}>
+          AETHER OS · PHASE II · SECURE ACCESS
+        </div>
+      </div>
+
+      {/* ── Right form panel ────────────────────────────── */}
+      <div style={{
+        flex: 1, display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        padding: "40px 24px", overflowY: "auto",
+      }}>
+        {loading ? (
+          /* Loading placeholder */
+          <div style={{
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
+            animation: "aether-fade .4s ease both",
+          }}>
+            <div style={{
+              width: 36, height: 36,
+              border: "2px solid rgba(0,255,178,0.15)",
+              borderTop: "2px solid #00FFB2",
+              borderRadius: "50%",
+              animation: "aether-spin 1s linear infinite",
+            }}/>
+            <div style={{
+              fontFamily: "'Space Mono',monospace", fontSize: 9,
+              color: "rgba(0,255,178,0.5)", letterSpacing: "0.2em",
+            }}>INITIALISING ···</div>
+            <a href={`${basePath}/sign-in`} style={{
+              marginTop: 8,
+              fontFamily: "'Space Mono',monospace", fontSize: 10,
+              color: "#00FFB2", textDecoration: "none", letterSpacing: "0.14em",
+              border: "1px solid rgba(0,255,178,0.35)", borderRadius: 4,
+              padding: "8px 20px",
+              background: "rgba(0,255,178,0.06)",
+            }}>SIGN IN</a>
+          </div>
+        ) : children}
+      </div>
+    </div>
+  );
+}
+
 function SignInPage() {
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-      background: "#02030A", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", zIndex: 9999, overflowY: "auto", padding: "40px 16px" }}>
-      <div style={{ marginBottom: 24, fontFamily: "'Cinzel', serif", fontSize: "1.4rem",
-        color: "#00FFB2", letterSpacing: "0.4em", textAlign: "center" }}>AETHER</div>
+    <AuthLayout>
       <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
-    </div>
+    </AuthLayout>
   );
 }
 
 function SignUpPage() {
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-      background: "#02030A", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", zIndex: 9999, overflowY: "auto", padding: "40px 16px" }}>
-      <div style={{ marginBottom: 24, fontFamily: "'Cinzel', serif", fontSize: "1.4rem",
-        color: "#00FFB2", letterSpacing: "0.4em", textAlign: "center" }}>AETHER</div>
+    <AuthLayout>
       <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
-    </div>
+    </AuthLayout>
   );
 }
 
@@ -481,18 +612,7 @@ function ClerkProviderWithRoutes() {
 
 function AuthGate({ children }: { children: ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
-  if (!isLoaded) {
-    return (
-      <div style={{ position:"fixed", top:0, left:0, width:"100vw", height:"100vh",
-        background:"#02030A", display:"flex", flexDirection:"column",
-        alignItems:"center", justifyContent:"center", gap:14, zIndex:9999 }}>
-        <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.4rem",
-          color:"#00FFB2", letterSpacing:"0.4em" }}>AETHER</div>
-        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9,
-          color:"#3A5060", letterSpacing:"0.2em" }}>AUTHENTICATING ···</div>
-      </div>
-    );
-  }
+  if (!isLoaded) return <AuthLayout loading />;
   if (!isSignedIn) return <SignInPage />;
   return <>{children}</>;
 }
