@@ -530,29 +530,70 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
-  /* ── Double-click zoom ── */
-  const [zoomOn, setZoomOn] = useState(false);
-  const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
-  const zoomHideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /* ── Double-click zoom + drag pan ── */
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomTx, setZoomTx] = useState(0);
+  const [zoomTy, setZoomTy] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const [zoomHint, setZoomHint] = useState(false);
+  const zoomHideRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const panRef       = useRef<{ sx:number; sy:number; tx:number; ty:number } | null>(null);
+  const draggedRef   = useRef(false);     // true if last mousedown moved significantly
+  const txRef        = useRef(0);         // mirror of zoomTx for use inside event handlers
+  const tyRef        = useRef(0);
+  const scaleRef     = useRef(1);
+
+  /* keep refs in sync */
+  useEffect(() => { txRef.current = zoomTx; },    [zoomTx]);
+  useEffect(() => { tyRef.current = zoomTy; },    [zoomTy]);
+  useEffect(() => { scaleRef.current = zoomScale; }, [zoomScale]);
 
   const handleDblClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (draggedRef.current) return;
     const t = e.target as HTMLElement;
     if (t.closest("button,a,input,textarea,select,canvas,[role=button],[role=slider]")) return;
-    if (zoomOn) {
-      setZoomOn(false);
+    if (scaleRef.current === 2) {
+      setZoomScale(1); setZoomTx(0); setZoomTy(0);
       setZoomHint(false);
     } else {
       const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const ox = (((e.clientX - rect.left) / rect.width)  * 100).toFixed(1);
-      const oy = (((e.clientY - rect.top)  / rect.height) * 100).toFixed(1);
-      setZoomOrigin(`${ox}% ${oy}%`);
-      setZoomOn(true);
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      /* fix the clicked point: translate so scale(2) keeps it in place */
+      setZoomTx(-sx); setZoomTy(-sy);
+      setZoomScale(2);
       setZoomHint(true);
       if (zoomHideRef.current) clearTimeout(zoomHideRef.current);
-      zoomHideRef.current = setTimeout(() => setZoomHint(false), 1800);
+      zoomHideRef.current = setTimeout(() => setZoomHint(false), 2000);
     }
-  }, [zoomOn]);
+  }, []);
+
+  const handlePanDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (scaleRef.current === 1) return;
+    const t = e.target as HTMLElement;
+    if (t.closest("button,a,input,textarea,select,canvas,[role=button],[role=slider]")) return;
+    e.preventDefault();
+    draggedRef.current = false;
+    panRef.current = { sx: e.clientX, sy: e.clientY, tx: txRef.current, ty: tyRef.current };
+    setDragging(true);
+  }, []);
+
+  const handlePanMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!panRef.current) return;
+    const dx = e.clientX - panRef.current.sx;
+    const dy = e.clientY - panRef.current.sy;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) draggedRef.current = true;
+    setZoomTx(panRef.current.tx + dx);
+    setZoomTy(panRef.current.ty + dy);
+  }, []);
+
+  const handlePanUp = useCallback(() => {
+    if (!panRef.current) return;
+    panRef.current = null;
+    setDragging(false);
+    /* keep draggedRef true briefly so dblclick handler can read it */
+    if (draggedRef.current) setTimeout(() => { draggedRef.current = false; }, 250);
+  }, []);
 
   /* ── Sidebar resize ── */
   const [sidebarWidth, setSidebarWidth] = useState<number>(loadSidebarWidth);
@@ -894,38 +935,49 @@ export function Layout({ children }: { children: React.ReactNode }) {
           ref={mainRef}
           className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background"
         >
-          {/* zoom wrapper — double-click anywhere (not on interactive elements) to zoom 2× */}
+          {/* zoom + pan wrapper */}
           <div
             onDoubleClick={handleDblClick}
+            onMouseDown={handlePanDown}
+            onMouseMove={handlePanMove}
+            onMouseUp={handlePanUp}
+            onMouseLeave={handlePanUp}
             style={{
               flex: 1,
-              transformOrigin: zoomOrigin,
-              transform: zoomOn ? "scale(2)" : "scale(1)",
-              transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1), transform-origin 0s",
-              cursor: zoomOn ? "zoom-out" : "default",
+              transformOrigin: "0 0",
+              transform: `translate(${zoomTx}px,${zoomTy}px) scale(${zoomScale})`,
+              transition: dragging ? "none" : "transform 0.28s cubic-bezier(0.4,0,0.2,1)",
+              cursor: zoomScale === 2 ? (dragging ? "grabbing" : "grab") : "default",
+              userSelect: dragging ? "none" : "auto",
             }}
           >
             {children}
           </div>
 
-          {/* zoom indicator badge */}
+          {/* zoom / pan indicator badge */}
           <div style={{
             position: "fixed", bottom: 20, right: 20, zIndex: 9999,
             pointerEvents: "none",
-            opacity: (zoomOn || zoomHint) ? 1 : 0,
-            transform: (zoomOn || zoomHint) ? "translateY(0) scale(1)" : "translateY(8px) scale(0.9)",
+            opacity: (zoomScale === 2 || zoomHint) ? 1 : 0,
+            transform: (zoomScale === 2 || zoomHint) ? "translateY(0) scale(1)" : "translateY(8px) scale(0.9)",
             transition: "opacity 0.25s, transform 0.25s",
             display: "flex", alignItems: "center", gap: 7,
             background: "rgba(4,6,14,0.88)",
-            border: `1px solid ${zoomOn ? "#00FFB2" : "#3A5060"}`,
+            border: `1px solid ${zoomScale === 2 ? "#00FFB2" : "#3A5060"}`,
             borderRadius: 6, padding: "5px 12px",
             fontFamily: "'Space Mono',monospace", fontSize: 11,
-            color: zoomOn ? "#00FFB2" : "#B8CCE8",
+            color: zoomScale === 2 ? "#00FFB2" : "#B8CCE8",
             backdropFilter: "blur(6px)",
-            boxShadow: zoomOn ? "0 0 16px #00FFB244" : "none",
+            boxShadow: zoomScale === 2 ? "0 0 16px #00FFB244" : "none",
           }}>
-            <span style={{ fontSize: 14, lineHeight: 1 }}>{zoomOn ? "🔍" : "🔎"}</span>
-            {zoomOn ? "2× ZOOM  ·  double-click to exit" : "ZOOM OFF"}
+            <span style={{ fontSize: 14, lineHeight: 1 }}>
+              {dragging ? "✥" : zoomScale === 2 ? "🔍" : "🔎"}
+            </span>
+            {dragging
+              ? "DRAGGING  ·  release to stop"
+              : zoomScale === 2
+                ? "2× ZOOM  ·  drag to pan  ·  double-click to exit"
+                : "ZOOM OFF"}
           </div>
         </main>
       </div>
