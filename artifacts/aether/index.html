@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>AETHER Knowledge System</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="" />
+    <script>
+      (function () {
+        function setCanonical() {
+          var canonical = document.querySelector('link[rel="canonical"]');
+          if (canonical) canonical.setAttribute("href", window.location.origin + window.location.pathname);
+        }
+        setCanonical();
+        var _pushState = history.pushState;
+        history.pushState = function () { _pushState.apply(history, arguments); setCanonical(); };
+        var _replaceState = history.replaceState;
+        history.replaceState = function () { _replaceState.apply(history, arguments); setCanonical(); };
+        window.addEventListener("popstate", setCanonical);
+      })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@200;300;400;600&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet" />
   </head>
   <body>

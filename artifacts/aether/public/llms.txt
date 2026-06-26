@@ -1,0 +1,70 @@
+# AETHER Knowledge System
+A public knowledge library covering the Crystallization Model of Intelligence — synthesizing concepts from cosmology, mathematics, biology, computing, and philosophy into an interconnected knowledge graph.
+
+## Primary Entry Points
+
+/
+/glossary
+/knowledge-map
+/research
+/simulation
+/aether-why
+/clcs-architecture
+/aether-dashboard
+/aether-whitepaper
+/unified-synthesis
+
+## Educational Media
+
+/learning-layers
+/aether-childrens-realm
+/computer-brains
+/aether-seasons
+/aether-foundations
+
+## Simulators & Canvases
+
+/pde-simulator
+/morpho-computer
+/cgle-live
+/cuca-hybrid-skin
+/cuca-gyroid
+/lunar-coherence
+/quantum-ammeter
+/rd-simulator
+
+## Knowledge Topics
+
+/coherence
+/equations
+/lattice
+/ecosystem
+/biology
+/neural-emergence
+/phi-aether
+/quantum-living-systems
+/heliospheric-coherence
+/plant-network
+/mycorrhizal-network
+/cosmic-convergence
+/atlantis-alignment
+
+## Tools & Workbenches
+
+/math-engine
+/product-research
+/math-studio
+/sparkle-text
+/calm-company
+/social-deploy
+/aether-flow
+
+## Concepts & Philosophy
+
+/divine-timing
+/awakening-timeline
+/aether-metaphysics
+/implicate-order
+/knowable-universe
+/non-physical-phenomena
+/three-rs-reality
