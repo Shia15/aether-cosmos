@@ -990,7 +990,7 @@ export default function KnowableUniversePage() {
             <Bridge to="/equations" label="Equations Gallery" sub="Curated collection of the equations that show up across AETHER pages." accent={B.amber} />
             <Bridge to="/quaternions" label="Quaternions · 4D Algebra" sub="One step beyond complex numbers — same rotation engine, more dimensions." accent={B.cyan} />
             <Bridge to="/octonion-aether" label="Octonion AETHER · 8D Algebra" sub="One step further still — the Cayley–Dickson tower that ends at the octonions." accent={B.violet} />
-            <Bridge to="/even-odd-functions" label="Even / Odd Functions" sub="Where Euler's formula lives in disguise — cosine even, sine odd, e^(iθ) the bridge." accent={B.rose} />
+            <Bridge to="/even-odd" label="Even / Odd Functions" sub="Where Euler's formula lives in disguise — cosine even, sine odd, e^(iθ) the bridge." accent={B.rose} />
             <Bridge to="/aether-doctrine" label="AETHER Doctrine" sub="The philosophical posture: substrate-first, distinction-immaterial, things-as-one." accent={B.gold} />
           </div>
         </section>
