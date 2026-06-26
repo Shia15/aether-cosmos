@@ -623,7 +623,7 @@ function PageLoader() {
 function SignInPage() {
   return (
     <AuthLayout>
-      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
+      <SignIn routing="virtual" signUpUrl={`${basePath}/sign-up`} />
     </AuthLayout>
   );
 }
@@ -631,7 +631,7 @@ function SignInPage() {
 function SignUpPage() {
   return (
     <AuthLayout>
-      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
+      <SignUp routing="virtual" signInUrl={`${basePath}/sign-in`} />
     </AuthLayout>
   );
 }
