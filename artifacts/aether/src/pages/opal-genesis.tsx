@@ -328,6 +328,278 @@ function OpalCanvas() {
     style={{width:"100%",height:480,display:"block",borderRadius:"0 0 4px 4px"}}/>;
 }
 
+/* ── Chain Stage Data ────────────────────────────────────────── */
+const CHAIN_STAGES = [
+  { label:"SOLAR PHOTON",         col:V.shock, sub:"hν · 700–1000 nm near-infrared" },
+  { label:"H\u2082S + h\u03BD \u2192 S\u2070 + 2H\u207A", col:V.vio,   sub:"anoxygenic photosynthesis \u00B7 no O\u2082" },
+  { label:"S\u2070 \u2192 H\u2082SO\u2084",               col:V.amb,   sub:"sulfur oxidation \u00B7 acid generation" },
+  { label:"H\u2082SO\u2084 + SiO\u2082 \u2192 Si(OH)\u2084", col:V.blue, sub:"silicate dissolution \u00B7 silicic acid" },
+  { label:"n Si(OH)\u2084 \u2192 SiO\u2082\u00B7nH\u2082O", col:"#C8B0FF", sub:"polymerisation \u00B7 opal precipitation" },
+  { label:"SiO\u2082\u00B7nH\u2082O \u2192 Si",            col:V.aurora,sub:"dehydration \u00B7 reduction \u00B7 semiconductor" },
+];
+
+/* ── Chain Simulator Canvas ──────────────────────────────────── */
+function ChainCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    const W = cv.width, H = cv.height;
+    let t = 0;
+
+    const N = CHAIN_STAGES.length;
+    const BOX_W = 110, BOX_H = 168;
+    const PAD = 55;
+    const spacing = (W - PAD * 2) / (N - 1);
+    const boxCX = (i:number) => PAD + i * spacing;
+    const boxTop = H * 0.5 - BOX_H * 0.5;
+
+    const mkRng=(seed:number)=>{let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646;};};
+    const rng = mkRng(77);
+    const particles = Array.from({ length:28 }, (_,i) => ({
+      pos:   (i / 28) * (N - 1) * 0.9,
+      speed: 0.003 + rng() * 0.005,
+      lane:  (rng() - 0.5) * 22,
+    }));
+
+    function rrect(x:number,y:number,w:number,h:number,r:number){
+      ctx.beginPath();
+      ctx.moveTo(x+r,y);
+      ctx.lineTo(x+w-r,y); ctx.arcTo(x+w,y,x+w,y+r,r);
+      ctx.lineTo(x+w,y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+      ctx.lineTo(x+r,y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+      ctx.lineTo(x,y+r); ctx.arcTo(x,y,x+r,y,r);
+      ctx.closePath();
+    }
+
+    function drawMol(stage:number, cx:number, cy:number, ph:number) {
+      if (stage === 0) {
+        /* photon: sine wave */
+        ctx.beginPath();
+        for (let xi=-30; xi<=30; xi++) {
+          const yi = Math.sin(xi * 0.21 + ph * 3) * 13;
+          xi===-30 ? ctx.moveTo(cx+xi,cy+yi) : ctx.lineTo(cx+xi,cy+yi);
+        }
+        ctx.strokeStyle=V.shock+"BB"; ctx.lineWidth=2; ctx.stroke();
+        const peakY = Math.sin(ph*3+1)*13;
+        ctx.beginPath(); ctx.arc(cx+10,cy+peakY,5,0,Math.PI*2);
+        ctx.fillStyle=V.shock+"EE"; ctx.fill();
+        ctx.fillStyle=V.shock+"99"; ctx.font=`7px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("h\u03BD",cx,cy+26);
+      } else if (stage === 1) {
+        /* H₂S molecule */
+        ctx.beginPath(); ctx.arc(cx-8,cy,10,0,Math.PI*2);
+        ctx.fillStyle=V.vio+"BB"; ctx.fill();
+        ctx.fillStyle="#FFF8"; ctx.font=`6px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("S",cx-8,cy+2);
+        [[-21,-11],[-21,11]].forEach(([dx,dy])=>{
+          ctx.beginPath(); ctx.moveTo(cx-8+dx*0.4,cy+dy*0.4); ctx.lineTo(cx-8+dx,cy+dy);
+          ctx.strokeStyle=V.rose+"55"; ctx.lineWidth=1; ctx.stroke();
+          ctx.beginPath(); ctx.arc(cx-8+dx,cy+dy,4.5,0,Math.PI*2);
+          ctx.fillStyle="#FFFFFF99"; ctx.fill();
+          ctx.fillStyle="#444"; ctx.font=`5px ${MONO}`;
+          ctx.fillText("H",cx-8+dx,cy+dy+2);
+        });
+        /* photon flash */
+        const fl=0.5+0.5*Math.sin(ph*4);
+        ctx.beginPath(); ctx.arc(cx+16,cy,6*fl,0,Math.PI*2);
+        ctx.fillStyle=V.shock+ha(fl*160); ctx.fill();
+        ctx.fillStyle=V.shock+"66"; ctx.font=`5px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("h\u03BD",cx+16,cy+13);
+        /* arrow */
+        ctx.fillStyle=V.aurora+"88"; ctx.font=`9px ${MONO}`;
+        ctx.fillText("\u2192",cx+4,cy+3);
+        /* product S⁰ */
+        ctx.beginPath(); ctx.arc(cx+28,cy,8,0,Math.PI*2);
+        ctx.fillStyle=V.gold+"CC"; ctx.fill();
+        ctx.fillStyle="#FFF8"; ctx.font=`6px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("S\u2070",cx+28,cy+2);
+      } else if (stage === 2) {
+        /* H₂SO₄: central S + 4 O */
+        ctx.beginPath(); ctx.arc(cx,cy,9,0,Math.PI*2);
+        ctx.fillStyle=V.amb+"BB"; ctx.fill();
+        ctx.fillStyle="#FFF8"; ctx.font=`6px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("S",cx,cy+2);
+        [[0,-20],[20,0],[0,20],[-20,0]].forEach(([dx,dy],oi)=>{
+          ctx.beginPath(); ctx.moveTo(cx+dx*0.4,cy+dy*0.4); ctx.lineTo(cx+dx*0.82,cy+dy*0.82);
+          ctx.strokeStyle=V.rose+"77"; ctx.lineWidth=1.5; ctx.stroke();
+          ctx.beginPath(); ctx.arc(cx+dx,cy+dy,6,0,Math.PI*2);
+          ctx.fillStyle=V.rose+"BB"; ctx.fill();
+          ctx.fillStyle="#FFF8"; ctx.font=`5px ${MONO}`;
+          ctx.fillText("O",cx+dx,cy+dy+2);
+          if (oi===0||oi===2) {
+            const hx=cx+dx+(oi===0?-9:9), hy=cy+dy+(oi===0?-5:5);
+            ctx.beginPath(); ctx.moveTo(cx+dx,cy+dy); ctx.lineTo(hx,hy);
+            ctx.strokeStyle="#FFFFFF33"; ctx.lineWidth=1; ctx.stroke();
+            ctx.beginPath(); ctx.arc(hx,hy,3.5,0,Math.PI*2);
+            ctx.fillStyle="#FFFFFF99"; ctx.fill();
+          }
+        });
+      } else if (stage === 3) {
+        /* Si(OH)₄ */
+        ctx.beginPath(); ctx.arc(cx,cy,9,0,Math.PI*2);
+        ctx.fillStyle=V.blue+"CC"; ctx.fill();
+        ctx.strokeStyle=V.cyan+"66"; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.fillStyle="#FFF8"; ctx.font=`6px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("Si",cx,cy+2);
+        [[0,-21],[21,0],[0,21],[-21,0]].forEach(([dx,dy])=>{
+          ctx.beginPath(); ctx.moveTo(cx+dx*0.4,cy+dy*0.4); ctx.lineTo(cx+dx*0.82,cy+dy*0.82);
+          ctx.strokeStyle=V.cyan+"55"; ctx.lineWidth=1.5; ctx.stroke();
+          ctx.beginPath(); ctx.arc(cx+dx,cy+dy,6,0,Math.PI*2);
+          ctx.fillStyle=V.rose+"AA"; ctx.fill();
+          ctx.fillStyle="#FFF8"; ctx.font=`5px ${MONO}`;
+          ctx.fillText("OH",cx+dx,cy+dy+2);
+        });
+      } else if (stage === 4) {
+        /* opal sphere — iridescent */
+        const OCOLS=[V.opal1,V.opal2,V.opal3,V.opal4];
+        const ogrd=ctx.createRadialGradient(cx,cy,0,cx,cy,18);
+        ogrd.addColorStop(0,V.opal2+"FF");
+        ogrd.addColorStop(0.4,V.opal1+"EE");
+        ogrd.addColorStop(0.75,V.opal3+"CC");
+        ogrd.addColorStop(1,V.vio+"44");
+        ctx.beginPath(); ctx.arc(cx,cy,18,0,Math.PI*2);
+        ctx.fillStyle=ogrd; ctx.fill();
+        ctx.strokeStyle=OCOLS[Math.floor(ph*4)%4]+"AA"; ctx.lineWidth=1.5; ctx.stroke();
+        for (let oi=0;oi<4;oi++){
+          const oa=ph*2+oi*(Math.PI/2);
+          ctx.beginPath(); ctx.moveTo(cx,cy);
+          ctx.lineTo(cx+Math.cos(oa)*14,cy+Math.sin(oa)*14);
+          ctx.strokeStyle=OCOLS[oi]+"44"; ctx.lineWidth=1; ctx.stroke();
+        }
+      } else if (stage === 5) {
+        /* Si crystal lattice */
+        const ATOMS=[[0,0],[16,0],[-16,0],[8,-14],[-8,-14],[8,14],[-8,14]];
+        ATOMS.forEach(([ax,ay],ai)=>{
+          if(ai>0){
+            ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+ax,cy+ay);
+            ctx.strokeStyle=V.aurora+"44"; ctx.lineWidth=1; ctx.stroke();
+          }
+          ctx.beginPath(); ctx.arc(cx+ax,cy+ay,ai===0?8:5.5,0,Math.PI*2);
+          ctx.fillStyle=V.aurora+ha(140+ai*14); ctx.fill();
+          ctx.strokeStyle=V.cyan+"33"; ctx.lineWidth=0.8; ctx.stroke();
+        });
+        const agrd=ctx.createRadialGradient(cx,cy,0,cx,cy,26);
+        agrd.addColorStop(0,V.aurora+"22"); agrd.addColorStop(1,V.aurora+"00");
+        ctx.beginPath(); ctx.arc(cx,cy,26,0,Math.PI*2);
+        ctx.fillStyle=agrd; ctx.fill();
+        ctx.fillStyle=V.aurora+"77"; ctx.font=`7px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText("Si",cx,cy+3);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle=V.bg; ctx.fillRect(0,0,W,H);
+
+      /* ── Connector lines + chain links ── */
+      for (let i=0;i<N-1;i++){
+        const x1=boxCX(i)+BOX_W*0.5, x2=boxCX(i+1)-BOX_W*0.5, y=H*0.5;
+        const c1=CHAIN_STAGES[i].col, c2=CHAIN_STAGES[i+1].col;
+        const lg=ctx.createLinearGradient(x1,y,x2,y);
+        lg.addColorStop(0,c1+"66"); lg.addColorStop(1,c2+"66");
+        ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y);
+        ctx.strokeStyle=lg; ctx.lineWidth=3; ctx.stroke();
+        /* chain oval at midpoint */
+        const mx=(x1+x2)*0.5;
+        ctx.save(); ctx.translate(mx,y);
+        ctx.beginPath(); ctx.ellipse(0,0,11,5.5,0,0,Math.PI*2);
+        ctx.strokeStyle=c1+ha(80+30*Math.sin(t*2+i)); ctx.lineWidth=2; ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(0,0,5.5,11,0,0,Math.PI*2);
+        ctx.strokeStyle=c2+ha(80+30*Math.sin(t*2+i+1)); ctx.lineWidth=2; ctx.stroke();
+        ctx.restore();
+        /* arrowhead just before next box */
+        const ax=x2-4;
+        ctx.beginPath();
+        ctx.moveTo(ax-7,y-4); ctx.lineTo(ax,y); ctx.lineTo(ax-7,y+4);
+        ctx.strokeStyle=c2+"99"; ctx.lineWidth=1.5; ctx.stroke();
+      }
+
+      /* ── Chain boxes ── */
+      CHAIN_STAGES.forEach((stage,i)=>{
+        const bx=boxCX(i)-BOX_W*0.5, by=boxTop;
+        /* glow */
+        const ggrd=ctx.createRadialGradient(boxCX(i),H*0.5,0,boxCX(i),H*0.5,BOX_W*0.8);
+        ggrd.addColorStop(0,stage.col+"1A"); ggrd.addColorStop(1,stage.col+"00");
+        ctx.fillStyle=ggrd; ctx.fillRect(bx-14,by-14,BOX_W+28,BOX_H+28);
+        /* box */
+        rrect(bx,by,BOX_W,BOX_H,7);
+        ctx.fillStyle=stage.col+"0D"; ctx.fill();
+        ctx.strokeStyle=stage.col+ha(70+40*Math.sin(t*1.5+i)); ctx.lineWidth=1.5; ctx.stroke();
+        /* number badge */
+        ctx.beginPath(); ctx.arc(bx+14,by+14,9,0,Math.PI*2);
+        ctx.fillStyle=stage.col+"28"; ctx.fill();
+        ctx.strokeStyle=stage.col+"77"; ctx.lineWidth=1; ctx.stroke();
+        ctx.fillStyle=stage.col; ctx.font=`7px ${MONO}`; ctx.textAlign="center";
+        ctx.fillText(String(i+1),bx+14,by+17);
+        /* molecule drawing in upper portion */
+        drawMol(i, boxCX(i), by+60, t);
+        /* stage label */
+        const lines=stage.label.split(" \u2192 ");
+        const hasArrow=stage.label.includes("\u2192");
+        if (hasArrow) {
+          ctx.fillStyle=stage.col+ha(170); ctx.font=`5.5px ${MONO}`; ctx.textAlign="center";
+          ctx.fillText(stage.label.split("\u2192")[0].trim(),boxCX(i),by+BOX_H-32);
+          ctx.fillStyle=V.aurora+"66"; ctx.font=`7px ${MONO}`;
+          ctx.fillText("\u2192",boxCX(i),by+BOX_H-22);
+          ctx.fillStyle=stage.col+ha(170); ctx.font=`5.5px ${MONO}`;
+          ctx.fillText(stage.label.split("\u2192")[1].trim(),boxCX(i),by+BOX_H-12);
+        } else {
+          ctx.fillStyle=stage.col+ha(180); ctx.font=`7px ${MONO}`; ctx.textAlign="center";
+          ctx.fillText(stage.label,boxCX(i),by+BOX_H-18);
+        }
+        ctx.fillStyle=stage.col+"44"; ctx.font=`5px ${MONO}`;
+        ctx.fillText(stage.sub,boxCX(i),by+BOX_H-4);
+      });
+
+      /* ── Flowing particles ── */
+      particles.forEach(p=>{
+        p.pos+=p.speed;
+        if(p.pos>=N-0.05) p.pos=0;
+        const si=Math.floor(p.pos), sf=p.pos-si;
+        const ni=Math.min(si+1,N-1);
+        /* only draw in gap region (not inside boxes) */
+        const gapStart=boxCX(si)+BOX_W*0.5;
+        const gapEnd  =boxCX(ni)-BOX_W*0.5;
+        if(gapStart>=gapEnd) return;
+        const px=gapStart+(gapEnd-gapStart)*sf;
+        const py=H*0.5+p.lane;
+        if(!isFinite(px)||!isFinite(py)) return;
+        const col=CHAIN_STAGES[si].col;
+        const alpha=0.7+0.3*Math.sin(t*3+p.pos*4);
+        ctx.beginPath(); ctx.arc(px,py,3.5,0,Math.PI*2);
+        ctx.fillStyle=col+ha(alpha*190); ctx.fill();
+        /* trail */
+        for(let tr=1;tr<=4;tr++){
+          const tpx=px-p.speed*spacing*tr*5;
+          if(!isFinite(tpx)||tpx<gapStart) continue;
+          ctx.beginPath(); ctx.arc(tpx,py,3-tr*0.5,0,Math.PI*2);
+          ctx.fillStyle=col+ha(alpha*80-tr*16); ctx.fill();
+        }
+        /* transform flash at entry to next box */
+        if(sf>0.88&&si<N-1){
+          const fl=(sf-0.88)/0.12;
+          ctx.beginPath(); ctx.arc(gapEnd+8,H*0.5,16*fl,0,Math.PI*2);
+          ctx.strokeStyle=CHAIN_STAGES[ni].col+ha(fl*130); ctx.lineWidth=2; ctx.stroke();
+        }
+      });
+
+      /* HUD */
+      ctx.fillStyle=V.aurora+"44"; ctx.font=`7px ${MONO}`; ctx.textAlign="left";
+      ctx.fillText("CHAIN SIMULATOR \u00B7 SOLAR \u2192 BACTERIA \u2192 ACID \u2192 SILICA \u2192 OPAL \u2192 Si",14,13);
+      t+=0.012;
+    }
+
+    function loop(){ draw(); raf.current=requestAnimationFrame(loop); }
+    loop();
+    return()=>cancelAnimationFrame(raf.current);
+  },[]);
+
+  return <canvas ref={ref} width={900} height={300}
+    style={{width:"100%",height:300,display:"block",borderRadius:"0 0 4px 4px"}}/>;
+}
+
 /* ── AETHER Pipeline ─────────────────────────────────────────── */
 const PIPELINE = [
   { step:"NATURAL SYSTEMS",   col:V.green, icon:"🌿",
@@ -415,6 +687,29 @@ export default function OpalGenesisPage() {
                 <div style={{fontFamily:SERIF,fontSize:12,color:V.ink+"66",lineHeight:1.6,paddingTop:4}}>
                   {row.label}
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Chain Simulator ── */}
+        <div style={{margin:"40px 0 0"}}>
+          <div style={{borderLeft:`3px solid ${V.aurora}`,paddingLeft:14,marginBottom:12}}>
+            <div style={{fontFamily:MONO,fontSize:10,color:V.aurora,letterSpacing:"0.18em"}}>
+              REACTION CHAINS · LIVE SIMULATION
+            </div>
+            <div style={{fontFamily:SERIF,fontSize:13,color:V.ink+"88",marginTop:4}}>
+              Molecular particles flow and transform through each stage of the biological silicon pathway
+            </div>
+          </div>
+          <div style={{borderRadius:6,overflow:"hidden",border:`1px solid ${V.aurora}22`,background:V.bg}}>
+            <ChainCanvas />
+          </div>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:10}}>
+            {CHAIN_STAGES.map((s,i)=>(
+              <div key={i} style={{display:"flex",alignItems:"center",gap:5}}>
+                <div style={{width:8,height:8,borderRadius:"50%",background:s.col,boxShadow:`0 0 6px ${s.col}88`}}/>
+                <span style={{fontFamily:MONO,fontSize:9,color:s.col+"BB"}}>{s.sub}</span>
               </div>
             ))}
           </div>
