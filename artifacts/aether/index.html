@@ -4,20 +4,55 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
     <title>AETHER Knowledge System</title>
+    <meta name="description" content="AETHER synthesizes and discovers knowledge through a Knowledge Graph &amp; Coherence System inspired by the Crystallization Model of Intelligence." />
+
+    <meta property="og:title" content="AETHER Knowledge System" />
+    <meta property="og:description" content="AETHER synthesizes and discovers knowledge through a Knowledge Graph &amp; Coherence System inspired by the Crystallization Model of Intelligence." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="/opengraph.jpg" />
+    <meta property="og:site_name" content="AETHER Knowledge System" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AETHER Knowledge System" />
+    <meta name="twitter:description" content="AETHER synthesizes and discovers knowledge through a Knowledge Graph &amp; Coherence System inspired by the Crystallization Model of Intelligence." />
+    <meta name="twitter:image" content="/opengraph.jpg" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="" />
     <script>
       (function () {
+        var origin = window.location.origin;
+        var pathname = window.location.pathname;
+
         function setCanonical() {
           var canonical = document.querySelector('link[rel="canonical"]');
           if (canonical) canonical.setAttribute("href", window.location.origin + window.location.pathname);
         }
+        function setOgUrl() {
+          var el = document.querySelector('meta[property="og:url"]');
+          if (el) el.setAttribute("content", window.location.origin + window.location.pathname);
+        }
+        function setAbsoluteImages() {
+          ["og:image", "twitter:image"].forEach(function(prop) {
+            var attr = prop.startsWith("og:") ? 'meta[property="' + prop + '"]' : 'meta[name="' + prop + '"]';
+            var el = document.querySelector(attr);
+            if (el) {
+              var src = el.getAttribute("content") || "";
+              if (src.startsWith("/")) el.setAttribute("content", origin + src);
+            }
+          });
+        }
+
         setCanonical();
+        setOgUrl();
+        setAbsoluteImages();
+
         var _pushState = history.pushState;
-        history.pushState = function () { _pushState.apply(history, arguments); setCanonical(); };
+        history.pushState = function () { _pushState.apply(history, arguments); setCanonical(); setOgUrl(); };
         var _replaceState = history.replaceState;
-        history.replaceState = function () { _replaceState.apply(history, arguments); setCanonical(); };
-        window.addEventListener("popstate", setCanonical);
+        history.replaceState = function () { _replaceState.apply(history, arguments); setCanonical(); setOgUrl(); };
+        window.addEventListener("popstate", function() { setCanonical(); setOgUrl(); });
       })();
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@200;300;400;600&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet" />
