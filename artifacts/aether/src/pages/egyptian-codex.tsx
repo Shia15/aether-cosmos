@@ -195,9 +195,10 @@ function PapyrusCanvas() {
       ctx.fillRect(18, H * 0.72 + 2, 120, 6);
 
       // ── hieroglyph text rows ──────────────────────
+      const NOTO = "'Noto Sans Egyptian Hieroglyphs', serif";
       // Row 1: top register (full width)
       const glyphY1 = H * 0.05;
-      ctx.font = `${Math.floor(H * 0.055)}px serif`;
+      ctx.font = `${Math.floor(H * 0.055)}px ${NOTO}`;
       ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       for (let gi = 0; gi < 38; gi++) {
         const gx = 8 + gi * ((W - 16) / 38);
@@ -208,7 +209,7 @@ function PapyrusCanvas() {
       ctx.globalAlpha = 1;
 
       // Left column glyphs (beside seated deity)
-      ctx.font = `${Math.floor(H * 0.042)}px serif`;
+      ctx.font = `${Math.floor(H * 0.042)}px ${NOTO}`;
       const leftCol = [
         '𓇳','𓂀','𓆓','𓅃','𓋴','𓎡','𓊪','𓄿','𓆑','𓌀','𓀁','𓁺',
       ];
@@ -230,7 +231,7 @@ function PapyrusCanvas() {
         { y: 0.79,  start: 300, size: 0.028 },
       ];
       midGlyphRows.forEach(({ y, start, size }, ri) => {
-        ctx.font = `${Math.floor(H * size)}px serif`;
+        ctx.font = `${Math.floor(H * size)}px ${NOTO}`;
         ctx.fillStyle = INK; ctx.textAlign = 'center';
         for (let gi = 0; gi < 36; gi++) {
           const gx = start + gi * ((W - start - 8) / 36);
@@ -309,17 +310,18 @@ function GlyphTickerCanvas() {
     let t = 0;
     const row1 = Array.from({ length: 60 }, (_, i) => GLYPHS[(i * 7 + 3) % GLYPHS.length]);
     const row2 = Array.from({ length: 60 }, (_, i) => GLYPHS[(i * 5 + 11) % GLYPHS.length]);
+    const NOTO = "'Noto Sans Egyptian Hieroglyphs', serif";
     const draw = () => {
       const bg = ctx.createLinearGradient(0, 0, 0, H);
       bg.addColorStop(0, '#dfc990ee'); bg.addColorStop(1, '#c8b070ee');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-      ctx.font = '20px serif';
+      ctx.font = `20px ${NOTO}`;
       for (let i = 0; i < 44; i++) {
         const x = ((i * 21 - t * 0.7) % (W + 21) + W + 21) % (W + 21);
         ctx.fillStyle = `rgba(42,24,6,${0.5 + 0.3 * Math.sin(t * 0.04 + i * 0.7)})`;
         ctx.fillText(row1[i % row1.length], x, 22);
       }
-      ctx.font = '16px serif';
+      ctx.font = `16px ${NOTO}`;
       for (let i = 0; i < 54; i++) {
         const x = ((i * 17 + t * 0.5) % (W + 17) + W + 17) % (W + 17);
         ctx.fillStyle = `rgba(90,58,16,${0.4 + 0.25 * Math.sin(t * 0.03 + i * 0.5)})`;
