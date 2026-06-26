@@ -530,6 +530,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
+  /* ── Double-click zoom ── */
+  const [zoomOn, setZoomOn] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
+  const zoomHideRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [zoomHint, setZoomHint] = useState(false);
+
+  const handleDblClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const t = e.target as HTMLElement;
+    if (t.closest("button,a,input,textarea,select,canvas,[role=button],[role=slider]")) return;
+    if (zoomOn) {
+      setZoomOn(false);
+      setZoomHint(false);
+    } else {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const ox = (((e.clientX - rect.left) / rect.width)  * 100).toFixed(1);
+      const oy = (((e.clientY - rect.top)  / rect.height) * 100).toFixed(1);
+      setZoomOrigin(`${ox}% ${oy}%`);
+      setZoomOn(true);
+      setZoomHint(true);
+      if (zoomHideRef.current) clearTimeout(zoomHideRef.current);
+      zoomHideRef.current = setTimeout(() => setZoomHint(false), 1800);
+    }
+  }, [zoomOn]);
+
   /* ── Sidebar resize ── */
   const [sidebarWidth, setSidebarWidth] = useState<number>(loadSidebarWidth);
   const dragRef = useRef<{ startX: number; startW: number } | null>(null);
@@ -870,7 +894,39 @@ export function Layout({ children }: { children: React.ReactNode }) {
           ref={mainRef}
           className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background"
         >
-          {children}
+          {/* zoom wrapper — double-click anywhere (not on interactive elements) to zoom 2× */}
+          <div
+            onDoubleClick={handleDblClick}
+            style={{
+              flex: 1,
+              transformOrigin: zoomOrigin,
+              transform: zoomOn ? "scale(2)" : "scale(1)",
+              transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1), transform-origin 0s",
+              cursor: zoomOn ? "zoom-out" : "default",
+            }}
+          >
+            {children}
+          </div>
+
+          {/* zoom indicator badge */}
+          <div style={{
+            position: "fixed", bottom: 20, right: 20, zIndex: 9999,
+            pointerEvents: "none",
+            opacity: (zoomOn || zoomHint) ? 1 : 0,
+            transform: (zoomOn || zoomHint) ? "translateY(0) scale(1)" : "translateY(8px) scale(0.9)",
+            transition: "opacity 0.25s, transform 0.25s",
+            display: "flex", alignItems: "center", gap: 7,
+            background: "rgba(4,6,14,0.88)",
+            border: `1px solid ${zoomOn ? "#00FFB2" : "#3A5060"}`,
+            borderRadius: 6, padding: "5px 12px",
+            fontFamily: "'Space Mono',monospace", fontSize: 11,
+            color: zoomOn ? "#00FFB2" : "#B8CCE8",
+            backdropFilter: "blur(6px)",
+            boxShadow: zoomOn ? "0 0 16px #00FFB244" : "none",
+          }}>
+            <span style={{ fontSize: 14, lineHeight: 1 }}>{zoomOn ? "🔍" : "🔎"}</span>
+            {zoomOn ? "2× ZOOM  ·  double-click to exit" : "ZOOM OFF"}
+          </div>
         </main>
       </div>
 
