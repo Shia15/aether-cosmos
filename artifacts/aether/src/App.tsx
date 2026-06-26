@@ -1,7 +1,7 @@
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
-import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
+import { useEffect, useRef, type ReactNode } from "react";
+import { ClerkProvider, SignIn, SignUp, useClerk, useAuth } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { dark } from "@clerk/themes";
 import { Toaster } from "@/components/ui/toaster";
@@ -478,13 +478,34 @@ function ClerkProviderWithRoutes() {
   );
 }
 
+function AuthGate({ children }: { children: ReactNode }) {
+  const { isSignedIn, isLoaded } = useAuth();
+  if (!isLoaded) {
+    return (
+      <div style={{ position:"fixed", top:0, left:0, width:"100vw", height:"100vh",
+        background:"#02030A", display:"flex", flexDirection:"column",
+        alignItems:"center", justifyContent:"center", gap:14, zIndex:9999 }}>
+        <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.4rem",
+          color:"#00FFB2", letterSpacing:"0.4em" }}>AETHER</div>
+        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9,
+          color:"#3A5060", letterSpacing:"0.2em" }}>AUTHENTICATING ···</div>
+      </div>
+    );
+  }
+  if (!isSignedIn) return <SignInPage />;
+  return <>{children}</>;
+}
+
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/sign-in/*?" component={SignInPage} />
-        <Route path="/sign-up/*?" component={SignUpPage} />
-        <Route path="/" component={GraphView} />
+    <Switch>
+      <Route path="/sign-in/*?" component={SignInPage} />
+      <Route path="/sign-up/*?" component={SignUpPage} />
+      <Route>
+        <AuthGate>
+          <Layout>
+            <Switch>
+              <Route path="/" component={GraphView} />
         <Route path="/architecture" component={ArchitectureView} />
         <Route path="/upload" component={UploadView} />
         <Route path="/coherence" component={CoherenceView} />
@@ -823,8 +844,11 @@ function Router() {
         <Route path="/propulsion-dynamics" component={PropulsionDynamicsPage} />
         <Route path="/polymer-biobreak" component={PolymerBiobreakPage} />
         <Route component={NotFound} />
-      </Switch>
-    </Layout>
+            </Switch>
+          </Layout>
+        </AuthGate>
+      </Route>
+    </Switch>
   );
 }
 
