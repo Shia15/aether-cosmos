@@ -347,6 +347,7 @@ const NAV_ITEMS = [
   { href: "/stacked-rings", label: "Stacked Rings Conjecture · 500+ Barriered Vortical Harmonics · Dirichlet Kernel · N-Spike Interference · Delta Comb · Traveling Standing Wave · Auto Sweep", icon: Atom },
   { href: "/earth-living-system", label: "Earth Living System · Planetary Layers · Solar Wind · Magnetosphere · Biological Networks · Ancient Structures · Geometric Grids · Natural Knots · Interconnected System", icon: Atom },
   { href: "/opal-genesis", label: "Opal Genesis · Solar Silica Synthesis · Phototrophic Sulfur Bacteria · H2S · Root Star Architecture · SiO2 · Opal → Silicon · Semiconductor · AETHER Materials", icon: Atom },
+  { href: "/dynamic-synthesis", label: "Dynamic Synthesis Framework · Plasmoidic Containment · Cosmic Field Amplification · Vortex Flow · Spacetime Lattice · MHD Equations · As Above So Below", icon: Atom },
   { href: "/portal-restoration", label: "Portal States · Restoration · Inner Resonance · Circadian Arc · 12:12 Portal · 7-Step Flow · Glow From Inside Out · Stonehenge · AETHER Module", icon: Atom },
   { href: "/gut-brain", label: "Gut-Brain Axis · Microbial Neural · Serotonin 90% · Vagus Nerve · Endocrine · Immune · Metabolic · 30 Plants · 3 Fermented · 8hr Sleep · 15hr Fast", icon: Atom },
   { href: "/planetary-neural", label: "Planetary-Neural Cascade · Solar Wind · Geomagnetic · Ocean Iodine · Thyroid T3 T4 · Brain Development · Goitre Belt · Cognitive Outcomes", icon: Atom },

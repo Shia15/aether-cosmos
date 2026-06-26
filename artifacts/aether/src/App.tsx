@@ -346,6 +346,7 @@ import StackedRingsPage from "@/pages/stacked-rings";
 import EarthLivingSystemPage from "@/pages/earth-living-system";
 import PortalRestorationPage from "@/pages/portal-restoration";
 import OpalGenesisPage from "@/pages/opal-genesis";
+import DynamicSynthesisPage from "@/pages/dynamic-synthesis";
 
 const queryClient = new QueryClient();
 
@@ -843,6 +844,7 @@ function Router() {
         <Route path="/non-terrestrial" component={NonTerrestrialPage} />
         <Route path="/propulsion-dynamics" component={PropulsionDynamicsPage} />
         <Route path="/polymer-biobreak" component={PolymerBiobreakPage} />
+        <Route path="/dynamic-synthesis" component={DynamicSynthesisPage} />
         <Route component={NotFound} />
             </Switch>
           </Layout>
