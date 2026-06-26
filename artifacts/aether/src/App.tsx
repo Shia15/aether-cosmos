@@ -339,6 +339,7 @@ import PropulsionDynamicsPage from "@/pages/propulsion-dynamics";
 import PolymerBiobreakPage from "@/pages/polymer-biobreak";
 import AtpTransportPage from "@/pages/atp-transport";
 import BorreliaKnotPage from "@/pages/borrelia-knot";
+import FloquetPetalsPage from "@/pages/floquet-petals";
 
 const queryClient = new QueryClient();
 
@@ -663,6 +664,7 @@ function Router() {
         <Route path="/stellar-brain" component={StellarBrainPage} />
         <Route path="/atp-transport" component={AtpTransportPage} />
         <Route path="/borrelia-knot" component={BorreliaKnotPage} />
+        <Route path="/floquet-petals" component={FloquetPetalsPage} />
         <Route path="/awakening-timeline" component={AwakeningTimelinePage} />
         <Route path="/aether-why" component={AetherWhyPage} />
         <Route path="/baby-rhythm" component={BabyRhythmPage} />

@@ -343,6 +343,7 @@ const NAV_ITEMS = [
   { href: "/stellar-brain", label: "Stellar Brain · Plutomate ♇ · Neural Core · Symbol Engine · Strange Loop · Self-Reflection · Deep Brain Systems · Brainstem · Amygdala · Hippocampus · Basal Ganglia", icon: Brain },
   { href: "/atp-transport", label: "ATP · Active Transport · Concentration Gradient · Hydrolysis · ADP Generation · Starburst · Phosphate · Ribose · Adenine · Na⁺ K⁺ Pump · 30.5 kJ/mol", icon: Atom },
   { href: "/borrelia-knot", label: "Borrelia Knot · DNA Topology · Trefoil 3₁ · Knot Invariants · Topoisomerase II · Thermal Decoherence · Seizure Threshold · Lyme Neuroborreliosis · Plausibility Radar", icon: Atom },
+  { href: "/floquet-petals", label: "Floquet Petals · Toroidal Azimuthal Modes · m=5 6 7 8 9 · Traveling Wave · Standing Wave · Spacetime Shaping · Petal Rings · Chern Number · Quasi-Energy", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
