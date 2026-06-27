@@ -366,6 +366,7 @@ const SeismicOilSynthesisPage   = lazy(() => import("@/pages/seismic-oil-synthes
 const QuantumGravityCosmosPage  = lazy(() => import("@/pages/quantum-gravity-cosmos"));
 const ProcessingDelayPage       = lazy(() => import("@/pages/processing-delay"));
 const WirelessPowerPage         = lazy(() => import("@/pages/wireless-power"));
+const PhiCrystallizationPage    = lazy(() => import("@/pages/phi-crystallization"));
 
 const queryClient = new QueryClient();
 
@@ -1186,6 +1187,7 @@ function Router() {
                 <Route path="/quantum-gravity-cosmos" component={QuantumGravityCosmosPage} />
                 <Route path="/processing-delay"      component={ProcessingDelayPage} />
                 <Route path="/wireless-power"        component={WirelessPowerPage} />
+                <Route path="/phi-crystallization"   component={PhiCrystallizationPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

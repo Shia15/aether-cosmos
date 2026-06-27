@@ -435,6 +435,7 @@ const NAV_ITEMS = [
   { href: "/quantum-gravity-cosmos",  label: "Quantum Gravity Cosmos · Einstein Field Equations · Schwarzschild · Path Integral · LQG · String Theory · AETHER Coherence Bridge", icon: Atom },
   { href: "/processing-delay",        label: "Processing Delay · AETHER Compute Substrate Monitor · Concurrent Processes · CPU Cores · Kernel Events · Scheduling Latency",             icon: Cpu  },
   { href: "/wireless-power",          label: "Wireless Power · Resonant Inductive Coupling · WiTricity · Coil Simulation · k-Factor · Q-Factor · Near-Field EM · Efficiency",          icon: Radio},
+  { href: "/phi-crystallization",     label: "phi-Crystallization · Decoherent to Coherent · 320 Particles · Fibonacci Lattice · Drone Choreography · Sky Mosaic · C(t) Engine",           icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
