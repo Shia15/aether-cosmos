@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ClerkProvider, SignIn, SignUp, useClerk, useAuth } from "@clerk/react";
@@ -628,7 +628,7 @@ function PageLoader() {
 function SignInPage() {
   return (
     <AuthLayout>
-      <SignIn routing="virtual" signUpUrl={`${basePath}/sign-up`} />
+      <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
     </AuthLayout>
   );
 }
@@ -636,7 +636,7 @@ function SignInPage() {
 function SignUpPage() {
   return (
     <AuthLayout>
-      <SignUp routing="virtual" signInUrl={`${basePath}/sign-in`} />
+      <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
     </AuthLayout>
   );
 }
@@ -682,11 +682,129 @@ function ClerkProviderWithRoutes() {
   );
 }
 
+const ACCESS_CODE_STORAGE_KEY = "aether.access.v1";
+
+function AccessCodeGate({ children }: { children: ReactNode }) {
+  const expectedCode = import.meta.env.VITE_AETHER_ACCESS_CODE as string | undefined;
+  const { signOut } = useClerk();
+
+  const [verified, setVerified] = useState(() => {
+    if (!expectedCode) return true;
+    return sessionStorage.getItem(ACCESS_CODE_STORAGE_KEY) === "1";
+  });
+  const [input, setInput] = useState("");
+  const [error, setError] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+
+  if (verified || !expectedCode) return <>{children}</>;
+
+  function submit() {
+    if (input.trim() === expectedCode) {
+      sessionStorage.setItem(ACCESS_CODE_STORAGE_KEY, "1");
+      setVerified(true);
+    } else {
+      const next = attempts + 1;
+      setAttempts(next);
+      setError(true);
+      setShake(true);
+      setInput("");
+      setTimeout(() => { setShake(false); }, 600);
+    }
+  }
+
+  return (
+    <AuthLayout>
+      <style>{`
+        @keyframes ak-shake {
+          0%,100%{transform:translateX(0)}
+          20%{transform:translateX(-8px)}
+          40%{transform:translateX(8px)}
+          60%{transform:translateX(-5px)}
+          80%{transform:translateX(5px)}
+        }
+      `}</style>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        <div style={{textAlign:"center",marginBottom:4}}>
+          <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
+            color:"rgba(0,255,178,0.55)",letterSpacing:"0.25em",marginBottom:8}}>
+            SECURE ACCESS
+          </div>
+          <div style={{fontFamily:"'Crimson Pro',serif",fontSize:"0.95rem",
+            color:"rgba(184,204,232,0.7)",lineHeight:1.5}}>
+            Enter your access code to enter the knowledge system.
+          </div>
+        </div>
+
+        <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(0,255,178,0.15),transparent)",margin:"6px 0"}}/>
+
+        <div style={{
+          animation: shake ? "ak-shake 0.55s ease" : "none",
+        }}>
+          <input
+            type="password"
+            autoFocus
+            value={input}
+            onChange={(e) => { setInput(e.target.value); setError(false); }}
+            onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+            placeholder="Enter access code"
+            style={{
+              width:"100%",boxSizing:"border-box",
+              background:"rgba(0,255,178,0.05)",
+              border:`1px solid ${error ? "rgba(255,68,119,0.6)" : "rgba(0,255,178,0.2)"}`,
+              borderRadius:6,
+              padding:"12px 16px",
+              fontFamily:"'Space Mono',monospace",fontSize:13,
+              color:"#B8CCE8",letterSpacing:"0.15em",
+              outline:"none",
+              transition:"border-color 0.2s",
+            }}
+          />
+        </div>
+
+        {error && (
+          <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
+            color:"#FF4477",letterSpacing:"0.14em",textAlign:"center"}}>
+            INCORRECT CODE{attempts >= 3 ? ` -- ${attempts} attempts` : ""}
+          </div>
+        )}
+
+        <button
+          onClick={submit}
+          style={{
+            marginTop:4,
+            background:"rgba(0,255,178,0.1)",
+            border:"1px solid rgba(0,255,178,0.35)",
+            borderRadius:6,padding:"11px",
+            fontFamily:"'Space Mono',monospace",fontSize:9,
+            color:"#00FFB2",letterSpacing:"0.22em",
+            cursor:"pointer",transition:"all 0.18s",
+          }}
+        >
+          ENTER AETHER
+        </button>
+
+        <button
+          onClick={() => signOut({ redirectUrl: basePath || "/" })}
+          style={{
+            background:"transparent",border:"none",
+            fontFamily:"'Space Mono',monospace",fontSize:7,
+            color:"rgba(184,204,232,0.3)",letterSpacing:"0.14em",
+            cursor:"pointer",padding:"6px",textAlign:"center",
+          }}
+        >
+          sign out
+        </button>
+      </div>
+    </AuthLayout>
+  );
+}
+
 function AuthGate({ children }: { children: ReactNode }) {
   const { isSignedIn, isLoaded } = useAuth();
   if (!isLoaded) return <AuthLayout loading />;
   if (!isSignedIn) return <SignInPage />;
-  return <>{children}</>;
+  return <AccessCodeGate>{children}</AccessCodeGate>;
 }
 
 function Router() {
