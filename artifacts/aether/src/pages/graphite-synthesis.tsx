@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { CodeFilesPanel } from "@/components/code-files-panel";
 
 /* ── Gray/white charcoal palette ─────────────────────────────────────────── */
 const BG0   = "#0a0a0c";  // near-black
@@ -452,6 +453,232 @@ function GraphiteCanvas() {
   return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
 }
 
+/* ── simulation code files ───────────────────────────────────────────── */
+const GRAPHITE_CODE_FILES = [
+  {
+    id: "graphite", name: "graphite_conductivity.qg", icon: "Cg",
+    content: `# AETHER-GRAY -- Graphite Layer Conductivity
+# sigma(x) grows with graphite layer count N(x)
+# sp2 carbon: pi electrons delocalised across graphene planes
+# Anisotropic: sigma_in-plane >> sigma_out-of-plane (ratio ~10^4)
+
+import numpy as np
+from aether.substrate import van_der_Pauw
+
+# Graphene monolayer: sigma_mono = 7.748e-5 S (quantum of conductance * 2)
+# Each additional layer adds sigma_mono (parallel layers)
+SIGMA_MONO  = 7.748e-5  # S -- conductance quantum G0 * 2
+RHO_BULK    = 3.5e-5    # Ohm m -- bulk graphite in-plane resistivity
+
+def layer_conductivity(N_layers, overlap=0.95):
+    """
+    sigma(N) = N * sigma_mono * overlap^(N-1)
+    overlap: interlayer electronic coupling (Bernal stacking ~ 0.95)
+    For few-layer graphene (N < 10): quantum effects, non-linear sigma(N)
+    For many layers (N > 30): converges to bulk graphite sigma
+    """
+    return N_layers * SIGMA_MONO * (overlap ** (N_layers - 1))
+
+def gradient_conductivity_field(N_field):
+    """
+    Given 2D array N(x,y) of layer counts, return sigma(x,y).
+    This IS the AETHER C(x,t) field for graphite substrate:
+    C_graphite(x,y) = sigma(x,y) / sigma_max
+    """
+    sigma = np.vectorize(layer_conductivity)(N_field)
+    return sigma / sigma.max()  # normalise to [0,1]
+
+class GradientSketch:
+    """Model of a graphite gradient drawing on paper."""
+    def __init__(self, width=200, height=150, paper_texture=0.02):
+        self.W, self.H = width, height
+        self.N = np.zeros((H, W))   # layer count field
+        self.noise = paper_texture
+
+    def shade(self, x0, y0, radius, layers=1):
+        """Add graphite at (x0,y0) with given radius and layer count."""
+        for y in range(self.H):
+            for x in range(self.W):
+                d = ((x-x0)**2 + (y-y0)**2)**0.5
+                if d < radius:
+                    self.N[y,x] += layers * (1 - d/radius)
+
+    def coherence_field(self):
+        """C_graphite = gradient_conductivity_field(N)"""
+        return gradient_conductivity_field(self.N)
+
+# The gray gradient made by an artist's hand:
+# Each stroke adds N_layers ~ 1-5 depending on pressure
+# Tonal value (darkness) = visual proxy for sigma(x)
+# The medium remembers every stroke -- irreversible accumulation`,
+  },
+  {
+    id: "phi", name: "phi_spiral.qg", icon: "ph",
+    content: `# AETHER-GRAY -- Phi-Spiral & Fibonacci Phyllotaxis
+# Golden angle: alpha = 360 * (1 - 1/phi) = 137.507764... degrees
+# phi = (1 + sqrt(5)) / 2 = 1.6180339...  (golden ratio)
+# Plants use this angle to pack leaves/seeds with maximum efficiency
+
+import numpy as np
+
+PHI = (1 + 5**0.5) / 2        # golden ratio
+GOLDEN_ANGLE = 2*np.pi * (1 - 1/PHI)  # 2.39996... rad = 137.5077...deg
+
+def fibonacci_lattice(n_points, scale=1.0):
+    """
+    Sunflower seed pattern: r = sqrt(i), theta = i * GOLDEN_ANGLE
+    Each new seed at angle golden_angle from previous -> no two seeds
+    ever align radially -> maximum density packing (Vogel 1979)
+    """
+    i = np.arange(n_points)
+    r     = scale * np.sqrt(i)
+    theta = i * GOLDEN_ANGLE
+    x = r * np.cos(theta)
+    y = r * np.sin(theta)
+    return x, y
+
+def fibonacci_sequence(n):
+    """F(n) = F(n-1) + F(n-2), F(0)=0, F(1)=1"""
+    F = [0, 1]
+    for _ in range(n-2):
+        F.append(F[-1] + F[-2])
+    return F
+
+def phi_power_spiral(n_arms, n_turns, steps=500):
+    """
+    Logarithmic spiral: r = a * exp(b * theta)
+    b = ln(phi) / (pi/2)  -> spiral grows by phi every quarter turn
+    Appears in: nautilus shells, galaxy arms, romanesco broccoli
+    """
+    b = np.log(PHI) / (np.pi / 2)
+    theta = np.linspace(0, n_turns * 2*np.pi, steps)
+    r     = np.exp(b * theta)
+    return r * np.cos(theta), r * np.sin(theta)
+
+# Rydberg atom arrays use phi-spiral geometry to minimise blockade overlap
+# Each atom site r_i = sqrt(i) * d_blockade -> no two atoms in same blockade
+# This is exactly the graphite phi-spiral tweezers geometry:
+# phi-spiral loading of optical tweezers -> maximum qubit density
+# C_quantum(x) = atom density matrix purity rho(x)`,
+  },
+  {
+    id: "rydberg", name: "rydberg_atom.qg", icon: "Ry",
+    content: `# AETHER-GRAY -- Rydberg Atom Arrays & Quantum Computation
+# Principal quantum number n >> 1: highly excited alkali atom
+# n=50-100: atom size ~ n^2 * a0 (micron scale), dipole ~ n^2 * e*a0
+# Blockade radius: no two atoms in Rydberg state simultaneously within r_b
+
+import numpy as np
+from aether.quantum import rydberg_units
+
+HBAR  = 1.055e-34  # [J s]
+A0    = 5.292e-11  # Bohr radius [m]
+E_H   = 4.36e-18   # Hartree energy [J]
+
+class RydbergAtom:
+    """
+    Single neutral atom (Rb-87 or Cs-133) laser-excited to state |n>.
+    Trapped in optical tweezer array at programmable positions.
+    """
+    def __init__(self, n=70, species="Rb87"):
+        self.n = n
+        self.species = species
+        self.r_orbit = n**2 * A0          # orbital radius [m]  ~ 260 nm at n=70
+        self.dipole  = n**2 * 1.6e-19 * A0 # electric dipole moment [C m]
+        self.lifetime = n**3 * 1e-9       # lifetime [s] ~ 340 us at n=70
+
+    def van_der_waals_C6(self):
+        """
+        C6 coefficient: U(r) = C6 / r^6
+        C6 ~ n^11  (scales strongly with n)
+        For n=70, Rb: C6 ~ 2e21 a.u. ~ 140 GHz um^6
+        """
+        return (self.n**11) * 1e-10  # [J m^6] approximate scaling
+
+    def blockade_radius(self, Omega_rabi_hz):
+        """
+        r_b = (C6 / hbar / Omega)^(1/6)
+        Within r_b: two-atom Rydberg excitation is blockaded.
+        Typical: r_b ~ 5-10 um for Omega/(2pi) ~ 1 MHz, n=70
+        """
+        C6 = self.van_der_waals_C6()
+        return (C6 / (HBAR * Omega_rabi_hz)) ** (1/6)
+
+    def two_qubit_gate_fidelity(self, r_m, Omega_hz):
+        """
+        CZ gate via Rydberg blockade.
+        Fidelity limited by finite blockade U vs Omega:
+        F ~ 1 - (Omega/U)^2 where U = C6/r^6
+        """
+        U = self.van_der_waals_C6() / r_m**6
+        return 1 - (HBAR * Omega_hz / U)**2
+
+# Gray Medium Substrate connection:
+# Graphite substrate sigma(x) = classical coherence field C_graphite
+# Rydberg array rho(x) = quantum coherence field C_quantum
+# Both: C in [0,1], ordered -> coherent, disordered -> decoherent
+# phi-spiral tweezers geometry optimises C_quantum density (same as seed packing)`,
+  },
+  {
+    id: "aether", name: "aether_gray_field.qg", icon: "Ag",
+    content: `# AETHER-GRAY -- C(x,t) Field Written in Three Substrates
+# Three media, one coherence field -- different physical instantiations
+# Gray gradient = sigma(x)/sigma_max  (graphite)
+# phi-spiral    = rho(x) purity      (quantum atoms)
+# Living flower = eta(x) exciton efficiency  (biological)
+
+from aether.kernel import CoherenceField
+import numpy as np
+
+class SubstrateCoherence:
+    """
+    Unified C(x,t) across three gray-medium substrates.
+    C in [0,1]: 0 = disordered, 1 = maximally coherent.
+    """
+    def graphite(self, N_layers, sigma_max):
+        """
+        C_graphite(x) = sigma(N(x)) / sigma_max
+        sigma grows with N_layers -- each pencil stroke adds coherence.
+        Irreversible: you cannot un-shade paper.
+        The medium accumulates and remembers every mark.
+        """
+        sigma_mono = 7.748e-5
+        sigma = N_layers * sigma_mono
+        return np.clip(sigma / sigma_max, 0, 1)
+
+    def quantum(self, rho_atom):
+        """
+        C_quantum(x) = Tr(rho^2)  -- purity of density matrix
+        rho = |psi><psi| for pure state (C=1)
+        rho = I/d for maximally mixed state (C=0)
+        phi-spiral geometry maximises sum_x C_quantum(x).
+        """
+        return np.real(np.trace(rho_atom @ rho_atom))
+
+    def biological(self, exciton_efficiency, eta_max):
+        """
+        C_bio(x) = eta_exciton(x) / eta_max
+        Exciton transfer in photosynthetic antenna:
+        FMO complex: 95% efficiency (near-quantum-optimal)
+        Coherent wavelike transport vs incoherent hopping
+        """
+        return np.clip(exciton_efficiency / eta_max, 0, 1)
+
+# AETHER synthesis:
+# All three substrates obey the same Crystallization Model:
+# Apply energy (pencil pressure / laser / sunlight) + geometry (phi-spiral)
+# -> C(x,t) crystallises from 0 toward 1
+# -> Structure emerges: gradient / qubit array / living flower
+# The gray gradient IS the C(x,t) field written in graphite.
+# The phi-spiral IS the C(x,t) field written in vacuum.
+# The living flower IS the C(x,t) field written in cellulose.
+
+sc = SubstrateCoherence()
+print("C_graphite at 10 layers:", sc.graphite(10, 50*7.748e-5))
+print("C_quantum (pure state):", sc.quantum(np.array([[1,0],[0,0]])))`,
+  },
+];
+
 export default function GraphiteSynthesisPage() {
   const [mode, setMode] = useState<Mode>("graphite");
   return (
@@ -823,6 +1050,11 @@ Performance:
             Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
           </div>
         </div>
+        <CodeFilesPanel
+          heading="Gray Medium Substrate Simulation Files"
+          accentColor={G80}
+          files={GRAPHITE_CODE_FILES}
+        />
       </div>
     </div>
   );

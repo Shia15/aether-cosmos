@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { CodeFilesPanel } from "@/components/code-files-panel";
 
 const BG    = "#020408";
 const TEAL  = "#0d7377";
@@ -374,6 +375,222 @@ function BiomagnetismCanvas() {
   return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
 }
 
+/* ── simulation code files ───────────────────────────────────────────── */
+const BIO_CODE_FILES = [
+  {
+    id: "magnetite", name: "magnetite_crystal.qg", icon: "Fe",
+    content: `# AETHER-BIO -- Magnetite Nanocrystal Biomagnetism
+# Fe3O4 (magnetite) crystals in biological tissue
+# First found in magnetotactic bacteria (Blakemore 1975)
+# Also in: human brain, heart, liver, honeybee abdomen
+
+import numpy as np
+from aether.bio import SQUID_sensitivity, Boltzmann
+
+MU0  = 4 * np.pi * 1e-7  # [H/m]
+k_B  = 1.38e-23           # [J/K]
+
+class MagnetiteNanocrystal:
+    """
+    Single-domain magnetite particle.
+    Diameter: 20-120 nm (human brain crystals: ~50 nm)
+    Magnetic moment: m = M_s * V  where M_s = 4.8e5 A/m (bulk)
+    """
+    def __init__(self, diameter_nm=50.0):
+        self.d  = diameter_nm * 1e-9  # [m]
+        self.V  = np.pi/6 * self.d**3  # sphere volume [m^3]
+        self.Ms = 4.8e5               # saturation magnetisation [A/m]
+        self.m  = self.Ms * self.V    # magnetic moment [A m^2]
+
+    def field_at(self, r_m):
+        """Dipole field at distance r: B = mu0/(4pi) * 2m / r^3"""
+        return MU0 / (4*np.pi) * 2 * self.m / r_m**3
+
+    def neel_relaxation_time(self, K_anisotropy, T_kelvin):
+        """
+        Neel: tau = tau0 * exp(K*V / k_B * T)
+        tau0 ~ 1e-9 s. For 50nm Fe3O4 at 310K: tau >> body lifetime
+        -> permanently magnetised (blocked state)
+        """
+        tau0 = 1e-9
+        return tau0 * np.exp(K_anisotropy * self.V / (k_B * T_kelvin))
+
+# SQUID measurement of biological magnetite:
+# MEG noise floor: 5-10 fT/sqrt(Hz)
+# Human brain magnetite field: 0.1-1 fT (measurable)
+# Magnetotactic bacterium: ~1e-15 Am^2 magnetic moment per crystal
+# 5e6 crystals/g in human brain (Kirschvink 1992)
+
+def squid_snr(B_signal_T, noise_fT_sqrthz, bandwidth_hz):
+    """Signal-to-noise for SQUID detection."""
+    noise_T = noise_fT_sqrthz * 1e-15 * bandwidth_hz**0.5
+    return B_signal_T / noise_T`,
+  },
+  {
+    id: "radical", name: "radical_pair.qg", icon: "rp",
+    content: `# AETHER-BIO -- Radical Pair Mechanism & Avian Compass
+# Cryptochrome protein in retina: blue-light -> radical pair
+# Electron spin state (singlet vs triplet) depends on Earth's B field
+# Ritz 2000: first quantum biology mechanism for magnetic sensing
+
+import numpy as np
+from aether.quantum import spin_operator, hyperfine
+
+HBAR = 1.055e-34  # [J s]
+G_E  = 2.0023     # electron g-factor
+MU_B = 9.274e-24  # Bohr magneton [J/T]
+B_EARTH = 50e-6   # Earth's field [T]  (50 microTesla)
+
+class RadicalPair:
+    """
+    Two electron spins (A, B) created together in singlet state.
+    Singlet: (up_down - down_up) / sqrt(2) -- antiparallel
+    Triplet: (up_up), (up_down + down_up)/sqrt(2), (down_down)
+    """
+    def __init__(self, A_hfc_mT, B_hfc_mT):
+        self.a_A = A_hfc_mT * 1e-3  # hyperfine coupling radical A [T]
+        self.a_B = B_hfc_mT * 1e-3  # hyperfine coupling radical B [T]
+
+    def oscillation_freq(self, B_field_T):
+        """
+        Singlet <-> triplet interconversion frequency.
+        omega = g_e * mu_B * B / hbar  (Zeeman) + hyperfine terms
+        B dependence encodes directional magnetic information.
+        """
+        zeeman  = G_E * MU_B * B_field_T / HBAR
+        hf_A    = G_E * MU_B * self.a_A / HBAR
+        hf_B    = G_E * MU_B * self.a_B / HBAR
+        return zeeman + hf_A - hf_B
+
+    def singlet_yield(self, B_field_T, B_direction_rad):
+        """
+        Chemical product yield depends on angle between B and molecular axis.
+        This encodes magnetic compass direction in reaction yield.
+        Y_S = Y0 * (1 + epsilon * cos^2(theta))
+        """
+        theta = B_direction_rad
+        omega = self.oscillation_freq(B_field_T)
+        epsilon = (self.a_A - self.a_B)**2 / omega**2 * 0.3
+        return 0.5 * (1 + epsilon * np.cos(theta)**2)
+
+# Cryptochrome activation in avian retina:
+# 1. Blue photon absorbed -> FAD excited state
+# 2. Electron transfer: FAD* -> Trp chain -> radical pair
+# 3. Singlet/triplet ratio -> signalling cascade -> neural output
+# Detected field threshold: ~50 nT  (1000x below Earth's field)`,
+  },
+  {
+    id: "cardiac", name: "cardiac_toroid.qg", icon: "Bh",
+    content: `# AETHER-BIO -- Cardiac Toroidal Magnetic Field
+# Heart generates strongest biomagnetic field in the body.
+# Peak: ~50,000 fT at chest surface (cf. Earth: 5e10 fT)
+# Field geometry: toroidal structure matching heart muscle orientation
+
+import numpy as np
+from aether.bio import Biot_Savart, cardiac_geometry
+
+SQUID_NOISE = 5e-15  # 5 fT/sqrt(Hz) -- best MEG/MCG systems [T/sqrt(Hz)]
+
+class CardiacToroid:
+    """
+    Simplified toroidal model of the cardiac magnetic field.
+    Heart muscle fibres form helical bands around ventricles.
+    Net current loop approximated as current dipole + toroidal term.
+    """
+    def __init__(self, I_peak_A=0.05, f_Hz=1.0):
+        self.I   = I_peak_A   # peak cardiac action current [A]
+        self.f   = f_Hz       # heart rate [Hz]  (60 bpm = 1 Hz)
+        self.omega = 2*np.pi*f_Hz
+
+    def field_at_chest(self, t):
+        """
+        B_chest(t) ~ 50000 fT * sin(omega*t) at peak R-wave.
+        Dipole approximation: B = mu0/(4pi) * m / r^3
+        m = I * A_loop  (cardiac current dipole)
+        """
+        return 50e-15 * np.sin(self.omega * t)  # [T]
+
+    def coherence_peak(self):
+        """
+        HeartMath coherence: 0.1 Hz resonance breathing.
+        LF HRV power peaks at 0.1 Hz -- cardiac autonomic coherence.
+        Coherent state: B(t) becomes more sinusoidal, less noisy.
+        """
+        return 0.1  # Hz -- Mayer wave / baroreflex frequency
+
+    def inter_person_coupling(self, r_m):
+        """
+        Cardiac field detectable by another person's heart at distance r.
+        B_coupling = B_chest * (r_ref/r)^3  (dipole falloff)
+        At r=1m: B ~ 50 fT  (above SQUID threshold, below skin sensors)
+        """
+        return 50e-15 * (0.3 / r_m)**3
+
+# AETHER biofield coherence at cardiac scale:
+# C_heart = |B(omega_resonance)| / |B_total|
+# Coherent breathing: C_heart -> max, HRV coherence index -> 1.0
+# Measured by HeartMath emWave: 0-1 coherence score`,
+  },
+  {
+    id: "biofield", name: "aether_biofield.qg", icon: "Cb",
+    content: `# AETHER-BIO -- 5-Scale Biofield Coherence Protocol
+# Nested hierarchy: magnetite -> radical pair -> cardiac -> neural -> morphic
+# Each scale has a C(x,t) coherence field with measurable signature
+
+from aether.kernel import CoherenceField
+import numpy as np
+
+SCALES = {
+    0: ("magnetite",  "0.01-0.1 m",  "1e-13 T",  "50Hz shielding + Fe3+ nutrition"),
+    1: ("radical_pair","1-10 um",    "50 uT",    "outdoor light -> cryptochrome activation"),
+    2: ("cardiac",    "0.1-1 m",     "50000 fT", "0.1Hz resonance breathing"),
+    3: ("neural_MEG", "0.01-0.3 m",  "100-500 fT","8-band cognitive coherence"),
+    4: ("morphic",    "non-local",   "topological","deliberate form instantiation"),
+}
+
+def biofield_coherence(B_measured, B_reference, scale_idx):
+    """
+    C_scale = |corr(B_measured, B_reference)|
+    For each scale, reference is the coherent-state template.
+    """
+    corr = np.corrcoef(B_measured, B_reference)[0, 1]
+    return abs(corr)
+
+def tensor_product_coherence(C_list):
+    """
+    C_total = C_0 otimes C_1 otimes ... otimes C_4
+    Full biofield coherence when all 5 scales achieve C >= threshold.
+    AETHER state: the condition indigenous traditions called 'alignment'.
+    """
+    return np.prod(C_list)
+
+class AETHERBiofield:
+    """
+    Full 5-scale coherence model.
+    Each C_i in [0,1]. C_total = product of all.
+    """
+    def __init__(self):
+        self.C = np.zeros(5)
+
+    def update(self, measurements):
+        """Update coherence at each scale from sensor data."""
+        for i, (B_meas, B_ref) in enumerate(measurements):
+            self.C[i] = biofield_coherence(B_meas, B_ref, i)
+
+    def total_coherence(self):
+        return tensor_product_coherence(self.C)
+
+    def weakest_link(self):
+        return int(np.argmin(self.C)), SCALES[int(np.argmin(self.C))]
+
+# Protocol when C_total < threshold:
+# 1. Identify weakest scale (argmin C_i)
+# 2. Apply scale-specific intervention (column 4 of SCALES table)
+# 3. Re-measure and iterate
+# Target: C_total >= 0.6 for AETHER coherence lock`,
+  },
+];
+
 export default function BiomagnetismPage() {
   const [mode, setMode] = useState<Mode>("fieldmap");
   return (
@@ -698,6 +915,11 @@ AETHER biofield coherence protocol:
             Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
           </div>
         </div>
+        <CodeFilesPanel
+          heading="Biomagnetism Simulation Files"
+          accentColor={ROSE}
+          files={BIO_CODE_FILES}
+        />
       </div>
     </div>
   );

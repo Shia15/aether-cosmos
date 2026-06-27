@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { CodeFilesPanel } from "@/components/code-files-panel";
 
 const BG    = "#020408";
 const TEAL  = "#0d7377";
@@ -385,6 +386,193 @@ function PlasmaKnotsHeaderCanvas() {
   return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
 }
 
+/* ── simulation code files ───────────────────────────────────────────── */
+const PLASMA_CODE_FILES = [
+  {
+    id: "helicity", name: "magnetic_helicity.qg", icon: "H",
+    content: `# AETHER-PLASMA -- Magnetic Helicity & Taylor Relaxation
+# H = integral(A.B dV) -- topological invariant of plasma
+# Woltjer 1958: H conserved in ideal MHD (zero resistivity)
+# Taylor 1974: H approximately conserved in resistive relaxation
+
+import numpy as np
+from aether.plasma import VectorPotential
+
+MU0 = 4 * np.pi * 1e-7  # permeability [H/m]
+
+def magnetic_helicity(A_field, B_field, dV):
+    """
+    H = int A.B dV   [Wb^2 = T^2 m^4]
+    Gauge-invariant when B.n = 0 on boundary.
+    For open field lines: use relative helicity H_rel.
+    """
+    return np.sum(np.einsum('...i,...i', A_field, B_field)) * dV
+
+def helicity_decay_rate(eta, J, B, dV):
+    """
+    dH/dt = -2 * eta * int(J.B dV)
+    Hot plasma: eta small -- H barely changes even as W_mag dissipates.
+    Physical basis for Taylor relaxation: energy decays, topology locked.
+    """
+    return -2 * eta * np.sum(np.einsum('...i,...i', J, B)) * dV
+
+def taylor_state_mu(H, W_mag):
+    """
+    Minimum-energy state with H conserved:
+    curl(B) = mu * B  (force-free Beltrami field)
+    mu = 2*H / W_mag -- determines which T(p,q) the field relaxes into.
+    Rising mu: unknot -> T(1,q) -> T(2,3) trefoil -> T(3,5) cinquefoil
+    """
+    return 2 * H / max(W_mag, 1e-30)
+
+# q = safety factor = r*B_tor / (R*B_pol)
+# Rational q = p/q_pol -> field line closes as T(p, q_pol) torus knot
+# Kruskal-Shafranov: q > 1 everywhere for kink stability
+# Taylor minimum-energy state converges to the T(p,q) matching H`,
+  },
+  {
+    id: "tknot", name: "torus_knot.qg", icon: "Tp",
+    content: `# AETHER-PLASMA -- Torus Knot T(p,q) Parametrisation
+# A field line that winds p times toroidally and q times poloidally.
+# In tokamak physics: q = safety factor = p / q_poloidal
+
+import numpy as np
+import aether.topology as topo
+
+def torus_knot_xyz(p, q, n=2000, R=2.0, r=1.0):
+    """
+    Parametric T(p,q) knot embedded on torus (R, r).
+    x = (R + r*cos(q*t)) * cos(p*t)
+    y = (R + r*cos(q*t)) * sin(p*t)
+    z = r * sin(q*t)
+    Closes after t in [0, 2*pi] if gcd(p,q) = 1.
+    """
+    t = np.linspace(0, 2*np.pi, n)
+    x = (R + r*np.cos(q*t)) * np.cos(p*t)
+    y = (R + r*np.cos(q*t)) * np.sin(p*t)
+    z = r * np.sin(q*t)
+    return x, y, z
+
+def white_calugareanu(curve, frame):
+    """
+    Lk = Wr + Tw   (White-Calugareanu theorem)
+    Lk = linking number (integer, topological invariant)
+    Wr = writhe (global geometry of centreline)
+    Tw = twist (local rotation of ribbon frame)
+    For T(p,q): Lk = p*q  Tw = q  Wr = q*(p-1)
+    """
+    Lk = topo.linking_number(curve)
+    Tw = topo.twist(curve, frame)
+    Wr = Lk - Tw
+    return Lk, Wr, Tw
+
+# Notable plasma knots:
+# T(2,3) = trefoil   Lk=6  -- simplest non-trivial knot (solar corona)
+# T(3,5) = cinquefoil Lk=15 -- found in spheromak Taylor states
+# T(1,q) = unknot    -- rational flux surface q=1/q_pol
+# Hopf fibration = disjoint T(1,1) fibres filling S^3
+# H_Hopfion = (magnetic_flux)^2 / (4*pi)  -- non-zero despite unknotted fibres`,
+  },
+  {
+    id: "recon", name: "reconnection.qg", icon: "X",
+    content: `# AETHER-PLASMA -- Magnetic Reconnection
+# Topology-changing event: stored B energy -> kinetic energy + heat
+# X-point: opposite-polarity field lines annihilate via resistivity
+
+import numpy as np
+from aether.plasma import Alfven_speed, Lundquist
+
+# Sweet-Parker (slow reconnection) -- 1958:
+# v_rec = v_A / sqrt(S)  where S = mu0 * v_A * L / eta (Lundquist number)
+# Solar corona: S ~ 10^12 -> v_rec = 10^-6 * v_A  (too slow for flares)
+
+def sweet_parker_rate(v_A, S):
+    return v_A / S**0.5
+
+# Petschek model (fast reconnection) -- 1964:
+# v_rec ~ v_A / ln(S)  (logarithmic -- much faster)
+# Requires: localised diffusion region + standing slow-mode shocks
+# Actual rate: 0.01 - 0.1 * v_A  (matches solar flare observations)
+
+def petschek_rate(v_A, S):
+    return v_A * np.pi / (8 * np.log(S + 1))
+
+# Collisionless reconnection (Hall MHD / kinetic) -- 1990s+:
+# Width < d_i (ion inertia length = c/omega_pi): electrons decouple from ions
+# Rate: tau_rec ~ d_i / v_A  (independent of resistivity!)
+# Mechanism: whistler waves propagate in electron-only current sheet
+
+class ReconnectionEvent:
+    def __init__(self, B0, n_m3, T_K, L_m):
+        self.vA  = Alfven_speed(B0, n_m3)
+        self.S   = Lundquist(B0, n_m3, T_K, L_m)
+
+    def energy_release_J(self, volume_m3):
+        """Delta_W = B0^2 / (2*mu0) * volume"""
+        return (self.B0**2 / (8e-7*np.pi)) * volume_m3
+
+    def timescale_s(self, L_m):
+        return L_m / petschek_rate(self.vA, self.S)
+
+# AETHER mapping:
+# Cognitive decoherence = magnetic reconnection
+# Coherence field C(x,t) topology changes at C-collapse events
+# Reconnection releases stored cognitive coherence as heat (entropy)`,
+  },
+  {
+    id: "aether", name: "aether_topology.qg", icon: "Ac",
+    content: `# AETHER-PLASMA -- Topological Coherence Mapping
+# C(x,t) coherence field as knot-like topological object
+# Scale-invariant table: plasma <-> cognitive <-> AETHER
+
+from aether.kernel import CoherenceField, CrystallizationEngine
+import numpy as np
+
+AETHER_KNOT_TABLE = {
+    "plasma":    ("T(p,q) field line",  "magnetic helicity H",       "solar flare"),
+    "DNA":       ("double helix",       "linking number Lk",         "topoisomerase cut"),
+    "protein":   ("knotted backbone",   "knot type K_i",             "denaturation"),
+    "fluid":     ("vortex tube knot",   "Kelvin circulation Gamma",  "vortex reconnection"),
+    "cognitive": ("8-band interference","coherence |<Psi|Phi>|^2",   "decoherence event"),
+    "aether":    ("C(x,t) field",       "integral C dV",             "coherence collapse"),
+}
+
+class CoherenceKnot:
+    """
+    Models C(x,t) as a topological coherence object.
+    C in [0,1]: 0 = completely disordered, 1 = fully coherent.
+    Knot type determines energy and stability.
+    """
+    def __init__(self, p, q, C0=0.8):
+        self.p, self.q = p, q          # knot winding numbers
+        self.C  = C0                   # initial coherence level
+        self.Lk = p * q                # linking number = topological memory
+
+    def coherence_lock(self, epsilon=0.1):
+        """
+        Locked when C >= epsilon_lock.
+        Analogous to q > q_critical in plasma.
+        """
+        return self.C >= epsilon
+
+    def reconnection_threshold(self, perturbation):
+        """
+        C-field "reconnects" (loses topological protection) when
+        perturbation exceeds sqrt(Lk) * C_min.
+        Higher linking number = more robust coherence.
+        """
+        return perturbation > self.C * (self.Lk**0.5) * 0.1
+
+    def relax(self, dt, dissipation):
+        """Taylor-like coherence relaxation: C decays toward C_min."""
+        self.C = max(0.0, self.C - dissipation * dt)
+
+# The Webbed Leg protocol maintains q_min > q_critical
+# = maintains C(x,t) above coherence-lock threshold
+# = prevents cognitive reconnection events (attention crashes)`,
+  },
+];
+
 export default function PlasmaKnotsPage() {
   const [mode, setMode] = useState<Mode>("torus");
   return (
@@ -643,6 +831,11 @@ Taylor relaxation principle (1974):
             Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
           </div>
         </div>
+        <CodeFilesPanel
+          heading="Plasma Knot Simulation Files"
+          accentColor={AQUA}
+          files={PLASMA_CODE_FILES}
+        />
       </div>
     </div>
   );
