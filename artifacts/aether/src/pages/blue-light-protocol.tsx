@@ -246,7 +246,7 @@ function CoherenceCanvas() {
         const p = h - 3;
         re = 0.82 + 0.04 * p;
         im = 0.015 * (1 - p);
-        col = '#88aaccaa';
+        col = '#88aacc';
       } else if (h < 8) { // Midday 10--14: Kuramoto-locked triad
         const p = (h - 4) / 4;
         re = 0.87 + 0.085 * Math.sin(2.4 * 2 * Math.PI * p);
