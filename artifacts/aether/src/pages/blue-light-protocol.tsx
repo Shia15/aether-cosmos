@@ -21,6 +21,36 @@ interface PhaseData {
 
 interface ArcPoint { x: number; y: number; r: number; g: number; b: number; }
 interface TrajPoint { re: number; im: number; col: string; }
+interface WaveRow   { nm: number; label: string; rgb: [number,number,number]; }
+interface MatDef    { name: string; col: string; T: number[]; R: number[]; }
+
+const WAVE_ROWS: WaveRow[] = [
+  { nm:415, label:'415nm violet', rgb:[145,50,255] },
+  { nm:470, label:'470nm blue',   rgb:[50,120,255] },
+  { nm:550, label:'550nm green',  rgb:[50,220,60]  },
+  { nm:630, label:'630nm red',    rgb:[255,60,40]  },
+  { nm:850, label:'850nm NIR',    rgb:[120,22,8]   },
+];
+
+const MAT_DEFS: MatDef[] = [
+  { name:'Clear Float Glass',    col:'#88ccee', T:[0.91,0.91,0.91,0.91,0.84], R:[0.04,0.04,0.04,0.04,0.05] },
+  { name:'Low-E Coated Glass',   col:'#44aacc', T:[0.18,0.40,0.72,0.73,0.08], R:[0.35,0.30,0.15,0.14,0.70] },
+  { name:'UV-Block Window Film', col:'#9966cc', T:[0.02,0.12,0.88,0.89,0.76], R:[0.05,0.08,0.06,0.05,0.10] },
+  { name:'Human Skin (1mm)',     col:'#cc8844', T:[0.01,0.03,0.10,0.28,0.52], R:[0.15,0.08,0.05,0.04,0.05] },
+  { name:'Water (2cm depth)',    col:'#33aacc', T:[0.84,0.89,0.88,0.82,0.58], R:[0.02,0.02,0.02,0.02,0.02] },
+  { name:'Leaf Chlorophyll',     col:'#55bb33', T:[0.04,0.06,0.10,0.06,0.55], R:[0.06,0.05,0.55,0.04,0.40] },
+];
+
+// Spectral transmission: wavelengths [280,300,320,340,360,380,400,420,460,500,550,600,650,700,750,800,900,1000,1200,1400]nm
+const SPEC_WLS = [280,300,320,340,360,380,400,420,460,500,550,600,650,700,750,800,900,1000,1200,1400];
+const GLASS_NAMES = ['Clear Float','Low-E Coated','UV-Block Film','Borosilicate'];
+const GLASS_COLS  = ['#aaddff','#44aaff','#cc88ff','#88ffcc'];
+const GLASS_PTS: number[][] = [
+  [0,0,0.05,0.40,0.78,0.88,0.90,0.91,0.91,0.91,0.91,0.91,0.91,0.91,0.88,0.86,0.82,0.78,0.65,0.50],
+  [0,0,0,0,0,0.05,0.10,0.15,0.35,0.55,0.72,0.73,0.72,0.70,0.25,0.08,0.04,0.02,0.02,0.01],
+  [0,0,0,0.02,0.05,0.10,0.10,0.12,0.45,0.82,0.88,0.89,0.89,0.88,0.85,0.82,0.76,0.72,0.65,0.55],
+  [0,0,0.20,0.70,0.88,0.91,0.92,0.92,0.92,0.92,0.92,0.92,0.92,0.92,0.91,0.90,0.88,0.85,0.78,0.68],
+];
 
 /* ── CCT to approximate display RGB ─ */
 function cctToRGB(T: number): [number,number,number] {
@@ -376,6 +406,224 @@ function CoherenceCanvas() {
 }
 
 /* ═══════════════════════════════════════════════════
+   III.  PHOTON-MATERIAL INTERACTION CANVAS
+   Animated wave packets -- 5 wavelengths x 6 materials
+   ═══════════════════════════════════════════════════ */
+function PhotonMaterialCanvas() {
+  const ref    = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv  = ref.current; if (!cv)  return;
+    const ctx = cv.getContext('2d'); if (!ctx) return;
+    const W = 700, H = 250;
+    cv.width = W; cv.height = H;
+    const SX = 338, SW = 24;
+    const RM = 26, RH = (H - RM * 2) / WAVE_ROWS.length;
+    const FREQ = 0.050, AMP = 5.5;
+    let t = 0;
+
+    function ry(i: number) { return RM + (i + 0.5) * RH; }
+
+    function wv(x1: number, x2: number, y: number,
+                amp: number, rgb: [number,number,number],
+                al: number, ph: number) {
+      if (amp < 0.5 || al < 0.04) return;
+      ctx.beginPath();
+      for (let x = x1; x <= x2; x += 1.5) {
+        const yp = y + amp * Math.sin(x * FREQ + ph);
+        if (x === x1) ctx.moveTo(x, yp); else ctx.lineTo(x, yp);
+      }
+      ctx.strokeStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${al})`;
+      ctx.lineWidth = 1.6; ctx.stroke();
+    }
+
+    function draw() {
+      t++;
+      ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+
+      const mi  = Math.floor((t / 420) % MAT_DEFS.length);
+      const mat = MAT_DEFS[mi];
+
+      // Slab
+      const sg = ctx.createLinearGradient(SX - SW/2, 0, SX + SW/2, 0);
+      sg.addColorStop(0,   mat.col + '18');
+      sg.addColorStop(0.5, mat.col + '60');
+      sg.addColorStop(1,   mat.col + '18');
+      ctx.fillStyle = sg;
+      ctx.fillRect(SX - SW/2, RM - 10, SW, H - RM * 2 + 20);
+      ctx.strokeStyle = mat.col + '55'; ctx.lineWidth = 0.7;
+      ctx.strokeRect(SX - SW/2, RM - 10, SW, H - RM * 2 + 20);
+
+      // Rows
+      for (let i = 0; i < WAVE_ROWS.length; i++) {
+        const row = WAVE_ROWS[i];
+        const y   = ry(i);
+        const T   = mat.T[i];
+        const R   = mat.R[i];
+        const A   = Math.max(0, 1 - T - R);
+        const ph  = t * 0.07 + i * 0.9;
+
+        // Wavelength label (left)
+        ctx.font = '6.5px Space Mono'; ctx.textAlign = 'right';
+        ctx.fillStyle = `rgba(${row.rgb[0]},${row.rgb[1]},${row.rgb[2]},0.65)`;
+        ctx.fillText(row.label, 18, y + 3);
+
+        // Incoming wave
+        wv(22, SX - SW/2, y, AMP, row.rgb, 0.80, ph);
+
+        // Transmitted wave (right) -- amplitude scaled by T
+        wv(SX + SW/2, W - 24, y, AMP * T, row.rgb, 0.80, ph);
+
+        // T% label (right edge)
+        ctx.font = '6px Space Mono'; ctx.textAlign = 'left';
+        ctx.fillStyle = `rgba(${row.rgb[0]},${row.rgb[1]},${row.rgb[2]},0.5)`;
+        ctx.fillText('T=' + Math.round(T * 100) + '%', W - 22, y + 3);
+
+        // Reflected wave (short, above incoming, reversed phase)
+        if (R > 0.04) {
+          wv(24, SX - SW/2 - 18, y - 11, AMP * R * 0.88, row.rgb, R * 0.70, -ph * 1.06);
+        }
+
+        // Absorbed glow at slab center
+        if (A > 0.04) {
+          const gr = ctx.createRadialGradient(SX, y, 0, SX, y, 18 * A + 3);
+          gr.addColorStop(0, `rgba(${row.rgb[0]},${row.rgb[1]},${row.rgb[2]},${Math.min(0.75, A)})`);
+          gr.addColorStop(1, 'transparent');
+          ctx.beginPath(); ctx.arc(SX, y, 18 * A + 3, 0, Math.PI * 2);
+          ctx.fillStyle = gr; ctx.fill();
+        }
+      }
+
+      // Column headers
+      ctx.font = '6px Space Mono'; ctx.fillStyle = DIM; ctx.textAlign = 'center';
+      ctx.fillText('INCIDENT', SX / 2, RM - 13);
+      ctx.fillText('TRANSMITTED', SX + (W - SX) / 2, RM - 13);
+      ctx.fillText('REFLECTED', SX / 2, RM - 5);
+
+      // Material name + progress bar
+      ctx.font = '8px Orbitron, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = mat.col;
+      ctx.fillText(mat.name, SX, H - 7);
+      const prog = (t % 420) / 420;
+      ctx.fillStyle = mat.col + '44';
+      ctx.fillRect(SX - 60, H - 3, 120 * prog, 2);
+
+      rafRef.current = requestAnimationFrame(draw);
+    }
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <canvas ref={ref} style={{width:'100%', height:'auto', display:'block', borderRadius:4}} />
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   IV.  SPECTRAL GLASS ENGINEERING CANVAS
+   Transmission curves -- 280 to 1400 nm
+   ═══════════════════════════════════════════════════ */
+function SpectralGlassCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const cv  = ref.current; if (!cv)  return;
+    const ctx = cv.getContext('2d'); if (!ctx) return;
+    const W = 700, H = 200;
+    cv.width = W; cv.height = H;
+    const ML = 42, MR = 16, MT = 24, MB = 28;
+    const PW = W - ML - MR, PH = H - MT - MB;
+    const WL_MIN = 280, WL_MAX = 1400;
+
+    function tx(wl: number) { return ML + (wl - WL_MIN) / (WL_MAX - WL_MIN) * PW; }
+    function ty(v: number)  { return MT + (1 - v) * PH; }
+
+    // Spectral visible background (380--700nm)
+    const vx1 = tx(380), vx2 = tx(700);
+    const vbg = ctx.createLinearGradient(vx1, 0, vx2, 0);
+    vbg.addColorStop(0,    'rgba(130,0,180,0.14)');
+    vbg.addColorStop(0.10, 'rgba(60,0,255,0.14)');
+    vbg.addColorStop(0.28, 'rgba(0,80,255,0.13)');
+    vbg.addColorStop(0.50, 'rgba(0,200,0,0.12)');
+    vbg.addColorStop(0.72, 'rgba(255,210,0,0.13)');
+    vbg.addColorStop(0.90, 'rgba(255,70,0,0.14)');
+    vbg.addColorStop(1,    'rgba(160,0,0,0.10)');
+    ctx.fillStyle = vbg;
+    ctx.fillRect(vx1, MT, vx2 - vx1, PH);
+
+    // Region labels
+    ctx.font = '6.5px Space Mono'; ctx.fillStyle = DIM; ctx.textAlign = 'center';
+    ctx.fillText('UV', (ML + vx1) / 2, MT + PH / 2 + 3);
+    ctx.fillText('VISIBLE SPECTRUM', (vx1 + vx2) / 2, MT + 10);
+    ctx.fillText('NEAR-INFRARED (NIR)', (vx2 + ML + PW) / 2, MT + PH / 2 + 3);
+
+    // Region separators
+    ctx.strokeStyle = '#2a4060'; ctx.lineWidth = 0.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(vx1, MT); ctx.lineTo(vx1, MT + PH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(vx2, MT); ctx.lineTo(vx2, MT + PH); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Grid -- wavelength verticals
+    const wlMarks = [300, 400, 500, 600, 700, 800, 1000, 1200];
+    ctx.strokeStyle = '#1a2840'; ctx.lineWidth = 0.4;
+    for (const wl of wlMarks) {
+      const x = tx(wl);
+      ctx.beginPath(); ctx.moveTo(x, MT); ctx.lineTo(x, MT + PH); ctx.stroke();
+      ctx.font = '5.5px Space Mono'; ctx.fillStyle = DIM; ctx.textAlign = 'center';
+      ctx.fillText(wl + 'nm', x, MT + PH + 11);
+    }
+
+    // Grid -- transmission horizontals
+    for (const v of [0, 0.25, 0.5, 0.75, 1.0]) {
+      const y = ty(v);
+      ctx.strokeStyle = '#1a2840'; ctx.lineWidth = 0.4;
+      ctx.beginPath(); ctx.moveTo(ML, y); ctx.lineTo(ML + PW, y); ctx.stroke();
+      ctx.font = '5.5px Space Mono'; ctx.fillStyle = DIM; ctx.textAlign = 'right';
+      ctx.fillText(Math.round(v * 100) + '%', ML - 3, y + 3);
+    }
+
+    // Axis labels
+    ctx.font = '7px Space Mono'; ctx.fillStyle = DIM; ctx.textAlign = 'center';
+    ctx.fillText('Wavelength (nm)', ML + PW / 2, H - 2);
+    ctx.save();
+    ctx.translate(11, MT + PH / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Transmission', 0, 0);
+    ctx.restore();
+
+    // Glass curves
+    for (let gi = 0; gi < GLASS_PTS.length; gi++) {
+      const pts = GLASS_PTS[gi];
+      ctx.beginPath();
+      for (let pi = 0; pi < SPEC_WLS.length; pi++) {
+        const x = tx(SPEC_WLS[pi]), y = ty(pts[pi]);
+        if (pi === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = GLASS_COLS[gi]; ctx.lineWidth = 1.7; ctx.stroke();
+    }
+
+    // Legend (top of chart)
+    for (let gi = 0; gi < GLASS_NAMES.length; gi++) {
+      const lx = ML + 10 + gi * 148;
+      ctx.strokeStyle = GLASS_COLS[gi]; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(lx, MT + 7); ctx.lineTo(lx + 16, MT + 7); ctx.stroke();
+      ctx.font = '6px Space Mono'; ctx.fillStyle = GLASS_COLS[gi]; ctx.textAlign = 'left';
+      ctx.fillText(GLASS_NAMES[gi], lx + 20, MT + 10);
+    }
+
+    // Border
+    ctx.strokeStyle = '#1a2840'; ctx.lineWidth = 0.7;
+    ctx.strokeRect(ML, MT, PW, PH);
+
+  }, []);
+
+  return (
+    <canvas ref={ref} style={{width:'100%', height:'auto', display:'block', borderRadius:4}} />
+  );
+}
+
+/* ═══════════════════════════════════════════════════
    MAIN PAGE
    ═══════════════════════════════════════════════════ */
 export default function BlueLightProtocolPage() {
@@ -479,6 +727,258 @@ export default function BlueLightProtocolPage() {
               <div key={t} style={{...card(col), borderColor:col+'22', padding:'8px 10px'}}>
                 <div style={{fontFamily:OR, fontSize:7, color:col, letterSpacing:1, marginBottom:4}}>{t}</div>
                 <div style={{fontSize:9.5, color:'rgba(180,200,220,0.58)', lineHeight:1.6}}>{b}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── III. Photon-Material Interaction ── */}
+        <div style={{...card(QUANT), marginBottom:16, borderColor:QUANT+'22'}}>
+          <div style={secLabel}>
+            Photon &middot; Material Interaction &middot; T / R / A per Wavelength
+          </div>
+          <p style={{fontSize:11, color:'rgba(180,240,220,0.7)', lineHeight:1.7,
+            marginBottom:12, maxWidth:820}}>
+            Every photon striking a material is either Transmitted (T), Reflected (R), or Absorbed (A).
+            T + R + A = 1. The absorbed fraction converts to heat or drives a photochemical reaction
+            (e.g. retinal isomerisation in ipRGCs, vitamin-D synthesis in skin, chlorophyll excitation in leaves).
+            The canvas cycles through six materials. Amplitude of each wave is proportional to T.
+            Glow at slab centre is proportional to A. Short reversed waves above the incoming beam represent R.
+          </p>
+          <PhotonMaterialCanvas />
+          <div style={{marginTop:10, display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:8}}>
+            {MAT_DEFS.map(m => (
+              <div key={m.name} style={{...card(m.col), borderColor:m.col+'25', padding:'7px 9px'}}>
+                <div style={{fontFamily:OR, fontSize:6.5, color:m.col, letterSpacing:1,
+                  marginBottom:5}}>{m.name}</div>
+                {WAVE_ROWS.map((row, i) => {
+                  const T = m.T[i], R = m.R[i], A = Math.max(0, 1 - T - R);
+                  return (
+                    <div key={row.nm} style={{display:'flex', justifyContent:'space-between',
+                      marginBottom:2, fontFamily:MN, fontSize:6}}>
+                      <span style={{color:`rgba(${row.rgb[0]},${row.rgb[1]},${row.rgb[2]},0.7)`}}>
+                        {row.nm}nm
+                      </span>
+                      <span style={{color:'rgba(160,220,200,0.55)'}}>
+                        T{Math.round(T*100)} R{Math.round(R*100)} A{Math.round(A*100)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── IV. Spectral Window Engineering ── */}
+        <div style={{...card(AZURE), marginBottom:16, borderColor:AZURE+'22'}}>
+          <div style={secLabel}>
+            Window Spectral Engineering &middot; UV / Visible / NIR Transmission Curves
+          </div>
+          <p style={{fontSize:11, color:'rgba(160,210,255,0.7)', lineHeight:1.7,
+            marginBottom:12, maxWidth:820}}>
+            Glass type is the most overlooked variable in circadian design.
+            Clear float transmits the full spectrum including UV and NIR.
+            Low-E coatings block NIR (energy saving) but also catastrophically cut UV and blue -- blocking
+            the melanopsin-activating 470nm band by up to 65%. UV-block film preserves visible
+            transmission while eliminating UVA/UVB. Borosilicate (lab and greenhouse glass) has
+            the widest UV transmission window of any silicate glass.
+          </p>
+          <SpectralGlassCanvas />
+          <div style={{marginTop:12, display:'grid',
+            gridTemplateColumns:'repeat(4,1fr)', gap:10}}>
+            {([
+              {name:'Clear Float Glass', col:'#aaddff',
+               t:'Standard soda-lime silicate. Cuts below 300nm (UV-C). Transmits full visible + NIR. Melanopsin-activating 460--480nm: ~91% through. Best choice for circadian morning windows facing east.'},
+              {name:'Low-E Coated Glass', col:'#44aaff',
+               t:'Metal oxide (Ag/TiO2) coating optimised for thermal insulation. Reflects NIR (750--2500nm) strongly -- but the same coating attenuates blue-violet (400--470nm) by 60--80%. Blocks melanopsin stimulus. Circadian penalty: 1--2h DLMO delay when used on bedroom windows facing sunrise.'},
+              {name:'UV-Block Window Film', col:'#cc88ff',
+               t:'Polyester + UV-absorbing compound blocks 99% of UV-A (315--400nm) and UV-B (280--315nm). Visible transmission >88%. Does not attenuate melanopsin band. Use on south/west skylights to protect art and furniture while preserving circadian signal.'},
+              {name:'Borosilicate Glass', col:'#88ffcc',
+               t:'Boron oxide network extends UV transmission to ~280nm (vs ~310nm for float). Used in laboratory, greenhouse, and phototherapy applications where full UV-B dose is required. High thermal stability. Vitamin-D synthesis in skin requires wavelengths 290--315nm.'},
+            ] as {name:string;col:string;t:string}[]).map(g => (
+              <div key={g.name} style={{...card(g.col), borderColor:g.col+'22',
+                borderTop:`2px solid ${g.col}55`, padding:'8px 10px'}}>
+                <div style={{fontFamily:OR, fontSize:7, color:g.col,
+                  letterSpacing:1, marginBottom:5}}>{g.name}</div>
+                <div style={{fontSize:9.5, color:'rgba(160,200,240,0.62)',
+                  lineHeight:1.6}}>{g.t}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── V. Photogenic Coherence Environment ── */}
+        <div style={{...card(GOLD), marginBottom:16, borderColor:GOLD+'22'}}>
+          <div style={secLabel}>
+            Photogenic Coherence Environment &middot; CRI &middot; S/P Ratio &middot; Material Reflectance
+          </div>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:14}}>
+            <div>
+              <div style={{fontFamily:OR, fontSize:11, color:GOLD, letterSpacing:1.5,
+                marginBottom:10, textShadow:'0 0 14px '+GOLD+'44'}}>
+                Light Quality Metrics
+              </div>
+              {([
+                {label:'CRI (Color Rendering Index)', val:'>95',
+                 desc:'A CRI of 95+ means skin tones, food, plants, and faces look as they do in full sunlight. Incandescent: CRI 100. Most fluorescent/LED: CRI 80. For spaces used for creative work, skin assessment, or aesthetic decisions, CRI <90 is a coherence penalty -- the brain\'s color-object model mismatches reality.'},
+                {label:'CCT (Correlated Colour Temp)', val:'phase-matched',
+                 desc:'Morning: 5500--6500K (neutral-blue). Midday: 5000--5500K. Afternoon: 3500--4500K. Evening: 2200--2700K. Mismatch between internal biological time and ambient CCT drives imaginary loading in C(x,t). A 4000K office at 20:00 is equivalent to a 1.5-hr westward time shift each evening.'},
+                {label:'S/P Ratio (scotopic/photopic)', val:'1.6 day / 0.4 night',
+                 desc:'The S/P ratio captures how a light source stimulates rod vision (scotopic, melatonin-sensitive) relative to cone vision (photopic, task-relevant). High S/P (>1.4) during day maximises alertness and circadian entrainment. Low S/P (<0.5) in evening minimises melatonin suppression.'},
+                {label:'Melanopic EDI (m-EDI)', val:'>250 lux day / <10 lux eve',
+                 desc:'Melanopic equivalent daylight illuminance quantifies ipRGC stimulation directly. Morning target: >250 melanopic lux at eye level. Evening target: <10 melanopic lux. Standard office lighting: 100--200 melanopic lux regardless of time -- chronically insufficient by day and disruptive by evening.'},
+              ] as {label:string;val:string;desc:string}[]).map(item => (
+                <div key={item.label} style={{marginBottom:10, paddingBottom:10,
+                  borderBottom:'1px solid rgba(200,160,48,0.10)'}}>
+                  <div style={{display:'flex', justifyContent:'space-between',
+                    alignItems:'baseline', marginBottom:3}}>
+                    <span style={{fontFamily:OR, fontSize:7.5, color:GOLD,
+                      letterSpacing:0.8}}>{item.label}</span>
+                    <span style={{fontFamily:MN, fontSize:7, color:QUANT+'aa'}}>{item.val}</span>
+                  </div>
+                  <div style={{fontSize:10, color:'rgba(220,200,140,0.60)',
+                    lineHeight:1.65}}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+            <div>
+              <div style={{fontFamily:OR, fontSize:11, color:GOLD, letterSpacing:1.5,
+                marginBottom:10, textShadow:'0 0 14px '+GOLD+'44'}}>
+                Surface Reflectance Guide
+              </div>
+              <div style={{fontSize:9, fontFamily:MN, color:DIM,
+                marginBottom:8, letterSpacing:'0.1em'}}>
+                Reflectance at 470nm (melanopsin) vs 630nm (photopic), approximate
+              </div>
+              {([
+                {surf:'Matte White Wall',    r470:'88%', r630:'89%', note:'Ideal morning diffuser -- bounces full-spectrum evenly.'},
+                {surf:'Mirror / Polished Al',r470:'92%', r630:'93%', note:'Specular -- does not diffuse. Increases perceived brightness without increasing melanopic dose.'},
+                {surf:'Warm Pine Wood',      r470:'12%', r630:'42%', note:'Selective blue absorber. Evening rooms with wood surfaces naturally filter melanopsin-active band.'},
+                {surf:'Dark Slate / Concrete',r470:'8%', r630:'10%', note:'High absorption across spectrum. Reduces lux without altering CCT. Good blackout surrounds.'},
+                {surf:'Green Foliage',        r470:'6%',  r630:'8%',  note:'Absorbs blue + red (photosynthesis). Reflects green broadly. Biophilic window view is measurably calming.'},
+                {surf:'Water Surface',        r470:'2%',  r630:'2%',  note:'Low reflectance, high transmission. Pools and glass floors transmit light below -- useful in greenhouses.'},
+                {surf:'Skin (Type II, pale)', r470:'8%',  r630:'38%', note:'Strong blue absorption by melanin + Hb. Skin glows red-warm under any warm CCT -- photogenic in amber evening light.'},
+                {surf:'Skin (Type V, deep)',  r470:'3%',  r630:'12%', note:'High melanin density extends absorption into red. Best rendering under very high CRI (>97) sources.'},
+              ] as {surf:string;r470:string;r630:string;note:string}[]).map((row,i) => (
+                <div key={row.surf} style={{display:'grid',
+                  gridTemplateColumns:'1.6fr 0.6fr 0.6fr 2fr',
+                  gap:'0 8px', alignItems:'center',
+                  padding:'5px 0',
+                  borderBottom:'1px solid rgba(200,160,48,0.08)',
+                  background: i%2===0 ? 'rgba(200,160,48,0.03)':'transparent'}}>
+                  <span style={{fontFamily:MN, fontSize:8, color:'rgba(220,200,150,0.75)'}}>{row.surf}</span>
+                  <span style={{fontFamily:MN, fontSize:8, color:AZURE+'bb', textAlign:'center'}}>{row.r470}</span>
+                  <span style={{fontFamily:MN, fontSize:8, color:AMBER+'bb', textAlign:'center'}}>{row.r630}</span>
+                  <span style={{fontSize:8.5, color:'rgba(200,180,100,0.5)', lineHeight:1.5}}>{row.note}</span>
+                </div>
+              ))}
+              <div style={{display:'grid', gridTemplateColumns:'1.6fr 0.6fr 0.6fr 2fr',
+                gap:'0 8px', marginTop:4, paddingTop:4,
+                borderTop:'1px solid rgba(200,160,48,0.15)'}}>
+                <span style={{fontFamily:MN, fontSize:6.5, color:DIM}}></span>
+                <span style={{fontFamily:MN, fontSize:6.5, color:AZURE+'88', textAlign:'center'}}>470nm</span>
+                <span style={{fontFamily:MN, fontSize:6.5, color:AMBER+'88', textAlign:'center'}}>630nm</span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Phase-by-phase room design */}
+          <div style={secLabel}>Room Design by Circadian Phase</div>
+          <div style={{display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:8}}>
+            {([
+              {col:AZURE, ph:'MORNING', time:'06--09',
+               lights:'Sky-facing east window. Blue-enriched LED panel 6500K 1000 lux at eye. No lamp shades.',
+               surfaces:'White ceiling + north wall reflect morning blue. Mirror south wall amplifies solar bounce.',
+               avoid:'Warm bulbs (<3000K). Blackout blinds still closed. Any screen on Night Shift mode.'},
+              {col:DAYLT, ph:'MIDDAY', time:'10--14',
+               lights:'Full-spectrum LED 5000--5500K. Open skylights or clerestory windows. CRI >95.',
+               surfaces:'Light grey work surfaces (neutral reflectance). White or light walls. Plant wall for biophilic diffusion.',
+               avoid:'Deep recessed lighting (cut-off angle reduces melanopic component). Tinted windows.'},
+              {col:WARM, ph:'AFTERNOON', time:'15--18',
+               lights:'Warm white 3500--4000K. Side lamps at desk height. Reduce overhead. Task light only.',
+               surfaces:'Warm wood tones begin to dominate. Reduce ceiling light level via dimmer to 300 lux.',
+               avoid:'Adding new blue-white sources. Bright screen without warm shift filter.'},
+              {col:AMBER, ph:'EVENING', time:'19--21',
+               lights:'Amber/red only. Salt lamp 2200K. Candles 1800K. Zero overhead LED.',
+               surfaces:'Dark wall or curtains absorb stray blue. Cover any LED indicator strips.',
+               avoid:'Phone/screen without amber filter at maximum. Bathroom vanity lights (cool-white).'},
+              {col:EMBER, ph:'NIGHT', time:'21--06',
+               lights:'Zero. Blackout. If needed: dim red nightlight <10 lux only.',
+               surfaces:'Blackout curtains both sides. Remove or cover all electronic indicator LEDs.',
+               avoid:'Phone in room. OLED standby glow. Street light bleed. Any blue source >1 lux.'},
+            ] as {col:string;ph:string;time:string;lights:string;surfaces:string;avoid:string}[]).map(item => (
+              <div key={item.ph} style={{...card(item.col),
+                borderTop:`2px solid ${item.col}66`, padding:'8px 10px'}}>
+                <div style={{fontFamily:OR, fontSize:7.5, color:item.col,
+                  letterSpacing:1.5, marginBottom:2}}>{item.ph}</div>
+                <div style={{fontFamily:MN, fontSize:6.5, color:item.col+'66',
+                  marginBottom:7}}>{item.time}</div>
+                <div style={{fontFamily:OR, fontSize:6, color:DIM,
+                  marginBottom:3, letterSpacing:0.8}}>LIGHT SOURCES</div>
+                <div style={{fontSize:9, color:'rgba(180,210,220,0.62)',
+                  lineHeight:1.6, marginBottom:6}}>{item.lights}</div>
+                <div style={{fontFamily:OR, fontSize:6, color:DIM,
+                  marginBottom:3, letterSpacing:0.8}}>SURFACES</div>
+                <div style={{fontSize:9, color:'rgba(180,210,220,0.55)',
+                  lineHeight:1.6, marginBottom:6}}>{item.surfaces}</div>
+                <div style={{fontFamily:OR, fontSize:6, color:EMBER+'88',
+                  marginBottom:3, letterSpacing:0.8}}>AVOID</div>
+                <div style={{fontSize:9, color:'rgba(220,160,140,0.50)',
+                  lineHeight:1.6}}>{item.avoid}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── VI. Photon-Tissue Optical Window ── */}
+        <div style={{...card(WARM), marginBottom:16, borderColor:WARM+'22'}}>
+          <div style={secLabel}>
+            Photon -- Tissue Optical Window &middot; Penetration Depth by Wavelength
+          </div>
+          <p style={{fontSize:11, color:'rgba(255,210,120,0.7)', lineHeight:1.7,
+            marginBottom:12, maxWidth:820}}>
+            The Tissue Optical Window (650--1350nm) is the wavelength range where absorption by
+            water and haemoglobin is minimal, allowing photons to penetrate deep into tissue.
+            Below 650nm, scattering and haemoglobin absorption dominate. Above 1350nm, water
+            absorption terminates transmission. Photobiomodulation (PBM), circadian photoreception,
+            and vitamin-D synthesis each require specific wavelength bands reaching specific tissue depths.
+          </p>
+          <div style={{display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:10}}>
+            {([
+              {wl:'280--315nm', name:'UV-B', col:AZURE,
+               depth:'0.1--0.3mm', abs:'Melanin, DNA, urocanic acid',
+               bio:'Vitamin-D3 synthesis (7-DHC --> previtamin-D3) in keratinocytes. DNA damage (cyclobutane pyrimidine dimers). Melanin upregulation. Reaches only epidermis. Requires 15--30 min unfiltered outdoor exposure.'},
+              {wl:'380--480nm', name:'Blue-Violet', col:'#6699ff',
+               depth:'0.5--1mm', abs:'Melanopsin (OPN4), flavins, porphyrins',
+               bio:'Primary melanopsin activation in ipRGCs (peak 480nm). Circadian clock entrainment. Retinal photoreception for colour and high-acuity vision. Cytochrome c reduction via flavoproteins in skin cells. Key target of the Blue-Light Protocol.'},
+              {wl:'550--650nm', name:'Green-Red', col:WARM,
+               depth:'1--3mm', abs:'Oxyhaemoglobin (oxy-Hb), myoglobin',
+               bio:'Stimulates mitochondrial cytochrome c oxidase (CCO) in superficial dermis. Activates clock gene expression in peripheral tissues. Responsible for the photogenic warmth of CRI 97+ sources -- skin richness under high-CRI light is Hb absorption at 578nm.'},
+              {wl:'650--850nm', name:'Red / Low NIR', col:AMBER,
+               depth:'3--10mm', abs:'Cytochrome c oxidase (CCO), water (minor)',
+               bio:'Photobiomodulation primary window. Cytochrome c oxidase absorbs at 660nm and 830nm -- upregulates ATP synthesis via Complex IV. Wound healing, anti-inflammatory signalling, muscle recovery. Evening red light (650--700nm) does not activate melanopsin.'},
+              {wl:'850--1350nm', name:'NIR / Deep NIR', col:EMBER,
+               depth:'10--50mm+', abs:'Water (mild, peaks 970nm)',
+               bio:'Deep tissue penetration. Reaches bone cortex, brain parenchyma, and deep muscle groups. Transcranial PBM studies use 810--1064nm to reach cortex. Mitochondrial stimulation persists through full tissue window. Warmth sensation from IR-A absorption in dermis.'},
+            ] as {wl:string;name:string;col:string;depth:string;abs:string;bio:string}[]).map(row => (
+              <div key={row.wl} style={{...card(row.col),
+                borderTop:`2px solid ${row.col}55`, padding:'8px 10px'}}>
+                <div style={{fontFamily:MN, fontSize:7.5, color:row.col,
+                  marginBottom:1}}>{row.wl}</div>
+                <div style={{fontFamily:OR, fontSize:8, color:row.col+'cc',
+                  letterSpacing:1, marginBottom:5}}>{row.name}</div>
+                <div style={{fontFamily:OR, fontSize:6, color:DIM,
+                  marginBottom:2, letterSpacing:0.8}}>DEPTH</div>
+                <div style={{fontFamily:MN, fontSize:8.5, color:QUANT+'99',
+                  marginBottom:6}}>{row.depth}</div>
+                <div style={{fontFamily:OR, fontSize:6, color:DIM,
+                  marginBottom:2, letterSpacing:0.8}}>ABSORBED BY</div>
+                <div style={{fontSize:9, color:'rgba(200,190,150,0.6)',
+                  lineHeight:1.55, marginBottom:6}}>{row.abs}</div>
+                <div style={{fontSize:9.5, color:'rgba(180,200,200,0.58)',
+                  lineHeight:1.65}}>{row.bio}</div>
               </div>
             ))}
           </div>
