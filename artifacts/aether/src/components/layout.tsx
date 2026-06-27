@@ -433,6 +433,8 @@ const NAV_ITEMS = [
   { href: "/morpho-prime",            label: "Morpho Prime · Biomimetic Morphogenesis · Parameter Sliders · Live Canvas",       icon: Microscope },
   { href: "/seismic-oil-synthesis",   label: "Seismic & Oil Synthesis · Induced Seismicity · Pore Pressure Diffusion · Mohr-Coulomb · Wastewater Injection · Fault Reactivation", icon: Atom },
   { href: "/quantum-gravity-cosmos",  label: "Quantum Gravity Cosmos · Einstein Field Equations · Schwarzschild · Path Integral · LQG · String Theory · AETHER Coherence Bridge", icon: Atom },
+  { href: "/processing-delay",        label: "Processing Delay · AETHER Compute Substrate Monitor · Concurrent Processes · CPU Cores · Kernel Events · Scheduling Latency",             icon: Cpu  },
+  { href: "/wireless-power",          label: "Wireless Power · Resonant Inductive Coupling · WiTricity · Coil Simulation · k-Factor · Q-Factor · Near-Field EM · Efficiency",          icon: Radio},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

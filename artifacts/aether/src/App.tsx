@@ -364,6 +364,8 @@ const MagneticDropsPage     = lazy(() => import("@/pages/magnetic-drops"));
 const EquationCodexPage       = lazy(() => import("@/pages/equation-codex"));
 const SeismicOilSynthesisPage   = lazy(() => import("@/pages/seismic-oil-synthesis"));
 const QuantumGravityCosmosPage  = lazy(() => import("@/pages/quantum-gravity-cosmos"));
+const ProcessingDelayPage       = lazy(() => import("@/pages/processing-delay"));
+const WirelessPowerPage         = lazy(() => import("@/pages/wireless-power"));
 
 const queryClient = new QueryClient();
 
@@ -1182,6 +1184,8 @@ function Router() {
                 <Route path="/equation-codex"        component={EquationCodexPage} />
                 <Route path="/seismic-oil-synthesis"  component={SeismicOilSynthesisPage} />
                 <Route path="/quantum-gravity-cosmos" component={QuantumGravityCosmosPage} />
+                <Route path="/processing-delay"      component={ProcessingDelayPage} />
+                <Route path="/wireless-power"        component={WirelessPowerPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
