@@ -567,14 +567,14 @@ export default function LightBodyTopology() {
             ["\\lambda|\\Psi_{\\text{sun}}|^{2}\\mathbf{\\Psi}_{\\text{moss}}","Nonlinear squeezing term -- births emergent moss modes from photosynthetic superposition"],
           ].map(([tex, desc]) => (
             <div key={tex} style={{
-              display:"flex", gap:16, alignItems:"flex-start",
+              display:"flex", gap:12, alignItems:"flex-start", flexWrap:"wrap",
               background:"rgba(200,160,48,0.03)", border:`1px solid ${V.gold}15`,
               borderRadius:7, padding:"12px 16px",
             }}>
-              <div style={{ minWidth:180, overflowX:"auto" }}>
+              <div style={{ minWidth:160, maxWidth:"100%", overflowX:"auto", flex:"0 0 auto" }}>
                 <Eq t={tex} />
               </div>
-              <div style={{ fontFamily:SERIF, fontSize:14, color:V.ink, lineHeight:1.6 }}>
+              <div style={{ fontFamily:SERIF, fontSize:14, color:V.ink, lineHeight:1.6, flex:"1 1 180px" }}>
                 {desc}
               </div>
             </div>

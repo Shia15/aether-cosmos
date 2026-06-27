@@ -451,6 +451,13 @@ export default function SoiBuilding(){
   const [floorAssign,setFloorAssign]=useState<number[]>([...DEFAULT_FLOORS]);
   const [selectedFloor,setSelectedFloor]=useState(0);
   const [pickingFor,setPickingFor]=useState<number|null>(null);
+  const [ww,setWw]=useState(()=>window.innerWidth);
+
+  useEffect(()=>{
+    const h=()=>setWw(window.innerWidth);
+    window.addEventListener("resize",h);
+    return()=>window.removeEventListener("resize",h);
+  },[]);
 
   const selFloorDef=FLOOR_CATALOGUE[floorAssign[selectedFloor]];
   const totalC=(floorAssign.reduce((s,fi)=>s+FLOOR_CATALOGUE[fi].coherence,0)/8).toFixed(3);
@@ -517,7 +524,7 @@ export default function SoiBuilding(){
           selectedFloor={selectedFloor}
           onSelectFloor={setSelectedFloor}
         />
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginTop:12}}>
+        <div style={{display:"grid",gridTemplateColumns:ww<600?"1fr":"1fr 1fr 1fr",gap:10,marginTop:12}}>
           {[
             {label:"Smart windows",col:V.blue,
               body:"Each of the 48 windows is a tunable electrochromic cell. The live coherence field value drives opacity -- high C(x,t) opens the window fully to maximise photon and field coupling with the exterior environment."},
@@ -541,7 +548,7 @@ export default function SoiBuilding(){
       <div style={{marginBottom:40}}>
         <SectionHead n="II" title="FLOOR DESIGN MECHANISM -- CONFIGURE EACH LEVEL" col={V.gold}/>
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 210px",gap:20,alignItems:"start"}}>
+        <div style={{display:"grid",gridTemplateColumns:ww<600?"1fr":"1fr 210px",gap:20,alignItems:"start"}}>
           {/* Floor list (rendered top→bottom for intuition) */}
           <div>
             <div style={{display:"grid",gridTemplateColumns:"36px 1fr 52px 36px",

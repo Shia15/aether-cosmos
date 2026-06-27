@@ -149,6 +149,7 @@ function GrowthCanvas(){
       ctx.save();
       ctx.translate(cx+ox,cy+oy-70);
       const a=(progress-0.1)/0.9;
+      if(a<0.01){ctx.restore();return;}
       // Solar fan arc
       for(let i=0;i<12;i++){
         const ang=-Math.PI/2+(-Math.PI/2+i*(Math.PI/11))*a;
@@ -182,6 +183,7 @@ function GrowthCanvas(){
       ctx.save();
       ctx.translate(cx+ox,cy+oy);
       const a=Math.min(1,(progress-0.05)/0.95);
+      if(a<0.01){ctx.restore();return;}
       // Organic wheel - grown arc spokes
       const spokes=8;
       for(let i=0;i<spokes;i++){
