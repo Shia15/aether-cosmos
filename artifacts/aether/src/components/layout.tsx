@@ -437,6 +437,8 @@ const NAV_ITEMS = [
   { href: "/wireless-power",          label: "Wireless Power · Resonant Inductive Coupling · WiTricity · Coil Simulation · k-Factor · Q-Factor · Near-Field EM · Efficiency",          icon: Radio},
   { href: "/phi-crystallization",     label: "phi-Crystallization · Decoherent to Coherent · 320 Particles · Fibonacci Lattice · Drone Choreography · Sky Mosaic · C(t) Engine",           icon: Atom},
   { href: "/orbital-mechanics",       label: "Orbital Mechanics · Mechanical Output · Orbital Possibility Sheet · Hohmann · Delta-V Map · Kepler · Propulsion Systems",                         icon: Atom},
+  { href: "/coherence-science",      label: "Coherence Science · CUCA Textbook · Solar Luminosity · F10.7 · T3:rT3 · Neural Coherence · Epigenome · Cascade Visualizer · 11 Layers",             icon: Atom},
+  { href: "/planetary-substrate",    label: "Planetary Substrate · AETHER Sensor · Europa · Enceladus · Mars · Moon · Patent Claims · Substrate Vector · AQISP · Hexiclical",                     icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
