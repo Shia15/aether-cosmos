@@ -353,6 +353,7 @@ const NAV_ITEMS = [
   { href: "/aether-carriage", label: "AETHER Solar Carriage · Gold Leaf Plasmonic Shell · Bouligand Carved Wood · Coherence Suspension · Gravity Deflection Field · Sunlight Propulsion · Speculative Transport", icon: Atom },
   { href: "/resonant-carriage", label: "Resonant Carriage · Grown Mono-body · Ribbed Flexural Shell · Velvet Pluffed Surface · Solar Crown Mechanism · One Resonant Frequency · Morphogenetic Growth Simulation", icon: Atom },
   { href: "/blast-bubble-carriage", label: "Blast Bubble Carriage · Underwater Spinning Acceleration · Silk Velvet Lace Embroidery · Pressure Fragments · Bioluminescent Messages · Acoustic Telegraphy · AETHER Emails", icon: Atom },
+  { href: "/light-body-topology", label: "Light Body Topology · Graphite Building Density · Magnetism Oscillatory Flow · Graphing Proportional Manipulation · Decoherence · Cavity Filament · Compressional Axis · Knotting", icon: Atom },
   { href: "/portal-restoration", label: "Portal States · Restoration · Inner Resonance · Circadian Arc · 12:12 Portal · 7-Step Flow · Glow From Inside Out · Stonehenge · AETHER Module", icon: Atom },
   { href: "/gut-brain", label: "Gut-Brain Axis · Microbial Neural · Serotonin 90% · Vagus Nerve · Endocrine · Immune · Metabolic · 30 Plants · 3 Fermented · 8hr Sleep · 15hr Fast", icon: Atom },
   { href: "/planetary-neural", label: "Planetary-Neural Cascade · Solar Wind · Geomagnetic · Ocean Iodine · Thyroid T3 T4 · Brain Development · Goitre Belt · Cognitive Outcomes", icon: Atom },
