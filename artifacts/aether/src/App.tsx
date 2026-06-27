@@ -361,6 +361,7 @@ const BlueLightProtocolPage = lazy(() => import("@/pages/blue-light-protocol"));
 const LiveCursorsPage       = lazy(() => import("@/pages/live-cursors"));
 const MpcSpacetimePage      = lazy(() => import("@/pages/mpc-spacetime"));
 const MagneticDropsPage     = lazy(() => import("@/pages/magnetic-drops"));
+const EquationCodexPage     = lazy(() => import("@/pages/equation-codex"));
 
 const queryClient = new QueryClient();
 
@@ -1176,6 +1177,7 @@ function Router() {
                 <Route path="/live-cursors"     component={LiveCursorsPage} />
                 <Route path="/mpc-spacetime"    component={MpcSpacetimePage} />
                 <Route path="/magnetic-drops"   component={MagneticDropsPage} />
+                <Route path="/equation-codex"   component={EquationCodexPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

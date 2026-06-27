@@ -364,6 +364,7 @@ const NAV_ITEMS = [
   { href: "/atomic-geometry",           label: "Atomic Geometry · Measuring by Atom · Fano Plane · Octonions · Quaternions · Aether Unit · Closed Discovery Loop · Oncology", icon: Microscope },
   { href: "/blue-light-protocol",       label: "Blue-Light Protocol · Circadian Coherence · CCT Phases · Kuramoto Triad · SU(3) Singlet · Glymphatic Clearance · C(x,t) Trajectory", icon: Sun },
   { href: "/live-cursors",              label: "Live Viewing Queue · Real-Time Cursors · Comet Trails · Co-Presence · Online Visitors", icon: Zap },
+  { href: "/equation-codex",            label: "Equation Codex · S(z) Master Operator · All Equations · Egyptian Codex · Python Java CLI · Units Reference · S(zeta) Complex Plane", icon: ScanLine },
   { href: "/mpc-spacetime",             label: "MPC Spacetime · Density Management · Warp Bubble · Bow Shock · Coherence Envelope · Underwater Transport · Potential Flow", icon: Waves },
   { href: "/magnetic-drops",            label: "Magnetic Drops · Ferrofluid Propulsion Substrate · Dipole Chain · MHD Thrust · Rosensweig · Tokamak Shell · MPC Material", icon: Magnet },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
