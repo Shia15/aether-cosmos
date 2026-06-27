@@ -352,6 +352,7 @@ const DynamicSynthesisPage = lazy(() => import("@/pages/dynamic-synthesis"));
 const CoherenceFieldTheoryPage = lazy(() => import("@/pages/coherence-field-theory"));
 const SubstrateQuantizationEnginePage = lazy(() => import("@/pages/substrate-quantization-engine"));
 const AetherCarriagePage = lazy(() => import("@/pages/aether-carriage"));
+const ResonantCarriagePage = lazy(() => import("@/pages/resonant-carriage"));
 
 const queryClient = new QueryClient();
 
@@ -1040,6 +1041,7 @@ function Router() {
                 <Route path="/coherence-field-theory" component={CoherenceFieldTheoryPage} />
                 <Route path="/substrate-quantization-engine" component={SubstrateQuantizationEnginePage} />
                 <Route path="/aether-carriage" component={AetherCarriagePage} />
+                <Route path="/resonant-carriage" component={ResonantCarriagePage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
