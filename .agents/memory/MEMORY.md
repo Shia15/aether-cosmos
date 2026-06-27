@@ -1,1 +1,2 @@
 - [Babel JSX parse limits](babel-jsx-parse-limits.md) — local type aliases in useEffect + P() strings >1000 chars with em-dashes both cause cascading parse errors in Vite/Babel
+- [App.tsx duplicate lazy imports](app-tsx-dupes.md) — when wiring new pages, check for pre-existing lazy() + Route entries in App.tsx and nav entries in layout.tsx before adding new ones; duplicates cause VarRedeclaration and React key errors

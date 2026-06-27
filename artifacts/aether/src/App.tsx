@@ -249,7 +249,6 @@ const SacredGeometryMathPage = lazy(() => import("@/pages/sacred-geometry-math")
 const ResonantSystemsPage = lazy(() => import("@/pages/resonant-systems"));
 const SymbolSifterPage = lazy(() => import("@/pages/symbol-sifter"));
 const CxeEquationPage = lazy(() => import("@/pages/cxe-equation"));
-const MagneticDropsPage = lazy(() => import("@/pages/magnetic-drops"));
 const FrogSimPaperPage = lazy(() => import("@/pages/frog-sim-paper"));
 const SpacetimeFabricPage = lazy(() => import("@/pages/spacetime-fabric"));
 const AetherVisualSystemPage = lazy(() => import("@/pages/aether-visual-system"));
@@ -360,6 +359,8 @@ const PhiLatticePage       = lazy(() => import("@/pages/phi-lattice"));
 const AtomicGeometryPage    = lazy(() => import("@/pages/atomic-geometry"));
 const BlueLightProtocolPage = lazy(() => import("@/pages/blue-light-protocol"));
 const LiveCursorsPage       = lazy(() => import("@/pages/live-cursors"));
+const MpcSpacetimePage      = lazy(() => import("@/pages/mpc-spacetime"));
+const MagneticDropsPage     = lazy(() => import("@/pages/magnetic-drops"));
 
 const queryClient = new QueryClient();
 
@@ -1072,7 +1073,6 @@ function Router() {
                 <Route path="/resonant-systems" component={ResonantSystemsPage} />
                 <Route path="/symbol-sifter" component={SymbolSifterPage} />
                 <Route path="/cxe-equation" component={CxeEquationPage} />
-                <Route path="/magnetic-drops" component={MagneticDropsPage} />
                 <Route path="/frog-sim-paper" component={FrogSimPaperPage} />
                 <Route path="/spacetime-fabric" component={SpacetimeFabricPage} />
                 <Route path="/aether-visual-system" component={AetherVisualSystemPage} />
@@ -1173,7 +1173,9 @@ function Router() {
                 <Route path="/phi-lattice" component={PhiLatticePage} />
                 <Route path="/atomic-geometry" component={AtomicGeometryPage} />
                 <Route path="/blue-light-protocol" component={BlueLightProtocolPage} />
-                <Route path="/live-cursors" component={LiveCursorsPage} />
+                <Route path="/live-cursors"     component={LiveCursorsPage} />
+                <Route path="/mpc-spacetime"    component={MpcSpacetimePage} />
+                <Route path="/magnetic-drops"   component={MagneticDropsPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
