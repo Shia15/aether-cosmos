@@ -353,6 +353,7 @@ const CoherenceFieldTheoryPage = lazy(() => import("@/pages/coherence-field-theo
 const SubstrateQuantizationEnginePage = lazy(() => import("@/pages/substrate-quantization-engine"));
 const AetherCarriagePage = lazy(() => import("@/pages/aether-carriage"));
 const ResonantCarriagePage = lazy(() => import("@/pages/resonant-carriage"));
+const BlastBubbleCarriagePage = lazy(() => import("@/pages/blast-bubble-carriage"));
 
 const queryClient = new QueryClient();
 
@@ -1042,6 +1043,7 @@ function Router() {
                 <Route path="/substrate-quantization-engine" component={SubstrateQuantizationEnginePage} />
                 <Route path="/aether-carriage" component={AetherCarriagePage} />
                 <Route path="/resonant-carriage" component={ResonantCarriagePage} />
+                <Route path="/blast-bubble-carriage" component={BlastBubbleCarriagePage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
