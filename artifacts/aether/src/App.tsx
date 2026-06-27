@@ -367,6 +367,7 @@ const QuantumGravityCosmosPage  = lazy(() => import("@/pages/quantum-gravity-cos
 const ProcessingDelayPage       = lazy(() => import("@/pages/processing-delay"));
 const WirelessPowerPage         = lazy(() => import("@/pages/wireless-power"));
 const PhiCrystallizationPage    = lazy(() => import("@/pages/phi-crystallization"));
+const OrbitalMechanicsPage      = lazy(() => import("@/pages/orbital-mechanics"));
 
 const queryClient = new QueryClient();
 
@@ -1188,6 +1189,7 @@ function Router() {
                 <Route path="/processing-delay"      component={ProcessingDelayPage} />
                 <Route path="/wireless-power"        component={WirelessPowerPage} />
                 <Route path="/phi-crystallization"   component={PhiCrystallizationPage} />
+                <Route path="/orbital-mechanics"     component={OrbitalMechanicsPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
