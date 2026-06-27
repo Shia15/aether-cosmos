@@ -431,6 +431,7 @@ const NAV_ITEMS = [
   { href: "/rd-simulator",            label: "RD Simulator · Reaction-Diffusion · Gray-Scott · Coral Growth · Labyrinthine",    icon: FlaskConical },
   { href: "/neural-topology",         label: "Neural Topology · Brainwave Bands · Delta Theta Alpha Beta Gamma · EEG",          icon: Brain },
   { href: "/morpho-prime",            label: "Morpho Prime · Biomimetic Morphogenesis · Parameter Sliders · Live Canvas",       icon: Microscope },
+  { href: "/seismic-oil-synthesis",   label: "Seismic & Oil Synthesis · Induced Seismicity · Pore Pressure Diffusion · Mohr-Coulomb · Wastewater Injection · Fault Reactivation", icon: Atom },
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
