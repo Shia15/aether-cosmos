@@ -356,7 +356,8 @@ const ResonantCarriagePage = lazy(() => import("@/pages/resonant-carriage"));
 const BlastBubbleCarriagePage = lazy(() => import("@/pages/blast-bubble-carriage"));
 const LightBodyTopologyPage = lazy(() => import("@/pages/light-body-topology"));
 const DailyCompanionPage  = lazy(() => import("@/pages/daily-companion"));
-const PhiLatticePage      = lazy(() => import("@/pages/phi-lattice"));
+const PhiLatticePage       = lazy(() => import("@/pages/phi-lattice"));
+const AtomicGeometryPage   = lazy(() => import("@/pages/atomic-geometry"));
 
 const queryClient = new QueryClient();
 
@@ -1168,6 +1169,7 @@ function Router() {
                 <Route path="/light-body-topology" component={LightBodyTopologyPage} />
                 <Route path="/daily-companion" component={DailyCompanionPage} />
                 <Route path="/phi-lattice" component={PhiLatticePage} />
+                <Route path="/atomic-geometry" component={AtomicGeometryPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

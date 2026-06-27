@@ -361,6 +361,7 @@ const NAV_ITEMS = [
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
   { href: "/daily-companion",           label: "Daily Companion · Planetary Resonance · Cycle Sync · Phase Meals · Body Log · Daily Plan · Cosmos", icon: HeartHandshake },
   { href: "/phi-lattice",               label: "phi-Lattice Transducer · Chaos-to-Order · Quasiperiodic Cellular Architecture · Phononic Bandgap · Gibson-Ashby", icon: Hexagon },
+  { href: "/atomic-geometry",           label: "Atomic Geometry · Measuring by Atom · Fano Plane · Octonions · Quaternions · Aether Unit · Closed Discovery Loop · Oncology", icon: Microscope },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
   { href: "/cli-nano",                 label: "CLI · nano · Cheat Sheet + Live Key Tester (Engine 01)", icon: Terminal },
   { href: "/calm-company",             label: "Calm Company OS · 12 Buckets · Daily 2-Post Engine · Mediums", icon: Feather },
