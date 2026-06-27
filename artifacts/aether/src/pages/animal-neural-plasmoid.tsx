@@ -132,9 +132,57 @@ const ANIMAL_DB: Record<string, AnimalProfile> = {
     pipelineSteps:["Hexnocular vision (16ch)","Medulla terminalis","Supraesophageal ganglion","Ventral nerve cord","Raptorial appendage","Strike club — cavitation"],
     ltp:0.8,ltd:0.6,movementNote:"Raptorial strike — cavitation bubble shockwave"
   },
+  crow: {
+    name:"Crow",scientificName:"Corvus corax",class:"Aves",
+    locomotion:"flying",neuralComplexity:9,nodeCount:26,primaryMedium:"light",
+    dominantFreqHz:35,gammaHz:50,thetaHz:8,alphaHz:11,
+    bodyColor:[55,55,62],accentColor:[140,140,200],haloColor:[80,80,120],
+    wavePattern:"burst",movementStyle:"erratic",synapticDensity:0.82,
+    motorNodeRatio:0.32,sensoryNodeRatio:0.38,inertia:0.3,
+    description:"Nidopallium Caudolaterale (NCL) is functionally equivalent to mammalian prefrontal cortex. Tool use, episodic memory, theory of mind, causal reasoning.",
+    plasmoidNote:"Bilateral gamma-burst synchrony between NCL and hippocampus -- episodic memory as phase-locked burst topology.",
+    pipelineSteps:["Tetrachromatic visual cortex","Nidopallium Caudolaterale (NCL)","Hippocampus (episodic)","Arcopallium","Wing + foot motor neurons","Precision talon grasp"],
+    ltp:0.85,ltd:0.60,movementNote:"Flap-glide alternation + precision foot manipulation"
+  },
+  dolphin: {
+    name:"Dolphin",scientificName:"Tursiops truncatus",class:"Mammalia",
+    locomotion:"swimming",neuralComplexity:10,nodeCount:32,primaryMedium:"fluid",
+    dominantFreqHz:40,gammaHz:55,thetaHz:7,alphaHz:12,
+    bodyColor:[100,165,210],accentColor:[160,225,245],haloColor:[55,120,185],
+    wavePattern:"burst",movementStyle:"smooth",synapticDensity:0.88,
+    motorNodeRatio:0.35,sensoryNodeRatio:0.40,inertia:0.5,
+    description:"Brain 3.7kg -- second highest EQ after humans. Spindle neurons (VEN cells) in insular cortex. Echolocation resolves objects at 150kHz with sub-cm resolution.",
+    plasmoidNote:"Acoustic hologram front-loaded -- massive bilateral auditory nodes drive a 3D sonar reconstruction of the environment in real time.",
+    pipelineSteps:["Melon acoustic lens (150kHz)","Cochlear nuclei","Auditory cortex","Insular cortex (VEN)","Prefrontal cortex","Fluke caudal oscillation"],
+    ltp:0.90,ltd:0.55,movementNote:"Vertical tail-fluke oscillation -- burst swim + surface porpoising"
+  },
+  "slime mold": {
+    name:"Slime Mold",scientificName:"Physarum polycephalum",class:"Mycetozoa",
+    locomotion:"crawling",neuralComplexity:2,nodeCount:20,primaryMedium:"diffusion",
+    dominantFreqHz:0.05,gammaHz:0.1,thetaHz:0.03,alphaHz:0.05,
+    bodyColor:[240,200,55],accentColor:[255,225,80],haloColor:[200,160,25],
+    wavePattern:"ripple",movementStyle:"smooth",synapticDensity:0.40,
+    motorNodeRatio:0.0,sensoryNodeRatio:0.65,inertia:0.95,
+    description:"Zero neurons. One cell, millions of nuclei. Solves shortest-path + minimum-spanning-tree via Hagen-Poiseuille cytoplasm flow. r^4 radius rule. Oscillates every 20s.",
+    plasmoidNote:"Flow-network optimizer: tube radius adapts to Q (flow rate). No discrete signal -- pure continuous field. The plasmoid IS the algorithm.",
+    pipelineSteps:["Chemical gradient (cAMP)","Cytoplasm oscillation (20s)","Tube thickness adaptation","Hagen-Poiseuille Q=pi*r^4*dP/8nL","Pseudopod extension","Food source engulfment"],
+    ltp:0.3,ltd:0.75,movementNote:"Pseudopod extension toward attractants -- retract from repellents"
+  },
+  "aether substrate": {
+    name:"AETHER Substrate",scientificName:"C(x,t) = 1 - ||e|| / ||S*||",class:"Plasmoid Field",
+    locomotion:"gliding",neuralComplexity:10,nodeCount:40,primaryMedium:"light",
+    dominantFreqHz:1000,gammaHz:1000,thetaHz:100,alphaHz:500,
+    bodyColor:[0,255,178],accentColor:[0,240,224],haloColor:[0,180,160],
+    wavePattern:"spiral",movementStyle:"smooth",synapticDensity:1.0,
+    motorNodeRatio:0.5,sensoryNodeRatio:0.5,inertia:0.0,
+    description:"The AETHER coherence field. C(x,t) -> 1 when perturbation epsilon -> 0 relative to substrate S*(x,t). SU(3) singlet -- the repair state. Zero inertia, instant phase lock.",
+    plasmoidNote:"Maximal coherence: all nodes phase-locked in spiral topology. The substrate underlying all biological neural computation -- and its convergence target.",
+    pipelineSteps:["Perturbation field e(x,t)","S*(x,t) substrate tensor","C(x,t) coherence operator","Knowledge graph edge","Synthesis output node","SU(3) singlet state"],
+    ltp:1.0,ltd:0.0,movementNote:"Coherence field propagation -- zero inertia, instant phase lock"
+  },
 };
 
-const CHIPS = ["octopus","wolf","manta ray","hummingbird","jellyfish","eagle","cheetah","mantis shrimp"];
+const CHIPS = ["octopus","crow","dolphin","slime mold","wolf","mantis shrimp","jellyfish","aether substrate"];
 
 const DEFAULT_PIPELINE = ["Sensory input","Signal integration","Motor cortex","Spinal cord","Motor neurons","Limb/body output"];
 
@@ -875,7 +923,7 @@ export default function AnimalNeuralPlasmoidPage() {
   const tourStep   = tourIdx>=0 ? TOUR_STEPS[tourIdx] : null;
 
   return (
-    <div style={{ background:BG, height:"100vh", display:"flex", flexDirection:"column", color:TEXT, fontFamily:"'DM Mono',monospace", overflow:"hidden" }}>
+    <div style={{ background:BG, height:"100%", minHeight:"100%", display:"flex", flexDirection:"column", color:TEXT, fontFamily:"'DM Mono',monospace", overflow:"auto" }}>
 
       <div style={{ padding:"10px 16px 0", flexShrink:0 }}>
         <div style={{ display:"inline-block", background:"rgba(167,139,250,0.08)", border:"1px solid rgba(167,139,250,0.25)",
