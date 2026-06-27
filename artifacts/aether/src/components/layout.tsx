@@ -359,6 +359,7 @@ const NAV_ITEMS = [
   { href: "/planetary-neural", label: "Planetary-Neural Cascade · Solar Wind · Geomagnetic · Ocean Iodine · Thyroid T3 T4 · Brain Development · Goitre Belt · Cognitive Outcomes", icon: Atom },
   { href: "/awakening-timeline",       label: "Awakening Timeline · Nov 5 Super Moon · 7 Pillars · Angel Numbers", icon: Sunrise },
   { href: "/aether-why",               label: "AETHER · The Why · Founders Letter (Nov 5 publication)", icon: BookOpen },
+  { href: "/daily-companion",           label: "Daily Companion · Planetary Resonance · Cycle Sync · Phase Meals · Body Log · Daily Plan · Cosmos", icon: HeartHandshake },
   { href: "/baby-rhythm",              label: "Baby Rhythm · Weston's Routine · Feeding · Diaper-Bag Checklist", icon: HeartHandshake },
   { href: "/cli-nano",                 label: "CLI · nano · Cheat Sheet + Live Key Tester (Engine 01)", icon: Terminal },
   { href: "/calm-company",             label: "Calm Company OS · 12 Buckets · Daily 2-Post Engine · Mediums", icon: Feather },

@@ -355,6 +355,7 @@ const AetherCarriagePage = lazy(() => import("@/pages/aether-carriage"));
 const ResonantCarriagePage = lazy(() => import("@/pages/resonant-carriage"));
 const BlastBubbleCarriagePage = lazy(() => import("@/pages/blast-bubble-carriage"));
 const LightBodyTopologyPage = lazy(() => import("@/pages/light-body-topology"));
+const DailyCompanionPage = lazy(() => import("@/pages/daily-companion"));
 
 const queryClient = new QueryClient();
 
@@ -1164,6 +1165,7 @@ function Router() {
                 <Route path="/resonant-carriage" component={ResonantCarriagePage} />
                 <Route path="/blast-bubble-carriage" component={BlastBubbleCarriagePage} />
                 <Route path="/light-body-topology" component={LightBodyTopologyPage} />
+                <Route path="/daily-companion" component={DailyCompanionPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
