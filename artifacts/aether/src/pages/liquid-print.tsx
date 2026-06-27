@@ -684,15 +684,28 @@ export default function LiquidPrintPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parallel, gateMix]);
 
+  const CARD: React.CSSProperties = {
+    boxShadow: "0 1px 0 rgba(255,255,255,0.025) inset, 0 30px 70px -30px rgba(0,0,0,0.78)",
+    backdropFilter: "blur(3px)",
+    WebkitBackdropFilter: "blur(3px)",
+  };
+  const activeTab = TABS.find(t => t.key === tab)!;
+
   return (
-    <div className="min-h-screen relative overflow-x-hidden" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(6,7,12,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LIQUID PRINT · BIO-HYBRID INK · SUBSTRATE DEPOSITION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>5 orbiting ink blobs — the live AETHER liquid print deposition simulation.</p></div>
+    <div style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif", minHeight: "100%", position: "relative", overflowX: "hidden" }}>
+      <div style={{ flexShrink: 0 }}>
+        <div style={{ padding: "8px 12px" }}>
+          <div style={{ display: "inline-block", border: "1px solid #2ef0d8", padding: "4px 12px", fontSize: 10, letterSpacing: "0.2em", color: "#2ef0d8", fontFamily: "'DM Mono',monospace", marginBottom: 16 }}>LIVE SIMULATION</div>
+        </div>
+        <div style={{ margin: "0 12px 20px", background: "rgba(6,7,12,0.8)", borderLeft: "3px solid #2ef0d8", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ padding: "12px 16px 8px" }}>
+            <h2 style={{ margin: 0, fontSize: 13, color: "#2ef0d8", fontFamily: "'DM Mono',monospace", letterSpacing: "0.15em", fontWeight: 400 }}>LIQUID PRINT · BIO-HYBRID INK · SUBSTRATE DEPOSITION · AETHER</h2>
+            <p style={{ margin: "4px 0 8px", fontSize: 10, color: "rgba(46,240,216,0.5)", fontFamily: "'DM Mono',monospace", letterSpacing: "0.1em" }}>5 orbiting ink blobs -- the live AETHER liquid print deposition simulation.</p>
+          </div>
           <LiquidPrintCanvas />
         </div>
       </div>
+
       <style>{`
         @keyframes lp-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes lp-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }
@@ -700,251 +713,260 @@ export default function LiquidPrintPage() {
         @keyframes lp-fadein  { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes lp-shimmer { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
         .lp-pulse-dot { animation: lp-pulse 2.6s ease-in-out infinite; transform-origin: center; }
-        .lp-glow-1 { animation: lp-breathe 9s ease-in-out infinite, lp-drift 22s ease-in-out infinite; }
-        .lp-glow-2 { animation: lp-breathe 11s ease-in-out infinite, lp-drift 28s ease-in-out infinite reverse; }
-        .lp-glow-3 { animation: lp-breathe 13s ease-in-out infinite, lp-drift 34s ease-in-out infinite; }
+        .lp-glow-1 { animation: lp-breathe 9s ease-in-out infinite, lp-drift 22s ease-in-out infinite; position:absolute; }
+        .lp-glow-2 { animation: lp-breathe 11s ease-in-out infinite, lp-drift 28s ease-in-out infinite reverse; position:absolute; }
+        .lp-glow-3 { animation: lp-breathe 13s ease-in-out infinite, lp-drift 34s ease-in-out infinite; position:absolute; }
         .lp-event   { animation: lp-fadein 320ms ease-out; }
         .lp-rule    { animation: lp-shimmer 6s ease-in-out infinite; }
-        .lp-card    { box-shadow: 0 1px 0 rgba(255,255,255,0.025) inset, 0 30px 70px -30px rgba(0,0,0,0.78); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+        input[type=range] { width: 100%; cursor: pointer; accent-color: currentColor; }
       `}</style>
 
       {/* atmospheric glow layer */}
-      <div className="pointer-events-none absolute inset-0 select-none" aria-hidden>
-        <div className="lp-glow-1 absolute" style={{ top: "-12%",  left: "-8%",   width: 720, height: 720, background: "radial-gradient(circle, rgba(181,150,232,0.18) 0%, rgba(181,150,232,0) 70%)", filter: "blur(20px)" }} />
-        <div className="lp-glow-2 absolute" style={{ top:  "28%",  right: "-15%", width: 640, height: 640, background: "radial-gradient(circle, rgba(232,200,120,0.10) 0%, rgba(232,200,120,0) 70%)", filter: "blur(20px)" }} />
-        <div className="lp-glow-3 absolute" style={{ bottom: "-22%", left: "22%", width: 760, height: 760, background: "radial-gradient(circle, rgba(122,197,232,0.10) 0%, rgba(122,197,232,0) 70%)", filter: "blur(20px)" }} />
+      <div style={{ pointerEvents: "none", position: "absolute", inset: 0, userSelect: "none" }} aria-hidden>
+        <div className="lp-glow-1" style={{ top: "-12%", left: "-8%", width: 720, height: 720, background: "radial-gradient(circle, rgba(181,150,232,0.18) 0%, rgba(181,150,232,0) 70%)", filter: "blur(20px)" }} />
+        <div className="lp-glow-2" style={{ top: "28%", right: "-15%", width: 640, height: 640, background: "radial-gradient(circle, rgba(232,200,120,0.10) 0%, rgba(232,200,120,0) 70%)", filter: "blur(20px)" }} />
+        <div className="lp-glow-3" style={{ bottom: "-22%", left: "22%", width: 760, height: 760, background: "radial-gradient(circle, rgba(122,197,232,0.10) 0%, rgba(122,197,232,0) 70%)", filter: "blur(20px)" }} />
       </div>
 
-      <div className="relative px-8 py-8">
-      <div className="mb-7 max-w-4xl">
-        <div className="text-[10px] tracking-[0.4em] uppercase italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
-          aether · rapid liquid printing · bio-hybrid computer · soft electronics
+      <div style={{ position: "relative", padding: "32px" }}>
+        <div style={{ marginBottom: 28, maxWidth: 800 }}>
+          <div style={{ fontSize: 10, letterSpacing: "0.4em", textTransform: "uppercase", fontStyle: "italic", color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
+            aether · rapid liquid printing · bio-hybrid computer · soft electronics
+          </div>
+          <h1 style={{ fontSize: 40, marginTop: 8, lineHeight: 1.05, color: C.white, letterSpacing: "0.015em", margin: "8px 0 0" }}>
+            Liquid Print · <span style={{ color: C.gold }}>Bio-Hybrid Computer</span>
+          </h1>
+          <div className="lp-rule" style={{ marginTop: 12, marginBottom: 16, height: 1, background: `linear-gradient(90deg, ${C.gold}66 0%, ${C.violet}40 35%, transparent 100%)`, width: "62%" }} />
+          <p style={{ fontSize: 13.5, marginTop: 12, lineHeight: 1.7, color: C.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
+            A <span style={{ color: C.cyan }}>shear-thinning hydrogel</span> holds every printed material in place mid-air, removing gravity from the build process.
+            That single change collapses build time from <span style={{ color: C.gold }}>hours to minutes</span> and lets the print head deposit
+            <span style={{ color: C.amber }}> conductive ink and liquid metal</span> in 3D -- no vias, no rigid substrate. Then we swap the solid parts of a conventional computer for
+            a <span style={{ color: C.green }}>DNA / RNA switching layer</span> that does massively parallel logic by strand displacement, and stitch the whole thing together with a
+            <span style={{ color: C.violet }}> hybrid interface</span> on top. The result is one merged-substrate device -- circuits, biocomputation, and sensors all printed into the same gel.
+          </p>
+          <p style={{ fontSize: 12, marginTop: 12, fontStyle: "italic", color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
+            -- a living prototype board · still learning
+          </p>
         </div>
-        <h1 className="text-[40px] mt-2 leading-[1.05]" style={{ color: C.white, letterSpacing: "0.015em" }}>
-          Liquid Print · <span style={{ color: C.gold }}>Bio-Hybrid Computer</span>
-        </h1>
-        <div className="lp-rule mt-3 mb-4 h-px" style={{ background: `linear-gradient(90deg, ${C.gold}66 0%, ${C.violet}40 35%, transparent 100%)`, width: "62%" }} />
-        <p className="text-[13.5px] mt-3 leading-relaxed" style={{ color: C.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
-          A <span style={{ color: C.cyan }}>shear-thinning hydrogel</span> holds every printed material in place mid-air, removing gravity from the build process.
-          That single change collapses build time from <span style={{ color: C.gold }}>hours to minutes</span> and lets the print head deposit
-          <span style={{ color: C.amber }}> conductive ink and liquid metal</span> in 3D — no vias, no rigid substrate. Then we swap the solid parts of a conventional computer for
-          a <span style={{ color: C.green }}>DNA / RNA switching layer</span> that does massively parallel logic by strand displacement, and stitch the whole thing together with a
-          <span style={{ color: C.violet }}> hybrid interface</span> on top. The result is one merged-substrate device — circuits, biocomputation, and sensors all printed into the same gel.
-        </p>
-        <p className="text-[12px] mt-3 italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
-          — a living prototype board · still learning
-        </p>
-      </div>
 
-      <div className="flex gap-2 mb-5 flex-wrap" data-testid="lp-tabs">
-        {TABS.map(T => {
-          const active = tab === T.key;
-          return (
-            <button key={T.key} onClick={() => { setTab(T.key); pushLog("tab", `→ ${T.label}`, T.col); }}
-              data-testid={`tab-${T.key}`} aria-pressed={active}
-              aria-label={`Switch to ${T.label}`}
-              className="px-4 py-2.5 text-[11px] tracking-[0.2em] uppercase border rounded-full inline-flex items-center gap-2 transition-colors"
-              style={{
-                borderColor: active ? `${T.col}88` : C.border,
-                background:  active ? `${T.col}10` : "rgba(20,18,32,0.45)",
-                color:       active ? T.col : C.text,
-                fontFamily:  "Cinzel, ui-serif, Georgia, serif",
-                boxShadow:   active ? `0 0 24px ${T.col}33, inset 0 0 12px ${T.col}11` : "none",
-              }}>
-              {active ? (
-                <span className="lp-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: T.col, boxShadow: `0 0 8px ${T.col}` }} />
-              ) : (
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "transparent", border: `1px solid ${C.dim}` }} />
-              )}
-              <span style={{ color: active ? T.col : C.muted }}>{T.sym}</span>
-              <span>{T.label}</span>
-            </button>
-          );
-        })}
-      </div>
+        {/* Tab row */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }} data-testid="lp-tabs">
+          {TABS.map(T => {
+            const active = tab === T.key;
+            return (
+              <button key={T.key} onClick={() => { setTab(T.key); pushLog("tab", `-> ${T.label}`, T.col); }}
+                data-testid={`tab-${T.key}`} aria-pressed={active}
+                aria-label={`Switch to ${T.label}`}
+                style={{
+                  padding: "10px 16px", fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase",
+                  border: `1px solid ${active ? T.col + "88" : C.border}`,
+                  borderRadius: 9999, display: "inline-flex", alignItems: "center", gap: 8,
+                  cursor: "pointer", transition: "all 0.18s",
+                  background: active ? T.col + "18" : "rgba(20,18,32,0.45)",
+                  color: active ? T.col : C.text,
+                  fontFamily: "Cinzel, ui-serif, Georgia, serif",
+                  boxShadow: active ? `0 0 24px ${T.col}33, inset 0 0 12px ${T.col}11` : "none",
+                }}>
+                {active ? (
+                  <span className="lp-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: T.col, boxShadow: `0 0 8px ${T.col}`, flexShrink: 0 }} />
+                ) : (
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "transparent", border: `1px solid ${C.dim}`, flexShrink: 0 }} />
+                )}
+                <span style={{ color: active ? T.col : C.muted }}>{T.sym}</span>
+                <span>{T.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-      <div className="grid gap-5" style={{ gridTemplateColumns: "minmax(0,1fr) 340px" }}>
-        <div>
-          <div className="lp-card border rounded-[10px] overflow-hidden" style={{ borderColor: C.border, background: C.panel }}>
-            <div className="flex justify-between items-center px-5 py-2.5 border-b" style={{ borderColor: C.border }}>
-              <div className="text-[10px] tracking-[0.3em] uppercase inline-flex items-center gap-2" style={{ color: TABS.find(t => t.key === tab)!.col }}>
-                <span className="lp-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: TABS.find(t => t.key === tab)!.col, boxShadow: `0 0 8px ${TABS.find(t => t.key === tab)!.col}` }} />
-                {TABS.find(t => t.key === tab)!.label} · LIVE RENDER
+        {/* Main 2-col grid */}
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 20 }}>
+          <div>
+            {/* Canvas card */}
+            <div style={{ ...CARD, border: `1px solid ${C.border}`, borderRadius: 10, overflow: "hidden", background: C.panel }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 20px", borderBottom: `1px solid ${C.border}` }}>
+                <div style={{ fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", display: "inline-flex", alignItems: "center", gap: 8, color: activeTab.col }}>
+                  <span className="lp-pulse-dot" style={{ width: 6, height: 6, borderRadius: "50%", background: activeTab.col, boxShadow: `0 0 8px ${activeTab.col}`, flexShrink: 0 }} />
+                  {activeTab.label} · LIVE RENDER
+                </div>
+                <div style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: C.muted }}>
+                  ops · <span style={{ color: C.gold, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{ops}</span>
+                </div>
               </div>
-              <div className="text-[10px] tracking-[0.2em] uppercase" style={{ color: C.muted }}>
-                ops · <span style={{ color: C.gold, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{ops}</span>
+              <canvas ref={cvRef} data-testid="lp-canvas" style={{ width: "100%", height: 520, display: "block" }} />
+            </div>
+
+            {/* Tab content card */}
+            <AnimatePresence mode="wait">
+              <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22 }}
+                style={{ ...CARD, marginTop: 20, border: `1px solid ${C.border}`, borderRadius: 10, padding: 24, background: C.panel }}>
+
+                {tab === "gel" && (
+                  <>
+                    <Title col={C.cyan}>Gel scaffold -- the support is the medium</Title>
+                    <Body>
+                      A shear-thinning hydrogel behaves as a soft solid at rest and a viscous liquid wherever the moving nozzle pushes through it. The deposited filament is suspended exactly
+                      where it's laid -- no overhang collapse, no support lattice, no per-layer cooldown. With <span style={{ color: C.gold }}>build time = path / speed</span>, complex
+                      flexible geometries that used to take hours print in <span style={{ color: C.gold }}>minutes</span>. The same vat can hold multiple inks at once.
+                    </Body>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Slider id="speed"  label="v_print (mm/s)"      value={printSpeed}  min={5}   max={120} step={1}    col={C.gold}   fmt={v => `${v.toFixed(0)}`} onChange={setPS} />
+                      <Slider id="nozzle" label="nozzle Ø (um)"        value={nozzle}      min={20}  max={400} step={5}    col={C.amber}  fmt={v => `${v.toFixed(0)}`} onChange={setNZ} />
+                      <Slider id="shear"  label="n_shear (gel index)"  value={shearN}      min={0.1} max={1.0} step={0.01} col={C.cyan}   fmt={v => v.toFixed(2)}      onChange={setSN} />
+                      <Slider id="cplx"   label="path complexity"      value={pathComplex} min={0.1} max={1.0} step={0.01} col={C.violet} fmt={v => v.toFixed(2)}      onChange={setPC} />
+                    </div>
+                    <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
+                      <button onClick={purgeAndPrime} data-testid="btn-prime" aria-label="Purge nozzle and prime gel"
+                        style={{ padding: "8px 12px", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", border: `1px solid ${C.border2}`, color: C.cyan, background: "transparent", cursor: "pointer", borderRadius: 4 }}>
+                        purge & prime
+                      </button>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Stat k="build time"  v={`${obs.buildSec.toFixed(1)} s`}     c={C.gold}   />
+                      <Stat k="path length" v={`${obs.pathMm.toFixed(0)} mm`}      c={C.cyan}   />
+                      <Stat k="resolution"  v={`${obs.resΜm.toFixed(0)} um`}        c={C.amber}  />
+                      <Stat k="eta drop"    v={`x ${obs.etaDrop.toFixed(1)}`}       c={C.violet} />
+                    </div>
+                  </>
+                )}
+
+                {tab === "conduct" && (
+                  <>
+                    <Title col={C.amber}>Conductive layer -- liquid metal & polymer ink, in 3D</Title>
+                    <Body>
+                      With the gel doing the holding, the print head can route conductive ink and gallium-based liquid metal along curves and through arbitrary 3D paths.
+                      There are no <span style={{ color: C.amber }}>vias</span>, no rigid PCB stack-up, no soldermask. Traces can bend with the device,
+                      and a fan-out lattice multiplies endpoint count by the fanout factor.
+                    </Body>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Slider id="trace"  label="traces (N)"          value={traceN}  min={2}   max={14}  step={1}    col={C.amber}  fmt={v => `${Math.round(v)}`} onChange={setTN} />
+                      <Slider id="cond"   label="conductivity"        value={conduct} min={0.05} max={1.0} step={0.01} col={C.gold}   fmt={v => v.toFixed(2)}      onChange={setCD} />
+                      <Slider id="bend"   label="bend (gel-allowed)"  value={bend}    min={0.0} max={1.0}  step={0.01} col={C.cyan}   fmt={v => v.toFixed(2)}      onChange={setBD} />
+                      <Slider id="fanout" label="fanout / trace"      value={fanout}  min={1}   max={6}    step={1}    col={C.violet} fmt={v => `${Math.round(v)}`} onChange={setFO} />
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Stat k="endpoints" v={`${obs.totalLines}`}              c={C.amber}  />
+                      <Stat k="sigma S/m" v={obs.sigma.toExponential(2)}       c={C.gold}   />
+                      <Stat k="bend"      v={bend.toFixed(2)}                  c={C.cyan}   />
+                      <Stat k="fanout"    v={`${fanout}`}                      c={C.violet} />
+                    </div>
+                  </>
+                )}
+
+                {tab === "dna" && (
+                  <>
+                    <Title col={C.green}>DNA / RNA switching -- solid parts swapped for biocomputation</Title>
+                    <Body>
+                      The classical solid-state pieces (gates, registers) are replaced with synthetic <span style={{ color: C.green }}>DNA / RNA</span> strands engineered for strand-displacement
+                      logic. Input strands toehold-bind the gate template and displace an output strand -- that displacement is the bit flip. Different sequences encode <span style={{ color: C.cyan }}>AND</span>,
+                      <span style={{ color: C.gold }}> OR</span>, <span style={{ color: C.rose }}>NOT</span>, <span style={{ color: C.violet }}>XOR</span>, <span style={{ color: C.amber }}>NAND</span>.
+                      Massively parallel: every site fires independently in solution.
+                    </Body>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Slider id="conc"  label="[strand]"           value={conc}     min={0.05} max={1.0}  step={0.01} col={C.green}  fmt={v => v.toFixed(2)}      onChange={setCC} />
+                      <Slider id="krate" label="k_rxn (rate)"       value={kRate}    min={0.05} max={1.0}  step={0.01} col={C.gold}   fmt={v => v.toFixed(2)}      onChange={setKR} />
+                      <Slider id="par"   label="parallel sites"     value={parallel} min={1}    max={12}   step={1}    col={C.cyan}   fmt={v => `${Math.round(v)}`} onChange={setPP} />
+                      <Slider id="mix"   label="gate mix AND-XOR"   value={gateMix}  min={0.0}  max={1.0}  step={0.01} col={C.violet} fmt={v => v.toFixed(2)}      onChange={setGM} />
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Stat k="sites"   v={`${obs.sites}`}                    c={C.green}  />
+                      <Stat k="ops/s"   v={obs.opsPerSec.toExponential(2)}    c={C.gold}   />
+                      <Stat k="[strand]" v={conc.toFixed(2)}                  c={C.amber}  />
+                      <Stat k="k_rxn"   v={kRate.toFixed(2)}                  c={C.cyan}   />
+                    </div>
+                  </>
+                )}
+
+                {tab === "stack" && (
+                  <>
+                    <Title col={C.violet}>Hybrid stack -- merged substrate computer</Title>
+                    <Body>
+                      The full stack: <span style={{ color: C.cyan }}>hydrogel scaffold</span> at the base, a <span style={{ color: C.amber }}>conductive grid</span> for fast deterministic signals,
+                      a <span style={{ color: C.green }}>DNA logic plane</span> as a parallel co-processor, a <span style={{ color: C.rose }}>sensor lattice</span> for live environment readback,
+                      and a printable <span style={{ color: C.violet }}>hybrid interface</span> that translates between electronics and biochemistry. The whole thing is printed into one
+                      gel vat, then UV / temperature cross-link locks the geometry while keeping it flexible.
+                    </Body>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Slider id="layers" label="layers"             value={layers}  min={3}    max={7}   step={1}    col={C.violet} fmt={v => `${Math.round(v)}`} onChange={setLY} />
+                      <Slider id="sd"     label="sensor density"     value={sensorD} min={0.05} max={1.0} step={0.01} col={C.rose}   fmt={v => v.toFixed(2)}      onChange={setSD} />
+                      <Slider id="cp"     label="inter-layer coupling" value={coupling} min={0.0} max={1.0} step={0.01} col={C.gold} fmt={v => v.toFixed(2)}      onChange={setCP} />
+                    </div>
+                    <div style={{ marginTop: 16, display: "flex", gap: 8 }}>
+                      <button onClick={flashCrosslink} data-testid="btn-crosslink" aria-label="Fire UV/thermal cross-link pulse"
+                        style={{ padding: "8px 12px", fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", border: `1px solid ${C.border2}`, color: C.gold, background: "transparent", cursor: "pointer", borderRadius: 4 }}>
+                        cross-link pulse
+                      </button>
+                    </div>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
+                      <Stat k="layers"       v={`${layers}`}                           c={C.violet} />
+                      <Stat k="height"       v={`${obs.stackHeightMm.toFixed(2)} mm`}  c={C.cyan}   />
+                      <Stat k="sensors"      v={sensorD.toFixed(2)}                    c={C.rose}   />
+                      <Stat k="coupling"     v={coupling.toFixed(2)}                   c={C.gold}   />
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Print phenomena bars */}
+            <div style={{ ...CARD, marginTop: 20, border: `1px solid ${C.border}`, borderRadius: 10, padding: 20, background: C.panel }}>
+              <div style={{ fontSize: 10, letterSpacing: "0.4em", textTransform: "uppercase", marginBottom: 16, fontStyle: "italic", color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>print phenomena</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 16 }}>
+                <Bar label="gel suspension"  val={1 - shearN}                      c={C.cyan}   />
+                <Bar label="conductive sigma" val={conduct}                         c={C.amber}  />
+                <Bar label="DNA parallelism" val={Math.min(1, parallel / 12)}      c={C.green}  />
+                <Bar label="hybrid coupling" val={coupling}                         c={C.violet} />
               </div>
             </div>
-            <canvas ref={cvRef} data-testid="lp-canvas" style={{ width: "100%", height: 520, display: "block" }} />
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.22 }}
-              className="lp-card mt-5 border rounded-[10px] p-6" style={{ borderColor: C.border, background: C.panel }}>
-
-              {tab === "gel" && (
-                <>
-                  <Title col={C.cyan}>Gel scaffold — the support is the medium</Title>
-                  <Body>
-                    A shear-thinning hydrogel behaves as a soft solid at rest and a viscous liquid wherever the moving nozzle pushes through it. The deposited filament is suspended exactly
-                    where it's laid — no overhang collapse, no support lattice, no per-layer cooldown. With <span style={{ color: C.gold }}>build time = path / speed</span>, complex
-                    flexible geometries that used to take hours print in <span style={{ color: C.gold }}>minutes</span>. The same vat can hold multiple inks at once.
-                  </Body>
-                  <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Slider id="speed"   label="v_print  (mm/s)"        value={printSpeed} min={5}    max={120}  step={1}    col={C.gold}   fmt={v => `${v.toFixed(0)}`} onChange={setPS} />
-                    <Slider id="nozzle"  label="nozzle Ø  (μm)"          value={nozzle}     min={20}   max={400}  step={5}    col={C.amber}  fmt={v => `${v.toFixed(0)}`} onChange={setNZ} />
-                    <Slider id="shear"   label="n_shear (gel index)"     value={shearN}     min={0.1}  max={1.0}  step={0.01} col={C.cyan}   fmt={v => v.toFixed(2)} onChange={setSN} />
-                    <Slider id="cplx"    label="path complexity"          value={pathComplex} min={0.1} max={1.0} step={0.01} col={C.violet} fmt={v => v.toFixed(2)} onChange={setPC} />
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <button onClick={purgeAndPrime} data-testid="btn-prime"
-                      aria-label="Purge nozzle and prime gel"
-                      className="px-3 py-2 text-[10px] tracking-[0.2em] uppercase border"
-                      style={{ borderColor: C.border2, color: C.cyan }}>purge & prime</button>
-                  </div>
-                  <div className="grid gap-3 mt-4 text-[11px]" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Stat k="build time"  v={`${obs.buildSec.toFixed(1)} s`}                    c={C.gold}   />
-                    <Stat k="path length" v={`${obs.pathMm.toFixed(0)} mm`}                     c={C.cyan}   />
-                    <Stat k="resolution"  v={`${obs.resΜm.toFixed(0)} μm`}                       c={C.amber}  />
-                    <Stat k="η drop"      v={`× ${obs.etaDrop.toFixed(1)}`}                      c={C.violet} />
-                  </div>
-                </>
-              )}
-
-              {tab === "conduct" && (
-                <>
-                  <Title col={C.amber}>Conductive layer — liquid metal & polymer ink, in 3D</Title>
-                  <Body>
-                    With the gel doing the holding, the print head can route conductive ink and gallium-based liquid metal along curves and through arbitrary 3D paths.
-                    There are no <span style={{ color: C.amber }}>vias</span>, no rigid PCB stack-up, no soldermask. Traces can bend with the device,
-                    and a fan-out lattice multiplies endpoint count by the fanout factor.
-                  </Body>
-                  <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Slider id="trace"   label="traces (N)"            value={traceN}   min={2}    max={14}   step={1}    col={C.amber}  fmt={v => `${Math.round(v)}`} onChange={setTN} />
-                    <Slider id="cond"    label="conductivity"           value={conduct}  min={0.05} max={1.0}  step={0.01} col={C.gold}   fmt={v => v.toFixed(2)} onChange={setCD} />
-                    <Slider id="bend"    label="bend (gel-permitted)"  value={bend}     min={0.0}  max={1.0}  step={0.01} col={C.cyan}   fmt={v => v.toFixed(2)} onChange={setBD} />
-                    <Slider id="fanout"  label="fanout / trace"          value={fanout}   min={1}    max={6}    step={1}    col={C.violet} fmt={v => `${Math.round(v)}`} onChange={setFO} />
-                  </div>
-                  <div className="grid gap-3 mt-4 text-[11px]" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Stat k="endpoints"     v={`${obs.totalLines}`}                          c={C.amber}  />
-                    <Stat k="σ (S/m)"        v={obs.sigma.toExponential(2)}                   c={C.gold}   />
-                    <Stat k="bend"          v={bend.toFixed(2)}                              c={C.cyan}   />
-                    <Stat k="fanout"        v={`${fanout}`}                                  c={C.violet} />
-                  </div>
-                </>
-              )}
-
-              {tab === "dna" && (
-                <>
-                  <Title col={C.green}>DNA / RNA switching — solid parts swapped for biocomputation</Title>
-                  <Body>
-                    The classical solid-state pieces (gates, registers) are replaced with synthetic <span style={{ color: C.green }}>DNA / RNA</span> strands engineered for strand-displacement
-                    logic. Input strands toehold-bind the gate template and displace an output strand — that displacement is the bit flip. Different sequences encode <span style={{ color: C.cyan }}>AND</span>,
-                    <span style={{ color: C.gold }}> OR</span>, <span style={{ color: C.rose }}>NOT</span>, <span style={{ color: C.violet }}>XOR</span>, <span style={{ color: C.amber }}>NAND</span>.
-                    Massively parallel: every site fires independently in solution.
-                  </Body>
-                  <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Slider id="conc"    label="[strand]"               value={conc}     min={0.05} max={1.0}  step={0.01} col={C.green}  fmt={v => v.toFixed(2)} onChange={setCC} />
-                    <Slider id="krate"   label="k_rxn (rate)"           value={kRate}    min={0.05} max={1.0}  step={0.01} col={C.gold}   fmt={v => v.toFixed(2)} onChange={setKR} />
-                    <Slider id="par"     label="parallel sites"          value={parallel} min={1}    max={12}   step={1}    col={C.cyan}   fmt={v => `${Math.round(v)}`} onChange={setPP} />
-                    <Slider id="mix"     label="gate mix (AND ↔ XOR)"  value={gateMix}  min={0.0}  max={1.0}  step={0.01} col={C.violet} fmt={v => v.toFixed(2)} onChange={setGM} />
-                  </div>
-                  <div className="grid gap-3 mt-4 text-[11px]" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Stat k="sites"      v={`${obs.sites}`}                           c={C.green}  />
-                    <Stat k="ops/s"      v={obs.opsPerSec.toExponential(2)}            c={C.gold}   />
-                    <Stat k="[strand]"   v={conc.toFixed(2)}                          c={C.amber}  />
-                    <Stat k="k_rxn"      v={kRate.toFixed(2)}                         c={C.cyan}   />
-                  </div>
-                </>
-              )}
-
-              {tab === "stack" && (
-                <>
-                  <Title col={C.violet}>Hybrid stack — merged substrate computer</Title>
-                  <Body>
-                    The full stack: <span style={{ color: C.cyan }}>hydrogel scaffold</span> at the base, a <span style={{ color: C.amber }}>conductive grid</span> for fast deterministic signals,
-                    a <span style={{ color: C.green }}>DNA logic plane</span> as a parallel co-processor, a <span style={{ color: C.rose }}>sensor lattice</span> for live environment readback,
-                    and a printable <span style={{ color: C.violet }}>hybrid interface</span> that translates between electronics and biochemistry. The whole thing is printed into one
-                    gel vat, then UV / temperature cross-link locks the geometry while keeping it flexible.
-                  </Body>
-                  <div className="grid gap-3 mt-4" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
-                    <Slider id="layers"  label="layers"                value={layers}    min={3}    max={7}    step={1}    col={C.violet} fmt={v => `${Math.round(v)}`} onChange={setLY} />
-                    <Slider id="sd"      label="sensor density"         value={sensorD}  min={0.05} max={1.0}  step={0.01} col={C.rose}   fmt={v => v.toFixed(2)} onChange={setSD} />
-                    <Slider id="cp"      label="inter-layer coupling"   value={coupling} min={0.0}  max={1.0}  step={0.01} col={C.gold}   fmt={v => v.toFixed(2)} onChange={setCP} />
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <button onClick={flashCrosslink} data-testid="btn-crosslink"
-                      aria-label="Fire UV/thermal cross-link pulse"
-                      className="px-3 py-2 text-[10px] tracking-[0.2em] uppercase border"
-                      style={{ borderColor: C.border2, color: C.gold }}>cross-link pulse</button>
-                  </div>
-                  <div className="grid gap-3 mt-4 text-[11px]" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-                    <Stat k="layers"      v={`${layers}`}                          c={C.violet} />
-                    <Stat k="height"      v={`${obs.stackHeightMm.toFixed(2)} mm`}  c={C.cyan}   />
-                    <Stat k="sensors"     v={sensorD.toFixed(2)}                   c={C.rose}   />
-                    <Stat k="coupling"    v={coupling.toFixed(2)}                  c={C.gold}   />
-                  </div>
-                </>
-              )}
-            </motion.div>
-          </AnimatePresence>
-
-          <div className="lp-card mt-5 border rounded-[10px] p-5" style={{ borderColor: C.border, background: C.panel }}>
-            <div className="text-[10px] tracking-[0.4em] uppercase mb-4 italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>print phenomena</div>
-            <div className="grid gap-4" style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr" }}>
-              <Bar label="gel suspension"     val={1 - shearN}                              c={C.cyan}   />
-              <Bar label="conductive σ"        val={conduct}                                c={C.amber}  />
-              <Bar label="DNA parallelism"     val={Math.min(1, parallel / 12)}              c={C.green}  />
-              <Bar label="hybrid coupling"     val={coupling}                                c={C.violet} />
+          {/* Telemetry sidebar */}
+          <aside style={{ ...CARD, border: `1px solid ${C.border}`, borderRadius: 10, padding: 20, background: C.panel, alignSelf: "start" }}>
+            <div style={{ fontSize: 10, letterSpacing: "0.4em", textTransform: "uppercase", marginBottom: 16, fontStyle: "italic", color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>telemetry</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 11, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
+              <Row k="active workbench" v={activeTab.label} c={activeTab.col} />
+              <Row k="v_print"       v={`${printSpeed.toFixed(0)} mm/s`}       c={C.gold}   />
+              <Row k="nozzle Ø"      v={`${nozzle.toFixed(0)} um`}             c={C.amber}  />
+              <Row k="n_shear"       v={shearN.toFixed(2)}                      c={C.cyan}   />
+              <Row k="build time"    v={`${obs.buildSec.toFixed(1)} s`}         c={C.gold}   />
+              <Row k="path"          v={`${obs.pathMm.toFixed(0)} mm`}          c={C.cyan}   />
+              <Row k="traces"        v={`${traceN}`}                            c={C.amber}  />
+              <Row k="sigma"         v={`${obs.sigma.toExponential(1)} S/m`}    c={C.gold}   />
+              <Row k="endpoints"     v={`${obs.totalLines}`}                    c={C.violet} />
+              <Row k="DNA sites"     v={`${obs.sites}`}                         c={C.green}  />
+              <Row k="ops/s"         v={obs.opsPerSec.toExponential(1)}         c={C.gold}   />
+              <Row k="layers"        v={`${layers}`}                            c={C.violet} />
+              <Row k="stack height"  v={`${obs.stackHeightMm.toFixed(2)} mm`}  c={C.cyan}   />
+              <Row k="ops"           v={`${ops}`}                               c={C.gold}   />
             </div>
-          </div>
+            <div style={{ marginTop: 20, borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>
+              <div style={{ fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", marginBottom: 8, color: C.muted }}>thesis</div>
+              <div style={{ fontSize: 10.5, lineHeight: 1.7, color: C.text }}>
+                <p style={{ margin: "0 0 8px" }}>The <span style={{ color: C.cyan }}>gel</span> is the support, so gravity is no longer a constraint. Builds collapse from hours to minutes and 3D conductive routing becomes free.</p>
+                <p style={{ margin: "0 0 8px" }}>Then we swap the solid parts of a conventional computer for a <span style={{ color: C.green }}>DNA / RNA logic layer</span> -- strand-displacement gates running massively in parallel -- and stitch them together with a printed <span style={{ color: C.violet }}>hybrid interface</span>.</p>
+                <p style={{ margin: 0 }}>One vat. One pass. A merged-substrate bio-electronic device.</p>
+              </div>
+            </div>
+          </aside>
         </div>
 
-        <aside className="lp-card border rounded-[10px] p-5" style={{ borderColor: C.border, background: C.panel }}>
-          <div className="text-[10px] tracking-[0.4em] uppercase mb-4 italic" style={{ color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>telemetry</div>
-          <div className="space-y-2 text-[11px]" style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
-            <Row k="active workbench" v={TABS.find(t => t.key === tab)!.label} c={TABS.find(t => t.key === tab)!.col} />
-            <Row k="v_print"       v={`${printSpeed.toFixed(0)} mm/s`}        c={C.gold} />
-            <Row k="nozzle Ø"     v={`${nozzle.toFixed(0)} μm`}              c={C.amber} />
-            <Row k="n_shear"       v={shearN.toFixed(2)}                       c={C.cyan} />
-            <Row k="build time"   v={`${obs.buildSec.toFixed(1)} s`}          c={C.gold} />
-            <Row k="path"           v={`${obs.pathMm.toFixed(0)} mm`}            c={C.cyan} />
-            <Row k="traces"        v={`${traceN}`}                              c={C.amber} />
-            <Row k="σ"               v={`${obs.sigma.toExponential(1)} S/m`}      c={C.gold} />
-            <Row k="endpoints"     v={`${obs.totalLines}`}                      c={C.violet} />
-            <Row k="DNA sites"     v={`${obs.sites}`}                            c={C.green} />
-            <Row k="ops/s"         v={obs.opsPerSec.toExponential(1)}           c={C.gold} />
-            <Row k="layers"         v={`${layers}`}                              c={C.violet} />
-            <Row k="stack height"  v={`${obs.stackHeightMm.toFixed(2)} mm`}     c={C.cyan} />
-            <Row k="ops"            v={`${ops}`}                                 c={C.gold} />
+        {/* Event log */}
+        <div style={{ ...CARD, marginTop: 24, border: `1px solid ${C.border}`, borderRadius: 10, overflow: "hidden", background: C.panel }}>
+          <div style={{ padding: "10px 20px", fontSize: 10, letterSpacing: "0.4em", textTransform: "uppercase", borderBottom: `1px solid ${C.border}`, fontStyle: "italic", display: "inline-flex", alignItems: "center", gap: 8, color: C.muted, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
+            <span className="lp-pulse-dot" style={{ width: 5, height: 5, borderRadius: "50%", background: C.gold, boxShadow: `0 0 6px ${C.gold}`, flexShrink: 0 }} />
+            event log
           </div>
-          <div className="mt-5 border-t pt-4" style={{ borderColor: C.border }}>
-            <div className="text-[10px] tracking-[0.3em] uppercase mb-2" style={{ color: C.muted }}>thesis</div>
-            <div className="text-[10.5px] leading-relaxed" style={{ color: C.text }}>
-              <p>The <span style={{ color: C.cyan }}>gel</span> is the support, so gravity is no longer a constraint. Builds collapse from hours to minutes and 3D conductive routing becomes free.</p>
-              <p className="mt-2">Then we swap the solid parts of a conventional computer for a <span style={{ color: C.green }}>DNA / RNA logic layer</span> — strand-displacement gates running massively in parallel — and stitch them together with a printed <span style={{ color: C.violet }}>hybrid interface</span>.</p>
-              <p className="mt-2">One vat. One pass. A merged-substrate bio-electronic device.</p>
-            </div>
+          <div data-testid="event-log" style={{ padding: "12px 20px", maxHeight: 192, overflowY: "auto", fontSize: 11, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
+            {log.map((L, i) => (
+              <div key={i} className="lp-event" style={{ display: "flex", gap: 12, padding: "2px 0" }}>
+                <span style={{ color: C.muted }}>{L.ts}</span>
+                <span style={{ color: L.col, minWidth: 80 }}>[{L.tag}]</span>
+                <span style={{ color: C.text }}>{L.msg}</span>
+              </div>
+            ))}
           </div>
-        </aside>
-      </div>
-
-      <div className="lp-card mt-6 border rounded-[10px] overflow-hidden" style={{ borderColor: C.border, background: C.panel }}>
-        <div className="px-5 py-2.5 text-[10px] tracking-[0.4em] uppercase border-b italic inline-flex items-center gap-2" style={{ color: C.muted, borderColor: C.border, fontFamily: "'Cinzel', ui-serif, Georgia, serif" }}>
-          <span className="lp-pulse-dot" style={{ width: 5, height: 5, borderRadius: "50%", background: C.gold, boxShadow: `0 0 6px ${C.gold}` }} />
-          event log
         </div>
-        <div className="px-5 py-3 max-h-48 overflow-y-auto text-[11px]" data-testid="event-log" style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>
-          {log.map((L, i) => (
-            <div key={i} className="lp-event flex gap-3 py-0.5">
-              <span style={{ color: C.muted }}>{L.ts}</span>
-              <span style={{ color: L.col, minWidth: 80 }}>[{L.tag}]</span>
-              <span style={{ color: C.text }}>{L.msg}</span>
-            </div>
-          ))}
-        </div>
-      </div>
       </div>
     </div>
   );
@@ -955,22 +977,22 @@ function nowStamp() {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:${String(d.getSeconds()).padStart(2, "0")}`;
 }
 function Title({ children, col }: { children: React.ReactNode; col: string }) {
-  return <div className="text-[15px] tracking-[0.04em] mb-3" style={{ color: col, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>{children}</div>;
+  return <div style={{ fontSize: 15, letterSpacing: "0.04em", marginBottom: 12, color: col, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>{children}</div>;
 }
 function Body({ children }: { children: React.ReactNode }) {
-  return <div className="text-[12.5px] leading-relaxed" style={{ color: C.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>{children}</div>;
+  return <div style={{ fontSize: 12.5, lineHeight: 1.7, color: C.text, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>{children}</div>;
 }
 function Stat({ k, v, c }: { k: string; v: string; c: string }) {
   return (
-    <div className="border rounded-[6px] px-3 py-2.5" style={{ borderColor: C.border, background: "rgba(20,18,32,0.4)" }}>
-      <div className="text-[9px] tracking-[0.25em] uppercase" style={{ color: C.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>{k}</div>
-      <div className="mt-1 text-[12px]" style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v}</div>
+    <div style={{ border: `1px solid ${C.border}`, borderRadius: 6, padding: "10px 12px", background: "rgba(20,18,32,0.4)" }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.25em", textTransform: "uppercase", color: C.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>{k}</div>
+      <div style={{ marginTop: 4, fontSize: 12, color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v}</div>
     </div>
   );
 }
 function Row({ k, v, c }: { k: string; v: string; c: string }) {
   return (
-    <div className="flex justify-between items-baseline">
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
       <span style={{ color: C.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", fontSize: 10.5, letterSpacing: "0.04em" }}>{k}</span>
       <span style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v}</span>
     </div>
@@ -980,12 +1002,12 @@ function Bar({ label, val, c }: { label: string; val: number; c: string }) {
   const v = Math.max(0, Math.min(1, val));
   return (
     <div>
-      <div className="flex justify-between text-[10px] mb-1.5">
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, marginBottom: 6 }}>
         <span style={{ color: "#6A6680", fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", letterSpacing: "0.04em" }}>{label}</span>
         <span style={{ color: c, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{v.toFixed(2)}</span>
       </div>
-      <div className="h-[4px] rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.04)" }}>
-        <div className="h-full rounded-full" style={{ width: `${v * 100}%`, background: `linear-gradient(90deg, ${c}55 0%, ${c} 100%)`, boxShadow: `0 0 8px ${c}66` }} />
+      <div style={{ height: 4, borderRadius: 9999, overflow: "hidden", background: "rgba(255,255,255,0.04)" }}>
+        <div style={{ height: "100%", borderRadius: 9999, width: `${v * 100}%`, background: `linear-gradient(90deg, ${c}55 0%, ${c} 100%)`, boxShadow: `0 0 8px ${c}66` }} />
       </div>
     </div>
   );
@@ -994,7 +1016,7 @@ function Slider({ id, label, value, min, max, step, col, fmt, onChange }:
   { id: string; label: string; value: number; min: number; max: number; step: number; col: string; fmt: (v: number) => string; onChange: (v: number) => void }) {
   return (
     <div>
-      <div className="flex justify-between text-[11px] mb-1">
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, marginBottom: 4 }}>
         <span style={{ color: "#60607A" }}>{label}</span>
         <span style={{ color: col }}>{fmt(value)}</span>
       </div>
@@ -1002,7 +1024,7 @@ function Slider({ id, label, value, min, max, step, col, fmt, onChange }:
         onChange={e => onChange(parseFloat(e.target.value))}
         onInput={e => onChange(parseFloat((e.target as HTMLInputElement).value))}
         data-testid={`slider-${id}`} aria-label={label}
-        className="w-full" />
+        style={{ width: "100%", accentColor: col, cursor: "pointer" }} />
     </div>
   );
 }
