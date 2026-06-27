@@ -350,6 +350,7 @@ const NAV_ITEMS = [
   { href: "/dynamic-synthesis", label: "Dynamic Synthesis Framework · Plasmoidic Containment · Cosmic Field Amplification · Vortex Flow · Spacetime Lattice · MHD Equations · As Above So Below", icon: Atom },
   { href: "/coherence-field-theory", label: "Coherence Field Theory · Substrate Quantization · Epigenetic Network Spectrum · Allen-Cahn PDE · Order Parameter · Gravity as Network · Speculative Framework", icon: Atom },
   { href: "/substrate-quantization-engine", label: "Substrate Quantization Engine · Slime Materials · Epigenetic Network · CUCA Photonic Stack P0-P9 · Cephalopod Edge Constraint · State Matrix · Pipeline", icon: Atom },
+  { href: "/aether-carriage", label: "AETHER Solar Carriage · Gold Leaf Plasmonic Shell · Bouligand Carved Wood · Coherence Suspension · Gravity Deflection Field · Sunlight Propulsion · Speculative Transport", icon: Atom },
   { href: "/portal-restoration", label: "Portal States · Restoration · Inner Resonance · Circadian Arc · 12:12 Portal · 7-Step Flow · Glow From Inside Out · Stonehenge · AETHER Module", icon: Atom },
   { href: "/gut-brain", label: "Gut-Brain Axis · Microbial Neural · Serotonin 90% · Vagus Nerve · Endocrine · Immune · Metabolic · 30 Plants · 3 Fermented · 8hr Sleep · 15hr Fast", icon: Atom },
   { href: "/planetary-neural", label: "Planetary-Neural Cascade · Solar Wind · Geomagnetic · Ocean Iodine · Thyroid T3 T4 · Brain Development · Goitre Belt · Cognitive Outcomes", icon: Atom },
