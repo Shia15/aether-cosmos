@@ -349,6 +349,7 @@ const EarthLivingSystemPage = lazy(() => import("@/pages/earth-living-system"));
 const PortalRestorationPage = lazy(() => import("@/pages/portal-restoration"));
 const OpalGenesisPage = lazy(() => import("@/pages/opal-genesis"));
 const DynamicSynthesisPage = lazy(() => import("@/pages/dynamic-synthesis"));
+const CoherenceFieldTheoryPage = lazy(() => import("@/pages/coherence-field-theory"));
 
 const queryClient = new QueryClient();
 
@@ -1034,6 +1035,7 @@ function Router() {
                 <Route path="/propulsion-dynamics" component={PropulsionDynamicsPage} />
                 <Route path="/polymer-biobreak" component={PolymerBiobreakPage} />
                 <Route path="/dynamic-synthesis" component={DynamicSynthesisPage} />
+                <Route path="/coherence-field-theory" component={CoherenceFieldTheoryPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
