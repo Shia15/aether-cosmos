@@ -359,6 +359,7 @@ const DailyCompanionPage  = lazy(() => import("@/pages/daily-companion"));
 const PhiLatticePage       = lazy(() => import("@/pages/phi-lattice"));
 const AtomicGeometryPage    = lazy(() => import("@/pages/atomic-geometry"));
 const BlueLightProtocolPage = lazy(() => import("@/pages/blue-light-protocol"));
+const LiveCursorsPage       = lazy(() => import("@/pages/live-cursors"));
 
 const queryClient = new QueryClient();
 
@@ -1172,6 +1173,7 @@ function Router() {
                 <Route path="/phi-lattice" component={PhiLatticePage} />
                 <Route path="/atomic-geometry" component={AtomicGeometryPage} />
                 <Route path="/blue-light-protocol" component={BlueLightProtocolPage} />
+                <Route path="/live-cursors" component={LiveCursorsPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
