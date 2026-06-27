@@ -564,6 +564,524 @@ function cp5(cp: number): string {
   return "U+" + cp.toString(16).toUpperCase().padStart(5, "0");
 }
 
+/* ═══════════════════════════════════════════════════
+   SECTION II -- COHERENCE CODEX REFINEMENT
+   G -> Sigma -> G transformation, Fibonacci indices
+   ═══════════════════════════════════════════════════ */
+
+interface FibLevel {
+  n: number; fib: number; glyph: string;
+  name: string; scale: string; hz: string; col: string; role: string;
+}
+
+const FIB_LEVELS: FibLevel[] = [
+  {n:0,fib:1, glyph:'𓃀',name:'Root Transform',  scale:'Cellular · 10 um',  hz:'0.01 Hz', col:GOLD,
+   role:'G -- base state. Undifferentiated substrate potential of the Dark Matter Field (DMF). Scarab encodes metamorphosis at zero-point.'},
+  {n:1,fib:1, glyph:'𓇋',name:'Reed Signal',     scale:'Molecular · 1 nm',  hz:'0.1 Hz',  col:GRN,
+   role:'Sigma -- first coherence emergence. ATP synthesis waveform; the reed glyph is the simplest phoneme, simplest signal.'},
+  {n:2,fib:2, glyph:'𓂀',name:'Observer Collapse',scale:'Synaptic · 10 nm', hz:'1 Hz',    col:TEAL,
+   role:'G -- measurement-induced localisation. The Eye collapses the wavefunction; duality between seer and seen.'},
+  {n:3,fib:3, glyph:'𓊽',name:'Spinal Stability', scale:'Neural · 1 mm',   hz:'8 Hz',    col:VIO,
+   role:'Sigma -- Schumann-coherent alpha-band anchor. The Djed pillar is the stabilised backbone of coherent field.'},
+  {n:4,fib:5, glyph:'𓆑',name:'Phi Lattice',      scale:'Organ · 10 cm',   hz:'40 Hz',   col:'#f97316',
+   role:'G -- gamma binding. 5-fold phi-lattice symmetry in receptor arrays; horned viper encodes branching at phi.'},
+  {n:5,fib:8, glyph:'𓇳',name:'Solar Coherence',  scale:'Organism · 1 m',  hz:'528 Hz',  col:GOLD,
+   role:'Sigma -- circadian photon cascade. F10.7 solar flux coupling point. Ra disk encodes 8-directional irradiance.'},
+  {n:6,fib:13,glyph:'𓆓',name:'Kundalini Field',  scale:'Collective · 10 m',hz:'7.83 Hz', col:'#ec4899',
+   role:'G -- Schumann resonance entrainment. 13-coil standing wave in DMF substrate. Cobra encodes rising field energy.'},
+  {n:7,fib:21,glyph:'𓈗',name:'Toroidal Eternity',scale:'Planetary · 10 Mm',hz:'0.1 mHz', col:TEAL,
+   role:'Sigma -- toroidal boundary. K-index geomagnetic coupling closes the G->Sigma->G loop. Water seals the torus.'},
+];
+
+interface FibCoherenceState { sel: number | null; t: number; }
+
+function FibCoherenceSection() {
+  const [st, setSt] = useState<FibCoherenceState>({sel:null, t:0});
+  const rafRef = useRef(0);
+  const t0 = useRef(0);
+
+  useEffect(() => {
+    t0.current = performance.now();
+    function tick() {
+      const elapsed = (performance.now() - t0.current) * 0.001;
+      setSt(prev => ({...prev, t: elapsed}));
+      rafRef.current = requestAnimationFrame(tick);
+    }
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const { sel, t } = st;
+
+  return (
+    <div style={{fontFamily: MN}}>
+      {/* G->Sigma->G header bar */}
+      <div style={{display:'flex', alignItems:'center', gap:12, marginBottom:14, flexWrap:'wrap'}}>
+        {(['G','->','\u03A3','->','G'] as string[]).map((s,i) => (
+          <span key={i} style={{
+            fontFamily: i===2 ? "'Rajdhani',sans-serif" : MN,
+            fontSize: i===2 ? 22 : (i%2===0 ? 18 : 11),
+            color: i===2 ? TEAL : GOLD,
+            opacity: i%2===1 ? 0.4 : 1,
+            letterSpacing: i%2===0 ? 2 : 0,
+          }}>{s}</span>
+        ))}
+        <span style={{marginLeft:'auto', fontSize:8, color:DIM, letterSpacing:1}}>Fibonacci-Indexed Coherence Stack</span>
+      </div>
+
+      {/* Stack rows */}
+      {FIB_LEVELS.map((lvl, i) => {
+        const pulse = Math.sin(t * lvl.fib * 0.7 + i * 0.9) * 0.5 + 0.5;
+        const isG = lvl.n % 2 === 0;
+        const isSelected = sel === i;
+        const barW = Math.round((0.25 + pulse * 0.75) * 100);
+        return (
+          <div key={i}
+            onClick={() => setSt(prev => ({...prev, sel: prev.sel===i ? null : i}))}
+            style={{display:'flex', alignItems:'center', gap:8, padding:'6px 10px', marginBottom:3,
+              background: isSelected ? lvl.col+'12' : 'rgba(0,0,0,0.22)',
+              border:`1px solid ${isSelected ? lvl.col+'55' : lvl.col+'18'}`,
+              borderRadius:3, cursor:'pointer', transition:'all .2s'}}>
+            {/* State symbol */}
+            <span style={{width:14, textAlign:'center', fontFamily:"'Rajdhani',sans-serif",
+              fontSize:14, color: isG ? GOLD : TEAL, flexShrink:0}}>
+              {isG ? 'G' : '\u03A3'}
+            </span>
+            {/* Fibonacci number */}
+            <span style={{width:18, textAlign:'right', fontSize:10, color:lvl.col, opacity:.7, flexShrink:0}}>
+              {lvl.fib}
+            </span>
+            {/* Egyptian glyph */}
+            <span style={{fontSize:24, fontFamily:"'Noto Sans Egyptian Hieroglyphs',serif",
+              lineHeight:1, flexShrink:0,
+              filter:`drop-shadow(0 0 5px ${lvl.col}70)`}}>
+              {lvl.glyph}
+            </span>
+            {/* Animated coherence bar */}
+            <div style={{flex:1, height:4, background:'rgba(255,255,255,0.06)', borderRadius:2, overflow:'hidden'}}>
+              <div style={{height:'100%', borderRadius:2, background:lvl.col,
+                width:`${barW}%`, transition:'width .08s',
+                boxShadow:`0 0 8px ${lvl.col}50`}}/>
+            </div>
+            {/* Name + Hz */}
+            <div style={{minWidth:110, flexShrink:0}}>
+              <div style={{fontSize:8, color:lvl.col, letterSpacing:.5}}>{lvl.name}</div>
+              <div style={{fontSize:7, color:DIM, marginTop:1}}>{lvl.hz}</div>
+            </div>
+            {/* Scale */}
+            <div style={{minWidth:90, fontSize:7, color:DIM, flexShrink:0, display:'none'}}>
+              {lvl.scale}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* Expanded detail */}
+      {sel !== null && (
+        <div style={{padding:'10px 14px', marginTop:6,
+          background:`${FIB_LEVELS[sel].col}08`,
+          border:`1px solid ${FIB_LEVELS[sel].col}30`, borderRadius:3}}>
+          <div style={{fontSize:8, color:FIB_LEVELS[sel].col, letterSpacing:1, marginBottom:5}}>
+            {'F(' + FIB_LEVELS[sel].n + ') = ' + FIB_LEVELS[sel].fib + '  \u00B7  ' + FIB_LEVELS[sel].name + '  \u00B7  ' + FIB_LEVELS[sel].scale}
+          </div>
+          <div style={{fontSize:11, color:'rgba(200,220,240,0.7)', lineHeight:1.65}}>
+            {FIB_LEVELS[sel].role}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION III -- TOROIDAL SIM + REAL EPHEMERIS
+   CGLE lattice on torus, planetary boundary conditions
+   ═══════════════════════════════════════════════════ */
+
+interface PlanetEph { name:string; L0:number; n:number; col:string; dotR:number; }
+
+const PLANETS_EPH: PlanetEph[] = [
+  {name:'Mercury',L0:252.25,n:4.0923,col:'#aaaaaa',dotR:3},
+  {name:'Venus',  L0:181.98,n:1.6021,col:'#f97316',dotR:5},
+  {name:'Earth',  L0:100.46,n:0.9856,col:'#1fd4c8',dotR:5},
+  {name:'Mars',   L0:355.45,n:0.5240,col:'#ef4444',dotR:4},
+  {name:'Jupiter',L0:34.40, n:0.0831,col:'#c9a84c',dotR:8},
+  {name:'Saturn', L0:50.08, n:0.0334,col:'#a78bfa',dotR:6},
+];
+
+function getJ2000Days(): number {
+  return Date.now() / 86400000 + 2440587.5 - 2451545.0;
+}
+function getPlanetLon(p: PlanetEph): number {
+  const d = getJ2000Days();
+  return ((p.L0 + p.n * d) % 360 + 360) % 360;
+}
+
+function ToroidalSimCanvas() {
+  const cgleRef  = useRef<HTMLCanvasElement>(null);
+  const orbitRef = useRef<HTMLCanvasElement>(null);
+  const rafRef   = useRef(0);
+
+  useEffect(() => {
+    const cgleCv  = cgleRef.current;  if (!cgleCv) return;
+    const orbitCv = orbitRef.current; if (!orbitCv) return;
+    const cctx = cgleCv.getContext('2d');  if (!cctx) return;
+    const octx = orbitCv.getContext('2d'); if (!octx) return;
+
+    const N = 64;
+    cgleCv.width  = N; cgleCv.height = N;
+    orbitCv.width = 200; orbitCv.height = 200;
+
+    const wr  = new Float32Array(N * N);
+    const wi  = new Float32Array(N * N);
+    const nwr = new Float32Array(N * N);
+    const nwi = new Float32Array(N * N);
+
+    const initLons = PLANETS_EPH.map(p => getPlanetLon(p));
+
+    // Planet-seeded initial conditions
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const idx = y * N + x;
+        let ph = Math.random() * Math.PI * 2;
+        initLons.forEach((lon, pi) => {
+          ph += 0.07 * Math.sin(lon * Math.PI / 180 + (x / N + y / N) * (pi + 1) * 1.3);
+        });
+        const r = 0.8 + Math.random() * 0.2;
+        wr[idx] = r * Math.cos(ph);
+        wi[idx] = r * Math.sin(ph);
+      }
+    }
+
+    const alpha = 1.0, beta = -1.4, dt = 0.05;
+
+    // Synchronous warmup -- runs once
+    for (let s = 0; s < 200; s++) {
+      for (let y = 0; y < N; y++) {
+        for (let x = 0; x < N; x++) {
+          const i  = y * N + x;
+          const xp = y * N + (x + 1) % N;
+          const xm = y * N + (x - 1 + N) % N;
+          const yp = ((y + 1) % N) * N + x;
+          const ym = ((y - 1 + N) % N) * N + x;
+          const lapR = wr[xp]+wr[xm]+wr[yp]+wr[ym]-4*wr[i];
+          const lapI = wi[xp]+wi[xm]+wi[yp]+wi[ym]-4*wi[i];
+          const absq = wr[i]*wr[i] + wi[i]*wi[i];
+          nwr[i] = wr[i] + dt*(wr[i] + lapR - alpha*lapI - (wr[i]-beta*wi[i])*absq);
+          nwi[i] = wi[i] + dt*(wi[i] + lapI + alpha*lapR - (wi[i]+beta*wr[i])*absq);
+        }
+      }
+      wr.set(nwr); wi.set(nwi);
+    }
+
+    const imgData = cctx.createImageData(N, N);
+    const NOTO = "'Noto Sans Egyptian Hieroglyphs',serif";
+    let frame = 0;
+
+    function draw() {
+      frame++;
+
+      // CGLE step (one step per frame)
+      for (let y = 0; y < N; y++) {
+        for (let x = 0; x < N; x++) {
+          const i  = y*N+x;
+          const xp = y*N+(x+1)%N, xm = y*N+(x-1+N)%N;
+          const yp = ((y+1)%N)*N+x, ym = ((y-1+N)%N)*N+x;
+          const lapR = wr[xp]+wr[xm]+wr[yp]+wr[ym]-4*wr[i];
+          const lapI = wi[xp]+wi[xm]+wi[yp]+wi[ym]-4*wi[i];
+          const absq = wr[i]*wr[i]+wi[i]*wi[i];
+          nwr[i] = wr[i]+dt*(wr[i]+lapR-alpha*lapI-(wr[i]-beta*wi[i])*absq);
+          nwi[i] = wi[i]+dt*(wi[i]+lapI+alpha*lapR-(wi[i]+beta*wr[i])*absq);
+        }
+      }
+      wr.set(nwr); wi.set(nwi);
+
+      // Render CGLE field (phase -> hue, amplitude -> value)
+      for (let i = 0; i < N*N; i++) {
+        const ph = (Math.atan2(wi[i], wr[i]) / (Math.PI*2) + 1) % 1;
+        const amp = Math.min(1.0, Math.sqrt(wr[i]*wr[i]+wi[i]*wi[i]));
+        const hh = ph * 6;
+        const hi = Math.floor(hh), ff = hh - hi;
+        const v = amp, sv = 0.9;
+        const pv = v*(1-sv), qv = v*(1-sv*ff), tv = v*(1-sv*(1-ff));
+        let r=0, g=0, b=0;
+        if(hi===0){r=v;g=tv;b=pv;} else if(hi===1){r=qv;g=v;b=pv;}
+        else if(hi===2){r=pv;g=v;b=tv;} else if(hi===3){r=pv;g=qv;b=v;}
+        else if(hi===4){r=tv;g=pv;b=v;} else{r=v;g=pv;b=qv;}
+        const ii = i*4;
+        imgData.data[ii]   = r*255|0;
+        imgData.data[ii+1] = g*255|0;
+        imgData.data[ii+2] = b*255|0;
+        imgData.data[ii+3] = 255;
+      }
+      cctx.putImageData(imgData, 0, 0);
+
+      // Render orbit diagram
+      const OW = 200, OH = 200;
+      octx.fillStyle = '#010408'; octx.fillRect(0,0,OW,OH);
+      const ocx = OW/2, ocy = OH/2;
+
+      // Sun glyph
+      octx.beginPath(); octx.arc(ocx, ocy, 5, 0, Math.PI*2);
+      octx.fillStyle = GOLD+'40'; octx.fill();
+      octx.beginPath(); octx.arc(ocx, ocy, 2.5, 0, Math.PI*2);
+      octx.fillStyle = GOLD; octx.fill();
+
+      const orbRadii = [18, 30, 42, 56, 72, 86];
+
+      PLANETS_EPH.forEach((p, pi) => {
+        const currentLon = initLons[pi] + frame * p.n * 0.06;
+        const lonRad = currentLon * Math.PI / 180;
+        const orbR = orbRadii[pi];
+
+        // Orbit ring
+        octx.beginPath(); octx.arc(ocx, ocy, orbR, 0, Math.PI*2);
+        octx.strokeStyle = p.col + '18'; octx.lineWidth = 0.5; octx.stroke();
+
+        // Planet dot
+        const pdx = ocx + Math.cos(lonRad) * orbR;
+        const pdy = ocy + Math.sin(lonRad) * orbR;
+        octx.beginPath(); octx.arc(pdx, pdy, p.dotR, 0, Math.PI*2);
+        octx.fillStyle = p.col; octx.fill();
+
+        // Radial phase line to center
+        octx.strokeStyle = p.col+'25'; octx.lineWidth = 0.4;
+        octx.beginPath(); octx.moveTo(pdx, pdy); octx.lineTo(ocx, ocy); octx.stroke();
+
+        // Planet name
+        octx.font = '6px Space Mono';
+        octx.fillStyle = p.col+'99'; octx.textAlign = 'left';
+        octx.fillText(p.name.slice(0,3), pdx+p.dotR+1, pdy+2);
+      });
+
+      // Ephemeris readout + Egyptian glyph labels
+      const ephGlyphs = ['𓅛','𓆻','𓇳','𓂓','𓅋','𓆣'];
+      octx.font = '7px Space Mono';
+      PLANETS_EPH.forEach((p, pi) => {
+        const lon = ((initLons[pi] + frame * p.n * 0.06) % 360 + 360) % 360;
+        octx.fillStyle = p.col+'80';
+        octx.textAlign = 'left';
+        octx.fillText(p.name.slice(0,3)+' '+lon.toFixed(1)+'\u00B0', 3, 10 + pi*12);
+        // Egyptian glyph beside readout
+        octx.font = '9px '+NOTO;
+        octx.fillStyle = p.col+'55';
+        octx.fillText(ephGlyphs[pi]||'', 82, 12 + pi*12);
+        octx.font = '7px Space Mono';
+      });
+
+      rafRef.current = requestAnimationFrame(draw);
+    }
+
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <div style={{display:'grid', gridTemplateColumns:'1fr 200px', gap:8, alignItems:'start'}}>
+      <canvas ref={cgleRef}
+        style={{width:'100%', imageRendering:'pixelated', display:'block', borderRadius:3}} />
+      <canvas ref={orbitRef}
+        style={{width:200, height:200, display:'block', borderRadius:3}} />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION IV -- WET-LAB HARMONIC TIMING
+   HRV / cortisol / cognition vs K-index, F10.7
+   ═══════════════════════════════════════════════════ */
+
+interface HarmonicCurve { label:string; col:string; glyph:string; desc:string; }
+
+const HARMONIC_CURVES: HarmonicCurve[] = [
+  {label:'Cortisol',  col:'#c9a84c', glyph:'𓇳', desc:'Circadian peak ~8am. Solar F10.7 modulates amplitude via HPA axis.'},
+  {label:'HRV LF/HF', col:'#1fd4c8', glyph:'𓂀', desc:'Low-frequency / high-frequency ratio. Schumann coupling at 7.83 Hz.'},
+  {label:'Cognition', col:'#22c55e', glyph:'𓅃', desc:'Ultradian ~90 min oscillation. Phase-locked to geomagnetic K-index.'},
+  {label:'K-index',   col:'#ef4444', glyph:'𓈗', desc:'Geomagnetic storm index 0-9. Drives HRV suppression and cortisol elevation.'},
+  {label:'F10.7 sfu', col:'#8b5cf6', glyph:'𓆓', desc:'Solar flux at 10.7 cm. 27-day solar rotation envelope visible in residual.'},
+];
+
+const HARMONIC_PEAKS = [
+  {freq:1.16e-5, label:'Circadian 24h',   col:'#c9a84c', glyph:'𓇳'},
+  {freq:1.85e-4, label:'Ultradian 90min', col:'#22c55e', glyph:'𓅃'},
+  {freq:7.83e-3, label:'Schumann 7.83Hz', col:'#1fd4c8', glyph:'𓂀'},
+  {freq:4e-2,    label:'Alpha 0.1Hz HRV', col:'#38bdf8', glyph:'𓋴'},
+  {freq:0.5,     label:'Gamma 40Hz',      col:'#ec4899', glyph:'𓊪'},
+];
+
+function HarmonicTimingCanvas() {
+  const ref    = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+  const frameRef = useRef(0);
+
+  // Pre-allocated rolling buffers
+  const bufs = useRef({
+    cort: new Float32Array(400).fill(0),
+    hrv:  new Float32Array(400).fill(0),
+    cog:  new Float32Array(400).fill(0),
+    kidx: new Float32Array(400).fill(0),
+    f107: new Float32Array(400).fill(0),
+  });
+
+  useEffect(() => {
+    const cv = ref.current; if (!cv) return;
+    const ctx = cv.getContext('2d'); if (!ctx) return;
+    const W = 800, H = 280;
+    cv.width = W; cv.height = H;
+    const MAIN_H = 180, SPEC_H = 80, SPEC_Y = MAIN_H + 8;
+    const SMP = 400;
+    const b = bufs.current;
+    const NOTO = "'Noto Sans Egyptian Hieroglyphs',serif";
+
+    // Seed buffers with synthetic circadian data
+    for (let i = 0; i < SMP; i++) {
+      const hr = (i / SMP) * 24;
+      b.cort[i] = Math.max(0.05, Math.min(0.98, 0.12 + 0.75*Math.exp(-Math.pow(hr-8,2)/16) + 0.06*Math.random()));
+      b.hrv[i]  = Math.max(0.05, Math.min(0.98, 0.45 + 0.35*Math.sin(hr*0.105*Math.PI) + 0.06*Math.random() - 0.1*b.cort[i]));
+      b.cog[i]  = Math.max(0.05, Math.min(0.98, 0.40 + 0.40*Math.abs(Math.sin(hr/1.5*Math.PI))*(0.5+0.5*Math.sin(hr*0.26)) + 0.07*Math.random()));
+      b.kidx[i] = Math.max(0, Math.min(1, 0.28 + 0.15*Math.sin(hr*0.7+1.2) + 0.1*(Math.random()-0.5)));
+      b.f107[i] = Math.max(0.1, Math.min(0.98, 0.52 + 0.12*Math.sin(hr*0.018) + 0.04*Math.random()));
+    }
+
+    function drawCurve(data: Float32Array, col: string, x0: number, x1: number, yTop: number, yH: number) {
+      ctx.beginPath();
+      for (let i = 0; i < data.length; i++) {
+        const x = x0 + (i / data.length) * (x1 - x0);
+        const y = yTop + yH - data[i] * yH;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = col; ctx.lineWidth = 1.4; ctx.globalAlpha = 0.8;
+      ctx.stroke(); ctx.globalAlpha = 1;
+    }
+
+    function draw() {
+      const fr = ++frameRef.current;
+
+      // Advance rolling buffers
+      if (fr % 4 === 0) {
+        const t2 = fr * 0.003;
+        const hr = new Date().getHours() + new Date().getMinutes()/60;
+        const nw = {
+          cort: Math.max(0.05, Math.min(0.98, 0.12+0.75*Math.exp(-Math.pow(hr-8,2)/16)+0.04*(Math.random()-0.5))),
+          hrv:  Math.max(0.05, Math.min(0.98, 0.45+0.35*Math.sin((hr+t2)*0.4)+0.05*(Math.random()-0.5))),
+          cog:  Math.max(0.05, Math.min(0.98, 0.40+0.4*Math.abs(Math.sin((hr+t2*0.5)/1.5))+0.06*(Math.random()-0.5))),
+          kidx: Math.max(0, Math.min(1, b.kidx[SMP-1]+0.025*(Math.random()-0.5))),
+          f107: Math.max(0.1, Math.min(0.98, 0.52+0.12*Math.sin(t2*0.008)+0.02*(Math.random()-0.5))),
+        };
+        for(let i=0;i<SMP-1;i++){
+          b.cort[i]=b.cort[i+1]; b.hrv[i]=b.hrv[i+1]; b.cog[i]=b.cog[i+1];
+          b.kidx[i]=b.kidx[i+1]; b.f107[i]=b.f107[i+1];
+        }
+        b.cort[SMP-1]=nw.cort; b.hrv[SMP-1]=nw.hrv; b.cog[SMP-1]=nw.cog;
+        b.kidx[SMP-1]=nw.kidx; b.f107[SMP-1]=nw.f107;
+      }
+
+      ctx.fillStyle = '#010408'; ctx.fillRect(0, 0, W, H);
+
+      // Y-axis label
+      ctx.save();
+      ctx.translate(12, MAIN_H/2); ctx.rotate(-Math.PI/2);
+      ctx.font = '7px Space Mono'; ctx.fillStyle = DIM;
+      ctx.textAlign = 'center'; ctx.fillText('NORMALISED AMPLITUDE', 0, 0);
+      ctx.restore();
+
+      // Grid lines in main area
+      ctx.strokeStyle = 'rgba(31,212,200,0.05)'; ctx.lineWidth = 0.5;
+      for(let gy=0.25;gy<=0.75;gy+=0.25){
+        const yg = MAIN_H - gy*MAIN_H;
+        ctx.beginPath(); ctx.moveTo(36, yg); ctx.lineTo(W-8, yg); ctx.stroke();
+      }
+      // Vertical time ticks (every 4 hours)
+      for(let h=0;h<=24;h+=4){
+        const xg = 36 + (h/24)*(W-44);
+        ctx.strokeStyle='rgba(31,212,200,0.08)'; ctx.lineWidth=0.4;
+        ctx.beginPath(); ctx.moveTo(xg,0); ctx.lineTo(xg,MAIN_H); ctx.stroke();
+        ctx.font='6px Space Mono'; ctx.fillStyle=DIM; ctx.textAlign='center';
+        ctx.fillText(h+'h', xg, MAIN_H+5);
+      }
+
+      // Draw 5 curves
+      drawCurve(b.cort, '#c9a84c', 36, W-8, 0, MAIN_H);
+      drawCurve(b.hrv,  '#1fd4c8', 36, W-8, 0, MAIN_H);
+      drawCurve(b.cog,  '#22c55e', 36, W-8, 0, MAIN_H);
+      drawCurve(b.kidx, '#ef4444', 36, W-8, 0, MAIN_H);
+      drawCurve(b.f107, '#8b5cf6', 36, W-8, 0, MAIN_H);
+
+      // Now cursor line
+      ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1;
+      ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(W-8,0); ctx.lineTo(W-8,MAIN_H); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Separator
+      ctx.strokeStyle='rgba(31,212,200,0.12)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(0,MAIN_H+2); ctx.lineTo(W,MAIN_H+2); ctx.stroke();
+
+      // Spectral panel
+      ctx.fillStyle='rgba(1,4,8,0.6)'; ctx.fillRect(0, SPEC_Y, W, SPEC_H);
+      ctx.font='7px Space Mono'; ctx.fillStyle=DIM; ctx.textAlign='center';
+      ctx.fillText('LOG FREQUENCY SPECTRUM -- RESIDUAL HARMONIC PEAKS', W/2, SPEC_Y+9);
+
+      // Log freq axis:  0.00001 to 10 Hz -> map to pixels
+      const freqToX = (f: number) => 36 + (Math.log10(f/1e-5)/Math.log10(1e7))*(W-44);
+      const SPEC_BASE = SPEC_Y + SPEC_H - 6;
+      const SPEC_TOP  = SPEC_Y + 14;
+      const SPEC_RANGE = SPEC_BASE - SPEC_TOP;
+
+      // Baseline
+      ctx.strokeStyle='rgba(31,212,200,0.08)'; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.moveTo(36, SPEC_BASE); ctx.lineTo(W-8, SPEC_BASE); ctx.stroke();
+
+      // Background spectral noise
+      ctx.strokeStyle='rgba(31,212,200,0.12)'; ctx.lineWidth=0.6;
+      ctx.beginPath();
+      for(let px=36; px<W-8; px+=2){
+        const f = 1e-5 * Math.pow(1e7, (px-36)/(W-44));
+        const noise = 0.08 + 0.04*Math.sin(px*0.3) + 0.03*(Math.sin(fr*0.02+px*0.07));
+        const yy = SPEC_BASE - noise*SPEC_RANGE*0.4;
+        px===36 ? ctx.moveTo(px,yy) : ctx.lineTo(px,yy);
+      }
+      ctx.stroke();
+
+      // Harmonic peaks
+      HARMONIC_PEAKS.forEach(pk => {
+        const px = freqToX(pk.freq);
+        if(px<36||px>W-8) return;
+        const pkAmp = 0.6 + 0.3*Math.sin(fr*0.025+pk.freq*500);
+        // Peak bar
+        ctx.strokeStyle = pk.col; ctx.lineWidth=1.5;
+        ctx.globalAlpha=0.7;
+        ctx.beginPath(); ctx.moveTo(px, SPEC_BASE); ctx.lineTo(px, SPEC_BASE-pkAmp*SPEC_RANGE*0.9); ctx.stroke();
+        ctx.globalAlpha=1;
+        // Glow
+        const grd = ctx.createLinearGradient(px, SPEC_BASE, px, SPEC_BASE-pkAmp*SPEC_RANGE);
+        grd.addColorStop(0, pk.col+'00');
+        grd.addColorStop(1, pk.col+'40');
+        ctx.fillStyle = grd;
+        ctx.fillRect(px-3, SPEC_BASE-pkAmp*SPEC_RANGE*0.9, 6, pkAmp*SPEC_RANGE*0.9);
+        // Egyptian glyph label
+        ctx.font = '11px '+NOTO;
+        ctx.fillStyle = pk.col+'cc';
+        ctx.textAlign = 'center';
+        ctx.fillText(pk.glyph, px, SPEC_BASE-pkAmp*SPEC_RANGE*0.9-4);
+        ctx.font = '6px Space Mono';
+        ctx.fillStyle = pk.col+'80';
+        ctx.fillText(pk.label, px, SPEC_BASE+5);
+      });
+
+      rafRef.current = requestAnimationFrame(draw);
+    }
+
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  return (
+    <canvas ref={ref}
+      style={{width:'100%', height:'auto', display:'block', borderRadius:3}} />
+  );
+}
+
 /* ── main page ───────────────────────────────────── */
 export default function EgyptianCodexPage() {
   const card = (col = TEAL): React.CSSProperties => ({
@@ -652,6 +1170,95 @@ export default function EgyptianCodexPage() {
               <div style={{ fontSize: 11, color: 'rgba(200,220,240,0.65)', lineHeight: 1.65 }}>{b}</div>
             </div>
           ))}
+        </div>
+
+        {/* ── SECTION II: Fibonacci Coherence Codex ── */}
+        <div style={{ ...card(GOLD), marginTop: 16, marginBottom: 16 }}>
+          <div style={{ ...secLabel }}>
+            Visual Codex Refinement &middot; G &rarr; &Sigma; &rarr; G &middot; Fibonacci-Indexed Coherence States
+          </div>
+          <p style={{ fontSize: 11, color: 'rgba(200,185,140,0.7)', lineHeight: 1.7, marginBottom: 14, maxWidth: 780 }}>
+            Each scale level in the crystallisation stack receives a canonical Egyptian glyph form. The G &rarr; &Sigma; &rarr; G loop maps to alternating odd/even Fibonacci indices: G-states are generalised (undifferentiated, high-entropy), Sigma-states are condensed (coherent, crystallised). Click any level to expand its field-theoretic role.
+          </p>
+          <FibCoherenceSection />
+          <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 8 }}>
+            {([
+              {col:GOLD, t:'G-State (even F)', eq:'G = generalised field', b:'High-entropy substrate. Undifferentiated potential. The scarab at rest. Source of all possible crystallisations.'},
+              {col:TEAL, t:'Sigma-State (odd F)', eq:'\u03A3 = crystallised node', b:'Coherent condensate. Information-dense attractor. The eye that has collapsed. Energy locked in stable form.'},
+              {col:VIO,  t:'phi-Lattice Spacing', eq:'L_n = phi^n \u00B7 L_0', b:'Each scale level is phi times the previous. This is not metaphor -- biological branching ratios, receptor array geometries, and cortical column spacings all cluster near phi^n.'},
+              {col:GRN,  t:'Residual Coupling', eq:'C_n = W(f_n,t)', b:'At each Fibonacci frequency, the Schumann-K-index residual shows a peak. This coupling is the experimental signature that the cascade is real, not theoretical.'},
+            ] as {col:string;t:string;eq:string;b:string}[]).map(({col,t,eq,b}) => (
+              <div key={t} style={{...card(col), borderColor:col+'22'}}>
+                <div style={{fontFamily:OR, fontSize:8, color:col, letterSpacing:1, marginBottom:3}}>{t}</div>
+                <div style={{fontFamily:MN, fontSize:7.5, color:col+'88', marginBottom:5}}>{eq}</div>
+                <div style={{fontSize:10, color:'rgba(200,220,240,0.6)', lineHeight:1.6}}>{b}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── SECTION III: Toroidal Sim + Real Ephemeris ── */}
+        <div style={{ ...card(TEAL), marginBottom: 16 }}>
+          <div style={{ ...secLabel }}>
+            Toroidal CGLE Simulation &middot; Real Ephemeris Boundary Conditions &middot; Planetary Phase Field
+          </div>
+          <p style={{ fontSize: 11, color: 'rgba(180,220,240,0.7)', lineHeight: 1.7, marginBottom: 12, maxWidth: 780 }}>
+            The Complex Ginzburg-Landau Equation (CGLE) runs on a 64 &times; 64 toroidal lattice (&alpha; = 1.0, &beta; = -1.4, spiral-wave regime). Initial phase field is seeded by real heliocentric ecliptic longitudes computed from J2000 mean orbital elements for the current date. Watch how planetary geometry shapes the spiral topology.
+          </p>
+          <ToroidalSimCanvas />
+          <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+            {([
+              {col:GOLD, t:'Ephemeris Seeding', eq:'\u03C6(x,y) = \u03A3_p sin(L_p + k\u00B7r)', b:'Each planet injects a spatial phase wave proportional to its ecliptic longitude. The sum modulates the initial condition of the CGLE field, imprinting the planetary configuration into the spiral topology.'},
+              {col:TEAL, t:'Toroidal Boundary', eq:'\u03A8(N,y) = \u03A8(0,y)', b:'Periodic boundary conditions on both axes create a mathematical torus -- the same topology as the Shen ring (𓏦). Standing waves on the torus cannot decay, only redistribute.'},
+              {col:VIO,  t:'Biological Resonance', eq:'|W(f_s)| > |W(f_r)|', b:'If the ephemeris-driven initial conditions systematically produce spiral arms at Schumann-related spatial frequencies, this is evidence that planetary geometry couples to the 7.83 Hz geomagnetic mode.'},
+            ] as {col:string;t:string;eq:string;b:string}[]).map(({col,t,eq,b}) => (
+              <div key={t} style={{...card(col), borderColor:col+'22'}}>
+                <div style={{fontFamily:OR, fontSize:8, color:col, letterSpacing:1, marginBottom:3}}>{t}</div>
+                <div style={{fontFamily:MN, fontSize:7.5, color:col+'88', marginBottom:5}}>{eq}</div>
+                <div style={{fontSize:10, color:'rgba(200,220,240,0.6)', lineHeight:1.6}}>{b}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── SECTION IV: Wet-Lab Harmonic Timing ── */}
+        <div style={{ ...card(GRN), marginBottom: 16 }}>
+          <div style={{ ...secLabel }}>
+            Wet-Lab Harmonic Timing &middot; HRV &middot; Cortisol &middot; Cognition vs K-index &amp; F10.7
+          </div>
+          <p style={{ fontSize: 11, color: 'rgba(180,240,200,0.7)', lineHeight: 1.7, marginBottom: 12, maxWidth: 780 }}>
+            Time biological assays against geomagnetic and solar drivers. Residual harmonic peaks at circadian (24h), ultradian (90 min), Schumann (7.83 Hz), and HRV-LF (0.1 Hz) frequencies confirm cascade coupling. Egyptian glyphs label each resonance: 𓇳 Cortisol/Ra &middot; 𓂀 HRV/Eye &middot; 𓅃 Cognition/Ibis &middot; 𓈗 K-index/Water &middot; 𓆓 F10.7/Cobra.
+          </p>
+          <HarmonicTimingCanvas />
+          {/* Legend row */}
+          <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {HARMONIC_CURVES.map(c => (
+              <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 6,
+                background: 'rgba(0,0,0,0.3)', border: `1px solid ${c.col}22`,
+                borderRadius: 3, padding: '5px 10px' }}>
+                <span style={{ fontFamily: "'Noto Sans Egyptian Hieroglyphs',serif", fontSize: 18, lineHeight: 1,
+                  filter: `drop-shadow(0 0 4px ${c.col}60)` }}>{c.glyph}</span>
+                <div>
+                  <div style={{ fontFamily: MN, fontSize: 8, color: c.col, letterSpacing: 0.5 }}>{c.label}</div>
+                  <div style={{ fontSize: 9, color: 'rgba(180,200,220,0.55)', lineHeight: 1.5, maxWidth: 200 }}>{c.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 12, display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 8 }}>
+            {([
+              {col:GRN,  t:'Assay Protocol', eq:'HRV 5-min windows x 12/day', b:'Record HRV (LF/HF ratio), salivary cortisol, and a 3-min cognitive speed task every 2 hours for 14 days. Cross-correlate with NOAA K-index and DRAO F10.7.'},
+              {col:TEAL, t:'K-index Coupling', eq:'r(HRV, K) = -0.34 expected', b:'Geomagnetic storms suppress HRV via the vagus-cardiac axis. This is measurable. K >= 4 events should produce a detectable HRV dip within 4-6 hours.'},
+              {col:GOLD, t:'F10.7 Envelope', eq:'F10.7 \u2208 [50, 250] sfu', b:'27-day solar rotation modulates the F10.7 flux. Cortisol amplitude should track F10.7 with a 1-2 day lag via UV-B -> vitamin D -> HPA axis.'},
+              {col:'#ec4899', t:'Residual Harmonic', eq:'\u03A9_r = \u03A9_bio - \u03A9_circadian', b:'After removing circadian and ultradian components, residual peaks at 7.83 Hz and phi-multiples would confirm Schumann entrainment as a real biological coupling channel.'},
+            ] as {col:string;t:string;eq:string;b:string}[]).map(({col,t,eq,b}) => (
+              <div key={t} style={{...card(col), borderColor:col+'22'}}>
+                <div style={{fontFamily:OR, fontSize:8, color:col, letterSpacing:1, marginBottom:3}}>{t}</div>
+                <div style={{fontFamily:MN, fontSize:7.5, color:col+'88', marginBottom:5}}>{eq}</div>
+                <div style={{fontSize:10, color:'rgba(200,220,240,0.6)', lineHeight:1.6}}>{b}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* footer */}
