@@ -378,6 +378,9 @@ const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
 const GrandUnifiedPage          = lazy(() => import("@/pages/grand-unified"));
+const DcSolarPage               = lazy(() => import("@/pages/dc-solar"));
+const AetherResearchPage        = lazy(() => import("@/pages/aether-research"));
+const DarkMatterVol3Page        = lazy(() => import("@/pages/dark-matter-vol3"));
 
 const queryClient = new QueryClient();
 
@@ -1210,6 +1213,9 @@ function Router() {
                 <Route path="/path-forward"         component={PathForwardPage} />
                 <Route path="/dark-matter-vol2"     component={DarkMatterVol2Page} />
                 <Route path="/grand-unified"        component={GrandUnifiedPage} />
+                <Route path="/dc-solar"             component={DcSolarPage} />
+                <Route path="/aether-research"      component={AetherResearchPage} />
+                <Route path="/dark-matter-vol3"     component={DarkMatterVol3Page} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

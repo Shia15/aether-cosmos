@@ -447,6 +447,9 @@ const NAV_ITEMS = [
   { href: "/path-forward",          label: "Path Forward · Four Papers · Seven Tests · Three Theorems · phi-Time · Master Equation · Coherence Bridge · HYP to DOC · Publication Roadmap", icon: Atom},
   { href: "/dark-matter-vol2",      label: "Dark Matter Vol II · Tubulin Mechanics · Vortex Dynamics · Spectral Transforms · TLE Hierarchy · Asteroid Superhighways · Warp Event Bus · Grand Synthesis", icon: Atom},
   { href: "/grand-unified",         label: "Grand Unified · AETHER Loop · Floral Volatiles · Coherence Bridge · Oncology · Kuramoto Sim · phi-Fibonacci Field · GC-MS Chromatogram · Epistemic Registry", icon: Atom},
+  { href: "/dc-solar",              label: "DC-Native Solar · ARPA-E Proposal · 150-200 kW Recovery per MW · 48V/380V/800V DC Bus · AI Optimization · Johnstown PA Resonant Cell · $3.5M Funding", icon: Atom},
+  { href: "/aether-research",       label: "AETHER Research Paper · Seven-Layer Coupling Architecture · C(x,t) Coherence Field · 25 Functions · Schumann Resonance · Resonant Cell · Hypothesis Testing", icon: Atom},
+  { href: "/dark-matter-vol3",      label: "Dark Matter Vol III · RG Flow g_bio · Coherence Phase Diagram · Observer Theory · Jarzynski · Skyrmions · Topological Protection · AETHER Equation of Everything", icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
