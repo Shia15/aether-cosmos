@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import emitterCoherence from "@assets/ChatGPT_Image_Jun_28,_2026,_02_14_27_PM_1782670485215.png";
+import emitterSubstrate from "@assets/ChatGPT_Image_Jun_28,_2026,_02_17_55_PM_1782670690599.png";
+import emitterCerulean from "@assets/ChatGPT_Image_Jun_28,_2026,_02_19_47_PM_1782670795970.png";
 
 const V = {
   bg:"#04060E",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
@@ -740,9 +743,61 @@ export default function SoiBuilding(){
         </div>
       </div>
 
-      {/* V — AETHER Build Framing */}
+      {/* V — Bio-Photonic Emitters */}
       <div style={{marginBottom:40}}>
-        <SectionHead n="V" title="AETHER BUILD FRAMING -- ARCHITECTURALLY SOUND" col={V.gold}/>
+        <SectionHead n="V" title="BIO-PHOTONIC EMITTERS -- BIOLUMINESCENT CHANNELS" col={V.vio}/>
+        <div style={{fontFamily:SERIF,fontSize:"0.9rem",color:"rgba(184,204,232,0.7)",
+          lineHeight:1.55,marginBottom:14,maxWidth:760}}>
+          The living walls and bio floors emit light through coherence-gated luciferase
+          systems. Each channel is a luciferin -- luciferase pair tuned to a distinct
+          emission window, from visible sea-milk Cerulean to telecom-band Substrate-Dark.
+          Emission intensifies as local coherence C(x,t) rises -- the building reports its
+          own field state as light.
+        </div>
+        <div style={{display:"grid",gridTemplateColumns:ww<700?"1fr":"repeat(3,1fr)",gap:14}}>
+          {[
+            {img:emitterCerulean,name:"Cerulean",band:"476 nm -- visible",col:V.blue,
+              eta:"eta_Q 0.09",half:"half-life 3 min",sub:"lambda-Carrageenan fluid gel",
+              body:"Symbiodinium dinoflagellate -- the original AETHER sea-milk emitter. Brightest channel, drives plankton-bloom luminescence."},
+            {img:emitterCoherence,name:"Coherence-Node",band:"940 nm -- near-IR",col:V.vio,
+              eta:"eta_Q ~0.01",half:"variable with C(x,t)",sub:"DNA hydrogel + field antenna",
+              body:"Synthetic photoprobe. Quantum yield spikes 0.001 to 0.01 when C(x,t) crosses phi-inverse -- the tissue glows at its equilibrium point."},
+            {img:emitterSubstrate,name:"Substrate-Dark",band:"1550 nm -- SWIR",col:V.plasma,
+              eta:"eta_Q ~0.002",half:"half-life <1 min",sub:"silica nanoporous matrix",
+              body:"Deep-SWIR coral-luciferase hybrid at the telecom C-band -- lets living tissue inject signal directly into photonic fibre."},
+          ].map(e=>(
+            <figure key={e.name} style={{margin:0,borderRadius:8,overflow:"hidden" as const,
+              background:`${e.col}08`,border:`1px solid ${e.col}30`}}>
+              <a href={e.img} target="_blank" rel="noopener noreferrer"
+                style={{display:"block",lineHeight:0}}>
+                <img src={e.img} alt={`${e.name} bioluminescent emitter infographic`}
+                  loading="lazy"
+                  style={{width:"100%",height:"auto",display:"block"}}/>
+              </a>
+              <figcaption style={{padding:"12px 14px"}}>
+                <div style={{display:"flex",justifyContent:"space-between",
+                  alignItems:"baseline",gap:8,flexWrap:"wrap" as const}}>
+                  <div style={{fontFamily:DISP,fontSize:"1rem",color:e.col,
+                    letterSpacing:"0.08em"}}>{e.name}</div>
+                  <div style={{fontFamily:MONO,fontSize:8,color:e.col}}>{e.band}</div>
+                </div>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap" as const,margin:"7px 0"}}>
+                  {[e.eta,e.half,e.sub].map(t=>(
+                    <span key={t} style={{fontFamily:MONO,fontSize:7,color:V.dim,
+                      border:`1px solid ${V.dim}55`,borderRadius:3,padding:"2px 6px"}}>{t}</span>
+                  ))}
+                </div>
+                <div style={{fontFamily:SERIF,fontSize:"0.82rem",
+                  color:"rgba(184,204,232,0.65)",lineHeight:1.45}}>{e.body}</div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+
+      {/* VI — AETHER Build Framing */}
+      <div style={{marginBottom:40}}>
+        <SectionHead n="VI" title="AETHER BUILD FRAMING -- ARCHITECTURALLY SOUND" col={V.gold}/>
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
           {[
             {layer:"Structural Core",mat:"Mycelium composite column + lignin beam",col:V.amb,status:"Buildable"},
