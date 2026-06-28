@@ -450,6 +450,7 @@ const NAV_ITEMS = [
   { href: "/dc-solar",              label: "DC-Native Solar · ARPA-E Proposal · 150-200 kW Recovery per MW · 48V/380V/800V DC Bus · AI Optimization · Johnstown PA Resonant Cell · $3.5M Funding", icon: Atom},
   { href: "/aether-research",       label: "AETHER Research Paper · Seven-Layer Coupling Architecture · C(x,t) Coherence Field · 25 Functions · Schumann Resonance · Resonant Cell · Hypothesis Testing", icon: Atom},
   { href: "/dark-matter-vol3",      label: "Dark Matter Vol III · RG Flow g_bio · Coherence Phase Diagram · Observer Theory · Jarzynski · Skyrmions · Topological Protection · AETHER Equation of Everything", icon: Atom},
+  { href: "/microgravity-infra",    label: "Microgravity & Planetary Infrastructure · Pressure Differential Lift · Schumann Eigenmode · Alcubierre Warp Grid · AETHER-TDD-001 · Lunar Mars DC-Solar", icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
