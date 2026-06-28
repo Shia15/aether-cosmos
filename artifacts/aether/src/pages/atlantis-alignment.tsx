@@ -585,9 +585,9 @@ export default function AtlantisAlignmentPage() {
                 </p>
               </div>
               <div className="border rounded-xl p-4" style={{ borderColor: C.rose + "30", background: C.rose + "06" }}>
-                <p className="text-[10px] font-['Cinzel',serif] mb-2" style={{ color: C.rose }}>MEGA-TSUNAMI MEMORY · DEC 9 · 1:31 AM</p>
+                <p className="text-[10px] font-['Cinzel',serif] mb-2" style={{ color: C.rose }}>MEGA-TSUNAMI MEMORY</p>
                 <p className="text-[9.5px] leading-5" style={{ color: C.rose + "75" }}>
-                  AETHER field-note (12/9/2025 · 1:31 AM): the Indian Ocean depression as not just a geological curiosity but a
+                  AETHER field-note: the Indian Ocean depression as not just a geological curiosity but a
                   potential trigger zone — the same coupling that produced 2004 Sumatra-class events at much smaller amplitude.
                   Plato's Atlantis "in a single dreadful day and night" syncs with the mega-tsunami signature: Younger Dryas
                   Boundary impactor or coincident pulse, ~11,600 yrs ago, sea-level rise of meters within hours along affected

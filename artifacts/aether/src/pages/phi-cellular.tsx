@@ -1125,7 +1125,7 @@ All are φ — all are the same.`}</EQ>
             and applies it to the field of knowledge itself.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 14 }}>
-            CUCA BioEngine v3.2 · AETHER Coherence Framework · φ = 1.6180339887... · 2026
+            CUCA BioEngine v3.2 · AETHER Coherence Framework · φ = 1.6180339887...
           </div>
         </div>
       </div>

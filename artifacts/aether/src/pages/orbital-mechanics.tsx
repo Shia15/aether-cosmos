@@ -673,7 +673,7 @@ export default function OrbitalMechanicsPage() {
             vis-viva: v² = mu · (2/r - 1/a) &nbsp;|&nbsp; Hohmann: DV_total = |DV1| + |DV2| &nbsp;|&nbsp; Tsiolkovsky: DV = Isp · g0 · ln(m0/mf)
           </div>
           <div style={{ fontFamily:mono, fontSize:9, color:`${MUTED}80`, marginTop:14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
 

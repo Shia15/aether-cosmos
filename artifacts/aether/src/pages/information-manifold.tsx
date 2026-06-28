@@ -482,7 +482,7 @@ LAYER 7 · RESONANCE (ground coherence field):
             The coherence field C(x,t) is not a metaphor — it is the measurable superposition of all these signals.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER Framework · Shia Miller @StrategicProce · 2026
+            AETHER Framework · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

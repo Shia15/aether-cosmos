@@ -176,7 +176,7 @@ export default function MyceliumSubstratePage() {
         <header className="mb-10">
           <div className="text-[10.5px] uppercase tracking-[0.32em] mb-2"
                style={{ color: B.mossDeep, fontFamily: "Inter, sans-serif" }}>
-            Shia Miller (@StrategicProce) · April 2026 · A Living Computational Substrate
+            Shia Miller (@StrategicProce) · A Living Computational Substrate
           </div>
           <h1 className="text-[44px] leading-[1.05] tracking-tight"
               style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>Mycelium Bricks</h1>
@@ -232,7 +232,7 @@ export default function MyceliumSubstratePage() {
           <ImgFig
             src={imgPaper}
             alt="First page of Shia Miller's April 2026 academic paper on mycelium-based bricks as a living computational substrate, with abstract, sections on mycelium as binder and structural matrix, fire and mold resistance, the computational layer of hyphal networks, and a selected references list."
-            caption="Shia Miller · April 2026 · the source paper"
+            caption="Shia Miller · the source paper"
           />
         </section>
 

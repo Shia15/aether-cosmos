@@ -170,7 +170,7 @@ export default function AetherWhitepaperPage() {
 
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
         <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>
-          AETHER · Concept Whitepaper v1.0 · AetherLife.co · February 2026
+          AETHER · Concept Whitepaper v1.0 · AetherLife.co
         </p>
         <h1 className="font-['Cinzel',serif] font-light leading-none tracking-tight" style={{ fontSize: "clamp(34px,4.8vw,58px)", color: C.white }}>
           AETHER <em style={{ color: C.gold, fontStyle: "italic" }}>Whitepaper</em>
@@ -484,7 +484,7 @@ export default function AetherWhitepaperPage() {
             <div className="mt-6 text-center text-[10px] tracking-[0.22em]" style={{ color: C.dim }}>
               <p>The prototypes exist. The loop is running.</p>
               <p className="mt-1" style={{ color: C.gold }}>AETHERLIFE.CO · RESONANCE REPLACES FRAGMENTATION</p>
-              <p className="mt-1">Version 1.0 · February 2026 · Concept Whitepaper</p>
+              <p className="mt-1">Version 1.0 · Concept Whitepaper</p>
             </div>
           </Section>
         )}
@@ -492,7 +492,7 @@ export default function AetherWhitepaperPage() {
       </AnimatePresence>
 
       <div className="mt-12 pt-4 border-t flex justify-between text-[8px] tracking-[0.16em] uppercase" style={{ borderColor: C.border, color: C.dim }}>
-        <span>AETHER Whitepaper v1.0 · Feb 2026 · AetherLife.co</span>
+        <span>AETHER Whitepaper v1.0 · AetherLife.co</span>
         <span style={{ fontFamily: "serif", fontSize: 14, color: C.gold, fontStyle: "italic" }}>Sense · Deliver · Activate · Feedback · Learn</span>
         <span>resonance replaces fragmentation</span>
       </div>

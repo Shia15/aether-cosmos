@@ -191,7 +191,7 @@ export default function AetherWhyPage() {
           <div style={{ display:"flex", flexWrap:"wrap", gap:"1.2rem", alignItems:"center", marginTop:"1.2rem",
             paddingTop:"1.1rem", borderTop:"1px solid rgba(255,255,255,0.08)",
             fontSize:"0.82rem", color:"#cbd5e1", fontFamily:"'DM Mono',monospace", letterSpacing:"0.12em", textTransform:"uppercase" }}>
-            <span><span style={{ color:"#94a3b8" }}>Filed</span> · Nov 5 · 2025 · 12:22 PM</span>
+            <span><span style={{ color:"#94a3b8" }}>Filed</span>
             <span><span style={{ color:"#94a3b8" }}>Anchor</span> · Super-moon awakening point</span>
             <span><span style={{ color:"#94a3b8" }}>Reading time</span> · ~7 min</span>
             <span><span style={{ color:"#94a3b8" }}>By</span> · The AETHER project, written from itself</span>

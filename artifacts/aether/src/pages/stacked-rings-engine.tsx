@@ -311,7 +311,7 @@ export default function StackedRingsEnginePage() {
       <header style={headerStyle}>
         <div style={{maxWidth:1320,margin:"0 auto",display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:20,flexWrap:"wrap"}}>
           <div>
-            <div style={logoLabel}>System Engine · v1.0 · 2026</div>
+            <div style={logoLabel}>System Engine · v1.0</div>
             <div style={h1Style}>STACKED RINGS CONJECTURE</div>
             <div style={{fontFamily:"'Crimson Pro',serif",fontSize:16,fontStyle:"italic",color:TEXT_S,marginTop:6}}>A Dimensionless Framework of Barriered Vortical Harmonics</div>
           </div>

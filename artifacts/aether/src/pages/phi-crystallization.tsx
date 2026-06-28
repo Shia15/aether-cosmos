@@ -623,7 +623,7 @@ export default function PhiCrystallizationPage() {
             F(n+1) / F(n) &#x2192; phi as n &#x2192; infinity &nbsp;|&nbsp; arms_cw = F(n) &nbsp;|&nbsp; arms_ccw = F(n+1)
           </div>
           <div style={{ fontFamily:mono, fontSize:9, color:`${MUTED}80`, marginTop:14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
 

@@ -1429,7 +1429,7 @@ AETHER is the framework that reads this chain in reverse:
             AETHER is the framework that sees this across scales simultaneously.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER Framework · Shia Miller @StrategicProce · 2026
+            AETHER Framework · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

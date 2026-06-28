@@ -563,7 +563,7 @@ GOLDEN RATIO THRESHOLD (universal):
             they are all measuring the same field from different angles. φ⁻¹ is the universal coherence threshold.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER Framework · Shia Miller @StrategicProce · 2026 · Next: /compound-eye-500d
+            AETHER Framework · Shia Miller @StrategicProce · Next: /compound-eye-500d
           </div>
         </div>
       </div>

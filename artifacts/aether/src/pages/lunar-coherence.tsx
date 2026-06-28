@@ -276,7 +276,7 @@ export default function LunarCoherencePage() {
         {/* IV · Consciousness implication */}
         <Section kicker="IV · Working hypothesis"
           title="Lunar orientation tides — from within the groundwater — affect us at the energetic and conscious level"
-          lead="Field-note (12/9/2025 · 1:31 AM): 'unambiguous presence of a lunar orientation tides from within the groundwater affect us energetically and conscious level arises.' This is the operational claim AETHER tracks.">
+          lead="Field-note: 'unambiguous presence of a lunar orientation tides from within the groundwater affect us energetically and conscious level arises.' This is the operational claim AETHER tracks.">
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.9rem" }}>
             <Card kicker="What we expect" title="Sub-perceptual baseline" accent="#22c55e">
               A continuous ~24.84 h envelope on cell-fluid pressure, EEG band power and dream-state recall. Not a "full-moon

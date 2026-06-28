@@ -597,7 +597,7 @@ export default function ProcessingDelayPage() {
             latency = scheduling_delay + cache_miss_penalty + ipc_cost + physics_time + render_time
           </div>
           <div style={{ fontFamily:mono, fontSize:9, color:`${DIM}80`, marginTop:14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
 

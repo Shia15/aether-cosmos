@@ -588,7 +588,7 @@ export default function WirelessPowerPage() {
             k·Q = effective coupling -- small k, large Q = same result as large k, small Q
           </div>
           <div style={{ fontFamily:mono, fontSize:9, color:`${DIM}80`, marginTop:14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
 

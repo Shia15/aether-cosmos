@@ -562,7 +562,7 @@ SEED / GERMINATE:    Coherence amplification
             is a physical equation made edible. The machine and the cook are solving the same problem.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER Framework · Shia Miller @StrategicProce · 2026
+            AETHER Framework · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

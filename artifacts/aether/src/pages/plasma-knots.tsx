@@ -828,7 +828,7 @@ Taylor relaxation principle (1974):
             T(p,q) field line · q = p/q_pol · H = ∫A·B dV = const · Taylor relaxation
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
         <CodeFilesPanel

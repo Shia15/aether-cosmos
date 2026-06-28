@@ -566,7 +566,7 @@ export default function MathStudioPage() {
           ctx.fillText(label, canvas.width / 2, footerY + 20 * DPR);
           ctx.font = `${8 * DPR}px "Courier New", monospace`;
           ctx.fillStyle = "rgba(255,255,255,0.15)";
-          ctx.fillText("AETHER Framework · shia miller · 2026", canvas.width / 2, footerY + 28 * DPR);
+          ctx.fillText("AETHER Framework · shia miller", canvas.width / 2, footerY + 28 * DPR);
 
           // Gradient border top line
           const grd = ctx.createLinearGradient(0, 0, canvas.width, 0);

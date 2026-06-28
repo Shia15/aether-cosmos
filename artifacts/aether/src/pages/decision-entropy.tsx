@@ -3,7 +3,7 @@ import { Link } from "wouter";
 
 /* ──────────────────────────────────────────────────────────────────────
    AETHER · Possibility, Time, and Decision Entropy
-   Theoretical Extension · Time-Cost Formalism · v1.0 · April 2026
+   Theoretical Extension · Time-Cost Formalism · v1.0
 
    Faithful React port of the user's typeset essay. Parchment-cream
    typographic document — distinct from AETHER's dark UI shell because
@@ -197,7 +197,7 @@ export default function DecisionEntropyPage() {
           flexWrap: "wrap", gap: 6,
         }}>
           <span>AetherLife.co · @StrategicProce</span>
-          <span>AETHER Theoretical Extension · April 2026</span>
+          <span>AETHER Theoretical Extension</span>
           <span>DOC / EST / HYP tagged throughout</span>
         </div>
 

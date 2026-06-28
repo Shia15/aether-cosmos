@@ -164,7 +164,7 @@ export default function BrainMetabolismView() {
             <button key={s.id} data-testid={`bm-toc-${s.id}`} onClick={() => scrollTo(s.id)} style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.15em", textTransform: "uppercase", color: active === s.id ? C.teal : C.textD, background: active === s.id ? C.tealD : "transparent", textDecoration: "none", padding: "6px 10px", borderRadius: 2, border: "none", cursor: "pointer", transition: "color .2s, background .2s" }}>{s.label}</button>
           ))}
         </div>
-        <div style={{ fontFamily: C.mono, fontSize: 9, color: C.textD, border: `1px solid ${C.border}`, padding: "3px 9px", borderRadius: 2, letterSpacing: "0.1em" }}>v2.0 · 2026</div>
+        <div style={{ fontFamily: C.mono, fontSize: 9, color: C.textD, border: `1px solid ${C.border}`, padding: "3px 9px", borderRadius: 2, letterSpacing: "0.1em" }}>v2.0</div>
       </nav>
 
       <div style={{ maxWidth: 1040, margin: "0 auto", padding: "60px 40px 80px" }}>

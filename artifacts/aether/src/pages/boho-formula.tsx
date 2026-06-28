@@ -558,13 +558,13 @@ export default function BohoFormulaPage() {
         <div className="bf-fadein mb-10" style={{ animationDelay: "750ms" }}>
           <div className="text-[10px] uppercase tracking-[0.3em] mb-3"
                style={{ color: B.muted, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
-            Rojo Formula · Colour Palette · Oct 21, 2025 · 6:09 PM
+            Rojo Formula · Colour Palette
           </div>
           <div className="bf-card border rounded-[14px] p-5 mb-5"
                style={{ borderColor: B.border, background: B.panel }}>
             <p className="text-[13px] leading-relaxed mb-4"
                style={{ color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
-              Noted October 21, 2025 at 6:09 PM — the Rojo formula colour language as personal frequency signal.
+              The Rojo formula colour language as personal frequency signal.
               Each tone a dimension of the field.
             </p>
             <div className="grid grid-cols-7 gap-2 mb-4">

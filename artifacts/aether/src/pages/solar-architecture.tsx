@@ -880,7 +880,7 @@ Roof pitch at latitude φ × 10° = 16.18°:
             The geometry of shelter and the geometry of light are the same geometry.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER Built Environment · Shia Miller @StrategicProce · 2026
+            AETHER Built Environment · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

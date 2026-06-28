@@ -499,7 +499,7 @@ NUTRITIONAL COHERENCE INTEGRAL:
             Understanding the food's phase geometry is the beginning of nutritional intelligence.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER Framework · Shia Miller @StrategicProce · 2026
+            AETHER Framework · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

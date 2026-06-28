@@ -210,7 +210,7 @@ export default function CancerCoherencePage() {
 
         <header className="mb-6">
           <div className="text-xs tracking-[0.4em] uppercase mb-2" style={{ color: C.phi }}>
-            φ-AETHER · Coherent Oncology Brief · March 2026
+            φ-AETHER · Coherent Oncology Brief
           </div>
           <h1 className="text-3xl md:text-5xl tracking-tight mb-2" style={{ fontFamily: "Cinzel, serif", color: C.white }}>
             Cancer Coherence
@@ -463,7 +463,7 @@ export default function CancerCoherencePage() {
             <div className="border p-4" style={{ borderColor: C.border, background: C.panel }}>
               <div className="text-xs tracking-[0.2em] uppercase mb-3" style={{ color: C.muted }}>Provenance</div>
               <div className="text-[11px]" style={{ color: C.muted }}>
-                φ-AETHER Executive Brief · March 2026 · derivation from coupled CGLE order parameter and per-patient permutation entropy estimator. Reduced rational form chosen for closed-form pole / root inspection.
+                φ-AETHER Executive Brief · derivation from coupled CGLE order parameter and per-patient permutation entropy estimator. Reduced rational form chosen for closed-form pole / root inspection.
               </div>
             </div>
           </aside>

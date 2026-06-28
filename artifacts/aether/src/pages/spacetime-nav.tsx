@@ -1132,7 +1132,7 @@ Navigation success condition:
             They are the four directions of the navigator's mind.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${TEXT_D}80`, marginTop: 12 }}>
-            AETHER Dimensional Engine · Shia Miller @StrategicProce · 2026
+            AETHER Dimensional Engine · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

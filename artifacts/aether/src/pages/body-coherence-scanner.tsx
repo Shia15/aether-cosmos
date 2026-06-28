@@ -521,7 +521,7 @@ NAVIGATION PHASES:
             expressing C(x,t) ≥ φ⁻¹ across nine orders of magnitude.
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}80`, marginTop: 10 }}>
-            AETHER Body Scanner · Shia Miller @StrategicProce · 2026
+            AETHER Body Scanner · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

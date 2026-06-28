@@ -636,7 +636,7 @@ export default function VortexMathPage() {
           <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono pl-4" style={{ color: C.muted }}>
             <span style={{ color: C.white }}>— Independent observer post</span>
             <span className="opacity-50">·</span>
-            <span style={{ color: C.gold }}>External coherence echo · 2026</span>
+            <span style={{ color: C.gold }}>External coherence echo</span>
             <span className="opacity-50">·</span>
             <span>Maps to: 144 latent grid · 3·6·9 vortex · capstone</span>
           </div>

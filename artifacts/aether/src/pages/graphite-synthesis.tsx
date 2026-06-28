@@ -1047,7 +1047,7 @@ Performance:
             σ(x) ∝ N_layers (graphite) · ‖ρ(x)‖ ∝ N_atoms (quantum) · η(x) ∝ N_cells (bio)
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${G20}cc`, marginTop: 14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
         <CodeFilesPanel

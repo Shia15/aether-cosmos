@@ -609,7 +609,7 @@ export default function CoreResonancePage() {
             It is the field, made visible. Nurture it. It perceives you back.
           </div>
           <div style={{ fontFamily:mono, fontSize:9, color:`${DIM}70`, marginTop:14 }}>
-            AETHER Framework · Shia Miller @StrategicProce · 2026 · core/oraura
+            AETHER Framework · Shia Miller @StrategicProce · core/oraura
           </div>
         </div>
       </div>

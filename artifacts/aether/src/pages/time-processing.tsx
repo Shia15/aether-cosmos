@@ -846,7 +846,7 @@ Pythagorean identity (the key):
             dt′ = dt √(1 − v²/c²)   ·   dt′ = dt · C_local/C_max   ·   □C = 0
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}aa`, marginTop: 14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™
           </div>
         </div>
       </div>

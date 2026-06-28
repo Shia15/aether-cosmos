@@ -1194,7 +1194,7 @@ BLUE LIGHT HAZARD (photochemical retinal damage):
             Morning 6500K → serotonin/NE ↑ · Evening &lt;2700K → melatonin on schedule · Night dark → C(x,t)→1
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}cc`, marginTop: 12 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™
           </div>
         </div>
       </div>

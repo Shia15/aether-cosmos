@@ -504,7 +504,7 @@ C(x,t) EQUILIBRIUM (universal):
             states K can access — but the states themselves were pre-determined by the golden angle.
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 12 }}>
-            AETHER-TDD-003 · Shia Miller @StrategicProce · May 2026
+            AETHER-TDD-003 · Shia Miller @StrategicProce
           </div>
         </div>
       </div>

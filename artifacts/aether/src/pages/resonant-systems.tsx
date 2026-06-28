@@ -320,7 +320,7 @@ export default function ResonantSystemsPage() {
         {active === "atlantis" && (
           <div>
             <div style={{ marginBottom: "1.5rem" }}>
-              <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "#86efac", margin: "0 0 0.4rem" }}>Atlantis Beacon Portal · July 2025 – July 2026 · 13-Month Cycle</h2>
+              <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "#86efac", margin: "0 0 0.4rem" }}>Atlantis Beacon Portal · 13-Month Cycle</h2>
               <p style={{ color: "#94a3b8", margin: 0, fontSize: "0.95rem" }}>
                 90-Day Intensity Protocol — Reflect Reality into Structure. A lunar-cycle tracking map aligned to the Capricorn Atlantis Beacon Portal (May 9, 2026), pole shift timing, and a 26,000-year precession cycle.
               </p>

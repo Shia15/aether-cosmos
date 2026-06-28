@@ -210,7 +210,7 @@ export default function AllBusinessIdeasPage() {
           background:"linear-gradient(135deg,rgba(242,195,84,0.12),rgba(138,110,220,0.12))",
           border:"1px solid rgba(242,195,84,0.35)", borderLeft:"4px solid #f2c354" }}>
           <div style={{ ...KS, fontSize:9, color:C.gold, marginBottom:8 }}>
-            ⭐ Dec 10, 2025 · 1:02 PM · Foundational Insight
+            ⭐ Foundational Insight
           </div>
           <div style={{ fontFamily:"'Cinzel',serif", fontSize:"1.25rem", color:"#fff5e0",
             fontWeight:700, marginBottom:"0.75rem", lineHeight:1.4 }}>
@@ -234,7 +234,7 @@ export default function AllBusinessIdeasPage() {
             ))}
           </div>
           <div style={{ fontSize:"0.82rem", color:"rgba(200,190,230,0.5)", fontStyle:"italic" }}>
-            Written December 10, 2025 at 1:02 PM — the theoretical backbone of the entire AETHER system.
+            The theoretical backbone of the entire AETHER system.
           </div>
         </div>
 

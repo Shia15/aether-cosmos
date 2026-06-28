@@ -912,7 +912,7 @@ AETHER biofield coherence protocol:
             Magnetite → Radical Pair → Cardiac Toroid → Neural MEG → Morphic C-field
           </div>
           <div style={{ fontFamily: mono, fontSize: 10, color: `${DIM}80`, marginTop: 14 }}>
-            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce · 2026
+            Shia Miller · AetherLife.co · Cosmic Chaos Corporation™ · @StrategicProce
           </div>
         </div>
         <CodeFilesPanel

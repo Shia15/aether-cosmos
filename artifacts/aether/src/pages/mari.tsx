@@ -651,7 +651,7 @@ export default function MariPage() {
           <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono" style={{ color: C.muted }}>
             <span style={{ color: C.white }}>— Boho Formula Boutique</span>
             <span className="opacity-50">·</span>
-            <span style={{ color: C.gold }}>Brand asset · 2026</span>
+            <span style={{ color: C.gold }}>Brand asset</span>
             <span className="opacity-50">·</span>
             <span>Maps to: M · A · R · I — the four eggs running on this page</span>
           </div>

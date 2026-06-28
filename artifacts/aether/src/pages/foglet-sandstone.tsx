@@ -493,7 +493,7 @@ MECHANICAL RESULT:
             The material is not inert — it is a phase-coupled coherence network waiting for K to exceed K_c.
           </div>
           <div style={{ fontFamily: mono, fontSize: 9, color: `${DIM}80`, marginTop: 10 }}>
-            AETHER-TDD-002 · Shia Miller @StrategicProce · May 2026
+            AETHER-TDD-002 · Shia Miller @StrategicProce
           </div>
         </div>
       </div>
