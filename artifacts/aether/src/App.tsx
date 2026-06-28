@@ -323,6 +323,9 @@ const CoherenceNavPage = lazy(() => import("@/pages/coherence-nav"));
 const SuperradiancePage = lazy(() => import("@/pages/superradiance"));
 const RadianceSpectrumPage = lazy(() => import("@/pages/radiance-spectrum"));
 const RationalFunctionPage = lazy(() => import("@/pages/rational-function"));
+const EquationsInMotionPage = lazy(() => import("@/pages/equations-in-motion"));
+const HelicalFrameworkPage = lazy(() => import("@/pages/helical-framework"));
+const RobotStrokesPage = lazy(() => import("@/pages/robot-strokes"));
 const AgentMappingPage = lazy(() => import("@/pages/agent-mapping"));
 const EventHorizonPage = lazy(() => import("@/pages/event-horizon"));
 const PhotonEmissionPage = lazy(() => import("@/pages/photon-emission"));
@@ -1232,6 +1235,9 @@ function Router() {
                 <Route path="/superradiance"         component={SuperradiancePage} />
                 <Route path="/radiance-spectrum"    component={RadianceSpectrumPage} />
                 <Route path="/rational-function"    component={RationalFunctionPage} />
+                <Route path="/equations-in-motion" component={EquationsInMotionPage} />
+                <Route path="/helical-framework"   component={HelicalFrameworkPage} />
+                <Route path="/robot-strokes"       component={RobotStrokesPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
