@@ -531,6 +531,297 @@ function DarkSunCanvas({ mode }: { mode: Mode }) {
   );
 }
 
+/* ── ASTEROID BELT CANVAS ──────────────────────────────── */
+function AsteroidBeltCanvas() {
+  const cv = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d")!;
+    const fit = () => { const p = c.parentElement!; c.width = p.clientWidth; c.height = Math.min(260, Math.round(p.clientWidth * 0.27)); };
+    fit(); window.addEventListener("resize", fit);
+    let r2 = 7777;
+    const rng = () => { r2 = (r2 * 16807) % 2147483647; return (r2 - 1) / 2147483646; };
+    const GAPS = [2.50, 2.82, 2.96, 3.28];
+    const asts: { a: number; ang: number; spd: number; sz: number; is24: boolean }[] = [];
+    let tries = 0;
+    while (asts.length < 180 && tries++ < 2000) {
+      const a = 2.1 + rng() * 1.2;
+      if (GAPS.some(g => Math.abs(a - g) < 0.055)) continue;
+      asts.push({ a, ang: rng() * Math.PI * 2, spd: 0.00016 / Math.sqrt(a), sz: 0.8 + rng() * 1.8, is24: false });
+    }
+    asts.push({ a: 3.135, ang: 0.4, spd: 0.00009, sz: 4, is24: true });
+    const loop = () => {
+      const W = c.width, H = c.height, cy = H / 2;
+      const toX = (au: number) => 30 + (au / 6.3) * (W - 55);
+      ctx.clearRect(0, 0, W, H); ctx.fillStyle = "#010610"; ctx.fillRect(0, 0, W, H);
+      const sg = ctx.createRadialGradient(toX(0), cy, 0, toX(0), cy, 22);
+      sg.addColorStop(0, "#fff8d0"); sg.addColorStop(0.5, "#f5a020"); sg.addColorStop(1, "transparent");
+      ctx.beginPath(); ctx.arc(toX(0), cy, 22, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
+      ([[1.52, ROSE, "MARS"], [5.20, AMBER, "JUPITER"]] as [number, string, string][]).forEach(([a, C, L]) => {
+        const rx = toX(a) - toX(0), ry = rx * 0.14;
+        ctx.beginPath(); ctx.ellipse(toX(0), cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = C + "28"; ctx.lineWidth = 0.7; ctx.stroke();
+        ctx.fillStyle = C + "70"; ctx.font = `6px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(L, toX(a), cy - ry - 5);
+      });
+      const bx1 = toX(2.1), bx2 = toX(3.3), bh = H * 0.22;
+      const bg = ctx.createLinearGradient(bx1, 0, bx2, 0);
+      bg.addColorStop(0, "rgba(200,168,76,0.03)"); bg.addColorStop(0.5, "rgba(200,168,76,0.07)"); bg.addColorStop(1, "rgba(200,168,76,0.03)");
+      ctx.fillStyle = bg; ctx.fillRect(bx1, cy - bh, bx2 - bx1, bh * 2);
+      GAPS.forEach((g, gi) => {
+        const gx = toX(g);
+        ctx.fillStyle = "#010610cc"; ctx.fillRect(gx - 2, cy - bh, 5, bh * 2);
+        ctx.fillStyle = DIM + "55"; ctx.font = `5.5px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(["3:1","5:2","7:3","2:1"][gi], gx, cy + bh + 9);
+      });
+      ctx.fillStyle = GOLD + "50"; ctx.font = `7px ${mono}`; ctx.textAlign = "center";
+      ctx.fillText("ASTEROID BELT", toX(2.7), cy - bh - 7);
+      asts.forEach(ast => {
+        ast.ang += ast.spd;
+        const bx = toX(ast.a), ry = bh * 0.85;
+        const px = bx + Math.cos(ast.ang) * 2, py = cy + Math.sin(ast.ang) * ry;
+        ctx.beginPath(); ctx.arc(px, py, ast.sz, 0, Math.PI * 2);
+        if (ast.is24) {
+          ctx.fillStyle = TEAL; ctx.shadowColor = TEAL; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0;
+          ctx.fillStyle = TEAL; ctx.font = `7px ${mono}`; ctx.textAlign = "center"; ctx.fillText("24 THEMIS", px, py - 9);
+          ctx.fillStyle = TEAL + "70"; ctx.font = `5.5px ${mono}`; ctx.fillText("H2O + ORGANICS", px, py + 12);
+        } else { ctx.fillStyle = GOLD + "55"; ctx.fill(); }
+      });
+      const jx = toX(5.2);
+      const jg = ctx.createRadialGradient(jx, cy, 0, jx, cy, 12);
+      jg.addColorStop(0, "#e8a840"); jg.addColorStop(1, "#a06010");
+      ctx.beginPath(); ctx.arc(jx, cy, 12, 0, Math.PI * 2); ctx.fillStyle = jg; ctx.fill();
+      ctx.fillStyle = AMBER + "80"; ctx.font = `6px ${mono}`; ctx.textAlign = "center"; ctx.fillText("JUPITER", jx, cy + 18);
+      [1,2,3,4,5].forEach(au => {
+        const x = toX(au);
+        ctx.beginPath(); ctx.moveTo(x, H * 0.82); ctx.lineTo(x, H * 0.87);
+        ctx.strokeStyle = DIM + "22"; ctx.lineWidth = 0.5; ctx.stroke();
+        ctx.fillStyle = DIM; ctx.font = `6px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(`${au} AU`, x, H * 0.95);
+      });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", fit); };
+  }, []);
+  return (
+    <div style={{ borderRadius: 8, overflow: "hidden", border: `1px solid ${BLUE}22`, marginBottom: 16 }}>
+      <div style={{ padding: "5px 12px", borderBottom: `1px solid ${BLUE}14`, fontFamily: mono, fontSize: 9, color: BLUE, letterSpacing: "0.18em" }}>
+        INNER SOLAR SYSTEM SIMULATOR · KIRKWOOD RESONANCE GAPS · 24 THEMIS ORBIT · LIVE
+      </div>
+      <canvas ref={cv} style={{ display: "block", width: "100%", height: "auto" }} />
+    </div>
+  );
+}
+
+/* ── UV SPECTRUM CANVAS ────────────────────────────────── */
+function UVSpectrumCanvas() {
+  const cv = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d")!;
+    const fit = () => { const p = c.parentElement!; c.width = p.clientWidth; c.height = Math.min(300, Math.round(p.clientWidth * 0.30)); };
+    fit(); window.addEventListener("resize", fit);
+    let r2 = 1234;
+    const rng = () => { r2 = (r2 * 16807) % 2147483647; return (r2 - 1) / 2147483646; };
+    const UVBANDS = [
+      { nm0: 100, nm1: 280, label: "UV-C", col: "#6b21a8", abs: 0.97 },
+      { nm0: 280, nm1: 315, label: "UV-B", col: VIOLET,    abs: 0.55 },
+      { nm0: 315, nm1: 400, label: "UV-A", col: BLUE,      abs: 0.10 },
+      { nm0: 400, nm1: 500, label: "VIS",  col: GREEN,     abs: 0.02 },
+    ];
+    const photons = Array.from({ length: 70 }, () => {
+      const bi = Math.floor(rng() * 4);
+      const b = UVBANDS[bi];
+      return { y: rng(), nm: b.nm0 + rng() * (b.nm1 - b.nm0), band: bi, alive: true, absY: -1 };
+    });
+    const loop = () => {
+      const W = c.width, H = c.height;
+      const OZONE_Y = H * 0.38, SURF_Y = H * 0.82;
+      const nmToX = (nm: number) => 24 + ((nm - 100) / 400) * (W - 48);
+      ctx.clearRect(0, 0, W, H); ctx.fillStyle = "#010610"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = TEXT + "55"; ctx.font = `8px ${mono}`; ctx.textAlign = "left";
+      ctx.fillText("SOLAR OUTPUT -- SPACE", 24, 12);
+      const ozG = ctx.createLinearGradient(0, OZONE_Y - 14, 0, OZONE_Y + 14);
+      ozG.addColorStop(0, "transparent"); ozG.addColorStop(0.5, TEAL + "18"); ozG.addColorStop(1, "transparent");
+      ctx.fillStyle = ozG; ctx.fillRect(0, OZONE_Y - 14, W, 28);
+      ctx.fillStyle = TEAL + "80"; ctx.font = `7px ${mono}`; ctx.textAlign = "left";
+      ctx.fillText("STRATOSPHERIC OZONE (~25 km)  O2 + hv -> 2O -> O3  Chapman cycle", 24, OZONE_Y + 5);
+      ctx.fillStyle = GREEN + "12"; ctx.fillRect(0, SURF_Y, W, H - SURF_Y);
+      ctx.fillStyle = GREEN + "70"; ctx.font = `7px ${mono}`; ctx.textAlign = "left";
+      ctx.fillText("EARTH SURFACE", 24, SURF_Y + 12);
+      UVBANDS.forEach(b => {
+        const x1 = nmToX(b.nm0), x2 = nmToX(b.nm1);
+        const bG = ctx.createLinearGradient(0, 18, 0, SURF_Y);
+        bG.addColorStop(0, b.col + "30"); bG.addColorStop(1, b.col + "07");
+        ctx.fillStyle = bG; ctx.fillRect(x1, 18, x2 - x1, SURF_Y - 18);
+        ctx.strokeStyle = b.col + "18"; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(x1, 18); ctx.lineTo(x1, SURF_Y); ctx.stroke();
+        ctx.fillStyle = b.col + "cc"; ctx.font = `9px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(b.label, (x1 + x2) / 2, 26);
+        ctx.fillStyle = b.col + "70"; ctx.font = `7px ${mono}`;
+        ctx.fillText(`${b.nm0}-${b.nm1}nm`, (x1 + x2) / 2, 38);
+        const barY = SURF_Y + 8, barH = 7;
+        ctx.fillStyle = "#ffffff08"; ctx.fillRect(x1, barY, x2 - x1, barH);
+        ctx.fillStyle = b.col + "dd"; ctx.fillRect(x1, barY, (x2 - x1) * (1 - b.abs), barH);
+        ctx.fillStyle = b.col + "80"; ctx.font = `6px ${mono}`; ctx.textAlign = "center";
+        ctx.fillText(`${Math.round((1 - b.abs) * 100)}%`, (x1 + x2) / 2, barY + barH + 9);
+      });
+      ctx.fillStyle = TEXT + "30"; ctx.font = `6px ${mono}`; ctx.textAlign = "left";
+      ctx.fillText("SURFACE TRANSMISSION:", 24, SURF_Y + 14);
+      photons.forEach(ph => {
+        ph.y += 0.004;
+        if (ph.y > 1.04) { ph.y = -0.02; ph.alive = true; ph.absY = -1; }
+        const b = UVBANDS[ph.band];
+        const px = nmToX(b.nm0 + (ph.nm - b.nm0)) + Math.sin(ph.y * 20) * 3;
+        const py = ph.y * SURF_Y;
+        if (ph.alive && py > OZONE_Y && ph.absY < 0 && rng() < b.abs * 0.018) {
+          ph.alive = false; ph.absY = py;
+        }
+        if (!ph.alive) {
+          const ago = py - ph.absY;
+          const alpha = Math.max(0, 0.8 - ago * 0.015);
+          if (alpha < 0.01) return;
+          ctx.beginPath(); ctx.arc(px, ph.absY + 2, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = TEAL + Math.round(alpha * 200).toString(16).padStart(2, "0"); ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI * 2);
+          ctx.fillStyle = b.col + "cc"; ctx.fill();
+        }
+      });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", fit); };
+  }, []);
+  return (
+    <div style={{ borderRadius: 8, overflow: "hidden", border: `1px solid ${VIOLET}22`, marginBottom: 16 }}>
+      <div style={{ padding: "5px 12px", borderBottom: `1px solid ${VIOLET}14`, fontFamily: mono, fontSize: 9, color: VIOLET, letterSpacing: "0.18em" }}>
+        UV SPECTRUM SIMULATOR · OZONE ABSORPTION · PHOTON TRANSMISSION · CHAPMAN CYCLE
+      </div>
+      <canvas ref={cv} style={{ display: "block", width: "100%", height: "auto" }} />
+    </div>
+  );
+}
+
+/* ── DNA PIANO CANVAS ──────────────────────────────────── */
+function DNAPianoCanvas() {
+  const cv = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d")!;
+    const fit = () => { const p = c.parentElement!; c.width = p.clientWidth; c.height = Math.min(310, Math.round(p.clientWidth * 0.32)); };
+    fit(); window.addEventListener("resize", fit);
+    const N_PAIRS = 32, N_KEYS = 24;
+    const BPCOLS: Record<string, string> = { "AT": ROSE, "GC": TEAL, "TA": GREEN, "CG": BLUE };
+    const SEQ_CYCLE = ["AT","GC","TA","CG","GC","AT","TA"];
+    const SEQ = Array.from({ length: N_PAIRS }, (_, i) => SEQ_CYCLE[i % 7]);
+    const methyl = Array.from({ length: N_PAIRS }, (_, i) => [3,7,11,18,22,28].includes(i));
+    const methAlpha = methyl.map(m => m ? 0.9 : 0);
+    const ENV_SIGS = [
+      { x: 0.15, y: 0.0,   label: "UV-B",     col: VIOLET, spd: 0.0028 },
+      { x: 0.48, y: -0.12, label: "CORTISOL",  col: AMBER,  spd: 0.0022 },
+      { x: 0.78, y: 0.05,  label: "NUTRITION", col: GREEN,  spd: 0.0025 },
+    ];
+    const KEY_SEQ = [0, 4, 7, 11, 14, 7, 4, 0, 9, 5, 2, 7];
+    const BLACK_KEYS = new Set([1,3,6,8,10,13,15,18,20,22]);
+    let t = 0, keyTimer = 0, keyIdx = 0, activeKey = 0;
+    const loop = () => {
+      const W = c.width, H = c.height;
+      const helixH = H * 0.53, pianoTop = helixH + 8;
+      ctx.clearRect(0, 0, W, H); ctx.fillStyle = "#010610"; ctx.fillRect(0, 0, W, H);
+      keyTimer++;
+      if (keyTimer > 28) { keyTimer = 0; keyIdx = (keyIdx + 1) % KEY_SEQ.length; activeKey = KEY_SEQ[keyIdx]; }
+      ENV_SIGS.forEach((s, si) => {
+        s.y += s.spd;
+        if (s.y > 0.58) {
+          s.y = -0.1;
+          const idx = (si * 7 + Math.floor(t / 50)) % N_PAIRS;
+          methyl[idx] = !methyl[idx];
+        }
+        const sx = s.x * W, sy = s.y * helixH;
+        if (sy < 0 || sy > helixH) return;
+        ctx.beginPath(); ctx.arc(sx, sy, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = s.col; ctx.shadowColor = s.col; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fillStyle = s.col + "99"; ctx.font = `7px ${mono}`; ctx.textAlign = "center"; ctx.fillText(s.label, sx, sy - 9);
+        ctx.setLineDash([2, 3]);
+        ctx.beginPath(); ctx.moveTo(sx, sy + 6); ctx.lineTo(sx, Math.min(sy + 20, helixH - 4));
+        ctx.strokeStyle = s.col + "40"; ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
+      });
+      const pairW = (W - 60) / N_PAIRS;
+      const helix1: [number, number][] = [];
+      const helix2: [number, number][] = [];
+      for (let i = 0; i < N_PAIRS; i++) {
+        const bpX = 30 + i * pairW + pairW / 2;
+        const wave = Math.sin((i / N_PAIRS) * Math.PI * 3.5 + t * 0.025) * helixH * 0.14;
+        const mid = helixH * 0.4;
+        helix1.push([bpX, mid + wave]); helix2.push([bpX, mid - wave]);
+      }
+      ctx.beginPath(); helix1.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+      ctx.strokeStyle = BLUE + "45"; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.beginPath(); helix2.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+      ctx.strokeStyle = BLUE + "45"; ctx.lineWidth = 1.2; ctx.stroke();
+      for (let i = 0; i < N_PAIRS; i++) {
+        const [x1, y1] = helix1[i], [x2, y2] = helix2[i];
+        const col = BPCOLS[SEQ[i]] || TEAL;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+        ctx.strokeStyle = col + "50"; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(x1, y1, 2.5, 0, Math.PI * 2); ctx.fillStyle = col + "cc"; ctx.fill();
+        ctx.beginPath(); ctx.arc(x2, y2, 2.5, 0, Math.PI * 2); ctx.fillStyle = col + "cc"; ctx.fill();
+        if (methyl[i] && methAlpha[i] < 0.9) methAlpha[i] = Math.min(0.9, methAlpha[i] + 0.015);
+        if (!methyl[i] && methAlpha[i] > 0) methAlpha[i] = Math.max(0, methAlpha[i] - 0.01);
+        if (methAlpha[i] > 0.02) {
+          const mY = (y1 + y2) / 2, ma = methAlpha[i];
+          ctx.beginPath(); ctx.arc(x1 - 4, mY, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(232,160,48,${ma})`; ctx.fill();
+          if (ma > 0.5) {
+            ctx.fillStyle = `rgba(232,160,48,${ma * 0.9})`; ctx.font = `4.5px ${mono}`; ctx.textAlign = "center";
+            ctx.fillText("CH3", x1 - 4, mY + 1.5);
+          }
+        }
+      }
+      ctx.fillStyle = TEXT + "35"; ctx.font = `7px ${mono}`; ctx.textAlign = "left";
+      ctx.fillText("ORANGE = CH3 METHYLATION (SILENCED)  |  ENV SIGNALS REWRITE EPIGENOME", 30, helixH - 4);
+      const keyW = (W - 60) / N_KEYS, keyH = H - pianoTop - 8;
+      for (let k = 0; k < N_KEYS; k++) {
+        if (BLACK_KEYS.has(k % 12)) continue;
+        const kx = 30 + k * keyW, isActive = k === activeKey;
+        ctx.fillStyle = isActive ? GOLD + "ee" : "#dde0e4";
+        if (isActive) { ctx.shadowColor = GOLD; ctx.shadowBlur = 14; }
+        ctx.fillRect(kx + 0.5, pianoTop, keyW - 1, keyH); ctx.shadowBlur = 0;
+        ctx.strokeStyle = "#00000055"; ctx.lineWidth = 0.5; ctx.strokeRect(kx + 0.5, pianoTop, keyW - 1, keyH);
+        if (isActive) {
+          ctx.fillStyle = GOLD; ctx.font = `5.5px ${mono}`; ctx.textAlign = "center";
+          ctx.fillText("GENE", kx + keyW / 2, pianoTop + keyH * 0.65);
+        }
+      }
+      for (let k = 0; k < N_KEYS; k++) {
+        if (!BLACK_KEYS.has(k % 12)) continue;
+        const kx = 30 + k * keyW, isActive = k === activeKey;
+        ctx.fillStyle = isActive ? GOLD : "#111";
+        if (isActive) { ctx.shadowColor = GOLD; ctx.shadowBlur = 10; }
+        ctx.fillRect(kx + 0.5, pianoTop, keyW - 1, keyH * 0.62); ctx.shadowBlur = 0;
+      }
+      ctx.fillStyle = TEXT + "35"; ctx.font = `7px ${mono}`; ctx.textAlign = "left";
+      ctx.fillText("GENOME KEYBOARD  |  GOLD KEY = ACTIVE EXPRESSION  |  ENV SIGNALS DRIVE EPIGENETIC STATE", 30, H - 3);
+      t++; raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener("resize", fit); };
+  }, []);
+  return (
+    <div style={{ borderRadius: 8, overflow: "hidden", border: `1px solid ${TEAL}22`, marginBottom: 16 }}>
+      <div style={{ padding: "5px 12px", borderBottom: `1px solid ${TEAL}14`, fontFamily: mono, fontSize: 9, color: TEAL, letterSpacing: "0.18em" }}>
+        DNA PIANO SIMULATOR · EPIGENETIC METHYLATION · ENV SIGNAL DRIVEN GENE EXPRESSION
+      </div>
+      <canvas ref={cv} style={{ display: "block", width: "100%", height: "auto" }} />
+    </div>
+  );
+}
+
 function ModeTabs({ value, onChange }: { value: Mode; onChange: (m: Mode) => void }) {
   const tabs = [
     { k: "solar" as Mode,     label: "Solar Cycle · Sunspot Dynamics",   col: SOLAR  },
@@ -836,6 +1127,7 @@ Water ice detection (Rivkin & Emery, 2010):
   Also: organic compounds (CH₂, CH₃ stretch features at 3.3–3.5 μm)
   Implication: outer belt asteroids may have delivered water + organics to early Earth`}</EQ>
 
+        <AsteroidBeltCanvas />
         {/* ── IV ── */}
         <SecHead id="s4" n="IV" title="Citizen 24 · Mobile Solar Monitoring Platform"
           sub="AETHER's distributed heliophysics observatory — rootex dynamics in efficient engine architecture" col={TEAL} />
@@ -888,6 +1180,7 @@ Ozone thinning consequences:
   1% ozone decrease → 1.5–2% increase in UV-B at surface
   Each 1% UV-B increase → ~3% increase in non-melanoma skin cancer incidence`}</EQ>
 
+        <UVSpectrumCanvas />
         {/* ── VI ── */}
         <SecHead id="s6" n="VI" title="Quantum Living Systems · Entropy Reversal"
           sub="How life maintains low entropy by exporting disorder — and the quantum mechanisms that make it efficient" col={GREEN} />
@@ -1013,6 +1306,7 @@ Lamarckian inheritance (modern form — transgenerational epigenetics):
           ]}
         />
 
+        <DNAPianoCanvas />
         {/* ── VIII ── */}
         <SecHead id="s8" n="VIII" title="The Nano Thermodynamic Motor · 10ms Heroic Calculation"
           sub="Molecular machines, quantum target-finding, and the thermodynamic efficiency of life's engines" col={VIOLET} />
