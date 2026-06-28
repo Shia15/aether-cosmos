@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import marsImg1 from "@assets/ChatGPT_Image_Jun_28,_2026,_11_14_01_AM_1782662651182.png";
-import marsImg2 from "@assets/ChatGPT_Image_Jun_28,_2026,_11_03_33_AM_1782662661985.png";
+
+const marsImg1 = import.meta.env.BASE_URL + "mars-world-detail.png";
+const marsImg2 = import.meta.env.BASE_URL + "mars-world-overview.png";
 
 /* ── Palette ────────────────────────────────────────────────────── */
 const BG    = "#04060E";
