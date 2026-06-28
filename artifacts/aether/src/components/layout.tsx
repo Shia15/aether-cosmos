@@ -105,6 +105,7 @@ const NAV_ITEMS = [
   { href: "/circular-farm",   label: "Circular AI Farm",   icon: Leaf },
   { href: "/eye-evolution",  label: "Eye Evolution",       icon: Dna },
   { href: "/quantum-substrate",   label: "Quantum Substrate · Diagonalization & Knotting", icon: Atom },
+  { href: "/resonant-nexus",      label: "Resonant Nexus · AETHER CORE · Mnesis · Infernia · Aletheia · Reverie",  icon: Atom },
   { href: "/neural-psychedelic",  label: "Neural · Multiscale · Psychedelics · Organoids",  icon: Brain },
   { href: "/photo-timeline",      label: "Timeline Map · Photo Archive",                     icon: Telescope },
   { href: "/quantum-gravity",   label: "Quantum Gravity & Relativity · Loop Quantum Gravity · Strings · AETHER C(x,t) Unification", icon: Atom },
