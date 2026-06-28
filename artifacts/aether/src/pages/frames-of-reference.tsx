@@ -56,14 +56,8 @@ function hitTAxis(px: number, pct: number, dx: number, dct: number, slope: numbe
   return (slope * pct - px) / denom;
 }
 
-function drawAxes(ctx: CanvasRenderingContext2D, dx: number, dct: number, col: string, label: string, len: number) {
-  /* t-axis direction */
+function drawAxes(ctx: CanvasRenderingContext2D, dx: number, dct: number, col: string, _label: string, len: number) {
   const [ox, oy] = toScreen(0, 0);
-  const [tx, ty] = [ox + dct * SCALE * len, oy - len * SCALE];
-  /* x-axis direction */
-  const [xx, xy] = [ox + dx * SCALE * len, oy - dct * SCALE * len * dx / (dx || 1)];
-  // just draw from -len to +len in each direction
-  const step = 1;
   for (let sign = -1; sign <= 1; sign += 2) {
     /* t-direction axis */
     ctx.beginPath();
@@ -76,9 +70,7 @@ function drawAxes(ctx: CanvasRenderingContext2D, dx: number, dct: number, col: s
     ctx.lineTo(ox + sign * dx * SCALE * len, oy - sign * dct * SCALE * len);
     ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
   }
-  _ = label; _ = tx; _ = ty; _ = xx; _ = xy; _ = step;
 }
-declare const _: unknown;
 
 interface CanvasProps { beta: number; ex: number; ect: number; }
 
@@ -102,7 +94,6 @@ function MinkowskiCanvas({ beta, ex, ect }: CanvasProps) {
       const [,sy] = toScreen(0, i); ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(W, sy); ctx.stroke();
     }
 
-    const g = gamma(beta);
     const b = beta;
 
     /* ── light cone ── */
@@ -236,7 +227,6 @@ function MinkowskiCanvas({ beta, ex, ect }: CanvasProps) {
         ctx.fillText(`ct''=${antiP.ct.toFixed(2)}`, tx + 5, ty + 10);
       }
       ctx.setLineDash([]);
-      _ = g;
     }
 
     /* coordinate dot marks on S axes */

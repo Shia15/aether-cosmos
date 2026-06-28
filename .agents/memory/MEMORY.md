@@ -2,3 +2,4 @@
 - [App.tsx duplicate lazy imports](app-tsx-dupes.md) — when wiring new pages, check for pre-existing lazy() + Route entries in App.tsx and nav entries in layout.tsx before adding new ones; duplicates cause VarRedeclaration and React key errors
 - [Concept-page equation signs](concept-page-equation-signs.md) — displayed governing equation, state-bar label, and runtime sign must all reference the same variable; mismatch slips past typecheck
 - [Concept-page source-number fidelity](concept-page-equation-signs.md) — when copy cites a number from user-provided source spec, the runtime formula must reproduce it (e.g. tunnel hoop stress uses water-column gauge P=rho*g*h, not +atm)
+- [declare-const underscore suppression trap](frames-of-reference-underscore-crash.md) — `declare const _` + `_ = x` to silence unused-var warnings emits NO runtime binding and crashes with 'ReferenceError: _ is not defined'; delete the dead vars instead
