@@ -400,6 +400,7 @@ const AetherResearchPage        = lazy(() => import("@/pages/aether-research"));
 const DarkMatterVol3Page        = lazy(() => import("@/pages/dark-matter-vol3"));
 const MicrogravityInfraPage     = lazy(() => import("@/pages/microgravity-infra"));
 const WoodFrogKnotsPage         = lazy(() => import("@/pages/wood-frog-knots"));
+const MarsWorldPage             = lazy(() => import("@/pages/mars-world"));
 
 const queryClient = new QueryClient();
 
@@ -1237,6 +1238,7 @@ function Router() {
                 <Route path="/dark-matter-vol3"     component={DarkMatterVol3Page} />
                 <Route path="/microgravity-infra"   component={MicrogravityInfraPage} />
                 <Route path="/wood-frog-knots"      component={WoodFrogKnotsPage} />
+                <Route path="/mars-world"           component={MarsWorldPage} />
                 <Route path="/mom-study"            component={MomStudyPage} />
                 <Route path="/photosynthesis-planet" component={PhotosynthesisPlanetPage} />
                 <Route path="/stromatolite"          component={StromatoliteSimPage} />
