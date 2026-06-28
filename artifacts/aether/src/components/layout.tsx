@@ -472,6 +472,10 @@ const NAV_ITEMS = [
   { href: "/aether-research",       label: "AETHER Research Paper · Seven-Layer Coupling Architecture · C(x,t) Coherence Field · 25 Functions · Schumann Resonance · Resonant Cell · Hypothesis Testing", icon: Atom},
   { href: "/dark-matter-vol3",      label: "Dark Matter Vol III · RG Flow g_bio · Coherence Phase Diagram · Observer Theory · Jarzynski · Skyrmions · Topological Protection · AETHER Equation of Everything", icon: Atom},
   { href: "/microgravity-infra",    label: "Microgravity & Planetary Infrastructure · Pressure Differential Lift · Schumann Eigenmode · Alcubierre Warp Grid · AETHER-TDD-001 · Lunar Mars DC-Solar", icon: Atom},
+  { href: "/crystallization-locking", label: "Crystallization · Locking · Disruption → Infiltration → Locking · dS/dt = −k(chaos) + m(minerals) · SOC Power-Law Fragility · Coherence Injection", icon: Hexagon},
+  { href: "/quaternion-burst",       label: "Quaternion · Burst · q = w + xi + yj + zk · 4D Hypercomplex Rotation · Gimbal-Lock-Free · Hamilton Product · Unit Sphere S3", icon: Rotate3d},
+  { href: "/neuroweave",             label: "NEUROWEAVE · Biological Control Matrix · Neural Hub · Reflex Arc · Hippocampus · Amygdala · Neural Spectrum · Synaptic Interface", icon: Brain},
+  { href: "/hyper-perception",       label: "HYPER PERCEPTION · Environmental Analysis Matrix · Air Pressure · Altitude · Geolocation · Color Radar · Perception Core · Sensory Overlay", icon: Gauge},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

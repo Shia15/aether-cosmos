@@ -403,6 +403,10 @@ const DarkMatterVol3Page        = lazy(() => import("@/pages/dark-matter-vol3"))
 const MicrogravityInfraPage     = lazy(() => import("@/pages/microgravity-infra"));
 const WoodFrogKnotsPage         = lazy(() => import("@/pages/wood-frog-knots"));
 const MarsWorldPage             = lazy(() => import("@/pages/mars-world"));
+const CrystallizationLockingPage = lazy(() => import("@/pages/crystallization-locking"));
+const QuaternionBurstPage       = lazy(() => import("@/pages/quaternion-burst"));
+const NeuroweavePage            = lazy(() => import("@/pages/neuroweave"));
+const HyperPerceptionPage       = lazy(() => import("@/pages/hyper-perception"));
 
 const queryClient = new QueryClient();
 
@@ -1260,6 +1264,10 @@ function Router() {
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
+                <Route path="/crystallization-locking" component={CrystallizationLockingPage} />
+                <Route path="/quaternion-burst"    component={QuaternionBurstPage} />
+                <Route path="/neuroweave"          component={NeuroweavePage} />
+                <Route path="/hyper-perception"    component={HyperPerceptionPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
