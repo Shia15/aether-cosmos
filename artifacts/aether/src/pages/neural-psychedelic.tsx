@@ -616,8 +616,108 @@ function CrystalMap({ bloodType }: { bloodType: "O"|"A"|"B"|"AB" }) {
   );
 }
 
+// ─── Torus Ring Simulation ────────────────────────────────────────────────────
+
+type TorusRingDef = {
+  R: number; r: number; color: string;
+  sx: number; sy: number; sz: number;
+  wA: number; wF: number; wP: number;
+  label: string; desc: string;
+};
+
+const TORUS_RINGS: TorusRingDef[] = [
+  { R:115, r:34, color:"#00FFEE", sx:0.31, sy:0.82, sz:0.12, wA:16, wF:3, wP:0,
+    label:"5-HT2A Receptor Gate", desc:"Primary serotonin gate -- 5-HT2A full agonism, psychedelic binding site" },
+  { R:98, r:28, color:"#FF00FF", sx:0.71, sy:0.21, sz:0.54, wA:22, wF:5, wP:1.05,
+    label:"Pineal DMT Synthesis", desc:"Endogenous N,N-DMT release -- pineal tryptamine production field" },
+  { R:128, r:38, color:"#BBFF00", sx:0.14, sy:0.53, sz:0.87, wA:14, wF:2, wP:2.09,
+    label:"Organoid Alpha Node", desc:"Cortical organoid resonance -- self-organizing neural field topology" },
+  { R:104, r:31, color:"#FFB400", sx:0.62, sy:0.44, sz:0.28, wA:19, wF:4, wP:3.14,
+    label:"Theta Coherence Ring", desc:"4-8Hz hippocampal entrainment -- memory consolidation wave" },
+  { R:118, r:35, color:"#9966FF", sx:0.43, sy:0.91, sz:0.17, wA:24, wF:6, wP:4.19,
+    label:"GABA Inhibitory Gate", desc:"GABAergic tone modulation -- consciousness gating mechanism" },
+  { R:92, r:27, color:"#FF4488", sx:0.84, sy:0.13, sz:0.72, wA:11, wF:3, wP:5.24,
+    label:"N,N-DMT Sigma-1", desc:"Sigma-1 receptor complex -- breakthrough binding site" },
+];
+
+function tRot3(x: number, y: number, z: number, rx: number, ry: number, rz: number): [number,number,number] {
+  const y1 = y*Math.cos(rx) - z*Math.sin(rx);
+  const z1 = y*Math.sin(rx) + z*Math.cos(rx);
+  const x2 = x*Math.cos(ry) + z1*Math.sin(ry);
+  const z2 = -x*Math.sin(ry) + z1*Math.cos(ry);
+  const x3 = x2*Math.cos(rz) - y1*Math.sin(rz);
+  const y3 = x2*Math.sin(rz) + y1*Math.cos(rz);
+  return [x3, y3, z2];
+}
+
+const T_FOV = 700;
+
+function drawOneTorus(
+  ctx: CanvasRenderingContext2D,
+  cfg: TorusRingDef,
+  ax: number, ay: number, az: number,
+  t: number, cx: number, cy: number
+) {
+  const THETA = 72, PHI = 22;
+  const c = cfg.color;
+  const cr = parseInt(c.slice(1,3),16);
+  const cg = parseInt(c.slice(3,5),16);
+  const cb = parseInt(c.slice(5,7),16);
+  ctx.shadowBlur = 16;
+  ctx.shadowColor = c;
+  for (let j = 0; j < PHI; j++) {
+    const phi = (j/PHI)*Math.PI*2;
+    const wr = cfg.r + 7*Math.sin(phi*2 + t*1.3 + cfg.wP);
+    ctx.beginPath();
+    let first = true;
+    for (let i = 0; i <= THETA; i++) {
+      const theta = (i/THETA)*Math.PI*2;
+      const wR = cfg.R + cfg.wA*Math.sin(theta*cfg.wF + t + cfg.wP);
+      const x = (wR + wr*Math.cos(phi))*Math.cos(theta);
+      const y = (wR + wr*Math.cos(phi))*Math.sin(theta);
+      const z = wr*Math.sin(phi);
+      const [rx, ry, rz] = tRot3(x, y, z, ax, ay, az);
+      const sc = T_FOV/(T_FOV + rz + 300);
+      const px = cx + rx*sc, py = cy + ry*sc;
+      if (first) { ctx.moveTo(px, py); first = false; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    const la = 0.12 + (j%4===0 ? 0.3 : 0.04);
+    ctx.strokeStyle = `rgba(${cr},${cg},${cb},${la})`;
+    ctx.lineWidth = j%5===0 ? 2 : 0.8;
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+}
+
+function drawTorusCanvas(canvas: HTMLCanvasElement, t: number, propMode: boolean) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = "rgba(4,2,16,0.18)";
+  ctx.fillRect(0, 0, W, H);
+  const cx = W/2, cy = H/2;
+  if (propMode) {
+    const pr = [TORUS_RINGS[0], TORUS_RINGS[2], TORUS_RINGS[4]];
+    pr.forEach((ring, i) => {
+      const off = (i/3)*Math.PI*2;
+      drawOneTorus(ctx, ring, t*ring.sx + off, t*ring.sy, -t*ring.sz, t, cx, cy);
+    });
+    ctx.fillStyle = "rgba(0,255,238,0.35)";
+    ctx.font = "10px 'DM Mono',monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("3-RING PROPULSION -- COUNTER-ROTATING AT 120 DEGREE PHASE OFFSETS", cx, 20);
+    ctx.textAlign = "left";
+  } else {
+    TORUS_RINGS.forEach(ring => {
+      drawOneTorus(ctx, ring, t*ring.sx, t*ring.sy, t*ring.sz, t, cx, cy);
+    });
+  }
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
-type Tab = "multiscale" | "receptors" | "organoid" | "pineal" | "psilocybin" | "consciousness" | "crystals";
+type Tab = "multiscale" | "receptors" | "organoid" | "pineal" | "psilocybin" | "consciousness" | "crystals" | "torus";
 
 function NeuralPsychedelicHeaderCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -674,6 +774,8 @@ export default function NeuralPsychedelicPage() {
   const [consDynamic, setConsDynamic] = useState(true);
   // Crystal map
   const [bloodType, setBloodType] = useState<"O"|"A"|"B"|"AB">("O");
+  const [torusSpeed, setTorusSpeed] = useState(0.8);
+  const [propMode, setPropMode] = useState(false);
 
   const msRef = useRef<HTMLCanvasElement>(null);
   const recRef = useRef<HTMLCanvasElement>(null);
@@ -681,12 +783,14 @@ export default function NeuralPsychedelicPage() {
   const pinealRef = useRef<HTMLCanvasElement>(null);
   const psiRef = useRef<HTMLCanvasElement>(null);
   const consRef = useRef<HTMLCanvasElement>(null);
+  const torusRef = useRef<HTMLCanvasElement>(null);
   const rafMs = useRef(0);
   const rafRec = useRef(0);
   const rafOrg = useRef(0);
   const rafPineal = useRef(0);
   const rafPsi = useRef(0);
   const rafCons = useRef(0);
+  const rafTorus = useRef(0);
 
   // Init organoid nodes
   useEffect(() => {
@@ -773,6 +877,17 @@ export default function NeuralPsychedelicPage() {
     return () => cancelAnimationFrame(rafCons.current);
   }, [consMode, consDynamic]);
 
+  useEffect(() => {
+    const canvas = torusRef.current; if (!canvas) return;
+    const st = Date.now();
+    const loop = () => {
+      drawTorusCanvas(canvas, (Date.now() - st) / 1000 * torusSpeed, propMode);
+      rafTorus.current = requestAnimationFrame(loop);
+    };
+    rafTorus.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafTorus.current);
+  }, [torusSpeed, propMode]);
+
   const panel = { background: "rgba(6,13,26,0.9)", border: "1px solid rgba(0,229,192,0.1)", borderRadius: 12 };
   const tabBtn = (id: Tab, label: string, color: string) => (
     <button onClick={() => setTab(id)} style={{
@@ -817,6 +932,7 @@ export default function NeuralPsychedelicPage() {
           {tabBtn("psilocybin",   "⬥ Psilocybin",   "#f472b6")}
           {tabBtn("consciousness","△ Consciousness",  "#c9a227")}
           {tabBtn("crystals",     "⟐ Body Crystals",  "#4db8ff")}
+          {tabBtn("torus",        "◎ Torus Rings",    "#00FFEE")}
         </div>
       </div>
 
@@ -1140,6 +1256,101 @@ export default function NeuralPsychedelicPage() {
                   <p style={{ fontSize: 9, color: "rgba(255,255,255,0.38)", lineHeight: 1.6, margin: 0 }}>{c.text}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── TORUS RINGS TAB ── */}
+        {tab === "torus" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "1.5rem" }}>
+              <div style={{ ...panel, overflow: "hidden" }}>
+                <canvas ref={torusRef} width={800} height={520}
+                  style={{ width: "100%", height: "auto", display: "block" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ ...panel, padding: "1rem 1.2rem" }}>
+                  <div style={{ fontSize: 9, letterSpacing: "0.3em", color: "#00FFEE", textTransform: "uppercase", marginBottom: 14 }}>
+                    Simulation Controls
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, color: C.dim, marginBottom: 6 }}>
+                      <span>ROTATION SPEED</span><span>{torusSpeed.toFixed(1)}x</span>
+                    </div>
+                    <input type="range" min={0.1} max={2.5} step={0.05} value={torusSpeed}
+                      onChange={e => setTorusSpeed(Number(e.target.value))}
+                      style={{ width: "100%", accentColor: "#00FFEE" }} />
+                  </div>
+                  <div style={{ fontSize: 8, color: C.dim, letterSpacing: "0.15em", marginBottom: 8 }}>MODE</div>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {(["all", "prop"] as const).map(m => {
+                      const active = (m === "prop") === propMode;
+                      return (
+                        <button key={m} onClick={() => setPropMode(m === "prop")} style={{
+                          flex: 1, padding: "0.45rem", borderRadius: 6, cursor: "pointer", border: "1px solid",
+                          borderColor: active ? "#00FFEE" : "rgba(255,255,255,0.08)",
+                          background: active ? "rgba(0,255,238,0.12)" : "transparent",
+                          color: active ? "#00FFEE" : "rgba(255,255,255,0.3)",
+                          fontFamily: "'DM Mono',monospace", fontSize: 8, letterSpacing: "0.12em",
+                        }}>{m === "prop" ? "PROPULSION" : "ALL 6 RINGS"}</button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {[
+                  { col: "#00FFEE", kicker: "3D Torus Geometry",
+                    text: "Each ring is a warping torus rendered via phi-loop parametric curves. Major radius R oscillates as R + A*sin(theta*F + t) -- a living, breathing donut-shaped field." },
+                  { col: "#9966FF", kicker: "Warp Mechanics",
+                    text: "Six independent warp frequencies (2-6 Hz) drive morphic field distortion. Phase offsets keep the rings desynchronized -- maintaining chaotic psychedelic coherence." },
+                  { col: "#FF4488", kicker: "Neural Correlation",
+                    text: "Each ring maps to a receptor system. Overlapping torus fields model cross-talk between binding sites -- DMT activating 5-HT2A while GABA gates the downstream cascade." },
+                ].map(c => (
+                  <div key={c.kicker} style={{ ...panel, padding: "0.8rem 1rem", borderLeft: `3px solid ${c.col}` }}>
+                    <div style={{ fontSize: 8, color: c.col, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 }}>{c.kicker}</div>
+                    <p style={{ fontSize: 9, color: "rgba(255,255,255,0.38)", lineHeight: 1.6, margin: 0 }}>{c.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.8rem" }}>
+              {TORUS_RINGS.map((ring, i) => (
+                <div key={ring.label} style={{ ...panel, padding: "0.75rem 1rem", borderLeft: `3px solid ${ring.color}` }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: ring.color, flexShrink: 0 }} />
+                    <div style={{ fontSize: 8, color: ring.color, letterSpacing: "0.12em", textTransform: "uppercase" }}>Ring {i + 1}</div>
+                  </div>
+                  <div style={{ fontSize: 9, color: ring.color, opacity: 0.8, marginBottom: 3 }}>{ring.label}</div>
+                  <div style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", lineHeight: 1.5 }}>{ring.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ ...panel, padding: "1.2rem 1.5rem", borderLeft: "3px solid #9966FF" }}>
+              <div style={{ fontSize: 9, letterSpacing: "0.3em", color: "#9966FF", textTransform: "uppercase", marginBottom: 12 }}>
+                Three-Ring Propulsion Mechanism
+              </div>
+              <p style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.65, margin: "0 0 1rem" }}>
+                Switch to PROPULSION mode above -- rings 1, 3 and 5 counter-rotate at 120 degree phase offsets around a shared axis.
+                Three of these torus rings, used as a propulsion mechanistic device, create an asymmetric warp field geometry with net directional flux.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
+                {[
+                  { title: "Field Topology", col: "#00FFEE",
+                    text: "Three torus rings at 120 degree offsets form a closed magnetic topology. Haramein vacuum tensor analysis predicts net directional flux through this configuration via broken warp symmetry in the overlapping fields." },
+                  { title: "Counter-Rotation", col: "#FF00FF",
+                    text: "Ring A (forward) + Ring B (reverse) + Ring C (forward) -- alternating chirality cancels internal torque while constructively interfering in the axial thrust vector. Net angular momentum is zero; net linear force is non-zero." },
+                  { title: "AETHER Substrate", col: "#9966FF",
+                    text: "In the AETHER model, the three-ring device couples to the substrate crystallization field at theta coherence frequency (4-8 Hz), converting quantum vacuum fluctuations into classical directional force via field crystallization asymmetry." },
+                ].map(s => (
+                  <div key={s.title} style={{ borderLeft: `2px solid ${s.col}`, paddingLeft: "0.9rem" }}>
+                    <div style={{ fontSize: 8, color: s.col, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 5 }}>{s.title}</div>
+                    <p style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", lineHeight: 1.6, margin: 0 }}>{s.text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
