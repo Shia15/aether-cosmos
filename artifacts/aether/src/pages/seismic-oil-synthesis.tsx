@@ -643,7 +643,7 @@ export default function SeismicOilSynthesisPage() {
                   <div style={{ marginTop: 14 }}>
                     <div style={{ fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", color: C.muted, marginBottom: 8 }}>Mohr-Coulomb failure criterion</div>
                     <EqChip col={C.violet}>tau_f = c + mu_f * (sigma_n - P_f)</EqChip>
-                    <EqChip col={C.rose}>slip when tau >= tau_f</EqChip>
+                    <EqChip col={C.rose}>slip when tau {'>='} tau_f</EqChip>
                     <EqChip col={C.gold}>Delta_P_crit = (tau - c) / mu_f - sigma_n + tau/mu_f</EqChip>
                     <div style={{ fontSize: 11, color: C.muted, marginTop: 8, fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}>
                       c = cohesion, mu_f = friction coefficient (0.6-0.85 Byerlee), sigma_n = normal stress, P_f = pore pressure
