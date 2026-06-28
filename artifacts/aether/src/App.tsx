@@ -321,6 +321,8 @@ const PhotosynthesisPlanetPage = lazy(() => import("@/pages/photosynthesis-plane
 const StromatoliteSimPage = lazy(() => import("@/pages/stromatolite"));
 const CoherenceNavPage = lazy(() => import("@/pages/coherence-nav"));
 const SuperradiancePage = lazy(() => import("@/pages/superradiance"));
+const RadianceSpectrumPage = lazy(() => import("@/pages/radiance-spectrum"));
+const RationalFunctionPage = lazy(() => import("@/pages/rational-function"));
 const AgentMappingPage = lazy(() => import("@/pages/agent-mapping"));
 const EventHorizonPage = lazy(() => import("@/pages/event-horizon"));
 const PhotonEmissionPage = lazy(() => import("@/pages/photon-emission"));
@@ -1228,6 +1230,8 @@ function Router() {
                 <Route path="/stromatolite"          component={StromatoliteSimPage} />
                 <Route path="/coherence-nav"         component={CoherenceNavPage} />
                 <Route path="/superradiance"         component={SuperradiancePage} />
+                <Route path="/radiance-spectrum"    component={RadianceSpectrumPage} />
+                <Route path="/rational-function"    component={RationalFunctionPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

@@ -283,6 +283,8 @@ const NAV_ITEMS = [
   { href: "/stromatolite",           label: "Stromatolite Simulator · 60x60 Cellular Automaton Growth", icon: Waves },
   { href: "/coherence-nav",          label: "Coherence Navigation · 9 Identity Modes · Insight Mapping", icon: Aperture },
   { href: "/superradiance",          label: "Superradiance Engine · phi-Spiral Spin Inversion · Kersten 2023", icon: Atom },
+  { href: "/radiance-spectrum",      label: "Radiance Spectrum · I(lam)=B·g·eps · Planck · DoS · Emissivity · Medium Filter", icon: Sun },
+  { href: "/rational-function",      label: "Rational Function Explorer · Asymptotes · Intercepts · Interactive Canvas", icon: Atom },
   { href: "/universal-grammar",        label: "Universal Grammar · Paper",            icon: BookOpen },
   { href: "/aether-edge-constraint",   label: "Edge Constraint · Section 32",          icon: Aperture },
   { href: "/quantum-living-systems",   label: "Quantum Living · DNA Piano",            icon: Music },
