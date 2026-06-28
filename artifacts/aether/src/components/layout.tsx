@@ -451,6 +451,7 @@ const NAV_ITEMS = [
   { href: "/soi-building",            label: "SOI Building · Coherent Region · Isolation · Displacement Pulse Protocol",        icon: Boxes },
   { href: "/seismic-self-build",      label: "Seismic Self-Build · Earthquake Defiance · Base Isolation · Recursive Nanobiotic Construction · Self-Similar Bracing", icon: Boxes },
   { href: "/nutritional-dna-key",     label: "Nutritional Rainbow DNA Key · Food Is Information · Coherence Field · Stevedore 6₁ Topology Gate · Topoisomerase Passage", icon: Dna },
+  { href: "/electron-field",          label: "Unbreakable Pulsing Electron Field · Air Land Water Sea · Coherence Floor · T+R+A=1 · Spacetime Density Flow", icon: Zap },
   { href: "/rd-simulator",            label: "RD Simulator · Reaction-Diffusion · Gray-Scott · Coral Growth · Labyrinthine",    icon: FlaskConical },
   { href: "/neural-topology",         label: "Neural Topology · Brainwave Bands · Delta Theta Alpha Beta Gamma · EEG",          icon: Brain },
   { href: "/morpho-prime",            label: "Morpho Prime · Biomimetic Morphogenesis · Parameter Sliders · Live Canvas",       icon: Microscope },
