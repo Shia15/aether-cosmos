@@ -316,6 +316,11 @@ const AntimatterWavePage = lazy(() => import("@/pages/antimatter-wave"));
 const CognitiveArchitecturePage = lazy(() => import("@/pages/cognitive-architecture"));
 const WorldHarmonyArchetypePage = lazy(() => import("@/pages/world-harmony-archetype"));
 const FluidComputerPage = lazy(() => import("@/pages/fluid-computer"));
+const MomStudyPage = lazy(() => import("@/pages/mom-study"));
+const PhotosynthesisPlanetPage = lazy(() => import("@/pages/photosynthesis-planet"));
+const StromatoliteSimPage = lazy(() => import("@/pages/stromatolite"));
+const CoherenceNavPage = lazy(() => import("@/pages/coherence-nav"));
+const SuperradiancePage = lazy(() => import("@/pages/superradiance"));
 const AgentMappingPage = lazy(() => import("@/pages/agent-mapping"));
 const EventHorizonPage = lazy(() => import("@/pages/event-horizon"));
 const PhotonEmissionPage = lazy(() => import("@/pages/photon-emission"));
@@ -1218,6 +1223,11 @@ function Router() {
                 <Route path="/aether-research"      component={AetherResearchPage} />
                 <Route path="/dark-matter-vol3"     component={DarkMatterVol3Page} />
                 <Route path="/microgravity-infra"   component={MicrogravityInfraPage} />
+                <Route path="/mom-study"            component={MomStudyPage} />
+                <Route path="/photosynthesis-planet" component={PhotosynthesisPlanetPage} />
+                <Route path="/stromatolite"          component={StromatoliteSimPage} />
+                <Route path="/coherence-nav"         component={CoherenceNavPage} />
+                <Route path="/superradiance"         component={SuperradiancePage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
