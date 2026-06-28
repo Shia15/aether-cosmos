@@ -294,6 +294,7 @@ const NAV_ITEMS = [
   { href: "/stacked-rings-engine",   label: "Stacked Rings Conjecture · 500D Vortecual Engine State · 47-Node Dictionary",  icon: Layers },
   { href: "/whats-new",              label: "What's New · System Log · All Domains · Biological Timeline",                   icon: Layers },
   { href: "/lightning-spectrum",     label: "Peak Lightning Equation · Unruh Radiation · EM Spectrum · AETHER Ring Bands",   icon: Layers },
+  { href: "/nutrition-force",        label: "Neural Nutrition Force · Brain Metabolism · Gut-Brain · Living Nutrition · Food Substrate · AETHER Health", icon: HeartHandshake },
   { href: "/universal-grammar",        label: "Universal Grammar · Paper",            icon: BookOpen },
   { href: "/aether-edge-constraint",   label: "Edge Constraint · Section 32",          icon: Aperture },
   { href: "/quantum-living-systems",   label: "Quantum Living · DNA Piano",            icon: Music },
