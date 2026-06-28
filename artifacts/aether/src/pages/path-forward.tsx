@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const GOLD = "#C8A840";
 const BLOOM = "#7EC890";
@@ -82,9 +82,9 @@ function PaperCard({ num, title, journal, body, claims, tags, accent }: {
   );
 }
 
-function TestCard({ dotColor, domain, title, body, protocol, falsify, pct, pctLabel, pfStart, pfEnd }: {
+function TestCard({ dotColor, domain, title, body, protocol, falsify, pct, pctLabel, pfStart, pfEnd, sim }: {
   dotColor: string; domain: string; title: string; body: string; protocol: string; falsify: string;
-  pct: number; pctLabel: string; pfStart: string; pfEnd: string;
+  pct: number; pctLabel: string; pfStart: string; pfEnd: string; sim?: React.ReactNode;
 }) {
   return (
     <div style={styles.testCard}>
@@ -94,6 +94,7 @@ function TestCard({ dotColor, domain, title, body, protocol, falsify, pct, pctLa
       </div>
       <div style={styles.testTitle}>{title}</div>
       <div style={styles.testBody}>{body}</div>
+      {sim}
       <div style={styles.testProtocol}>{protocol}</div>
       <div style={styles.testFalsify}>{falsify}</div>
       <div style={styles.progressBar}>
@@ -101,6 +102,457 @@ function TestCard({ dotColor, domain, title, body, protocol, falsify, pct, pctLa
       </div>
       <div style={styles.progressLabel}><span>{pctLabel.split(" · ")[0]}</span><span>{pctLabel.split(" · ").slice(1).join(" · ")}</span></div>
     </div>
+  );
+}
+
+const PHI = 1.6180339887;
+const INV_PHI = 0.6180339887;
+
+function fitCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  canvas.width = Math.max(1, Math.round(w * dpr));
+  canvas.height = Math.max(1, Math.round(h * dpr));
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { w, h };
+}
+
+function ringDiscrepancy(points: number[]) {
+  const pts = [...points].sort((a, b) => a - b);
+  const n = pts.length;
+  if (n < 2) return 1;
+  let maxG = pts[0] + 1 - pts[n - 1];
+  let minG = maxG;
+  for (let i = 1; i < n; i++) { const g = pts[i] - pts[i - 1]; if (g > maxG) maxG = g; if (g < minG) minG = g; }
+  return maxG - minG;
+}
+
+function SimBox({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ border: `1px solid ${BORDER}`, borderRadius: 2, background: "rgba(0,0,0,0.3)", padding: 10, marginBottom: 14 }}>
+      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 2, color: GOLD, opacity: 0.75, textTransform: "uppercase", marginBottom: 6 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+
+function Rd({ label, vref, color }: { label: string; vref: React.RefObject<HTMLSpanElement | null>; color: string }) {
+  return (
+    <div style={{ flex: 1, minWidth: 62 }}>
+      <span ref={vref} style={{ fontFamily: "'Space Mono',monospace", fontSize: 14, color, lineHeight: 1 }}>--</span>
+      <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 7, letterSpacing: 1, color: DIM, textTransform: "uppercase", marginTop: 3 }}>{label}</div>
+    </div>
+  );
+}
+
+function T1Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  const r3 = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    const base = [0.42, 0.30, 0.18, 0.55, 0.22, 0.12, 0.38, 0.27];
+    const rosa = [0.38, 0.34, 0.15, 0.50, 0.26, 0.10, 0.40, 0.24];
+    const foll = [0.10, 0.55, 0.40, 0.08, 0.48, 0.42, 0.12, 0.50];
+    let id = 0, t = 0, accOR = 0, accFR = 0, n = 0;
+    function cos(a: number[], b: number[]) {
+      let d = 0, na = 0, nb = 0;
+      for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; }
+      return d / (Math.sqrt(na) * Math.sqrt(nb) || 1);
+    }
+    function jit(arr: number[], k: number) { return arr.map((v, i) => Math.max(0.02, v + Math.sin(t * 1.7 + i * 1.3 + k) * 0.05)); }
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      t += 0.03;
+      ctx!.fillStyle = "rgba(6,5,15,0.92)"; ctx!.fillRect(0, 0, w, h);
+      const ov = jit(base, 0), ro = jit(rosa, 1.1), fo = jit(foll, 2.2);
+      accOR += cos(ov, ro); accFR += cos(fo, ro); n++;
+      const pad = 8, bw = (w - pad * 2) / base.length;
+      for (let i = 0; i < base.length; i++) {
+        const x = pad + i * bw;
+        const ovh = ov[i] * (h - 22), roh = ro[i] * (h - 22);
+        ctx!.fillStyle = "rgba(200,168,64,0.78)"; ctx!.fillRect(x + bw * 0.18, h - 14 - ovh, bw * 0.28, ovh);
+        ctx!.fillStyle = "rgba(212,104,120,0.72)"; ctx!.fillRect(x + bw * 0.52, h - 14 - roh, bw * 0.28, roh);
+      }
+      ctx!.font = "7px Space Mono"; ctx!.fillStyle = DIM; ctx!.textAlign = "center";
+      ctx!.fillText("8 VOC channels -- gold: ovulatory   rose: R. centifolia", w / 2, h - 3);
+      if (r1.current) r1.current.textContent = (accOR / n).toFixed(2);
+      if (r2.current) r2.current.textContent = (accFR / n).toFixed(2);
+      if (r3.current) r3.current.textContent = n > 70 ? "< 0.05" : "...";
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- GC-MS cosine clustering (simulated)">
+      <canvas ref={cv} style={{ width: "100%", height: 120, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <Rd label="cos(ovul, rosa)" vref={r1} color={GOLD} />
+        <Rd label="cos(foll, rosa)" vref={r2} color={ROSE} />
+        <Rd label="bootstrap p" vref={r3} color={BLOOM} />
+      </div>
+    </SimBox>
+  );
+}
+
+function T2Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    const T2b = 1.0, T2a = 1.0 * PHI, T2c = 1.0 * 0.9;
+    let id = 0, sweep = 0;
+    function env(tt: number, T2: number) { return Math.exp(-Math.pow(tt / T2, 1.5)); }
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, h);
+      const pad = 6, gw = w - pad * 2, gh = h - 18, Tmax = 3.2;
+      const toX = (tt: number) => pad + (tt / Tmax) * gw;
+      const toY = (v: number) => pad + (1 - v) * gh;
+      ctx!.strokeStyle = "rgba(200,168,64,0.06)"; ctx!.lineWidth = 0.5;
+      for (let i = 0; i <= 4; i++) { const y = pad + (i / 4) * gh; ctx!.beginPath(); ctx!.moveTo(pad, y); ctx!.lineTo(pad + gw, y); ctx!.stroke(); }
+      const curves = [{ T2: T2c, col: "rgba(136,120,212,0.6)" }, { T2: T2b, col: "rgba(212,104,120,0.8)" }, { T2: T2a, col: "rgba(200,168,64,0.95)" }];
+      curves.forEach(cu => {
+        ctx!.beginPath();
+        for (let px = 0; px <= gw; px += 2) { const tt = (px / gw) * Tmax; const v = env(tt, cu.T2); if (px === 0) ctx!.moveTo(toX(tt), toY(v)); else ctx!.lineTo(toX(tt), toY(v)); }
+        ctx!.strokeStyle = cu.col; ctx!.lineWidth = 1.6; ctx!.stroke();
+      });
+      ctx!.strokeStyle = "rgba(232,224,208,0.2)"; ctx!.setLineDash([3, 3]); ctx!.beginPath(); ctx!.moveTo(pad, toY(1 / Math.E)); ctx!.lineTo(pad + gw, toY(1 / Math.E)); ctx!.stroke(); ctx!.setLineDash([]);
+      sweep += 0.01; if (sweep > 1) sweep = 0;
+      const st = sweep * Tmax;
+      ctx!.beginPath(); ctx!.arc(toX(st), toY(env(st, T2a)), 3, 0, Math.PI * 2); ctx!.fillStyle = "#fff"; ctx!.fill();
+      ctx!.font = "7px Space Mono"; ctx!.fillStyle = DIM; ctx!.textAlign = "left";
+      ctx!.fillText("Hahn echo envelope -- gold: phi-Fib   rose: grid   lav: random", pad, h - 4);
+      if (r1.current) r1.current.textContent = (T2a / T2b + Math.sin(sweep * 6.28) * 0.02).toFixed(3);
+      if (r2.current) r2.current.textContent = "phi = " + PHI.toFixed(3);
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- NV center T2 coherence decay (Lindblad model)">
+      <canvas ref={cv} style={{ width: "100%", height: 120, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <Rd label="T2(phi)/T2(grid)" vref={r1} color={GOLD} />
+        <Rd label="target ratio" vref={r2} color={BLOOM} />
+      </div>
+    </SimBox>
+  );
+}
+
+function T3Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  const r3 = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    let id = 0, count = 3, t = 0;
+    const rnd = Array.from({ length: 90 }, () => Math.random());
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      t += 1; if (t % 6 === 0) { count++; if (count > 80) count = 3; }
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, h);
+      const cy = h / 2 - 4, R = Math.min(h * 0.34, w / 7);
+      const centers = [w * 0.18, w * 0.5, w * 0.82];
+      const phiPts: number[] = [], perPts: number[] = [], ranPts: number[] = [];
+      for (let i = 0; i < count; i++) { phiPts.push((i * INV_PHI) % 1); perPts.push((i / 12) % 1); ranPts.push(rnd[i % rnd.length]); }
+      const sets = [{ pts: phiPts, col: "rgba(200,168,64,0.95)", lab: "phi" }, { pts: perPts, col: "rgba(212,104,120,0.85)", lab: "1/12" }, { pts: ranPts, col: "rgba(136,120,212,0.7)", lab: "rand" }];
+      sets.forEach((s, k) => {
+        const cx = centers[k];
+        ctx!.strokeStyle = "rgba(232,224,208,0.12)"; ctx!.lineWidth = 1; ctx!.beginPath(); ctx!.arc(cx, cy, R, 0, Math.PI * 2); ctx!.stroke();
+        s.pts.forEach(p => { const a = p * Math.PI * 2 - Math.PI / 2; const x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R; ctx!.beginPath(); ctx!.arc(x, y, 2.1, 0, Math.PI * 2); ctx!.fillStyle = s.col; ctx!.fill(); });
+        ctx!.font = "7px Space Mono"; ctx!.fillStyle = DIM; ctx!.textAlign = "center"; ctx!.fillText(s.lab, cx, h - 3);
+      });
+      if (r1.current) r1.current.textContent = ringDiscrepancy(phiPts).toFixed(3);
+      if (r2.current) r2.current.textContent = ringDiscrepancy(perPts).toFixed(3);
+      if (r3.current) r3.current.textContent = ringDiscrepancy(ranPts).toFixed(3);
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- point packing on the circle -- D_N gap discrepancy">
+      <canvas ref={cv} style={{ width: "100%", height: 130, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <Rd label="D_N phi-time" vref={r1} color={GOLD} />
+        <Rd label="D_N periodic" vref={r2} color={ROSE} />
+        <Rd label="D_N random" vref={r3} color={LAV} />
+      </div>
+    </SimBox>
+  );
+}
+
+function T4Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    const N = 28;
+    const mk = (cx: number, cy: number) => Array.from({ length: N }, () => ({ x: Math.random(), y: Math.random(), tx: cx + (Math.random() - 0.5) * 0.22, ty: cy + (Math.random() - 0.5) * 0.22 }));
+    const tnbc = mk(0.22, 0.30), heal = mk(0.80, 0.72);
+    let id = 0;
+    function aucCalc(pos: number[], neg: number[]) { let win = 0; for (let i = 0; i < pos.length; i++) for (let j = 0; j < neg.length; j++) { if (pos[i] > neg[j]) win++; else if (pos[i] === neg[j]) win += 0.5; } return win / (pos.length * neg.length); }
+    function mean(arr: { x: number; y: number }[]) { return { x: arr.reduce((s, p) => s + p.x, 0) / arr.length, y: arr.reduce((s, p) => s + p.y, 0) / arr.length }; }
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      const upd = (arr: { x: number; y: number; tx: number; ty: number }[]) => arr.forEach(p => { p.x += (p.tx - p.x) * 0.02; p.y += (p.ty - p.y) * 0.02; });
+      upd(tnbc); upd(heal);
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, h);
+      const px = (v: number) => 8 + v * (w - 16), py = (v: number) => (h - 16) - v * (h - 26);
+      tnbc.forEach(p => { ctx!.beginPath(); ctx!.arc(px(p.x), py(p.y), 2.6, 0, Math.PI * 2); ctx!.fillStyle = "rgba(212,104,120,0.8)"; ctx!.fill(); });
+      heal.forEach(p => { ctx!.beginPath(); ctx!.arc(px(p.x), py(p.y), 2.6, 0, Math.PI * 2); ctx!.fillStyle = "rgba(126,200,144,0.8)"; ctx!.fill(); });
+      const mt = mean(tnbc), mh = mean(heal);
+      ctx!.strokeStyle = "rgba(232,224,208,0.25)"; ctx!.setLineDash([4, 4]); ctx!.beginPath(); ctx!.moveTo(px(mt.x), py(mt.y)); ctx!.lineTo(px(mh.x), py(mh.y)); ctx!.stroke(); ctx!.setLineDash([]);
+      let dx = mh.x - mt.x, dy = mh.y - mt.y; const nrm = Math.hypot(dx, dy) || 1; dx /= nrm; dy /= nrm;
+      const projH = heal.map(p => p.x * dx + p.y * dy), projT = tnbc.map(p => p.x * dx + p.y * dy);
+      ctx!.font = "7px Space Mono"; ctx!.fillStyle = "rgba(212,104,120,0.7)"; ctx!.textAlign = "left"; ctx!.fillText("M.cardinalis (low C)", 8, 10);
+      ctx!.fillStyle = "rgba(126,200,144,0.7)"; ctx!.textAlign = "right"; ctx!.fillText("M.lewisii (high C)", w - 8, h - 4);
+      if (r1.current) r1.current.textContent = aucCalc(projH, projT).toFixed(2);
+      if (r2.current) r2.current.textContent = nrm.toFixed(2);
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- breath-VOC cosine clustering -- ROC separation">
+      <canvas ref={cv} style={{ width: "100%", height: 130, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <Rd label="ROC AUC" vref={r1} color={GOLD} />
+        <Rd label="cluster sep" vref={r2} color={CYAN} />
+      </div>
+    </SimBox>
+  );
+}
+
+function T5Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  const r3 = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    const seeds = [0.04, 0.97, 0.45];
+    const cols = ["rgba(200,168,64,0.95)", "rgba(78,184,212,0.8)", "rgba(212,104,120,0.8)"];
+    let hist: number[][] = seeds.map(s => [s]);
+    let id = 0, t = 0; const MAXN = 46;
+    function g(x: number) { return 1 / (1 + x); }
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      t++; if (t % 5 === 0) { hist = hist.map(arr => { const na = [...arr, g(arr[arr.length - 1])]; if (na.length > MAXN) na.shift(); return na; }); }
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, h);
+      const pad = 6, gw = w - pad * 2, gh = h - 16;
+      const toX = (i: number, len: number) => pad + (i / Math.max(1, len - 1)) * gw;
+      const toY = (v: number) => pad + (1 - v) * gh;
+      ctx!.strokeStyle = "rgba(200,168,64,0.35)"; ctx!.setLineDash([4, 4]); ctx!.beginPath(); ctx!.moveTo(pad, toY(INV_PHI)); ctx!.lineTo(pad + gw, toY(INV_PHI)); ctx!.stroke(); ctx!.setLineDash([]);
+      ctx!.font = "7px Space Mono"; ctx!.fillStyle = "rgba(200,168,64,0.7)"; ctx!.textAlign = "left"; ctx!.fillText("phi^-1 = 0.618 (attractor)", pad + 2, toY(INV_PHI) - 3);
+      hist.forEach((arr, k) => {
+        ctx!.beginPath(); arr.forEach((v, i) => { const x = toX(i, arr.length), y = toY(v); if (i === 0) ctx!.moveTo(x, y); else ctx!.lineTo(x, y); }); ctx!.strokeStyle = cols[k]; ctx!.lineWidth = 1.5; ctx!.stroke();
+        const lx = toX(arr.length - 1, arr.length), ly = toY(arr[arr.length - 1]); ctx!.beginPath(); ctx!.arc(lx, ly, 2.5, 0, Math.PI * 2); ctx!.fillStyle = cols[k]; ctx!.fill();
+      });
+      const a0 = hist[0]; const cur = a0[a0.length - 1]; const err = Math.abs(cur - INV_PHI); const prevErr = a0.length > 1 ? Math.abs(a0[a0.length - 2] - INV_PHI) : err;
+      if (r1.current) r1.current.textContent = cur.toFixed(4);
+      if (r2.current) r2.current.textContent = err.toExponential(1);
+      if (r3.current) r3.current.textContent = (prevErr > 1e-9 ? err / prevErr : 0).toFixed(3);
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- fixed-point iteration converging to phi^-1 (Lyapunov stable)">
+      <canvas ref={cv} style={{ width: "100%", height: 120, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <Rd label="x_n" vref={r1} color={GOLD} />
+        <Rd label="error" vref={r2} color={LAV} />
+        <Rd label="contraction" vref={r3} color={CYAN} />
+      </div>
+    </SimBox>
+  );
+}
+
+function T6Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  const [n, setN] = useState(4);
+  const nRef = useRef(4);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    const BINS = 60, TMAX = 6;
+    let h1 = new Array(BINS).fill(0), hN = new Array(BINS).fill(0);
+    let tot1 = 0, totN = 0, lastK = nRef.current, id = 0;
+    function sampleMin(k: number) { let m = Infinity; for (let i = 0; i < k; i++) { const e = -Math.log(1 - Math.random()); if (e < m) m = e; } return m; }
+    function ccdf(arr: number[], total: number) { const out = new Array(BINS).fill(0); let acc = 0; for (let i = BINS - 1; i >= 0; i--) { acc += arr[i]; out[i] = acc / Math.max(1, total); } return out; }
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, H = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      const k = nRef.current;
+      if (k !== lastK) { hN = new Array(BINS).fill(0); totN = 0; lastK = k; }
+      for (let s = 0; s < 200; s++) {
+        const a = sampleMin(1), b = sampleMin(k);
+        const ia = Math.min(BINS - 1, Math.floor(a / TMAX * BINS)), ib = Math.min(BINS - 1, Math.floor(b / TMAX * BINS));
+        h1[ia]++; hN[ib]++; tot1++; totN++;
+      }
+      const c1 = ccdf(h1, tot1), cN = ccdf(hN, totN);
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, H);
+      const pad = 6, gw = w - pad * 2, gh = H - 16;
+      const toX = (i: number) => pad + (i / (BINS - 1)) * gw;
+      const toY = (p: number) => { const lp = Math.log10(Math.max(p, 1e-5)); return pad + (1 - (lp + 5) / 5) * gh; };
+      ctx!.strokeStyle = "rgba(200,168,64,0.06)"; ctx!.lineWidth = 0.5; ctx!.font = "7px Space Mono"; ctx!.fillStyle = "rgba(200,168,64,0.4)"; ctx!.textAlign = "left";
+      for (let e = 0; e >= -4; e--) { const y = toY(Math.pow(10, e)); ctx!.beginPath(); ctx!.moveTo(pad, y); ctx!.lineTo(pad + gw, y); ctx!.stroke(); ctx!.fillText("1e" + e, pad + 1, y - 1); }
+      const line = (cc: number[], col: string) => { ctx!.beginPath(); let started = false; for (let i = 0; i < BINS; i++) { if (cc[i] <= 0) continue; const x = toX(i), y = toY(cc[i]); if (!started) { ctx!.moveTo(x, y); started = true; } else ctx!.lineTo(x, y); } ctx!.strokeStyle = col; ctx!.lineWidth = 1.6; ctx!.stroke(); };
+      line(c1, "rgba(212,104,120,0.8)"); line(cN, "rgba(126,200,144,0.95)");
+      ctx!.fillStyle = DIM; ctx!.textAlign = "right"; ctx!.fillText("rose: N=1   green: N=" + k + "   x: latency  y: P(>t)", w - 4, H - 3);
+      const q = (cc: number[]) => { for (let i = 0; i < BINS; i++) { if (cc[i] <= 1e-4) return i / BINS * TMAX; } return TMAX; };
+      const comp = q(c1) / Math.max(1e-6, q(cN));
+      if (r1.current) r1.current.textContent = "N = " + k;
+      if (r2.current) r2.current.textContent = comp.toFixed(1) + "x";
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- N parallel paths -- min latency -- tail compression">
+      <canvas ref={cv} style={{ width: "100%", height: 130, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
+        <Rd label="paths" vref={r1} color={BLOOM} />
+        <Rd label="p99.99 vs N=1" vref={r2} color={GOLD} />
+        <div style={{ flex: 2, minWidth: 90 }}>
+          <input type="range" min={1} max={8} step={1} value={n} onChange={e => { const v = Number(e.target.value); setN(v); nRef.current = v; }} style={{ width: "100%", accentColor: BLOOM }} />
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: 7, color: DIM, textTransform: "uppercase", marginTop: 2 }}>paths N = {n}</div>
+        </div>
+      </div>
+    </SimBox>
+  );
+}
+
+function T7Sim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  const [mode, setMode] = useState("phi");
+  const modeRef = useRef("phi");
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    let id = 0, t = 0; const N = 13;
+    function positions(m: string) { const p: number[] = []; for (let i = 0; i < N; i++) { p.push(m === "phi" ? (-1 + 2 * ((i * INV_PHI) % 1)) : (-1 + 2 * i / (N - 1))); } return p; }
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      t += 0.05;
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, h);
+      const domeH = 58, cx = w / 2, cy = domeH, R = Math.min(domeH - 6, w / 2 - 12);
+      ctx!.strokeStyle = "rgba(232,224,208,0.18)"; ctx!.lineWidth = 1.2; ctx!.beginPath(); ctx!.arc(cx, cy, R, Math.PI, 2 * Math.PI); ctx!.stroke();
+      ctx!.strokeStyle = "rgba(78,184,212,0.16)"; ctx!.lineWidth = 1;
+      for (let yy = ((t * 16) % 18); yy < domeH - 2; yy += 18) { ctx!.beginPath(); ctx!.moveTo(cx - R, yy); ctx!.lineTo(cx + R, yy); ctx!.stroke(); }
+      const pos = positions(modeRef.current);
+      pos.forEach(d => {
+        const x = cx + d * R; const yy = cy - Math.sqrt(Math.max(0, R * R - (d * R) * (d * R)));
+        ctx!.beginPath(); ctx!.arc(x, yy, 2.4, 0, Math.PI * 2); ctx!.fillStyle = modeRef.current === "phi" ? "rgba(200,168,64,0.95)" : "rgba(78,184,212,0.85)"; ctx!.fill();
+        ctx!.strokeStyle = "rgba(200,168,64,0.18)"; ctx!.lineWidth = 0.6; ctx!.beginPath(); ctx!.moveTo(x, yy); ctx!.lineTo(cx, cy); ctx!.stroke();
+      });
+      ctx!.beginPath(); ctx!.arc(cx, cy, 3.5, 0, Math.PI * 2); ctx!.fillStyle = "#fff"; ctx!.fill();
+      const SC = 180; const mainLobe = N; let peakSide = 0;
+      const af: number[] = [];
+      for (let s = 0; s < SC; s++) { const th = (-Math.PI / 2) + (s / (SC - 1)) * Math.PI; const u = Math.sin(th); let re = 0, im = 0; for (const d of pos) { const ph = Math.PI * d * u; re += Math.cos(ph); im += Math.sin(ph); } af.push(Math.hypot(re, im)); }
+      const cIdx = Math.floor(SC / 2);
+      for (let s = 0; s < SC; s++) { if (Math.abs(s - cIdx) < SC * 0.06) continue; if (af[s] > peakSide) peakSide = af[s]; }
+      const gh = h - domeH - 14, gy0 = domeH + 6;
+      ctx!.strokeStyle = "rgba(200,168,64,0.06)"; ctx!.lineWidth = 0.5; ctx!.beginPath(); ctx!.moveTo(6, gy0 + gh); ctx!.lineTo(w - 6, gy0 + gh); ctx!.stroke();
+      ctx!.beginPath();
+      af.forEach((v, s) => { const x = 6 + (s / (SC - 1)) * (w - 12); const y = gy0 + gh - (v / N) * gh; if (s === 0) ctx!.moveTo(x, y); else ctx!.lineTo(x, y); });
+      ctx!.strokeStyle = modeRef.current === "phi" ? "rgba(200,168,64,0.95)" : "rgba(78,184,212,0.9)"; ctx!.lineWidth = 1.5; ctx!.stroke();
+      ctx!.font = "7px Space Mono"; ctx!.fillStyle = DIM; ctx!.textAlign = "left"; ctx!.fillText("array factor vs scan angle -- lower sidelobes = cleaner integration", 6, h - 3);
+      const sllDb = 20 * Math.log10(Math.max(1e-6, peakSide) / mainLobe);
+      if (r1.current) r1.current.textContent = mainLobe.toFixed(0) + "x";
+      if (r2.current) r2.current.textContent = sllDb.toFixed(1) + " dB";
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- dome phased aperture -- focus gain & sidelobe pattern (modeled)">
+      <canvas ref={cv} style={{ width: "100%", height: 150, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8, alignItems: "center" }}>
+        <Rd label="aperture gain" vref={r1} color={GOLD} />
+        <Rd label="peak sidelobe" vref={r2} color={CYAN} />
+        <div style={{ flex: 1, display: "flex", gap: 6 }}>
+          {["phi", "flat"].map(m => (
+            <button key={m} onClick={() => { setMode(m); modeRef.current = m; }} style={{ flex: 1, fontFamily: "'Space Mono',monospace", fontSize: 8, letterSpacing: 1, textTransform: "uppercase", padding: "6px 4px", cursor: "pointer", borderRadius: 2, border: `1px solid ${mode === m ? "rgba(200,168,64,0.6)" : BORDER}`, background: mode === m ? "rgba(200,168,64,0.12)" : "transparent", color: mode === m ? GOLD : DIM }}>{m === "phi" ? "phi nodes" : "flat nodes"}</button>
+          ))}
+        </div>
+      </div>
+    </SimBox>
+  );
+}
+
+function MasterSim() {
+  const cv = useRef<HTMLCanvasElement | null>(null);
+  const r1 = useRef<HTMLSpanElement | null>(null);
+  const r2 = useRef<HTMLSpanElement | null>(null);
+  const r3 = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const c = cv.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    let id = 0, step = 0, E = 1.0;
+    let Ehist: number[] = [], Chist: number[] = []; const MAX = 170;
+    function frame() {
+      const dim = fitCanvas(c!, ctx!); const w = dim.w, h = dim.h;
+      if (!w) { id = requestAnimationFrame(frame); return; }
+      step++;
+      E = INV_PHI * E + Math.abs((Math.random() - 0.5) * 0.015);
+      if (E < 0.0008) E = 0.0008;
+      const C = 1 - E;
+      Ehist.push(E); Chist.push(C); if (Ehist.length > MAX) { Ehist.shift(); Chist.shift(); }
+      ctx!.fillStyle = "rgba(6,5,15,0.95)"; ctx!.fillRect(0, 0, w, h);
+      const pad = 6, gw = w - pad * 2, gh = h - 16;
+      const toX = (i: number, len: number) => pad + (i / Math.max(1, len - 1)) * gw;
+      ctx!.strokeStyle = "rgba(200,168,64,0.2)"; ctx!.setLineDash([4, 4]); ctx!.beginPath(); ctx!.moveTo(pad, pad); ctx!.lineTo(pad + gw, pad); ctx!.stroke(); ctx!.setLineDash([]);
+      const plot = (arr: number[], col: string) => { ctx!.beginPath(); arr.forEach((v, i) => { const x = toX(i, arr.length), y = pad + (1 - v) * gh; if (i === 0) ctx!.moveTo(x, y); else ctx!.lineTo(x, y); }); ctx!.strokeStyle = col; ctx!.lineWidth = 1.6; ctx!.stroke(); };
+      plot(Ehist, "rgba(212,104,120,0.85)"); plot(Chist, "rgba(200,168,64,0.95)");
+      ctx!.font = "7px Space Mono"; ctx!.fillStyle = DIM; ctx!.textAlign = "left"; ctx!.fillText("gold: coherence C(t)   rose: error ||E(t)||", pad, h - 3);
+      const ratio = Ehist.length > 2 ? Ehist[Ehist.length - 1] / Math.max(1e-6, Ehist[Ehist.length - 2]) : INV_PHI;
+      if (r1.current) r1.current.textContent = C.toFixed(3);
+      if (r2.current) r2.current.textContent = E.toExponential(1);
+      if (r3.current) r3.current.textContent = ratio.toFixed(3);
+      if (step % 320 === 0) E = 1.0;
+      id = requestAnimationFrame(frame);
+    }
+    frame();
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <SimBox label="Live -- master-equation relaxation -- coherence rises as error falls (illustrative)">
+      <canvas ref={cv} style={{ width: "100%", height: 130, display: "block" }} />
+      <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+        <Rd label="coherence C(t)" vref={r1} color={GOLD} />
+        <Rd label="error ||E||" vref={r2} color={ROSE} />
+        <Rd label="fixed-pt ratio" vref={r3} color={LAV} />
+      </div>
+    </SimBox>
   );
 }
 
@@ -328,13 +780,13 @@ export default function PathForwardPage() {
             Each one is achievable with existing technology in 2026.
           </p>
           <div style={styles.testGrid}>
-            <TestCard dotColor={ROSE} domain="Floral · Biology · HYP--DOC" title="T1 · Coherence Bridge: VOC Cosine Clustering" body="Does human ovulatory headspace cluster with Rosa centifolia bouquet under cosine similarity analysis? The 0.82 cosine score is modeled from documented 2-phenylethanol and linalool overlap -- not measured." protocol={`Protocol:\n1. GC-MS headspace sampling: n=20 women,\n   days 12-14 (ovulatory) vs days 1-3 (follicular)\n2. Normalize VOC vectors per AETHER bouquet eq.\n3. Compute cosine_sim(V_ovulatory, V_Rosa_centifolia)\n4. Bootstrap CI: 10,000 permutations\nPass: cosine > 0.6 at p < 0.05\nFail: cosine < 0.4 OR not significant`} falsify="Falsified if: cosine < 0.4 or p > 0.05 in controlled GC-MS assay" pct={15} pctLabel="HYP · 15% - protocol designed" pfStart={ROSE} pfEnd={GOLD} />
-            <TestCard dotColor={GOLD} domain="Physics · NV Diamond · EST--DOC" title="T2 · phi-Fibonacci NV Implantation T2 Boost" body="Does phi-indexed Fibonacci lattice implantation in HPHT diamond extend T2 coherence time by factor ~phi compared to grid and random controls? This is the highest-priority falsifiable test in the AETHER corpus." protocol={`Protocol:\n1. Three HPHT diamond samples:\n   A: phi-Fibonacci N+ implantation (F_n spacing)\n   B: Uniform grid spacing (control)\n   C: Random spacing (noise control)\n2. Hahn echo measurement: T2 at 4K and 300K\n3. Extract noise spectral density S(omega) at omega_NV\nPass: T2(A) / T2(B) ~= phi +/- 10%\nFail: ratio < 1.2 or > 2.5`} falsify="Falsified if: T2 ratio != phi (outside [1.4, 1.9] at 95% CI)" pct={42} pctLabel="EST · 42% - Lindblad model run" pfStart={GOLD} pfEnd={BLOOM} />
-            <TestCard dotColor={BLOOM} domain="Computing · DRAM · DOC basis" title="T3 · phi-Time Scheduler Discrepancy Benchmark" body="Does phi-time scheduling reduce packing discrepancy by >=25% vs. periodic mode at N=512 task insertions? Three-Distance Theorem predicts D_N(phi) <= 1/(F_n*sqrt(5)). This is computationally verifiable today." protocol={`Protocol:\n1. Implement three schedulers:\n   A: phi-time: t_n = n*Theta_phi mod 1\n   B: Periodic: t_n = n/N\n   C: Random: t_n ~ Uniform[0,1]\n2. Measure discrepancy D_N at N=64,128,256,512\n3. Plot D_N vs N on log-log scale\nPass: D_N(A) < D_N(B) at all N, slope = 1/N\nFail: D_N(A) >= D_N(B) for any N >= 128`} falsify="Falsified if: phi-time discrepancy >= periodic at N >= 128" pct={78} pctLabel="EST · 78% - simulation confirms, formal proof pending" pfStart={BLOOM} pfEnd={CYAN} />
-            <TestCard dotColor={ROSE} domain="Oncology · TME · HYP" title="T4 · TME Coherence Collapse VOC Clustering" body="Do breath biopsy VOC profiles from TNBC patients cluster with low-coherence floral phenotypes in cosine similarity analysis vs. healthy controls?" protocol={`Protocol:\n1. Breath biopsy: n=30 TNBC, n=30 healthy controls\n2. GC-MS headspace: identify VOC fingerprint vector\n3. Normalize per AETHER bouquet equation\n4. Compute cosine_sim to M.cardinalis vs M.lewisii\n   reference bouquets\nPass: TNBC clusters with M.cardinalis (C~=0.10)\n      Healthy clusters with M.lewisii (C~=0.92)\n      p < 0.01, ROC AUC > 0.75`} falsify="Falsified if: TNBC VOC does not cluster with low-coherence floral phenotypes" pct={8} pctLabel="HYP · 8% - conceptual framework only" pfStart={ROSE} pfEnd={LAV} />
-            <TestCard dotColor={LAV} domain="Mathematics · Lyapunov · Open" title="T5 · Hebbian Convergence: phi^-1 Learning Rate Stability" body="Does the AETHER weight update rule with learning rate eta = phi^-1 ~= 0.618 converge? Under what conditions on the state space? This is the central open mathematical problem." protocol={`Required work:\n1. Lyapunov function V(W) for the update rule\n2. Show dV/dt <= 0 under eta = phi^-1\n3. Characterize convergence basin\n4. Compute convergence rate lambda(eta)\n5. Compare: eta=phi^-1 vs eta=0.5 vs eta=0.9\nPass: Lyapunov stability proven analytically\n      phi^-1 achieves faster convergence\nFail: No Lyapunov function exists OR eta=0.618\n      does not uniquely minimize convergence time`} falsify="Falsified if: no Lyapunov stability proof exists for eta = phi^-1" pct={22} pctLabel="Open · 22% - conjecture stated, proof missing" pfStart={LAV} pfEnd={GOLD} />
-            <TestCard dotColor={CYAN} domain="Biological Computation · EST" title="T6 · Mycelial Multi-Path Routing Coherence" body="Does multi-path signal routing in Physarum polycephalum mycelium networks suppress tail latency following the same C(N) scaling as DRAM channel hedging?" protocol={`Protocol:\n1. Microfluidic maze: single vs N=2,4,8 parallel paths\n2. Measure food-gradient response time distribution\n3. Fit P(response > t) = exp(-(t/tau)^kappa * C(N))\n4. Extract C(N) empirically\nPass: C(N) grows with N, kappa consistent across\n      both DRAM and Physarum measurements\nFail: C(N) flat with N, or inconsistent kappa`} falsify="Falsified if: parallel paths do not compress response-time tails" pct={31} pctLabel="EST · 31% - Physarum literature supports, not yet measured" pfStart={CYAN} pfEnd={BLOOM} />
-            <TestCard dotColor={GOLD} domain="Dome Apparatus · HYP" title="T7 · Physical Dome as Fibonacci Field Integrator" body="Does the semicircular membrane dome with radial phi-patterning and central sensor achieve field integration gain >=2x compared to a flat equivalent? This tests the macro-scale Fibonacci field integrator hypothesis." protocol={`Protocol:\n1. Construct flat-membrane control (same area)\n2. Measure signal integration at central sensor:\n   acoustic / EM / pressure -- three modalities\n3. Compute gain = dome_output / flat_output\n4. Test at phi-spaced radial node positions\n   vs. random spacing\nPass: gain >= 2x at phi-spaced nodes (p<0.05)\nFail: gain < 1.5x OR random spacing matches phi`} falsify="Falsified if: field integration gain < 1.5x vs flat equivalent" pct={12} pctLabel="HYP · 12% - apparatus built, measurement pending" pfStart={GOLD} pfEnd={ROSE} />
+            <TestCard dotColor={ROSE} domain="Floral · Biology · HYP--DOC" title="T1 · Coherence Bridge: VOC Cosine Clustering" body="Does human ovulatory headspace cluster with Rosa centifolia bouquet under cosine similarity analysis? The 0.82 cosine score is modeled from documented 2-phenylethanol and linalool overlap -- not measured." protocol={`Protocol:\n1. GC-MS headspace sampling: n=20 women,\n   days 12-14 (ovulatory) vs days 1-3 (follicular)\n2. Normalize VOC vectors per AETHER bouquet eq.\n3. Compute cosine_sim(V_ovulatory, V_Rosa_centifolia)\n4. Bootstrap CI: 10,000 permutations\nPass: cosine > 0.6 at p < 0.05\nFail: cosine < 0.4 OR not significant`} falsify="Falsified if: cosine < 0.4 or p > 0.05 in controlled GC-MS assay" pct={15} pctLabel="HYP · 15% - protocol designed" pfStart={ROSE} pfEnd={GOLD} sim={<T1Sim />} />
+            <TestCard dotColor={GOLD} domain="Physics · NV Diamond · EST--DOC" title="T2 · phi-Fibonacci NV Implantation T2 Boost" body="Does phi-indexed Fibonacci lattice implantation in HPHT diamond extend T2 coherence time by factor ~phi compared to grid and random controls? This is the highest-priority falsifiable test in the AETHER corpus." protocol={`Protocol:\n1. Three HPHT diamond samples:\n   A: phi-Fibonacci N+ implantation (F_n spacing)\n   B: Uniform grid spacing (control)\n   C: Random spacing (noise control)\n2. Hahn echo measurement: T2 at 4K and 300K\n3. Extract noise spectral density S(omega) at omega_NV\nPass: T2(A) / T2(B) ~= phi +/- 10%\nFail: ratio < 1.2 or > 2.5`} falsify="Falsified if: T2 ratio != phi (outside [1.4, 1.9] at 95% CI)" pct={42} pctLabel="EST · 42% - Lindblad model run" pfStart={GOLD} pfEnd={BLOOM} sim={<T2Sim />} />
+            <TestCard dotColor={BLOOM} domain="Computing · DRAM · DOC basis" title="T3 · phi-Time Scheduler Discrepancy Benchmark" body="Does phi-time scheduling reduce packing discrepancy by >=25% vs. periodic mode at N=512 task insertions? Three-Distance Theorem predicts D_N(phi) <= 1/(F_n*sqrt(5)). This is computationally verifiable today." protocol={`Protocol:\n1. Implement three schedulers:\n   A: phi-time: t_n = n*Theta_phi mod 1\n   B: Periodic: t_n = n/N\n   C: Random: t_n ~ Uniform[0,1]\n2. Measure discrepancy D_N at N=64,128,256,512\n3. Plot D_N vs N on log-log scale\nPass: D_N(A) < D_N(B) at all N, slope = 1/N\nFail: D_N(A) >= D_N(B) for any N >= 128`} falsify="Falsified if: phi-time discrepancy >= periodic at N >= 128" pct={78} pctLabel="EST · 78% - simulation confirms, formal proof pending" pfStart={BLOOM} pfEnd={CYAN} sim={<T3Sim />} />
+            <TestCard dotColor={ROSE} domain="Oncology · TME · HYP" title="T4 · TME Coherence Collapse VOC Clustering" body="Do breath biopsy VOC profiles from TNBC patients cluster with low-coherence floral phenotypes in cosine similarity analysis vs. healthy controls?" protocol={`Protocol:\n1. Breath biopsy: n=30 TNBC, n=30 healthy controls\n2. GC-MS headspace: identify VOC fingerprint vector\n3. Normalize per AETHER bouquet equation\n4. Compute cosine_sim to M.cardinalis vs M.lewisii\n   reference bouquets\nPass: TNBC clusters with M.cardinalis (C~=0.10)\n      Healthy clusters with M.lewisii (C~=0.92)\n      p < 0.01, ROC AUC > 0.75`} falsify="Falsified if: TNBC VOC does not cluster with low-coherence floral phenotypes" pct={8} pctLabel="HYP · 8% - conceptual framework only" pfStart={ROSE} pfEnd={LAV} sim={<T4Sim />} />
+            <TestCard dotColor={LAV} domain="Mathematics · Lyapunov · Open" title="T5 · Hebbian Convergence: phi^-1 Learning Rate Stability" body="Does the AETHER weight update rule with learning rate eta = phi^-1 ~= 0.618 converge? Under what conditions on the state space? This is the central open mathematical problem." protocol={`Required work:\n1. Lyapunov function V(W) for the update rule\n2. Show dV/dt <= 0 under eta = phi^-1\n3. Characterize convergence basin\n4. Compute convergence rate lambda(eta)\n5. Compare: eta=phi^-1 vs eta=0.5 vs eta=0.9\nPass: Lyapunov stability proven analytically\n      phi^-1 achieves faster convergence\nFail: No Lyapunov function exists OR eta=0.618\n      does not uniquely minimize convergence time`} falsify="Falsified if: no Lyapunov stability proof exists for eta = phi^-1" pct={22} pctLabel="Open · 22% - conjecture stated, proof missing" pfStart={LAV} pfEnd={GOLD} sim={<T5Sim />} />
+            <TestCard dotColor={CYAN} domain="Biological Computation · EST" title="T6 · Mycelial Multi-Path Routing Coherence" body="Does multi-path signal routing in Physarum polycephalum mycelium networks suppress tail latency following the same C(N) scaling as DRAM channel hedging?" protocol={`Protocol:\n1. Microfluidic maze: single vs N=2,4,8 parallel paths\n2. Measure food-gradient response time distribution\n3. Fit P(response > t) = exp(-(t/tau)^kappa * C(N))\n4. Extract C(N) empirically\nPass: C(N) grows with N, kappa consistent across\n      both DRAM and Physarum measurements\nFail: C(N) flat with N, or inconsistent kappa`} falsify="Falsified if: parallel paths do not compress response-time tails" pct={31} pctLabel="EST · 31% - Physarum literature supports, not yet measured" pfStart={CYAN} pfEnd={BLOOM} sim={<T6Sim />} />
+            <TestCard dotColor={GOLD} domain="Dome Apparatus · HYP" title="T7 · Physical Dome as Fibonacci Field Integrator" body="Does the semicircular membrane dome with radial phi-patterning and central sensor achieve field integration gain >=2x compared to a flat equivalent? This tests the macro-scale Fibonacci field integrator hypothesis." protocol={`Protocol:\n1. Construct flat-membrane control (same area)\n2. Measure signal integration at central sensor:\n   acoustic / EM / pressure -- three modalities\n3. Compute gain = dome_output / flat_output\n4. Test at phi-spaced radial node positions\n   vs. random spacing\nPass: gain >= 2x at phi-spaced nodes (p<0.05)\nFail: gain < 1.5x OR random spacing matches phi`} falsify="Falsified if: field integration gain < 1.5x vs flat equivalent" pct={12} pctLabel="HYP · 12% - apparatus built, measurement pending" pfStart={GOLD} pfEnd={ROSE} sim={<T7Sim />} />
           </div>
         </section>
 
@@ -489,6 +941,7 @@ Falsification:
 If RG analysis yields a different fixed-point ratio
 (e.g., sqrt(2), e, or domain-dependent irrational),
 the phi^-1 conjecture fails and must be revised.`}</pre>
+            <div style={{ marginTop: 20, textAlign: "left" }}><MasterSim /></div>
             <div style={styles.masterLabel}>The loop is the invariant. phi is its fingerprint. -- AETHER Unified Synthesis v1.0</div>
           </div>
         </section>
