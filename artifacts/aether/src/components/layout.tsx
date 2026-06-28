@@ -476,6 +476,7 @@ const NAV_ITEMS = [
   { href: "/quaternion-burst",       label: "Quaternion · Burst · q = w + xi + yj + zk · 4D Hypercomplex Rotation · Gimbal-Lock-Free · Hamilton Product · Unit Sphere S3", icon: Rotate3d},
   { href: "/neuroweave",             label: "NEUROWEAVE · Biological Control Matrix · Neural Hub · Reflex Arc · Hippocampus · Amygdala · Neural Spectrum · Synaptic Interface", icon: Brain},
   { href: "/hyper-perception",       label: "HYPER PERCEPTION · Environmental Analysis Matrix · Air Pressure · Altitude · Geolocation · Color Radar · Perception Core · Sensory Overlay", icon: Gauge},
+  { href: "/air-nanotube",           label: "Air Nanotube Transport · Pressure Propulsion · Pressurize → Launch → Glide · Tube Network Topology · Mini Robotic Ethos · Airlock Nodes · Programmable Routing", icon: Waypoints},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

@@ -407,6 +407,7 @@ const CrystallizationLockingPage = lazy(() => import("@/pages/crystallization-lo
 const QuaternionBurstPage       = lazy(() => import("@/pages/quaternion-burst"));
 const NeuroweavePage            = lazy(() => import("@/pages/neuroweave"));
 const HyperPerceptionPage       = lazy(() => import("@/pages/hyper-perception"));
+const AirNanotubePage           = lazy(() => import("@/pages/air-nanotube"));
 
 const queryClient = new QueryClient();
 
@@ -1268,6 +1269,7 @@ function Router() {
                 <Route path="/quaternion-burst"    component={QuaternionBurstPage} />
                 <Route path="/neuroweave"          component={NeuroweavePage} />
                 <Route path="/hyper-perception"    component={HyperPerceptionPage} />
+                <Route path="/air-nanotube"        component={AirNanotubePage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
