@@ -375,6 +375,9 @@ const BindingTheDarkPage        = lazy(() => import("@/pages/binding-the-dark"))
 const SymphonicGovernancePage   = lazy(() => import("@/pages/symphonic-governance"));
 const DiamondPearlPage          = lazy(() => import("@/pages/diamond-pearl"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
+const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
+const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
+const GrandUnifiedPage          = lazy(() => import("@/pages/grand-unified"));
 
 const queryClient = new QueryClient();
 
@@ -1204,6 +1207,9 @@ function Router() {
                 <Route path="/symphonic-governance" component={SymphonicGovernancePage} />
                 <Route path="/diamond-pearl"        component={DiamondPearlPage} />
                 <Route path="/animal-silhouettes"   component={AnimalSilhouettesPage} />
+                <Route path="/path-forward"         component={PathForwardPage} />
+                <Route path="/dark-matter-vol2"     component={DarkMatterVol2Page} />
+                <Route path="/grand-unified"        component={GrandUnifiedPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

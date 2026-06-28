@@ -444,6 +444,9 @@ const NAV_ITEMS = [
   { href: "/symphonic-governance",  label: "Symphonic Protocol · Governing a Living Civilization · Mycelial Infrastructure · Sovereignty Dividend · Resonant Medicine · Planetary Tissue", icon: Atom},
   { href: "/diamond-pearl",         label: "Diamond Pearl · NV Diamond · Mycelial · Nacre · phi-Time · Golden Pearl · South Sea · Tahitian · Freshwater · Quantum Coherence Simulation", icon: Atom},
   { href: "/animal-silhouettes",    label: "Animal Silhouettes · Particle Morphogenesis · Serpent · Vulture · Scorpion · Aurochs · Fox · Egyptian Glyphs · Gravity Well · 150 Particles", icon: Atom},
+  { href: "/path-forward",          label: "Path Forward · Four Papers · Seven Tests · Three Theorems · phi-Time · Master Equation · Coherence Bridge · HYP to DOC · Publication Roadmap", icon: Atom},
+  { href: "/dark-matter-vol2",      label: "Dark Matter Vol II · Tubulin Mechanics · Vortex Dynamics · Spectral Transforms · TLE Hierarchy · Asteroid Superhighways · Warp Event Bus · Grand Synthesis", icon: Atom},
+  { href: "/grand-unified",         label: "Grand Unified · AETHER Loop · Floral Volatiles · Coherence Bridge · Oncology · Kuramoto Sim · phi-Fibonacci Field · GC-MS Chromatogram · Epistemic Registry", icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
