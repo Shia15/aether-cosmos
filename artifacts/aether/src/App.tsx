@@ -370,6 +370,7 @@ const PhiCrystallizationPage    = lazy(() => import("@/pages/phi-crystallization
 const OrbitalMechanicsPage      = lazy(() => import("@/pages/orbital-mechanics"));
 const CoherenceSciencePage      = lazy(() => import("@/pages/coherence-science"));
 const PlanetarySubstratePage    = lazy(() => import("@/pages/planetary-substrate"));
+const FramesOfReferencePage     = lazy(() => import("@/pages/frames-of-reference"));
 
 const queryClient = new QueryClient();
 
@@ -1194,6 +1195,7 @@ function Router() {
                 <Route path="/orbital-mechanics"     component={OrbitalMechanicsPage} />
                 <Route path="/coherence-science"     component={CoherenceSciencePage} />
                 <Route path="/planetary-substrate"   component={PlanetarySubstratePage} />
+                <Route path="/frames-of-reference"  component={FramesOfReferencePage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

@@ -439,6 +439,7 @@ const NAV_ITEMS = [
   { href: "/orbital-mechanics",       label: "Orbital Mechanics · Mechanical Output · Orbital Possibility Sheet · Hohmann · Delta-V Map · Kepler · Propulsion Systems",                         icon: Atom},
   { href: "/coherence-science",      label: "Coherence Science · CUCA Textbook · Solar Luminosity · F10.7 · T3:rT3 · Neural Coherence · Epigenome · Cascade Visualizer · 11 Layers",             icon: Atom},
   { href: "/planetary-substrate",    label: "Planetary Substrate · AETHER Sensor · Europa · Enceladus · Mars · Moon · Patent Claims · Substrate Vector · AQISP · Hexiclical",                     icon: Atom},
+  { href: "/frames-of-reference",   label: "Frames of Reference · Minkowski Diagram · Lorentz Transform · x' anti-x' · Two Observers One Event · Spacetime Symmetry · Special Relativity", icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
