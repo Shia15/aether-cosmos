@@ -291,6 +291,7 @@ const NAV_ITEMS = [
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
   { href: "/wood-frog-biophotonics", label: "Wood Frog Skin · Photonic Bio-Engine · C(x,t) Simulation · 4 Views",        icon: Layers },
   { href: "/integration-dimensions", label: "D21-D26 Integration Dimensions · Void Breath Fire Dark Matter Coherence Totality", icon: Layers },
+  { href: "/stacked-rings-engine",   label: "Stacked Rings Conjecture · 500D Vortecual Engine State · 47-Node Dictionary",  icon: Layers },
   { href: "/universal-grammar",        label: "Universal Grammar · Paper",            icon: BookOpen },
   { href: "/aether-edge-constraint",   label: "Edge Constraint · Section 32",          icon: Aperture },
   { href: "/quantum-living-systems",   label: "Quantum Living · DNA Piano",            icon: Music },
