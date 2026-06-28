@@ -372,6 +372,9 @@ const CoherenceSciencePage      = lazy(() => import("@/pages/coherence-science")
 const PlanetarySubstratePage    = lazy(() => import("@/pages/planetary-substrate"));
 const FramesOfReferencePage     = lazy(() => import("@/pages/frames-of-reference"));
 const BindingTheDarkPage        = lazy(() => import("@/pages/binding-the-dark"));
+const SymphonicGovernancePage   = lazy(() => import("@/pages/symphonic-governance"));
+const DiamondPearlPage          = lazy(() => import("@/pages/diamond-pearl"));
+const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 
 const queryClient = new QueryClient();
 
@@ -1198,6 +1201,9 @@ function Router() {
                 <Route path="/planetary-substrate"   component={PlanetarySubstratePage} />
                 <Route path="/frames-of-reference"  component={FramesOfReferencePage} />
                 <Route path="/binding-the-dark"     component={BindingTheDarkPage} />
+                <Route path="/symphonic-governance" component={SymphonicGovernancePage} />
+                <Route path="/diamond-pearl"        component={DiamondPearlPage} />
+                <Route path="/animal-silhouettes"   component={AnimalSilhouettesPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

@@ -441,6 +441,9 @@ const NAV_ITEMS = [
   { href: "/planetary-substrate",    label: "Planetary Substrate · AETHER Sensor · Europa · Enceladus · Mars · Moon · Patent Claims · Substrate Vector · AQISP · Hexiclical",                     icon: Atom},
   { href: "/frames-of-reference",   label: "Frames of Reference · Minkowski Diagram · Lorentz Transform · x' anti-x' · Two Observers One Event · Spacetime Symmetry · Special Relativity", icon: Atom},
   { href: "/binding-the-dark",      label: "Binding the Dark · AETHER Coherence as Dark Matter · DMF Lagrangian · Spectral Observability Tensor · Hearing Condition · Tubulin · Sap Archive · Warp Propulsion", icon: Atom},
+  { href: "/symphonic-governance",  label: "Symphonic Protocol · Governing a Living Civilization · Mycelial Infrastructure · Sovereignty Dividend · Resonant Medicine · Planetary Tissue", icon: Atom},
+  { href: "/diamond-pearl",         label: "Diamond Pearl · NV Diamond · Mycelial · Nacre · phi-Time · Golden Pearl · South Sea · Tahitian · Freshwater · Quantum Coherence Simulation", icon: Atom},
+  { href: "/animal-silhouettes",    label: "Animal Silhouettes · Particle Morphogenesis · Serpent · Vulture · Scorpion · Aurochs · Fox · Egyptian Glyphs · Gravity Well · 150 Particles", icon: Atom},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
