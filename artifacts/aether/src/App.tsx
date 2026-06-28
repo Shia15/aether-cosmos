@@ -344,6 +344,7 @@ const PhotonEmissionPage = lazy(() => import("@/pages/photon-emission"));
 const TranscendentArtPage = lazy(() => import("@/pages/transcendent-art"));
 const MotorCortexPage = lazy(() => import("@/pages/motor-cortex"));
 const LiquidPrintMathPage = lazy(() => import("@/pages/liquid-print-math"));
+const ChromaticGlarePage = lazy(() => import("@/pages/chromatic-glare"));
 const OpticalHullSimPage = lazy(() => import("@/pages/optical-hull-sim"));
 const BlackHoleFrameworkPage = lazy(() => import("@/pages/black-hole-framework"));
 const NeuroMetabolicPage = lazy(() => import("@/pages/neuro-metabolic"));
@@ -1198,6 +1199,7 @@ function Router() {
                 <Route path="/fluid-computer" component={FluidComputerPage} />
                 <Route path="/motor-cortex" component={MotorCortexPage} />
                 <Route path="/liquid-print-math" component={LiquidPrintMathPage} />
+                <Route path="/chromatic-glare" component={ChromaticGlarePage} />
                 <Route path="/optical-hull-sim" component={OpticalHullSimPage} />
                 <Route path="/black-hole-framework" component={BlackHoleFrameworkPage} />
                 <Route path="/agent-mapping" component={AgentMappingPage} />

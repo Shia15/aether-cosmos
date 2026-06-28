@@ -264,6 +264,7 @@ const NAV_ITEMS = [
   { href: "/aether-doctrine",          label: "AETHER · The Doctrine",                icon: BookOpen },
   { href: "/personal-operating-model", label: "Personal Operating Model",             icon: Workflow },
   { href: "/color-cosmology",          label: "Color Cosmology · Six Shells",         icon: Palette },
+  { href: "/chromatic-glare",          label: "Chromatic Glare · Inverted Opposite Colors · Simultaneous Contrast · Afterimage · Complementary Glow", icon: Palette },
   { href: "/april-23-alignment",       label: "April 23 Alignment · Reality vs Symbol", icon: Orbit },
   { href: "/as-above-so-below",        label: "As Above, So Below · Geohistorical",   icon: Telescope },
   { href: "/piano-arithmetic",         label: "Piano Arithmetic · Earth Harmonizer",  icon: AudioWaveform },
