@@ -218,6 +218,7 @@ const CarbonLayeredPage = lazy(() => import("@/pages/carbon-layered"));
 const StromatoliteAutomatonPage = lazy(() => import("@/pages/stromatolite-automaton"));
 const PhotosynthesisSparkPage = lazy(() => import("@/pages/photosynthesis-spark"));
 const ResonantNexusPage = lazy(() => import("@/pages/resonant-nexus"));
+const LightForcesPage = lazy(() => import("@/pages/light-forces"));
 const UniversalGrammarPage = lazy(() => import("@/pages/universal-grammar"));
 const AetherEdgeConstraintView = lazy(() => import("@/pages/aether-edge-constraint"));
 const QuantumLivingSystemsView = lazy(() => import("@/pages/quantum-living-systems"));
@@ -1090,6 +1091,7 @@ function Router() {
                 <Route path="/unified-field" component={UnifiedFieldPage} />
                 <Route path="/giza-circuit" component={GizaCircuitPage} />
                 <Route path="/quantum-substrate" component={QuantumSubstratePage} />
+                <Route path="/light-forces" component={LightForcesPage} />
                 <Route path="/resonant-nexus" component={ResonantNexusPage} />
                 <Route path="/neural-psychedelic" component={NeuralPsychedelicPage} />
                 <Route path="/photo-timeline" component={PhotoTimelinePage} />
