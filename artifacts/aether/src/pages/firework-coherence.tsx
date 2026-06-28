@@ -404,6 +404,7 @@ export default function FireworkCoherencePage() {
     function drawScene(){
       const s=S.current;
       const {W,H,waterY,towerX,towerTopY,towerBaseY}=s;
+      if(cv.width===0||cv.height===0||W===0||H===0) return;
       ctx.clearRect(0,0,W,H);
       // sky
       const sky=ctx.createLinearGradient(0,0,0,H);
@@ -502,7 +503,7 @@ export default function FireworkCoherencePage() {
       });
 
       // water reflection
-      if(s.waterOn){
+      if(s.waterOn && cv.width>0 && cv.height>0 && waterY>0){
         reflCtx.clearRect(0,0,W,waterY);
         reflCtx.drawImage(cv,0,0,W,waterY,0,0,W/window.devicePixelRatio,waterY);
         ctx.fillStyle='#020810';ctx.fillRect(0,waterY,W,H-waterY);
