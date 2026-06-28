@@ -290,6 +290,7 @@ const NAV_ITEMS = [
   { href: "/robot-strokes",          label: "Filament String Mechanics · 6 Robot Stroke Primitives · phi-Coherence",     icon: Waves },
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
   { href: "/wood-frog-biophotonics", label: "Wood Frog Skin · Photonic Bio-Engine · C(x,t) Simulation · 4 Views",        icon: Layers },
+  { href: "/wood-frog-knots",        label: "Wood Frog Skin x Tait Knots · C(x,t) Coherence Field · Gradient Opacity Differential · Phase Singularity · A(x)=tanh(dist/sigma)", icon: Layers },
   { href: "/integration-dimensions", label: "D21-D26 Integration Dimensions · Void Breath Fire Dark Matter Coherence Totality", icon: Layers },
   { href: "/stacked-rings-engine",   label: "Stacked Rings Conjecture · 500D Vortecual Engine State · 47-Node Dictionary",  icon: Layers },
   { href: "/whats-new",              label: "What's New · System Log · All Domains · Biological Timeline",                   icon: Layers },
