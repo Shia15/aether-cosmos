@@ -326,6 +326,9 @@ const RationalFunctionPage = lazy(() => import("@/pages/rational-function"));
 const EquationsInMotionPage = lazy(() => import("@/pages/equations-in-motion"));
 const HelicalFrameworkPage = lazy(() => import("@/pages/helical-framework"));
 const RobotStrokesPage = lazy(() => import("@/pages/robot-strokes"));
+const FlowerClockPage = lazy(() => import("@/pages/flower-clock"));
+const WoodFrogBiophotonicsPage = lazy(() => import("@/pages/wood-frog-biophotonics"));
+const IntegrationDimensionsPage = lazy(() => import("@/pages/integration-dimensions"));
 const AgentMappingPage = lazy(() => import("@/pages/agent-mapping"));
 const EventHorizonPage = lazy(() => import("@/pages/event-horizon"));
 const PhotonEmissionPage = lazy(() => import("@/pages/photon-emission"));
@@ -1238,6 +1241,9 @@ function Router() {
                 <Route path="/equations-in-motion" component={EquationsInMotionPage} />
                 <Route path="/helical-framework"   component={HelicalFrameworkPage} />
                 <Route path="/robot-strokes"       component={RobotStrokesPage} />
+                <Route path="/flower-clock"        component={FlowerClockPage} />
+                <Route path="/wood-frog-biophotonics" component={WoodFrogBiophotonicsPage} />
+                <Route path="/integration-dimensions" component={IntegrationDimensionsPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
