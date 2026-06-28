@@ -331,6 +331,7 @@ const WoodFrogBiophotonicsPage = lazy(() => import("@/pages/wood-frog-biophotoni
 const IntegrationDimensionsPage = lazy(() => import("@/pages/integration-dimensions"));
 const StackedRingsEnginePage = lazy(() => import("@/pages/stacked-rings-engine"));
 const WhatsNewPage           = lazy(() => import("@/pages/whats-new"));
+const LightningSpectrumPage  = lazy(() => import("@/pages/lightning-spectrum"));
 const AgentMappingPage = lazy(() => import("@/pages/agent-mapping"));
 const EventHorizonPage = lazy(() => import("@/pages/event-horizon"));
 const PhotonEmissionPage = lazy(() => import("@/pages/photon-emission"));
@@ -1248,6 +1249,7 @@ function Router() {
                 <Route path="/integration-dimensions" component={IntegrationDimensionsPage} />
                 <Route path="/stacked-rings-engine" component={StackedRingsEnginePage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
+                <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
