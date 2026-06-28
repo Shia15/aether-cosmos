@@ -477,6 +477,7 @@ const NAV_ITEMS = [
   { href: "/neuroweave",             label: "NEUROWEAVE · Biological Control Matrix · Neural Hub · Reflex Arc · Hippocampus · Amygdala · Neural Spectrum · Synaptic Interface", icon: Brain},
   { href: "/hyper-perception",       label: "HYPER PERCEPTION · Environmental Analysis Matrix · Air Pressure · Altitude · Geolocation · Color Radar · Perception Core · Sensory Overlay", icon: Gauge},
   { href: "/air-nanotube",           label: "Air Nanotube Transport · Pressure Propulsion · Pressurize → Launch → Glide · Tube Network Topology · Mini Robotic Ethos · Airlock Nodes · Programmable Routing", icon: Waypoints},
+  { href: "/resonant-tunnel",        label: "Living Resonant Tunnel · Waterproof Graphene · Hoop-Stress σ = P·r/t · Depth → Pressure · Knot Routing · Lunar Energy Harvest · Custom Energy Flow · Resonant Living Spectrum", icon: Moon},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
