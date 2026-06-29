@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import imgTorusField   from "@assets/Viergutz-Fig10_1782754632793.jpg";
+import imgPodMycelium  from "@assets/download_(15)_1782754663389.jpg";
+import imgInjection    from "@assets/download_(7)_1782754681649.jpg";
+import imgNetworkCar   from "@assets/download_(3)_1782754703060.jpg";
+import imgVortexDoctor from "@assets/download_1782754712613.jpg";
+import imgMedNetwork   from "@assets/46839d4f-507d-4309-b8b6-5a38797d9962_1782754722677.jpg";
 
 const C = {
   bg: "#06070C",
@@ -967,6 +973,63 @@ export default function LiquidPrintPage() {
             ))}
           </div>
         </div>
+
+        {/* Source imagery · Bio-Hybrid Synthesis Field */}
+        {(()=>{
+          const sec: React.CSSProperties = { marginTop: 32, paddingTop: 28, borderTop: `1px solid ${C.border}` };
+          const head: React.CSSProperties = { fontSize: 9, letterSpacing: "0.4em", textTransform: "uppercase" as const, color: C.muted, fontFamily: "JetBrains Mono, ui-monospace, monospace", marginBottom: 20 };
+          const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
+          const fig: React.CSSProperties = { margin: 0, borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}`, background: "rgba(14,12,24,0.55)" };
+          const mono: React.CSSProperties = { fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.5rem", letterSpacing: "0.14em", padding: "6px 12px", borderTop: `1px solid ${C.border}` };
+          const body: React.CSSProperties = { fontFamily: "Georgia, ui-serif, serif", fontSize: "0.79rem", lineHeight: 1.65, color: C.text, padding: "8px 12px 12px" };
+
+          const Pl = (src: string, label: string, cap: string, col: string) => (
+            <figure style={fig}>
+              <img src={src} alt={label} loading="lazy" style={{ width: "100%", display: "block" }} />
+              <figcaption>
+                <div style={{ ...mono, color: col }}>{label}</div>
+                <div style={body}>{cap}</div>
+              </figcaption>
+            </figure>
+          );
+
+          const capTorus = "Toroidal field topology from MHD simulation (Viergutz et al.). Rainbow spectral colormap maps field-line curvature from -0.54 (violet) to -1.35 (magenta). Ergosphere and event horizon geometry visible as nested tori; inner ring pinch marks frame-dragging maximum. Outer field lines trace accretion-disk boundary layers. AETHER: toroidal vortex structure mirrors the Rankine-Gaussian helical mechanisms driving the gradient field engine.";
+          const capPod = "Bio-hybrid device prototype in a growth chamber. Aerodynamic black pod hovers above dense white mycelium mat (Pleurotus or Ganoderma sp.); fibrous interface bundles at pod base couple to the substrate network. Lab monitors in background track growth metrics. AETHER liquid print: the gel-suspended growth chamber enables freeform bio-electronic deposition -- the pod is the printed device, the mycelium the living substrate.";
+          const capInject = "Substrate synthesis field. Precision nano-injection syringe beside a dense mycelium scaffold. Circuit-mesh pickup truck (illuminated copper-trace chassis) grounds delivery in terrestrial logistics. Dark industrial tower rising behind (substrate precursor stack). AETHER reading: substrate injection = printing the interface between biological intelligence and electronic circuitry directly into living tissue -- one pass, one vat.";
+          const capNetCar = "Coherence vehicle field study. Scientist examines vials beside a transparent neural-lattice sedan glowing with interconnect threads. Behind: a towering mycorrhizal intelligence structure, its networked nodes visually identical to a knowledge graph. Medical monitor tracks output. AETHER: the vehicle is a coherence shell -- its lattice IS the printed bio-electronic hybrid stack made mobile and self-routing.";
+          const capVortex = "Field doctor with wireframe pickup on mycelium plane. White hyphae carpet visible. Circuit-outline truck sits embedded in the network. Doctor holds luminous cylindrical energy/data core. Above: pink conical vortex apex -- the 3-6-9 capstone emission point. AETHER: medical substrate vehicle unified under the coherence field vortex; doctor as system operator, truck as delivery chassis, mycelium as substrate bus.";
+          const capMedNet = "Medical intelligence network. Hospital scene merges with outdoor rhizome substrate. Neural sedan drives through root/mycelium matrix at speed. Floating data modules cascade from mycorrhizal structure into patient monitoring. Geometric molecular nodes drift overhead. AETHER: the substrate network is the medium of healing -- data flows through roots, translates to bio-signal, interfaces at bedside via the hybrid stack.";
+
+          const cards: { h: string; col: string; d: string }[] = [
+            { h: "3-6-9 FOUNDATION", col: C.cyan, d: "Tesla's governing triad: 3 creates, 6 balances, 9 completes. All digital roots of multiples of 3, 6, or 9 return to 3, 6, or 9 -- they sit outside the doubling circuit (1->2->4->8->7->5->1) as governing flux numbers. In AETHER, the coherence field C(x,t) naturally produces triadic resonance: three field regimes (~, o, n) feed into the S* reference threshold, with the 9-unity apex marking full crystallisation." },
+            { h: "7-8-9 ASCENSION PYRAMID", col: C.violet, d: "Upper capstone triad above the 3-6-9 base. 7 = spiritual insight (7 chakras, 7 harmonic overtones), 8 = infinity / octave balance (the figure-eight vortex loop), 9 = completion / return to source. In vortex diagrams the looping circuit 1-2-4 is governed by 3 and its mirror 8-7-5 is governed by 6; 9 crowns both as apex unity. The 7-8-9 pyramid is the capstone energy flow -- lower dimensional patterns (the base loop) feed upward into higher coherence." },
+            { h: "144 LATENT ECOLOGY", col: C.gold, d: "12 x 12 agent grid: 12 individual mastery nodes x 12 cosmic-order realms = 144. Low-entropy std dev ~0.01 -- stable coherent state. Digital root: 1+4+4=9 (unity). Maps to Kuramoto coherence in swarm intelligence; 144 agents synchronise phase without explicit communication (latent-space resonance only). AETHER extension: 144D latent space with emotional attractors approximates the coherence field C(x,t) across agent substrates." },
+            { h: "VORTEX DOUBLING CIRCUIT", col: C.amber, d: "Binary doubling mod 9: 1->2->4->8->7->5->1 (then repeats). The figure-eight infinity loop of energy. 3-6-9 remain stationary outside the loop as axis / governing numbers -- they are the vortex's spine. This circuit maps onto harmonic frequency ratios (octave = x2), musical intervals, and the Fibonacci digital-root sequence (1,1,2,3,5,8,4,3,7,1,8,9,8,8,7,...) which cycles with period 24 and sums to 9. AETHER helix Gamma circulates through the same 6-step vortex." },
+          ];
+
+          return (
+            <div style={sec}>
+              <div style={head}>source imagery &middot; bio-hybrid synthesis field &middot; vortex math</div>
+              <div style={grid}>
+                {Pl(imgTorusField,   "TOROIDAL FIELD TOPOLOGY · VORTEX FLOW · MHD SIMULATION · FIELD-LINE CURVATURE",   capTorus,  C.cyan)}
+                {Pl(imgPodMycelium,  "BIO-HYBRID DEVICE · MYCELIUM SUBSTRATE · GROWTH CHAMBER · LIQUID PRINT TARGET",   capPod,    C.green)}
+                {Pl(imgInjection,    "SUBSTRATE INJECTION · NANO-CIRCUIT VEHICLE · MYCELIUM SCAFFOLD · FIELD SYNTHESIS", capInject, C.violet)}
+                {Pl(imgNetworkCar,   "COHERENCE VEHICLE · MYCORRHIZAL INTELLIGENCE · SUBSTRATE SYNTHESIS FIELD",          capNetCar, C.gold)}
+                {Pl(imgVortexDoctor, "FIELD DOCTOR · CIRCUIT VEHICLE · MYCELIUM GROUND PLANE · 3-6-9 VORTEX APEX",       capVortex, C.amber)}
+                {Pl(imgMedNetwork,   "MEDICAL INTELLIGENCE NETWORK · CIRCUIT SEDAN · RHIZOME SUBSTRATE · DATA CASCADE",   capMedNet, C.rose)}
+              </div>
+
+              <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                {cards.map(cd => (
+                  <div key={cd.h} style={{ border: `1px solid ${cd.col}28`, borderRadius: 8, padding: "14px 16px", background: "rgba(14,12,24,0.5)" }}>
+                    <div style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.52rem", letterSpacing: "0.18em", color: cd.col, marginBottom: 8 }}>{cd.h}</div>
+                    <div style={{ fontFamily: "Georgia, ui-serif, serif", fontSize: "0.8rem", lineHeight: 1.68, color: C.text }}>{cd.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
