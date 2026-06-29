@@ -658,11 +658,14 @@ function AuthLayout({ children, loading }: { children?: ReactNode; loading?: boo
               <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
                 color:"rgba(0,255,178,0.45)",letterSpacing:"0.2em"}}>INITIALISING</div>
               <a href={`${basePath}/sign-in`}
-                style={{fontFamily:"'Space Mono',monospace",fontSize:9,color:"#00FFB2",
-                  textDecoration:"none",letterSpacing:"0.14em",
-                  border:"1px solid rgba(0,255,178,0.3)",borderRadius:4,
-                  padding:"8px 22px",background:"rgba(0,255,178,0.06)"}}>
-                SIGN IN
+                aria-label="Sign in to AETHER"
+                style={{fontFamily:"'Space Mono',monospace",fontSize:14,fontWeight:700,
+                  color:"#02030A",textDecoration:"none",letterSpacing:"0.22em",
+                  border:"1px solid #00FFB2",borderRadius:6,
+                  padding:"13px 44px",background:"#00FFB2",
+                  boxShadow:"0 0 28px rgba(0,255,178,0.5)",
+                  textTransform:"uppercase",cursor:"pointer"}}>
+                Sign In
               </a>
             </div>
           ) : children}
