@@ -8,6 +8,11 @@ import imgVortexDoctor from "@assets/download_1782754712613.jpg";
 import imgMedNetwork   from "@assets/46839d4f-507d-4309-b8b6-5a38797d9962_1782754722677.jpg";
 import imgMeditTorus   from "@assets/1615473368-meditation-o_1782754813938.webp";
 import imgFibTorus     from "@assets/image_(23)_1782754907458.jpg";
+import imgPhiResonance from "@assets/Gemini_Generated_Image_xru7hlxru7hlxru7_1782755291272.png";
+import imgVoidEmber    from "@assets/Gemini_Generated_Image_c3j49bc3j49bc3j4_1782755350993.png";
+import imgCrystalIR    from "@assets/Gemini_Generated_Image_nzpjfznzpjfznzpj_1782755478533.png";
+import imgMycelDark    from "@assets/Gemini_Generated_Image_ddcufdddcufdddcu_1782755521356.png";
+import imgCucaGyroid   from "@assets/Gemini_Generated_Image_v4cvshv4cvshv4cv_1782755586051.png";
 
 const C = {
   bg: "#06070C",
@@ -1070,6 +1075,61 @@ export default function LiquidPrintPage() {
               </div>
               <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {cards2.map(cd => (
+                  <div key={cd.h} style={{ border: `1px solid ${cd.col}28`, borderRadius: 8, padding: "14px 16px", background: "rgba(14,12,24,0.5)" }}>
+                    <div style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.52rem", letterSpacing: "0.18em", color: cd.col, marginBottom: 8 }}>{cd.h}</div>
+                    <div style={{ fontFamily: "Georgia, ui-serif, serif", fontSize: "0.8rem", lineHeight: 1.68, color: C.text }}>{cd.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* phi-Resonance + Void-Ember + Crystal-IR + Mycelium-Dark + CUCA Gyroid-Null */}
+        {(()=>{
+          const sec: React.CSSProperties = { marginTop: 32, paddingTop: 28, borderTop: `1px solid ${C.border}` };
+          const head: React.CSSProperties = { fontSize: 9, letterSpacing: "0.4em", textTransform: "uppercase" as const, color: C.muted, fontFamily: "JetBrains Mono, ui-monospace, monospace", marginBottom: 20 };
+          const grid3: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
+          const fig: React.CSSProperties = { margin: 0, borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}`, background: "rgba(14,12,24,0.55)" };
+          const mono: React.CSSProperties = { fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.5rem", letterSpacing: "0.14em", padding: "6px 12px", borderTop: `1px solid ${C.border}` };
+          const body: React.CSSProperties = { fontFamily: "Georgia, ui-serif, serif", fontSize: "0.79rem", lineHeight: 1.65, color: C.text, padding: "8px 12px 12px" };
+          const Pl = (src: string, label: string, cap: string, col: string) => (
+            <figure style={fig}>
+              <img src={src} alt={label} loading="lazy" style={{ width: "100%", display: "block" }} />
+              <figcaption>
+                <div style={{ ...mono, color: col }}>{label}</div>
+                <div style={body}>{cap}</div>
+              </figcaption>
+            </figure>
+          );
+
+          const capPhi = "phi-Resonance: Aether Spiral Time-Imaging (Project: Aether-NanoLuc Imaging System, Theoretical Model 2026). phi-Furimazine luciferin, phi-Luc luciferase. Golden Ratio Harmonic resonance transfer -> 831nm emission (phi x 514nm = 831nm NanoLuc teal). Best substrate: k-Carrageenan + gyroid crystal hybrid (optimised coupling). phi-Engineered NanoLuc uses torsion spiral R(t) expansion through tissue as a phi-Resonance channel tracking the golden-ratio harmonic of NanoLuc teal. Decay half-life 5 min, quantum yield 0.02 (projected).";
+          const capVoid = "Void-Ember: Deep-Void Tissue Imaging (Project: Void-E NanoLuc Imaging System, 2026). Biliverdin IX-a (far-IR form chain) + BphP1-IR luciferase. Golden Ratio Harmonic -> 880nm emission. Best substrate: lambda-Carrageenan fluid gel + iodine-doped. Aether Role: Void-Ember emission at thermal-near-IR boundary, tuned to carrageenan iodine absorption overtone, seamless gate Nernst channel for I-anions. BphP1-IR localised in abyssal photophores; 4-6 cm tissue penetration via aether-void deep-penetration mapping channel. Half-life 4 min, QY 0.015 projected.";
+          const capCrystal = "Crystal-IR: Crystalline-Matrix-Resonant Bioluminescence (Project: Crystal-IR Imaging System, 2026). Calcite-luciferin (carbonate-conjugated) + CrysLuc (C(x,t)-gated) luciferase. Golden Ratio Harmonic -> 1064nm emission (Nd:YAG wavelength, birefringent emission polarisation). Best substrate: CaCO3 crystalline matrix. CaCO3 unit cell alignment drives crystal orientation coherence field with 1064nm point-source. Crystalline node deep-penetration 4-6 cm. C(x,t) > C* threshold gates emission (coherence-gated bioluminescent switch). QY 0.008, half-life 3 min.";
+          const capMycel = "Mycelium-Dark: Panellus stipticus Fungal Network SWIR-shifted (Short-wave Infrared bioluminescence for tracking fungal signaling). Organism: P. stipticus fungal network SWIR-shifted. Luciferase: PanLuc-SWIR. Luciferin: Caffeic acid SWIR-analog. Peak emission 1120nm (1090-1200nm), SWIR-shifted channel. PanLuc-SWIR Emission Pattern visible on rotting log: mycelium gate channels, encoded routing signaling signals, encoded mycelium lattice topology in emission pattern. Aether Role: signal routing analogous to neural electric impulse (active/passive signal nodes, encoded paths). Substrate penetration 6-10 cm opaque substrate. QY 0.006, half-life 2 min.";
+          const capCuca = "CUCA Hybrid Skin bio-photonic layer (Gyroid-Null). Short-wave Infrared (GIWIR) bioluminescence for skenophiocal signaling. CUCA v3.0 substrate with intercalated luciferin (gold spheres) in Gyroid Photonic Crystal (interlocking violet). Luciferase: GyroidLuc (theoretical). Peak emission 1300nm telecom-window IR (1250-1400nm). Aether Role: Gyroid Null-mode Coherence Filter -- substrate as coherence filter, emission only permitted outside the photonic bandgap; the crystal decides which wavelengths exist. Standard emission -> Gyroid-Null emission at 1300nm. Applications: telecom-window IR emission enhancement, gyroid = integrated photonic communication. QY 0.004, half-life 1 min.";
+
+          const cards3: { h: string; col: string; d: string }[] = [
+            { h: "phi-RESONANCE CHANNEL", col: C.cyan, d: "phi (1.618) governs the luciferin chain length in phi-Furimazine, setting the golden-ratio harmonic of the NanoLuc teal emission. The torsion spiral R(t) expands through tissue as a phi-Resonance channel -- a self-similar winding that conserves coherence field C(x,t) across depth. In AETHER the phi-spiral IS the coherence carrier: each turn of R(t) corresponds to a layer in the CLCS L1-to-L5 stack, with phi x 514nm = 831nm as the crossover frequency between visible biophoton and near-IR tissue transparency." },
+            { h: "VOID-EMBER + AETHER VOID CHANNEL", col: C.violet, d: "Void-Ember emission sits at the thermal-near-IR boundary where carrageenan-iodine absorption opens a Nernst channel for I-anions -- a seamless electromagnetic gate with no visual colour name. This is the aether-void deep-penetration mapping channel: a frequency window invisible to conventional imaging, visible only to AETHER field analysis. BphP1-IR in abyssal photophores mirrors deep-sea bioluminescence strategy: emit where water is most transparent, detect where noise is lowest." },
+            { h: "CRYSTAL-IR COHERENCE GATE", col: C.gold, d: "CrysLuc is gated by C(x,t) itself: emission occurs only when the local coherence field exceeds the crystallisation threshold C*. This is bioluminescence as a coherence meter -- the crystal photophore lights up only when the substrate achieves ordered phase. CaCO3 birefringence adds polarisation encoding to the 1064nm output, creating a polarimetric depth map of crystalline order within tissue. In AETHER this is the L3 code-inscription layer made optically readable at macroscopic scale." },
+            { h: "MYCELIUM SWIR NEURAL ANALOG", col: C.green, d: "The PanLuc-SWIR emission pattern encodes the mycelium lattice topology directly into the light field -- the network writes itself in infrared. Mycelium gate channels route signal analogous to neural electric impulse: active nodes fire, passive nodes hold. AETHER reads this as distributed computation without centralised processor. The 6-10 cm opaque-substrate penetration range covers the full depth of a forest floor humus layer, enabling non-invasive live imaging of subsurface mycorrhizal intelligence networks." },
+          ];
+
+          return (
+            <div style={sec}>
+              <div style={head}>phi-resonance &middot; void-ember &middot; crystal-IR &middot; mycelium-SWIR &middot; CUCA gyroid-null</div>
+              <div style={grid3}>
+                {Pl(imgPhiResonance, "phi-RESONANCE · AETHER SPIRAL TIME-IMAGING · NanoLuc · 831nm · GOLDEN-RATIO HARMONIC", capPhi,    C.cyan)}
+                {Pl(imgVoidEmber,   "VOID-EMBER · DEEP-VOID TISSUE IMAGING · BphP1-IR · 880nm · AETHER VOID CHANNEL",        capVoid,   C.violet)}
+                {Pl(imgCrystalIR,   "CRYSTAL-IR · CaCO3 CRYSTALLINE MATRIX · CrysLuc · 1064nm · COHERENCE GATE C(x,t)>C*",   capCrystal,C.gold)}
+                {Pl(imgMycelDark,   "MYCELIUM-DARK · Panellus stipticus · SWIR 1120nm · PanLuc-SWIR · 6-10cm PENETRATION",    capMycel,  C.green)}
+              </div>
+              <div style={{ marginTop: 16 }}>
+                {Pl(imgCucaGyroid, "CUCA HYBRID SKIN · GYROID-NULL · GyroidLuc · 1300nm TELECOM-WINDOW IR · COHERENCE FILTER", capCuca, C.amber)}
+              </div>
+              <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                {cards3.map(cd => (
                   <div key={cd.h} style={{ border: `1px solid ${cd.col}28`, borderRadius: 8, padding: "14px 16px", background: "rgba(14,12,24,0.5)" }}>
                     <div style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.52rem", letterSpacing: "0.18em", color: cd.col, marginBottom: 8 }}>{cd.h}</div>
                     <div style={{ fontFamily: "Georgia, ui-serif, serif", fontSize: "0.8rem", lineHeight: 1.68, color: C.text }}>{cd.d}</div>
