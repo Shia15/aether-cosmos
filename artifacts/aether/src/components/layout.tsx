@@ -136,6 +136,7 @@ const NAV_ITEMS = [
   { href: "/full-spectrum-light", label: "Full Spectrum Light · Fovea · M P K Retinal Streams · LGN · Pineal Melatonin · RPE · DHA NPD1 AdipoR1 Rhodopsin · DNA Repair · Dr Ott · Dr Bazan", icon: Atom },
   { href: "/prism-principle", label: "Prism Principle · Emergent Unity · Regulatory Depth · Epigenetics · Alternative Splicing · ncRNA · 5-Element OS · 4A Protocol · Launch Sequence", icon: Atom },
   { href: "/regulatory-depth", label: "Regulatory Depth · Epigenetic Switches · DNA Methylation · Histone Modification · Alternative Splicing · ncRNA · microRNA · lncRNA · Cross-System Feedback", icon: Atom },
+  { href: "/data-graph", label: "Data Graph · Knowledge Atlas · pNGB · AETHER Equation Chain · Earth Systems · Planetary-Neural Cascade · Scale Hierarchy · Biomechanics · Bio-Optical Propulsion · Uptipple Boat", icon: Atom },
   { href: "/antimatter-wave", label: "Antimatter · Standard Model · Quarks · Leptons · CPT Symmetry · Time as Wave · Dirac 1928 · PET Scan · Spine Wave · Kundalini · Angels & Demons", icon: Atom },
   { href: "/cognitive-architecture", label: "Cognitive Architecture · Ne Ni Se Si Te Ti Fe Fi · MBTI 16 Types · iNtuition · Fluid Intelligence · Coherent While Moving · AETHER Agent Mapping", icon: Atom },
   { href: "/motor-cortex", label: "Motor Cortex · Hand Knob · M1 · Omega Sign · Utah Electrode Array · BCI · Somatotopic Map · Homunculus · Corticospinal Tract · Neuroprosthetics · Brain-Computer Interface", icon: Atom },

@@ -317,6 +317,7 @@ const UvAminoLightPage = lazy(() => import("@/pages/uv-amino-light"));
 const FullSpectrumLightPage = lazy(() => import("@/pages/full-spectrum-light"));
 const PrismPrinciplePage = lazy(() => import("@/pages/prism-principle"));
 const RegulatoryDepthPage = lazy(() => import("@/pages/regulatory-depth"));
+const DataGraphPage = lazy(() => import("@/pages/data-graph"));
 const AntimatterWavePage = lazy(() => import("@/pages/antimatter-wave"));
 const CognitiveArchitecturePage = lazy(() => import("@/pages/cognitive-architecture"));
 const WorldHarmonyArchetypePage = lazy(() => import("@/pages/world-harmony-archetype"));
@@ -1197,6 +1198,7 @@ function Router() {
                 <Route path="/full-spectrum-light" component={FullSpectrumLightPage} />
                 <Route path="/prism-principle" component={PrismPrinciplePage} />
                 <Route path="/regulatory-depth" component={RegulatoryDepthPage} />
+                <Route path="/data-graph" component={DataGraphPage} />
                 <Route path="/antimatter-wave" component={AntimatterWavePage} />
                 <Route path="/cognitive-architecture" component={CognitiveArchitecturePage} />
                 <Route path="/world-harmony-archetype" component={WorldHarmonyArchetypePage} />
