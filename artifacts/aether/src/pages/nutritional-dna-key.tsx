@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import plateNutrition from "@assets/ChatGPT_Image_May_9,_2026,_02_48_12_PM_1782671843324.png";
-import plateStevedore from "@assets/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782671805904.png";
-import plateFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_02_38_24_PM_1782671918130.png";
+import plateTrefoil from "@assets/Gemini_Generated_Image_bp8s3tbp8s3tbp8s_1782732632585.png";
+import plateCinquefoil from "@assets/ChatGPT_Image_Jun_29,_2026,_07_06_40_AM_1782732632585.png";
+import plateStevedore from "@assets/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782732622437.png";
+import plateFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_08_58_11_PM_1782732632584.png";
 
 const V = {
   bg:"#05060C",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
@@ -550,6 +552,8 @@ export default function NutritionalDnaKeyPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
           {[
             { src: plateNutrition, t: "The Nutritional Key", d: "The three colour channels -- anthocyanins, resistant starch, curcumin -- as the rainbow inputs." },
+            { src: plateTrefoil, t: "Trefoil Knot 3_1", d: "The simplest non-trivial knot -- models collagen helix topology; three phase singularities at its crossings." },
+            { src: plateCinquefoil, t: "Cinquefoil Knot 5_1", d: "Torus knot T(2,5), winding number 2 -- pentagonal symmetry seen in viral capsids and wood-frog guanine arrays." },
             { src: plateStevedore, t: "Stevedore Knot 6_1", d: "The topology gate and its invariants: Alexander, Jones, determinant, hyperbolic volume." },
             { src: plateFrog, t: "Wood Frog Coherence", d: "The coherence field C(x,t)=A(x)e^{i(phi-wt)} and the 6_1 crossings that gate crystallisation." },
           ].map((p) => (
