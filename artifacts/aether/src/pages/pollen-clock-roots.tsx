@@ -1,4 +1,10 @@
 import React, { useEffect, useRef } from "react";
+import imgGravitropism  from "@assets/Gemini_Generated_Image_hfeys3hfeys3hfey_1782753878224.png";
+import imgMeristem      from "@assets/Gemini_Generated_Image_jb7g0ajb7g0ajb7g_1782753900629.png";
+import imgRootHair      from "@assets/Gemini_Generated_Image_sjnv2isjnv2isjnv_1782753926093.png";
+import imgMossEcology   from "@assets/Gemini_Generated_Image_yz72jyz72jyz72jy_1782753944404.png";
+import imgSaffronRoot   from "@assets/image_1782754082763.png";
+import imgPoppyRoot     from "@assets/Gemini_Generated_Image_t2acpet2acpet2ac_1782754133064.png";
 
 const TAU=Math.PI*2, PI=Math.PI;
 const CW=900;
@@ -644,6 +650,31 @@ export default function PollenClockRootsPage(){
         {P("The axis from root to flower is the fundamental axis of plant information processing. The root reads: gravity vector, water potential gradient, oxygen concentration, ion concentrations, mycorrhizal chemical signals, touch from soil particles, and pathogen chemical signatures. This information travels upward as electrical signals (action potentials at 1-10 cm/s) and chemical signals (auxin, cytokinin, ABA, ethylene at mm/h).")}
         {P("Moss occupies the transition zone: it is simultaneously substrate and bridge. As a substrate, it retains water (up to 20x its dry weight), moderates temperature fluctuations, and provides physical structure for seedling establishment. As a bridge, it connects the mineral soil substrate (populated by bacteria and fungi) with the aerial environment (populated by insects and light).")}
         {P("The flower is the plant's information compression and transmission organ. It compresses the plant's genetic information (pollen) into a durable, mobile packet. It transmits this packet using pollinators (bees, butterflies, birds, bats, slugs) as carrier waves. The flower's timing, colour, shape, and fragrance are all encoded messages optimised for specific carrier frequencies — plant language written in the interface between chemistry and physics.")}
+        {(()=>{
+          const Pl=(src:string,label:string,cap:string,col:string)=>(
+            <figure key={label} style={{margin:"0 0 28px",borderRadius:8,overflow:"hidden",border:`1px solid ${col}44`,background:"rgba(0,0,0,0.45)"}}>
+              <img src={src} alt={label} loading="lazy" style={{width:"100%",display:"block"}} />
+              <figcaption style={{padding:"10px 15px",borderTop:`1px solid ${col}22`}}>
+                <div style={{fontFamily:V.mono,fontSize:"0.52rem",color:col,letterSpacing:"0.15em",marginBottom:6}}>{label}</div>
+                <div style={{fontFamily:V.serif,fontSize:"0.82rem",color:V.ink,opacity:0.7,lineHeight:1.65}}>{cap}</div>
+              </figcaption>
+            </figure>
+          );
+          return (<>
+            {Pl(imgGravitropism,"GRAVITROPISM · AMYLOPLAST SEDIMENTATION · AUXIN SIGNALLING · DIFFERENTIAL ELONGATION",
+              "Gravity sensing: starch-filled plastids (amyloplasts) sediment to the bottom of statocyte cells in the root cap columella. Sedimentation triggers asymmetric redistribution of auxin (IAA) via PIN auxin transporters — higher auxin accumulates on the lower side. At root-effective concentrations, high IAA inhibits elongation, so the lower side grows slower than the upper side, bending the root tip downward. Macro-scale curvature response time: 10–30 min for initial curvature, 1–3 hours for complete reorientation.",col:V.gold)}
+            {Pl(imgMeristem,"MERISTEMATIC ZONE · APICAL MERISTEM STRUCTURE · CELLULAR DYNAMICS · HORMONE GRADIENTS",
+              "Root Apical Meristem (RAM): Quiescent Centre (QC) surrounded by initial cells (stem cells) that divide asymmetrically — one daughter self-renews, one becomes a transit-amplifying (TA) cell that divides further and differentiates. Meristem size: ~0.5–2 mm. Tip elongation: ~2 mm/day (Arabidopsis). Hormone gradients maintain pluripotency: high Auxin (IAA) at tip suppresses differentiation; high Cytokinin above tip promotes cell division. Three zones: Meristematic (blue) → Elongation (purple) → Maturation (green).",col:V.aurora)}
+            {Pl(imgRootHair,"ROOT HAIR FUNCTION · SINGLE-CELL ELONGATION · TIP GROWTH · CALCIUM SIGNALLING · NUTRIENT UPTAKE",
+              "Root hairs are single-cell elongations of trichoblast epidermal cells. Length: 0.1–1 cm. Lifetime: 2–3 weeks. Density: 10–40 per mm of root. Surface area increase: up to 70×, dramatically increasing water and nutrient uptake capacity. Tip growth is driven by a focused Ca²⁺ gradient maintained by inositol-IP₃ signalling, Ca²⁺ influx through hyperpolarisation-activated channels, cytoskeleton remodelling, and targeted exocytosis of cell wall material at the growing tip. Nutrient pathways: apoplastic (around cells) and symplastic (through plasmodesmata).",col:V.green)}
+            {Pl(imgMossEcology,"MOSS ECOLOGY · LIFE CYCLE · SPHAGNUM WATER RETENTION · PEAT BOG CARBON SINK",
+              "Moss life cycle: haploid gametophyte (the green carpet) dominates; diploid sporophyte (stalk + capsule) is short-lived and dependent. Spores germinate on wet surfaces → filamentous protonemata → leafy gametophores → sporophytes → spore release. Sphagnum (peat moss): hyaline cells (large, porous, dead) absorb and hold 20× dry weight in water. Peat bogs store 550 Gt of carbon — more than all forests combined (~280–450 Gt C). Anoxic, waterlogged conditions slow decomposition, locking organic carbon in partially decomposed peat and permafrost.",col:V.photon)}
+            {Pl(imgSaffronRoot,"SAFFRON ROOT · CROCUS SATIVUS CORM ANATOMY · CLONAL PROPAGATION · FIBROUS ROOT SYSTEM",
+              "Crocus sativus grows from a corm (swollen stem tissue, not a bulb). Corm diameter: 3–5 cm. Anatomy: tunica (protective scale leaves), apical bud (shoot meristem), axillary buds (cormlet initiation), vascular tissue, corm base. Annual cycle: corm → seasonal growth (stigma/style production) → senescence → daughter corm + cormlets. Root system: adventitious roots from corm base, shallow, fibrous, highly branched. Root depth: ~20 cm. Root length: 15–30 cm. Adapted for rocky, well-drained soils (Iran, Spain, Kashmir). C. sativus is a triploid sterile hybrid — propagated vegetatively for 3,500+ years, no viable seeds produced.",col:V.vio)}
+            {Pl(imgPoppyRoot,"POPPY ROOT · PAPAVER SOMNIFERUM TAPROOT · LATICIFEROUS SYSTEM · ALKALOID DISTRIBUTION",
+              "Papaver somniferum: taproot system reaching 60 cm depth. Lateral root branching: first-order laterals every 5–10 mm (high density). Laticiferous system: latex canals (laticiferous cells) form a connected network through roots, stems, leaves, and seed capsule. Damage mechanism: root damage → latex pressure → latex exudation → coagulation → wound seal. Alkaloid distribution: morphine, codeine, and noscapine present throughout the plant; highest concentration in seed capsule latex. Root latex: lower alkaloid vesicle count than seed capsule. Annual cycle: germination → growth → flowering → seed capsule production → senescence.",col:V.plasma)}
+          </>);
+        })()}
         {cards([
           {h:"ROOT INTELLIGENCE",col:V.gold,d:"Plants solve distributed optimisation problems with no nervous system. Root foraging: when nutrient patches are found (localised nitrate, phosphate), root proliferation increases 10-fold in that patch (precision foraging). When nutrient patches are depleted, root growth shifts elsewhere. This is the 'economic root growth' model — cost-benefit analysis of carbon invested in roots vs. nutrient return, optimised by auxin/cytokinin signalling."},
           {h:"MYCORRHIZAL NETWORK",col:V.green,d:"90% of land plant species form mycorrhizal partnerships. Arbuscular mycorrhizal fungi (AMF) extend root reach by up to 100x (hyphae: 1-10 um diameter, roots: 0.1-3 mm). Exchange: plant provides 20-30% of photosynthate as carbon; fungus provides phosphate, nitrate, water. The 'Wood Wide Web': common mycorrhizal networks connect multiple plants. Carbon transfer between trees documented. Signals (strigolactones from plant, LCOs from fungi) initiate partnership."},
