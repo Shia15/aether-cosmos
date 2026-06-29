@@ -84,6 +84,7 @@ import {
   BookA,
   SunMedium,
   Camera,
+  StickyNote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -397,6 +398,7 @@ const NAV_ITEMS = [
   { href: "/cli-nano",                 label: "CLI · nano · Cheat Sheet + Live Key Tester (Engine 01)", icon: Terminal },
   { href: "/calm-company",             label: "Calm Company OS · 12 Buckets · Daily 2-Post Engine · Mediums", icon: Feather },
   { href: "/social-deploy",            label: "Social Deploy · 30-day calendar · X · LinkedIn · Threads · Instagram", icon: Rocket },
+  { href: "/community-notes",          label: "Community Notes · Global Board · Sticky Notes · Earth Moon Sun Stars",  icon: StickyNote },
   { href: "/divine-timing",            label: "Divine Timing · Eris-in-Pisces · 11/11 Letter · Field of Numbers", icon: InfinityIcon },
   { href: "/glossary",                 label: "Glossary · A–Z Vocabulary of AETHER · Filterable", icon: BookA },
   { href: "/quantum-ammeter",          label: "Quantum Ammeter · Solar Prototype · Live Shot-Noise Sim", icon: SunMedium },
@@ -883,6 +885,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <AuthWidget />
       <div className="p-4 border-t border-border shrink-0 flex items-center justify-between gap-2">
         <div className="text-xs font-mono text-muted-foreground/50">AETHER OS v1.2.0</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        {/* Sticky Note button */}
+        <Link href="/community-notes">
+          <button
+            title="Community Notes — global board"
+            style={{
+              display: "flex", alignItems: "center", gap: 4,
+              padding: "4px 8px", borderRadius: 14, cursor: "pointer",
+              border: "1px solid rgba(184,150,232,0.35)",
+              background: "rgba(184,150,232,0.06)",
+              color: "#b596e8",
+              fontFamily: "'Space Mono', monospace",
+              fontSize: 8, letterSpacing: "0.08em",
+              transition: "all 0.2s",
+            }}
+          >
+            <StickyNote style={{ width: 10, height: 10 }} />
+            NOTES
+          </button>
+        </Link>
         {/* Screenshot button */}
         <button
           onClick={captureScreenshot}
@@ -902,6 +924,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Camera style={{ width: 10, height: 10 }} />
           {shotState === "busy" ? "CAPTURING…" : shotState === "done" ? "SAVED ✓" : "SCREENSHOT"}
         </button>
+        </div>
       </div>
     </>
   );

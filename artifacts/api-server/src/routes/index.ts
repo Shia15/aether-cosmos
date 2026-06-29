@@ -13,6 +13,7 @@ import aetherIntakeRouter from "./aether-intake";
 import dialogueRouter from "./dialogue";
 import animalProfileRouter from "./animal-profile";
 import liveCursorsRouter from "./live-cursors";
+import communityNotesRouter from "./community-notes";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(aetherIntakeRouter);
 router.use(dialogueRouter);
 router.use(animalProfileRouter);
 router.use(liveCursorsRouter);
+router.use(communityNotesRouter);
 
 export default router;
