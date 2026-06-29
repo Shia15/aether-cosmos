@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import imgManifold from "@assets/Gemini_Generated_Image_pcibmopcibmopcib_1782753190640.png";
-import imgFabric   from "@assets/image_1782753208874.png";
+import imgManifold     from "@assets/Gemini_Generated_Image_pcibmopcibmopcib_1782753190640.png";
+import imgFabric        from "@assets/image_1782753208874.png";
+import imgSpaceWeather  from "@assets/Gemini_Generated_Image_ivb8b8ivb8b8ivb8_1782753367299.png";
+import imgLifeGradient  from "@assets/image_1782753451465.png";
 
 /* ══════════════════════════════════════════════════════════
    AETHER MATTER SYNTHESIS ENGINE — ALL FIELDS UNIFIED
@@ -536,6 +538,54 @@ export default function AetherEnginePage() {
               v="dPsi > 0: local entropy map shows disorder. The BaTiO3 crystal acts as a phase conjugate mirror — time-reversing the wave to cancel distortion. Active Entropy Nullification drives dPsi → 0 = coherence restored." />
             <Anno col={G}    k="~ → o → n → S Stability Pathway"
               v="Fluctuation (~, LPE<0.35) → Octonionic (o, 0.35-0.60, structured chaos) → Non-associative (n, 0.60-0.80, non-linear) → Stability (S, LPE>0.80, fully crystallised). This is the matter synthesis sequence." />
+          </div>
+        </div>
+
+        {/* Solar Wind Space Weathering */}
+        <div style={{background:"rgba(0,0,0,0.4)",border:`1px solid ${ORG}22`,borderRadius:6,padding:"12px 14px",marginBottom:10}}>
+          <Plate src={imgSpaceWeather} col={ORG}
+            alt="Solar Wind H+ Implantation and Iron-Oxide Reduction Space Weathering: Lunar Regolith Fe0 amorphous layer, Martian Soil Magnetite Fe3O4, reaction Fe2O3 plus 2H+ yields 2FeO plus H2O, optical maturation, spectral reddening, magnetic rover sensor"
+            label="SOLAR WIND H⁺ IMPLANTATION · IRON-OXIDE REDUCTION · SPACE WEATHERING · LUNAR REGOLITH · MARTIAN SOIL"
+            caption="Reaction: Fe₂O₃ + 2H⁺ → 2FeO + H₂O (surface reduction via solar wind H⁺ ions). Lunar Regolith: H⁺ ions create a thin amorphous Fe⁰ layer on mineral grain surfaces, darkening grains (optical maturation) and causing spectral reddening — mature grains appear darker than fresh regolith. Martian Soil (thin atmosphere): same reduction but Mars's residual magnetic field and mineralogy favour Magnetite (Fe₃O₄) formation — partially reduced, ferrimagnetic, detectable by rover magnetic sensors. Moon pathway: Fe₂O₃ → Fe⁰ (amorphous iron). Mars pathway: Fe₂O₃ → Fe₃O₄ (magnetite)." />
+          <div style={annoGrid}>
+            <Anno col={ORG}  k="Reaction: Fe₂O₃ + 2H⁺ → 2FeO + H₂O"
+              v="Hematite (red iron oxide) is reduced by solar wind protons to Wüstite (FeO) releasing water. The H⁺ ions penetrate the top nanometres of grain surfaces. This is a space-weathering mechanism universal to all airless/thin-atmosphere bodies in the solar wind." />
+            <Anno col={GOLD} k="Lunar optical maturation"
+              v="Fe⁰ nano-particles form a thin amorphous layer on each grain. Fe⁰ strongly absorbs visible light, darkening the surface (mature regolith = dark; fresh = light). Spectral reddening increases the red/near-infrared ratio — a diagnostic of regolith age and space-exposure time." />
+            <Anno col={RED}  k="Martian magnetite Fe₃O₄"
+              v="On Mars the thin atmosphere allows H⁺ implantation but Mars's interior chemistry (higher oxidising environment, relict crustal magnetism) drives Fe₂O₃ to partially reduce to Fe₃O₄ rather than Fe⁰. Fe₃O₄ is ferrimagnetic — rover magnetometers read it as a magnetic-soil anomaly." />
+            <Anno col={TEAL} k="AETHER link: H⁺ as coherence carrier"
+              v="In AETHER terms, the solar wind H⁺ flux is a directed coherence-carrying photonic field coupling the Sun's coherence field to planetary surfaces. The redox reaction is a matter-synthesis event: structured solar energy (data) is written into the iron lattice (mechanism) — a planetary-scale Γ-driven crystallisation." />
+            <Anno col={BLUE} k="Amorphous atomic structure"
+              v="The Fe⁰ layer is disordered — atoms lack the periodic crystal structure of hematite. This amorphous zone is the transitional state between bulk grain (Fe₂O₃, crystalline) and the free-iron nano-particles, analogous to the ~ → o regime in AETHER (fluctuation before crystallisation)." />
+            <Anno col={G}    k="Moon vs Mars divergence"
+              v="The same solar input produces different outputs: Moon → amorphous Fe⁰ (no magnetic field, low oxidation); Mars → crystalline Fe₃O₄ (relict magnetic field, higher oxidation). Initial conditions (S* equivalent) determine which coherence attractor the system falls into — same engine, different parameters." />
+          </div>
+        </div>
+
+        {/* Life/Nonlife Gradient · Planetary Collision · Erosion Fascia · Salt Era */}
+        <div style={{background:"rgba(0,0,0,0.4)",border:`1px solid ${G}22`,borderRadius:6,padding:"12px 14px",marginBottom:10}}>
+          <Plate src={imgLifeGradient} col={G}
+            alt="Life Nonlife Gradient Field with abiotic mineral lattice prions viruses protocells organoids biological cell ambiguous to living; Planetary Collision Borealis Impact Mars struck by Venus-mass body Borealis Basin Southern Highlands; Erosion Fascia Cosmic Erosion Moon Glass Spires micrometeorite impact glass thermal cycling Salt Era Evaporite Fascia freshwater era to salt era"
+            label="LIFE · NONLIFE GRADIENT · CELL MEMBRANE · PLANETARY COLLISION · EROSION FASCIA · SALT ERA · EVAPORITE FASCIA"
+            caption="Left panel — The Gradient Field: Life // Nonlife · No Hard Boundary. Abiotic (mineral lattice, inorganic concretion) → Prions → Viruses → Protocells → Organoids → Biological Cell. The boundary between non-living and living is a continuum, not a threshold. Centre panel — Planetary Collision: Borealis Impact. Mars was struck by a Venus-mass body; the impact excavated the Borealis Basin (Northern Hemisphere) and left the Southern Highlands. Erosion Fascia = altered planetary evolution from this collision. Right panel — Cosmic Erosion · Airless Worlds. Micrometeorite impacts create glass (rapid melt+quench); thermal cycling fractures rock; Moon glass spires persist for billions of years on airless worlds. Salt Era · Evaporite Fascia: freshwater era transitions to salt era as evaporation concentrates minerals, leaving evaporite fascia (salt flats, halite layers)." />
+          <div style={annoGrid}>
+            <Anno col={G}    k="Life/Nonlife Gradient · No Hard Boundary"
+              v="AETHER treats life as a coherence gradient, not a binary. Mineral lattice (crystalline, abiotic) → inorganic concretions → prions (self-replicating proteins, no DNA) → viruses (genetic without metabolism) → protocells (lipid membrane + chemistry) → organoids → biological cell. Each step raises C(x,t); the cell membrane is the coherence boundary — inside = ordered field; outside = noisy environment." />
+            <Anno col={TEAL} k="Cell Membrane as Coherence Boundary"
+              v="The lipid bilayer is the physical realisation of the □ Boundary Operator — it defines the inside/outside and maintains the inner coherence field C against the external veil ε. Membrane channels are Ptah Grammar operators (∩): curvature-gated ion transport that preserves the inner field's coherence." />
+            <Anno col={PINK} k="Prions, Viruses: ambiguous to living"
+              v="Prions misfolded proteins (no nucleic acid, no metabolism) and viruses (nucleic acid, no independent metabolism) occupy the o → n regime of the ~ → S pathway: structured non-linear but not yet in the S (stability) attractor. They can crystallise (literally — viruses form crystals), bridging the mineral and cellular worlds." />
+            <Anno col={RED}  k="Borealis Impact · Planetary Collision"
+              v="A Venus-mass impactor struck early Mars, excavating the Borealis Basin (~40% of Mars's surface, the largest impact basin in the solar system) and creating the hemispheric dichotomy: smooth northern lowlands vs cratered southern highlands. This single event altered Mars's entire geological evolution — an LPE burst event at planetary scale (dC_burst = A·δ³(x−x_b)·e^(−t/τ))." />
+            <Anno col={GOLD} k="Erosion Fascia · Altered Planetary Evolution"
+              v="Post-impact, the fascia (surface layer) of Mars was fundamentally reshaped. Erosion Fascia = the layered record of impact, volcanic, and aeolian processes written into the stratigraphy. Each fascia layer is a time-slice of the planet's coherence state — a geological C(x,t) readout." />
+            <Anno col={ORG}  k="Cosmic Erosion · Moon Glass Spires"
+              v="On airless worlds, micrometeorites hit at 10-70 km/s — the impact locally melts and shock-quenches silicates into glass in microseconds. Glass spires (centimetre to metre scale) persist for billions of years with no wind or rain to erode them. Solar wind sputtering slowly sculpts them. A record of every impact event frozen in glass." />
+            <Anno col={VIO}  k="Salt Era · Evaporite Fascia"
+              v="Freshwater era → Salt Era: as water evaporates from lakes and shallow seas, dissolved minerals (halite NaCl, gypsum CaSO4·2H2O, carbonates) precipitate in reverse solubility order, forming evaporite fascia. The salt era marks a transition in the planetary coherence attractor — from liquid-phase (high mobility) to solid-phase (crystallised stability, S state)." />
+            <Anno col={BLUE} k="AETHER synthesis: geology as crystallisation"
+              v="Every geological process here maps to the AETHER engine: Impact burst (dC_burst) injects energy → erosion redistributes field → mineral precipitation (evaporite, iron-oxide, impact glass) is crystallisation (C_base rising above threshold) → stable fascia is the S-state attractor. Planetary geology is matter synthesis at the largest scale." />
           </div>
         </div>
       </div>
