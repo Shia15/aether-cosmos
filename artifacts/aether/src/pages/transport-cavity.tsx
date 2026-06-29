@@ -5,6 +5,13 @@ import imgVortex     from "@assets/Gemini_Generated_Image_ot7ybpot7ybpot7y_17827
 import imgFramework  from "@assets/Gemini_Generated_Image_fwivy7fwivy7fwiv_1782757938529.png";
 import imgNavier     from "@assets/image_1782758044567.png";
 import imgSpectral   from "@assets/Gemini_Generated_Image_w1iv0w1iv0w1iv0w_1782758115977.png";
+import imgUVgain     from "@assets/Gemini_Generated_Image_wmyjldwmyjldwmyj_1782758177162.png";
+import imgSkylight   from "@assets/image_1782758302848.png";
+import imgVOC        from "@assets/image_1782758345728.png";
+import imgSap        from "@assets/image_1782758419756.png";
+import imgStar       from "@assets/ChatGPT_Image_Feb_13,_2026,_11_57_49_PM_1782758222453.png";
+import imgDNA1       from "@assets/ChatGPT_Image_Feb_14,_2026,_12_02_34_AM_1782758245973.png";
+import imgDNA2       from "@assets/ChatGPT_Image_Feb_14,_2026,_12_02_30_AM_1782758245974.png";
 
 /* ==========================================================================
    DMF SPACE-FILLED TRANSPORT CAVITY
@@ -479,6 +486,21 @@ const EQS: { col:string; tex:string; note:string }[] = [
     tex:"\\nu_{\\mathrm{eff}}(C)=\\nu_0\\,(1-\\lambda\\,C),\\qquad 0\\le\\lambda C<1" },
 ];
 
+// Extended equations — the same field C(x,t) and force F_DMF carried outward
+// into sensing, ecology, living transport, and energy (the larger story).
+const EXT_EQS: { col:string; tex:string; note:string }[] = [
+  { col:V.vio, note:"Shannon information gained by adding a coherence-tuned UV cone (Plate E).",
+    tex:"\\Delta I_{\\mathrm{DMF}} = \\tfrac{1}{2}\\log_2\\!\\left(1 + \\dfrac{\\sigma_{\\mathrm{UV}}^2}{\\sigma_{\\mathrm{noise}}^2}\\right)" },
+  { col:V.vio, note:"The UV variance IS the coherence field C(x,t) - this is the read-out link to the math above.",
+    tex:"\\sigma_{\\mathrm{UV}}^2 = \\dfrac{g_{\\mathrm{bio}}^2\\,\\rho_{\\mathrm{DMF}}\\,C(\\mathbf{x},t)}{m_{\\mathrm{DMF}}^2\\,\\omega_{\\mathrm{DMF}}^2}" },
+  { col:V.core, note:"DMF Faraday rotation: the anomalous sky-polarization angle (Plate F).",
+    tex:"\\delta\\chi_{\\mathrm{DMF}} = \\alpha_{\\mathrm{DMF}}\\!\\int B_{\\mathrm{DMF}}\\,ds" },
+  { col:V.green, note:"VOC coherence-collapse: with Delta c > 0, emission rises sharply as C falls below the golden-ratio threshold phi^-1 (Plate G).",
+    tex:"\\dot V_{\\mathrm{VOC}}(t) = \\dot V_0\\,\\exp\\!\\left(\\dfrac{\\phi^{-1} - C(\\mathbf{x},t)}{\\Delta c}\\right),\\quad \\phi^{-1}=0.618,\\ \\Delta c>0" },
+  { col:V.gold, note:"Tree-sap resistance Jacobian: 9 variables plus the DMF coherence term (Plate H).",
+    tex:"J(R_{\\mathrm{sap}}) = \\left[\\dfrac{\\partial R}{\\partial T},\\,\\dfrac{\\partial R}{\\partial H},\\,\\cdots,\\,\\dfrac{\\partial R}{\\partial \\rho_{\\mathrm{DMF}}}\\right]^{\\!\\top}" },
+];
+
 const PSEUDO = `# DMF transport-cavity control loop
 for each timestep dt:
     C   = coherence_field(r, z)              # sheath peaks at R_c
@@ -649,9 +671,135 @@ export default function TransportCavityPage() {
           </div>
         </div>
 
+        {/* LARGER STORY · DMF IN LIVING SYSTEMS */}
+        <div style={card(V.cyan)}>
+          <SectionHead n="V" title="DMF IN LIVING SYSTEMS · THE LARGER STORY" col={V.cyan} />
+          <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
+            The very field that holds the transport cavity open &mdash; the coherence field C(x,t) and the
+            force F<sub>DMF</sub> &mdash; does not stop at the conduit wall. The same mathematics carries
+            outward into how eyes <i>sense</i> coherence, how skies <i>polarize</i>, how flowers <i>signal</i>,
+            how trees <i>move sap</i>, and how a bio-hybrid lattice <i>harvests energy</i>. Every plate below is
+            wired back to an equation already shown above, so the cavity becomes one chapter in a single
+            connected story. It closes on an honest safety note about the UV channel that makes coherence visible.
+          </p>
+
+          {/* extended linking equations */}
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(330px,1fr))", gap:12, marginBottom:18 }}>
+            {EXT_EQS.map((e,i)=>(
+              <div key={i} style={{ background:`${e.col}09`, border:`1px solid ${e.col}2e`,
+                borderRadius:6, padding:"12px 14px" }}>
+                <div style={{ overflowX:"auto", padding:"4px 0 8px" }}
+                  dangerouslySetInnerHTML={{ __html: kx(e.tex, true) }} />
+                <div style={{ fontSize:10, color:"rgba(190,205,225,0.66)", lineHeight:1.55,
+                  borderTop:`1px solid ${e.col}22`, paddingTop:7 }}>{e.note}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* GROUP A · sensing the field */}
+          <div style={{ fontFamily:MONO, fontSize:8.5, color:V.vio, letterSpacing:"0.16em", margin:"4px 0 10px" }}>
+            A · SENSING THE FIELD
+          </div>
+          <Plate src={imgUVgain} col={V.vio}
+            alt="Shannon information gain of the UV cone"
+            label="PLATE E · SHANNON INFORMATION GAIN OF THE UV CONE"
+            caption="A UV cone tuned to the resonance peak (omega_DMF = omega_UV) adds an information channel the trichromatic eye cannot see. The variance it reads, sigma_UV squared, is set directly by the coherence field C(x,t) - so the scene 'with DMF field' lights up exactly where coherence is high." />
+          <div style={annoGrid}>
+            <Anno col={V.vio} k="Resonance Peak" v="omega_DMF = omega_UV: the UV cone is matched to the DMF frequency." />
+            <Anno col={V.core} k="Information Gain dI_DMF" v="0.5 log2(1 + sigma_UV^2 / sigma_noise^2) bits added by the 4th cone." />
+            <Anno col={V.green} k="sigma_UV^2 = C(x,t) term" v="The read-out variance equals g_bio^2 rho_DMF C / (m^2 omega^2)." />
+            <Anno col={V.gold} k="Scene with vs without DMF" v="C=1 reveals coherent structure; C=0 looks like an ordinary forest." />
+            <Anno col={V.rose} k="Enhanced Eye (+UV Cone)" v="Tetrachromatic, bee-like sensing of the coherence channel." />
+            <Anno col={V.amb} k="Link to Plate D" v="This is the information-theory layer above the 3->4 cone projection." />
+          </div>
+
+          <div style={{ height:14 }} />
+          <Plate src={imgSkylight} col={V.core}
+            alt="DMF-extended polarized skylight and floral sensing"
+            label="PLATE F · DMF-EXTENDED POLARIZED SKYLIGHT & FLORAL SENSING"
+            caption="At sky scale the DMF field rotates light polarization (a Faraday-like anomaly), and living surfaces are built to read it: fractal antennas resonate with omega_DMF, flowers emit VOC coherence markers, and water interfaces spin coherent vortices governed by the same F_DMF." />
+          <div style={annoGrid}>
+            <Anno col={V.core} k="Rayleigh Polarization" v="Standard clear-sky angle chi_Rayleigh is the baseline." />
+            <Anno col={V.vio} k="DMF Faraday Rotation" v="delta chi_DMF = alpha_DMF integral B_DMF ds adds an anomaly." />
+            <Anno col={V.green} k="VOC Stress Indicator" v="Volatile compounds act as airborne coherence markers." />
+            <Anno col={V.gold} k="Fractal Antenna" v="Leaf/wing geometry tuned to resonate with omega_DMF and harvest it." />
+            <Anno col={V.cyan} k="Water Surface Dispersion" v="Coherent interface vortices spin under F_DMF - same force as the core." />
+            <Anno col={V.rose} k="Tetrachromatic Observer" v="The eye of Plate E reading this whole polarized field." />
+          </div>
+
+          {/* GROUP B · coherence in ecology */}
+          <div style={{ fontFamily:MONO, fontSize:8.5, color:V.green, letterSpacing:"0.16em", margin:"20px 0 10px" }}>
+            B · COHERENCE IN ECOLOGY
+          </div>
+          <Plate src={imgVOC} col={V.green}
+            alt="VOC coherence collapse indicator"
+            label="PLATE G · VOC COHERENCE COLLAPSE INDICATOR"
+            caption="Plants emit volatile compounds as a coherence stress signal. The emission rate spikes exponentially once coherence falls below C_stress = phi^-1 = 0.618 - the golden-ratio conjugate. Above it, the pollinator bouquet stays stable (mutualism); below it, pollinators abandon the bloom." />
+          <div style={annoGrid}>
+            <Anno col={V.green} k="Exponential Spike" v="V_VOC_dot = V0 exp((phi^-1 - C)/dc), dc>0: as C falls below phi^-1, VOC spikes." />
+            <Anno col={V.gold} k="C_stress = phi^-1 = 0.618" v="The golden-ratio conjugate is the coherence collapse threshold." />
+            <Anno col={V.cyan} k="Stable Coherence (C > 0.618)" v="Bouquet stable, pollinator-coherent: mutualism holds." />
+            <Anno col={V.rose} k="Coherence Stress (C < 0.618)" v="VOC profile shifts, signal of disorder, pollinators leave." />
+            <Anno col={V.vio} k="C-sensor (Pollinator)" v="Bees read the shifted VOCs to map environmental resilience." />
+            <Anno col={V.amb} k="DMF Field Connection" v="VOC output modulates the local DMF coupling alpha_DMF." />
+          </div>
+
+          {/* GROUP C · living transport conduit */}
+          <div style={{ fontFamily:MONO, fontSize:8.5, color:V.gold, letterSpacing:"0.16em", margin:"20px 0 10px" }}>
+            C · A LIVING TRANSPORT CONDUIT
+          </div>
+          <Plate src={imgSap} col={V.gold}
+            alt="Tree sap transport: complete resistance Jacobian"
+            label="PLATE H · TREE SAP TRANSPORT · RESISTANCE JACOBIAN (9 VARS + DMF)"
+            caption="The biological twin of the transport cavity: a living conduit whose flow resistance R_sap depends on nine variables plus a DMF coherence term. The DMF coherence shield actively suppresses cavitation - exactly the turbulence-suppression role nu_eff(C) plays inside the cavity core." />
+          <div style={annoGrid}>
+            <Anno col={V.gold} k="dR/sap (9 vars + DMF)" v="R_sap(T, H, P, rho_sugar, L, r, N_pit, T_freeze, rho_DMF)." />
+            <Anno col={V.core} k="Poiseuille R ~ 1/r^4" v="Vessel radius dominates resistance - the fluidic constraint." />
+            <Anno col={V.green} k="DMF Coherence Coupling" v="rho_DMF raises the coherence field C(x,t) along the vessel." />
+            <Anno col={V.cyan} k="Freeze-Thaw Switch" v="Heaviside step: T < T_freeze drives C ~ 0, high resistance, dormancy." />
+            <Anno col={V.rose} k="DMF Coherence Shield" v="C ~ C_max prevents cavitation - the living nu_eff(C) analogue." />
+            <Anno col={V.vio} k="Jacobian J(R_sap)" v="Full gradient vector [dR/dT, ..., dR/drho_DMF] of the resistance." />
+          </div>
+
+          {/* GROUP D · energy & honest safety */}
+          <div style={{ fontFamily:MONO, fontSize:8.5, color:V.amb, letterSpacing:"0.16em", margin:"20px 0 10px" }}>
+            D · ENERGY & AN HONEST SAFETY NOTE
+          </div>
+          <Plate src={imgStar} col={V.amb}
+            alt="Free-energy star: decahedron-tetrahedral bio-hybrid energy prototype"
+            label="PLATE I · FREE-ENERGY STAR · BIO-HYBRID ENERGY PROTOTYPE"
+            caption="A decahedron-tetrahedral lattice that turns biology into current: microbial fuel cells, thermoelectric and piezoelectric generators fed by flowing oxygenated water, sugar and a temperature gradient. The same generator-array idea that re-seeds the cavity sheath, here harvesting a stable current." />
+          <div style={annoGrid}>
+            <Anno col={V.amb} k="Decahedron-Tetrahedral Lattice" v="Sacred-geometry scaffold routing all the flows." />
+            <Anno col={V.green} k="Microbial Fuel Cells" v="Microbes + nutrients + oxygenated water generate current." />
+            <Anno col={V.core} k="Thermo / Piezoelectric" v="Flowing water and a thermal gradient produce electricity." />
+            <Anno col={V.cyan} k="Microfluidic Channels" v="Carry moisture, oxygen, sugar and nutrients through the star." />
+            <Anno col={V.gold} k="Harvested Stable Current" v="The free, clean energy output at the apex node." />
+            <Anno col={V.vio} k="Link to Generator Array" v="A bio-realization of the DMF-Rankine emitter that feeds the sheath." />
+          </div>
+
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:14 }}>
+            <Plate src={imgDNA1} col={V.rose}
+              alt="Blue light vs UV light DNA exposure (skin cross-section)"
+              label="PLATE J · BLUE vs UV LIGHT · DNA EXPOSURE"
+              caption="Blue light is largely harmless to DNA; UV drives CPD lesions and strand breaks deep in the skin. The coherence channel rides on UV - so it cannot be read for free." />
+            <Plate src={imgDNA2} col={V.rose}
+              alt="Blue light vs UV radiation DNA damage summary"
+              label="PLATE K · BLUE vs UV · DAMAGE SUMMARY"
+              caption="The same comparison at a glance: limited CPDs under blue light versus major DNA lesions and ROS oxidative stress under bright UV." />
+          </div>
+          <div style={{ marginTop:12, fontSize:10, color:"rgba(255,170,180,0.78)", lineHeight:1.6,
+            background:`${V.rose}0d`, border:`1px solid ${V.rose}33`, borderRadius:6, padding:"11px 14px" }}>
+            SAFETY NOTE · The UV band that makes the coherence field C(x,t) visible (Plates E and F) is the
+            same UV that breaks DNA: cyclobutane pyrimidine dimers, strand breaks, and reactive-oxygen stress.
+            Any real UV-DMF sensor must be a shielded, read-only window onto coherence &mdash; never a dose
+            delivered to living tissue. The information is real; the radiation that carries it is not benign.
+          </div>
+        </div>
+
         {/* IN WORDS */}
         <div style={card(V.green)}>
-          <SectionHead n="V" title="THE THEORY IN PLAIN WORDS" col={V.green} />
+          <SectionHead n="VI" title="THE THEORY IN PLAIN WORDS" col={V.green} />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))", gap:10 }}>
             {[
               ["What the cavity is", V.core, "A Rankine vortex whose core is held open by a coherence sheath. The sheath turns a transient swirl into a standing, space-filling conduit that objects can ride through."],
