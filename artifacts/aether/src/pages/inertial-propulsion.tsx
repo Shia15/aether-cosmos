@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import imgCalc from "@assets/image_1782759541470.png";
+import imgMatrix from "@assets/image_1782759572268.png";
 
 /* ==========================================================================
    INERTIAL TUBE DRIVE
@@ -76,6 +78,35 @@ const card = (col:string): React.CSSProperties => ({
 const panel = (col:string): React.CSSProperties => ({
   background:"rgba(255,255,255,0.015)", border:`1px solid ${col}26`, borderRadius:8, padding:"14px 16px",
 });
+
+function Plate({ src, alt, col, label, caption }:
+  { src:string; alt:string; col:string; label:string; caption:string }) {
+  return (
+    <figure style={{ margin:0, borderRadius:7, overflow:"hidden",
+      border:`1px solid ${col}55`, background:"#05070b",
+      boxShadow:`0 0 30px ${col}1e, inset 0 0 0 1px ${col}11` }}>
+      <img src={src} alt={alt} loading="lazy" style={{ width:"100%", display:"block" }} />
+      <figcaption style={{ padding:"10px 14px", borderTop:`1px solid ${col}26`,
+        background:`linear-gradient(180deg, ${col}0a, transparent)` }}>
+        <div style={{ fontFamily:MONO, fontSize:8, color:col, letterSpacing:"0.14em", marginBottom:5 }}>{label}</div>
+        <div style={{ fontSize:10.5, color:"rgba(200,210,228,0.68)", lineHeight:1.6 }}>{caption}</div>
+      </figcaption>
+    </figure>
+  );
+}
+
+function Anno({ col, k, v }: { col:string; k:string; v:string }) {
+  return (
+    <div style={{ background:`${col}0d`, border:`1px solid ${col}33`, borderRadius:4, padding:"8px 11px" }}>
+      <div style={{ fontFamily:MONO, fontSize:8.5, color:col, fontWeight:700, marginBottom:3 }}>{k}</div>
+      <div style={{ fontSize:10, color:"rgba(190,205,225,0.66)", lineHeight:1.55 }}>{v}</div>
+    </div>
+  );
+}
+
+const annoGrid: React.CSSProperties = {
+  display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(178px,1fr))", gap:8, marginTop:12,
+};
 
 /* ════════════════════════════════════════════════════════════════════════
    SIM 1 · Inertial Mass to Speed optimiser
@@ -486,6 +517,181 @@ function BioreactorCanvas() {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
+   WORKED CALCULATION · reproduces Blueprint 01's headline numbers
+   a = 2d/t^2 ; F_in = m_mov*a ; F_lift = P*A ; F_fric = mu(mg - F_lift)
+   F_net = F_in + F_lift - F_drag ; a_net = F_net/m ; v = sqrt(2*a_net*s)
+   Source defaults reproduce a=1.875, F_net=1240.375 N, v~222.7 m/s.
+   ════════════════════════════════════════════════════════════════════════ */
+function CalcStep({ k, eq, val, col }: { k:string; eq:string; val:string; col:string }) {
+  return (
+    <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:10,
+      padding:"7px 0", borderBottom:"1px solid rgba(120,140,170,0.12)" }}>
+      <div>
+        <div style={{ fontFamily:MONO, fontSize:8, color:col, letterSpacing:"0.08em", marginBottom:2 }}>{k}</div>
+        <div style={{ fontFamily:MONO, fontSize:9.5, color:"rgba(180,196,218,0.6)" }}>{eq}</div>
+      </div>
+      <div style={{ fontFamily:MONO, fontSize:"0.92rem", color:col, whiteSpace:"nowrap", textAlign:"right" }}>{val}</div>
+    </div>
+  );
+}
+
+function WorkedCalc() {
+  const G = 9.81;
+  const [m, setM]       = useState(0.50);
+  const [mMov, setMMov] = useState(0.20);
+  const [d, setD]       = useState(0.15);
+  const [tc, setTc]     = useState(0.40);
+  const [P, setP]       = useState(25000);
+  const [A, setA]       = useState(0.050);
+  const [mu, setMu]     = useState(0.02);
+  const [drag, setDrag] = useState(10);
+  const [dist, setDist] = useState(10);
+
+  const a     = (2*d)/(tc*tc);
+  const fIn   = mMov*a;
+  const fLift = P*A;
+  const fFric = mu*(m*G - fLift);
+  const fNet  = fIn + fLift - drag;
+  const aNet  = fNet/m;
+  const v     = Math.sqrt(Math.max(0, 2*aNet*dist));
+  const vKmh  = v*3.6;
+
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"260px 1fr", gap:14 }}>
+      <div style={panel(V.amb)}>
+        <Slider label="TOTAL MASS m (kg)"        value={m}    min={0.2}  max={2}     step={0.01}  col={V.amb}   onChange={setM}    fmt={(x)=>x.toFixed(2)} />
+        <Slider label="MOVABLE MASS m_mov (kg)"  value={mMov} min={0.05} max={1}     step={0.01}  col={V.gold}  onChange={setMMov} fmt={(x)=>x.toFixed(2)} />
+        <Slider label="STROKE d (m)"             value={d}    min={0.05} max={0.5}   step={0.01}  col={V.green} onChange={setD}    fmt={(x)=>x.toFixed(2)} />
+        <Slider label="CYCLE TIME t (s)"         value={tc}   min={0.1}  max={1}     step={0.01}  col={V.core}  onChange={setTc}   fmt={(x)=>x.toFixed(2)} />
+        <Slider label="AIR PRESSURE P (Pa)"      value={P}    min={5000} max={60000} step={500}   col={V.vio}   onChange={setP}    fmt={(x)=>x.toFixed(0)} />
+        <Slider label="CONTACT AREA A (m\u00b2)" value={A}    min={0.01} max={0.15}  step={0.005} col={V.cyan}  onChange={setA}    fmt={(x)=>x.toFixed(3)} />
+        <Slider label="FRICTION \u03bc"          value={mu}   min={0}    max={0.2}   step={0.005} col={V.rose}  onChange={setMu}   fmt={(x)=>x.toFixed(3)} />
+        <Slider label="DRAG F_drag (N)"          value={drag} min={0}    max={50}    step={1}     col={V.dim}   onChange={setDrag} fmt={(x)=>x.toFixed(0)} />
+        <Slider label="DISTANCE s (m)"           value={dist} min={1}    max={50}    step={1}     col={V.amb}   onChange={setDist} fmt={(x)=>x.toFixed(0)} />
+      </div>
+      <div style={panel(V.gold)}>
+        <CalcStep k="1 \u00b7 INERTIAL ACCEL"  eq="a = 2d / t\u00b2"                col={V.green} val={`${a.toFixed(3)} m/s\u00b2`} />
+        <CalcStep k="1 \u00b7 INERTIAL FORCE"  eq="F_in = m_mov \u00b7 a"           col={V.green} val={`${fIn.toFixed(3)} N`} />
+        <CalcStep k="2 \u00b7 LIFT FORCE"      eq="F_lift = P \u00b7 A"             col={V.core}  val={`${fLift.toFixed(1)} N`} />
+        <CalcStep k="3 \u00b7 FILM FRICTION"   eq="F_fric = \u03bc(mg \u2212 F_lift)" col={V.rose} val={`${fFric.toFixed(2)} N`} />
+        <CalcStep k="4 \u00b7 NET FORCE"       eq="F_net = F_in + F_lift \u2212 F_drag" col={V.gold} val={`${fNet.toFixed(3)} N`} />
+        <CalcStep k="5 \u00b7 NET ACCEL"       eq="a_net = F_net / m"               col={V.vio}   val={`${aNet.toFixed(2)} m/s\u00b2`} />
+        <CalcStep k="6 \u00b7 TOP SPEED"       eq="v = \u221a(2 \u00b7 a_net \u00b7 s)" col={V.amb} val={`${v.toFixed(1)} m/s \u00b7 ${vKmh.toFixed(0)} km/h`} />
+        <div style={{ marginTop:10, fontSize:9.5, color:"rgba(180,196,218,0.6)", lineHeight:1.6, fontFamily:MONO }}>
+          NEGATIVE FILM FRICTION = NET LIFT (the pod floats), so step 4 folds it into lift and counts only
+          drag &mdash; the blueprint&rsquo;s bottom line. Defaults reproduce its chain (a&nbsp;=&nbsp;1.875 m/s&sup2;
+          &rarr; F_net&nbsp;=&nbsp;1240.375 N &rarr; ~222.7 m/s), matching the 222.6 m/s / 804 km/h headline to rounding.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SIM 4 · ATP harvesting vs local coherence (Blueprint 02 health half)
+   rate(C) = k*dMu*G*sigmoid((C-0.5)/0.12) ; G = 1 + g_bio*rho_DMF (dMu0=1)
+   ════════════════════════════════════════════════════════════════════════ */
+function AtpCanvas() {
+  const cvs = useRef<HTMLCanvasElement | null>(null);
+  const [dMu, setDMu]   = useState(0.7);
+  const [gBio, setGBio] = useState(0.8);
+  const [rho, setRho]   = useState(0.6);
+  const [k, setK]       = useState(1.0);
+  const dRef = useRef(dMu); useEffect(()=>{dRef.current=dMu;},[dMu]);
+  const gRef = useRef(gBio); useEffect(()=>{gRef.current=gBio;},[gBio]);
+  const rRef = useRef(rho); useEffect(()=>{rRef.current=rho;},[rho]);
+  const kRef = useRef(k);   useEffect(()=>{kRef.current=k;},[k]);
+
+  const gainRef = useRef<HTMLSpanElement>(null);
+  const peakRef = useRef<HTMLSpanElement>(null);
+  const nowRef  = useRef<HTMLSpanElement>(null);
+  const cohRef  = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const canvas = cvs.current; if (!canvas) return;
+    const reduce = prefersReduced();
+    let raf = 0; let t = 0;
+    const sig = (z:number) => 1/(1+Math.exp(-z));
+    const rateAt = (C:number, dmu:number, gb:number, rh:number, kk:number) =>
+      kk*dmu*(1 + gb*rh)*sig((C-0.5)/0.12);
+
+    const draw = () => {
+      const { w, h } = fitCanvas(canvas, 300);
+      const ctx = canvas.getContext("2d"); if (!ctx) return;
+      const dmu=dRef.current, gb=gRef.current, rh=rRef.current, kk=kRef.current;
+      ctx.clearRect(0,0,w,h);
+      const padL=48, padB=30, padT=18, padR=16;
+      const x0=padL, x1=w-padR, y0=h-padB, y1=padT;
+      const gain = 1 + gb*rh;
+      const peak = kk*dmu*gain*sig((1-0.5)/0.12);
+      const scale = Math.max(peak*1.1, 0.2);
+
+      ctx.strokeStyle="rgba(120,140,170,0.18)"; ctx.lineWidth=1;
+      for(let i=1;i<=4;i++){ const gy=y0-(i/4)*(y0-y1); ctx.beginPath(); ctx.moveTo(x0,gy); ctx.lineTo(x1,gy); ctx.stroke(); }
+      ctx.strokeStyle="rgba(120,140,170,0.45)";
+      ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.stroke();
+      ctx.fillStyle="rgba(150,170,200,0.6)"; ctx.font=`8px ${MONO}`;
+      ctx.fillText("local coherence C \u2192", x1-110, y0+16);
+      ctx.save(); ctx.translate(13,(y0+y1)/2); ctx.rotate(-Math.PI/2);
+      ctx.fillText("ATP rate", -22, 0); ctx.restore();
+
+      ctx.beginPath();
+      for(let i=0;i<=240;i++){
+        const C=i/240;
+        const rate=rateAt(C,dmu,gb,rh,kk);
+        const px=x0+C*(x1-x0);
+        const py=y0-Math.min(rate/scale,1)*(y0-y1);
+        if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+      }
+      ctx.strokeStyle=V.green; ctx.lineWidth=2; ctx.shadowColor=V.green; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+
+      const pxh=x0+0.5*(x1-x0);
+      ctx.strokeStyle=`${V.gold}99`; ctx.setLineDash([4,4]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(pxh,y0); ctx.lineTo(pxh,y1); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle=V.gold; ctx.font=`8px ${MONO}`; ctx.fillText("C\u00bd", pxh+3, y1+10);
+
+      if(!reduce) t+=0.01;
+      const Cc=0.5+0.5*Math.sin(t);
+      const rc=rateAt(Cc,dmu,gb,rh,kk);
+      const cpx=x0+Cc*(x1-x0);
+      const cpy=y0-Math.min(rc/scale,1)*(y0-y1);
+      ctx.strokeStyle=`${V.rose}aa`; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(cpx,y0); ctx.lineTo(cpx,y1); ctx.stroke();
+      ctx.fillStyle=V.rose; ctx.beginPath(); ctx.arc(cpx,cpy,3.5,0,Math.PI*2); ctx.fill();
+
+      if(gainRef.current) gainRef.current.textContent=gain.toFixed(3);
+      if(peakRef.current) peakRef.current.textContent=peak.toFixed(3);
+      if(nowRef.current)  nowRef.current.textContent=rc.toFixed(3);
+      if(cohRef.current)  cohRef.current.textContent=Cc.toFixed(2);
+
+      raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div style={{ display:"grid", gridTemplateColumns:"1fr 240px", gap:14 }}>
+      <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${V.green}26`, background:"#04050a" }}>
+        <canvas ref={cvs} style={{ width:"100%", height:300, display:"block" }} />
+      </div>
+      <div style={panel(V.green)}>
+        <Slider label="PROTON FORCE \u0394\u03bc_H" value={dMu} min={0.1} max={1.5} step={0.05} col={V.core} onChange={setDMu} fmt={(x)=>x.toFixed(2)} />
+        <Slider label="BIO GAIN g_bio"           value={gBio} min={0} max={2}    step={0.05} col={V.gold} onChange={setGBio} fmt={(x)=>x.toFixed(2)} />
+        <Slider label="DMF DENSITY \u03c1_DMF"    value={rho} min={0} max={1.5}  step={0.05} col={V.vio}  onChange={setRho} fmt={(x)=>x.toFixed(2)} />
+        <Slider label="SYNTHASE RATE k"          value={k}   min={0.2} max={2}   step={0.05} col={V.amb}  onChange={setK}   fmt={(x)=>x.toFixed(2)} />
+        <div style={{ display:"grid", gap:7, marginTop:10 }}>
+          <Stat label="GAIN FACTOR G"        col={V.gold}  vref={gainRef} />
+          <Stat label="PEAK ATP RATE"        col={V.green} vref={peakRef} />
+          <Stat label="RATE AT CURSOR"       col={V.rose}  vref={nowRef} />
+          <Stat label="COHERENCE AT CURSOR"  col={V.core}  vref={cohRef} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════════
    EQUATIONS
    ════════════════════════════════════════════════════════════════════════ */
 const EQS: { t:string; d:string }[] = [
@@ -511,6 +717,22 @@ const EQS: { t:string; d:string }[] = [
     d:"Biomass doubling time under the limiting resource." },
 ];
 
+/* image-2 merged-matrix equations (travel x health) */
+const MERGED_EQS: { t:string; d:string }[] = [
+  { t:"\\dfrac{dx_{\\text{pod}}}{dt} = -L_{\\text{graph}} = K\\,\\dfrac{C(x_i)\\,C(x_j)}{|x_i-x_j|^2 + \\ell_c^2}",
+    d:"Transport matrix: the pod flows down a graph-Laplacian gradient, pulled between coherent network nodes \u2014 routing becomes a field, not a timetable." },
+  { t:"\\dot N_{\\text{ATP}} = k_{\\text{syn}}\\,\\Delta\\mu_{H^+}\\left(1 + \\dfrac{g_{\\text{bio}}\\,\\rho_{\\text{DMF}}}{\\Delta\\mu_{H^+}^{0}}\\right)",
+    d:"Mitochondrial ATP harvesting: the field coherence that moves the pod also boosts cellular energy yield \u2014 the travel substrate feeds personal health." },
+  { t:"F_{\\text{net}} = \\eta_{\\text{eco}}\\,\\gamma_{\\text{DMF}}\\,\\dfrac{\\Delta M_{\\text{anch}}}{\\Delta M_{\\text{prop}}}\\,K_{\\text{pert}}",
+    d:"Eco-weighted propulsion: net force scales with the anchor-to-propulsion mass ratio, gated by an ecological efficiency factor." },
+  { t:"K_{\\text{pert}} = K^{(0)} + \\varepsilon\\sum_{i\\neq j}\\dfrac{|V_{\\text{cross}}|^2}{K_i^{(0)} - K_j^{(0)}}",
+    d:"Cross-system perturbation: climate, economic and human couplings second-order correct the base transport constant." },
+  { t:"G_{\\text{gain}} = \\dfrac{I^{(4)} - I^{(3)}}{V_{\\text{det,VOC}}} + \\varepsilon\\,F_{\\text{net}}\\,K",
+    d:"Information-driven system gain: a VOC feedback loop turns sensing precision into regulatory stability \u2014 the recursive eco-consciousness control." },
+  { t:"\\text{Growth} \\sim G_{\\text{gain}}\\cdot\\dfrac{\\text{Air}}{\\text{Energy flux}}",
+    d:"Biomaterial cultivation rate is driven by the system gain, modulated by available air and harvested energy flux." },
+];
+
 function VerbalCard({ col, title, body }: { col:string; title:string; body:string }) {
   return (
     <div style={{ background:`${col}0b`, border:`1px solid ${col}2e`, borderRadius:6, padding:"13px 15px" }}>
@@ -532,28 +754,49 @@ export default function InertialPropulsionPage() {
         {/* HERO */}
         <header style={{ marginBottom:26 }}>
           <div style={{ fontFamily:MONO, fontSize:9, color:V.core, letterSpacing:"0.34em", marginBottom:10 }}>
-            AETHER \u00b7 TRANSPORT LAYER \u00b7 BUILDABLE PROPULSION
+            AETHER &middot; REINVENTING TRAVEL &times; PERSONAL HEALTH
           </div>
           <h1 style={{ fontFamily:DISP, fontSize:"clamp(1.7rem,4vw,2.9rem)", margin:"0 0 14px",
             background:`linear-gradient(90deg,${V.core},${V.gold},${V.green})`,
             WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", letterSpacing:"0.04em" }}>
             Inertial Tube Drive
           </h1>
-          <p style={{ fontSize:13, color:"rgba(200,212,230,0.74)", lineHeight:1.8, maxWidth:780, margin:0 }}>
-            The Air Nanotube does not have to fire one big pressure shot. It can <strong>crawl</strong>.
-            An inchworm gait switches the pod&rsquo;s weight between a foot that grips the wall with
-            magnetic adhesion and a foot that glides on a thin pressurised film &mdash; hydroplanation.
-            The reaction mass decides how much momentum each stroke delivers; the adhesion decides how
-            hard you can stroke before the anchor slips. Between those two limits there is a single
-            <em> best cadence</em> that maximises speed &mdash; and that is exactly what we can calculate.
-            The same tube, fed by air and harvested energy, becomes a bioreactor that grows material on
-            its own inner wall.
+          <p style={{ fontSize:13, color:"rgba(200,212,230,0.74)", lineHeight:1.8, maxWidth:820, margin:0 }}>
+            Two blueprints, one infrastructure. The first prices out an <strong>inchworm propulsion</strong>
+            pod inside an air nanotube &mdash; mass switching, magnetic adhesion and pressure-regulated
+            hydroplanation lifting a half-kilogram pod to roughly <strong>800&nbsp;km/h</strong>. The second
+            wraps that same tube in <strong>biomaterial cultivation</strong> &mdash; graph-Laplacian routing,
+            mitochondrial ATP harvesting and a recursive eco-consciousness loop. Merge them and the line that
+            carries you is also the line that grows your food and tunes your cells: <em>travel</em> and
+            <em> personal health</em> become one closed system. Everything below is live &mdash; the worked
+            numbers, three physics simulations, an ATP-coherence model, and the full merged math.
           </p>
         </header>
 
+        {/* SOURCE BLUEPRINTS */}
+        <div style={card(V.cyan)}>
+          <SectionHead n="I" title="SOURCE BLUEPRINTS \u00b7 THE TWO CONCEPTS BEING MERGED" col={V.cyan} />
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))", gap:14 }}>
+            <Plate src={imgCalc} col={V.gold}
+              alt="Air nanotube inertial propulsion mass calculation"
+              label="BLUEPRINT 01 \u00b7 INERTIAL PROPULSION MASS CALCULATION"
+              caption="The travel engine: inch-worm movement cycle, pressure & depth regulation, magnetic adhesion / mass switching, and a six-step calculation lifting a 0.50 kg pod to 222.6 m/s (804 km/h)." />
+            <Plate src={imgMatrix} col={V.vio}
+              alt="AETHER biomaterial cultivation and buoyancy-regulated propulsion matrix"
+              label="BLUEPRINT 02 \u00b7 BIOMATERIAL CULTIVATION & BUOYANCY MATRIX"
+              caption="The health engine: graph-Laplacian transport flow, mitochondrial ATP harvesting, biomaterial cultivation chambers, and a recursive eco-consciousness information chain." />
+          </div>
+          <div style={annoGrid}>
+            <Anno col={V.gold} k="TRAVEL" v="High-speed, low-energy pods that grip the wall and never coast." />
+            <Anno col={V.green} k="HEALTH" v="The tube grows algae, fungi and cells; coherence lifts ATP yield." />
+            <Anno col={V.core} k="ONE TUBE" v="The same pressurised bore carries pods and cultivates biomaterial." />
+            <Anno col={V.vio} k="ECO-LOOP" v="Sense \u2192 evaluate \u2192 act keeps the whole network in balance." />
+          </div>
+        </div>
+
         {/* SIM 1 */}
         <div style={card(V.core)}>
-          <SectionHead n="I" title="INERTIAL MASS \u2192 SPEED \u00b7 THE BEST CADENCE" col={V.core} />
+          <SectionHead n="II" title="INERTIAL MASS \u2192 SPEED \u00b7 THE BEST CADENCE" col={V.core} />
           <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
             Each stroke throws the reaction mass forward and the gait rectifies that oscillation into
             crawl. The peak inertial force grows as F<sub>in</sub> = 2&pi;&sup2;&middot;m&middot;L&middot;f&sup2;.
@@ -566,15 +809,29 @@ export default function InertialPropulsionPage() {
           <div style={{ marginTop:12, fontSize:9.5, color:"rgba(180,196,218,0.6)", lineHeight:1.6,
             fontFamily:MONO, background:`${V.core}0a`, border:`1px solid ${V.core}26`,
             borderRadius:5, padding:"9px 12px" }}>
-            RUNTIME MODEL \u00b7 normalized units. v(f) = L&middot;f&middot;min(1, F_mag / (2&pi;&sup2; m L f&sup2;));
+            RUNTIME MODEL &middot; normalized units. v(f) = L&middot;f&middot;min(1, F_mag / (2&pi;&sup2; m L f&sup2;));
             the gold marker is f* = (1/2&pi;)&radic;(2 F_mag / m L) and v_max = L&middot;f*; the rose cursor
             sweeps cadence so you can watch grip turn to slip past the optimum.
           </div>
         </div>
 
+        {/* WORKED CALCULATION */}
+        <div style={card(V.amb)}>
+          <SectionHead n="III" title="WORKED CALCULATION \u00b7 HALF A KILO TO ~800 KM/H" col={V.amb} />
+          <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
+            This is Blueprint 01 made live. Every slider starts at the source value and the six steps
+            recompute on the fly. Inertial mass switching gives a small forward force; the air cushion
+            (F<sub>lift</sub> = P&middot;A) does the heavy lifting &mdash; so much that the film friction turns
+            <em> negative</em> and the pod floats. With drag the only real opponent, a half-kilogram pod
+            reaches roughly 800&nbsp;km/h over ten metres. Change pressure, area or cycle time and watch the
+            top speed move.
+          </p>
+          <WorkedCalc />
+        </div>
+
         {/* SIM 2 */}
         <div style={card(V.gold)}>
-          <SectionHead n="II" title="INCHWORM GAIT \u00b7 ADHESION \u00b7 HYDROPLANATION" col={V.gold} />
+          <SectionHead n="IV" title="INCHWORM GAIT \u00b7 ADHESION \u00b7 HYDROPLANATION" col={V.gold} />
           <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
             One full cycle has two strokes. <strong>Extend</strong>: the rear foot clamps (magnet on,
             violet glow) while the front foot floats forward on its hydroplanation film.
@@ -588,7 +845,7 @@ export default function InertialPropulsionPage() {
           <div style={{ marginTop:12, fontSize:9.5, color:"rgba(180,196,218,0.6)", lineHeight:1.6,
             fontFamily:MONO, background:`${V.gold}0a`, border:`1px solid ${V.gold}26`,
             borderRadius:5, padding:"9px 12px" }}>
-            RUNTIME MODEL \u00b7 the body extends and contracts on a triangular phase u(t); ribs scroll at
+            RUNTIME MODEL &middot; the body extends and contracts on a triangular phase u(t); ribs scroll at
             speed &prop; cadence&middot;grip to show net travel; the anchored foot shows a magnetic clamp,
             the gliding foot a pressure film whose brightness tracks p_film. Grip falls when depth&middot;
             adhesion cannot meet the cadence demand, flashing SLIP.
@@ -597,7 +854,7 @@ export default function InertialPropulsionPage() {
 
         {/* SIM 3 */}
         <div style={card(V.green)}>
-          <SectionHead n="III" title="IN-TUBE BIOREACTOR \u00b7 GROW MATERIAL FROM AIR + ENERGY" col={V.green} />
+          <SectionHead n="V" title="IN-TUBE BIOREACTOR \u00b7 GROW MATERIAL FROM AIR + ENERGY" col={V.green} />
           <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
             The transport tube is also a growth chamber. Air carries the feedstock; harvested energy drives
             synthesis; material accretes on the inner wall. Growth is logistic &mdash; fast while there is
@@ -610,15 +867,36 @@ export default function InertialPropulsionPage() {
           <div style={{ marginTop:12, fontSize:9.5, color:"rgba(180,196,218,0.6)", lineHeight:1.6,
             fontFamily:MONO, background:`${V.green}0a`, border:`1px solid ${V.green}26`,
             borderRadius:5, padding:"9px 12px" }}>
-            RUNTIME MODEL \u00b7 dB/dt = r&middot;B&middot;(1 - B/K)&middot;min(a,e), integrated each frame and
+            RUNTIME MODEL &middot; dB/dt = r&middot;B&middot;(1 - B/K)&middot;min(a,e), integrated each frame and
             looped at capacity; the ring on the right is the tube cross-section, its green wall layer
             thickening with B while the open bore shrinks; doubling time t2 = ln2 / (r&middot;min(a,e)).
           </div>
         </div>
 
+        {/* ATP HARVESTING */}
+        <div style={card(V.green)}>
+          <SectionHead n="VI" title="ATP HARVESTING \u00b7 COHERENCE BECOMES ENERGY" col={V.green} />
+          <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
+            This is the personal-health half of the merge. Blueprint 02 ties cellular energy to field
+            coherence: ATP production climbs as an S-curve with the local coherence C, scaled by a gain
+            factor G = 1 + g<sub>bio</sub>&middot;&rho;<sub>DMF</sub>. The same DMF field that organises
+            transport in the tube raises the proton motive force in the mitochondria &mdash; so the
+            infrastructure that moves you also feeds you. Push coherence past the C&frac12; knee and the
+            energy yield saturates.
+          </p>
+          <AtpCanvas />
+          <div style={{ marginTop:12, fontSize:9.5, color:"rgba(180,196,218,0.6)", lineHeight:1.6,
+            fontFamily:MONO, background:`${V.green}0a`, border:`1px solid ${V.green}26`,
+            borderRadius:5, padding:"9px 12px" }}>
+            RUNTIME MODEL &middot; ATP rate(C) = k&middot;&Delta;&mu;_H&middot;G&middot;&sigma;((C&minus;0.5)/0.12),
+            with G = 1 + g_bio&middot;&rho;_DMF (reference &Delta;&mu;&deg; normalized to 1); the gold dashed line
+            is the half-max coherence C&frac12; and the rose cursor sweeps C so you can watch the rate saturate.
+          </div>
+        </div>
+
         {/* MATH */}
         <div style={card(V.vio)}>
-          <SectionHead n="IV" title="THE COMPLETE MODEL" col={V.vio} />
+          <SectionHead n="VII" title="THE PROPULSION + BIOREACTOR MODEL" col={V.vio} />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:12 }}>
             {EQS.map((e, i) => (
               <div key={i} style={{ background:"rgba(255,255,255,0.015)", border:`1px solid ${V.vio}26`,
@@ -631,9 +909,38 @@ export default function InertialPropulsionPage() {
           </div>
         </div>
 
+        {/* MERGED MATRIX */}
+        <div style={card(V.vio)}>
+          <SectionHead n="VIII" title="THE MERGED MATRIX \u00b7 TRAVEL \u00d7 HEALTH AS ONE SYSTEM" col={V.vio} />
+          <p style={{ fontSize:11, color:"rgba(200,212,230,0.72)", lineHeight:1.7, margin:"0 0 14px" }}>
+            Blueprint 02 supplies the equations that fuse the two halves. Transport stops being a timetable
+            and becomes a <strong>field</strong>: the pod flows down a graph-Laplacian gradient between
+            coherent nodes. That same coherence drives <strong>ATP harvesting</strong>, so the line that moves
+            you also raises the energy yield of the cells riding it. A cross-system perturbation term folds in
+            climate, economics and human factors, and a VOC feedback loop closes the <em>eco-consciousness</em>
+            control: sense &rarr; evaluate &rarr; act, keeping the whole network in balance.
+          </p>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:12 }}>
+            {MERGED_EQS.map((e, i) => (
+              <div key={i} style={{ background:"rgba(255,255,255,0.015)", border:`1px solid ${V.vio}26`,
+                borderRadius:6, padding:"13px 15px" }}>
+                <div style={{ overflowX:"auto", marginBottom:7 }}
+                  dangerouslySetInnerHTML={{ __html: kx(e.t, true) }} />
+                <div style={{ fontSize:10.5, color:"rgba(190,205,225,0.66)", lineHeight:1.55 }}>{e.d}</div>
+              </div>
+            ))}
+          </div>
+          <div style={annoGrid}>
+            <Anno col={V.core} k="SENSE" v="Bio-receptors read the field state across the network." />
+            <Anno col={V.green} k="EVALUATE" v="Eco-ethical weighting scores each option for harmony + balance." />
+            <Anno col={V.gold} k="DECIDE" v="The recursive loop picks the action that keeps coherence high." />
+            <Anno col={V.vio} k="ADAPT" v="Output feeds back as regulatory input \u2014 the system heals itself." />
+          </div>
+        </div>
+
         {/* WHY IT WORKS */}
         <div style={card(V.amb)}>
-          <SectionHead n="V" title="WHY THIS BEATS A SINGLE PRESSURE SHOT" col={V.amb} />
+          <SectionHead n="IX" title="WHY THIS REINVENTS TRAVEL & PERSONAL HEALTH" col={V.amb} />
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(248px,1fr))", gap:10 }}>
             <VerbalCard col={V.core} title="GENTLE ON CARGO"
               body="A crawl spreads acceleration over many small strokes instead of one violent launch. Fragile or living cargo never sees a damaging g-spike." />
@@ -647,6 +954,10 @@ export default function InertialPropulsionPage() {
               body="Idle tube volume grows material from air and harvested energy. Transport infrastructure becomes manufacturing infrastructure for free." />
             <VerbalCard col={V.cyan} title="DEPTH AS A DIAL"
               body="Regulatory depth sets the ambient pressure budget. The same hardware behaves differently shallow vs deep, so one design serves many environments." />
+            <VerbalCard col={V.green} title="FOOD WHERE YOU TRAVEL"
+              body="Cultivation chambers ride the same tube, so fresh biomaterial is grown at the destination instead of shipped to it. The network feeds the places it connects." />
+            <VerbalCard col={V.amb} title="COHERENCE IS THE CURRENCY"
+              body="One field coherence both routes the pod and raises mitochondrial ATP yield. Tuning the system for speed and tuning it for health are the same act." />
           </div>
         </div>
 
