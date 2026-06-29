@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import imgEpigenetic from "@assets/image_1782209643151.jpeg";
-import imgSplicing   from "@assets/image_1782209675669.jpeg";
-import imgTweet      from "@assets/image_1782209692388.png";
+import imgChromatin   from "@assets/Gemini_Generated_Image_f4nig2f4nig2f4ni_1782734452851.png";
+import imgMethylation from "@assets/Gemini_Generated_Image_nkbtawnkbtawnkbt_1782734530065.png";
+import imgSynthesis   from "@assets/image_1782734551897.png";
+import imgSplicing    from "@assets/image_1782209675669.jpeg";
+import imgTweet       from "@assets/image_1782209692388.png";
 
 /* ── palette ─────────────────────────────────── */
 const BG   = "#040508";
@@ -85,6 +87,33 @@ function NcRnaCard({ type, size, count, targets, col, desc }:
   );
 }
 
+/* ── framed diagram plate ─────────────────────── */
+function Plate({ src, alt, col, label, caption }:
+  { src:string; alt:string; col:string; label:string; caption:string }) {
+  return (
+    <figure style={{ margin:0, borderRadius:7, overflow:"hidden",
+      border:`1px solid ${col}55`, background:"#05070b",
+      boxShadow:`0 0 34px ${col}1f, inset 0 0 0 1px ${col}11` }}>
+      <img src={src} alt={alt} loading="lazy" style={{ width:"100%", display:"block" }} />
+      <figcaption style={{ padding:"10px 14px", borderTop:`1px solid ${col}26`,
+        background:`linear-gradient(180deg, ${col}0a, transparent)` }}>
+        <div style={{ fontFamily:MN, fontSize:8, color:col, letterSpacing:"0.16em", marginBottom:5 }}>{label}</div>
+        <div style={{ fontSize:10.5, color:"rgba(200,210,228,0.68)", lineHeight:1.62 }}>{caption}</div>
+      </figcaption>
+    </figure>
+  );
+}
+
+/* ── diagram annotation chip (label → meaning) ── */
+function Anno({ col, k, v }: { col:string; k:string; v:string }) {
+  return (
+    <div style={{ background:`${col}0d`, border:`1px solid ${col}33`, borderRadius:4, padding:"8px 11px" }}>
+      <div style={{ fontFamily:MN, fontSize:8.5, color:col, fontWeight:700, marginBottom:3 }}>{k}</div>
+      <div style={{ fontSize:10, color:"rgba(190,205,225,0.66)", lineHeight:1.55 }}>{v}</div>
+    </div>
+  );
+}
+
 /* ── main page ────────────────────────────────── */
 export default function RegulatoryDepthPage() {
   const card = (col=TEAL): React.CSSProperties => ({
@@ -100,6 +129,9 @@ export default function RegulatoryDepthPage() {
   });
   const body: React.CSSProperties = {
     fontSize:11.5, color:"rgba(200,210,228,0.72)", lineHeight:1.72,
+  };
+  const annoGrid: React.CSSProperties = {
+    display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))", gap:8, marginTop:10,
   };
 
   return (
@@ -121,6 +153,20 @@ export default function RegulatoryDepthPage() {
           <p style={{ ...body, maxWidth:820, margin:0 }}>
             What we "need" is <strong style={{color:GRN}}>regulatory depth</strong>. The genome is not the unit of biological output — regulation is. The same 20,000 genes produce radically different people, diseases, capabilities, and states depending on how they are regulated. The levers are: epigenetic switches, alternative splicing, non-coding RNA, and cross-system feedback loops. Adaptability, cognition, resilience, and intuition live here — not in the sequence.
           </p>
+        </div>
+
+        {/* ── synthesis hero ── */}
+        <div style={{ marginBottom:16 }}>
+          <Plate src={imgSynthesis} col={GRN}
+            alt="Genomic regulation and cross-system feedback: a modern synthesis"
+            label="THE MODERN SYNTHESIS · GENOMIC REGULATION AS A DYNAMIC, MULTI-LAYERED SWITCH"
+            caption="One map of all four levers at once. Panel 01 — epigenetic switches turn genes on and off without changing the code. Panel 02 — alternative splicing turns one gene into many proteins. Panel 03 — non-coding RNA forms the regulatory dark matter (~98% of transcribed RNA). Panel 04 — feedback loops couple brain, adrenals, gut, and immune system. The genome is fixed at birth; the epigenome is constantly rewritten." />
+          <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginTop:8 }}>
+            {[["01 · Epigenetic Switches",VIO],["02 · Alternative Splicing",BLUE],["03 · Non-coding RNA",PINK],["04 · Feedback Loops",ORG]].map(([t,c]) => (
+              <div key={t} style={{ fontFamily:MN, fontSize:8, padding:"3px 9px", borderRadius:3,
+                background:`${c}14`, border:`1px solid ${c}44`, color:c }}>{t}</div>
+            ))}
+          </div>
         </div>
 
         {/* ── tweet + intro ── */}
@@ -157,53 +203,74 @@ export default function RegulatoryDepthPage() {
           </div>
         </div>
 
-        {/* ── epigenetic mechanisms ── */}
+        {/* ── Lever 01 · epigenetic switches (image-led) ── */}
         <div style={{ ...card(VIO), marginBottom:14 }}>
-          <div style={secLabel}>Lever 01 · Epigenetic Mechanisms · DNA Methylation + Histone Modification</div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, alignItems:"start" }}>
-            <img src={imgEpigenetic} alt="Epigenetic mechanisms diagram"
-              style={{ width:"100%", borderRadius:4, display:"block" }} />
-            <div>
-              <h2 style={h2(VIO)}>The Epigenome: The Writable Layer Above the Genome</h2>
-              <p style={body}>
-                The epigenome is the layer of chemical marks on and around DNA that controls gene expression without altering the underlying sequence. Two primary mechanisms:
+          <div style={secLabel}>Lever 01 · Epigenetic Switches · Histone Modification + DNA Methylation</div>
+          <h2 style={h2(VIO)}>The Epigenome: The Writable Layer Above the Genome</h2>
+          <p style={{ ...body, maxWidth:860 }}>
+            The epigenome is the layer of chemical marks on and around DNA that controls gene expression without altering the underlying sequence. The genome is fixed at birth; the epigenome is constantly rewritten by development, diet, stress, light, chemicals, and aging. Two primary switches do the work — and each is drawn out below.
+          </p>
+
+          {/* Switch A — histone modification */}
+          <div style={{ marginTop:14 }}>
+            <Plate src={imgChromatin} col={PINK}
+              alt="Compacted heterochromatin versus open euchromatin set by histone modification"
+              label="SWITCH A · HISTONE MODIFICATION · COMPACTION CONTROLS ACCESS"
+              caption="Read left to right along the compaction axis. On the left, highly compacted chromatin (heterochromatin) keeps DNA inaccessible — transcription OFF, gene silent. Histone modification relaxes the spools into open chromatin (euchromatin) on the right, exposing the DNA so RNA polymerase can transcribe it. The same DNA, two opposite states — set entirely by the marks on the histone tails." />
+            <div style={annoGrid}>
+              <Anno col={PINK} k="Heterochromatin" v="Compact nucleosomes, DNA inaccessible — transcription OFF, gene silent." />
+              <Anno col={GRN}  k="Euchromatin" v="Open nucleosomes, DNA accessible — RNA polymerase transcribes, gene active." />
+              <Anno col={GRN}  k="Acetylation (Ac)" v="Neutralises histone-tail charge, loosens the spool — relaxes structure, opens chromatin." />
+              <Anno col={GOLD} k="Methylation (Me)" v="On/off switch and address tag on the tails; the surrounding context decides the meaning." />
+              <Anno col={ORG}  k="Phosphorylation (P)" v="Marks tails during signalling and chromosome condensation events." />
+              <Anno col={VIO}  k="Ubiquitination (Ub)" v="Tags histones to recruit or repel the transcription machinery." />
+            </div>
+            <div style={{ background:`${PINK}10`, border:`1px solid ${PINK}33`, borderRadius:4, padding:"10px 12px", marginTop:10 }}>
+              <div style={{ fontFamily:MN, fontSize:9, color:PINK, fontWeight:700, marginBottom:4 }}>
+                Histones · The Spools That Gate the Genome
+              </div>
+              <p style={{ ...body, fontSize:10.5, margin:0 }}>
+                <strong style={{color:PINK}}>Histones</strong> are the proteins around which DNA winds for compaction — roughly 2 m of DNA packed into a nucleus ~6 μm across. The <strong style={{color:PINK}}>histone tails</strong> protrude from each nucleosome core and carry the marks above. When the tails drive compaction, the DNA is hidden and the gene is silent; when acetylation opens them, the gene can be read. Histone modification is the on/off switch; methylation is the address tag.
               </p>
-              {/* DNA methylation */}
-              <div style={{ background:`${VIO}10`, border:`1px solid ${VIO}33`, borderRadius:4,
-                padding:"10px 12px", marginBottom:10, marginTop:8 }}>
-                <div style={{ fontFamily:MN, fontSize:9, color:VIO, fontWeight:700, marginBottom:4 }}>
-                  DNA Methylation · The Methyl Group Switch
-                </div>
-                <p style={{ ...body, fontSize:10.5, margin:0 }}>
-                  A <strong style={{color:VIO}}>methyl group (CH₃)</strong> — an epigenetic factor found in some dietary sources — attaches to cytosine bases in DNA (typically at CpG sites). This tag either <strong style={{color:GRN}}>activates</strong> or <strong style={{color:"#ef4444"}}>represses</strong> the gene below it. Methylation is dynamic: it can be written by DNMT enzymes and erased by TET enzymes. Diet, environment, and development all influence methylation patterns across the genome. Aberrant methylation (silencing tumour suppressor genes, or activating oncogenes) is a primary mechanism in cancer.
-                </p>
+            </div>
+          </div>
+
+          {/* Switch B — DNA methylation */}
+          <div style={{ marginTop:16 }}>
+            <Plate src={imgMethylation} col={VIO}
+              alt="DNA methylation cycle with writer DNMTs, eraser TETs, CpG sites, and aberrant methylation in cancer"
+              label="SWITCH B · DNA METHYLATION · A DYNAMIC EPIGENETIC SWITCH"
+              caption="A reversible cycle running between two faces of cytosine. Writers (DNMTs) add a methyl group (CH₃) at CpG sites; erasers (TETs) take it off. Environmental inputs on the left — diet (folate, B12), environmental factors, development — set the pattern. On the right, aging and carcinogens push it into aberrant methylation: a silenced tumour-suppressor (p53 → cell-cycle misregulation) or an activated oncogene (MYC → uncontrolled proliferation)." />
+            <div style={annoGrid}>
+              <Anno col={GRN}  k="Writer · DNMTs" v="DNA methyltransferases add CH₃ to cytosine — can silence the gene below." />
+              <Anno col={TEAL} k="Eraser · TETs" v="Ten-eleven translocation enzymes strip the mark — reactivating the gene." />
+              <Anno col={GOLD} k="CpG site" v="Cytosine-phosphate-Guanine: the exact spot where the methyl tag is written." />
+              <Anno col={VIO}  k="Methyl group (CH₃)" v="The epigenetic tag itself, supplied in part by dietary folate and B12." />
+              <Anno col={BLUE} k="Environmental inputs" v="Diet, environment, and development write the methylation pattern over a lifetime." />
+              <Anno col={PINK} k="Aberrant in cancer" v="Silenced p53 (suppressor) or activated MYC (oncogene) → uncontrolled proliferation." />
+            </div>
+            <div style={{ background:`${VIO}10`, border:`1px solid ${VIO}33`, borderRadius:4, padding:"10px 12px", marginTop:10 }}>
+              <div style={{ fontFamily:MN, fontSize:9, color:VIO, fontWeight:700, marginBottom:4 }}>
+                DNA Methylation · The Methyl Group Switch
               </div>
-              {/* histone modification */}
-              <div style={{ background:`${PINK}10`, border:`1px solid ${PINK}33`, borderRadius:4,
-                padding:"10px 12px", marginBottom:10 }}>
-                <div style={{ fontFamily:MN, fontSize:9, color:PINK, fontWeight:700, marginBottom:4 }}>
-                  Histone Modification · Compaction Controls Access
-                </div>
-                <p style={{ ...body, fontSize:10.5, margin:0 }}>
-                  <strong style={{color:PINK}}>Histones</strong> are proteins around which DNA winds for compaction — ~2m of DNA is packaged into a nucleus 6μm across. The <strong style={{color:PINK}}>histone tails</strong> protrude from the nucleosome core and can be modified by epigenetic factors: acetylation (opens chromatin → gene active), methylation, phosphorylation, ubiquitination. When histones are compacted, DNA is inaccessible and the gene is silent. When opened, the gene can be transcribed. Histone modification is the on/off switch; methylation is the address tag.
-                </p>
+              <p style={{ ...body, fontSize:10.5, margin:0 }}>
+                A <strong style={{color:VIO}}>methyl group (CH₃)</strong> — an epigenetic factor partly sourced from diet — attaches to cytosine bases (typically at CpG sites). This tag either <strong style={{color:GRN}}>activates</strong> or <strong style={{color:"#ef4444"}}>represses</strong> the gene below it. Methylation is dynamic: written by DNMT enzymes and erased by TET enzymes. Diet, environment, and development shape methylation across the genome, and aberrant methylation — silencing tumour suppressor genes or activating oncogenes — is a primary mechanism in cancer.
+              </p>
+            </div>
+            <div style={{ background:"rgba(0,0,0,0.3)", border:"1px solid rgba(200,180,255,0.15)",
+              borderRadius:4, padding:"10px 12px", marginTop:10 }}>
+              <div style={{ fontFamily:MN, fontSize:8.5, color:GOLD, marginBottom:6 }}>
+                Factors That Write the Epigenome
               </div>
-              {/* triggers */}
-              <div style={{ background:"rgba(0,0,0,0.3)", border:"1px solid rgba(200,180,255,0.15)",
-                borderRadius:4, padding:"10px 12px" }}>
-                <div style={{ fontFamily:MN, fontSize:8.5, color:GOLD, marginBottom:6 }}>
-                  Factors That Write the Epigenome
-                </div>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
-                  {["Development (in utero, childhood)","Environmental chemicals","Drugs / Pharmaceuticals",
-                    "Aging","Diet","Light exposure","Stress","Microbiome"].map(f => (
-                    <div key={f} style={{ fontFamily:MN, fontSize:7.5, padding:"2px 8px", borderRadius:3,
-                      background:`${VIO}18`, border:`1px solid ${VIO}44`, color:`${VIO}cc` }}>{f}</div>
-                  ))}
-                </div>
-                <div style={{ fontFamily:MN, fontSize:8, color:"#ef4444aa", marginTop:8 }}>
-                  Health endpoints: Cancer · Autoimmune disease · Mental disorders · Diabetes
-                </div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
+                {["Development (in utero, childhood)","Environmental chemicals","Drugs / Pharmaceuticals",
+                  "Aging","Diet","Light exposure","Stress","Microbiome"].map(f => (
+                  <div key={f} style={{ fontFamily:MN, fontSize:7.5, padding:"2px 8px", borderRadius:3,
+                    background:`${VIO}18`, border:`1px solid ${VIO}44`, color:`${VIO}cc` }}>{f}</div>
+                ))}
+              </div>
+              <div style={{ fontFamily:MN, fontSize:8, color:"#ef4444aa", marginTop:8 }}>
+                Health endpoints: Cancer · Autoimmune disease · Mental disorders · Diabetes
               </div>
             </div>
           </div>
