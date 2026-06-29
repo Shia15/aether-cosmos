@@ -142,6 +142,7 @@ const CliNanoPage = lazy(() => import("@/pages/cli-nano"));
 const CalmCompanyPage = lazy(() => import("@/pages/calm-company"));
 const SocialDeployPage = lazy(() => import("@/pages/social-deploy"));
 const DivineTimingPage = lazy(() => import("@/pages/divine-timing"));
+const FieldMechanicsPage = lazy(() => import("@/pages/field-mechanics"));
 const GlossaryPage = lazy(() => import("@/pages/glossary"));
 const QuantumAmmeterPage = lazy(() => import("@/pages/quantum-ammeter"));
 const ThermalHierarchyView = lazy(() => import("@/pages/thermal-hierarchy"));
@@ -1088,6 +1089,7 @@ function Router() {
                 <Route path="/calm-company" component={CalmCompanyPage} />
                 <Route path="/social-deploy" component={SocialDeployPage} />
                 <Route path="/divine-timing" component={DivineTimingPage} />
+                <Route path="/field-mechanics" component={FieldMechanicsPage} />
                 <Route path="/glossary" component={GlossaryPage} />
                 <Route path="/quantum-ammeter" component={QuantumAmmeterPage} />
                 <Route path="/organoid-intel" component={OrganoidIntelPage} />

@@ -1,6 +1,123 @@
 import { useEffect, useRef } from "react";
 import letterImg from "@assets/IMG_1704_1778075886223.jpeg";
 
+function CelestialCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    const DPR = window.devicePixelRatio || 1;
+    const W = canvas.offsetWidth * DPR;
+    const H = 360 * DPR;
+    canvas.width = W; canvas.height = H;
+    const cx = W / 2, cy = H / 2;
+    const PHI = (1 + Math.sqrt(5)) / 2;
+
+    let seed = 137;
+    const rnd = () => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return (seed >>> 0) / 0xffffffff; };
+
+    const stars = Array.from({ length: 300 }, (_, i) => {
+      const angle = i * 2 * Math.PI * PHI;
+      const r = Math.sqrt(i / 300) * Math.min(cx, cy) * 0.94;
+      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle), sz: rnd() * 1.9 + 0.3, bright: rnd() * 0.75 + 0.25, tw: rnd() * Math.PI * 2 };
+    });
+
+    const ZODIAC = [
+      { name: "Ari", col: "#fb7185" }, { name: "Tau", col: "#fbbf24" }, { name: "Gem", col: "#22d3ee" },
+      { name: "Can", col: "#a78bfa" }, { name: "Leo", col: "#f59e0b" }, { name: "Vir", col: "#4ade80" },
+      { name: "Lib", col: "#67e8f9" }, { name: "Sco", col: "#f43f5e" }, { name: "Sag", col: "#fb923c" },
+      { name: "Cap", col: "#94a3b8" }, { name: "Aqu", col: "#818cf8" }, { name: "Pis", col: "#c084fc" },
+    ];
+
+    let t = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(cx, cy));
+      bg.addColorStop(0, "#0a0820"); bg.addColorStop(0.5, "#060512"); bg.addColorStop(1, "#030309");
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      const mw = ctx.createLinearGradient(0, H * 0.1, W, H * 0.88);
+      mw.addColorStop(0, "rgba(100,80,180,0)"); mw.addColorStop(0.45, "rgba(120,100,200,0.055)");
+      mw.addColorStop(0.55, "rgba(100,80,180,0.038)"); mw.addColorStop(1, "rgba(100,80,180,0)");
+      ctx.fillStyle = mw; ctx.fillRect(0, 0, W, H);
+
+      stars.forEach(s => {
+        const tw = 0.55 + 0.45 * Math.sin(t * 0.018 + s.tw);
+        const a = s.bright * tw;
+        if (s.sz > 1.3) {
+          const gr = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.sz * 4.5);
+          gr.addColorStop(0, `rgba(210,200,255,${a * 0.9})`);
+          gr.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.sz * 4.5, 0, Math.PI * 2); ctx.fillStyle = gr; ctx.fill();
+        }
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.sz, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220,215,255,${a})`; ctx.fill();
+      });
+
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(0.1);
+      const RX = cx * 0.68, RY = cy * 0.5;
+
+      ctx.beginPath(); ctx.ellipse(0, 0, RX, RY, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(251,191,36,0.16)"; ctx.lineWidth = DPR; ctx.setLineDash([6 * DPR, 9 * DPR]); ctx.stroke(); ctx.setLineDash([]);
+
+      ZODIAC.forEach((z, i) => {
+        const angle = (i / 12) * Math.PI * 2 - Math.PI / 2 + t * 0.0008;
+        const px = RX * Math.cos(angle), py = RY * Math.sin(angle);
+        const isPis = i === 11, isAri = i === 0;
+        const nr = isPis ? 5 * DPR : 2.5 * DPR;
+        ctx.beginPath(); ctx.arc(px, py, nr, 0, Math.PI * 2);
+        ctx.fillStyle = isPis ? "#c084fc" : (isAri ? "#fb7185" : `${z.col}88`); ctx.fill();
+        ctx.font = `${(isPis ? 8 : 7) * DPR}px 'DM Mono',monospace`;
+        ctx.fillStyle = isPis ? "#c084fc" : `${z.col}bb`;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(z.name, px * 1.2, py * 1.2);
+        if (isPis) {
+          const ep = (i / 12) * Math.PI * 2 - Math.PI / 2 + 0.2 + t * 0.0008;
+          const ex = RX * 0.88 * Math.cos(ep), ey = RY * 0.88 * Math.sin(ep);
+          const pulse = 0.5 + 0.5 * Math.sin(t * 0.035);
+          const eg = ctx.createRadialGradient(ex, ey, 0, ex, ey, 20 * DPR * (1 + pulse * 0.4));
+          eg.addColorStop(0, `rgba(192,132,252,${0.5 + pulse * 0.3})`);
+          eg.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.beginPath(); ctx.arc(ex, ey, 20 * DPR * (1 + pulse * 0.4), 0, Math.PI * 2); ctx.fillStyle = eg; ctx.fill();
+          ctx.beginPath(); ctx.arc(ex, ey, 4 * DPR, 0, Math.PI * 2); ctx.fillStyle = "#f0abfc"; ctx.fill();
+          ctx.font = `${9 * DPR}px 'DM Mono',monospace`;
+          ctx.fillStyle = "#e9d5ff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillText("ERIS", ex, ey - 14 * DPR);
+        }
+        if (isAri) {
+          const vx1 = px * 0.55, vy1 = py * 0.55, vx2 = px * 1.08, vy2 = py * 1.08;
+          ctx.beginPath(); ctx.moveTo(vx1, vy1); ctx.lineTo(vx2, vy2);
+          ctx.strokeStyle = "rgba(251,191,36,0.55)"; ctx.lineWidth = DPR; ctx.stroke();
+          ctx.font = `${7 * DPR}px 'DM Mono',monospace`;
+          ctx.fillStyle = "rgba(251,191,36,0.7)"; ctx.fillText("0\u00b0 Ari", px * 1.38, py * 1.38);
+        }
+      });
+
+      const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, 70 * DPR);
+      cg.addColorStop(0, "rgba(100,80,200,0.07)"); cg.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.beginPath(); ctx.arc(0, 0, 70 * DPR, 0, Math.PI * 2); ctx.fillStyle = cg; ctx.fill();
+      ctx.restore();
+
+      ctx.font = `${6.5 * DPR}px 'DM Mono',monospace`;
+      ctx.fillStyle = "rgba(251,191,36,0.35)";
+      ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+      ctx.fillText("phi-fibonacci star field  \u00b7  Eris in Pisces", W - 10 * DPR, H - 8 * DPR);
+
+      t++;
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf.current);
+  }, []);
+
+  return (
+    <canvas ref={ref}
+      style={{ width: "100%", height: 360, display: "block", borderRadius: 10,
+        border: "1px solid rgba(167,139,250,0.2)", background: "#030309" }} />
+  );
+}
+
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#fbbf24",
   fontFamily:"'DM Mono',monospace", textTransform:"uppercase", marginBottom:6 };
 
@@ -261,6 +378,26 @@ export default function DivineTimingPage() {
                 border:`1px solid ${s.c}40`, borderLeft:`3px solid ${s.c}` }}>
                 <div style={{ fontSize:"1rem", fontWeight:700, color:s.c, marginBottom:5,
                   fontFamily:"'Cinzel',serif" }}>{s.t}</div>
+                <div style={{ fontSize:"0.8rem", color:"#e5e7eb", lineHeight:1.55 }}>{s.d}</div>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* V · Celestial Star Map */}
+        <Section kicker="Celestial Map" title="Live Star Field · Eris in Pisces"
+          lead="phi-Fibonacci star distribution across the zodiac ecliptic. Eris currently transiting late Pisces -- the last degree before the Vernal Equinox hands the field to Aries. The glowing violet node marks her position. The gold dashed ellipse is the ecliptic plane. All 12 zodiac signs rotate slowly on the golden angle.">
+          <CelestialCanvas />
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%,200px),1fr))", gap:"0.55rem", marginTop:"0.9rem" }}>
+            {[
+              { t:"phi Fibonacci Stars", d:"300 stars seeded by the golden-angle spiral (i * 2pi * phi). No two stars share the same angular sector -- maximum visual entropy, minimum clustering.", c:"#fbbf24" },
+              { t:"Eris in Pisces", d:"Eris (dwarf planet, orbital period ~559 yr) has been transiting Pisces since ~1924. She moves to Aries ca. 2048. The violet pulse marks her current position near 29 deg Pisces.", c:"#c084fc" },
+              { t:"Ecliptic Plane", d:"The gold dashed ellipse is the ecliptic -- the apparent path of the Sun across the sky. All major planets and most asteroids orbit close to this plane. Zodiac signs are 30-deg sectors of it.", c:"#fbbf24" },
+              { t:"0 Aries · Vernal Equinox", d:"The gold line at 0 deg Aries is the Vernal Equinox point -- the moment the Sun crosses the celestial equator northward. It is the prime meridian of the sky and the zero point for tropical astrology.", c:"#fb7185" },
+            ].map(s => (
+              <div key={s.t} style={{ padding:"0.85rem 1rem", borderRadius:10, background:"rgba(15,23,42,0.65)",
+                border:`1px solid ${s.c}40`, borderLeft:`3px solid ${s.c}` }}>
+                <div style={{ fontSize:"1rem", fontWeight:700, color:s.c, marginBottom:5, fontFamily:"'Cinzel',serif" }}>{s.t}</div>
                 <div style={{ fontSize:"0.8rem", color:"#e5e7eb", lineHeight:1.55 }}>{s.d}</div>
               </div>
             ))}
