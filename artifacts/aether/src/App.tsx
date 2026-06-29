@@ -307,6 +307,8 @@ const SoiBuildingPage = lazy(() => import("@/pages/soi-building"));
 const SeismicSelfBuildPage = lazy(() => import("@/pages/seismic-self-build"));
 const NutritionalDnaKeyPage = lazy(() => import("@/pages/nutritional-dna-key"));
 const ElectronFieldPage = lazy(() => import("@/pages/electron-field"));
+const LightAbsorptionPressurePage = lazy(() => import("@/pages/light-absorption-pressure"));
+const RhombusGatePage = lazy(() => import("@/pages/rhombus-gate"));
 const RdSimulatorPage = lazy(() => import("@/pages/rd-simulator"));
 const NeuralTopologyPage = lazy(() => import("@/pages/neural-topology"));
 const MorphoPrimePage = lazy(() => import("@/pages/morpho-prime"));
@@ -1197,6 +1199,8 @@ function Router() {
                 <Route path="/seismic-self-build" component={SeismicSelfBuildPage} />
                 <Route path="/nutritional-dna-key" component={NutritionalDnaKeyPage} />
                 <Route path="/electron-field" component={ElectronFieldPage} />
+                <Route path="/light-absorption-pressure" component={LightAbsorptionPressurePage} />
+                <Route path="/rhombus-gate" component={RhombusGatePage} />
                 <Route path="/rd-simulator" component={RdSimulatorPage} />
                 <Route path="/neural-topology" component={NeuralTopologyPage} />
                 <Route path="/morpho-prime" component={MorphoPrimePage} />
