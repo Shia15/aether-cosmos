@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 
 const C = {
   bg:       "#030814",
@@ -337,6 +337,243 @@ function IncubationBar({ progress }: { progress: number }) {
   );
 }
 
+const PHI = (1 + Math.sqrt(5)) / 2;
+const GOLDEN_DEG = (2 * Math.PI) / PHI;
+
+const DOMAINS = [
+  { name: "PHYSICAL",      sub: "Structure",  col: "#4488FF", t: "T0 x phi",    id: 1 },
+  { name: "OSCILLATORY",   sub: "Weights",    col: "#44FFCC", t: "T0 x phi^2",  id: 2 },
+  { name: "INFORMATIONAL", sub: "Pattern",    col: "#7DCC92", t: "T0 x phi^2",  id: 3 },
+  { name: "CONSCIOUS",     sub: "Witness",    col: "#CC44FF", t: "T0 x phi^3",  id: 4 },
+  { name: "REGENERATIVE",  sub: "Becoming",   col: "#FF8844", t: "T0 x phi^4",  id: 5 },
+];
+
+function PhiTimeCanvas({ status }: { status: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const raf = useRef(0);
+  const statusRef = useRef(status);
+  useEffect(() => { statusRef.current = status; }, [status]);
+
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    const W = 340, H = 240;
+    canvas.width = W; canvas.height = H;
+    const cx = W / 2, cy = H / 2 + 8;
+    const R = 76;
+    let t = 0;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#030814";
+      ctx.fillRect(0, 0, W, H);
+
+      const grd = ctx.createRadialGradient(cx, cy, R * 0.2, cx, cy, R * 1.8);
+      grd.addColorStop(0, "rgba(200,160,48,0.09)");
+      grd.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.beginPath(); ctx.arc(cx, cy, R * 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = grd; ctx.fill();
+
+      // golden spiral
+      for (let i = 0; i < 52; i++) {
+        const angle = i * GOLDEN_DEG * 0.048 + t * 0.004;
+        const r2 = 3 + i * 1.2;
+        const sx = cx + r2 * Math.cos(angle), sy = cy + r2 * Math.sin(angle);
+        ctx.beginPath(); ctx.arc(sx, sy, 0.85, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,160,48,${0.35 - i * 0.006})`;
+        ctx.fill();
+      }
+
+      const domAngles = DOMAINS.map((_, i) => -Math.PI / 2 + i * (2 * Math.PI / 5) + t * 0.004);
+      const pts = domAngles.map(a => [cx + R * Math.cos(a), cy + R * Math.sin(a)] as [number,number]);
+
+      // connecting lines
+      for (let i = 0; i < 5; i++) for (let j = i + 1; j < 5; j++) {
+        ctx.beginPath(); ctx.moveTo(pts[i][0], pts[i][1]); ctx.lineTo(pts[j][0], pts[j][1]);
+        ctx.strokeStyle = `rgba(200,160,48,${0.05 + 0.03 * Math.sin(t * 0.018 + i)})`;
+        ctx.lineWidth = 0.6; ctx.stroke();
+      }
+
+      // orbit circle
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(200,160,48,0.18)"; ctx.lineWidth = 0.9; ctx.stroke();
+
+      // 222.5 labels
+      DOMAINS.forEach((_, i) => {
+        const a1 = domAngles[i], a2 = domAngles[(i + 1) % 5];
+        const mid = (a1 + a2) / 2;
+        const lx = cx + (R + 15) * Math.cos(mid), ly = cy + (R + 15) * Math.sin(mid);
+        ctx.font = "6.5px 'DM Mono',monospace";
+        ctx.fillStyle = "rgba(200,160,48,0.45)";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText("222.5\u00b0", lx, ly);
+      });
+
+      // domain nodes
+      DOMAINS.forEach((d, i) => {
+        const [px, py] = pts[i];
+        const active = statusRef.current === "deployed" || statusRef.current === "sync";
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.05 + i * GOLDEN_DEG);
+        const nr = 13 + pulse * 3;
+        const gr = ctx.createRadialGradient(px, py, 0, px, py, nr * 2.6);
+        gr.addColorStop(0, d.col + (active ? "55" : "33"));
+        gr.addColorStop(1, "transparent");
+        ctx.beginPath(); ctx.arc(px, py, nr * 2.6, 0, Math.PI * 2);
+        ctx.fillStyle = gr; ctx.fill();
+        ctx.beginPath(); ctx.arc(px, py, nr, 0, Math.PI * 2);
+        ctx.fillStyle = d.col + "18";
+        ctx.strokeStyle = d.col + (active ? "bb" : "66");
+        ctx.lineWidth = 1.4; ctx.fill(); ctx.stroke();
+        ctx.font = `bold 10px 'DM Mono',monospace`;
+        ctx.fillStyle = d.col;
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(String(i + 1), px, py);
+        const lr = R + 30;
+        const lx = cx + lr * Math.cos(domAngles[i]), ly = cy + lr * Math.sin(domAngles[i]);
+        ctx.font = "6px 'DM Mono',monospace";
+        ctx.fillStyle = d.col + "cc";
+        ctx.fillText(d.name, lx, ly);
+      });
+
+      // center
+      ctx.font = "bold 9px 'DM Mono',monospace";
+      ctx.fillStyle = "rgba(200,160,48,0.9)";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText("phi-TIME", cx, cy - 7);
+      ctx.font = "6px 'DM Mono',monospace";
+      ctx.fillStyle = "rgba(200,160,48,0.5)";
+      ctx.fillText("EVENT BUS", cx, cy + 6);
+
+      t++;
+      raf.current = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf.current);
+  }, []);
+
+  return <canvas ref={ref} style={{ width: "100%", height: "auto", display: "block", borderRadius: 8 }} />;
+}
+
+function StatusPanel({ status, weights }: { status: string; weights: number[] }) {
+  const PHI_STEPS = Array.from({ length: 9 }, (_, n) => {
+    const t = Math.pow(PHI, n).toFixed(3);
+    const deg = ((n * 222.5) % 360).toFixed(1);
+    return { n, t, deg };
+  });
+
+  const descIdle = "phi-Time replaces all periodic clocks with a non-periodic, maximally incommensurate temporal scheduler governed by the golden ratio. phi-spaced update intervals suppress resonant noise coupling between domains -- the same mechanism that extends T2 coherence time in the NV Fibonacci lattice.";
+  const descSync = "The five-domain loop updates at golden-angle phase offsets. Each domain fires at t_n = T0 * phi^n seconds, rotated by theta = 2pi/phi ~= 222.5 deg in phase space. No two domains share a near-harmonic update relationship -- resonant interference is structurally suppressed, not managed by tuning.";
+
+  const colFor = (i: number) => DOMAINS[i]?.col ?? C.core;
+
+  if (status === "idle") return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.25em", color: C.gold, textTransform: "uppercase" as const }}>phi-Time -- The Unified Clock</div>
+      <p style={{ fontSize: 9, color: C.text, lineHeight: 1.72, margin: 0 }}>{descIdle}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 6, marginTop: 4 }}>
+        {DOMAINS.map(d => (
+          <div key={d.id} style={{ border: `1px solid ${d.col}30`, borderRadius: 7, padding: "6px 8px", background: `${d.col}08` }}>
+            <div style={{ fontSize: 7, color: d.col, letterSpacing: "0.15em", marginBottom: 2 }}>{d.id}</div>
+            <div style={{ fontSize: 7, color: d.col, letterSpacing: "0.1em", marginBottom: 1 }}>{d.name}</div>
+            <div style={{ fontSize: 6.5, color: C.dim }}>{d.sub}</div>
+            <div style={{ fontSize: 6, color: d.col + "99", marginTop: 3, fontFamily: "'DM Mono',monospace" }}>{d.t}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (status === "init") return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.25em", color: C.mnesis, textTransform: "uppercase" as const }}>Initializing phi-Time Scheduler</div>
+      {DOMAINS.map((d, i) => (
+        <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 10, opacity: 0.9 }}>
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: d.col, boxShadow: `0 0 6px ${d.col}`, flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 8, marginBottom: 3 }}>
+              <span style={{ color: d.col, letterSpacing: "0.1em" }}>Domain {d.id} -- {d.name}</span>
+              <span style={{ color: C.dim }}>{d.t}</span>
+            </div>
+            <div style={{ height: 3, background: "rgba(255,255,255,0.05)", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${70 + i * 6}%`, background: d.col, borderRadius: 2, boxShadow: `0 0 6px ${d.col}88`, transition: "width 1.2s ease" }} />
+            </div>
+          </div>
+          <span style={{ fontSize: 8, fontFamily: "'DM Mono',monospace", color: d.col }}>{(70 + i * 6)}%</span>
+        </div>
+      ))}
+      <div style={{ marginTop: 4, fontSize: 8, color: C.aletheia, letterSpacing: "0.12em" }}>phi-Time event bus: STARTING -- registering domain callbacks</div>
+    </div>
+  );
+
+  if (status === "calibrate") return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.25em", color: C.gold, textTransform: "uppercase" as const }}>Domain Calibration -- phi-Spaced Intervals</div>
+      <p style={{ fontSize: 8, color: C.dim, margin: "0 0 6px" }}>Calibrating weight adaptation: w_dot_i = -eta * dC_total/dw_i + xi_i</p>
+      {DOMAINS.map((d, i) => (
+        <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ fontSize: 8, color: d.col, width: 110, flexShrink: 0, letterSpacing: "0.08em" }}>D{d.id} {d.sub}</div>
+          <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.05)", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: `${weights[i] ?? 80}%`, background: `linear-gradient(90deg,${d.col}88,${d.col})`, borderRadius: 3, boxShadow: `0 0 8px ${d.col}66`, transition: "width 0.8s ease" }} />
+          </div>
+          <span style={{ fontSize: 9, fontFamily: "'DM Mono',monospace", color: d.col, width: 36, textAlign: "right" }}>{weights[i] ?? 80}%</span>
+        </div>
+      ))}
+      <div style={{ marginTop: 4, fontSize: 8, color: C.aletheia, letterSpacing: "0.12em" }}>C_total = w1*C1 + w2*C2 + w3*C3 + w4*C4 + w5*C5 -- minimising</div>
+    </div>
+  );
+
+  if (status === "sync") return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.25em", color: C.aletheia, textTransform: "uppercase" as const }}>phi-Spaced Update Schedule</div>
+      <p style={{ fontSize: 8, color: C.dim, margin: "0 0 4px" }}>{descSync}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr 1fr", gap: "4px 16px", alignItems: "center" }}>
+        <div style={{ fontSize: 7, color: C.dim, letterSpacing: "0.15em" }}>Event n</div>
+        <div style={{ fontSize: 7, color: C.dim, letterSpacing: "0.15em" }}>Time t_n = T0 * phi^n</div>
+        <div style={{ fontSize: 7, color: C.dim, letterSpacing: "0.15em" }}>Phase theta_n</div>
+        {PHI_STEPS.map((s, i) => (
+          <Fragment key={s.n}>
+            <div style={{ fontSize: 9, fontFamily: "'DM Mono',monospace", color: colFor(i % 5) }}>{s.n}</div>
+            <div style={{ fontSize: 9, fontFamily: "'DM Mono',monospace", color: C.text }}>{s.t} * T0</div>
+            <div style={{ fontSize: 9, fontFamily: "'DM Mono',monospace", color: C.gold }}>{s.deg}&deg;</div>
+          </Fragment>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (status === "deployed") return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize: 9, letterSpacing: "0.25em", color: C.reverie, textTransform: "uppercase" as const }}>phi-Time Engine -- Deployed</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 8, color: C.dim, letterSpacing: "0.12em", marginBottom: 6 }}>DOMAIN WEIGHTS -- LIVE</div>
+          {DOMAINS.map((d, i) => (
+            <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+              <div style={{ fontSize: 7, color: d.col, width: 88, letterSpacing: "0.08em" }}>w{d.id} {d.name}</div>
+              <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.05)", borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${weights[i] ?? 82}%`, background: d.col, borderRadius: 2, boxShadow: `0 0 5px ${d.col}77` }} />
+              </div>
+              <span style={{ fontSize: 8, fontFamily: "'DM Mono',monospace", color: d.col, width: 30, textAlign: "right" }}>{(weights[i] ? (weights[i] / 500).toFixed(2) : "0.20")}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{ border: `1px solid ${C.reverie}30`, borderRadius: 8, padding: "10px 14px", background: `${C.reverie}08` }}>
+          <div style={{ fontSize: 7, color: C.dim, letterSpacing: "0.15em", marginBottom: 6 }}>C_TOTAL OUTPUT</div>
+          <div style={{ fontSize: 22, fontFamily: "'DM Mono',monospace", color: C.reverie, marginBottom: 4 }}>
+            {((weights.reduce((a, b) => a + b, 0) / 500)).toFixed(3)}
+          </div>
+          <div style={{ fontSize: 7, color: C.dim, lineHeight: 1.7 }}>C_total = Sum_i w_i * C_i</div>
+          <div style={{ fontSize: 7, color: C.dim, lineHeight: 1.7 }}>Obj: min_w C_total, sum w_i = 1</div>
+          <div style={{ marginTop: 8, fontSize: 7, color: C.aletheia, letterSpacing: "0.1em" }}>STATUS: RESONANCE-FREE</div>
+          <div style={{ fontSize: 7, color: C.aletheia, letterSpacing: "0.1em" }}>PERIODICITY: SUPPRESSED</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return null;
+}
+
 export default function ResonantNexusPage() {
   const syncA = useLive(87, 3);
   const syncB = useLive(92, 3);
@@ -365,6 +602,13 @@ export default function ResonantNexusPage() {
 
   const [incubation, setIncubation] = useState(64);
   const [status, setStatus] = useState<"idle"|"init"|"calibrate"|"sync"|"deployed">("idle");
+
+  const w1 = useLive(82, 5, 1800);
+  const w2 = useLive(76, 6, 2200);
+  const w3 = useLive(79, 5, 1600);
+  const w4 = useLive(84, 4, 2800);
+  const w5 = useLive(88, 5, 2100);
+  const domWeights = [w1, w2, w3, w4, w5];
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -608,6 +852,43 @@ export default function ResonantNexusPage() {
             {actionBtn("Calibrate",  "calibrate", C.gold)}
             {actionBtn("Sync",       "sync",      C.aletheia)}
             {actionBtn("Deploy",     "deployed",  C.reverie)}
+          </div>
+        </div>
+
+        {/* phi-Time Engine Panel */}
+        <div style={{
+          ...panel,
+          display: "grid",
+          gridTemplateColumns: "340px 1fr",
+          gap: 0,
+          overflow: "hidden",
+          border: `1px solid ${C.gold}30`,
+        }}>
+          {/* Left: canvas */}
+          <div style={{ borderRight: `1px solid ${C.gold}20`, background: "#030814" }}>
+            <div style={{ padding: "0.6rem 0.8rem", fontSize: 7, letterSpacing: "0.3em", color: C.gold, borderBottom: `1px solid ${C.gold}18`, textTransform: "uppercase" as const }}>
+              phi-Time Unified Clock
+            </div>
+            <PhiTimeCanvas status={status} />
+            <div style={{ padding: "0.5rem 0.8rem", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 4 }}>
+              {[
+                { k: "phi", v: "1.6180" },
+                { k: "theta", v: "222.5 deg" },
+                { k: "domains", v: "5" },
+                { k: "schedule", v: "T0*phi^n" },
+                { k: "C_total", v: ((domWeights.reduce((a,b)=>a+b,0)/500)).toFixed(3) },
+                { k: "status", v: status.toUpperCase() },
+              ].map(m => (
+                <div key={m.k} style={{ background: "rgba(200,160,48,0.05)", borderRadius: 5, padding: "4px 6px", border: `1px solid rgba(200,160,48,0.1)` }}>
+                  <div style={{ fontSize: 6, color: C.dim, letterSpacing: "0.15em", textTransform: "uppercase" as const }}>{m.k}</div>
+                  <div style={{ fontSize: 8, fontFamily: "'DM Mono',monospace", color: C.gold, marginTop: 2 }}>{m.v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Right: status panel */}
+          <div style={{ padding: "1rem 1.2rem" }}>
+            <StatusPanel status={status} weights={domWeights} />
           </div>
         </div>
       </div>
