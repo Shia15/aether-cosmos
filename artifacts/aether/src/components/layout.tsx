@@ -85,6 +85,7 @@ import {
   SunMedium,
   Camera,
   StickyNote,
+  Worm,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -493,6 +494,7 @@ const NAV_ITEMS = [
   { href: "/hyper-perception",       label: "HYPER PERCEPTION · Environmental Analysis Matrix · Air Pressure · Altitude · Geolocation · Color Radar · Perception Core · Sensory Overlay", icon: Gauge},
   { href: "/air-nanotube",           label: "Air Nanotube Transport · Pressure Propulsion · Pressurize → Launch → Glide · Tube Network Topology · Mini Robotic Ethos · Airlock Nodes · Programmable Routing", icon: Waypoints},
   { href: "/resonant-tunnel",        label: "Living Resonant Tunnel · Waterproof Graphene · Hoop-Stress σ = P·r/t · Depth → Pressure · Knot Routing · Lunar Energy Harvest · Custom Energy Flow · Resonant Living Spectrum", icon: Moon},
+  { href: "/inertial-propulsion",    label: "Inertial Tube Drive · Inchworm Gait · Reaction Mass → Speed · Optimal Cadence f* · Magnetic Adhesion · Plate-Weight Switching · Hydroplanation Film · In-Tube Bioreactor · Air + Energy Growth", icon: Worm},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
