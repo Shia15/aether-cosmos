@@ -164,6 +164,21 @@ function FourA({ letter, word, col, desc }: { letter: string; word: string; col:
   );
 }
 
+/* ── faithful transcription of a handwritten note ─ */
+function NoteTranscript({ col, lines }: { col: string; lines: string[] }) {
+  return (
+    <div style={{ marginTop: 8, background: "rgba(0,0,0,0.45)",
+      border: `1px solid ${col}33`, borderRadius: 4, padding: "9px 11px" }}>
+      <div style={{ fontFamily: MN, fontSize: 7, letterSpacing: "0.2em", color: `${col}aa`,
+        textTransform: "uppercase", marginBottom: 6 }}>Transcription</div>
+      <div style={{ fontFamily: MN, fontSize: 9.5, color: "rgba(205,214,228,0.8)",
+        lineHeight: 1.65, whiteSpace: "pre-wrap" }}>
+        {lines.join("\n")}
+      </div>
+    </div>
+  );
+}
+
 /* ── page ─────────────────────────────────────── */
 export default function PrismPrinciplePage() {
   const card = (col = TEAL): React.CSSProperties => ({
@@ -290,9 +305,55 @@ export default function PrismPrinciplePage() {
           {/* 5-element OS */}
           <div style={card(GOLD)}>
             <div style={secLabel}>AETHER as Emotional OS · 5-Element · 5-Time System · Handwritten Notes Oct 2025</div>
-            <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
-              <img src={noteLaunch} alt="Launch sequence notes" style={{ width: "48%", borderRadius: 3, opacity: 0.85 }} />
-              <img src={noteBoho}   alt="Boho formula notes"   style={{ width: "48%", borderRadius: 3, opacity: 0.85 }} />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+              <div>
+                <img src={noteLaunch} alt="Launch sequence notes" style={{ width: "100%", borderRadius: 3, opacity: 0.85 }} />
+                <NoteTranscript col={TEAL} lines={[
+                  "(Solidified) Launch Sequence  ·  9:54am  ·  v1.0",
+                  "",
+                  "Core: Attention First 30min",
+                  "  - Hydrate",
+                  "  - Stretch",
+                  "  - Breathe   } Mentally call up elements",
+                  "  ...to do",
+                  "",
+                  "So I have a 5-element, 5-time system,",
+                  "two architectures @ once.",
+                  "  AETHER : Emotional OS",
+                  "  Personal Brand : mirrors structure in human form",
+                  "",
+                  "Reinforce the sys: use distinct colour / tones",
+                  "for each element's posts. e.g.",
+                  "  emerald for boho",
+                  "  gold for cosmic",
+                  "  indigo for aether",
+                  "  rose for personal",
+                  "  teal for elemental",
+                  "Keep format consistent.",
+                  "",
+                  "#3 choose the trigger: ONE TIME, Daily / Weekly.",
+                  "You want recurring schedule. date + time.",
+                ]} />
+              </div>
+              <div>
+                <img src={noteBoho} alt="Boho formula notes" style={{ width: "100%", borderRadius: 3, opacity: 0.85 }} />
+                <NoteTranscript col={GOLD} lines={[
+                  "Boho Formula  ·  9:10 AM 10/23/25",
+                  "",
+                  "boho_pollen_frame1   <- slug / pollen base",
+                  "boho_pollen_frame1.txt   ^ caption file",
+                  "boho_pollen_frame1.png   ^ image file",
+                  "the scheduled task calls:",
+                  "[Brand boho - slug] boho_pollen_frame1",
+                  "",
+                  "Signature Rhythm  ·  10/21/25 6:00pm",
+                  "Boho Formula slots:",
+                  "  Pastel · Purple · Pink · Blue",
+                  "  Cinnamon · Turquoise · Terracotta · Cream",
+                  "",
+                  "Succeed.",
+                ]} />
+              </div>
             </div>
             <div style={quote(GOLD)}>
               "I have a 5-element, 5-time system, two architectures at once. AETHER: Emotional OS. Personal Brand: mirrors structure in human form."
@@ -324,7 +385,23 @@ export default function PrismPrinciplePage() {
             {/* 4A mental protocol */}
             <div style={card(RED)}>
               <div style={secLabel}>Mental Emergency Protocol · Handwritten Oct 2025</div>
-              <img src={noteMental} alt="Mental protocol notes" style={{ width: "100%", borderRadius: 3, marginBottom: 12, opacity: 0.85 }} />
+              <img src={noteMental} alt="Mental protocol notes" style={{ width: "100%", borderRadius: 3, opacity: 0.85 }} />
+              <div style={{ marginBottom: 12 }}>
+                <NoteTranscript col={RED} lines={[
+                  "Am I being a ...?",
+                  "  Scientist mode:",
+                  "  Prosecutor mode : mean mode",
+                  "     write down what happened",
+                  "",
+                  "Reliable process when things are",
+                  "emotionally heightened:",
+                  "",
+                  "Mental emergency protocol",
+                  "  Acknowledge { Analyze, Adjust, Advance }",
+                  "  1st",
+                  "  react / Not that Bad",
+                ]} />
+              </div>
               <h2 style={h2(RED)}>4A Framework · Reliable Process Under Emotional Pressure</h2>
               <div style={{ ...body, fontSize: 10.5, marginBottom: 14 }}>
                 Scientist mode and Prosecutor mode are two states. Prosecutor mode = mean mode — write down what happened. The reliable process when things are emotionally heightened:
@@ -373,7 +450,19 @@ export default function PrismPrinciplePage() {
             <div style={card(ORG)}>
               <div style={secLabel}>Automation · Task Scheduler · Oct 21 2025 · 4:46PM</div>
               <div style={{ display: "flex", gap: 10 }}>
-                <img src={noteAuto} alt="Automation notes" style={{ width: "42%", borderRadius: 3, opacity: 0.85 }} />
+                <div style={{ width: "42%" }}>
+                  <img src={noteAuto} alt="Automation notes" style={{ width: "100%", borderRadius: 3, opacity: 0.85 }} />
+                  <NoteTranscript col={ORG} lines={[
+                    "Automation  ·  Oct 21st 4:46PM",
+                    "Task scheduler",
+                    "",
+                    "Start 10/21/2025",
+                    "@ 8:08:08 PM",
+                    "  Sync across time zones! ♥",
+                    "",
+                    "Computer must be set to wake.",
+                  ]} />
+                </div>
                 <div style={{ flex: 1 }}>
                   <h2 style={h2(ORG)}>Windows Task Scheduler · Content Automation</h2>
                   <div style={{ ...body, fontSize: 10.5, marginBottom: 8 }}>
