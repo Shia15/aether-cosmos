@@ -6,3 +6,4 @@
 - [declare-const underscore suppression trap](frames-of-reference-underscore-crash.md) — `declare const _` + `_ = x` to silence unused-var warnings emits NO runtime binding and crashes with 'ReferenceError: _ is not defined'; delete the dead vars instead
 - [Canvas simulation input guards](canvas-sim-input-guards.md) — angle-difference metrics must use circular separation (mod 360); date-derived canvas inputs need NaN/isFinite guards or the rAF draw loop crashes
 - [Screenshot tool can't reach deep SPA routes](screenshot-spa-deep-routes.md) — direct screenshot of /deep-route boots the AETHER SPA at `/` (home GraphView), not a bug; verify deep pages via Vite transform + nav, not screenshots
+- [HTML entities in JSX props](jsx-entities-in-props.md) — `&middot;`/`&amp;`/`&mdash;` only decode in JSX text nodes; inside string PROPS (title/sub/role/label) they render literally — use literal glyphs `·`/`—`/`&` instead

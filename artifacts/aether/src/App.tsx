@@ -144,6 +144,7 @@ const SocialDeployPage = lazy(() => import("@/pages/social-deploy"));
 const DivineTimingPage = lazy(() => import("@/pages/divine-timing"));
 const FieldMechanicsPage = lazy(() => import("@/pages/field-mechanics"));
 const SkyDialPage = lazy(() => import("@/pages/sky-dial"));
+const ConvergencePage = lazy(() => import("@/pages/convergence"));
 const GlossaryPage = lazy(() => import("@/pages/glossary"));
 const QuantumAmmeterPage = lazy(() => import("@/pages/quantum-ammeter"));
 const ThermalHierarchyView = lazy(() => import("@/pages/thermal-hierarchy"));
@@ -1092,6 +1093,7 @@ function Router() {
                 <Route path="/divine-timing" component={DivineTimingPage} />
                 <Route path="/field-mechanics" component={FieldMechanicsPage} />
                 <Route path="/sky-dial" component={SkyDialPage} />
+                <Route path="/convergence" component={ConvergencePage} />
                 <Route path="/glossary" component={GlossaryPage} />
                 <Route path="/quantum-ammeter" component={QuantumAmmeterPage} />
                 <Route path="/organoid-intel" component={OrganoidIntelPage} />
