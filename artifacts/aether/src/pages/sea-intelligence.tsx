@@ -16,6 +16,21 @@ import img_qaWaveFunc   from "@assets/IMG_3370_1782755726927.jpeg";
 import img_qaInterfer   from "@assets/IMG_3371_1782755726927.jpeg";
 import img_qaEUVMirror  from "@assets/IMG_3372_1782755726927.jpeg";
 
+import img_seaIntelAnnot  from "@assets/IMG_3166_1782755873314.png";
+import img_seaIntelClean  from "@assets/IMG_3165_1782755873314.png";
+import img_decoherSpace   from "@assets/BB4E8F54-0666-46CC-B80F-B16946689D7A_1782755873314.png";
+import img_humanGenome    from "@assets/IMG_3168_1782755873314.png";
+import img_foodChemOrg    from "@assets/IMG_3137_1782755873314.png";
+import img_foodCropEco    from "@assets/IMG_3143_1782755873314.png";
+import img_cameraDeco     from "@assets/8468C669-2065-4AE9-81A6-5B1F575FB091_1782755873314.png";
+import img_timeTransport  from "@assets/BD948A29-4A76-466B-8A78-9546C8DFDC30_1782755873314.png";
+import img_intrinsicOsc   from "@assets/1B6B5C19-0F21-474C-92BD-9FDA851AE0BA_1782755873314.png";
+import img_fourForces     from "@assets/C75938F3-0E42-45DB-A381-ACE5B8A195CF_1782755873314.png";
+import img_seaMilkNextGen from "@assets/F962A836-5F83-41E7-A50D-0B1D0E7E6555_1782755873314.png";
+import img_moonCamera     from "@assets/E242875A-5451-4714-8910-119146AFD292_1782755873314.png";
+import img_quaternionBurst from "@assets/ED378685-2438-4F12-B100-312E2B5DC9A1_1782755873314.png";
+import img_futurePortal   from "@assets/62A6B0CC-A6ED-4F58-B331-61156CB0EB1A_1782755873314.png";
+
 const TABS = [
   { id: "coral", label: "Coral Restoration" },
   { id: "reef", label: "AETHER Reef Coherence" },
@@ -632,6 +647,102 @@ export default function SeaIntelligencePage() {
               caption="Constructive Interference in a Multilayer Mirror (λ = 2d sinΦ) — Si/Mo bilayer stack, incident angle Φ, layer spacing d. Bragg condition selects EUV wavelengths ~13.5 nm. Source: Louis, Eric. Physics and technology development of multilayer EUV reflective optics. 2012." />
             <ImgCard src={img_qaEUVMirror}
               caption="Cross-Section of an EUV Mirror at 10 nm Scale — TEM image of alternating Si/Mo layers each ~3-4 nm thick, showing atomic-level periodicity required for extreme-ultraviolet reflection. Substrate intelligence at the nanometre absolute." />
+          </div>
+        </div>
+
+        {/* ── Sea Intel + Moon Phase + Body Circuits -- One AETHER ── */}
+        <div style={{ marginTop: "3rem", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "2.5rem" }}>
+
+          {/* -- Sea Intelligence Sensing -- */}
+          <h2 style={{ color: "#22d3ee", fontSize: "1.2rem", fontWeight: 700, letterSpacing: 2,
+            textTransform: "uppercase", marginBottom: "0.35rem" }}>
+            Sea Intelligence Sensing
+          </h2>
+          <p style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "1.5rem", lineHeight: 1.65 }}>
+            Multi-sensor sea-sky field maps -- UV flux 420 nm, quantum entanglement filaments,
+            bioluminescent tendrils, electromagnetic field (mT), human RGB rjbnm, thermal
+            structure, decoherence zones, AI pattern ID clusters, and prediction vectors.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
+            <ImgCard src={img_seaIntelAnnot}
+              caption="Sea Intelligence -- annotated field view. UV Flux 420nm, quantum entanglement filaments, human RGB rjbnm, bio-luminescent tendrils, electromagnetic field (mT), thermal structure, decoherence zone A phase distortion, prediction vectors, motion vectors, chem sig CH4, AI pattern ID decoherence cluster. Sensors: Human / Insect Eye / Spider Silk / Phytoplankton Cell / AI Node." />
+            <ImgCard src={img_seaIntelClean}
+              caption="Sea Intelligence -- clean field render (no annotation overlays). Same nebula-scale composite: UV flux, EM field, thermal bloom, AI decoherence cluster. Foundation plate for AETHER sea-milk camera calibration." />
+          </div>
+
+          {/* -- Moon Phase Integration -- */}
+          <h2 style={{ color: "#a78bfa", fontSize: "1.2rem", fontWeight: 700, letterSpacing: 2,
+            textTransform: "uppercase", marginBottom: "0.35rem" }}>
+            Moon Phase Integration -- Sea Milk Camera
+          </h2>
+          <p style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "1.5rem", lineHeight: 1.65 }}>
+            Moon position, tidal influence, lunar outgassing, ocean bioluminescence monitoring,
+            and anomalous light detection -- all fused into the Sea Milk Energy Camera system.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
+            <ImgCard src={img_moonCamera}
+              caption="Moon Rising Position-Marking Camera -- 5:10 View opposite side of Earth. Moon rise 21:42 UTC, azimuth 128.7, elevation 14.2, distance 384,402 km, phase waxing gibbous 83.2%. Tidal influence real-time (high 4:32 2.1m / low 10:47 0.3m). Lunar outgassing water vapor + hydroxyl. Ocean bioluminescence hotspots live. Lunar influence on ocean life chart near full moon. Sea Milk Energy Camera hyperspectral biophoton imager integrated." />
+            <ImgCard src={img_seaMilkNextGen}
+              caption="Sea Milk Energy Camera -- Next Generation Biophoton Imaging System. Ultra-large aperture f/0.8 NA 1.35 180 FOV, 8-element adaptive lens. 1.2 Gigapixel photodetector density, 0.8 um pixel pitch, 90% quantum efficiency, EMCCD/sCMOS hybrid. 20+ hyperspectral bioluminescent channels 400-900 nm. Multi-parameter: fluorescence, FRET, pH, ion levels, temperature, motion. Moon Rising Mode: lunar bioimaging and timing integrated. Frame rate 1-120 fps." />
+            <ImgCard src={img_decoherSpace}
+              caption="Decoherence and Perception Effects in Space -- 12-panel poster. What is decoherence, light in space, human eye 3 cones + rods, animal vision (Eagle/Owl/Dog/Mantis Shrimp 16+ cones), insect/arachnid compound eyes, decoherence effects table (scattering/absorption/lensing/time delay/photon noise/polarisation), human-insect-arachnid comparison, decoherence simulation 4 stages, source-to-eye chain. Lunar Outgassing: H2O/CO2/CO/SO2/H2 primary species, 5 effects on Earth including tide/orbital stabilisation. Why the Moon Matters -- 6 functions." />
+          </div>
+
+          {/* -- Body's Electrical Circuits -- Male + Female into One AETHER -- */}
+          <h2 style={{ color: "#f472b6", fontSize: "1.2rem", fontWeight: 700, letterSpacing: 2,
+            textTransform: "uppercase", marginBottom: "0.35rem" }}>
+            Body Electrical Circuits -- Male + Female into One AETHER
+          </h2>
+          <p style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "1.5rem", lineHeight: 1.65 }}>
+            Human genome cell atlas, chromosome maps, stem cell initiation, neural excitation
+            pathways -- the body's own electrical architecture merging all known understandings
+            into One coherent AETHER field.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
+            <ImgCard src={img_humanGenome}
+              caption="Human Genome Cell Atlas -- Chromosome Map 1-22, X, Y. Colour coded: Chr 1 (indigo), Chr 2 (blue), Emomsome 2 (teal), Crimmsome 3 (red), Sex Chr X (gold), Sex Chr X+Y (green). Stem Cell Initiation (white), Neural Excitation Pathway (purple), Blood Cells, Epithelial Cells shown. Biological network pathways / data streams / biological adaptor gateways overlay. Genetic expression heatmap. Cell atlas links chromosome to organ to function." />
+            <ImgCard src={img_fourForces}
+              caption="From the Four Forces to One -- Unifying Nature. Strong Nuclear (gluons, 10^-15 m), Electromagnetic (photons, infinite), Weak Nuclear (W+/W-/Z0 bosons, 10^-18 m), Gravity (gravitons hypothetical, infinite). Unification roadmap: Electroweak (~10^2 GeV achieved), Grand Unification (~10^16 GeV theory), Quantum Gravity (~10^19 GeV Planck scale, Theory of Everything). Vibration view: all forces as modes of one underlying field. Einstein: Nature is not separate in her operations." />
+          </div>
+
+          {/* -- Food Coherence + Substrate Intelligence -- */}
+          <h2 style={{ color: "#4ade80", fontSize: "1.2rem", fontWeight: 700, letterSpacing: 2,
+            textTransform: "uppercase", marginBottom: "0.35rem" }}>
+            Food Coherence + Substrate Intelligence
+          </h2>
+          <p style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "1.5rem", lineHeight: 1.65 }}>
+            Chemical vs organic food systems mapped as coherent structure clusters -- the substrate
+            of what we eat determines biological coherence output. PCA cluster analysis reveals
+            the emergent structure separating synthetic from biology-driven ecosystems.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "2.5rem" }}>
+            <ImgCard src={img_foodChemOrg}
+              caption="Determining Coherent Structure: Chemical vs Organic Food Systems (Dynamic Simulation Model). Left: synthetic substrate, fast uptake, leaching, high biomass but suppressed metabolites, chemical preservatives, irradiation. Right: living organic soil, slow adaptive uptake, microbial decomposition, minimal processing, natural storage, increased secondary metabolites (polyphenols, antioxidants). PCA Cluster Analysis: Cluster A (chemical) vs Cluster B (organic). Emergent Coherent Structure -- predictable differences in nutrient density, flavour, and stability." />
+            <ImgCard src={img_foodCropEco}
+              caption="Emergent Coherent Structures in Food Crop Ecosystems. Left pathway: simplified synthetic-driven (synthetic substrate, fast uptake, leaching, high biomass suppressed metabolites, chemical preservatives, irradiation). Right pathway: complex biology-driven (living organic soil, compost/manure, slower adaptive uptake, microbial decomposition, minimal processing, natural storage). Coherent Structure Cluster / Systems Model Data Matrix / PCA Cluster Analysis. Organically grown profile: high micronutrients, complex flavour, no residues." />
+          </div>
+
+          {/* -- Quantum Field Mechanics -- */}
+          <h2 style={{ color: "#fb923c", fontSize: "1.2rem", fontWeight: 700, letterSpacing: 2,
+            textTransform: "uppercase", marginBottom: "0.35rem" }}>
+            Quantum Field Mechanics -- All Fields into One
+          </h2>
+          <p style={{ color: "#64748b", fontSize: "0.8rem", marginBottom: "1.5rem", lineHeight: 1.65 }}>
+            Camera as decoherence instrument, intrinsic oscillator time transport, quaternion burst
+            dynamics, and the Future-Forward Portal -- every measurement system and every field
+            mechanic unified into AETHER's one coherent synthesis.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem" }}>
+            <ImgCard src={img_cameraDeco}
+              caption="Camera Machinery is Decoherence Measured Time Fragments. Psi(x,y,z,t) quantum light field (superposition) -> Nx x Ny pixel lattice -> Psi -> I(x,y) wave to classical intensity -> pixel tiling measurement cells -> I(x,y,tn) spatial image time fragment. Video = sequence of decohered time slices at 60 FPS dt=1/60 s. Resolution R = Nx x Ny. Compound resolution: R_effective = R_sensor x R_temporal x R_algorithms. Cameras are spacetime sampling machines." />
+            <ImgCard src={img_intrinsicOsc}
+              caption="Intrinsic Oscillator: Perturbed by Light -- harnessing stable coherent oscillation in dark matter fabric for instantaneous time transport of large mass. Dark matter fabric intrinsic coherent oscillation (self-sustaining, high-Q, uniform). Coherent light input slightly perturbs phase + amplitude. Phase-time relationship: dT = f(dPhi, dA, df). Warp chamber couples perturbed oscillator to object. Physical system: coherent light source -> modulation engine -> oscillator interface -> warp chamber -> time displacement control -> safety/recovery." />
+            <ImgCard src={img_timeTransport}
+              caption="Instant Time Transport of Large Mass -- moving a heavy object across time by manipulating the fabric of space-time. 4-step sequence: Enclose (pressure chamber, field stabilised) -> Isolate (local space-time region isolated from external reference frame) -> Phase Shift (coherent warp oscillation shifts chamber time coordinate by dT) -> Re-Integrate (field re-attaches at new time coordinate). Warp-Time Chamber System: oxygen combustion control unit, coherent wave synchroniser, light interaction array, substrate matrix lining, pressure field shell, field conduit core." />
+            <ImgCard src={img_quaternionBurst}
+              caption="Quaternion Burst in Analog Simulation Loop -- natural analogy: bubbles expanding when hot. 5 stages: Coherent State (stable quaternion Psi = a0+a1i+a2j+a3k) -> Compression (topological pressure) -> Boundary Instability (B(t) >= Bc, symmetry breaking) -> Quaternion Burst (E_burst = alpha||nabla Psi||^2, entropy + kinetic spike) -> Decoherence/Reformation (new Psi' loop). Mathematical map: Temperature -> Boundary parameter, Heat Input -> Compression/Tension, Bubble Nucleation -> Boundary Instability, Bubble Expansion -> Quaternion Burst. Physical manifestations: lightning, magnetic reconnection, neural firing, chemical reaction, social avalanche." />
+            <ImgCard src={img_futurePortal}
+              caption="Future-Forward Portal -- Instantaneous Artificially Generating Compute Imaging. Observe -> Model -> Predict -> Render. Continuous multi-physics sensing: LiDAR point cloud, thermal imaging, particle/aerosol density, wind/velocity, acoustic array, electromagnetic RF/light spectrum. Physics + AI compute engine: Navier-Stokes CFD, heat transfer, particle dynamics, electromagnetics. Adaptive active control: adaptive illumination, sensor steering, wavefront control, acoustic probing. 5 vision capabilities: see through fog, smoke, low-light, volumetric 4D, predictive tracking. 10-100x better visibility, >90% more information extracted." />
           </div>
         </div>
 
