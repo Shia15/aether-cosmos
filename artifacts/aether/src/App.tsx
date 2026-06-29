@@ -178,6 +178,7 @@ const StackFabricPage = lazy(() => import("@/pages/stack-fabric"));
 const BioEnginePage = lazy(() => import("@/pages/bio-engine"));
 const BloodDNALabPage = lazy(() => import("@/pages/blood-dna-lab"));
 const CircularFarmPage = lazy(() => import("@/pages/circular-farm"));
+const GradientFieldPage = lazy(() => import("@/pages/gradient-field"));
 const EyeEvolutionPage = lazy(() => import("@/pages/eye-evolution"));
 const QuantumGravityPage = lazy(() => import("@/pages/quantum-gravity"));
 const MathStudioPage = lazy(() => import("@/pages/math-studio"));
@@ -947,6 +948,7 @@ function Router() {
                 <Route path="/bio-engine" component={BioEnginePage} />
                 <Route path="/blood-dna-lab" component={BloodDNALabPage} />
                 <Route path="/circular-farm" component={CircularFarmPage} />
+                <Route path="/gradient-field" component={GradientFieldPage} />
                 <Route path="/eye-evolution" component={EyeEvolutionPage} />
                 <Route path="/quantum-gravity" component={QuantumGravityPage} />
                 <Route path="/math-studio" component={MathStudioPage} />

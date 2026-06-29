@@ -103,6 +103,7 @@ const NAV_ITEMS = [
   { href: "/biology",        label: "Biology",        icon: Dna },
   { href: "/blood-dna-lab",   label: "Blood & DNA Lab",    icon: Dna },
   { href: "/circular-farm",   label: "Circular AI Farm",   icon: Leaf },
+  { href: "/gradient-field",  label: "Gradient Field · Mechanisms Map · Helical Vacuum Flow · Pyramidal Engine · C(x,t) Superposition", icon: Atom },
   { href: "/eye-evolution",  label: "Eye Evolution",       icon: Dna },
   { href: "/quantum-substrate",   label: "Quantum Substrate · Diagonalization & Knotting", icon: Atom },
   { href: "/light-forces",        label: "Light · Forces · EM Spectrum · Bending · Fragmentation · Invisible Fields", icon: Atom },
