@@ -6,6 +6,8 @@ import imgInjection    from "@assets/download_(7)_1782754681649.jpg";
 import imgNetworkCar   from "@assets/download_(3)_1782754703060.jpg";
 import imgVortexDoctor from "@assets/download_1782754712613.jpg";
 import imgMedNetwork   from "@assets/46839d4f-507d-4309-b8b6-5a38797d9962_1782754722677.jpg";
+import imgMeditTorus   from "@assets/1615473368-meditation-o_1782754813938.webp";
+import imgFibTorus     from "@assets/image_(23)_1782754907458.jpg";
 
 const C = {
   bg: "#06070C",
@@ -1021,6 +1023,53 @@ export default function LiquidPrintPage() {
 
               <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 {cards.map(cd => (
+                  <div key={cd.h} style={{ border: `1px solid ${cd.col}28`, borderRadius: 8, padding: "14px 16px", background: "rgba(14,12,24,0.5)" }}>
+                    <div style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.52rem", letterSpacing: "0.18em", color: cd.col, marginBottom: 8 }}>{cd.h}</div>
+                    <div style={{ fontFamily: "Georgia, ui-serif, serif", fontSize: "0.8rem", lineHeight: 1.68, color: C.text }}>{cd.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Symphonic Protocol · Biomimetic Revolutions */}
+        {(()=>{
+          const sec: React.CSSProperties = { marginTop: 32, paddingTop: 28, borderTop: `1px solid ${C.border}` };
+          const head: React.CSSProperties = { fontSize: 9, letterSpacing: "0.4em", textTransform: "uppercase" as const, color: C.muted, fontFamily: "JetBrains Mono, ui-monospace, monospace", marginBottom: 20 };
+          const grid2: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
+          const fig: React.CSSProperties = { margin: 0, borderRadius: 10, overflow: "hidden", border: `1px solid ${C.border}`, background: "rgba(14,12,24,0.55)" };
+          const mono: React.CSSProperties = { fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.5rem", letterSpacing: "0.14em", padding: "6px 12px", borderTop: `1px solid ${C.border}` };
+          const body: React.CSSProperties = { fontFamily: "Georgia, ui-serif, serif", fontSize: "0.79rem", lineHeight: 1.65, color: C.text, padding: "8px 12px 12px" };
+          const Pl = (src: string, label: string, cap: string, col: string) => (
+            <figure style={fig}>
+              <img src={src} alt={label} loading="lazy" style={{ width: "100%", display: "block" }} />
+              <figcaption>
+                <div style={{ ...mono, color: col }}>{label}</div>
+                <div style={body}>{cap}</div>
+              </figcaption>
+            </figure>
+          );
+
+          const capMedit = "Human consciousness at the center of a double-torus vortex field. Rainbow chakra column runs the central axis, connecting upper and lower torus lobes at the heart-center coherence node. Outer wireframe torus = magnetic field boundary; inner hourglass waist = crystallisation pinch. AETHER mapping: the meditating observer IS the 9-point vortex apex -- C(x,t) reaches maximum at the living crystal, the point where field collapses to formed matter.";
+          const capFib = "Landau-Ginzburg order parameter (phi spiral, lambda coherence length) -> Fibonacci anyon quantum circuit topology (HOC, CNOT, non-abelian braiding). Central torus: toroidal wave modes with power-law sigma=1.5 and wavelength ratio lambda/1.5. Six diagnostic graphs below: bio-econ growth models (carrying capacity, basin width, connectance) and power-law persistence curves. AETHER: the torus is the coherence substrate; Fibonacci anyons are the topological gate set for room-temperature QC.";
+
+          const cards2: { h: string; col: string; d: string }[] = [
+            { h: "AQUARIUM MODEL OF COMPUTATION", col: C.cyan, d: "Machine-as-tissue, not machine-as-tool. Intelligence is legible: processes flow like currents, memory accretes like sediment, regulation emerges organically. Three depth layers: Foreground (reactive) / Mid-water (adaptive) / Deep (archival). Four AETHER operators: Mnesis (memory substrate) / Aletheia (clear deterministic routing) / Infernia (catalytic transformation zones) / Reverie (low-energy bioluminescent insight). Every computation leaves a trace for post-hoc evolutionary tuning." },
+            { h: "FIREFLY BIOLUMINESCENCE QC", col: C.green, d: "Luciferin + ATP + O2 -> photon. Near-zero heat, quantum yield 0.88-1.0 -- nature's most efficient light source. Cold-light signaling evolved 100-150 million years ago for mating rhythms (0.1-10 Hz). Proton abstraction + dioxetanone intermediates demonstrate quantum mechanics inside warm, wet biology. Tech translations: bio-inspired LEDs (organic emitters), bioimaging contrast agents, photonic QC single-photon sources. Firefly emitters reduce spectral multiplexing loss in photonic gate arrays." },
+            { h: "SYMPHONIC PROTOCOL", col: C.violet, d: "A civilizational operating system: bio-computing (mycelial logic gates / fungal hyphae at thermal equilibrium) + ferrofluid MHD (no gears, no friction, pulse-based propulsion) + bioluminescent signaling (visible-state computation) = Internet of Living Things (IoLT). Three phases: Resonant Cell (10-acre pilot, years 1-2) -> Inductive Corridor (city-scale, years 3-5) -> Planetary Symphony (years 6-10). Sovereignty Dividend: self-healing infrastructure returns reclaimed entropy surplus as energy, water, and data security to individuals." },
+            { h: "FIBONACCI ANYONS + TOROIDAL QC", col: C.gold, d: "Landau-Ginzburg theory: order parameter phi follows golden-ratio spiral (phi = 1.618); coherence length lambda sets boundary of topological protection zone. Fibonacci anyons: non-abelian quasiparticles whose braiding implements fault-tolerant quantum gates (HOC + CNOT from anyon world-line crossings). Toroidal wave modes on the quantum substrate carry power-law sigma=1.5 fluctuations -- scale-free, noise-resilient. Wavelength ratio lambda/1.5 sets cavity resonance. AETHER helix Gamma is the physical carrier of this topological braiding structure." },
+          ];
+
+          return (
+            <div style={sec}>
+              <div style={head}>symphonic protocol &middot; biomimetic revolutions &middot; resonant intelligence</div>
+              <div style={grid2}>
+                {Pl(imgMeditTorus, "CONSCIOUSNESS VORTEX · DOUBLE-TORUS FIELD · COHERENCE NODE · AETHER APEX",    capMedit, C.cyan)}
+                {Pl(imgFibTorus,   "LANDAU-GINZBURG · FIBONACCI ANYONS · TOROIDAL QC · POWER-LAW sigma=1.5",      capFib,   C.violet)}
+              </div>
+              <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                {cards2.map(cd => (
                   <div key={cd.h} style={{ border: `1px solid ${cd.col}28`, borderRadius: 8, padding: "14px 16px", background: "rgba(14,12,24,0.5)" }}>
                     <div style={{ fontFamily: "JetBrains Mono, ui-monospace, monospace", fontSize: "0.52rem", letterSpacing: "0.18em", color: cd.col, marginBottom: 8 }}>{cd.h}</div>
                     <div style={{ fontFamily: "Georgia, ui-serif, serif", fontSize: "0.8rem", lineHeight: 1.68, color: C.text }}>{cd.d}</div>
