@@ -265,6 +265,7 @@ const NAV_ITEMS = [
   { href: "/personal-operating-model", label: "Personal Operating Model",             icon: Workflow },
   { href: "/color-cosmology",          label: "Color Cosmology · Six Shells",         icon: Palette },
   { href: "/chromatic-glare",          label: "Chromatic Glare · Inverted Opposite Colors · Simultaneous Contrast · Afterimage · Complementary Glow", icon: Palette },
+  { href: "/uptipple-boat",            label: "Uptipple · Rockable Wave Boat · Buoyancy · Metacentric Stability · Capsize", icon: Waves },
   { href: "/april-23-alignment",       label: "April 23 Alignment · Reality vs Symbol", icon: Orbit },
   { href: "/as-above-so-below",        label: "As Above, So Below · Geohistorical",   icon: Telescope },
   { href: "/piano-arithmetic",         label: "Piano Arithmetic · Earth Harmonizer",  icon: AudioWaveform },
