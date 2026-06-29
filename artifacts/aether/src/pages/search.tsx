@@ -254,15 +254,139 @@ function DailyIngestionOverview() {
   );
 }
 
+// ── Image engine ──────────────────────────────────────────────────────────
+// The unified search also queries the static visual library (public/gpt_imgs +
+// public/linkedin_imgs) via public/image-index.json (regenerate with
+// `pnpm --filter @workspace/aether run build:image-index`). Categories mirror
+// the Knowledge Map taxonomy so both engines share one vocabulary.
+const BASE_URL = (import.meta.env.BASE_URL || "/");
+const IMAGE_INDEX_URL = `${BASE_URL}image-index.json`;
+const MAX_IMAGE_RESULTS = 36;
+
+type ImageEntry = { file: string; dir: string; cat: string; video?: boolean };
+
+const CAT_META: Record<string, { label: string; color: string }> = {
+  aether: { label: "AETHER Architecture", color: "#00D4FF" },
+  cosmic: { label: "Cosmic & Planetary", color: "#C87BFF" },
+  hardware: { label: "Hardware & Prototypes", color: "#FF9632" },
+  science: { label: "Science & Engineering", color: "#00FFCC" },
+  narrative: { label: "Narrative", color: "#FFD050" },
+  emotional: { label: "Emotional & Personal", color: "#FF8FB3" },
+  visual: { label: "AI Generative & Visual", color: "#FF6644" },
+  video: { label: "Video Clip", color: "#44FF88" },
+  uncategorized: { label: "Visual Library", color: "#7fb8b0" },
+};
+
+const SOURCE_SYN: Record<string, string> = {
+  gpt_imgs: "gpt openai generated ai image render visual",
+  linkedin_imgs: "linkedin professional post social image visual",
+};
+
+const IMAGE_INTENT = new Set([
+  "image", "images", "picture", "pictures", "pic", "pics", "photo", "photos",
+  "visual", "visuals", "render", "renders", "art", "artwork", "graphic",
+  "graphics", "gallery", "thumbnail", "thumbnails", "video", "videos", "clip", "clips",
+]);
+
+function imageSrc(it: ImageEntry): string {
+  return `${BASE_URL}${it.dir}/${it.file}`;
+}
+
+function scoreImage(it: ImageEntry, tokens: string[], hasIntent: boolean): number {
+  const cat = CAT_META[it.cat] || CAT_META.uncategorized;
+  const hay = `${it.file} ${it.dir} ${SOURCE_SYN[it.dir] || ""} ${cat.label} ${it.cat} ${it.video ? "video clip motion" : ""}`.toLowerCase();
+  let matched = 0;
+  for (const t of tokens) if (t && hay.includes(t)) matched += 1;
+  if (matched === 0 && !hasIntent) return 0;
+  let rel = tokens.length ? matched / tokens.length : 0;
+  if (hasIntent) rel = Math.max(rel, 0.45);
+  return Math.min(1, rel);
+}
+
+function useImageIndex(): ImageEntry[] {
+  const [entries, setEntries] = useState<ImageEntry[]>([]);
+  useEffect(() => {
+    let alive = true;
+    fetch(IMAGE_INDEX_URL)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        if (!alive || !Array.isArray(data)) return;
+        setEntries(
+          data
+            .filter((d): d is Record<string, unknown> => !!d && typeof d === "object")
+            .map((d) => ({
+              file: asStr(d.file),
+              dir: asStr(d.dir),
+              cat: asStr(d.cat) || "uncategorized",
+              video: d.video === true,
+            }))
+            .filter((d) => d.file && d.dir)
+        );
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return entries;
+}
+
+function ImageResultCard({ it, relevance }: { it: ImageEntry; relevance: number }) {
+  const cat = CAT_META[it.cat] || CAT_META.uncategorized;
+  const src = imageSrc(it);
+  return (
+    <a href={src} target="_blank" rel="noreferrer" className="block">
+      <Card className="p-3 bg-card border-white/5 hover:border-primary/30 transition-all cursor-pointer group">
+        <div className="flex items-center gap-4">
+          <div className="w-20 h-20 shrink-0 rounded-md overflow-hidden bg-black/40 border border-white/5 flex items-center justify-center">
+            {it.video ? (
+              <video src={src} muted playsInline preload="metadata" className="w-full h-full object-cover" />
+            ) : (
+              <img src={src} alt={it.file} loading="lazy" className="w-full h-full object-cover" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="font-mono text-sm text-foreground group-hover:text-primary transition-colors truncate">{it.file}</h3>
+              <Badge variant="outline" className="font-mono text-[10px] uppercase border-white/10" style={{ color: cat.color }}>
+                {it.video ? "video" : "image"}
+              </Badge>
+            </div>
+            <p className="text-muted-foreground font-mono text-[11px] truncate">
+              {cat.label} · {it.dir === "gpt_imgs" ? "GPT / OpenAI" : it.dir === "linkedin_imgs" ? "LinkedIn" : it.dir}
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="font-mono text-[10px] text-muted-foreground uppercase mb-1">Relevance</div>
+            <div className="font-mono text-lg text-accent">{(relevance * 100).toFixed(0)}%</div>
+          </div>
+        </div>
+      </Card>
+    </a>
+  );
+}
+
 export default function SearchView() {
   const [query, setQuery] = useState("");
   const [type, setType] = useState<SearchConceptsType>("semantic");
   const [activeSearch, setActiveSearch] = useState({ q: "", type: "semantic" as SearchConceptsType });
 
-  const { data: results, isLoading, isFetching } = useSearchConcepts(
+  const imageIndex = useImageIndex();
+
+  const { data: results, isFetching } = useSearchConcepts(
     { q: activeSearch.q, type: activeSearch.type },
     { query: { enabled: !!activeSearch.q } }
   );
+
+  const imageMatches = useMemo(() => {
+    const q = activeSearch.q.trim().toLowerCase();
+    if (!q || imageIndex.length === 0) return { list: [] as { it: ImageEntry; rel: number }[], total: 0 };
+    const tokens = q.split(/\s+/).filter(Boolean);
+    const hasIntent = tokens.some((t) => IMAGE_INTENT.has(t));
+    const scored = imageIndex
+      .map((it) => ({ it, rel: scoreImage(it, tokens, hasIntent) }))
+      .filter((x) => x.rel > 0)
+      .sort((a, b) => b.rel - a.rel);
+    return { list: scored.slice(0, MAX_IMAGE_RESULTS), total: scored.length };
+  }, [activeSearch.q, imageIndex]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -325,52 +449,96 @@ export default function SearchView() {
       </header>
 
       <div className="flex-1 overflow-y-auto pr-4 pb-8 space-y-4">
-        {isFetching && !results ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-          </div>
-        ) : results && results.length > 0 ? (
-          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {results.map((res, i) => (
-              <Card key={`${res.id}-${i}`} className="p-5 bg-card border-white/5 hover:border-primary/30 transition-all cursor-pointer group">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">{res.name}</h3>
-                      <Badge variant="outline" className="font-mono text-[10px] uppercase border-white/10 text-muted-foreground">
-                        {res.type}
-                      </Badge>
-                    </div>
-                    {res.snippet && (
-                      <p className="text-muted-foreground font-serif text-sm leading-relaxed max-w-3xl">
-                        "{res.snippet}"
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <div className="text-right">
-                      <div className="font-mono text-[10px] text-muted-foreground uppercase mb-1">Relevance</div>
-                      <div className="font-mono text-lg text-accent">{(res.relevance * 100).toFixed(0)}%</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-mono text-[10px] text-muted-foreground uppercase mb-1">Coherence</div>
-                      <div className="font-mono text-sm text-foreground">{(res.coherence * 100).toFixed(0)}%</div>
-                    </div>
-                  </div>
+        {(() => {
+          const conceptItems = (results || []).map((res, i) => ({
+            kind: "concept" as const,
+            rel: res.relevance,
+            key: `c-${res.id}-${i}`,
+            res,
+          }));
+          const imageItems = imageMatches.list.map((x) => ({
+            kind: "image" as const,
+            rel: x.rel,
+            key: `i-${x.it.dir}-${x.it.file}`,
+            it: x.it,
+          }));
+          const combined = [...conceptItems, ...imageItems].sort((a, b) => b.rel - a.rel);
+          const stillLoading = isFetching && !results;
+
+          if (stillLoading && imageItems.length === 0) {
+            return (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+              </div>
+            );
+          }
+
+          if (combined.length > 0) {
+            return (
+              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 flex-wrap font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+                  <span className="text-primary">{conceptItems.length} concepts</span>
+                  <span className="text-white/20">·</span>
+                  <span className="text-accent">{imageMatches.total} images</span>
+                  {imageMatches.total > imageMatches.list.length && (
+                    <span className="text-white/30 normal-case tracking-normal">(showing first {imageMatches.list.length})</span>
+                  )}
+                  {stillLoading && (
+                    <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin ml-1" />
+                  )}
                 </div>
-              </Card>
-            ))}
-          </div>
-        ) : activeSearch.q ? (
-          <div className="text-center py-20">
-            <Hexagon className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="font-serif text-lg text-muted-foreground italic">No topological matches found for this query.</p>
-          </div>
-        ) : (
-           <div className="text-center py-20">
-            <p className="font-mono text-sm text-muted-foreground tracking-widest uppercase">Awaiting query parameters.</p>
-          </div>
-        )}
+                {combined.map((item) =>
+                  item.kind === "concept" ? (
+                    <Card key={item.key} className="p-5 bg-card border-white/5 hover:border-primary/30 transition-all cursor-pointer group">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-serif text-2xl text-foreground group-hover:text-primary transition-colors">{item.res.name}</h3>
+                            <Badge variant="outline" className="font-mono text-[10px] uppercase border-white/10 text-muted-foreground">
+                              {item.res.type}
+                            </Badge>
+                          </div>
+                          {item.res.snippet && (
+                            <p className="text-muted-foreground font-serif text-sm leading-relaxed max-w-3xl">
+                              "{item.res.snippet}"
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                          <div className="text-right">
+                            <div className="font-mono text-[10px] text-muted-foreground uppercase mb-1">Relevance</div>
+                            <div className="font-mono text-lg text-accent">{(item.res.relevance * 100).toFixed(0)}%</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-mono text-[10px] text-muted-foreground uppercase mb-1">Coherence</div>
+                            <div className="font-mono text-sm text-foreground">{(item.res.coherence * 100).toFixed(0)}%</div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ) : (
+                    <ImageResultCard key={item.key} it={item.it} relevance={item.rel} />
+                  )
+                )}
+              </div>
+            );
+          }
+
+          if (activeSearch.q) {
+            return (
+              <div className="text-center py-20">
+                <Hexagon className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                <p className="font-serif text-lg text-muted-foreground italic">No topological matches found for this query.</p>
+              </div>
+            );
+          }
+
+          return (
+            <div className="text-center py-20">
+              <p className="font-mono text-sm text-muted-foreground tracking-widest uppercase">Awaiting query parameters.</p>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
