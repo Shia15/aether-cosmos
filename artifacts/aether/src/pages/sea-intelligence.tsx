@@ -6,6 +6,15 @@ import img_seaMilkMain from "@assets/228A29BD-3F84-4083-AF1E-818924EFA8C4_178144
 import img_seaMilkDetail from "@assets/32EF9A25-4864-4D20-AC34-D9CEACB7C17B_1781446652782.png";
 import img_natureEngineering from "@assets/BAFFCDB0-56AD-48F1-807A-8FB4D7820FDD_1781446652782.png";
 import img_bioColors from "@assets/0E5F00A2-9A8C-4246-9D53-18DE355382FD_1781446652782.png";
+import img_qaHexLight   from "@assets/IMG_3466_1782755726927.png";
+import img_qaMycelium   from "@assets/IMG_3469_1782755726927.png";
+import img_qaBioDigital from "@assets/IMG_3464_1782755726927.png";
+import img_qaHexDark    from "@assets/IMG_3465_1782755726927.png";
+import img_qaThermalize from "@assets/5F3C41A7-8516-4E4F-B00F-27B4539619C5_1782755726927.png";
+import img_qaFirefly    from "@assets/IMG_3458_1782755726927.png";
+import img_qaWaveFunc   from "@assets/IMG_3370_1782755726927.jpeg";
+import img_qaInterfer   from "@assets/IMG_3371_1782755726927.jpeg";
+import img_qaEUVMirror  from "@assets/IMG_3372_1782755726927.jpeg";
 
 const TABS = [
   { id: "coral", label: "Coral Restoration" },
@@ -578,6 +587,54 @@ export default function SeaIntelligencePage() {
         {tab === "reef" && <ReefTab />}
         {tab === "seamilk" && <SeaMilkTab />}
         {tab === "biolum" && <BiolumTab />}
+
+        {/* ── Quantum Absolutes · Substrate Intelligence ── */}
+        <div style={{ marginTop: "3rem", borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: "2.5rem" }}>
+          <h2 style={{ color: "#7dd3fc", fontSize: "1.25rem", fontWeight: 700, letterSpacing: 2,
+            textTransform: "uppercase", marginBottom: "0.4rem" }}>
+            Quantum Absolutes · Substrate Intelligence
+          </h2>
+          <p style={{ color: "#64748b", fontSize: "0.82rem", marginBottom: "2rem", lineHeight: 1.7 }}>
+            The non-negotiable absolutes of quantum systems — scale invariance from Planck substrate to whole body,
+            thermalization transitions, bio-digital decoherence fields, mycelial living circuits, and EUV optical
+            fabrication — mapped as knowledge plates for sea and substrate intelligence synthesis.
+          </p>
+
+          {/* Row 1 — AETHER hexical scale tables */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <ImgCard src={img_qaHexDark}
+              caption="AETHER Layer · Hexical Expression Scale Table — Planck/spin-foam (Layer 0: substrate) through Whole Body (Layer 9: self-recognition). Governing principles: Loop quantum gravity, gauge symmetry, angular momentum, backbone torsion, variational fold energy, GTP hydrolysis, surface energy, functional load, mechanical efficiency, coherent superposition." />
+            <ImgCard src={img_qaHexLight}
+              caption="AETHER Layer Hexical Expression (light render) — same 10-layer stack showing Physical Domain, Hexical Expression, Governing Principle, and AETHER Layer label for each scale from 10^-35 m spinor quantum to 10^0 m whole body standing wave." />
+          </div>
+
+          {/* Row 2 — Bio-digital & thermalization */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <ImgCard src={img_qaBioDigital}
+              caption="Bio-Digital Perception & Multidimensional Decoherence — Human Visual Ecosystem (decoherence threshold ~10^-9 s retinal; ~10^-5 s neural sync) vs Arachnid/Insect Sensory Arrays (nano-scale decoherence tolerance, ommatidium mosaic, polarised light). Perceptual Decoherence Field bridges quantum and classical states via Multi-Phyla Vision Matrix and bio-powered Infrastructure Beam." />
+            <ImgCard src={img_qaThermalize}
+              caption="From Coupled Oscillators to Blackbody Radiation: A Thermalization Transition — 5-stage coherence collapse (Strongly Coupled phase-locked → Partially Desynchronised clusters → Strongly Fluctuating transient → Near Thermalization random phases → Thermal Equilibrium Planck distribution B(v,T)=2hv^3/c^2 · 1/(e^hv/kT-1)). Control parameters: coupling K, temperature T, system size N, damping y. Key insight: same cavity produces coherent order or thermal noise depending on K/T ratio." />
+          </div>
+
+          {/* Row 3 — Mycelium + Firefly space-time */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
+            <ImgCard src={img_qaMycelium}
+              caption="Mycelial Electronics & Living Circuits (Slide 7) — Existing: mycelium PCBs, biodegradable substrates. Future: chips that heal when damaged, self-growing sensors, hybrid computation. Hybrid silicon-mycelium computation shown growing through a cracked substrate." />
+            <ImgCard src={img_qaFirefly}
+              caption="Quantum Firefly Energy & Space-Time Fabric — Galaxy Clusters, Cosmic Filaments, Antimatter String Filament Nodes, Star Systems, Sun, Earth, Light, Plants, Animals, Fields, Consciousness linked by bioluminescence, piezo-electricity, substrate energy & nutrient transfer, high-speed intrawater filament networks, and Hawking Radiation (energy loss mechanism). Firefly Energy Efficiency Model drives glow substrate + ecological growth." />
+          </div>
+
+          {/* Row 4 — EUV optics (full width then two side-by-side) */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1.5rem" }}>
+            <ImgCard src={img_qaWaveFunc}
+              caption="3D Quantum Probability Density Surface — wavefunction amplitude plotted over a 6x12 domain showing four coherence peaks with spiral basin topology. High-amplitude nodes (red-orange) surrounded by phase-interference troughs (cyan-blue). Directly analogous to AETHER coherence field C(x,t) peak structures." />
+            <ImgCard src={img_qaInterfer}
+              caption="Constructive Interference in a Multilayer Mirror (λ = 2d sinΦ) — Si/Mo bilayer stack, incident angle Φ, layer spacing d. Bragg condition selects EUV wavelengths ~13.5 nm. Source: Louis, Eric. Physics and technology development of multilayer EUV reflective optics. 2012." />
+            <ImgCard src={img_qaEUVMirror}
+              caption="Cross-Section of an EUV Mirror at 10 nm Scale — TEM image of alternating Si/Mo layers each ~3-4 nm thick, showing atomic-level periodicity required for extreme-ultraviolet reflection. Substrate intelligence at the nanometre absolute." />
+          </div>
+        </div>
+
       </div>
     </div>
   );
