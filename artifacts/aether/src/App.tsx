@@ -343,6 +343,10 @@ const SuperradiancePage = lazy(() => import("@/pages/superradiance"));
 const RadianceSpectrumPage = lazy(() => import("@/pages/radiance-spectrum"));
 const RationalFunctionPage = lazy(() => import("@/pages/rational-function"));
 const EquationsInMotionPage = lazy(() => import("@/pages/equations-in-motion"));
+const GufFlagshipPage = lazy(() => import("@/pages/guf-flagship"));
+const EngineDesignerPage = lazy(() => import("@/pages/engine-designer"));
+const GobekliPlasmaPage = lazy(() => import("@/pages/gobekli-plasma"));
+const GufCoinsPage = lazy(() => import("@/pages/guf-coins"));
 const HelicalFrameworkPage = lazy(() => import("@/pages/helical-framework"));
 const RobotStrokesPage = lazy(() => import("@/pages/robot-strokes"));
 const FlowerClockPage = lazy(() => import("@/pages/flower-clock"));
@@ -1299,6 +1303,10 @@ function Router() {
                 <Route path="/radiance-spectrum"    component={RadianceSpectrumPage} />
                 <Route path="/rational-function"    component={RationalFunctionPage} />
                 <Route path="/equations-in-motion" component={EquationsInMotionPage} />
+                <Route path="/guf-flagship"        component={GufFlagshipPage} />
+                <Route path="/engine-designer"     component={EngineDesignerPage} />
+                <Route path="/gobekli-plasma"      component={GobekliPlasmaPage} />
+                <Route path="/guf-coins"           component={GufCoinsPage} />
                 <Route path="/helical-framework"   component={HelicalFrameworkPage} />
                 <Route path="/robot-strokes"       component={RobotStrokesPage} />
                 <Route path="/flower-clock"        component={FlowerClockPage} />
