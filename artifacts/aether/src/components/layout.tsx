@@ -105,6 +105,7 @@ const NAV_ITEMS = [
   { href: "/biology",        label: "Biology",        icon: Dna },
   { href: "/blood-dna-lab",   label: "Blood & DNA Lab",    icon: Dna },
   { href: "/circular-farm",   label: "Circular AI Farm",   icon: Leaf },
+  { href: "/compote-chips",   label: "Crunchy Compote Chips",   icon: Leaf },
   { href: "/gradient-field",  label: "Gradient Field · Mechanisms Map · Helical Vacuum Flow · Pyramidal Engine · C(x,t) Superposition", icon: Atom },
   { href: "/aether-engine",   label: "AETHER Engine · All Fields Unified · Matter Synthesis · Observer Coupling · Veil Effect · Crystallisation · LPE Gate", icon: Atom },
   { href: "/eye-evolution",  label: "Eye Evolution",       icon: Dna },

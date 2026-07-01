@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+import imgVortexStone from "@assets/IMG_3682_1782767136954.jpeg";
+import imgCutawayVortex from "@assets/IMG_3683_1782767136954.jpeg";
+import imgPyramidGate from "@assets/IMG_3686_1782767136954.jpeg";
+import imgResonantTool from "@assets/IMG_3684_1782767136954.jpeg";
 
 const V = {
   bg: "#05060C", aurora: "#00FFB2", gold: "#C8A030", blue: "#4488FF",
@@ -74,6 +78,35 @@ function Readout({ label, col, vref }: { label: string; col: string; vref: React
     <div style={{ padding: "8px 10px", borderRadius: 5, background: `${col}0C`, border: `1px solid ${col}30` }}>
       <div style={{ fontFamily: MONO, fontSize: 7, color: col, letterSpacing: "0.12em", marginBottom: 3 }}>{label.toUpperCase()}</div>
       <span ref={vref} style={{ fontFamily: MONO, fontSize: "0.92rem", color: col }}>--</span>
+    </div>
+  );
+}
+
+function Plate({ src, title, cap, col }: { src: string; title: string; cap: string; col: string }) {
+  return (
+    <figure style={{ margin: 0, borderRadius: 10, overflow: "hidden",
+      border: `1px solid ${col}30`, background: `${col}08` }}>
+      <img src={src} alt={title} loading="lazy"
+        style={{ width: "100%", display: "block", aspectRatio: "3 / 4", objectFit: "cover" }} />
+      <figcaption style={{ padding: "10px 12px" }}>
+        <div style={{ fontFamily: MONO, fontSize: 8, color: col, letterSpacing: "0.12em", marginBottom: 4 }}>
+          {title.toUpperCase()}
+        </div>
+        <div style={{ fontFamily: SERIF, fontSize: "0.82rem", color: "rgba(184,204,232,0.65)", lineHeight: 1.4 }}>
+          {cap}
+        </div>
+      </figcaption>
+    </figure>
+  );
+}
+
+function Anno({ k, v, col }: { k: string; v: string; col: string }) {
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "baseline", padding: "5px 0",
+      borderBottom: `1px solid ${col}18` }}>
+      <span style={{ fontFamily: MONO, fontSize: 8, color: col, letterSpacing: "0.08em",
+        minWidth: 104, flexShrink: 0 }}>{k}</span>
+      <span style={{ fontFamily: SERIF, fontSize: "0.82rem", color: "rgba(184,204,232,0.7)", lineHeight: 1.4 }}>{v}</span>
     </div>
   );
 }
@@ -485,6 +518,210 @@ function SlipGateCanvas() {
   );
 }
 
+// ── SIM 3 — Four-cavity piezoelectric rhombus: stress on quartz makes charge ──────
+function FourCavityPiezoCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const strRef = useRef(0.7);    // drive stress amplitude
+  const frqRef = useRef(1.0);    // drive frequency (relative)
+  const cplRef = useRef(0.7);    // quartz piezo coupling d
+  const detRef = useRef(0.25);   // cavity detune spread (tone spread)
+  const gapRef = useRef(0.5);    // bottom air-gap width
+
+  const [str, setStr] = useState(0.7);
+  const [frq, setFrq] = useState(1.0);
+  const [cpl, setCpl] = useState(0.7);
+  const [det, setDet] = useState(0.25);
+  const [gap, setGap] = useState(0.5);
+
+  const vR = useRef<HTMLSpanElement | null>(null);   // total voltage
+  const pR = useRef<HTMLSpanElement | null>(null);   // peak cell
+  const fR = useRef<HTMLSpanElement | null>(null);   // resonant freq
+  const rR = useRef<HTMLSpanElement | null>(null);   // convergence coherence
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    let dim = fitCanvas(canvas, 440);
+    const onResize = () => { dim = fitCanvas(canvas, 440); };
+    window.addEventListener("resize", onResize);
+    const reduce = prefersReduced();
+
+    // air particles that ride the bottom slot (the "stick removed" gap)
+    const air = Array.from({ length: 46 }, () => ({
+      u: Math.random(), s: 0.3 + Math.random() * 0.9, off: Math.random(),
+    }));
+
+    let raf = 0, t = 0;
+
+    const draw = () => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { raf = requestAnimationFrame(draw); return; }
+      const w = dim.w, h = dim.h, cx = w / 2, cy = h / 2;
+      const A = strRef.current, f = frqRef.current, d = cplRef.current;
+      const detune = detRef.current, gapW = gapRef.current;
+      const dt = reduce ? 0 : 1;
+      t += dt / 60;
+      const om = f * 2 * Math.PI;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#05060C";
+      ctx.fillRect(0, 0, w, h);
+
+      const hw = w * 0.40, hh = h * 0.42;
+
+      // cupped diabase shell — outer soft cup + crisp inner rhombus
+      rhombusPath(ctx, cx, cy, hw + 7, hh + 7);
+      ctx.strokeStyle = "rgba(153,102,255,0.28)"; ctx.lineWidth = 9; ctx.stroke();
+      rhombusPath(ctx, cx, cy, hw, hh);
+      ctx.strokeStyle = "rgba(184,204,232,0.55)"; ctx.lineWidth = 1.6; ctx.stroke();
+
+      // four pyramidal cavities in quadrant / tetrahedral symmetry
+      const off = Math.min(hw, hh) * 0.46;
+      const size = Math.min(hw, hh) * 0.30;
+      const cav = [
+        { x: cx, y: cy - off, apexIn: true },
+        { x: cx + off, y: cy, apexIn: false },
+        { x: cx, y: cy + off, apexIn: true },
+        { x: cx - off, y: cy, apexIn: false },
+      ];
+
+      let totalV = 0, peak = 0, sumRe = 0, sumIm = 0, sumW = 0;
+      cav.forEach((c, i) => {
+        const ph = i * detune * Math.PI;                 // detune -> distinct tones
+        const s = A * (0.5 + 0.5 * Math.sin(om * t + ph));
+        const focus = c.apexIn ? 1.35 : 0.8;             // apex-in focuses, apex-out releases
+        const v = d * s * focus;                          // piezo polarisation
+        totalV += v; peak = Math.max(peak, v);
+        sumRe += v * Math.cos(om * t + ph);
+        sumIm += v * Math.sin(om * t + ph);
+        sumW += Math.max(v, 1e-6);
+
+        // apex direction: toward centre (apex-in) or away (apex-out)
+        let dxc = cx - c.x, dyc = cy - c.y;
+        const L = Math.hypot(dxc, dyc) || 1;
+        dxc /= L; dyc /= L;
+        const sgn = c.apexIn ? 1 : -1;
+        const ax = c.x + dxc * sgn * size * 0.75;
+        const ay = c.y + dyc * sgn * size * 0.75;
+        const bx = c.x - dxc * sgn * size * 0.55;
+        const by = c.y - dyc * sgn * size * 0.55;
+        const px = -dyc, py = dxc;                        // perpendicular
+        const glow = Math.min(1, v);
+        ctx.beginPath();
+        ctx.moveTo(ax, ay);
+        ctx.lineTo(bx + px * size * 0.6, by + py * size * 0.6);
+        ctx.lineTo(bx - px * size * 0.6, by - py * size * 0.6);
+        ctx.closePath();
+        const g = ctx.createLinearGradient(bx, by, ax, ay);
+        g.addColorStop(0, `rgba(153,102,255,0.10)`);
+        g.addColorStop(1, `rgba(255,153,51,${0.15 + glow * 0.6})`);
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.strokeStyle = c.apexIn ? `rgba(68,136,255,0.6)` : `rgba(255,102,153,0.55)`;
+        ctx.lineWidth = 1.1; ctx.stroke();
+        // quartz inclusion at the apex — brightens with charge
+        ctx.beginPath(); ctx.arc(ax, ay, 2.2 + glow * 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,220,120,${0.4 + glow * 0.6})`;
+        ctx.shadowBlur = glow * 12; ctx.shadowColor = "rgba(255,200,90,0.9)";
+        ctx.fill(); ctx.shadowBlur = 0;
+        // charge feed toward the centre
+        ctx.strokeStyle = `rgba(255,153,51,${0.10 + glow * 0.35})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(cx, cy); ctx.stroke();
+      });
+
+      const R = Math.hypot(sumRe, sumIm) / Math.max(sumW, 1e-6);  // convergence coherence
+
+      // central convergence vortex — brightness tracks coherence x charge
+      const conv = Math.min(1, R * totalV * 0.6);
+      const cg = ctx.createRadialGradient(cx, cy, 1, cx, cy, 34 + conv * 26);
+      cg.addColorStop(0, `rgba(0,255,178,${0.25 + conv * 0.6})`);
+      cg.addColorStop(1, "rgba(0,255,178,0)");
+      ctx.fillStyle = cg;
+      ctx.beginPath(); ctx.arc(cx, cy, 34 + conv * 26, 0, Math.PI * 2); ctx.fill();
+      for (let a = 0; a < 4; a++) {
+        ctx.beginPath();
+        for (let rr = 3; rr < 26 + conv * 22; rr += 2) {
+          const ang = (a / 4) * Math.PI * 2 + t * 2.4 + rr * 0.09;
+          const qx = cx + Math.cos(ang) * rr, qy = cy + Math.sin(ang) * rr;
+          if (rr === 3) ctx.moveTo(qx, qy); else ctx.lineTo(qx, qy);
+        }
+        ctx.strokeStyle = `rgba(0,255,178,${0.2 + conv * 0.5})`;
+        ctx.lineWidth = 1; ctx.stroke();
+      }
+
+      // bottom rectangular air-gap slot — the "stick removed" resonance channel
+      const slotW = 16 + gapW * 46;
+      const slotTop = cy + hh * 0.30;
+      const slotBot = cy + hh * 0.98;
+      ctx.fillStyle = "rgba(8,10,20,0.9)";
+      ctx.fillRect(cx - slotW / 2, slotTop, slotW, slotBot - slotTop);
+      ctx.strokeStyle = "rgba(0,255,178,0.35)"; ctx.lineWidth = 1;
+      ctx.strokeRect(cx - slotW / 2, slotTop, slotW, slotBot - slotTop);
+      for (const p of air) {
+        if (dt) { p.u += (0.004 + p.s * 0.006) * (0.4 + totalV); if (p.u > 1) p.u -= 1; }
+        const ay = slotBot - p.u * (slotBot - slotTop);
+        const ax = cx + (p.off - 0.5) * slotW * 0.8;
+        ctx.fillStyle = `rgba(120,200,255,${0.25 + p.s * 0.4})`;
+        ctx.beginPath(); ctx.arc(ax, ay, 1.1 + p.s, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // labels
+      ctx.font = `9px ${MONO}`;
+      ctx.fillStyle = V.amb; ctx.fillText("FOUR-CAVITY PIEZO -- QUADRANT SYMMETRY", 10, 16);
+      ctx.fillStyle = V.aurora;
+      ctx.fillText(conv > 0.45 ? "CONVERGENCE LOCKED -- CHARGE RINGS" : "SEEKING RESONANCE", 10, h - 10);
+
+      // acoustic quarter-wave: shorter effective column (tighter gap) rings higher
+      const Leff = 0.5 + (1 - gapW) * 1.6 + (1 - detune) * 0.3;
+      const fRes = 340 / (4 * Leff);
+
+      if (vR.current) vR.current.textContent = `${(totalV * 10).toFixed(1)} V`;
+      if (pR.current) pR.current.textContent = `${(peak * 10).toFixed(1)} V`;
+      if (fR.current) fR.current.textContent = `${fRes.toFixed(0)} Hz`;
+      if (rR.current) { rR.current.textContent = R.toFixed(2); rR.current.style.color = R > 0.6 ? V.aurora : V.gold; }
+
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
+  }, []);
+
+  return (
+    <div>
+      <canvas ref={canvasRef} style={{ width: "100%", height: 440, display: "block",
+        borderRadius: 8, border: `1px solid ${V.dim}44`, background: "#05060C" }} />
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 10 }}>
+        <Readout label="Total charge V" col={V.amb} vref={vR} />
+        <Readout label="Peak cavity V" col={V.gold} vref={pR} />
+        <Readout label="Resonant freq" col={V.blue} vref={fR} />
+        <Readout label="Convergence R" col={V.aurora} vref={rR} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 12 }}>
+        <div>
+          <Slider label="Drive stress" value={str} min={0.1} max={1.4} step={0.01} col={V.amb}
+            onChange={(v) => { setStr(v); strRef.current = v; }} fmt={(v) => v.toFixed(2)} />
+          <Slider label="Drive frequency" value={frq} min={0.3} max={3} step={0.05} col={V.blue}
+            onChange={(v) => { setFrq(v); frqRef.current = v; }} fmt={(v) => v.toFixed(2)} />
+          <Slider label="Quartz coupling d" value={cpl} min={0.2} max={1.4} step={0.01} col={V.gold}
+            onChange={(v) => { setCpl(v); cplRef.current = v; }} fmt={(v) => v.toFixed(2)} />
+        </div>
+        <div>
+          <Slider label="Cavity detune spread" value={det} min={0} max={1} step={0.01} col={V.rose}
+            onChange={(v) => { setDet(v); detRef.current = v; }} fmt={(v) => v.toFixed(2)} />
+          <Slider label="Air-gap slot width" value={gap} min={0} max={1} step={0.01} col={V.aurora}
+            onChange={(v) => { setGap(v); gapRef.current = v; }} fmt={(v) => v.toFixed(2)} />
+          <div style={{ fontFamily: SERIF, fontSize: "0.8rem", color: "rgba(184,204,232,0.55)", lineHeight: 1.4, marginTop: 6 }}>
+            Drive the stress into the four cavities. Apex-in pairs focus it, apex-out pairs release it; when
+            the four tones phase-lock the centre convergence R climbs and the charge rings out through the
+            air-gap slot &mdash; a resonant mining tool.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const PSEUDOCODE = `function rhombus_squared_gate(Gamma, r_a, drive, lpe):
     # 1. the building -- a rhombus tiled by rhombi (rhombus squared)
     shell = rhombus(hw, hh)
@@ -506,7 +743,14 @@ const PSEUDOCODE = `function rhombus_squared_gate(Gamma, r_a, drive, lpe):
     if gate_open:
         link(this_world, other_world)          # filaments across the throat
 
-    return gate_open`;
+    # 5. four-cavity piezo -- stress on quartz inclusions makes charge
+    for cell in cavities(4):                    # quadrant / tetrahedral symmetry
+        stress = drive * (focus if apex_in else release)
+        V_cell = d * stress                     # direct piezoelectric effect
+    R = order_parameter(cells)                  # convergence when tones phase-lock
+    ring_out(sum(V_cell)) through air_gap_slot  # resonant mining tool
+
+    return gate_open, R`;
 
 export default function RhombusGatePage() {
   return (
@@ -527,7 +771,9 @@ export default function RhombusGatePage() {
           throat crosses a threshold: the aperture opens and you slip through to the other world. It is
           the feeling of entering State College &mdash; the home ground where everything reads as
           connected at the same time. Built only from vortex, coherence, and threshold laws already
-          proven inside AETHER.
+          proven inside AETHER. Now the same shell is cut from ringing diabase and carved with four
+          pyramidal cavities &mdash; stress on their quartz inclusions makes charge, and the four tones
+          converge at the centre: a resonant mining tool.
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 8 }}>
           <Chip col={V.vio}>Rhombus &times; Rhombus</Chip>
@@ -536,6 +782,10 @@ export default function RhombusGatePage() {
           <Chip col={V.gold}>LPE Threshold 0.65</Chip>
           <Chip col={V.rose}>The Slip</Chip>
           <Chip col={V.green}>Connected At Once</Chip>
+          <Chip col={V.amb}>Four Cavities</Chip>
+          <Chip col={V.gold}>Piezo Charge</Chip>
+          <Chip col={V.vio}>Ringing Diabase</Chip>
+          <Chip col={V.blue}>Air-Gap Slot</Chip>
         </div>
         <div style={{ height: 1, background: `linear-gradient(90deg,${V.aurora}44,transparent)` }} />
       </div>
@@ -570,9 +820,59 @@ export default function RhombusGatePage() {
         <SlipGateCanvas />
       </div>
 
-      {/* III — math */}
+      {/* III — four-cavity piezo */}
       <div style={{ marginBottom: 42 }}>
-        <SectionHead n="III" title="DEFINED MATHEMATICALLY -- PROVEN AETHER EQUATIONS" col={V.gold} />
+        <SectionHead n="III" title="LIVE -- FOUR-CAVITY PIEZOELECTRIC ENGINE" col={V.amb} />
+        <div style={{ fontFamily: SERIF, fontSize: "0.92rem", color: "rgba(184,204,232,0.7)",
+          lineHeight: 1.55, marginBottom: 14, maxWidth: 820 }}>
+          The same rhombus, cut from ringing diabase and cupped like a shell, is carved with four
+          pyramidal cavities set in quadrant &mdash; tetrahedral &mdash; symmetry. Their apexes alternate
+          in and out: apex-in pairs focus the driving stress, apex-out pairs release it. Each cavity holds
+          quartz inclusions, and stress on quartz makes charge &mdash; the piezoelectric effect. When the
+          four tones phase-lock, their charge converges at the central vortex and rings out through the
+          bottom air-gap slot &mdash; the &quot;stick removed&quot; channel that lets the stone slip and
+          resonate. Drive the stress and watch the convergence R climb.
+        </div>
+        <FourCavityPiezoCanvas />
+      </div>
+
+      {/* IV — source images */}
+      <div style={{ marginBottom: 42 }}>
+        <SectionHead n="IV" title="THE VISION -- RINGING DIABASE, CARVED IN ENERGY" col={V.vio} />
+        <div style={{ fontFamily: SERIF, fontSize: "0.92rem", color: "rgba(184,204,232,0.7)",
+          lineHeight: 1.55, marginBottom: 16, maxWidth: 820 }}>
+          The four studies that seeded this page: a rhombus of stone with a vortex carved into its field
+          and a slot cut at its base; a cutaway showing the four-arm convergence at the core; the gate
+          read as a pyramid with cavity wells; and the resonant mining tool that carries the four cavities
+          into rock.
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <Plate src={imgVortexStone} col={V.blue} title="Rhombus Stone -- Field + Slot"
+            cap="The ringing rhombus with a vortex carved into the surrounding energy and the rectangular air-gap slot cut at its base." />
+          <Plate src={imgCutawayVortex} col={V.aurora} title="Cutaway -- Four-Arm Convergence"
+            cap="A section through the block: four arms spiral into a single convergence core seated on a clear resonant base." />
+          <Plate src={imgPyramidGate} col={V.gold} title="Pyramid Gate -- Cavity Wells"
+            cap="The gate read as a pyramid: a triangular vortex above, circular cavity wells opening at the base." />
+          <Plate src={imgResonantTool} col={V.amb} title="Resonant Mining Tool"
+            cap="The four pyramidal cavities carried into a tool -- quadrant symmetry, acoustic rings, quartz charge cracking rock." />
+        </div>
+        <div style={{ marginTop: 16, padding: "14px 16px", borderRadius: 8,
+          background: `${V.vio}08`, border: `1px solid ${V.vio}28` }}>
+          <div style={{ fontFamily: MONO, fontSize: 8, color: V.vio, letterSpacing: "0.14em", marginBottom: 8 }}>
+            IMAGE -&gt; MECHANISM MAP
+          </div>
+          <Anno k="Shell" v="Rhombus of ringing diabase, cupped so the whole body resonates as one bell." col={V.vio} />
+          <Anno k="Cavities" v="Four pyramids in quadrant / tetrahedral symmetry, apexes alternating in and out." col={V.blue} />
+          <Anno k="Quartz" v="Inclusions in each cavity convert stress to charge -- the piezoelectric source." col={V.gold} />
+          <Anno k="Convergence" v="The four tones meet at the central vortex; phase-lock amplifies the charge." col={V.aurora} />
+          <Anno k="Air-gap slot" v="Bottom rectangular channel (the removed stick) lets the stone slip and set its acoustic pitch." col={V.amb} />
+          <Anno k="Use" v="Carried into rock it becomes a resonant mining tool -- charge and sound, not brute force." col={V.rose} />
+        </div>
+      </div>
+
+      {/* V — math */}
+      <div style={{ marginBottom: 42 }}>
+        <SectionHead n="V" title="DEFINED MATHEMATICALLY -- PROVEN AETHER EQUATIONS" col={V.gold} />
         <div style={{ fontFamily: SERIF, fontSize: "0.86rem", color: "rgba(184,204,232,0.6)",
           lineHeight: 1.5, marginBottom: 14, maxWidth: 820 }}>
           The gate composes laws AETHER already carries &mdash; the vortex velocity field, the
@@ -605,6 +905,18 @@ export default function RhombusGatePage() {
             { c: V.fire, t: "Connection at the same time",
               tex: "\\Psi=\\Psi_{\\text{here}}\\otimes\\Psi_{\\text{there}}\\;(\\text{gate open})",
               d: "When open, the two worlds are not sequential but joined -- a tensor of both states, present at once. The felt meaning of everything connected at the same time." },
+            { c: V.gold, t: "Direct piezoelectric effect",
+              tex: "Q=d_{33}\\,F,\\qquad V=\\dfrac{Q}{C}",
+              d: "Stress on the quartz inclusions produces charge in proportion to the piezoelectric coefficient d. Divide by the cavity capacitance C and it reads out as a voltage." },
+            { c: V.blue, t: "Cavity quarter-wave resonance",
+              tex: "f_{\\text{res}}=\\dfrac{c}{4L_{\\text{eff}}}",
+              d: "Each pyramidal cavity plus the bottom air-gap slot behaves like a closed pipe. Tightening the slot shortens the effective column and rings the stone at a higher pitch." },
+            { c: V.aurora, t: "Four-cavity convergence",
+              tex: "R=\\dfrac{1}{\\sum_i v_i}\\Bigl|\\textstyle\\sum_i v_i\\,e^{\\,i(\\omega t+\\phi_i)}\\Bigr|",
+              d: "The Kuramoto order parameter of the four cavity voltages. When their tones phase-lock, R rises toward 1 and the charge converges at the centre." },
+            { c: V.rose, t: "Apex focus / quadrant phase",
+              tex: "v_i=d\\,\\sigma_i\\cdot\\!\\begin{cases}1.35&\\text{apex-in}\\\\0.8&\\text{apex-out}\\end{cases},\\;\\phi_i=i\\,\\delta\\pi",
+              d: "Apex-in cavities focus the stress, apex-out release it; the detune spread delta sets each cavity's phase, giving the four distinct tones that lock into one." },
           ].map((e) => (
             <div key={e.t} style={{ padding: "14px 16px", borderRadius: 8,
               background: `${e.c}08`, border: `1px solid ${e.c}30` }}>
@@ -621,9 +933,9 @@ export default function RhombusGatePage() {
         </div>
       </div>
 
-      {/* IV — architecture */}
+      {/* VI — architecture */}
       <div style={{ marginBottom: 42 }}>
-        <SectionHead n="IV" title="THE MECHANISM -- BUILD, CARVE, CROSS" col={V.aurora} />
+        <SectionHead n="VI" title="THE MECHANISM -- BUILD, CARVE, CROSS" col={V.aurora} />
         <div style={{ fontFamily: SERIF, fontSize: "0.92rem", color: "rgba(184,204,232,0.7)",
           lineHeight: 1.55, marginBottom: 12, maxWidth: 820 }}>
           One pass: build the rhombus-squared shell, carve the vortex hole, raise the coherence until it
@@ -635,9 +947,9 @@ export default function RhombusGatePage() {
           padding: "16px 18px", overflowX: "auto", margin: 0 }}>{PSEUDOCODE}</pre>
       </div>
 
-      {/* V — verbal */}
+      {/* VII — verbal */}
       <div style={{ marginBottom: 42 }}>
-        <SectionHead n="V" title="DEFINED VERBALLY -- THE HOME GROUND" col={V.vio} />
+        <SectionHead n="VII" title="DEFINED VERBALLY -- THE HOME GROUND" col={V.vio} />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             { c: V.vio, t: "A shape made of itself",
@@ -652,6 +964,12 @@ export default function RhombusGatePage() {
               b: "The home ground is not just a location on the left of the canvas -- it is the reference frame, the place from which the connection is felt. The gate opens from where you already are. The other world is reached by deepening the centre you stand on, not by leaving it." },
             { c: V.rose, t: "Only proven equations",
               b: "Nothing here is invented for the page. The vortex velocity field, the coherence field, the golden-ratio nesting, and the LPE threshold all already live inside AETHER. The only new step is carving them into one gate -- a rhombus-squared shell, a vortex throat, and a single number to cross." },
+            { c: V.amb, t: "Stone that rings",
+              b: "The shell is cut from diabase -- a dense, quartz-bearing stone that rings when struck. Cupped into a rhombus, the whole body becomes one bell: strike it anywhere and the four cavities answer together. The material is not a container for the mechanism; the material is the mechanism." },
+            { c: V.gold, t: "Four cavities, one bell",
+              b: "The four pyramidal cavities sit in quadrant, tetrahedral symmetry, apexes alternating in and out. Apex-in pairs pull the stress inward and focus it; apex-out pairs push it back and release it. This in-out breathing is what keeps the tones distinct until they choose to phase-lock and converge at the centre." },
+            { c: V.blue, t: "Charge, not force",
+              b: "Because stress on quartz makes charge, the tool mines by resonance rather than brute impact: drive the cavities, let the tones lock, and the converged charge and sound do the work. The bottom air-gap slot -- the removed stick -- lets the stone slip and sets the pitch, so the same body can be tuned to the rock it meets." },
           ].map((e) => (
             <div key={e.t} style={{ padding: "14px 16px", borderRadius: 8,
               background: `${e.c}08`, border: `1px solid ${e.c}28` }}>
