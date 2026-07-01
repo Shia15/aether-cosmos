@@ -305,6 +305,7 @@ const NAV_ITEMS = [
   { href: "/guf-coins",              label: "GUF Coin Gallery · Flippable PHICOIN · HLV · Eugacycle · SRC Numismatics",     icon: Circle },
   { href: "/guf-observatory",        label: "GUF Observatory · Live D1–D7 Coherence · HLV Wave · CGL · Eugacycle · Event Bus", icon: Gauge },
   { href: "/periodic-table",         label: "AETHER Periodic Table · Clickable Matter Synthesis Substrates · Emitters · Materials · Operators", icon: Grid3x3 },
+  { href: "/bismuth",                label: "Bismuth · Helium Nuclei · Alpha Particles · Coulomb Barrier · Astatine Synthesis · Energy Threshold", icon: Zap },
   { href: "/helical-framework",      label: "Unified Helical Aether Framework · Ptah · AQUA CXE · CUCA · Cosmos",        icon: Layers },
   { href: "/robot-strokes",          label: "Filament String Mechanics · 6 Robot Stroke Primitives · phi-Coherence",     icon: Waves },
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
