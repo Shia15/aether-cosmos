@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "6daU7_QPmw0Wi_HQ-6VAC"
+uri = "file://artifacts/aether/public/audio/aether-ambient.mp3"
+type = "audio"
+title = "aether ambient bed"

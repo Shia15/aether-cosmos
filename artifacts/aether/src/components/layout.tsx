@@ -89,6 +89,7 @@ import {
   Worm,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import BackgroundMusic from "@/components/background-music";
 
 const NAV_ITEMS = [
   { href: "/", label: "Graph Map", icon: Network },
@@ -1024,6 +1025,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       >
         {sidebarContent}
       </aside>
+
+      {/* ── Ambient background music ── */}
+      <BackgroundMusic />
 
       {/* ── Main content ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">

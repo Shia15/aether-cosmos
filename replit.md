@@ -42,6 +42,7 @@ Required Environment Variables:
 - **Interactive Canvases:** Extensive use of interactive live canvases for data visualization and simulation.
 - **Composite TypeScript Projects:** Utilizes TypeScript's project references for efficient type-checking and building.
 - **AI Integration:** Integrates Anthropic for features like auto-titling and section analysis.
+- **Ambient Background Music:** Global self-contained `BackgroundMusic` component (mounted once in `layout.tsx`) plays an AI-generated flowing ambient loop (`artifacts/aether/public/audio/aether-ambient.mp3`, served via `import.meta.env.BASE_URL`). Fixed bottom-right control (z-9998): play/pause toggle with animated equalizer, hover-reveal volume slider, gentle fade in/out, and localStorage persistence (`aether.music.v1`). Respects browser autoplay policy — if autoplay is blocked it pulses a hint and starts on first user gesture (pointerdown/keydown).
 
 ## Product
 
