@@ -309,6 +309,7 @@ const NAV_ITEMS = [
   { href: "/bismuth",                label: "Bismuth · Helium Nuclei · Alpha Particles · Coulomb Barrier · Astatine Synthesis · Energy Threshold", icon: Zap },
   { href: "/quartz-color",           label: "Quartz Color · Reds, Blues & Violets · Iron Impurities · Amethyst / Citrine · High Temperature · Conglomerations", icon: Hexagon },
   { href: "/bio-magnetic-convergence", label: "Bio-Magnetic Technology Convergence · Biology + Magnetism + Medicine · Larmor / T₁-T₂ · Kuramoto Entrainment · Mycelial Signal · Grown Machines", icon: Hexagon },
+  { href: "/aether-habitat", label: "AETHER Regenerative Habitat · Vortex Core · Piezo Bioluminescent Roots · High-κ Dielectric Field Storage · ALD Metamaterial Skin · Fibonacci Tower · Base Isolation", icon: Hexagon },
   { href: "/helical-framework",      label: "Unified Helical Aether Framework · Ptah · AQUA CXE · CUCA · Cosmos",        icon: Layers },
   { href: "/robot-strokes",          label: "Filament String Mechanics · 6 Robot Stroke Primitives · phi-Coherence",     icon: Waves },
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
