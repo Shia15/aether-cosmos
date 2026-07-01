@@ -7,3 +7,4 @@
 - [Canvas simulation input guards](canvas-sim-input-guards.md) — angle-difference metrics must use circular separation (mod 360); date-derived canvas inputs need NaN/isFinite guards or the rAF draw loop crashes
 - [Screenshot tool can't reach deep SPA routes](screenshot-spa-deep-routes.md) — direct screenshot of /deep-route boots the AETHER SPA at `/` (home GraphView), not a bug; verify deep pages via Vite transform + nav, not screenshots
 - [HTML entities in JSX props](jsx-entities-in-props.md) — `&middot;`/`&amp;`/`&mdash;` only decode in JSX text nodes; inside string PROPS (title/sub/role/label) they render literally — use literal glyphs `·`/`—`/`&` instead
+- [Audio volume clamp](audio-volume-clamp.md) — HTMLMediaElement.volume outside [0,1] throws IndexSizeError at runtime; clamp every rAF fade assignment (float easing drifts slightly negative)

@@ -57,14 +57,15 @@ export default function BackgroundMusic() {
     const start = el.volume;
     const t0 = performance.now();
     const dur = 1600;
+    const clamp = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
     const step = (now: number) => {
       const k = Math.min(1, (now - t0) / dur);
       const eased = k * (2 - k);
-      el.volume = start + (target - start) * eased;
+      el.volume = clamp(start + (target - start) * eased);
       if (k < 1) {
         fadeRef.current = requestAnimationFrame(step);
       } else {
-        el.volume = target;
+        el.volume = clamp(target);
         fadeRef.current = null;
         if (onDone) onDone();
       }
