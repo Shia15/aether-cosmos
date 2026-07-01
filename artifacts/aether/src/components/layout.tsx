@@ -302,6 +302,7 @@ const NAV_ITEMS = [
   { href: "/engine-designer",        label: "Matter Room Engine Designer · Medium × Scale × Coherence Engine Synthesiser", icon: Cpu },
   { href: "/gobekli-plasma",         label: "Göbekli Plasma Bounce · 18-Pillar Sequential Plasma Arc Simulator",           icon: Zap },
   { href: "/guf-coins",              label: "GUF Coin Gallery · Flippable PHICOIN · HLV · Eugacycle · SRC Numismatics",     icon: Circle },
+  { href: "/guf-observatory",        label: "GUF Observatory · Live D1–D7 Coherence · HLV Wave · CGL · Eugacycle · Event Bus", icon: Gauge },
   { href: "/helical-framework",      label: "Unified Helical Aether Framework · Ptah · AQUA CXE · CUCA · Cosmos",        icon: Layers },
   { href: "/robot-strokes",          label: "Filament String Mechanics · 6 Robot Stroke Primitives · phi-Coherence",     icon: Waves },
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
