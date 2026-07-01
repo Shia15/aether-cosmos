@@ -108,6 +108,7 @@ const NAV_ITEMS = [
   { href: "/compote-chips",   label: "Crunchy Compote Chips",   icon: Leaf },
   { href: "/gradient-field",  label: "Gradient Field · Mechanisms Map · Helical Vacuum Flow · Pyramidal Engine · C(x,t) Superposition", icon: Atom },
   { href: "/aether-engine",   label: "AETHER Engine · All Fields Unified · Matter Synthesis · Observer Coupling · Veil Effect · Crystallisation · LPE Gate", icon: Atom },
+  { href: "/dmf-field",       label: "DMF Coherence Field · Grand Synthesis · Master Equation · Rankine Vortex · Water Ring-Layer D8 · 4-Cone UV · Mito ATP · Heart Coupling · Transport Cavity · Emitter Atlas", icon: Atom },
   { href: "/eye-evolution",  label: "Eye Evolution",       icon: Dna },
   { href: "/quantum-substrate",   label: "Quantum Substrate · Diagonalization & Knotting", icon: Atom },
   { href: "/light-forces",        label: "Light · Forces · EM Spectrum · Bending · Fragmentation · Invisible Fields", icon: Atom },
