@@ -158,6 +158,7 @@ function prerenderPlugin(): Plugin {
   const META: Record<string, RouteMeta> = {
     "/": { title: SITE_NAME, description: DEFAULT_DESC },
     "/glossary": { title: `Glossary · ${SITE_NAME}`, description: "A–Z vocabulary of AETHER across 11 categories — search by word, definition, or etymology." },
+    "/coherence-atlas": { title: `Coherence Atlas · ${SITE_NAME}`, description: "Unified visual index of AETHER's recent threads — knots, bio-photonic emitters, tunnels, the coherence field, and regulation & cosmos, each linking to its source page." },
     "/research": { title: `Research · ${SITE_NAME}`, description: "Explore research synthesis, scientific papers, and coherence analysis within the AETHER knowledge system." },
     "/aether-why": { title: `AETHER · The Why · ${SITE_NAME}`, description: "The founder's letter outlining AETHER's vision — why a coherence-based knowledge system matters." },
     "/knowledge-map": { title: `Knowledge Map · ${SITE_NAME}`, description: "Client-side engine for ingesting and organizing 3000+ image/video files with intelligent categorization." },

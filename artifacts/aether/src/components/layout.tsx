@@ -91,6 +91,7 @@ import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/", label: "Graph Map", icon: Network },
+  { href: "/coherence-atlas", label: "Coherence Atlas · Unified Visual Index · Knots · Emitters · Tunnels · Coherence Field · Regulation & Cosmos", icon: LayoutGrid },
   { href: "/ecosystem", label: "Ecosystem", icon: Brain },
   { href: "/architecture", label: "Architecture", icon: Layers },
   { href: "/pipeline", label: "Pipeline", icon: Workflow },

@@ -3,6 +3,7 @@ import katex from "katex";
 import "katex/dist/katex.min.css";
 import plateLight from "@assets/ChatGPT_Image_Jun_28,_2026,_02_44_54_PM_1782672305141.png";
 import plateDensity from "@assets/ChatGPT_Image_Jun_28,_2026,_02_46_34_PM_1782672398737.png";
+import plateWoodFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_02_38_24_PM_1782919933851.png";
 
 const V = {
   bg:"#05060C",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
@@ -573,6 +574,7 @@ export default function ElectronFieldPage() {
           {[
             { src: plateLight, t: "T + R + A = 1", d: "How a photon meets six substrates -- transmitted, reflected, absorbed -- always summing to one. The law each medium uses to split the field." },
             { src: plateDensity, t: "Spacetime Density Field", d: "rho(x,y) = 1 + 0.5(1 - |V|^2) around an embedded coherence bubble: violet stagnation, amber equator, gold locked interior." },
+            { src: plateWoodFrog, t: "Wood Frog Skin Field", d: "Rana sylvatica survives freezing: guanine nanocrystals in a Bouligand helix form a gyroid photonic skin whose coherence field C(x,t)=A(x)e^{i(phi-wt)} collapses in amplitude as ~70% of its water turns to ice." },
           ].map((p) => (
             <figure key={p.t} style={{ margin: 0, borderRadius: 8, overflow: "hidden",
               border: `1px solid ${V.dim}44`, background: "#070A12" }}>

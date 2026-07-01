@@ -4,6 +4,11 @@ import "katex/dist/katex.min.css";
 import emitterCoherence from "@assets/ChatGPT_Image_Jun_28,_2026,_02_14_27_PM_1782670485215.png";
 import emitterSubstrate from "@assets/ChatGPT_Image_Jun_28,_2026,_02_17_55_PM_1782670690599.png";
 import emitterCerulean from "@assets/ChatGPT_Image_Jun_28,_2026,_02_19_47_PM_1782670795970.png";
+import emitterPhiOvertone from "@assets/ChatGPT_Image_Jun_30,_2026,_11_10_19_AM_1782920506186.png";
+import emitterCarmineIR from "@assets/ChatGPT_Image_Jun_30,_2026,_11_13_30_AM_1782920506187.png";
+import emitterPhantomIR from "@assets/ChatGPT_Image_Jun_30,_2026,_11_33_02_AM_1782920506188.png";
+import emitterCoralSWIR from "@assets/f2d30afa-9b9d-4fff-bc30-52d2d2799891_1782920506190.png";
+import bodyPhoton from "@assets/image_(31)_1782920506189.jpg";
 
 const V = {
   bg:"#04060E",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
@@ -765,6 +770,18 @@ export default function SoiBuilding(){
             {img:emitterSubstrate,name:"Substrate-Dark",band:"1550 nm -- SWIR",col:V.plasma,
               eta:"eta_Q ~0.002",half:"half-life <1 min",sub:"silica nanoporous matrix",
               body:"Deep-SWIR coral-luciferase hybrid at the telecom C-band -- lets living tissue inject signal directly into photonic fibre."},
+            {img:emitterPhiOvertone,name:"Phi-Squared Overtone",band:"1377 nm -- SWIR",col:V.fire,
+              eta:"eta_Q ~0.003",half:"half-life <1 min",sub:"kappa-carrageenan + silica",
+              body:"A phi-squared-Luc luciferase tuned along a torsion-helix to toroid harmonic -- the overtone channel that folds the golden ratio directly into its emission window."},
+            {img:emitterCarmineIR,name:"Carmine-IR",band:"690 nm -- deep red",col:V.rose,
+              eta:"eta_Q 0.06",half:"half-life 10 min",sub:"mycelium substrate",
+              body:"A BphS1-NLuc bacteriophytochrome fusion on a biliverdin luciferin -- the longest-lived channel, imaging bacteria straight through the photosynthesis zone."},
+            {img:emitterPhantomIR,name:"Phantom-IR",band:"760 nm -- NIR-I",col:V.amb,
+              eta:"eta_Q 0.03",half:"half-life 6 min",sub:"gyroid photonic crystal",
+              body:"An OplIR luciferase with a furimazine-IR analog -- a clean phantom-imaging channel that clears GFP, RFP and BFP background inside living tissue."},
+            {img:emitterCoralSWIR,name:"CoralLuc-SWIR",band:"1550 nm -- C-band",col:V.gold,
+              eta:"eta_Q ~0.002",half:"half-life <1 min",sub:"silica nanoporous coral",
+              body:"A coral-luciferase hybrid rendered as living reef -- injects bio-signal straight into telecom C-band fibre across 1530 to 1565 nm."},
           ].map(e=>(
             <figure key={e.name} style={{margin:0,borderRadius:8,overflow:"hidden" as const,
               background:`${e.col}08`,border:`1px solid ${e.col}30`}}>
@@ -793,6 +810,26 @@ export default function SoiBuilding(){
             </figure>
           ))}
         </div>
+        <figure style={{margin:"18px 0 0",borderRadius:8,overflow:"hidden" as const,
+          border:`1px solid ${V.fire}33`,background:`${V.fire}08`}}>
+          <a href={bodyPhoton} target="_blank" rel="noopener noreferrer"
+            style={{display:"block",lineHeight:0}}>
+            <img src={bodyPhoton} alt="Human body blackbody photon emission infographic"
+              loading="lazy" style={{width:"100%",height:"auto",display:"block"}}/>
+          </a>
+          <figcaption style={{padding:"12px 14px"}}>
+            <div style={{fontFamily:DISP,fontSize:"1rem",color:V.fire,letterSpacing:"0.08em"}}>
+              THE BODY ALREADY EMITS
+            </div>
+            <div style={{fontFamily:SERIF,fontSize:"0.82rem",color:"rgba(184,204,232,0.65)",
+              lineHeight:1.45,marginTop:6}}>
+              Before any engineered channel, human skin radiates as a blackbody -- P = pi A T^4,
+              roughly 872 W emitted with 176 W net loss, about 41.1x10^21 photons every second at
+              ~33 C skin against a ~16 C room. The living emitter is the baseline every luciferase
+              channel above is tuned to exceed.
+            </div>
+          </figcaption>
+        </figure>
       </div>
 
       {/* VI — AETHER Build Framing */}

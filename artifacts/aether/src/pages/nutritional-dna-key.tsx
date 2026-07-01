@@ -6,6 +6,7 @@ import plateTrefoil from "@assets/Gemini_Generated_Image_bp8s3tbp8s3tbp8s_178273
 import plateCinquefoil from "@assets/ChatGPT_Image_Jun_29,_2026,_07_06_40_AM_1782732632585.png";
 import plateStevedore from "@assets/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782732622437.png";
 import plateFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_08_58_11_PM_1782732632584.png";
+import plateFigureEight from "@assets/ChatGPT_Image_Jun_29,_2026,_07_31_16_AM_1782919933841.png";
 
 const V = {
   bg:"#05060C",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
@@ -556,6 +557,7 @@ export default function NutritionalDnaKeyPage() {
             { src: plateCinquefoil, t: "Cinquefoil Knot 5_1", d: "Torus knot T(2,5), winding number 2 -- pentagonal symmetry seen in viral capsids and wood-frog guanine arrays." },
             { src: plateStevedore, t: "Stevedore Knot 6_1", d: "The topology gate and its invariants: Alexander, Jones, determinant, hyperbolic volume." },
             { src: plateFrog, t: "Wood Frog Coherence", d: "The coherence field C(x,t)=A(x)e^{i(phi-wt)} and the 6_1 crossings that gate crystallisation." },
+            { src: plateFigureEight, t: "Figure-Eight Knot 4_1", d: "The amphichiral 4_1 knot -- four crossings, winding number 1 -- seen in DNA supercoiling and RNA pseudoknots; its coherence field climbs to 0.84." },
           ].map((p) => (
             <figure key={p.t} style={{ margin: 0, borderRadius: 8, overflow: "hidden",
               border: `1px solid ${V.dim}44`, background: "#070A12" }}>
