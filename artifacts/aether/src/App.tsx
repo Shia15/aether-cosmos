@@ -351,6 +351,7 @@ const GufObservatoryPage = lazy(() => import("@/pages/guf-observatory"));
 const PeriodicTablePage = lazy(() => import("@/pages/periodic-table"));
 const BismuthPage = lazy(() => import("@/pages/bismuth"));
 const QuartzColorPage = lazy(() => import("@/pages/quartz-color"));
+const BioMagneticConvergencePage = lazy(() => import("@/pages/bio-magnetic-convergence"));
 const HelicalFrameworkPage = lazy(() => import("@/pages/helical-framework"));
 const RobotStrokesPage = lazy(() => import("@/pages/robot-strokes"));
 const FlowerClockPage = lazy(() => import("@/pages/flower-clock"));
@@ -1315,6 +1316,7 @@ function Router() {
                 <Route path="/periodic-table"      component={PeriodicTablePage} />
                 <Route path="/bismuth"             component={BismuthPage} />
                 <Route path="/quartz-color"        component={QuartzColorPage} />
+                <Route path="/bio-magnetic-convergence" component={BioMagneticConvergencePage} />
                 <Route path="/helical-framework"   component={HelicalFrameworkPage} />
                 <Route path="/robot-strokes"       component={RobotStrokesPage} />
                 <Route path="/flower-clock"        component={FlowerClockPage} />
