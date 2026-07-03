@@ -459,6 +459,8 @@ const CompleteIntegrationPage   = lazy(() => import("@/pages/complete-integratio
 const AetherSymbolReferencePage = lazy(() => import("@/pages/aether-symbol-reference"));
 const AetherWhitepaperV2Page    = lazy(() => import("@/pages/aether-whitepaper-v2"));
 const DailyRitualPage           = lazy(() => import("@/pages/daily-ritual"));
+const CoherentBodyPage          = lazy(() => import("@/pages/coherent-body"));
+const LightBodyPage             = lazy(() => import("@/pages/light-body"));
 
 const queryClient = new QueryClient();
 
@@ -1375,6 +1377,8 @@ function Router() {
                 <Route path="/aether-symbol-reference" component={AetherSymbolReferencePage} />
                 <Route path="/aether-whitepaper-v2" component={AetherWhitepaperV2Page} />
                 <Route path="/daily-ritual" component={DailyRitualPage} />
+                <Route path="/coherent-body" component={CoherentBodyPage} />
+                <Route path="/light-body" component={LightBodyPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>

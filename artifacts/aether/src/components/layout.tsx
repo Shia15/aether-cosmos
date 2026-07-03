@@ -532,6 +532,8 @@ const NAV_ITEMS = [
   { href: "/air-nanotube",           label: "Air Nanotube Transport · Pressure Propulsion · Pressurize → Launch → Glide · Tube Network Topology · Mini Robotic Ethos · Airlock Nodes · Programmable Routing", icon: Waypoints},
   { href: "/resonant-tunnel",        label: "Living Resonant Tunnel · Waterproof Graphene · Hoop-Stress σ = P·r/t · Depth → Pressure · Knot Routing · Lunar Energy Harvest · Custom Energy Flow · Resonant Living Spectrum", icon: Moon},
   { href: "/inertial-propulsion",    label: "Inertial Tube Drive · Inchworm Gait · Reaction Mass → Speed · Optimal Cadence f* · Magnetic Adhesion · Plate-Weight Switching · Hydroplanation Film · In-Tube Bioreactor · Air + Energy Growth", icon: Worm},
+  { href: "/coherent-body",          label: "The Coherent Body · Cellular Clock · Stimulated vs Self-Organized · Dual Kuramoto Synchrony · Order Parameter r · Internal Synchronizing Clock ψ · State-Aware Cells", icon: HeartPulse},
+  { href: "/light-body",             label: "Light Body Genesis · Big Bang → All Life · Cosmic Emergence Timeline · Matter → Light Crystallization · Human / Animal / Tree · Coherence Cosmology 𝒞→1", icon: Sparkles},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────
