@@ -15,6 +15,7 @@ const BLUE  = "#1080D8";
 const CYAN  = "#20C8D8";
 const TEXT  = "#B8C8D8";
 const MUTED = "#3A5068";
+const STEEL = "#4A6480";
 const DIM   = "#1A2D44";
 const mono  = "'Space Mono', monospace";
 const serif = "'Cinzel', serif";
