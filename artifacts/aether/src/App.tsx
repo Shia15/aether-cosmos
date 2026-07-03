@@ -448,6 +448,10 @@ const ResonantTunnelPage        = lazy(() => import("@/pages/resonant-tunnel"));
 const InertialPropulsionPage    = lazy(() => import("@/pages/inertial-propulsion"));
 const DiamondFormationPage      = lazy(() => import("@/pages/diamond-formation"));
 const CrystallizationAtlasPage  = lazy(() => import("@/pages/crystallization-atlas"));
+const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
+const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
+const BioComputationalPage      = lazy(() => import("@/pages/bio-computational"));
+const PlasmodiumDeckPage        = lazy(() => import("@/pages/plasmodium-deck"));
 const AetherTheoryDeckPage      = lazy(() => import("@/pages/aether-theory-deck"));
 const CucaWhitePaperPage        = lazy(() => import("@/pages/cuca-white-paper"));
 const AetherUnifiedFrameworkPage = lazy(() => import("@/pages/aether-unified-framework"));
@@ -1368,6 +1372,10 @@ function Router() {
                 <Route path="/aether-whitepaper-v1" component={AetherWhitepaperV1Page} />
                 <Route path="/diamond-formation" component={DiamondFormationPage} />
                 <Route path="/crystallization-atlas" component={CrystallizationAtlasPage} />
+                <Route path="/symbolic-computation" component={SymbolicComputationPage} />
+                <Route path="/kinematic-replication" component={KinematicReplicationPage} />
+                <Route path="/bio-computational" component={BioComputationalPage} />
+                <Route path="/plasmodium-deck" component={PlasmodiumDeckPage} />
                 <Route path="/aether-theory-deck" component={AetherTheoryDeckPage} />
                 <Route path="/cuca-white-paper" component={CucaWhitePaperPage} />
                 <Route path="/aether-unified-framework" component={AetherUnifiedFrameworkPage} />
