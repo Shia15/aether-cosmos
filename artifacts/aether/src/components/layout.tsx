@@ -143,6 +143,7 @@ const NAV_ITEMS = [
   { href: "/cuca-bioengine", label: "CUCA Bioengine · Living Substrate · Bio-Hybrid Computation", icon: Hexagon },
   { href: "/biomimetic-revolutions", label: "Biomimetic Revolutions · Nature-Inspired Engineering · Cross-Domain Principles", icon: Hexagon },
   { href: "/diamond-formation", label: "Diamond Formation · Carbon Crystallization · High-Pressure Lattice · Coherence Analogy", icon: Hexagon },
+  { href: "/crystallization-atlas", label: "Crystallization Atlas · Live Staged Crystallization · All AETHER Atomic Substrates · Diamond · Silicon · SiC · Graphene · Graphite · Si₃N₄ · Quartz · Calcite · BaTiO₃ · Magnetite · NaCl · Ice · Pyrite · Bismuth", icon: Atom },
   { href: "/daily-ritual", label: "Daily Sensing Ritual · Coherence Journal · Body·Planet·Social Coupling · Incoherence Map", icon: BookOpen },
   { href: "/core-resonance", label: "CORE · Resonance Nodule · Orb Aura State · Sigil Growth · Ego Incubation · Cross-Page Synthesis", icon: Atom },
   { href: "/synchrony-field", label: "Synchrony Field · Coupled Oscillator · Phase-Locking · Behavioral Field Simulation · Kuramoto", icon: Atom },
