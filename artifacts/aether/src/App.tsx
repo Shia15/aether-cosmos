@@ -353,6 +353,13 @@ const BismuthPage = lazy(() => import("@/pages/bismuth"));
 const QuartzColorPage = lazy(() => import("@/pages/quartz-color"));
 const BioMagneticConvergencePage = lazy(() => import("@/pages/bio-magnetic-convergence"));
 const AetherHabitatPage = lazy(() => import("@/pages/aether-habitat"));
+const CodebaseSymbolEnginePage = lazy(() => import("@/pages/codebase-symbol-engine"));
+const JavaControlFlowPage = lazy(() => import("@/pages/java-control-flow"));
+const PetrificationTransformationPage = lazy(() => import("@/pages/petrification-transformation"));
+const QAetherResearchPage = lazy(() => import("@/pages/q-aether-research"));
+const ComputationalMathematicsPage = lazy(() => import("@/pages/computational-mathematics"));
+const SubstrateComputingPage = lazy(() => import("@/pages/substrate-computing"));
+const AetherWhitepaperV1Page = lazy(() => import("@/pages/aether-whitepaper-v1"));
 const HelicalFrameworkPage = lazy(() => import("@/pages/helical-framework"));
 const RobotStrokesPage = lazy(() => import("@/pages/robot-strokes"));
 const FlowerClockPage = lazy(() => import("@/pages/flower-clock"));
@@ -1335,6 +1342,13 @@ function Router() {
                 <Route path="/air-nanotube"        component={AirNanotubePage} />
                 <Route path="/resonant-tunnel"     component={ResonantTunnelPage} />
                 <Route path="/inertial-propulsion" component={InertialPropulsionPage} />
+                <Route path="/codebase-symbol-engine" component={CodebaseSymbolEnginePage} />
+                <Route path="/java-control-flow" component={JavaControlFlowPage} />
+                <Route path="/petrification-transformation" component={PetrificationTransformationPage} />
+                <Route path="/q-aether-research" component={QAetherResearchPage} />
+                <Route path="/computational-mathematics" component={ComputationalMathematicsPage} />
+                <Route path="/substrate-computing" component={SubstrateComputingPage} />
+                <Route path="/aether-whitepaper-v1" component={AetherWhitepaperV1Page} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
