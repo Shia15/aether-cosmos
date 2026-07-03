@@ -66,6 +66,139 @@ function Card({ children, title, kicker, accent="#a78bfa" }: {
 }
 
 // ───────────────────────────────────────────────────────────────────────────
+// Coherence Condensation — Cryo × Genesis × Cellular × Atomic → Condensation
+function ccFit(cv: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = cv.clientWidth || 640, h = cv.clientHeight || 340;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { w, h };
+}
+function ccMix(a: number[], b: number[], t: number) {
+  return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+}
+const CC_COLS = 16, CC_ROWS = 8;
+
+function CoherenceCondensationSim() {
+  const cvRef = useRef<HTMLCanvasElement | null>(null);
+  const tRef = useRef(0.85);      // temperature 0..1 (1 = hot)
+  const kRef = useRef(0.5);       // condensation sharpness
+  const targetRef = useRef<number | null>(null);
+  const partsRef = useRef<{ r: number; c: number; gx: number; gy: number; ph: number }[]>([]);
+  const [read, setRead] = useState({ T: 85, C: 0, state: "GAS · DISORDER" });
+
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d"); if (!ctx) return;
+    if (partsRef.current.length === 0) {
+      for (let r = 0; r < CC_ROWS; r++) for (let c = 0; c < CC_COLS; c++)
+        partsRef.current.push({ r, c, gx: Math.random(), gy: Math.random(), ph: Math.random() * Math.PI * 2 });
+    }
+    let raf = 0, t = 0, frame = 0;
+    const HOT = [255, 90, 106], WARM = [247, 201, 72], COLD = [95, 200, 255], ICE = [168, 122, 255];
+    const loop = () => {
+      const { w, h } = ccFit(cv, ctx);
+      if (targetRef.current !== null) {
+        tRef.current += (targetRef.current - tRef.current) * 0.03;
+        if (Math.abs(targetRef.current - tRef.current) < 0.005) { tRef.current = targetRef.current; targetRef.current = null; }
+      }
+      const T = Math.max(0, Math.min(1, tRef.current)), k = kRef.current;
+      const cold = 1 - T;
+      const O = 1 / (1 + Math.exp(-((cold - 0.5) * (6 + k * 18)))); // order parameter 𝒞
+      t += 0.02; frame++;
+      ctx.fillStyle = "#070a14"; ctx.fillRect(0, 0, w, h);
+      const marginX = w * 0.08, marginY = 26;
+      const gridW = w - marginX * 2, gridH = h - marginY * 2 - 34;
+      const sx = gridW / (CC_COLS - 1), sy = gridH / (CC_ROWS - 1);
+      const lx = (c: number) => marginX + c * sx;
+      const ly = (r: number) => marginY + r * sy;
+      if (O > 0.5) {
+        const a = Math.min(1, (O - 0.5) / 0.45);
+        ctx.strokeStyle = `rgba(168,122,255,${(a * 0.5).toFixed(3)})`;
+        ctx.lineWidth = 1; ctx.beginPath();
+        for (const p of partsRef.current) {
+          const x1 = lx(p.c), y1 = ly(p.r);
+          if (p.c < CC_COLS - 1) { ctx.moveTo(x1, y1); ctx.lineTo(lx(p.c + 1), ly(p.r)); }
+          if (p.r < CC_ROWS - 1) { ctx.moveTo(x1, y1); ctx.lineTo(lx(p.c), ly(p.r + 1)); }
+        }
+        ctx.stroke();
+      }
+      const jit = (1 - O) * 26;
+      for (const p of partsRef.current) {
+        const gx = marginX + p.gx * gridW, gy = marginY + p.gy * gridH;
+        const tx = lx(p.c), ty = ly(p.r);
+        const jx = Math.cos(t * 2 + p.ph) * jit, jy = Math.sin(t * 2.3 + p.ph) * jit;
+        const bx = gx + jx, by2 = gy + jy;
+        const x = bx + (tx - bx) * O, y = by2 + (ty - by2) * O;
+        let col: string;
+        if (O < 0.5) col = ccMix(HOT, WARM, O / 0.5);
+        else col = ccMix(WARM, O < 0.8 ? COLD : ICE, (O - 0.5) / 0.5);
+        ctx.beginPath(); ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+        ctx.fillStyle = col;
+        ctx.shadowBlur = O > 0.6 ? 8 * O : 3; ctx.shadowColor = col;
+        ctx.fill(); ctx.shadowBlur = 0;
+      }
+      const barY = h - 20;
+      const regimes = ["GAS", "GENESIS", "CELLULAR", "ATOMIC"];
+      const rc = [HOT, WARM, COLD, ICE];
+      const segW = (w - marginX * 2) / 4;
+      for (let i = 0; i < 4; i++) {
+        ctx.fillStyle = `rgba(${rc[i][0]},${rc[i][1]},${rc[i][2]},0.5)`;
+        ctx.fillRect(marginX + i * segW, barY, segW - 3, 6);
+        ctx.fillStyle = "#94a3b8"; ctx.font = "9px monospace";
+        ctx.fillText(regimes[i], marginX + i * segW + 2, barY - 4);
+      }
+      const mx = marginX + O * (w - marginX * 2);
+      ctx.beginPath(); ctx.arc(mx, barY + 3, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#f1f5f9"; ctx.fill();
+      if (frame % 6 === 0) {
+        let st = "GAS · DISORDER";
+        if (O >= 0.8) st = "ATOMIC LATTICE · COHERENT CONDENSATE";
+        else if (O >= 0.55) st = "CELLULAR · ORGANIZING";
+        else if (O >= 0.3) st = "GENESIS · NUCLEATION";
+        setRead({ T: Math.round(T * 100), C: Math.round(O * 100), state: st });
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const bstyle = (c: string): React.CSSProperties => ({
+    padding: "0.5rem 0.9rem", borderRadius: 8, cursor: "pointer",
+    background: "rgba(0,0,0,0.4)", border: `1px solid ${c}`, color: c,
+    fontFamily: "'DM Mono',monospace", fontSize: 12, letterSpacing: "0.08em",
+  });
+
+  return (
+    <div style={{ padding: "1.4rem", borderRadius: 16, background: "rgba(7,10,20,0.7)", border: "1px solid rgba(167,139,250,0.18)" }}>
+      <canvas ref={cvRef} style={{ width: "100%", height: 340, display: "block", borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)" }} />
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14, marginTop: "1.1rem" }}>
+        <button onClick={() => { targetRef.current = 0.02; }} style={bstyle("#5ec8ff")}>❄ Freeze · Cryo</button>
+        <button onClick={() => { targetRef.current = 0.95; }} style={bstyle("#ff5a6a")}>♨ Heat</button>
+        <label style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 180 }}>
+          <span style={{ ...KICKER, marginBottom: 0 }}>Temperature</span>
+          <input type="range" min={0} max={1} step={0.01} defaultValue={0.85}
+            onChange={e => { tRef.current = parseFloat(e.target.value); targetRef.current = null; }}
+            style={{ accentColor: "#5ec8ff" }} />
+        </label>
+        <label style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 180 }}>
+          <span style={{ ...KICKER, marginBottom: 0 }}>Condensation sharpness κ</span>
+          <input type="range" min={0} max={1} step={0.01} defaultValue={0.5}
+            onChange={e => { kRef.current = parseFloat(e.target.value); }}
+            style={{ accentColor: "#a78bfa" }} />
+        </label>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 20, marginTop: "1rem", fontFamily: "'DM Mono',monospace", fontSize: 12.5, color: "#94a3b8" }}>
+        <div>temperature: <span style={{ color: "#5ec8ff" }}>{read.T}%</span></div>
+        <div>coherence 𝒞: <span style={{ color: read.C > 55 ? "#7DCC92" : "#f7c948" }}>{read.C}%</span></div>
+        <div>state: <span style={{ color: "#f1f5f9" }}>{read.state}</span></div>
+      </div>
+    </div>
+  );
+}
+
+// ───────────────────────────────────────────────────────────────────────────
 // Live photochemistry sim — 4 jars + accumulating precipitate + chart
 function PhotochemSim() {
   const [running, setRunning] = useState(true);
@@ -754,8 +887,37 @@ export default function SubstrateSynthesisPage() {
           <Plate src={treeOfLife} caption="Tree of Life (Institut Pasteur, Feb 2023). LUCA at the centre; Bacteria (purple) and Archaea (cream) on either side; Eukarya inset (teal). Schematic illustrations at each leaf." aspect="16/10"/>
         </Section>
 
+        {/* Coherence Condensation */}
+        <Section
+          anchor="coherence-condensation"
+          kicker="VIII · Coherence Condensation"
+          title="Cryo × Genesis × Cellular × Atomic → Condensation"
+          lead="One move underlies freezing, the genesis of form, cellular organisation, and atomic-lattice order: as heat leaves a system, disorder falls, coherence 𝒞 rises, and matter condenses into an ordered state. Drop the temperature (Cryo) and scattered, jittering matter crosses through nucleation and cellular organisation into a locked atomic lattice — the same condensation, read at four scales, synthesising coherence states."
+        >
+          <CoherenceCondensationSim />
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap:"0.9rem", marginTop:"1.2rem" }}>
+            <Card kicker="Cryo · Freezing" title="Heat leaves → order enters" accent="#5ec8ff">
+              Lowering temperature removes the kinetic jitter that fights structure. As T→0 the coherence length grows and thermal noise can no longer break bonds — the precondition for every condensation below.
+            </Card>
+            <Card kicker="Genesis · Nucleation" title="First seed of form" accent="#f7c948">
+              Condensation begins locally: a fluctuation crosses the nucleation barrier and a first ordered seed appears. Genesis is the birth of the pattern the rest of the field will copy.
+            </Card>
+            <Card kicker="Cellular · Organisation" title="Order propagates" accent="#7DCC92">
+              Around each seed, neighbours align — the cellular scale, where local rules tile into tissue-like domains. Coherence spreads outward as organised cells, not yet a perfect crystal.
+            </Card>
+            <Card kicker="Atomic · Lattice Lock" title="Coherent condensate" accent="#a78bfa">
+              At full order the domains fuse into one lattice: bonds snap taut and the whole field shares a single phase. This is the coherent condensate — matter as one synchronised coherence state.
+            </Card>
+          </div>
+          <div style={{ marginTop:"0.9rem" }}>
+            <Card kicker="Synthesis" title="One law, four scales" accent="#00e5c0">
+              Freezing, genesis, cellular growth, and atomic crystallisation are not four processes but one condensation seen at four magnifications. The order parameter rises as 𝒞 = σ(κ·(1−T − ½)) — a single sigmoid gate turning heat into coherence.
+            </Card>
+          </div>
+        </Section>
+
         {/* Source plates */}
-        <Section kicker="VIII · Source Plates" title="Originals" lead="The infographics and tweets that drive this page.">
+        <Section kicker="IX · Source Plates" title="Originals" lead="The infographics and tweets that drive this page.">
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap:"0.9rem" }}>
             <Plate src={shiaLifeFormula}    caption="Shia Miller · LIFE = Energy Gradient + Medium + Mechanism (8:21 AM · 5/3/26)"/>
             <Plate src={shiaCaCO3}          caption="Shia Miller · 'calculation performed not symbolically but spatiotemporally, in matter, under light' (6:06 PM · 5/3/26)"/>
@@ -771,7 +933,7 @@ export default function SubstrateSynthesisPage() {
         {/* GUF Cross-Reference */}
         <Section
           anchor="guf-cross-reference"
-          kicker="IX · GUF Engine · Cross-Framework Infographics"
+          kicker="X · GUF Engine · Cross-Framework Infographics"
           title="Scale Architecture, Ferrofluid Substrates & Crystallization Control"
           lead="Four infographics from the GUF Master Engine that extend this substrate framework — Optical Scale Hierarchy (0.2 nm→1,000 km), Ferrofluid vs Silicon cross-scale comparison, Layered Optical Crystallization Control, and Accelerated Geological Formation. These are the physical blueprints AETHER's coherence stack is modelled on."
         >
@@ -793,7 +955,7 @@ export default function SubstrateSynthesisPage() {
         {/* LinkedIn Image Archive */}
         <Section
           anchor="linkedin-archive"
-          kicker="X · LinkedIn Archive"
+          kicker="XI · LinkedIn Archive"
           title="Friday April 24th — 227 Slides"
           lead="Full image archive extracted from the LinkedIn post collection. Slides load on demand — 40 per page. Click any slide to open it full-screen. Use the jump box to go directly to a slide number."
         >
@@ -804,7 +966,7 @@ export default function SubstrateSynthesisPage() {
         {/* GPT Image Archive */}
         <Section
           anchor="gpt-archive"
-          kicker="X · GPT Image Archive"
+          kicker="XII · GPT Image Archive"
           title="315 GPT Images"
           lead="ChatGPT-generated image collection — 235 images available. Loads 40 per page. Click any image to open full-screen. Use the jump box to go directly to a specific image number."
         >
