@@ -534,6 +534,7 @@ const NAV_ITEMS = [
   { href: "/inertial-propulsion",    label: "Inertial Tube Drive · Inchworm Gait · Reaction Mass → Speed · Optimal Cadence f* · Magnetic Adhesion · Plate-Weight Switching · Hydroplanation Film · In-Tube Bioreactor · Air + Energy Growth", icon: Worm},
   { href: "/coherent-body",          label: "The Coherent Body · Cellular Clock · Stimulated vs Self-Organized · Dual Kuramoto Synchrony · Order Parameter r · Internal Synchronizing Clock ψ · State-Aware Cells", icon: HeartPulse},
   { href: "/light-body",             label: "Light Body Genesis · Big Bang → All Life · Cosmic Emergence Timeline · Matter → Light Crystallization · Human / Animal / Tree · Coherence Cosmology 𝒞→1", icon: Sparkles},
+  { href: "/cloud-transport-warp",   label: "Cloud Transport System · Warp Drive Synthesis · Alcubierre Metric θ(x,y) · Solar + Planetary + Warp Unified · Matter-as-Cloud · Coherence Bubble · Elements of Motion", icon: Rocket},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

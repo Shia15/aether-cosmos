@@ -461,6 +461,7 @@ const AetherWhitepaperV2Page    = lazy(() => import("@/pages/aether-whitepaper-v
 const DailyRitualPage           = lazy(() => import("@/pages/daily-ritual"));
 const CoherentBodyPage          = lazy(() => import("@/pages/coherent-body"));
 const LightBodyPage             = lazy(() => import("@/pages/light-body"));
+const CloudTransportWarpPage    = lazy(() => import("@/pages/cloud-transport-warp"));
 
 const queryClient = new QueryClient();
 
@@ -1379,6 +1380,7 @@ function Router() {
                 <Route path="/daily-ritual" component={DailyRitualPage} />
                 <Route path="/coherent-body" component={CoherentBodyPage} />
                 <Route path="/light-body" component={LightBodyPage} />
+                <Route path="/cloud-transport-warp" component={CloudTransportWarpPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
