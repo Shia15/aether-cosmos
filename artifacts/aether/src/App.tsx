@@ -448,6 +448,7 @@ const ResonantTunnelPage        = lazy(() => import("@/pages/resonant-tunnel"));
 const InertialPropulsionPage    = lazy(() => import("@/pages/inertial-propulsion"));
 const DiamondFormationPage      = lazy(() => import("@/pages/diamond-formation"));
 const CrystallizationAtlasPage  = lazy(() => import("@/pages/crystallization-atlas"));
+const CompactFusionPage         = lazy(() => import("@/pages/compact-fusion"));
 const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
 const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
 const BioComputationalPage      = lazy(() => import("@/pages/bio-computational"));
@@ -1372,6 +1373,7 @@ function Router() {
                 <Route path="/aether-whitepaper-v1" component={AetherWhitepaperV1Page} />
                 <Route path="/diamond-formation" component={DiamondFormationPage} />
                 <Route path="/crystallization-atlas" component={CrystallizationAtlasPage} />
+                <Route path="/compact-fusion" component={CompactFusionPage} />
                 <Route path="/symbolic-computation" component={SymbolicComputationPage} />
                 <Route path="/kinematic-replication" component={KinematicReplicationPage} />
                 <Route path="/bio-computational" component={BioComputationalPage} />
