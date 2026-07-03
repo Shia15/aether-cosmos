@@ -451,6 +451,7 @@ const CrystallizationAtlasPage  = lazy(() => import("@/pages/crystallization-atl
 const CompactFusionPage         = lazy(() => import("@/pages/compact-fusion"));
 const SynapticEntropyPage       = lazy(() => import("@/pages/synaptic-entropy"));
 const SlinkyPropulsionPage      = lazy(() => import("@/pages/slinky-propulsion"));
+const FerrofluidPropulsionPage  = lazy(() => import("@/pages/ferrofluid-propulsion"));
 const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
 const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
 const BioComputationalPage      = lazy(() => import("@/pages/bio-computational"));
@@ -1378,6 +1379,7 @@ function Router() {
                 <Route path="/compact-fusion" component={CompactFusionPage} />
                 <Route path="/synaptic-entropy" component={SynapticEntropyPage} />
                 <Route path="/slinky-propulsion" component={SlinkyPropulsionPage} />
+                <Route path="/ferrofluid-propulsion" component={FerrofluidPropulsionPage} />
                 <Route path="/symbolic-computation" component={SymbolicComputationPage} />
                 <Route path="/kinematic-replication" component={KinematicReplicationPage} />
                 <Route path="/bio-computational" component={BioComputationalPage} />
