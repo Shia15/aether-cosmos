@@ -446,6 +446,19 @@ const HyperPerceptionPage       = lazy(() => import("@/pages/hyper-perception"))
 const AirNanotubePage           = lazy(() => import("@/pages/air-nanotube"));
 const ResonantTunnelPage        = lazy(() => import("@/pages/resonant-tunnel"));
 const InertialPropulsionPage    = lazy(() => import("@/pages/inertial-propulsion"));
+const DiamondFormationPage      = lazy(() => import("@/pages/diamond-formation"));
+const AetherTheoryDeckPage      = lazy(() => import("@/pages/aether-theory-deck"));
+const CucaWhitePaperPage        = lazy(() => import("@/pages/cuca-white-paper"));
+const AetherUnifiedFrameworkPage = lazy(() => import("@/pages/aether-unified-framework"));
+const CucaBioenginePage         = lazy(() => import("@/pages/cuca-bioengine"));
+const AetherPatentPage          = lazy(() => import("@/pages/aether-patent"));
+const FibonacciQuaternionPage   = lazy(() => import("@/pages/fibonacci-quaternion"));
+const BiomimeticRevolutionsPage = lazy(() => import("@/pages/biomimetic-revolutions"));
+const AetherSynthesisPage       = lazy(() => import("@/pages/aether-synthesis"));
+const CompleteIntegrationPage   = lazy(() => import("@/pages/complete-integration"));
+const AetherSymbolReferencePage = lazy(() => import("@/pages/aether-symbol-reference"));
+const AetherWhitepaperV2Page    = lazy(() => import("@/pages/aether-whitepaper-v2"));
+const DailyRitualPage           = lazy(() => import("@/pages/daily-ritual"));
 
 const queryClient = new QueryClient();
 
@@ -1349,6 +1362,19 @@ function Router() {
                 <Route path="/computational-mathematics" component={ComputationalMathematicsPage} />
                 <Route path="/substrate-computing" component={SubstrateComputingPage} />
                 <Route path="/aether-whitepaper-v1" component={AetherWhitepaperV1Page} />
+                <Route path="/diamond-formation" component={DiamondFormationPage} />
+                <Route path="/aether-theory-deck" component={AetherTheoryDeckPage} />
+                <Route path="/cuca-white-paper" component={CucaWhitePaperPage} />
+                <Route path="/aether-unified-framework" component={AetherUnifiedFrameworkPage} />
+                <Route path="/cuca-bioengine" component={CucaBioenginePage} />
+                <Route path="/aether-patent" component={AetherPatentPage} />
+                <Route path="/fibonacci-quaternion" component={FibonacciQuaternionPage} />
+                <Route path="/biomimetic-revolutions" component={BiomimeticRevolutionsPage} />
+                <Route path="/aether-synthesis" component={AetherSynthesisPage} />
+                <Route path="/complete-integration" component={CompleteIntegrationPage} />
+                <Route path="/aether-symbol-reference" component={AetherSymbolReferencePage} />
+                <Route path="/aether-whitepaper-v2" component={AetherWhitepaperV2Page} />
+                <Route path="/daily-ritual" component={DailyRitualPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
