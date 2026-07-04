@@ -1,302 +1,404 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import { ArrowUpRight } from "lucide-react";
-import imgEngine from "@assets/ChatGPT_Image_Apr_26,_2026,_02_30_07_PM_1777228209576.png";
 
-const B = {
-  bg:        "#0a0612",
-  panel:     "#15091e",
-  panelLite: "#1c0e26",
-  ink:       "#fbf2da",
-  text:      "rgba(248,238,212,0.80)",
-  textWarm:  "rgba(248,238,212,0.92)",
-  muted:     "rgba(248,238,212,0.55)",
-  border:    "rgba(220,140,140,0.18)",
-  blueIce:   "#7cc8ff",
-  cyan:      "#7be4ea",
-  red:       "#ff7a6a",
-  rose:      "#f59ec3",
-  amber:     "#f5b942",
-  green:     "#7be59f",
-  gold:      "#e9b94e",
-  violet:    "#b48cff",
-};
-
-function H({ num, label, accent }: { num: string; label: string; accent: string }) {
-  return (
-    <div className="mb-3">
-      <div className="text-[10px] uppercase tracking-[0.32em]"
-           style={{ color: accent, fontFamily: "Inter, sans-serif" }}>Section {num}</div>
-      <h2 className="text-[22px] mt-1" style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>{label}</h2>
-    </div>
-  );
+const BG="#04060d",PAN="#0a0d1a",PAN2="#0d1020",BORDER="#182038",TEXT="#b8cce8",MUTED="#5a6e8c";
+const GOLD="#ffb830",CYAN="#3fd8d0",VIOLET="#a87aff",GREEN="#50d49a",BLUE="#4ab0ff",ROSE="#f06090";
+function hexA(h:string,a:number){
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
 }
+function mulberry32(s:number){let x=s;return()=>{x|=0;x=x+0x6d2b79f5|0;let t=Math.imul(x^x>>>15,1|x);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 
-function ImgFig({ src, alt, caption }: { src: string; alt: string; caption: string }) {
-  return (
-    <figure className="rounded-md overflow-hidden mt-2" style={{ border: `1px solid ${B.border}`, background: "#000" }}>
-      <img src={src} alt={alt} loading="lazy" decoding="async" className="block w-full h-auto" />
-      <figcaption className="px-4 py-2 text-[10.5px] uppercase tracking-[0.22em]"
-                  style={{ color: B.muted, background: B.panel }}>{caption}</figcaption>
-    </figure>
-  );
-}
+type Substrate="neural"|"ferrofluid"|"plasma"|"fusion"|"crystal"|"bio";
 
-function Chip({ c, l }: { c: string; l: string }) {
-  return (
-    <span className="text-[10.5px] uppercase tracking-[0.22em] px-3 py-1.5 rounded-full border"
-          style={{ color: c, borderColor: c + "55", background: B.panelLite, fontFamily: "ui-monospace, monospace" }}>{l}</span>
-  );
-}
+// ── Master Coherence Field Canvas ─────────────────────────────────────────────────────
+function CoherenceFieldCanvas({substrate,onNucleationCount}:{substrate:Substrate;onNucleationCount:(n:number)=>void;}){
+  const cvRef=useRef<HTMLCanvasElement>(null);
+  const ARef=useRef(0.6);
+  const wRef=useRef(1.0);
+  const kRef=useRef(0.4);
+  const thRef=useRef(0.35);
+  const playRef=useRef(true);
+  const [A,setA]=useState(0.6);
+  const [w,setW]=useState(1.0);
+  const [k,setK]=useState(0.4);
+  const [th,setTh]=useState(0.35);
+  const [playing,setPlaying]=useState(true);
+  useEffect(()=>{ARef.current=A;},[A]);
+  useEffect(()=>{wRef.current=w;},[w]);
+  useEffect(()=>{kRef.current=k;},[k]);
+  useEffect(()=>{thRef.current=th;},[th]);
+  useEffect(()=>{playRef.current=playing;},[playing]);
 
-function Card({ accent, eyebrow, title, body }: { accent: string; eyebrow: string; title: string; body: React.ReactNode }) {
-  return (
-    <div className="rounded-md p-4 border h-full" style={{ borderColor: B.border, background: B.panel }}>
-      <div className="text-[10px] uppercase tracking-[0.28em] mb-1.5" style={{ color: accent, fontFamily: "Inter, sans-serif" }}>{eyebrow}</div>
-      <div className="text-[15px] mb-2" style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>{title}</div>
-      <div className="text-[13px] leading-relaxed" style={{ color: B.text }}>{body}</div>
-    </div>
-  );
-}
+  useEffect(()=>{
+    const cv=cvRef.current; if(!cv) return;
+    const ctx=cv.getContext("2d"); if(!ctx) return;
+    let raf=0,t=0,lastW=0;
+    const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+    const GRIDW=72,GRIDH=40;
+    let phs:number[][]=Array.from({length:GRIDH},()=>Array(GRIDW).fill(0));
 
-function Bridge({ to, label, accent }: { to: string; label: string; accent: string }) {
-  return (
-    <Link href={to} data-testid={`bridge-${to.slice(1)}`}
-          className="rounded-md p-3 border flex items-center justify-between gap-3 hover:opacity-90 transition"
-          style={{ borderColor: B.border, background: B.panel, color: B.ink, fontFamily: "Inter, sans-serif" }}>
-      <span className="text-[12.5px] uppercase tracking-[0.22em]" style={{ color: accent }}>{label}</span>
-      <ArrowUpRight size={14} style={{ color: accent }} />
-    </Link>
-  );
-}
+    const loop=()=>{
+      const dpr=Math.min(2,window.devicePixelRatio||1);
+      const W=cv.clientWidth||900,H=420;
+      if(W!==lastW){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);lastW=W;}
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      if(playRef.current&&!reduced) t+=0.018;
 
-const TABLE = [
-  { row: "Constituents",  h: "p⁺ + e⁻ (proton + electron)", a: "p̄⁻ + e⁺ (antiproton + positron)" },
-  { row: "Charge",        h: "Net zero, with positive nucleus and negative electron", a: "Net zero, with negative nucleus and positive electron" },
-  { row: "Spectrum",      h: "Lyman, Balmer, Paschen series at standard line wavelengths", a: "Predicted identical to hydrogen at the part-per-billion level (CPT)" },
-  { row: "Energy sign",   h: "+ Energy · ▲ Frequency (in the page's framing)", a: "− Energy · ▼ Frequency (mirror reading on the antimatter side)" },
-  { row: "Stability",     h: "Stable", a: "Stable in isolation; annihilates on contact with hydrogen" },
-  { row: "Where made",    h: "Everywhere — the most abundant atom", a: "ALPHA / AEgIS at CERN; small numbers, magnetic-trap confinement" },
-];
+      ctx.fillStyle=BG; ctx.fillRect(0,0,W,H);
 
-const PROBES = [
-  { c: B.cyan,   k: "1S–2S transition", v: "Compared between H and H̄ at the 10⁻¹² level — currently consistent within experimental uncertainty" },
-  { c: B.green,  k: "Gravitational free fall", v: "ALPHA-g (2023) measured antihydrogen falling under gravity — same direction as matter, statistical uncertainty still large" },
-  { c: B.amber,  k: "Charge-to-mass ratio", v: "BASE compared p and p̄ at 10⁻¹¹; consistent with CPT symmetry to that precision" },
-];
+      const Amp=ARef.current,omega=wRef.current,kappa=kRef.current,theta=thRef.current;
+      const cellW=W/GRIDW,cellH=H/GRIDH;
+      let nCount=0;
 
-function CoherenceEngineCanvas() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef(0);
-  useEffect(() => {
-    const canvas = ref.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-    canvas.width = 900; canvas.height = 200;
-    const W = canvas.width, H = canvas.height;
-    const cx=W/2, cy=H/2;
-    const nodes=[
-      { label:"INGEST", col:"#2ef0d8", ang:0, r:80 },
-      { label:"PATTERN", col:"#9966ff", ang:Math.PI*0.4, r:80 },
-      { label:"SYNTH", col:"#c9a84c", ang:Math.PI*0.8, r:80 },
-      { label:"COHERE", col:"#44aaff", ang:Math.PI*1.2, r:80 },
-      { label:"OUTPUT", col:"#44cc77", ang:Math.PI*1.6, r:80 },
-    ];
-    const flows: {from:number,to:number,t:number}[]=[];
-    let tick=0;
-    const draw=()=>{
-      ctx.fillStyle="rgba(4,8,20,0.2)"; ctx.fillRect(0,0,W,H);
-      tick++;
-      if(tick%18===0&&flows.length<14) flows.push({ from:tick%5, to:(tick+2)%5, t:0 });
-      for(let i=flows.length-1;i>=0;i--){
-        const f=flows[i]; f.t+=0.025;
-        const a=nodes[f.from], b=nodes[f.to];
-        const ax=cx+a.r*Math.cos(a.ang), ay=cy+a.r*Math.sin(a.ang);
-        const bx=cx+b.r*Math.cos(b.ang), by=cy+b.r*Math.sin(b.ang);
-        const px=ax+(bx-ax)*f.t, py=ay+(by-ay)*f.t;
-        ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2);
-        ctx.fillStyle=a.col; ctx.shadowColor=a.col; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
-        if(f.t>=1) flows.splice(i,1);
+      for(let gy=0;gy<GRIDH;gy++){
+        for(let gx=0;gx<GRIDW;gx++){
+          const fx=gx/GRIDW,fy=gy/GRIDH;
+          const phase=phs[gy][gx];
+          const r=Math.sqrt((fx-0.5)*(fx-0.5)+(fy-0.5)*(fy-0.5)*0.6);
+          const C=Amp*Math.exp(-kappa*r*2.5)*Math.cos(phase-omega*t*2);
+          const absC=Math.abs(C);
+
+          let col;
+          if(absC>theta){
+            const above=(absC-theta)/(1-theta);
+            if(substrate==="neural") col=hexA(GOLD,above*0.9);
+            else if(substrate==="ferrofluid") col=hexA(CYAN,above*0.85);
+            else if(substrate==="plasma") col=hexA(VIOLET,above*0.85);
+            else if(substrate==="fusion") col=hexA(GREEN,above*0.85);
+            else if(substrate==="crystal") col=hexA(BLUE,above*0.85);
+            else col=hexA(ROSE,above*0.85);
+            nCount++;
+          } else {
+            col=hexA(MUTED,0.04+absC*0.08);
+          }
+          ctx.fillStyle=col;
+          ctx.fillRect(gx*cellW,gy*cellH,cellW+0.5,cellH+0.5);
+          phs[gy][gx]+=0.003+0.004*Math.sin(fx*Math.PI*3+fy*Math.PI*2);
+        }
       }
-      nodes.forEach((n,i)=>{
-        const x=cx+n.r*Math.cos(n.ang), y=cy+n.r*Math.sin(n.ang);
-        if(i<nodes.length-1){ const b=nodes[i+1]; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(cx+b.r*Math.cos(b.ang),cy+b.r*Math.sin(b.ang)); ctx.strokeStyle=n.col+"22"; ctx.lineWidth=1; ctx.stroke(); }
-        ctx.beginPath(); ctx.arc(x,y,12,0,Math.PI*2);
-        ctx.fillStyle=n.col; ctx.shadowColor=n.col; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
-        ctx.fillStyle=n.col; ctx.font="bold 7px 'DM Mono',monospace"; ctx.textAlign="center";
-        ctx.fillText(n.label,x,y+22);
-      });
-      ctx.fillStyle="rgba(46,240,216,0.35)"; ctx.font="9px 'DM Mono',monospace"; ctx.textAlign="left";
-      ctx.fillText("COHERENCE ENGINE · INGEST → PATTERN → SYNTH → COHERE → OUTPUT · AETHER CRYSTALLIZATION MODEL",14,14);
-      rafRef.current=requestAnimationFrame(draw);
+
+      // threshold line label
+      ctx.fillStyle=hexA(TEXT,0.5); ctx.font="11px monospace"; ctx.textAlign="left";
+      ctx.fillText("threshold C\u209c = "+theta.toFixed(2),12,H-12);
+
+      // colorbar
+      const barY=H-28,barW=120,barH=8;
+      const barX=W-barW-14;
+      const tGrad=ctx.createLinearGradient(barX,0,barX+barW,0);
+      tGrad.addColorStop(0,hexA(MUTED,0.3)); tGrad.addColorStop(theta,hexA(MUTED,0.3));
+      const subCol=substrate==="neural"?GOLD:substrate==="ferrofluid"?CYAN:substrate==="plasma"?VIOLET:substrate==="fusion"?GREEN:substrate==="crystal"?BLUE:ROSE;
+      tGrad.addColorStop(theta,subCol); tGrad.addColorStop(1,subCol);
+      ctx.fillStyle=tGrad; ctx.fillRect(barX,barY,barW,barH);
+      ctx.strokeStyle=hexA(TEXT,0.5); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(barX+barW*theta,barY-2); ctx.lineTo(barX+barW*theta,barY+barH+2); ctx.stroke();
+
+      onNucleationCount(nCount);
+      raf=requestAnimationFrame(loop);
     };
-    draw();
-    return ()=>cancelAnimationFrame(rafRef.current);
-  },[]);
-  return <canvas ref={ref} style={{ width:"100%", height:"auto", borderRadius:8, display:"block" }} />;
+    raf=requestAnimationFrame(loop);
+    return ()=>cancelAnimationFrame(raf);
+  },[substrate,onNucleationCount]);
+
+  return (
+    <div>
+      <canvas ref={cvRef} style={{width:"100%",height:420,borderRadius:8,display:"block"}} />
+      <div style={{marginTop:12,display:"flex",gap:14,flexWrap:"wrap",alignItems:"flex-end"}}>
+        <label style={{flex:1,minWidth:140,color:TEXT,fontSize:12,fontFamily:"monospace"}}>
+          Amplitude A
+          <input type="range" min={0.1} max={1} step={0.01} value={A}
+            onChange={e=>{const v=+e.target.value;setA(v);ARef.current=v;}}
+            style={{display:"block",width:"100%",marginTop:4}} />
+        </label>
+        <label style={{flex:1,minWidth:140,color:TEXT,fontSize:12,fontFamily:"monospace"}}>
+          Frequency \u03c9
+          <input type="range" min={0.2} max={3} step={0.1} value={w}
+            onChange={e=>{const v=+e.target.value;setW(v);wRef.current=v;}}
+            style={{display:"block",width:"100%",marginTop:4}} />
+        </label>
+        <label style={{flex:1,minWidth:140,color:TEXT,fontSize:12,fontFamily:"monospace"}}>
+          Decay \u03ba
+          <input type="range" min={0.05} max={1.5} step={0.05} value={k}
+            onChange={e=>{const v=+e.target.value;setK(v);kRef.current=v;}}
+            style={{display:"block",width:"100%",marginTop:4}} />
+        </label>
+        <label style={{flex:1,minWidth:140,color:TEXT,fontSize:12,fontFamily:"monospace"}}>
+          Threshold C\u209c
+          <input type="range" min={0.05} max={0.8} step={0.01} value={th}
+            onChange={e=>{const v=+e.target.value;setTh(v);thRef.current=v;}}
+            style={{display:"block",width:"100%",marginTop:4}} />
+        </label>
+        <button onClick={()=>setPlaying(p=>!p)}
+          style={{background:PAN2,border:"1px solid "+BORDER,color:TEXT,
+            borderRadius:6,padding:"6px 16px",cursor:"pointer",fontFamily:"monospace",fontSize:12}}>
+          {playing?"Pause":"Play"}
+        </button>
+      </div>
+    </div>
+  );
 }
 
-export default function CoherenceEnginePage() {
+export default function CoherenceEnginePage(){
+  const [substrate,setSubstrate]=useState<Substrate>("neural");
+  const [nucleationCount,setNucleationCount]=useState(0);
+
+  const sec:React.CSSProperties={background:PAN,border:"1px solid "+BORDER,borderRadius:12,padding:20,marginBottom:22};
+  const secLabel:React.CSSProperties={fontFamily:"monospace",fontSize:10,letterSpacing:2,color:MUTED,textTransform:"uppercase",marginBottom:12};
+  const card:React.CSSProperties={background:PAN2,border:"1px solid "+BORDER,borderRadius:8,padding:14};
+
+  const substrates:{id:Substrate,label:string,col:string,icon:string,scale:string}[]=[
+    {id:"neural",label:"Neural",col:GOLD,icon:"\ud83e\udde0",scale:"1 nm \u2013 100 \u00b5m"},
+    {id:"ferrofluid",label:"Ferrofluid",col:CYAN,icon:"\ud83e\uddec",scale:"10 nm \u2013 10 cm"},
+    {id:"plasma",label:"Plasma",col:VIOLET,icon:"\u26a1",scale:"1 cm \u2013 100 m"},
+    {id:"fusion",label:"Fusion",col:GREEN,icon:"\u269b\ufe0f",scale:"10 cm \u2013 1 km"},
+    {id:"crystal",label:"Crystal",col:BLUE,icon:"\ud83d\udc8e",scale:"0.1 nm \u2013 1 m"},
+    {id:"bio",label:"Biological",col:ROSE,icon:"\ud83c\udf31",scale:"1 nm \u2013 10 m"},
+  ];
+
+  const engineData:{id:Substrate,name:string,threshold:string,thresholdVal:string,mechanism:string,page:string}[]=[
+    {id:"neural",name:"Synaptic Entropy Engine",threshold:"Co-firing > \u03b8",thresholdVal:"E(i)\u00b7E(j) > 0.3",mechanism:"Hebbian synapse lock via entropy burst",page:"/synaptic-entropy"},
+    {id:"ferrofluid",name:"Ferrofluid Propulsion",threshold:"Rosensweig H_c",thresholdVal:"\u03c7H\u00b2/(2\u03bc\u2080) > 2\u03b3/\u03bb",mechanism:"Spike nucleation \u2192 collapse thrust",page:"/ferrofluid-propulsion"},
+    {id:"plasma",name:"Slinky Propulsion",threshold:"Standing wave lock",thresholdVal:"|\u03a8\u209b\u209c\u2090\u2099\u1d48\u2097\u2092\u209c| > 0.5",mechanism:"Travelling plasma wave rides curvature",page:"/slinky-propulsion"},
+    {id:"fusion",name:"Compact Fusion Reactor",threshold:"Beta \u03b2 > \u03b2_c",thresholdVal:"B\u207f > B\u207b\u2075",mechanism:"Magnetic confinement \u2192 2\u02e3 power gain",page:"/compact-fusion"},
+    {id:"crystal",name:"Crystallization Atlas",threshold:"Nucleation T < T_c",thresholdVal:"C(x,t) > C\u209c at seed",mechanism:"Lattice ordering \u2192 crystal lock",page:"/crystallization-atlas"},
+    {id:"bio",name:"Bio-Computational Paradigm",threshold:"Coherence field gate",thresholdVal:"|C| > 0.5 at receptor",mechanism:"Cross-species biomolecule signaling",page:"/bio-computational"},
+  ];
+
+  const active=engineData.find(e=>e.id===substrate)!;
+  const activeCol=substrates.find(s=>s.id===substrate)!.col;
+
+  const stages=[
+    {n:"I",label:"Disordered",col:hexA(MUTED,0.6),
+     txt:"Entropy dominates. Phase is random. No coherent structure. The system is in thermal equilibrium with its environment."},
+    {n:"II",label:"Nucleation Seed",col:hexA(activeCol,0.7),
+     txt:"A perturbation crosses threshold. Local coherence forms: a spike, a synapse, a seed crystal, a plasma filament. The transition begins."},
+    {n:"III",label:"Phase Lock",col:activeCol,
+     txt:"Multiple nucleation sites couple. Constructive interference amplifies the coherent field. The structure becomes self-sustaining."},
+    {n:"IV",label:"Work Output",col:GOLD,
+     txt:"The locked structure interacts with its substrate to produce thrust, heat, signal, or computation. Coherence does work."},
+  ];
+
+  const scales=[
+    {label:"Synapse",sz:"1 nm",col:VIOLET,substrates:["neural","bio"]},
+    {label:"Nanoparticle",sz:"10 nm",col:ROSE,substrates:["ferrofluid","bio"]},
+    {label:"Cell",sz:"10 \u00b5m",col:GREEN,substrates:["bio"]},
+    {label:"Bearing seal",sz:"10 cm",col:CYAN,substrates:["ferrofluid"]},
+    {label:"Plasma ring",sz:"1 m",col:VIOLET,substrates:["plasma"]},
+    {label:"Fusion coil",sz:"10 m",col:GREEN,substrates:["fusion"]},
+    {label:"Slinky array",sz:"100 m",col:GOLD,substrates:["plasma"]},
+    {label:"Reactor vessel",sz:"1 km",col:BLUE,substrates:["fusion"]},
+  ];
+
+  const thresholds=[
+    {sub:"Neural",th:"E(i)\u00b7E(j) > 0.3",name:"Co-firing threshold",col:GOLD,
+     desc:"Two neurons firing simultaneously cross the Hebbian threshold and lock their synapse. Below: random noise. Above: memory formation."},
+    {sub:"Ferrofluid",th:"\u03c7H\u00b2/(2\u03bc\u2080) > 2\u03b3/\u03bb",name:"Rosensweig H_c",col:CYAN,
+     desc:"Magnetic pressure exceeds surface tension. The fluid surface buckles into ordered spikes. Below: flat fluid. Above: coherent lattice."},
+    {sub:"Plasma",th:"|\u03a8| > 0.5",name:"Standing wave lock",col:VIOLET,
+     desc:"Plasma wave amplitude crosses the coherence threshold. Below: turbulent diffusion. Above: self-organized ring array riding curvature."},
+    {sub:"Fusion",th:"B\u207f > B\u207b\u2075",name:"Beta critical",col:GREEN,
+     desc:"Magnetic confinement field crosses the minimum for plasma stability. Below: disruption. Above: sustained fusion burn with 2\u02e3 gain."},
+    {sub:"Crystal",th:"T < T_c",name:"Nucleation temperature",col:BLUE,
+     desc:"Thermal energy drops below the crystallization point. Below: disordered liquid. Above: lattice self-assembly and crystal lock."},
+    {sub:"Biological",th:"|C| > 0.5",name:"Receptor coherence gate",col:ROSE,
+     desc:"Coherence field amplitude at a cell membrane receptor exceeds the signaling threshold. Below: no response. Above: cascaded gene expression."},
+  ];
+
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="coherence-engine-page">
-      <div style={{ marginBottom:24 }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Coherence Engine · Ingest · Pattern · Synth · Cohere · Output · Crystallization Model
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five engine nodes (Ingest/teal · Pattern/violet · Synth/gold · Cohere/blue · Output/green) with live coherence packets flowing through the AETHER crystallization pipeline.
-          </p>
-          <CoherenceEngineCanvas />
-        </div>
-      </div>
-      <div className="max-w-5xl mx-auto">
+    <div style={{minHeight:"100vh",background:BG,color:TEXT,padding:"40px 20px 80px",fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <div style={{maxWidth:1040,margin:"0 auto"}}>
 
-        <header className="mb-10">
-          <div className="text-[10.5px] uppercase tracking-[0.32em] mb-2"
-               style={{ color: B.cyan, fontFamily: "Inter, sans-serif" }}>
-            Coherence Engine · Hydrogen ↔ Antihydrogen · Matter / Antimatter Inversion
-          </div>
-          <h1 className="text-[44px] leading-[1.05] tracking-tight"
-              style={{ color: B.ink, fontFamily: "Cinzel, serif" }}>Coherence Engine</h1>
-          <p className="text-[14.5px] mt-4 leading-relaxed max-w-3xl" style={{ color: B.textWarm }}>
-            The simplest atom and its mirror. On the left, hydrogen — proton and electron, the
-            most abundant atom in the universe. On the right, antihydrogen — antiproton and
-            positron, made by the handful at CERN. Between them, an event horizon: the
-            symmetry-and-inversion line where polarity reverses. The page reads this pair as
-            the canonical coherence engine — one substrate, two phases, perfect mirror.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Chip c={B.blueIce} l="HYDROGEN · MATTER" />
-            <Chip c={B.red}     l="ANTIHYDROGEN · ANTIMATTER" />
-            <Chip c={B.cyan}    l="EVENT HORIZON" />
-            <Chip c={B.amber}   l="SYMMETRY & INVERSION" />
-            <Chip c={B.violet}  l="CPT MIRROR" />
-          </div>
+        <p style={{fontFamily:"monospace",fontSize:11,letterSpacing:2,color:MUTED,textTransform:"uppercase",marginBottom:8}}>
+          AETHER · Unified Field Architecture
+        </p>
+        <h1 style={{fontSize:"clamp(24px,4.5vw,38px)",fontWeight:700,
+          background:"linear-gradient(90deg,"+VIOLET+","+CYAN+","+GOLD+","+GREEN+")",
+          WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:8}}>
+          Coherence Engine · All Engines Are One Engine
+        </h1>
+        <p style={{color:MUTED,fontFamily:"monospace",fontSize:13,marginBottom:36}}>
+          The same transition — disordered → nucleated → phase-locked → work-producing — across every substrate
+        </p>
 
-          <div className="mt-6 rounded-md p-4 border" style={{ borderColor: B.border, background: B.panel }}>
-            <div className="text-[10px] uppercase tracking-[0.32em] mb-2"
-                 style={{ color: B.amber, fontFamily: "Inter, sans-serif" }}>How to read this page</div>
-            <p className="text-[13px] leading-relaxed" style={{ color: B.text }}>
-              <strong style={{ color: B.blueIce }}>Hydrogen side</strong> and
-              <strong style={{ color: B.red }}> antihydrogen side</strong> are introduced
-              individually. <strong style={{ color: B.cyan }}>The event horizon</strong> names
-              what runs between them. <strong style={{ color: B.gold }}>Symmetry table</strong>
-              compares the two substrates on six axes. <strong style={{ color: B.green }}>Probes</strong>
-              records what experiments have actually compared. The honest line draws the boundary
-              between physics and the page's own visual framing.
+        {/* Master equation */}
+        <div style={sec}>
+          <p style={secLabel}>00 · The Governing Equation · Every Engine, Every Scale</p>
+          <div style={{textAlign:"center",padding:"24px 0",marginBottom:16}}>
+            <p style={{fontFamily:"monospace",fontSize:22,color:CYAN,fontWeight:700,letterSpacing:1,marginBottom:8}}>
+              C(x,t) = A(x) e^{i(\u03c6 - \u03c9t)} \u00b7 e^{- \u03ba\u00b7r}
+            </p>
+            <p style={{color:MUTED,fontSize:13,fontFamily:"monospace",lineHeight:1.7,maxWidth:640,margin:"0 auto"}}>
+              Coherence field C at position x and time t · A(x) = local amplitude (salience) · \u03c6 = phase encoding meaning · \u03c9 = angular frequency of oscillation · \u03ba = spatial decay (localization) · r = radial distance from coherence centre
             </p>
           </div>
-        </header>
-
-        <section className="mb-14" data-testid="section-poster">
-          <ImgFig
-            src={imgEngine}
-            alt="A wide poster titled COHERENCE ENGINE: Hydrogen Reversed - Antihydrogen, with a blue hydrogen atom illustration on the left labelled Matter, Normal Reality, plus a positive-energy waveform; a red antihydrogen atom on the right labelled Antimatter, Mirror Reality, with an inverted negative-energy waveform; and a luminous central seam labelled Event Horizon · Symmetry & Inversion · Polarity Reversal."
-            caption="The pair · matter / antimatter mirror · event-horizon seam"
-          />
-        </section>
-
-        <section className="mb-14" data-testid="section-hydrogen">
-          <H num="01" label="Hydrogen · The Reference Substrate" accent={B.blueIce} />
-          <p className="text-[14px] leading-relaxed mb-3" style={{ color: B.text }}>
-            One proton, one electron, the cleanest spectrum in physics. The Lyman, Balmer, and
-            Paschen line series of hydrogen are the most precisely measured spectral features
-            in the visible and near-UV — they are the standard against which every comparison
-            is made.
-          </p>
-          <div className="grid md:grid-cols-2 gap-3">
-            <Card accent={B.blueIce} eyebrow="Matter" title="Normal reality"
-                  body="Hydrogen is the most abundant atom in the universe. Every star is mostly hydrogen; every spectrum carries its fingerprint. The page treats it as the +Energy / ▲Frequency baseline of the engine." />
-            <Card accent={B.cyan}    eyebrow="Spectroscopy" title="The reference lines"
-                  body="Lyman α (121 nm), Hα (656 nm), Hβ (486 nm) and the rest of the Balmer series are measured to extraordinary precision — the ruler other atoms are calibrated against." />
-          </div>
-        </section>
-
-        <section className="mb-14" data-testid="section-antihydrogen">
-          <H num="02" label="Antihydrogen · The Mirror Substrate" accent={B.red} />
-          <p className="text-[14px] leading-relaxed mb-3" style={{ color: B.text }}>
-            One antiproton, one positron. Made first as an atom in 1995 (CERN PS210); now
-            routinely trapped in tens-to-hundreds at a time by ALPHA, AEgIS, and ASACUSA. CPT
-            symmetry predicts that antihydrogen and hydrogen should have identical spectra and
-            identical inertial mass — the experiments are still tightening that prediction.
-          </p>
-          <div className="grid md:grid-cols-2 gap-3">
-            <Card accent={B.red}  eyebrow="Antimatter" title="Mirror reality"
-                  body="Antihydrogen is the matter mirror at the atomic scale. It is stable in isolation, annihilates with hydrogen on contact, and is currently produced in numbers small enough to count individually." />
-            <Card accent={B.rose} eyebrow="Spectroscopy" title="The mirror lines"
-                  body="The 1S–2S transition has been compared between H and H̄ at the 10⁻¹² level. So far, no asymmetry has been seen — every measurement is consistent with CPT being exact." />
-          </div>
-        </section>
-
-        <section className="mb-14" data-testid="section-horizon">
-          <H num="03" label="Event Horizon · The Inversion Seam" accent={B.cyan} />
-          <div className="rounded-md p-5 border" style={{ borderColor: B.border, background: B.panelLite }}>
-            <p className="text-[15px] leading-relaxed" style={{ color: B.textWarm, fontFamily: "Cinzel, serif" }}>
-              The poster's central seam is labelled Event Horizon · Symmetry & Inversion ·
-              Polarity Reversal. Read literally, it names the CPT operation: charge conjugation,
-              parity inversion, time reversal — the combined symmetry under which hydrogen
-              becomes antihydrogen. Read as image, it names the visual fact that the two
-              substrates are mirror reflections of each other at the level of every quantum
-              number.
-            </p>
-          </div>
-        </section>
-
-        <section className="mb-14" data-testid="section-table">
-          <H num="04" label="Symmetry Table · Six Axes" accent={B.gold} />
-          <div className="rounded-md overflow-hidden border" style={{ borderColor: B.border, background: B.panel }}>
-            <div className="grid grid-cols-12 px-4 py-2 text-[10.5px] uppercase tracking-[0.22em]"
-                 style={{ color: B.muted, background: B.panelLite, fontFamily: "Inter, sans-serif" }}>
-              <div className="col-span-2">Axis</div>
-              <div className="col-span-5">Hydrogen</div>
-              <div className="col-span-5">Antihydrogen</div>
-            </div>
-            {TABLE.map((r) => (
-              <div key={r.row} className="grid grid-cols-12 px-4 py-3 text-[13px] border-t"
-                   style={{ borderColor: B.border, fontFamily: "Inter, sans-serif" }}>
-                <div className="col-span-2" style={{ color: B.amber }}>{r.row}</div>
-                <div className="col-span-5" style={{ color: B.blueIce }}>{r.h}</div>
-                <div className="col-span-5" style={{ color: B.red }}>{r.a}</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:10}}>
+            {[
+              {label:"A(x)",desc:"Spatial amplitude map — where coherence concentrates",col:GOLD},
+              {label:"\u03c6",desc:"Phase — encodes information, relationship, structure",col:CYAN},
+              {label:"\u03c9",desc:"Frequency — oscillation rate of the coherent mode",col:VIOLET},
+              {label:"\u03ba",desc:"Decay — how tightly coherence is localized in space",col:GREEN},
+              {label:"C\u209c",desc:"Threshold — the crossing point where order crystallizes",col:BLUE},
+              {label:"|C| > C\u209c",desc:"Nucleation condition — the universal engine trigger",col:ROSE},
+            ].map(p=>(
+              <div key={p.label} style={{...card,textAlign:"center",borderColor:hexA(p.col,0.25)}}>
+                <p style={{color:p.col,fontFamily:"monospace",fontSize:18,fontWeight:700,marginBottom:4}}>{p.label}</p>
+                <p style={{color:MUTED,fontSize:11,lineHeight:1.5}}>{p.desc}</p>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
-        <section className="mb-14" data-testid="section-probes">
-          <H num="05" label="Probes · What Has Actually Been Compared" accent={B.green} />
-          <div className="grid md:grid-cols-3 gap-3">
-            {PROBES.map((p) => (
-              <Card key={p.k} accent={p.c} eyebrow="Probe" title={p.k} body={p.v} />
+        {/* Live coherence field */}
+        <div style={sec}>
+          <p style={secLabel}>01 · Live Coherence Field · Interactive Nucleation Simulation</p>
+          <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
+            {substrates.map(s=>(
+              <button key={s.id} onClick={()=>setSubstrate(s.id)}
+                style={{background:substrate===s.id?hexA(s.col,0.12):PAN2,
+                  border:"1px solid "+(substrate===s.id?s.col:BORDER),
+                  color:substrate===s.id?s.col:MUTED,borderRadius:6,
+                  padding:"6px 14px",cursor:"pointer",fontFamily:"monospace",fontSize:12,
+                  display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:14}}>{s.icon}</span>
+                <span>{s.label}</span>
+              </button>
             ))}
           </div>
-        </section>
-
-        <section className="mb-14" data-testid="section-honest">
-          <H num="06" label="Honest Line · Where Physics Ends, Where the Image Begins" accent={B.muted} />
-          <div className="grid md:grid-cols-3 gap-3">
-            <Card accent={B.green}  eyebrow="Physics fact" title="Antihydrogen exists"
-                  body="Antihydrogen is real, made, and trapped. CPT-symmetry tests with it are some of the most precise low-energy tests of the Standard Model in existence. The mirror is not a metaphor at the atomic scale." />
-            <Card accent={B.amber}  eyebrow="Page framing" title="+/− energy is the page's idiom"
-                  body="The labels +Energy / −Energy on the two waveforms are the poster's framing, not a literal physical statement. Antihydrogen has positive rest energy like any other atom — what is reversed is charge, parity, and (in CPT) time direction." />
-            <Card accent={B.rose}   eyebrow="Open" title="Tiny CPT violations"
-                  body="Whether CPT symmetry is exact, or violated at some tiny level, is an open empirical question. ALPHA, AEgIS, and BASE are precisely the experiments looking for cracks. So far, the mirror holds." />
+          <CoherenceFieldCanvas substrate={substrate} onNucleationCount={setNucleationCount} key={substrate} />
+          <div style={{display:"flex",gap:20,marginTop:10,fontFamily:"monospace",fontSize:12}}>
+            <span style={{color:MUTED}}>Active substrate <span style={{color:activeCol}}>{active.name}</span></span>
+            <span style={{color:MUTED}}>Scale <span style={{color:TEXT}}>{substrates.find(s=>s.id===substrate)!.scale}</span></span>
+            <span style={{color:MUTED}}>Nucleated cells <span style={{color:activeCol}}>{nucleationCount}</span></span>
+            <span style={{color:MUTED}}>Threshold <span style={{color:TEXT}}>{active.thresholdVal}</span></span>
           </div>
-        </section>
+        </div>
 
-        <section data-testid="section-bridges">
-          <H num="07" label="Bridges · Where the Engine Touches the Stack" accent={B.gold} />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <Bridge to="/coherence"             label="Coherence · Live Lattice"        accent={B.cyan} />
-            <Bridge to="/closed-loop-coherence" label="Closed-Loop Coherence"           accent={B.green} />
-            <Bridge to="/piano-arithmetic"      label="Piano Arithmetic · Hydrogen Lines" accent={B.amber} />
-            <Bridge to="/phi-coherent-wave"     label="φ-Coherent Wave"                 accent={B.violet} />
-            <Bridge to="/aqua-cxe"              label="Aqua Cxe · Resonant Nexus"       accent={B.rose} />
-            <Bridge to="/q-aether-stack"        label="Q~AETHER Stack · 10⁹-Atom"       accent={B.cyan} />
-            <Bridge to="/aether-doctrine"       label="The Doctrine"                    accent={B.gold} />
+        {/* Four-stage transition */}
+        <div style={sec}>
+          <p style={secLabel}>02 · The Four-Stage Transition · Universal Across All Substrates</p>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:12}}>
+            {stages.map(s=>(
+              <div key={s.n} style={{...card,borderColor:hexA(s.col,0.35),textAlign:"center"}}>
+                <p style={{color:s.col,fontFamily:"monospace",fontSize:28,fontWeight:700,marginBottom:6}}>{s.n}</p>
+                <p style={{color:TEXT,fontFamily:"monospace",fontSize:13,fontWeight:700,marginBottom:8}}>{s.label}</p>
+                <p style={{color:MUTED,fontSize:12,lineHeight:1.6}}>{s.txt}</p>
+              </div>
+            ))}
           </div>
-        </section>
+          <div style={{marginTop:18,display:"flex",alignItems:"center",gap:0,justifyContent:"center",flexWrap:"wrap"}}>
+            {stages.map((s,i)=>[
+              <div key={s.n} style={{width:20,height:20,borderRadius:"50%",background:s.col,boxShadow:`0 0 12px ${s.col}`}} />,
+              i<3&&<div key={`a-${i}`} style={{width:40,height:2,background:hexA(GOLD,0.4)}} />
+            ]).flat()}
+          </div>
+        </div>
 
+        {/* Engine table */}
+        <div style={sec}>
+          <p style={secLabel}>03 · AETHER Engine Registry · Thresholds, Mechanisms, Routes</p>
+          <div style={{overflowX:"auto"}}>
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,minWidth:640}}>
+              <thead>
+                <tr style={{borderBottom:"1px solid "+BORDER}}>
+                  <th style={{textAlign:"left",padding:"10px 8px",color:MUTED,fontFamily:"monospace",fontSize:11,fontWeight:600}}>Engine</th>
+                  <th style={{textAlign:"left",padding:"10px 8px",color:MUTED,fontFamily:"monospace",fontSize:11,fontWeight:600}}>Threshold</th>
+                  <th style={{textAlign:"left",padding:"10px 8px",color:MUTED,fontFamily:"monospace",fontSize:11,fontWeight:600}}>Mechanism</th>
+                  <th style={{textAlign:"left",padding:"10px 8px",color:MUTED,fontFamily:"monospace",fontSize:11,fontWeight:600}}>Route</th>
+                </tr>
+              </thead>
+              <tbody>
+                {engineData.map(e=>{
+                  const sc=substrates.find(s=>s.id===e.id)!;
+                  return (
+                    <tr key={e.id} style={{borderBottom:"1px solid "+hexA(BORDER,0.5)}}>
+                      <td style={{padding:"10px 8px"}}>
+                        <span style={{fontSize:16,marginRight:8}}>{sc.icon}</span>
+                        <span style={{color:sc.col,fontWeight:600}}>{e.name}</span>
+                      </td>
+                      <td style={{padding:"10px 8px",fontFamily:"monospace",fontSize:12,color:CYAN}}>{e.threshold}</td>
+                      <td style={{padding:"10px 8px",color:MUTED,fontSize:12}}>{e.mechanism}</td>
+                      <td style={{padding:"10px 8px"}}>
+                        <Link href={e.page} style={{color:sc.col,fontFamily:"monospace",fontSize:12,textDecoration:"none"}}>\u2192 {e.page}</Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Scale ruler */}
+        <div style={sec}>
+          <p style={secLabel}>04 · Scale Ruler · From Synapse to Cosmic</p>
+          <div style={{position:"relative",padding:"20px 0 36px"}}>
+            <div style={{height:4,background:hexA(BORDER,0.6),borderRadius:2,position:"relative"}}>
+              {scales.map((s,i)=>{
+                const left=(i/(scales.length-1))*100;
+                const activeHere=s.substrates.includes(substrate);
+                return (
+                  <div key={s.label} style={{position:"absolute",left:`${left}%`,transform:"translateX(-50%)",top:-6}}>
+                    <div style={{width:14,height:14,borderRadius:"50%",background:activeHere?s.col:hexA(MUTED,0.4),border:`2px solid ${activeHere?s.col:BORDER}`,boxShadow:activeHere?`0 0 10px ${s.col}`:"none"}} />
+                    <div style={{marginTop:10,textAlign:"center"}}>
+                      <p style={{color:activeHere?s.col:MUTED,fontFamily:"monospace",fontSize:10,fontWeight:700,marginBottom:2,whiteSpace:"nowrap"}}>{s.label}</p>
+                      <p style={{color:hexA(MUTED,0.6),fontFamily:"monospace",fontSize:9,whiteSpace:"nowrap"}}>{s.sz}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p style={{color:MUTED,fontSize:12,textAlign:"center",fontFamily:"monospace"}}>
+            Highlighted = active substrate range · The coherence engine is substrate-scale invariant
+          </p>
+        </div>
+
+        {/* Threshold unification */}
+        <div style={sec}>
+          <p style={secLabel}>05 · Threshold Unification · One Crossing, Many Names</p>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:12}}>
+            {thresholds.map(t=>(
+              <div key={t.sub} style={{...card,borderColor:hexA(t.col,0.3)}}>
+                <p style={{color:t.col,fontFamily:"monospace",fontSize:11,fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:4}}>{t.sub}</p>
+                <p style={{color:TEXT,fontSize:13,fontWeight:600,marginBottom:4}}>{t.name}</p>
+                <p style={{color:CYAN,fontFamily:"monospace",fontSize:12,fontWeight:700,marginBottom:6}}>{t.th}</p>
+                <p style={{color:MUTED,fontSize:12,lineHeight:1.6}}>{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Closing synthesis */}
+        <div style={sec}>
+          <p style={secLabel}>06 · The Synthesis · Why All Engines Are One</p>
+          <p style={{color:TEXT,fontSize:15,lineHeight:1.8,marginBottom:16}}>
+            Every engine in the AETHER system — neural, ferrofluid, plasma, fusion, crystalline, biological — is not a separate invention. It is the same coherence law C(x,t) operating on a different substrate with a different threshold. The geometry of the transition is invariant:
+          </p>
+          <div style={{display:"flex",justifyContent:"center",marginBottom:16}}>
+            <div style={{...card,display:"inline-block",textAlign:"center",padding:"16px 28px",borderColor:hexA(GOLD,0.3)}}>
+              <p style={{color:GOLD,fontFamily:"monospace",fontSize:18,fontWeight:700,marginBottom:6}}>
+                Entropy → Nucleation → Phase Lock → Work
+              </p>
+              <p style={{color:MUTED,fontFamily:"monospace",fontSize:12}}>
+                Disordered → Seed → Coherent → Productive
+              </p>
+            </div>
+          </div>
+          <p style={{color:TEXT,fontSize:14,lineHeight:1.7}}>
+            A synapse strengthening in your brain is a ferrofluid spike forming above a magnet is a plasma wave locking into a ring array is a fusion plasma crossing beta critical is a crystal seed nucleating in a cooling melt. The substrate changes. The law does not. This is the AETHER Coherence Engine.
+          </p>
+        </div>
+
+        <div style={{marginTop:36,paddingTop:20,borderTop:"1px solid "+BORDER,
+          fontFamily:"monospace",fontSize:12,color:MUTED,display:"flex",gap:24,flexWrap:"wrap"}}>
+          <Link href="/synaptic-entropy" style={{color:GOLD,textDecoration:"none"}}>\u2192 Neural</Link>
+          <Link href="/ferrofluid-propulsion" style={{color:CYAN,textDecoration:"none"}}>\u2192 Ferrofluid</Link>
+          <Link href="/slinky-propulsion" style={{color:VIOLET,textDecoration:"none"}}>\u2192 Plasma</Link>
+          <Link href="/compact-fusion" style={{color:GREEN,textDecoration:"none"}}>\u2192 Fusion</Link>
+          <Link href="/crystallization-atlas" style={{color:BLUE,textDecoration:"none"}}>\u2192 Crystal</Link>
+          <Link href="/bio-computational" style={{color:ROSE,textDecoration:"none"}}>\u2192 Biological</Link>
+          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
+        </div>
       </div>
     </div>
   );
