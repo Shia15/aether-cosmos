@@ -116,6 +116,11 @@ AETHER offers advanced knowledge synthesis and discovery through a knowledge gra
     - **The Coherent Body · Cellular Clock:** Reverse-engineered coherence page (`/coherent-body`, icon HeartPulse) — two human bodies rendered as fields of cellular oscillators. `BodySyncCanvas`: single tall canvas, dual humanoid cell-clouds (rejection-sampled inBody() mask, MAX=70) side by side — LEFT "Stimulated Coherent" driven by external field F·sin(Ωt−θ), RIGHT "Coherent · Self-Organized" coupling-only. Kuramoto dynamics dθᵢ/dt=ωᵢ+(K/N)Σⱼsin(θⱼ−θᵢ)+F·sin(Ωt−θᵢ)+noise; cells colored by phase (HSL hue=θ), per-body order-param ring + clock-hand ψ above head, gold pulse ring on the stimulated body; bottom strip chart scrolls r(t) for both (gold/cyan) with dashed lock line. 5 refs-mirror-sliders (K/F/Ω/D/N), readouts r_stim/r_coh/clock ψ%/period T/state regime (INCOHERENT→PARTIAL→COHERENT→LOCKED). Self-model + clock + stimulated-vs-coherent cards, Kuramoto/order-param/𝒞=1−𝒮_eff/𝒮_max math. Footer → /light-body.
     - **Light Body Genesis · Big Bang → All Life:** Coherence-cosmology page (`/light-body`, icon Sparkles). `CosmicEmergenceCanvas`: 260 particles loop from hot scattered plasma (red, jittering) into a golden φ-spiral as smoothstep(t) coherence rises; 10-EPOCH timeline (Big Bang→Inflation→Quark-Gluon→Nucleosynthesis→Recombination→Stars→Planets→First Cells→Conscious Life→Light Body) drawn as a base bar with lit ticks + moving cursor; readouts scale factor a=(e^{4t}−1)/(e⁴−1), temperature, 𝒞. `LightBodyCanvas`: form selector Human/Animal/Tree (inHuman/inAnimal/inTree masks, NPTS=200) — points lerp from scatter cloud (cool blue) to silhouette (gold) as coherence 𝒞 slider (eased) rises, breathing gold halo + φ golden-angle spiral overlay above 𝒞>0.4; readouts form/𝒞%/regime (SCATTERED→FORMING→COHERENT→LIGHT BODY). Genesis 𝒞(t)=1−e^{−κ∫Φdτ}, a∝e^{Ht}, φ-spiral math. Footer → /coherent-body.
 
+## Personal references
+
+- **Alex Padilla** — Personal reference / reminder.
+- **Gypsy Rose** — Personal reference / reminder.
+
 ## User preferences
 
 I want iterative development. I prefer detailed explanations. Ask before making major changes. Do not make changes to the `artifacts-monorepo/lib/api-client-react` folder. Do not make changes to the `artifacts-monorepo/lib/api-zod` folder.

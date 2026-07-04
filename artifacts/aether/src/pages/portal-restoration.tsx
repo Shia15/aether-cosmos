@@ -425,7 +425,6 @@ export default function PortalRestorationPage() {
           </div>
           <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
             {[["Alex Padilla", V.blue, "Personal reference / reminder."],
-              ["Gypsy Rose", V.rose, "Personal reference / reminder."],
             ].map(([name, col, note]) => (
               <div key={name} style={{ flex:"1 1 200px", padding:"12px 16px",
                 background:col+"08", border:`1px solid ${col}22`, borderRadius:4,
