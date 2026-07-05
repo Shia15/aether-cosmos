@@ -100,7 +100,7 @@ function WaveguideCanvas(){
         </label>
       </div>
       <p style={{fontFamily:"monospace",fontSize:11,color:MUTED,marginTop:6}}>
-        22×14 Si₃N₄ waveguide array, 5 biological levels (colour-coded), DNLS evanescent coupling: i∂ψ_n/∂z = −β·Σ_{nb}ψ_m + γ|ψ_n|²ψ_n
+        {"22\xd714 Si\u2083N\u2084 waveguide array, 5 biological levels (colour-coded), DNLS evanescent coupling: i\u2202\u03c8_n/\u2202z = \u2212\u03b2·\u03a3_{nb}\u03c8_m + \u03b3|\u03c8_n|\xb2\u03c8_n"}
       </p>
     </div>
   );

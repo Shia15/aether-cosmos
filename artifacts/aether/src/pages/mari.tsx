@@ -470,7 +470,7 @@ export default function MariPage() {
       // pond border
       ctx.strokeStyle = "rgba(224,104,120,0.30)";
       ctx.lineWidth = 1.4;
-      const pondR = Math.min(w, h) / 2 - 18;
+      const pondR = Math.max(4, Math.min(w, h) / 2 - 18);
       ctx.beginPath(); ctx.arc(cx, cy, pondR, 0, Math.PI * 2); ctx.stroke();
 
       // Auto-drop a stone every 2.4 s if pond is empty
