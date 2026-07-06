@@ -342,6 +342,7 @@ const NAV_ITEMS = [
   { href: "/aether-whitepaper-v1", label: "AETHER Whitepaper v1 · Scale-Invariant Five-Phase Loop · Bone Marrow · Wearable · FQP-Edge-1 ASIC · Tectonic", icon: Hexagon },
   { href: "/helical-framework",      label: "Unified Helical Aether Framework · Ptah · AQUA CXE · CUCA · Cosmos",        icon: Layers },
   { href: "/robot-strokes",          label: "Filament String Mechanics · 6 Robot Stroke Primitives · phi-Coherence",     icon: Waves },
+  { href: "/filament-lattice",       label: "Filament Lattice · All 6 Strokes Simultaneous · Phi-Spiral · Hex · Kagome · AETHER Lattice Formations", icon: Waves },
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
   { href: "/wood-frog-biophotonics", label: "Wood Frog Skin · Photonic Bio-Engine · C(x,t) Simulation · 4 Views",        icon: Layers },
   { href: "/wood-frog-knots",        label: "Wood Frog Skin x Tait Knots · C(x,t) Coherence Field · Gradient Opacity Differential · Phase Singularity · A(x)=tanh(dist/sigma)", icon: Layers },
