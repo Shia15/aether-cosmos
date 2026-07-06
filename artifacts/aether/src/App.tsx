@@ -364,6 +364,7 @@ const HelicalFrameworkPage = lazy(() => import("@/pages/helical-framework"));
 const RobotStrokesPage = lazy(() => import("@/pages/robot-strokes"));
 const FilamentLatticePage = lazy(() => import("@/pages/filament-lattice"));
 const WaveLatticePage     = lazy(() => import("@/pages/wave-lattice"));
+const SynthesisFieldPage  = lazy(() => import("@/pages/synthesis-field"));
 const FlowerClockPage = lazy(() => import("@/pages/flower-clock"));
 const WoodFrogBiophotonicsPage = lazy(() => import("@/pages/wood-frog-biophotonics"));
 const IntegrationDimensionsPage = lazy(() => import("@/pages/integration-dimensions"));
@@ -1358,6 +1359,7 @@ function Router() {
                 <Route path="/robot-strokes"       component={RobotStrokesPage} />
                 <Route path="/filament-lattice"    component={FilamentLatticePage} />
                 <Route path="/wave-lattice"        component={WaveLatticePage} />
+                <Route path="/synthesis-field"    component={SynthesisFieldPage} />
                 <Route path="/flower-clock"        component={FlowerClockPage} />
                 <Route path="/wood-frog-biophotonics" component={WoodFrogBiophotonicsPage} />
                 <Route path="/integration-dimensions" component={IntegrationDimensionsPage} />
