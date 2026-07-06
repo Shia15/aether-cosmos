@@ -290,6 +290,171 @@ function KnotBubbleCanvas({ modeIdx }: { modeIdx: number }) {
   return <canvas ref={cvRef} style={{ width:"100%", height:360, display:"block" }} />;
 }
 
+// ─── Canvas 3: 1:1 Orb Propulsion Device ─────────────────────────────────
+function OrbPropulsionCanvas() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const stRef = useRef({ raf:0, t:0 });
+
+  useEffect(() => {
+    const cv  = cvRef.current!;
+    const ctx = cv.getContext("2d")!;
+    const ro  = new ResizeObserver(() => { cv.width=cv.offsetWidth||640; cv.height=cv.offsetHeight||470; });
+    ro.observe(cv);
+    cv.width  = cv.offsetWidth||640;
+    cv.height = cv.offsetHeight||470;
+
+    // 9 chamber positions in ovular array (normalised ix,iy offsets)
+    const CPOS = [
+      {ix:-1,iy:-0.85},{ix:0,iy:-1},{ix:1,iy:-0.85},
+      {ix:-1.35,iy:0}, {ix:0,iy:0}, {ix:1.35,iy:0},
+      {ix:-1,iy:0.85}, {ix:0,iy:1}, {ix:1,iy:0.85},
+    ];
+
+    function draw() {
+      stRef.current.raf = requestAnimationFrame(draw);
+      const s = stRef.current;
+      s.t    += 0.016;
+      const W = cv.width, H = cv.height;
+      const cx = W * 0.5;
+      const orbitCY  = H * 0.30;
+      const chamberCY= H * 0.72;
+      const R        = Math.min(W, H) * 0.21;
+
+      // Auto-oscillating tilt angle (30° – 60°)
+      const tilt   = 0.52 + 0.18 * Math.sin(s.t * 0.22);
+      const orbT   = s.t * 1.2;
+      const orbX   = cx + R * Math.cos(orbT);
+      const orbY   = orbitCY + R * Math.sin(orbT) * Math.cos(tilt);
+      const orbZ   = R * Math.sin(orbT) * Math.sin(tilt);
+
+      // Push force = downward component of velocity (positive when going down)
+      const pushForce = Math.max(0, Math.sin(orbT) * Math.sin(tilt));
+
+      ctx.fillStyle = BG; ctx.fillRect(0,0,W,H);
+
+      // Orbit ellipse (1:1 circle projected with tilt)
+      ctx.beginPath();
+      ctx.ellipse(cx, orbitCY, R, R * Math.cos(tilt), 0, 0, Math.PI*2);
+      ctx.strokeStyle = "rgba(0,255,238,0.10)"; ctx.lineWidth = 2; ctx.stroke();
+
+      // Tilt axis dashed line
+      ctx.save(); ctx.globalAlpha = 0.12; ctx.setLineDash([4,5]);
+      ctx.beginPath(); ctx.moveTo(cx-R-18, orbitCY); ctx.lineTo(cx+R+18, orbitCY);
+      ctx.strokeStyle = TEAL; ctx.lineWidth = 1; ctx.stroke();
+      ctx.setLineDash([]); ctx.restore();
+
+      // Pressure plane separator
+      const planeY = orbitCY + R * 0.85;
+      ctx.save(); ctx.globalAlpha = 0.22;
+      ctx.beginPath(); ctx.moveTo(24, planeY); ctx.lineTo(W-24, planeY);
+      ctx.strokeStyle = GOLD; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+      ctx.font = "8px 'DM Mono',monospace"; ctx.fillStyle = `${GOLD}99`;
+      ctx.textAlign = "right";
+      ctx.fillText("PRESSURE PLANE", W-28, planeY-5); ctx.textAlign = "left";
+
+      // Ovular array boundary
+      const aRx = W * 0.26, aRy = H * 0.14;
+      ctx.beginPath();
+      ctx.ellipse(cx, chamberCY, aRx, aRy, 0, 0, Math.PI*2);
+      ctx.strokeStyle = "rgba(201,162,39,0.09)"; ctx.lineWidth = 1.5; ctx.stroke();
+
+      // Chamber array
+      const cW = 36, cH = 20;
+      CPOS.forEach((pos, ci) => {
+        const chX = cx + pos.ix * aRx * 0.52;
+        const chY = chamberCY + pos.iy * aRy * 0.65;
+        const dx   = orbX - chX;
+        const dist = Math.sqrt(dx*dx + 400);
+        const prox = Math.max(0, 1 - dist / (R * 1.3));
+        const pres = pushForce * prox;
+
+        // Glow
+        if (pres > 0.04) {
+          ctx.save(); ctx.globalAlpha = pres * 0.28;
+          ctx.beginPath(); ctx.ellipse(chX, chY, cW+10, cH+10, 0, 0, Math.PI*2);
+          ctx.fillStyle = TEAL; ctx.fill(); ctx.restore();
+        }
+        // Chamber oval
+        ctx.beginPath(); ctx.ellipse(chX, chY, cW, cH, 0, 0, Math.PI*2);
+        ctx.strokeStyle = pres > 0.05 ? TEAL : "rgba(0,255,238,0.13)";
+        ctx.lineWidth   = pres > 0.05 ? 2 : 1; ctx.stroke();
+        ctx.save(); ctx.globalAlpha = 0.06 + pres * 0.38;
+        ctx.fillStyle = pres > 0.28 ? GOLD : TEAL; ctx.fill(); ctx.restore();
+
+        // Pressure % label
+        ctx.font = "7px 'DM Mono',monospace"; ctx.textAlign = "center";
+        ctx.fillStyle = pres > 0.1 ? GOLD : "rgba(255,255,255,0.28)";
+        ctx.fillText(`C${ci+1} ${(pres*100).toFixed(0)}%`, chX, chY+3);
+        ctx.textAlign = "left";
+
+        // Exhaust arrow when active
+        if (pres > 0.14) {
+          ctx.save(); ctx.globalAlpha = pres * 0.9;
+          ctx.beginPath();
+          ctx.moveTo(chX, chY+cH+2); ctx.lineTo(chX, chY+cH+15);
+          ctx.moveTo(chX-5, chY+cH+10); ctx.lineTo(chX, chY+cH+15); ctx.lineTo(chX+5, chY+cH+10);
+          ctx.strokeStyle = ORNG; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+        }
+      });
+
+      // Coupling line orb → chambers
+      if (pushForce > 0.05) {
+        ctx.save(); ctx.globalAlpha = pushForce * 0.35; ctx.setLineDash([3,6]);
+        ctx.beginPath(); ctx.moveTo(orbX, orbY); ctx.lineTo(cx, chamberCY);
+        ctx.strokeStyle = TEAL; ctx.lineWidth = 1; ctx.stroke();
+        ctx.setLineDash([]); ctx.restore();
+      }
+
+      // Net thrust arrow (upward)
+      const thrustLen = pushForce * 52;
+      if (thrustLen > 4) {
+        const arrowY  = planeY - 14;
+        const arrowTY = arrowY - thrustLen;
+        ctx.save(); ctx.globalAlpha = 0.75;
+        ctx.beginPath(); ctx.moveTo(cx, arrowY); ctx.lineTo(cx, arrowTY);
+        ctx.strokeStyle = GOLD; ctx.lineWidth = 3; ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx-7, arrowTY+10); ctx.lineTo(cx, arrowTY); ctx.lineTo(cx+7, arrowTY+10);
+        ctx.strokeStyle = GOLD; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+        ctx.font = "bold 9px 'DM Mono',monospace"; ctx.fillStyle = GOLD; ctx.textAlign = "center";
+        ctx.fillText(`NET THRUST ${(pushForce*100).toFixed(0)}%`, cx, arrowTY - 6); ctx.textAlign = "left";
+      }
+
+      // Orb (scaled by depth for 3D feel)
+      const orbScale = 1 + (orbZ / (R * 2)) * 0.22;
+      const orbR     = 12 * Math.max(0.7, orbScale);
+      ctx.save(); ctx.globalAlpha = 0.22;
+      ctx.beginPath(); ctx.arc(orbX, orbY, orbR+13, 0, Math.PI*2);
+      ctx.fillStyle = GOLD; ctx.fill(); ctx.restore();
+      const grd = ctx.createRadialGradient(orbX-orbR*0.3, orbY-orbR*0.3, 1, orbX, orbY, orbR);
+      grd.addColorStop(0, "#fffbe0"); grd.addColorStop(0.55, GOLD); grd.addColorStop(1, ORNG);
+      ctx.beginPath(); ctx.arc(orbX, orbY, orbR, 0, Math.PI*2);
+      ctx.fillStyle = grd; ctx.fill();
+
+      // Spin rings on orb
+      for (let r = 0; r < 2; r++) {
+        const spinAng = (s.t * 3.5 + r * Math.PI) % (Math.PI * 2);
+        ctx.save(); ctx.globalAlpha = 0.25;
+        ctx.beginPath();
+        ctx.arc(orbX, orbY, orbR * 0.72, spinAng, spinAng + Math.PI);
+        ctx.strokeStyle = WHT; ctx.lineWidth = 1; ctx.stroke(); ctx.restore();
+      }
+
+      // Readout
+      const tiltDeg = ((tilt) * 180 / Math.PI).toFixed(1);
+      ctx.font = "bold 11px 'DM Mono',monospace"; ctx.fillStyle = TEAL;
+      ctx.fillText(`1:1 ORB PROPULSION  ·  tilt ${tiltDeg}°  ·  downstroke ${(pushForce*100).toFixed(0)}%`, 12, 22);
+      ctx.font = "8px 'DM Mono',monospace"; ctx.fillStyle = "rgba(255,255,255,0.2)";
+      ctx.fillText("tilted 1:1 orbit → angled downstroke → ovular array → exhaust exhaled → reaction thrust", 12, 36);
+    }
+
+    stRef.current.raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(stRef.current.raf); ro.disconnect(); };
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width:"100%", height:470, display:"block" }} />;
+}
+
 // ─── Card helpers ──────────────────────────────────────────────────────────
 function MCard({ label, eq, note, col }: { label:string; eq:string; note:string; col?:string }) {
   return (
@@ -432,6 +597,18 @@ export default function FibonacciReplicantPage() {
                 eq="mass_launch = M_seed;  mass_built = M_seed * phi^n"
                 note="At generation 13, one seed has produced 233 offspring. At generation 20, one seed = 6,765 units. This is the entire point: launch 1 kg of powder, grow 6,765 kg of structure on-site. No rockets needed for the built mass." />
             </div>
+
+            <div style={{ margin:"1.8rem 0 0.8rem" }}>
+              <div style={{ fontSize:9, letterSpacing:"0.3em", color:ORNG, textTransform:"uppercase", marginBottom:4 }}>
+                Bloom as Directed Propulsion Funnel
+              </div>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }}>
+              <VCard col={ORNG} title="Phi-Spiral Nozzle"
+                body="When the phyllotaxis bloom is grown directionally (as a cone rather than a disk), the 233 seeds arranged at golden angles form a natural pressure nozzle. Each seed is a micro-valve. The golden-angle spacing means adjacent seeds are never aligned — creating a spiralling, non-overlapping flow path. Air or reactive gas enters the wide end and exits the narrow tip following a Fibonacci spiral — the lowest-drag path through any medium. This IS a nozzle, and the bloom geometry optimises it automatically." />
+              <VCard col={GOLD} title="From Replication to Propulsion"
+                body="A self-replicating powder that blooms at golden angles on a target planet can be seeded to bloom directionally — aimed at an ovular pressure array. The 233 seeds become 233 individual pressure valves. As the bloom expands outward, it compresses the ambient atmosphere against the array. The reaction lifts the array (and whatever is attached) off the surface. The propulsion mechanism is the bloom itself: replication = expansion = thrust. No moving parts. The Fibonacci geometry converts growth energy directly into directional force." />
+            </div>
           </div>
         )}
 
@@ -490,6 +667,39 @@ export default function FibonacciReplicantPage() {
               <MCard col={PINK} label="Planetary Orbital Knots"
                 eq="Jupiter:Saturn = 2:5;  Earth:Venus = 8:13 = F(6):F(7)"
                 note="Planetary orbital resonances are Fibonacci Lissajous knots at orbital scale. Jupiter-Saturn (5:2) and Earth-Venus (13:8) are knot mode (2:5) and (5:8) respectively. The solar system IS the (5:8) star knot — mode 4 on this canvas." />
+            </div>
+
+            {/* ── Propulsion Device ── */}
+            <div style={{ margin:"1.8rem 0 1rem" }}>
+              <div style={{ fontSize:9, letterSpacing:"0.3em", color:GOLD, textTransform:"uppercase", marginBottom:4 }}>
+                1:1 Circle → Propulsion Device · Tilted Orb · Ovular Pressure Array
+              </div>
+              <p style={{ fontSize:11.5, color:"rgba(255,255,255,0.38)", maxWidth:740, lineHeight:1.7, margin:0 }}>
+                The (1:1) circle — simplest Fibonacci knot — becomes a propulsion device when its orbit plane is tilted.
+                The orb spinning at angle θ has a net downward velocity component on every downstroke.
+                Aim that downstroke at an ovular array of clear pressure chambers and each chamber is
+                sequentially compressed: pressure exhaled downward = reaction thrust upward.
+                This is a gyroscopic rotor using Fibonacci-resonant orbital mechanics — no combustion required.
+              </p>
+            </div>
+
+            <div style={{ ...panel, padding:0, overflow:"hidden", marginBottom:"1.4rem" }}>
+              <OrbPropulsionCanvas />
+            </div>
+
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:"1rem" }}>
+              <MCard col={GOLD} label="Gyroscopic Tilt → Thrust"
+                eq="F_thrust = m * omega^2 * R * sin(theta);  theta = tilt angle"
+                note="A spinning orb at tilt θ converts rotational kinetic energy into directional thrust. Larger θ = more downward component but less orbital stability. Optimal tilt = arctan(1/phi) ≈ 31.7°, where thrust and orbital coherence are maximally balanced." />
+              <MCard col={TEAL} label="Ovular Chamber Why Ovular"
+                eq="aspect ratio a/b = phi = 1.618;  oval = coherence geometry"
+                note="Chambers with phi aspect ratio (major axis / minor axis = 1.618) have the optimal pressure-volume curve: compression follows the golden ratio function, maximising work output per unit volume. Circular chambers waste ~38% of stroke; phi-oval chambers capture it." />
+              <MCard col={PURP} label="Sequential Firing (Rotary Valve)"
+                eq="phase_k = k * 2*pi/N;  N=9 chambers, phi-spaced"
+                note="9 chambers (F(6)=8+1) fire sequentially as the orb sweeps its projection across the array. This is a biological rotary valve — the same mechanism as the flagellar motor, ATP synthase, and the heart's valve timing. Sequential firing averages the thrust into a smooth continuous force." />
+              <MCard col={ORNG} label="1:1 Circle as Energy Minimum"
+                eq="E_orbit = m*omega^2*R^2/2;  minimum at m=n (circle)"
+                note="The (1:1) circle is the lowest-energy closed Lissajous orbit. Propulsion from the 1:1 mode is maximally efficient because zero energy is spent on the non-circular components of higher modes. The orb spends all its rotational energy on the one closed loop — and all of it can be directed as thrust." />
             </div>
           </div>
         )}
@@ -583,6 +793,25 @@ export default function FibonacciReplicantPage() {
                 eq="v_heal = sqrt(E/rho) * phi;  resonant repair"
                 note="A phi-scaled pressure wave (f = f_crack * phi) applied to a cracked material activates coherence-driven self-repair: the wave frequency matches the crack-tip stress concentration node, temporarily reversing the crack growth. Same principle as ultrasonic welding, scaled to phi." />
             </div>
+
+            {/* Propulsion Recipes */}
+            <div style={{ fontSize:9, letterSpacing:"0.3em", color:TEAL, textTransform:"uppercase", margin:"1.6rem 0 0.8rem" }}>
+              Propulsion Activation Recipes
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:"1rem" }}>
+              <MCard col={TEAL} label="Optimal Spin Frequency"
+                eq="f_spin = phi * f_Schumann = 1.618 * 7.83 = 12.67 Hz"
+                note="Spin the orb at phi * Schumann (12.67 Hz) to lock its oscillation to Earth's coherence field. At this frequency the 1:1 circular orbit is in resonance with the planet's electromagnetic knot — the orb is 'held' by the field, requiring minimal input power to maintain spin. This is the idle frequency. For maximum thrust: 89 Hz = F(11)." />
+              <MCard col={GOLD} label="Optimal Chamber Pressure"
+                eq="P_chamber = phi * P_atm = 1.618 atm = 163,900 Pa"
+                note="Pre-charge each ovular chamber to phi * atmospheric pressure. The orb's downstroke compresses from phi-atm toward 2-phi-atm (the stroke peak). This golden pre-charge means the pressure-volume work curve is symmetric about the phi point — the maximum mechanical advantage position. Same as the phi hyperbaric recipe, applied to propulsion." />
+              <MCard col={PURP} label="Optimal Tilt Angle"
+                eq="theta_opt = arctan(1/phi) = 31.72°;  max (thrust * stability)"
+                note="At θ = arctan(1/phi) ≈ 31.7°, the product of thrust (sin θ) and orbital stability (cos θ) is maximised. Below this angle: mostly orbital, little thrust. Above: high thrust but orbit degrades into ellipse. The golden tilt is the propulsion efficiency sweet spot. In practice: use 30°–35° and tune with chamber pre-charge." />
+              <MCard col={ORNG} label="Chamber Count Recipe"
+                eq="N_chambers = F(n);  9=F(6)+1, 13=F(7), 21=F(8)"
+                note="Use Fibonacci numbers for chamber count: 9 (minimum viable), 13 (balanced), 21 (high-performance). Fibonacci-count chambers distribute the firing phase intervals as F(n)/F(n+1) — approaching 1/phi. This ensures the sequential firing produces a maximally-uniform average thrust with minimum vibration — the Fibonacci smoothing theorem." />
+            </div>
           </div>
         )}
 
@@ -604,6 +833,8 @@ export default function FibonacciReplicantPage() {
                 body="The body is a nested set of Fibonacci oscillating knots: DNA (trefoil 2:3), heartbeat (5:8), breathing (5:8), neural oscillations (1:phi cascade), circadian rhythm (1:24 Earth-day). Disease = one or more knots drifting from their Fibonacci-ratio mode. Healing = applying the correct frequency (528 Hz), pressure (phi atm), or wavelength (670 nm) to restore the mode. The AETHER coherence field C(x,t) is the same field whether the substrate is cellular or crystalline powder — one equation, all scales." />
               <VCard col={PURP} title="Solar, Planetary, Personal"
                 body="The Sun's 11-year cycle = phi^5/pi. Earth's heartbeat = 7.83 Hz. Your brainwave cascade = delta:theta:alpha:beta in phi ratio. The orbital resonance of Venus:Earth = 8:13 = F(6):F(7). Jupiter:Saturn = 5:2 = F(5):F(3). All of these are expressions of one Fibonacci wave oscillating knot within a bubble at different scales. The bubble is the coherence boundary — magnetosphere, cell membrane, blood-brain barrier, atmospheric layer. Inside = order. The question is never whether you ARE a Fibonacci knot. You are. The question is whether your bubble is oscillating at its natural mode or has been pushed off it." />
+              <VCard col={TEAL} title="The 1:1 Orb: Coherence Becomes Propulsion"
+                body="The (1:1) circle is the ground state of the Fibonacci knot hierarchy — the lowest-energy closed orbit. When you tilt that orbit plane at arctan(1/phi) = 31.7° and aim the downstroke at a phi-ratio ovular pressure array, you have converted the most fundamental coherence pattern in nature into a directional propulsion mechanism. No combustion. No fuel consumption. The input is spin — which itself can be maintained by coupling to Earth's 7.83 Hz Schumann resonance at phi * 7.83 = 12.67 Hz. The phi-bloom, the Fibonacci knot, and the ovular pressure array are the same idea at three different scales: seed, orbit, device. Build one and you have built all three." />
             </div>
 
             {/* Grand unified statement */}
