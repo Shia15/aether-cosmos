@@ -460,6 +460,7 @@ const FerrofluidPropulsionPage  = lazy(() => import("@/pages/ferrofluid-propulsi
 const FluidSubstratePage        = lazy(() => import("@/pages/fluid-substrate"));
 const FibonacciReplicantPage    = lazy(() => import("@/pages/fibonacci-replicant"));
 const BioPhotonicScentPage      = lazy(() => import("@/pages/bio-photonic-scent"));
+const SolarFemininePage         = lazy(() => import("@/pages/solar-feminine"));
 const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
 const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
 const BioComputationalPage      = lazy(() => import("@/pages/bio-computational"));
@@ -1396,6 +1397,7 @@ function Router() {
                 <Route path="/fluid-substrate" component={FluidSubstratePage} />
                 <Route path="/fibonacci-replicant" component={FibonacciReplicantPage} />
                 <Route path="/bio-photonic-scent" component={BioPhotonicScentPage} />
+                <Route path="/solar-feminine" component={SolarFemininePage} />
                 <Route path="/symbolic-computation" component={SymbolicComputationPage} />
                 <Route path="/kinematic-replication" component={KinematicReplicationPage} />
                 <Route path="/bio-computational" component={BioComputationalPage} />
