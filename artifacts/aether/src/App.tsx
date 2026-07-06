@@ -461,6 +461,7 @@ const FluidSubstratePage        = lazy(() => import("@/pages/fluid-substrate"));
 const FibonacciReplicantPage    = lazy(() => import("@/pages/fibonacci-replicant"));
 const BioPhotonicScentPage      = lazy(() => import("@/pages/bio-photonic-scent"));
 const PollenFlowerPage          = lazy(() => import("@/pages/pollen-flower"));
+const AetherBodySuitPage        = lazy(() => import("@/pages/aether-bodysuit"));
 const SolarFemininePage         = lazy(() => import("@/pages/solar-feminine"));
 const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
 const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
@@ -1399,6 +1400,7 @@ function Router() {
                 <Route path="/fibonacci-replicant" component={FibonacciReplicantPage} />
                 <Route path="/bio-photonic-scent" component={BioPhotonicScentPage} />
                 <Route path="/pollen-flower" component={PollenFlowerPage} />
+                <Route path="/aether-bodysuit" component={AetherBodySuitPage} />
                 <Route path="/solar-feminine" component={SolarFemininePage} />
                 <Route path="/symbolic-computation" component={SymbolicComputationPage} />
                 <Route path="/kinematic-replication" component={KinematicReplicationPage} />

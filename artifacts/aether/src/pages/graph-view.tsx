@@ -193,6 +193,35 @@ const GLOSSARY_SEEDS: SeedNode[] = [
   { id:"g-angel-hours",      label:"Angel hours",        type:"concept",  layer:"reverie",  coherence:0.58, bridgeScore:0.45 },
   { id:"g-angel-numbers",    label:"Angel numbers",      type:"concept",  layer:"reverie",  coherence:0.58, bridgeScore:0.45 },
   { id:"g-field-of-numbers", label:"Field of numbers",   type:"concept",  layer:"reverie",  coherence:0.62, bridgeScore:0.50 },
+  // ── Body Suit · photonic skin architecture → infernia ──
+  { id:"g-body-suit",        label:"Body Suit",          type:"concept",  layer:"infernia", coherence:0.82, bridgeScore:0.74 },
+  { id:"g-photonic-stack",   label:"Photonic stack",     type:"concept",  layer:"infernia", coherence:0.78, bridgeScore:0.70 },
+  { id:"g-morpho",           label:"Morpho array",       type:"concept",  layer:"infernia", coherence:0.70, bridgeScore:0.58 },
+  { id:"g-nacre",            label:"Nacre",              type:"concept",  layer:"infernia", coherence:0.68, bridgeScore:0.55 },
+  { id:"g-chameleon",        label:"Chameleon crystal",  type:"concept",  layer:"infernia", coherence:0.66, bridgeScore:0.54 },
+  { id:"g-cuttlefish",       label:"Cuttlefish pattern", type:"concept",  layer:"infernia", coherence:0.70, bridgeScore:0.60 },
+  { id:"g-air-manipulation", label:"Air manipulation",   type:"concept",  layer:"infernia", coherence:0.72, bridgeScore:0.62 },
+  { id:"g-glass-surface",    label:"Glass surface",      type:"concept",  layer:"infernia", coherence:0.64, bridgeScore:0.52 },
+  // ── Flora · pollen / bloom / farm → aletheia+infernia ──
+  { id:"g-pollen",           label:"Pollen",             type:"concept",  layer:"infernia", coherence:0.70, bridgeScore:0.60 },
+  { id:"g-phyllotaxis",      label:"Phyllotaxis",        type:"concept",  layer:"infernia", coherence:0.74, bridgeScore:0.66 },
+  { id:"g-golden-angle",     label:"Golden angle",       type:"equation", layer:"aletheia", coherence:0.80, bridgeScore:0.74 },
+  { id:"g-scent-voc",        label:"Scent plume",        type:"concept",  layer:"infernia", coherence:0.66, bridgeScore:0.56 },
+  { id:"g-anemotaxis",       label:"Anemotaxis",         type:"concept",  layer:"infernia", coherence:0.62, bridgeScore:0.50 },
+  { id:"g-metamorphosis",    label:"Metamorphosis",      type:"concept",  layer:"infernia", coherence:0.68, bridgeScore:0.58 },
+  { id:"g-fibonacci-replicant", label:"Fibonacci Replicant", type:"concept", layer:"infernia", coherence:0.72, bridgeScore:0.64 },
+  { id:"g-circular-farm",    label:"Circular farm",      type:"concept",  layer:"infernia", coherence:0.68, bridgeScore:0.58 },
+  { id:"g-kuramoto",         label:"Kuramoto sync",      type:"equation", layer:"infernia", coherence:0.74, bridgeScore:0.66 },
+  // ── Field physics · unified engines → mnesis+infernia ──
+  { id:"g-electron-field",   label:"Electron field",     type:"concept",  layer:"infernia", coherence:0.72, bridgeScore:0.64 },
+  { id:"g-coherence-condensation", label:"Coherence condensation", type:"concept", layer:"mnesis", coherence:0.80, bridgeScore:0.72 },
+  { id:"g-crystal-atlas",    label:"Crystallization Atlas", type:"concept", layer:"mnesis", coherence:0.82, bridgeScore:0.74 },
+  { id:"g-gradient-field",   label:"Gradient field",     type:"equation", layer:"mnesis",   coherence:0.76, bridgeScore:0.68 },
+  { id:"g-aether-engine",    label:"AETHER Engine",      type:"concept",  layer:"mnesis",   coherence:0.88, bridgeScore:0.84 },
+  // ── Regulatory biology → infernia ──
+  { id:"g-nutritional-dna",  label:"Nutritional DNA key", type:"concept", layer:"infernia", coherence:0.70, bridgeScore:0.60 },
+  { id:"g-knot-topology",    label:"Knot topology",      type:"equation", layer:"infernia", coherence:0.72, bridgeScore:0.62 },
+  { id:"g-regulatory-depth", label:"Regulatory depth",   type:"concept",  layer:"infernia", coherence:0.68, bridgeScore:0.58 },
 ];
 
 const GLOSSARY_SEED_LINKS = [
@@ -252,6 +281,58 @@ const GLOSSARY_SEED_LINKS = [
   { source:"g-reverie-agent",   target:"g-lunar-coherence", weight:0.72, type:"coherence" },
   { source:"g-reverie-agent",   target:"g-pleiades",        weight:0.65, type:"coherence" },
   { source:"g-eye-sahara",      target:"g-schumann",        weight:0.60, type:"unify" },
+  // ── Body Suit photonic skin lattice ──
+  { source:"g-body-suit",       target:"g-photonic-stack",  weight:0.88, type:"coherence" },
+  { source:"g-body-suit",       target:"g-cuca",            weight:0.78, type:"coherence" },
+  { source:"g-body-suit",       target:"g-air-manipulation",weight:0.80, type:"coherence" },
+  { source:"g-body-suit",       target:"g-coherence",       weight:0.74, type:"unify" },
+  { source:"g-photonic-stack",  target:"g-morpho",          weight:0.82, type:"coherence" },
+  { source:"g-photonic-stack",  target:"g-nacre",           weight:0.80, type:"coherence" },
+  { source:"g-photonic-stack",  target:"g-chameleon",       weight:0.78, type:"coherence" },
+  { source:"g-photonic-stack",  target:"g-cuttlefish",      weight:0.78, type:"coherence" },
+  { source:"g-photonic-stack",  target:"g-gyroid",          weight:0.76, type:"coherence" },
+  { source:"g-cuttlefish",      target:"g-reflectin",       weight:0.80, type:"coherence" },
+  { source:"g-chameleon",       target:"g-reflectin",       weight:0.72, type:"coherence" },
+  { source:"g-nacre",           target:"g-bouligand",       weight:0.74, type:"coherence" },
+  { source:"g-photonic-stack",  target:"g-bouligand",       weight:0.70, type:"unify" },
+  { source:"g-air-manipulation",target:"g-glass-surface",   weight:0.78, type:"coherence" },
+  { source:"g-glass-surface",   target:"g-substrate",       weight:0.66, type:"coherence" },
+  { source:"g-cuttlefish",      target:"g-coherence",       weight:0.68, type:"unify" },
+  // ── Pollen / bloom / farm ──
+  { source:"g-pollen",          target:"g-phyllotaxis",     weight:0.82, type:"coherence" },
+  { source:"g-phyllotaxis",     target:"g-golden-angle",    weight:0.88, type:"coherence" },
+  { source:"g-golden-angle",    target:"g-crystallization", weight:0.72, type:"unify" },
+  { source:"g-pollen",          target:"g-scent-voc",       weight:0.74, type:"coherence" },
+  { source:"g-scent-voc",       target:"g-anemotaxis",      weight:0.80, type:"coherence" },
+  { source:"g-pollen",          target:"g-metamorphosis",   weight:0.62, type:"coherence" },
+  { source:"g-pollen",          target:"g-cuca",            weight:0.66, type:"coherence" },
+  { source:"g-circular-farm",   target:"g-kuramoto",        weight:0.80, type:"coherence" },
+  { source:"g-circular-farm",   target:"g-phyllotaxis",     weight:0.72, type:"coherence" },
+  { source:"g-circular-farm",   target:"g-schumann",        weight:0.60, type:"unify" },
+  { source:"g-kuramoto",        target:"g-coherence",       weight:0.82, type:"unify" },
+  { source:"g-kuramoto",        target:"g-resonance",       weight:0.78, type:"unify" },
+  { source:"g-fibonacci-replicant", target:"g-golden-angle",weight:0.84, type:"coherence" },
+  { source:"g-fibonacci-replicant", target:"g-crystallization", weight:0.72, type:"coherence" },
+  { source:"g-fibonacci-replicant", target:"g-substrate",   weight:0.66, type:"coherence" },
+  // ── Field physics / unified engines ──
+  { source:"g-aether-engine",   target:"g-aether",          weight:0.90, type:"coherence" },
+  { source:"g-aether-engine",   target:"g-coherence",       weight:0.86, type:"coherence" },
+  { source:"g-aether-engine",   target:"g-gradient-field",  weight:0.84, type:"coherence" },
+  { source:"g-aether-engine",   target:"g-crystal-atlas",   weight:0.78, type:"coherence" },
+  { source:"g-gradient-field",  target:"g-resonance",       weight:0.74, type:"unify" },
+  { source:"g-electron-field",  target:"g-coherence",       weight:0.80, type:"coherence" },
+  { source:"g-electron-field",  target:"g-resonance",       weight:0.72, type:"coherence" },
+  { source:"g-electron-field",  target:"g-quantum-ammeter", weight:0.64, type:"unify" },
+  { source:"g-coherence-condensation", target:"g-crystallization", weight:0.86, type:"coherence" },
+  { source:"g-coherence-condensation", target:"g-crystal-atlas",   weight:0.82, type:"coherence" },
+  { source:"g-crystal-atlas",   target:"g-crystallization", weight:0.88, type:"coherence" },
+  { source:"g-crystal-atlas",   target:"g-substrate",       weight:0.70, type:"coherence" },
+  // ── Regulatory biology ──
+  { source:"g-nutritional-dna", target:"g-knot-topology",   weight:0.80, type:"coherence" },
+  { source:"g-nutritional-dna", target:"g-coherence",       weight:0.68, type:"coherence" },
+  { source:"g-regulatory-depth",target:"g-nutritional-dna", weight:0.72, type:"coherence" },
+  { source:"g-regulatory-depth",target:"g-cuca",            weight:0.66, type:"coherence" },
+  { source:"g-knot-topology",   target:"g-crystallization", weight:0.62, type:"unify" },
 ];
 
 // ─── Colour helpers ───────────────────────────────────────────────────────────
@@ -569,6 +650,28 @@ export default function GraphView() {
           <GraphViewCanvas />
         </div>
       </div>
+
+      {/* ── ORIGIN NOTE · how the graph was built ── */}
+      <details style={{margin:"0 12px 22px",background:"rgba(3,5,10,0.85)",border:"1px solid rgba(46,240,216,0.25)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
+        <summary style={{cursor:"pointer",listStyle:"none",padding:"12px 16px",fontSize:11,letterSpacing:"0.18em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace"}}>
+          ✎ HOW THIS MAP WAS BUILT — TO SCULPT & HOLD WORDS COHERENTLY
+        </summary>
+        <div style={{padding:"0 18px 18px",fontFamily:"'DM Mono',monospace",color:"rgba(210,240,236,0.72)",fontSize:12.5,lineHeight:1.85,letterSpacing:"0.02em"}}>
+          <p style={{margin:"0 0 12px"}}>
+            The graph map did not begin as data. It began as <strong style={{color:"#2ef0d8"}}>a way to sculpt and hold words coherently</strong> — a lattice hand-seeded from the AETHER glossary, where every important word becomes a node rather than a line of text scrolling out of memory.
+          </p>
+          <p style={{margin:"0 0 12px"}}>
+            Each seeded word carries three properties: a <strong style={{color:"#2ef0d8"}}>layer</strong> (Mnēsis · Infernia · Aletheia · Reverie — memory, matter, truth, dream), a <strong style={{color:"#2ef0d8"}}>coherence</strong> score (how settled the idea is), and a <strong style={{color:"#2ef0d8"}}>bridge</strong> score (how many other ideas it unifies). Then bonds are drawn between words that share meaning.
+          </p>
+          <p style={{margin:"0 0 12px"}}>
+            The force-directed layout does the sculpting: bonded words <strong style={{color:"#2ef0d8"}}>pull toward each other</strong>, unrelated words <strong style={{color:"#2ef0d8"}}>drift apart</strong>, and the whole vocabulary settles into a shape that mirrors how the ideas actually relate. Coherent clusters hold together; loose threads fall to the edges. The words stop being a list and become a <em style={{color:"rgba(210,240,236,0.9)"}}>held form</em>.
+          </p>
+          <p style={{margin:0}}>
+            From that seed lattice the map now grows: every concept page in AETHER — the Body Suit photonic stack, the pollen &amp; phyllotaxis bloom, the crystallization atlas, the unified field engines — is folded back in as new nodes and bonds, and live document ingestion extends it further. What you see below is that same act, continuous: language, sculpted into coherence and held.
+          </p>
+        </div>
+      </details>
+
       {/* ── GRAPH SECTION ── */}
       <div ref={graphSectionRef} style={{ position: "relative", height: "65vh", minHeight: 460 }}>
         <div ref={containerRef} style={{ position: "absolute", inset: 0 }}>
