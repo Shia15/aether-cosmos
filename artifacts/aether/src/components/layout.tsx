@@ -149,6 +149,7 @@ const NAV_ITEMS = [
   { href: "/synaptic-entropy", label: "Synaptic Entropy Engine · Cybernetic Brain · Hebbian Network · DNA Dynamics · High-State Cognitive Bursts · Consciousness Crystallization", icon: Brain },
   { href: "/slinky-propulsion", label: "Slinky Propulsion · Plasma Fusion Space Race Rings · Toroidal Harmonic Generators · Space-Time Curvature Riding · Inertialess Drive", icon: Orbit },
   { href: "/ferrofluid-propulsion", label: "Ferrofluid Nucleation Propulsion · Rosensweig Instability · Bio Nanoparticle Navigation · Magnetic Vehicle Levitation · Coherent Scale-Free Engine", icon: Magnet },
+  { href: "/fluid-substrate", label: "Fluid Substrate Engine · Coherence Fluid & Powder · Earth Moon Mars ISS · Dry Steel · Vortex Transport · Energy Funnel · Einstein · Zeta Packing", icon: FlaskConical },
   { href: "/symbolic-computation", label: "Symbolic Computation Hypothesis · Göbekli Tepe as Analog Information Processor · Pillar Graph · Light Oracle · Celestial Mapping", icon: Pyramid },
   { href: "/kinematic-replication", label: "Kinematic Self-Replication · Xenobots & Anthrobots · Bottom-Up Coherence · CUCA Loop · Controlled Breakdown", icon: GitFork },
   { href: "/bio-computational", label: "Bio-Computational Paradigm · Bone Marrow Core · Cross-Species Biomolecules · Claude Prototype · Wearable CBC", icon: HeartPulse },
