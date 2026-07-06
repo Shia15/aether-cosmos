@@ -345,6 +345,7 @@ const NAV_ITEMS = [
   { href: "/filament-lattice",       label: "Filament Lattice · All 6 Strokes Simultaneous · Phi-Spiral · Hex · Kagome · AETHER Lattice Formations", icon: Waves },
   { href: "/wave-lattice",           label: "Wave Lattice · Dynamic Wave Physics · Beat Interference · Standing Modes · Coupling Constant · Dimensional Cascade", icon: Waves },
   { href: "/synthesis-field",        label: "Synthesis Field · Color Smoke · Mist Particle Decay · Bioluminescence · Quantum Geometry · All Fields Unified", icon: Waves },
+  { href: "/brain-cube-camera",      label: "Brain Cube Camera · Photonic Brain Scanner · Voxel Heat Map · DNA Coherence · Sea-Milk Biophoton Imaging", icon: Waves },
   { href: "/flower-clock",           label: "24Flower Clock · Fibonacci Cycle · Scent Ritual · Phase Tracking",           icon: Atom },
   { href: "/wood-frog-biophotonics", label: "Wood Frog Skin · Photonic Bio-Engine · C(x,t) Simulation · 4 Views",        icon: Layers },
   { href: "/wood-frog-knots",        label: "Wood Frog Skin x Tait Knots · C(x,t) Coherence Field · Gradient Opacity Differential · Phase Singularity · A(x)=tanh(dist/sigma)", icon: Layers },
