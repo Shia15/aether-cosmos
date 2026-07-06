@@ -717,7 +717,7 @@ function drawTorusCanvas(canvas: HTMLCanvasElement, t: number, propMode: boolean
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
-type Tab = "multiscale" | "receptors" | "organoid" | "pineal" | "psilocybin" | "consciousness" | "crystals" | "torus";
+type Tab = "multiscale" | "receptors" | "organoid" | "pineal" | "psilocybin" | "consciousness" | "crystals" | "torus" | "voxel";
 
 function NeuralPsychedelicHeaderCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -756,8 +756,212 @@ function NeuralPsychedelicHeaderCanvas() {
   return <canvas ref={ref} style={{width:"100%",height:"auto",borderRadius:8,display:"block"}} />;
 }
 
+// ── VOXEL COHERENCE IMAGER — Brain states vs C(x,t) ──────────────────────────
+const VGW = 28;
+const VGH = 22;
+
+function voxInBrain(ix: number, iy: number): boolean {
+  const cx = VGW / 2 - 0.5;
+  const cy = VGH * 0.46;
+  const rx = VGW * 0.46;
+  const ry = VGH * 0.44;
+  const dx = (ix - cx) / rx;
+  const dy = (iy - cy) / ry;
+  if (dx * dx + dy * dy > 1.0) return false;
+  if (iy < cy - ry * 0.38 && Math.abs(ix - cx) < 1.3) return false;
+  return true;
+}
+
+function voxHeat(v: number): [number, number, number] {
+  const stops: [number, number, number][] = [
+    [5, 8, 30], [10, 25, 180], [0, 190, 200], [0, 220, 60],
+    [255, 200, 0], [255, 70, 0], [255, 240, 255],
+  ];
+  const n = stops.length - 1;
+  const i = Math.min(Math.floor(v * n), n - 1);
+  const f = v * n - i;
+  const a = stops[i], b = stops[i + 1];
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * f),
+    Math.round(a[1] + (b[1] - a[1]) * f),
+    Math.round(a[2] + (b[2] - a[2]) * f),
+  ];
+}
+
+const BRAIN_STATES = [
+  { id: "baseline",   label: "Baseline Waking",  color: "#4db8ff", base: 0.42, entropy: 0.10, wfreq: 1.0,  dmn: 0.92, integ: 0.35,
+    desc: "Structured Default Mode Network dominance. Moderate, orderly coherence. Ego-boundary intact. Segregated networks." },
+  { id: "psilocybin", label: "Psilocybin",       color: "#b47ef8", base: 0.50, entropy: 0.28, wfreq: 1.4,  dmn: 0.22, integ: 0.78,
+    desc: "DMN suppression + ego dissolution. Entropy rises, cross-network integration surges — coherence spreads globally." },
+  { id: "lsd",        label: "LSD",              color: "#4db8ff", base: 0.52, entropy: 0.34, wfreq: 0.8,  dmn: 0.18, integ: 0.86,
+    desc: "Maximal global integration, long-wavelength coherence, high entropy. Segregation collapses into unified field." },
+  { id: "dmt",        label: "DMT Breakthrough", color: "#f472b6", base: 0.60, entropy: 0.40, wfreq: 2.6,  dmn: 0.14, integ: 0.95,
+    desc: "Extreme high-frequency coherence bursts + near-total integration. The most ordered-yet-entropic state." },
+  { id: "ketamine",   label: "Ketamine",         color: "#00e5c0", base: 0.34, entropy: 0.46, wfreq: 1.6,  dmn: 0.40, integ: 0.22,
+    desc: "NMDA antagonism → dissociation. Fragmented, patchy coherence — high local entropy, low global binding." },
+  { id: "meditation", label: "Meditation / Flow",color: "#4ade80", base: 0.56, entropy: 0.05, wfreq: 0.5,  dmn: 0.55, integ: 0.72,
+    desc: "High global coherence, minimal entropy. Calm alpha/theta. Ordered integration without dissolution." },
+  { id: "sleep",      label: "Deep Sleep (NREM)",color: "#c9a227", base: 0.24, entropy: 0.08, wfreq: 0.25, dmn: 0.50, integ: 0.55,
+    desc: "Slow delta waves, low overall coherence, offline consolidation. Sensory gating maximal." },
+];
+
+function stateCoherence(ix: number, iy: number, t: number, S: typeof BRAIN_STATES[number]): number {
+  const cx = VGW / 2 - 0.5;
+  const cyDMN = VGH * 0.42;
+  let base = S.base;
+  const dmnMask = Math.exp(-(((ix - cx) * (ix - cx)) / 10 + ((iy - cyDMN) * (iy - cyDMN)) / 7));
+  base += dmnMask * (S.dmn - 0.5) * 0.55;
+  const glob = Math.sin((ix + iy) * 0.11 * (1 - S.integ * 0.7) - t * S.wfreq * 0.5) * (0.13 + S.integ * 0.16);
+  const fast = Math.sin(ix * 0.6 - iy * 0.42 - t * S.wfreq * 2.5) * 0.11;
+  const noise = Math.sin(ix * 12.9 + iy * 7.3 + t * 4.0) * Math.cos(ix * 3.1 - iy * 9.7 - t * 2.5) * 0.5 * S.entropy;
+  return Math.max(0, Math.min(1, base + glob + fast + noise));
+}
+
+interface VoxelImagerProps { stateIdx: number; }
+
+function VoxelCoherenceImager({ stateIdx }: VoxelImagerProps) {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  const idxRef = useRef(stateIdx);
+  const stRef = useRef({ raf: 0, t: 0, scanY: 0.1, scanDir: 1 });
+  useEffect(() => { idxRef.current = stateIdx; }, [stateIdx]);
+
+  useEffect(() => {
+    const cv = cvRef.current!;
+    const ctx = cv.getContext("2d")!;
+    function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(cv);
+    const s = stRef.current;
+
+    function draw() {
+      const W = cv.width, H = cv.height;
+      const S = BRAIN_STATES[idxRef.current];
+      const S0 = BRAIN_STATES[0];
+      ctx.fillStyle = "#020810";
+      ctx.fillRect(0, 0, W, H);
+
+      const bW = Math.floor(W * 0.68);
+      const VS = Math.max(8, Math.floor(Math.min(bW / (VGW + 2), H / (VGH + 2))));
+      const brainPxW = VS * VGW, brainPxH = VS * VGH;
+      const ox = Math.floor((bW - brainPxW) / 2);
+      const oy = Math.floor((H - brainPxH) / 2);
+      const scanPx = s.scanY * H;
+
+      // Base voxels
+      let totalC = 0, cnt = 0, totalC0 = 0;
+      ctx.globalCompositeOperation = "source-over";
+      for (let iy = 0; iy < VGH; iy++) {
+        for (let ix = 0; ix < VGW; ix++) {
+          if (!voxInBrain(ix, iy)) continue;
+          const c = stateCoherence(ix, iy, s.t, S);
+          totalC += c; cnt++;
+          totalC0 += stateCoherence(ix, iy, s.t, S0);
+          const sx = ox + ix * VS, sy = oy + iy * VS;
+          const scanDist = Math.abs(sy + VS / 2 - scanPx);
+          const boost = Math.max(0, 1 - scanDist / (VS * 3)) * 0.4;
+          const [r, g, b] = voxHeat(Math.min(1, c + boost));
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          ctx.fillRect(sx + 0.5, sy + 0.5, VS - 1, VS - 1);
+        }
+      }
+      // Glow halos
+      ctx.globalCompositeOperation = "screen";
+      for (let iy = 0; iy < VGH; iy++) {
+        for (let ix = 0; ix < VGW; ix++) {
+          if (!voxInBrain(ix, iy)) continue;
+          const c = stateCoherence(ix, iy, s.t, S);
+          if (c < 0.4) continue;
+          const sx = ox + ix * VS + VS / 2, sy = oy + iy * VS + VS / 2;
+          const r2 = VS * (0.8 + c * 1.3);
+          const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, r2);
+          const [r, g, b] = voxHeat(c);
+          const alpha = (c - 0.4) / 0.6 * 0.42;
+          grad.addColorStop(0, `rgba(${r},${g},${b},${alpha.toFixed(3)})`);
+          grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+          ctx.beginPath(); ctx.arc(sx, sy, r2, 0, Math.PI * 2);
+          ctx.fillStyle = grad; ctx.fill();
+        }
+      }
+      ctx.globalCompositeOperation = "source-over";
+
+      // Scan line
+      const sg = ctx.createLinearGradient(0, scanPx - 4, 0, scanPx + 4);
+      sg.addColorStop(0, "rgba(0,229,192,0)");
+      sg.addColorStop(0.5, "rgba(0,229,192,0.55)");
+      sg.addColorStop(1, "rgba(0,229,192,0)");
+      ctx.fillStyle = sg; ctx.fillRect(0, scanPx - 4, bW, 8);
+
+      // DMN marker ring
+      const dmnX = ox + (VGW / 2 - 0.5) * VS + VS / 2;
+      const dmnY = oy + VGH * 0.42 * VS + VS / 2;
+      ctx.strokeStyle = `rgba(180,126,248,${(0.2 + S.dmn * 0.5).toFixed(2)})`;
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.arc(dmnX, dmnY, VS * 3.4, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = `rgba(180,126,248,${(0.4 + S.dmn * 0.5).toFixed(2)})`;
+      ctx.font = "8px 'DM Mono',monospace"; ctx.textAlign = "center";
+      ctx.fillText("DMN", dmnX, dmnY - VS * 3.4 - 4);
+
+      // Viewfinder brackets
+      const br = 16;
+      ctx.strokeStyle = "rgba(0,229,192,0.5)"; ctx.lineWidth = 2;
+      [[ox - 4, oy - 4], [ox + brainPxW + 4 - br, oy - 4],
+       [ox - 4, oy + brainPxH - br + 4], [ox + brainPxW + 4 - br, oy + brainPxH - br + 4]].forEach(([px, py]) => {
+        ctx.beginPath();
+        ctx.moveTo(px, py + br); ctx.lineTo(px, py); ctx.lineTo(px + br, py);
+        ctx.moveTo(px + br, py + br); ctx.lineTo(px + br, py + br); ctx.stroke();
+      });
+
+      // ── Readout panel ──
+      const rX = bW + 10;
+      const meanC = cnt ? totalC / cnt : 0;
+      const meanC0 = cnt ? totalC0 / cnt : 0;
+      const delta = meanC - meanC0;
+      ctx.textAlign = "left";
+      ctx.fillStyle = S.color; ctx.font = "bold 10px 'DM Mono',monospace";
+      ctx.fillText(S.label.toUpperCase(), rX, 20);
+      ctx.fillStyle = "rgba(255,255,255,0.15)"; ctx.fillRect(rX, 26, W - rX - 12, 1);
+
+      const rows = [
+        { k: "C(x,t) mean", v: meanC.toFixed(3), col: "#e2e8f0" },
+        { k: "Δ vs baseline", v: (delta >= 0 ? "+" : "") + delta.toFixed(3), col: delta >= 0 ? "#4ade80" : "#f472b6" },
+        { k: "Entropy", v: (S.entropy * 100).toFixed(0) + "%", col: "#fb923c" },
+        { k: "Integration", v: (S.integ * 100).toFixed(0) + "%", col: "#00e5c0" },
+        { k: "DMN activity", v: (S.dmn * 100).toFixed(0) + "%", col: "#b47ef8" },
+      ];
+      rows.forEach((row, i) => {
+        const ry = 46 + i * 34;
+        ctx.fillStyle = "rgba(255,255,255,0.4)"; ctx.font = "9px 'DM Mono',monospace";
+        ctx.fillText(row.k, rX, ry);
+        ctx.fillStyle = row.col; ctx.font = "bold 14px 'DM Mono',monospace";
+        ctx.fillText(row.v, rX, ry + 16);
+      });
+
+      // Coherence bar
+      const barY = 46 + rows.length * 34 + 6;
+      ctx.fillStyle = "rgba(255,255,255,0.06)"; ctx.fillRect(rX, barY, W - rX - 12, 12);
+      const [cr, cg, cb] = voxHeat(meanC);
+      ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
+      ctx.fillRect(rX, barY, (W - rX - 12) * meanC, 12);
+
+      s.scanY += s.scanDir * 0.0024;
+      if (s.scanY > 0.95) s.scanDir = -1;
+      if (s.scanY < 0.05) s.scanDir = 1;
+      s.t += 0.016;
+      s.raf = requestAnimationFrame(draw);
+    }
+    s.raf = requestAnimationFrame(draw);
+    return () => { cancelAnimationFrame(s.raf); ro.disconnect(); };
+  }, []);
+
+  return <canvas ref={cvRef} style={{ width: "100%", height: 460, display: "block" }} />;
+}
+
 export default function NeuralPsychedelicPage() {
   const [tab, setTab] = useState<Tab>("multiscale");
+  const [voxelState, setVoxelState] = useState(1);
   const [scaleIdx, setScaleIdx] = useState(3);
   const [compound, setCompound] = useState("Psilocin");
   const [bindProgress, setBindProgress] = useState(0);
@@ -933,6 +1137,7 @@ export default function NeuralPsychedelicPage() {
           {tabBtn("consciousness","△ Consciousness",  "#c9a227")}
           {tabBtn("crystals",     "⟐ Body Crystals",  "#4db8ff")}
           {tabBtn("torus",        "◎ Torus Rings",    "#00FFEE")}
+          {tabBtn("voxel",        "▦ Voxel States",   "#f472b6")}
         </div>
       </div>
 
@@ -1373,6 +1578,64 @@ export default function NeuralPsychedelicPage() {
               ))}
             </div>
             <CrystalMap bloodType={bloodType} />
+          </div>
+        )}
+
+        {/* ── VOXEL COHERENCE STATES TAB ── */}
+        {tab === "voxel" && (
+          <div>
+            <div style={{ marginBottom: "1.4rem" }}>
+              <div style={{ fontSize: 9, letterSpacing: "0.3em", color: "#f472b6", textTransform: "uppercase", marginBottom: 4 }}>
+                Brain Cube Camera · Live Voxel Coherence Imager
+              </div>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", maxWidth: 760, lineHeight: 1.7, margin: 0 }}>
+                The human brain rendered as a live {VGW}×{VGH} voxel grid, each cell heat-colored by the AETHER coherence
+                function C(x,t). Select a brain state to see how psychedelics, dissociatives, meditation and sleep reshape
+                the coherence field — DMN suppression, entropy, and global integration measured against the waking baseline.
+              </p>
+            </div>
+
+            {/* State selector */}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: "1.4rem" }}>
+              {BRAIN_STATES.map((st, i) => (
+                <button key={st.id} onClick={() => setVoxelState(i)} style={{
+                  padding: "0.4rem 1rem", borderRadius: 8, cursor: "pointer", border: "1px solid",
+                  borderColor: voxelState === i ? st.color : "rgba(255,255,255,0.08)",
+                  background: voxelState === i ? `${st.color}18` : "transparent",
+                  color: voxelState === i ? st.color : "rgba(255,255,255,0.3)",
+                  fontFamily: "'DM Mono',monospace", fontSize: 10, letterSpacing: "0.12em",
+                  fontWeight: voxelState === i ? "bold" : "normal",
+                }}>{st.label}</button>
+              ))}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "1.5rem" }}>
+              <div style={{ ...panel, overflow: "hidden" }}>
+                <VoxelCoherenceImager stateIdx={voxelState} />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <div style={{ ...panel, padding: "1rem 1.2rem", borderLeft: `3px solid ${BRAIN_STATES[voxelState].color}` }}>
+                  <div style={{ fontSize: 9, letterSpacing: "0.3em", color: BRAIN_STATES[voxelState].color, textTransform: "uppercase", marginBottom: 8 }}>
+                    {BRAIN_STATES[voxelState].label}
+                  </div>
+                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.55)", lineHeight: 1.7 }}>
+                    {BRAIN_STATES[voxelState].desc}
+                  </div>
+                </div>
+                <div style={{ ...panel, padding: "1rem 1.2rem" }}>
+                  <div style={{ fontSize: 9, letterSpacing: "0.3em", color: C.teal, textTransform: "uppercase", marginBottom: 8 }}>
+                    Coherence Function
+                  </div>
+                  <div style={{ fontSize: 12, color: C.gold, fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>
+                    C(x,t) = base + DMN(x) + ∫integ + entropy·ξ
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", lineHeight: 1.7 }}>
+                    High coherence voxels glow white-hot; incoherent voxels fall to dark navy. Δ vs baseline shows how far
+                    the state departs from ordinary waking consciousness. DMN ring marks the default-mode midline.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
