@@ -88,10 +88,9 @@ export default function BackgroundMusic() {
       setNeedsGesture(false);
       persist({ playing: true });
       fadeTo(saved.current.volume);
-    }).catch((err) => {
+    }).catch(() => {
       setPlaying(false);
       setNeedsGesture(true);
-      throw err;
     });
   }, [fadeTo, persist]);
 

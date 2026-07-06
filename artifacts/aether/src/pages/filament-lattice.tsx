@@ -267,6 +267,22 @@ const LATTICES: LatticeConfig[] = [
 /* ══════════════════════════════════════════════════════════════════════════
    Component
 ══════════════════════════════════════════════════════════════════════════ */
+/* ── Slider — module-level so React sees a stable component type ─────────── */
+function Slider({ label, val, set, min, max, step, color, fmt }: {
+  label: string; val: number; set: (v: number) => void;
+  min: number; max: number; step: number; color: string; fmt: (v: number) => string;
+}) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+      <span style={{ fontFamily:MONO, fontSize:9, color:MUTED, width:72, flexShrink:0 }}>{label}</span>
+      <input type="range" min={min} max={max} step={step} value={val}
+        onChange={e => set(parseFloat(e.target.value))}
+        style={{ flex:1, accentColor:color, height:2 }} />
+      <span style={{ fontFamily:MONO, fontSize:9, color, width:56, textAlign:"right" }}>{fmt(val)}</span>
+    </div>
+  );
+}
+
 export default function FilamentLatticePage() {
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const rafRef     = useRef(0);
@@ -433,22 +449,6 @@ export default function FilamentLatticePage() {
   }, [drawFrame]);
 
   const activeCfg = LATTICES.find(l => l.key === lattice)!;
-
-  /* ── Slider helper ────────────────────────────────────────────────────── */
-  function Slider({ label, val, set, min, max, step, color, fmt }: {
-    label: string; val: number; set: (v: number) => void;
-    min: number; max: number; step: number; color: string; fmt: (v: number) => string;
-  }) {
-    return (
-      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-        <span style={{ fontFamily:MONO, fontSize:9, color:MUTED, width:72, flexShrink:0 }}>{label}</span>
-        <input type="range" min={min} max={max} step={step} value={val}
-          onChange={e => set(parseFloat(e.target.value))}
-          style={{ flex:1, accentColor:color, height:2 }} />
-        <span style={{ fontFamily:MONO, fontSize:9, color, width:56, textAlign:"right" }}>{fmt(val)}</span>
-      </div>
-    );
-  }
 
   return (
     <div style={{ minHeight:"100vh", background:BG, color:TEXT, padding:"18px 16px 60px", fontFamily:MONO }}>
