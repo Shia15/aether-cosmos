@@ -151,6 +151,7 @@ const NAV_ITEMS = [
   { href: "/ferrofluid-propulsion", label: "Ferrofluid Nucleation Propulsion · Rosensweig Instability · Bio Nanoparticle Navigation · Magnetic Vehicle Levitation · Coherent Scale-Free Engine", icon: Magnet },
   { href: "/fluid-substrate", label: "Fluid Substrate Engine · Coherence Fluid & Powder · Earth Moon Mars ISS · Dry Steel · Vortex Transport · Energy Funnel · Einstein · Zeta Packing", icon: FlaskConical },
   { href: "/fibonacci-replicant", label: "Fibonacci Replicant · Planetary Self-Expanding Powder · Oscillating Knot Bubble · Atmosphere Activation · Healing Recipes · Phi Coherence Law", icon: Orbit },
+  { href: "/bio-photonic-scent", label: "Bio-Photonic Quantum Sense · Plants FMO Quantum Walk · Butterfly Photonic Crystal · Scent Frequency Switching · Turin Tunneling · Digital Scent", icon: Dna },
   { href: "/symbolic-computation", label: "Symbolic Computation Hypothesis · Göbekli Tepe as Analog Information Processor · Pillar Graph · Light Oracle · Celestial Mapping", icon: Pyramid },
   { href: "/kinematic-replication", label: "Kinematic Self-Replication · Xenobots & Anthrobots · Bottom-Up Coherence · CUCA Loop · Controlled Breakdown", icon: GitFork },
   { href: "/bio-computational", label: "Bio-Computational Paradigm · Bone Marrow Core · Cross-Species Biomolecules · Claude Prototype · Wearable CBC", icon: HeartPulse },
