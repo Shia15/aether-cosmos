@@ -643,6 +643,32 @@ export default function GraphView() {
 
   return (
     <div style={{ background: "#03050a", minHeight: "100vh", overflowY: "auto" }}>
+
+      {/* ── CONNECTED SYSTEMS BANNER ── */}
+      <div style={{ margin: "16px 12px 8px", padding: "14px 18px", background: "rgba(2,8,18,0.95)", border: "1px solid rgba(255,220,50,0.35)", borderRadius: 8, boxShadow: "0 0 28px rgba(255,220,50,0.12), inset 0 0 40px rgba(255,220,50,0.04)" }}>
+        <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, letterSpacing: "0.28em", color: "rgba(255,220,50,0.6)", marginBottom: 10 }}>CONNECTED SYSTEMS — EXTERNAL APPS ↗</div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {([
+            { name: "Starburst",            url: "https://star-structure.replit.app/",            col: "#f2c354", desc: "Star-structure simulation" },
+            { name: "Simulation Notebook",  url: "https://star-structure.replit.app/notebook/",   col: "#2ef0d8", desc: "Live equations & experiments" },
+            { name: "Neutrino Laser",       url: "https://neutrino-laser-analysis.replit.app",     col: "#c084fc", desc: "Neutrino laser analysis" },
+          ] as const).map(app => (
+            <a key={app.url} href={app.url} target="_blank" rel="noopener noreferrer"
+              style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 14px", borderRadius: 6, background: app.col + "12", border: `1px solid ${app.col}50`, textDecoration: "none", transition: "all 0.15s", flexShrink: 0 }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = app.col + "22"; el.style.borderColor = app.col + "cc"; el.style.boxShadow = `0 0 14px ${app.col}30`; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = app.col + "12"; el.style.borderColor = app.col + "50"; el.style.boxShadow = "none"; }}
+            >
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: app.col, boxShadow: `0 0 8px ${app.col}` }} />
+              <div>
+                <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, fontWeight: 700, color: app.col, letterSpacing: "0.08em" }}>{app.name}</div>
+                <div style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: "rgba(200,220,240,0.45)", marginTop: 1 }}>{app.desc}</div>
+              </div>
+              <span style={{ fontFamily: "monospace", fontSize: 12, color: app.col + "80", marginLeft: 2 }}>↗</span>
+            </a>
+          ))}
+        </div>
+      </div>
+
       <div style={{flexShrink:0}}>
         <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
         <div style={{margin:"0 12px 20px",background:"rgba(3,5,10,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>

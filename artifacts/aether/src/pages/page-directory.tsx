@@ -360,6 +360,13 @@ const CONNECTED = [
     dot: C.teal,
     badge: "NOTEBOOK",
   },
+  {
+    name: "Neutrino Laser Analysis",
+    url: "https://neutrino-laser-analysis.replit.app",
+    desc: "Neutrino laser coherence analysis — beam dynamics and field modelling",
+    dot: C.purple,
+    badge: "ANALYSIS",
+  },
 ];
 
 export default function PageDirectory() {
