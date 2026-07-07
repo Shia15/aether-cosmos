@@ -1306,7 +1306,7 @@ function SeedPapersPanel({ onImport }: { onImport: (url: string) => void }) {
 
 // ── Archive Card ──
 function ArchiveCard({ doc, onDelete, onView }: { doc: any; onDelete: () => void; onView: () => void }) {
-  const layerMeta = LAYER_META[(doc.layer as AetherLayer) ?? "auto"];
+  const layerMeta = LAYER_META[(doc.layer as AetherLayer) ?? "auto"] ?? LAYER_META["auto"];
   return (
     <div className="group rounded-lg border border-border/20 hover:border-border/40 p-4 transition-all">
       <div className="flex items-start gap-3">
