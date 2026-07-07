@@ -87,6 +87,7 @@ import {
   Camera,
   StickyNote,
   Worm,
+  CircleDot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
@@ -263,7 +264,9 @@ const NAV_ITEMS = [
   { href: "/math-engine",           label: "Math Engine · Workbench",  icon: Calculator },
   { href: "/aether-language",       label: "AETHER Language · Coherence Grammar · Unified Symbolic System", icon: BookA },
   { href: "/symbol-alphabet",       label: "Symbol Alphabet · Greek · Latin · Egyptian · Japanese · Russian · AETHER Layers", icon: Globe },
+  { href: "/alphabet-map",          label: "Alphabet Map · Letter DNA · Every Form of Every Letter A–Z", icon: Feather },
   { href: "/math-frontier",         label: "Math Frontier · θ²/s · Astronomical Units · Quantum Uncertainty · Non-Euclidean · Primes · Supersymmetry", icon: Orbit },
+  { href: "/polar-transform",       label: "Cartesian · Polar Transform · Jacobian · Tensor Invariants · Coordinate Geometry", icon: CircleDot },
   { href: "/unified-field-theory",  label: "Unified Field Theory · Einstein · Maxwell · Lorentz · AETHER Synthesis · Graviton", icon: Waves },
   { href: "/product-research",      label: "Product Research",         icon: FlaskRound },
   { href: "/ultra-magnetism",       label: "Ultra-Magnetism · SC",     icon: Hexagon },
