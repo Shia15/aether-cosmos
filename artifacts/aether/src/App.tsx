@@ -155,6 +155,7 @@ const MathEnginePage = lazy(() => import("@/pages/math-engine"));
 const AetherLanguagePage = lazy(() => import("@/pages/aether-language"));
 const SymbolAlphabetPage = lazy(() => import("@/pages/symbol-alphabet"));
 const AlphabetMapPage = lazy(() => import("@/pages/alphabet-map"));
+const QuestionBankPage = lazy(() => import("@/pages/question-bank"));
 const MathFrontierPage = lazy(() => import("@/pages/math-frontier"));
 const PolarTransformPage = lazy(() => import("@/pages/polar-transform"));
 const UnifiedFieldTheoryPage = lazy(() => import("@/pages/unified-field-theory"));
@@ -1059,6 +1060,7 @@ function Router() {
                 <Route path="/aether-language" component={AetherLanguagePage} />
                 <Route path="/symbol-alphabet" component={SymbolAlphabetPage} />
                 <Route path="/alphabet-map" component={AlphabetMapPage} />
+                <Route path="/question-bank" component={QuestionBankPage} />
                 <Route path="/math-frontier" component={MathFrontierPage} />
                 <Route path="/polar-transform" component={PolarTransformPage} />
                 <Route path="/unified-field-theory" component={UnifiedFieldTheoryPage} />
