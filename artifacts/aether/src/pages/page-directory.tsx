@@ -345,6 +345,23 @@ function PageCard({ entry, onClick }: { entry: PageEntry; onClick: () => void })
   );
 }
 
+const CONNECTED = [
+  {
+    name: "Starburst",
+    url: "https://star-structure.replit.app/",
+    desc: "Live star-structure simulation — the primary companion app",
+    dot: C.gold,
+    badge: "PUBLISHED APP",
+  },
+  {
+    name: "Simulation Notebook",
+    url: "https://star-structure.replit.app/notebook/",
+    desc: "Interactive simulation notebook — equations and live experiments",
+    dot: C.teal,
+    badge: "NOTEBOOK",
+  },
+];
+
 export default function PageDirectory() {
   const [tab, setTab] = useState<Tab>("core");
   const [search, setSearch] = useState("");
@@ -358,6 +375,47 @@ export default function PageDirectory() {
   return (
     <div style={{ minHeight:"100vh", background:C.bg, color:C.text, padding:"32px 24px 80px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
+
+        {/* Connected Systems */}
+        <div style={{ marginBottom:28, padding:"18px 20px", background:C.panel, border:`1px solid ${C.gold}30`, borderRadius:10 }}>
+          <div style={{ ...KS, color:C.gold, marginBottom:14, fontSize:9 }}>CONNECTED SYSTEMS — EXTERNAL APPS</div>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:10 }}>
+            {CONNECTED.map(app => (
+              <a
+                key={app.url}
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display:"grid",
+                  gridTemplateColumns:"10px 1fr",
+                  gap:12,
+                  alignItems:"start",
+                  background:C.panel2,
+                  border:`1px solid ${app.dot}40`,
+                  borderRadius:8,
+                  padding:"13px 15px",
+                  textDecoration:"none",
+                  color:C.text,
+                  transition:"border-color 0.15s, background 0.15s",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = app.dot + "bb"; (e.currentTarget as HTMLAnchorElement).style.background = app.dot + "0d"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = app.dot + "40"; (e.currentTarget as HTMLAnchorElement).style.background = C.panel2; }}
+              >
+                <div style={{ width:10, height:10, borderRadius:"50%", background:app.dot, marginTop:4, boxShadow:`0 0 6px ${app.dot}` }} />
+                <div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+                    <span style={{ fontSize:14, fontWeight:700, color:C.text }}>{app.name}</span>
+                    <span style={{ ...KS, fontSize:8, color:app.dot, background:app.dot + "22", border:`1px solid ${app.dot}44`, borderRadius:3, padding:"1px 6px" }}>{app.badge}</span>
+                    <span style={{ marginLeft:"auto", fontSize:9, color:app.dot + "aa" }}>↗</span>
+                  </div>
+                  <div style={{ color:C.muted, fontSize:12, lineHeight:1.45 }}>{app.desc}</div>
+                  <div style={{ ...KS, color:app.dot + "70", marginTop:5, fontSize:9 }}>{app.url}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
 
         {/* Header */}
         <div style={{ marginBottom:28, borderBottom:`1px solid ${C.border}`, paddingBottom:22 }}>
