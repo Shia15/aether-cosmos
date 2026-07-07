@@ -464,6 +464,7 @@ const PollenFlowerPage          = lazy(() => import("@/pages/pollen-flower"));
 const AetherBodySuitPage        = lazy(() => import("@/pages/aether-bodysuit"));
 const MechanicalQubitsPage      = lazy(() => import("@/pages/mechanical-qubits"));
 const ThermalDecoyFilterPage    = lazy(() => import("@/pages/thermal-decoy-filter"));
+const NotionSyncPage            = lazy(() => import("@/pages/notion-sync"));
 const SolarFemininePage         = lazy(() => import("@/pages/solar-feminine"));
 const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
 const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
@@ -1402,6 +1403,7 @@ function Router() {
                 <Route path="/aether-bodysuit" component={AetherBodySuitPage} />
                 <Route path="/mechanical-qubits" component={MechanicalQubitsPage} />
                 <Route path="/thermal-decoy-filter" component={ThermalDecoyFilterPage} />
+                <Route path="/notion-sync" component={NotionSyncPage} />
                 <Route path="/solar-feminine" component={SolarFemininePage} />
                 <Route path="/symbolic-computation" component={SymbolicComputationPage} />
                 <Route path="/kinematic-replication" component={KinematicReplicationPage} />

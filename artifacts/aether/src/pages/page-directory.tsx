@@ -381,6 +381,13 @@ const CONNECTED = [
     dot: C.green,
     badge: "ENERGY",
   },
+  {
+    name: "Notion Sync",
+    url: "/notion-sync",
+    desc: "Pull Notion pages into AETHER knowledge graph · push synthesis notes back out",
+    dot: C.purple,
+    badge: "SYNC",
+  },
 ];
 
 export default function PageDirectory() {

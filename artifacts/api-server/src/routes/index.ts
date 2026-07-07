@@ -14,6 +14,7 @@ import dialogueRouter from "./dialogue";
 import animalProfileRouter from "./animal-profile";
 import liveCursorsRouter from "./live-cursors";
 import communityNotesRouter from "./community-notes";
+import notionRouter from "./notion";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(dialogueRouter);
 router.use(animalProfileRouter);
 router.use(liveCursorsRouter);
 router.use(communityNotesRouter);
+router.use(notionRouter);
 
 export default router;
