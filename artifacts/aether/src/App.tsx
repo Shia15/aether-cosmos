@@ -152,6 +152,7 @@ const QuantumAmmeterPage = lazy(() => import("@/pages/quantum-ammeter"));
 const ThermalHierarchyView = lazy(() => import("@/pages/thermal-hierarchy"));
 const GeometryOfPermissionView = lazy(() => import("@/pages/geometry-of-permission"));
 const MathEnginePage = lazy(() => import("@/pages/math-engine"));
+const AetherLanguagePage = lazy(() => import("@/pages/aether-language"));
 const ProductResearchPage = lazy(() => import("@/pages/product-research"));
 const UltraMagnetismPage = lazy(() => import("@/pages/ultra-magnetism"));
 const QuantumVacuumPage = lazy(() => import("@/pages/quantum-vacuum"));
@@ -1050,6 +1051,7 @@ function Router() {
                 <Route path="/thermal-hierarchy" component={ThermalHierarchyView} />
                 <Route path="/geometry-of-permission" component={GeometryOfPermissionView} />
                 <Route path="/math-engine" component={MathEnginePage} />
+                <Route path="/aether-language" component={AetherLanguagePage} />
                 <Route path="/product-research" component={ProductResearchPage} />
                 <Route path="/ultra-magnetism" component={UltraMagnetismPage} />
                 <Route path="/quantum-vacuum" component={QuantumVacuumPage} />
