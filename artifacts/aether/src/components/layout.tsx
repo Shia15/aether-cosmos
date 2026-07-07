@@ -157,6 +157,7 @@ const NAV_ITEMS = [
   { href: "/mechanical-qubits", label: "Thermo-Mechanical Qubit Train · Phonon Heating · Coherence Decay · Throughput Optimisation · Shuttle Speed vs T2 · Efficiency Frontier", icon: Zap },
   { href: "/thermal-decoy-filter", label: "Practical Decoy Filter · Weathering Seizure Threshold · Feathering DNA Topology · Lyme Topo-II · Evidence Scores · Two-Species Quantum", icon: Activity },
   { href: "/notion-sync", label: "Notion Sync · Pull Notion Pages into AETHER · Push Summaries to Notion · Two-Way Workspace Sync", icon: BookOpen },
+  { href: "/notion-atlas", label: "Notion Atlas · seaaether Workspace Map · 131 Pages · 10 Knowledge Clusters · Synthesis Overview", icon: BookOpen },
   { href: "/solar-feminine", label: "Solar-Feminine Cycle · 26D Hormone Manifold · HPG Packet-Switching Network · Melatonin-GnRH Gate · 4-Colour Phases · LUNAR=WOMAN=66", icon: Sun },
   { href: "/symbolic-computation", label: "Symbolic Computation Hypothesis · Göbekli Tepe as Analog Information Processor · Pillar Graph · Light Oracle · Celestial Mapping", icon: Pyramid },
   { href: "/kinematic-replication", label: "Kinematic Self-Replication · Xenobots & Anthrobots · Bottom-Up Coherence · CUCA Loop · Controlled Breakdown", icon: GitFork },
