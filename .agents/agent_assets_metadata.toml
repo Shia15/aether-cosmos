@@ -6,3 +6,9 @@ id = "6daU7_QPmw0Wi_HQ-6VAC"
 uri = "file://artifacts/aether/public/audio/aether-ambient.mp3"
 type = "audio"
 title = "aether ambient bed"
+
+[[outputs]]
+id = "xp8zjEJMcC9ws_dhokkwd"
+uri = "file://.local/outputs/AETHER-Pitch-Deck.pdf"
+type = "pdf"
+title = "AETHER Pitch Deck.pdf"
