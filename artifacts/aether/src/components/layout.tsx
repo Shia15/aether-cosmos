@@ -154,6 +154,7 @@ const NAV_ITEMS = [
   { href: "/bio-photonic-scent", label: "Bio-Photonic Quantum Sense · Plants FMO Quantum Walk · Butterfly Photonic Crystal · Scent Frequency Switching · Turin Tunneling · Digital Scent", icon: Dna },
   { href: "/pollen-flower", label: "Powder Simulator · Air + Pollen → Flower · Phyllotaxis Bloom · Scent Chemistry Plume · Moth Anemotaxis · Metamorphosis Loop · Pollinator Coherence Engine", icon: Feather },
   { href: "/aether-bodysuit", label: "AETHER Body Suit · Skin Architecture · Male/Female Form Simulators · 10-Layer Photonic Stack · Coherence Field · Air Manipulation · Glass Surface Interface", icon: Hexagon },
+  { href: "/mechanical-qubits", label: "Thermo-Mechanical Qubit Train · Phonon Heating · Coherence Decay · Throughput Optimisation · Shuttle Speed vs T2 · Efficiency Frontier", icon: Zap },
   { href: "/solar-feminine", label: "Solar-Feminine Cycle · 26D Hormone Manifold · HPG Packet-Switching Network · Melatonin-GnRH Gate · 4-Colour Phases · LUNAR=WOMAN=66", icon: Sun },
   { href: "/symbolic-computation", label: "Symbolic Computation Hypothesis · Göbekli Tepe as Analog Information Processor · Pillar Graph · Light Oracle · Celestial Mapping", icon: Pyramid },
   { href: "/kinematic-replication", label: "Kinematic Self-Replication · Xenobots & Anthrobots · Bottom-Up Coherence · CUCA Loop · Controlled Breakdown", icon: GitFork },
