@@ -934,9 +934,6 @@ function AccessCodeGate({ children }: { children: ReactNode }) {
 }
 
 function AuthGate({ children }: { children: ReactNode }) {
-  const { isSignedIn, isLoaded } = useAuth();
-  if (!isLoaded) return <AuthLayout loading />;
-  if (!isSignedIn) return <SignInPage />;
   return <AccessCodeGate>{children}</AccessCodeGate>;
 }
 
