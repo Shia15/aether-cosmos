@@ -136,8 +136,24 @@
     "speakerNotes": ""
   },
   {
-    "id": "a1b2c3d4-0018-4000-8000-aether000018",
+    "id": "a1b2c3d4-0019-4000-8000-aether000019",
     "position": 18,
+    "filepath": "src/pages/slides/Slide19ExtendedSims.tsx",
+    "title": "Extended Physics Library · 20+ Live Simulators",
+    "description": "Original 5 simulators + 10 new in 2026: Crystallization Atlas, AETHER Engine, Gradient Field, Uptipple Boat, Chromatic Glare, Circular Farm cosmological sims, Coherence Condensation, Rhombus Gate Piezo, Air Nanotube, Resonant Tunnel.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0020-4000-8000-aether000020",
+    "position": 19,
+    "filepath": "src/pages/slides/Slide20SynthesisLayer.tsx",
+    "title": "Knowledge Synthesis Layer",
+    "description": "5 new mathematical language tools: Question Bank (12 cross-system equation bridges + live clustering), Symbol Alphabet (114 symbols × 5 AETHER layers), Alphabet Map (26-letter DNA), Polar Transform (Jacobian canvas), Unified Field Theory (Einstein·Maxwell·Lorentz).",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0018-4000-8000-aether000018",
+    "position": 20,
     "filepath": "src/pages/slides/Slide18TheAsk.tsx",
     "title": "AETHER · The Ask",
     "description": "Seed investment ask. Use of funds, current status, next milestones. Contact info.",
