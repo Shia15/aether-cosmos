@@ -813,19 +813,48 @@ export default function GraphView() {
           </div>
         )}
 
-        {/* Node count */}
-        {graphData && (
-          <div style={{
-            position: "absolute", bottom: 20, left: 20, zIndex: 10,
-            fontFamily: "monospace", fontSize: 10, color: "rgba(148,163,184,0.3)",
-            background: "rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.06)",
-            borderRadius: 4, padding: "6px 10px",
-          }}>
-            <div>{graphData.nodes.length} nodes</div>
-            <div>{graphData.links.length} edges</div>
-            {activeId && <div style={{ color: "rgba(14,165,233,0.5)" }}>{neighborSet.size} connections</div>}
-          </div>
-        )}
+        {/* Stats panel — words + data points */}
+        {graphData && (() => {
+          const wordCount = graphData.nodes.reduce((acc: number, n: any) => {
+            const lbl: string = n.label ?? n.name ?? n.id ?? "";
+            return acc + lbl.trim().split(/\s+/).filter(Boolean).length;
+          }, 0);
+          const totalDataPoints = graphData.nodes.length + graphData.links.length;
+          return (
+            <div style={{
+              position: "absolute", bottom: 20, left: 20, zIndex: 10,
+              fontFamily: "monospace",
+              background: "rgba(2,8,20,0.85)",
+              border: "1px solid rgba(46,240,216,0.18)",
+              borderRadius: 8,
+              padding: "10px 14px",
+              backdropFilter: "blur(8px)",
+              minWidth: 160,
+            }}>
+              <div style={{ fontSize: 7, letterSpacing: "0.22em", color: "rgba(46,240,216,0.45)", marginBottom: 8 }}>
+                GRAPH STATS
+              </div>
+              {[
+                { label: "words",       value: wordCount,                    color: "#fbbf24" },
+                { label: "data points", value: totalDataPoints,              color: "#2ef0d8" },
+                { label: "nodes",       value: graphData.nodes.length,       color: "#9966ff" },
+                { label: "edges",       value: graphData.links.length,       color: "#64a0ff" },
+                { label: "agents",      value: AGENTS.length,                color: "#86efac" },
+              ].map(({ label, value, color }) => (
+                <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 18, marginBottom: 4 }}>
+                  <span style={{ fontSize: 9, color: "rgba(148,163,184,0.5)" }}>{label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color }}>{value.toLocaleString()}</span>
+                </div>
+              ))}
+              {activeId && (
+                <div style={{ marginTop: 6, paddingTop: 6, borderTop: "1px solid rgba(14,165,233,0.15)", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 18 }}>
+                  <span style={{ fontSize: 9, color: "rgba(14,165,233,0.5)" }}>connections</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#38bdf8" }}>{neighborSet.size}</span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Hypercomputation portal */}
         <Link href="/hypercomputation" data-testid="graph-hypercomputation-portal" style={{ position: "absolute", top: 20, right: 20, zIndex: 10, textDecoration: "none" }}>
