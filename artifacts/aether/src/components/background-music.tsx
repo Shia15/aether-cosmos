@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Music, Volume2, Headphones } from "lucide-react";
+import { Music, Pause, Volume2 } from "lucide-react";
 
 const AUDIO_SRC = `${import.meta.env.BASE_URL}audio/aether-ambient.mp3`;
 const LS_KEY = "aether.music.v1";
 const TEAL = "#2ef0d8";
-const GOLD = "#f0b429";
 
 type Saved = { playing: boolean; volume: number };
 
@@ -21,85 +20,15 @@ function loadSaved(): Saved {
   }
 }
 
-function getPageText(): string {
-  const bar = document.querySelector("[data-aether-bar]");
-  const excluded = new Set<Node>(bar ? [bar] : []);
-
-  const walker = document.createTreeWalker(
-    document.body,
-    NodeFilter.SHOW_TEXT,
-    {
-      acceptNode(node) {
-        const el = node.parentElement;
-        if (!el) return NodeFilter.FILTER_REJECT;
-        const tag = el.tagName.toLowerCase();
-        if (["script", "style", "noscript", "code", "pre"].includes(tag)) return NodeFilter.FILTER_REJECT;
-        let cur: Element | null = el;
-        while (cur) {
-          if (excluded.has(cur)) return NodeFilter.FILTER_REJECT;
-          if (cur.tagName === "NAV" || cur.getAttribute("role") === "navigation") return NodeFilter.FILTER_REJECT;
-          if (cur.getAttribute("data-aether-bar") != null) return NodeFilter.FILTER_REJECT;
-          const ctag = cur.tagName.toLowerCase();
-          if (ctag === "code" || ctag === "pre") return NodeFilter.FILTER_REJECT;
-          cur = cur.parentElement;
-        }
-        const cs = window.getComputedStyle(el);
-        if (cs.display === "none" || cs.visibility === "hidden") return NodeFilter.FILTER_REJECT;
-        const t = node.textContent?.trim() ?? "";
-        if (t.length < 3) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
-      },
-    }
-  );
-
-  const chunks: string[] = [];
-  let n: Node | null;
-  while ((n = walker.nextNode())) {
-    const t = n.textContent?.trim() ?? "";
-    if (t) chunks.push(t);
-  }
-
-  return chunks
-    .join(" ")
-    .replace(/[^\w\s.,;:!?'"\-–—()]/g, " ")
-    .replace(/\s{2,}/g, " ")
-    .replace(/([.!?])\s*/g, "$1  ")
-    .trim();
-}
-
-const VOICE_PREFS = [
-  "Google UK English Female",
-  "Google UK English Male",
-  "Samantha",
-  "Karen",
-  "Moira",
-  "Tessa",
-  "Google US English",
-  "Alex",
-];
-
-function pickVoice(): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
-  for (const name of VOICE_PREFS) {
-    const v = voices.find(v => v.name === name);
-    if (v) return v;
-  }
-  const eng = voices.find(v => v.lang.startsWith("en") && !v.name.toLowerCase().includes("compact"));
-  return eng ?? voices[0] ?? null;
-}
-
 export default function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeRef = useRef<number | null>(null);
-  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
   const saved = useRef<Saved>(loadSaved());
 
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(saved.current.volume);
   const [hover, setHover] = useState(false);
   const [needsGesture, setNeedsGesture] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
 
   const persist = useCallback((next: Partial<Saved>) => {
     const merged: Saved = {
@@ -107,11 +36,18 @@ export default function BackgroundMusic() {
       volume: next.volume ?? saved.current.volume,
     };
     saved.current = merged;
-    try { localStorage.setItem(LS_KEY, JSON.stringify(merged)); } catch { /* ignore */ }
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(merged));
+    } catch {
+      // ignore storage failures
+    }
   }, []);
 
   const clearFade = useCallback(() => {
-    if (fadeRef.current !== null) { cancelAnimationFrame(fadeRef.current); fadeRef.current = null; }
+    if (fadeRef.current !== null) {
+      cancelAnimationFrame(fadeRef.current);
+      fadeRef.current = null;
+    }
   }, []);
 
   const fadeTo = useCallback((target: number, onDone?: () => void) => {
@@ -124,9 +60,15 @@ export default function BackgroundMusic() {
     const clamp = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
     const step = (now: number) => {
       const k = Math.min(1, (now - t0) / dur);
-      el.volume = clamp(start + (target - start) * k * (2 - k));
-      if (k < 1) { fadeRef.current = requestAnimationFrame(step); }
-      else { el.volume = clamp(target); fadeRef.current = null; if (onDone) onDone(); }
+      const eased = k * (2 - k);
+      el.volume = clamp(start + (target - start) * eased);
+      if (k < 1) {
+        fadeRef.current = requestAnimationFrame(step);
+      } else {
+        el.volume = clamp(target);
+        fadeRef.current = null;
+        if (onDone) onDone();
+      }
     };
     fadeRef.current = requestAnimationFrame(step);
   }, [clearFade]);
@@ -134,64 +76,38 @@ export default function BackgroundMusic() {
   const startPlayback = useCallback((): Promise<void> => {
     const el = audioRef.current;
     if (!el) return Promise.resolve();
-    if (!el.paused) { setPlaying(true); setNeedsGesture(false); persist({ playing: true }); return Promise.resolve(); }
+    if (!el.paused) {
+      setPlaying(true);
+      setNeedsGesture(false);
+      persist({ playing: true });
+      return Promise.resolve();
+    }
     el.volume = 0;
     return el.play().then(() => {
-      setPlaying(true); setNeedsGesture(false); persist({ playing: true }); fadeTo(saved.current.volume);
-    }).catch(() => { setPlaying(false); setNeedsGesture(true); });
+      setPlaying(true);
+      setNeedsGesture(false);
+      persist({ playing: true });
+      fadeTo(saved.current.volume);
+    }).catch(() => {
+      setPlaying(false);
+      setNeedsGesture(true);
+    });
   }, [fadeTo, persist]);
 
   const stopPlayback = useCallback(() => {
     const el = audioRef.current;
     if (!el) return;
-    fadeTo(0, () => { el.pause(); });
+    fadeTo(0, () => {
+      el.pause();
+    });
     setPlaying(false);
     persist({ playing: false });
   }, [fadeTo, persist]);
 
   const toggle = useCallback(() => {
-    if (playing) stopPlayback(); else startPlayback().catch(() => {});
+    if (playing) stopPlayback();
+    else startPlayback().catch(() => {});
   }, [playing, startPlayback, stopPlayback]);
-
-  const toggleReadAloud = useCallback(() => {
-    if (speaking) {
-      window.speechSynthesis.cancel();
-      setSpeaking(false);
-      const el = audioRef.current;
-      if (el && playing) fadeTo(saved.current.volume);
-      return;
-    }
-    const text = getPageText();
-    if (!text) return;
-
-    const speak = () => {
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.rate  = 0.76;
-      utt.pitch = 0.92;
-      utt.volume = 0.95;
-      const voice = pickVoice();
-      if (voice) utt.voice = voice;
-
-      const el = audioRef.current;
-      if (el && playing) fadeTo(0.1);
-
-      const restore = () => {
-        setSpeaking(false);
-        if (el && playing) fadeTo(saved.current.volume);
-      };
-      utt.onend = restore;
-      utt.onerror = restore;
-      utterRef.current = utt;
-      window.speechSynthesis.speak(utt);
-      setSpeaking(true);
-    };
-
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; speak(); };
-    } else {
-      speak();
-    }
-  }, [speaking, playing, fadeTo]);
 
   useEffect(() => {
     const el = audioRef.current;
@@ -203,42 +119,61 @@ export default function BackgroundMusic() {
       window.removeEventListener("pointerdown", onFirst);
       window.removeEventListener("keydown", onFirst);
     }
-    function onFirst() { removeGesture(); startPlayback().catch(() => {}); }
+    function onFirst() {
+      removeGesture();
+      startPlayback().catch(() => {});
+    }
 
     startPlayback().catch(() => {
       window.addEventListener("pointerdown", onFirst);
       window.addEventListener("keydown", onFirst);
     });
+
     return removeGesture;
   }, [startPlayback]);
 
   useEffect(() => () => clearFade(), [clearFade]);
-  useEffect(() => () => { window.speechSynthesis.cancel(); }, []);
 
   const onVolume = useCallback((v: number) => {
     setVolume(v);
     persist({ volume: v });
     const el = audioRef.current;
-    if (el && playing) { clearFade(); el.volume = v; }
+    if (el && playing) {
+      clearFade();
+      el.volume = v;
+    }
   }, [persist, playing, clearFade]);
 
   return (
     <div
-      data-aether-bar
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ position: "fixed", bottom: 66, right: 20, zIndex: 9998, display: "flex", alignItems: "center", gap: 8, flexDirection: "row-reverse" }}
+      style={{
+        position: "fixed",
+        bottom: 66,
+        right: 20,
+        zIndex: 9998,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        flexDirection: "row-reverse",
+      }}
     >
       <audio ref={audioRef} src={AUDIO_SRC} loop preload="auto" />
 
-      {/* ── Music toggle ── */}
       <button
         onClick={toggle}
         title={playing ? "Pause ambient music" : "Play ambient music"}
         aria-label={playing ? "Pause ambient music" : "Play ambient music"}
         style={{
-          position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
-          width: 46, height: 46, borderRadius: "50%", cursor: "pointer",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 46,
+          height: 46,
+          borderRadius: "50%",
+          cursor: "pointer",
           border: `1px solid ${playing ? TEAL : "#1a3040"}`,
           background: playing ? "rgba(46,240,216,0.12)" : "rgba(4,6,14,0.86)",
           color: playing ? TEAL : "#8fb3c8",
@@ -248,12 +183,32 @@ export default function BackgroundMusic() {
         }}
       >
         {needsGesture && !playing && (
-          <span style={{ position: "absolute", inset: -3, borderRadius: "50%", border: `1px solid ${TEAL}`, opacity: 0.6, animation: "aetherMusicPulse 1.8s ease-out infinite", pointerEvents: "none" }} />
+          <span
+            style={{
+              position: "absolute",
+              inset: -3,
+              borderRadius: "50%",
+              border: `1px solid ${TEAL}`,
+              opacity: 0.6,
+              animation: "aetherMusicPulse 1.8s ease-out infinite",
+              pointerEvents: "none",
+            }}
+          />
         )}
         {playing ? (
           <span style={{ display: "flex", alignItems: "flex-end", gap: 2.5, height: 16 }}>
             {[0, 1, 2, 3].map((i) => (
-              <span key={i} style={{ display: "block", width: 2.5, borderRadius: 2, background: TEAL, height: 6, animation: `aetherEq 900ms ease-in-out ${i * 140}ms infinite` }} />
+              <span
+                key={i}
+                style={{
+                  display: "block",
+                  width: 2.5,
+                  borderRadius: 2,
+                  background: TEAL,
+                  height: 6,
+                  animation: `aetherEq 900ms ease-in-out ${i * 140}ms infinite`,
+                }}
+              />
             ))}
           </span>
         ) : (
@@ -261,54 +216,37 @@ export default function BackgroundMusic() {
         )}
       </button>
 
-      {/* ── Volume slider (hover reveal) ── */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 8, overflow: "hidden",
-        maxWidth: hover ? 168 : 0, opacity: hover ? 1 : 0,
-        paddingLeft: hover ? 12 : 0, paddingRight: hover ? 12 : 0,
-        height: 38, borderRadius: 19,
-        border: hover ? "1px solid #1a3040" : "1px solid transparent",
-        background: "rgba(4,6,14,0.86)", backdropFilter: "blur(6px)",
-        transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)", whiteSpace: "nowrap",
-      }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          overflow: "hidden",
+          maxWidth: hover ? 168 : 0,
+          opacity: hover ? 1 : 0,
+          paddingLeft: hover ? 12 : 0,
+          paddingRight: hover ? 12 : 0,
+          height: 38,
+          borderRadius: 19,
+          border: hover ? "1px solid #1a3040" : "1px solid transparent",
+          background: "rgba(4,6,14,0.86)",
+          backdropFilter: "blur(6px)",
+          transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
+          whiteSpace: "nowrap",
+        }}
+      >
         <Volume2 style={{ width: 15, height: 15, color: "#8fb3c8", flexShrink: 0 }} />
         <input
-          type="range" min={0} max={1} step={0.01} value={volume}
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={volume}
           onChange={(e) => onVolume(parseFloat(e.target.value))}
           aria-label="Music volume"
           style={{ width: 96, accentColor: TEAL, cursor: "pointer" }}
         />
       </div>
-
-      {/* ── Read-aloud button ── */}
-      <button
-        onClick={toggleReadAloud}
-        title={speaking ? "Stop reading" : "Read page aloud"}
-        aria-label={speaking ? "Stop reading" : "Read page aloud"}
-        style={{
-          position: "relative", display: "flex", alignItems: "center", justifyContent: "center",
-          width: 46, height: 46, borderRadius: "50%", cursor: "pointer",
-          border: `1px solid ${speaking ? GOLD : "#1a3040"}`,
-          background: speaking ? "rgba(240,180,41,0.12)" : "rgba(4,6,14,0.86)",
-          color: speaking ? GOLD : "#8fb3c8",
-          backdropFilter: "blur(6px)",
-          boxShadow: speaking ? "0 0 18px rgba(240,180,41,0.35)" : "0 2px 10px rgba(0,0,0,0.4)",
-          transition: "all 0.25s",
-        }}
-      >
-        {speaking && (
-          <span style={{ position: "absolute", inset: -3, borderRadius: "50%", border: `1px solid ${GOLD}`, opacity: 0.5, animation: "aetherMusicPulse 1.4s ease-out infinite", pointerEvents: "none" }} />
-        )}
-        {speaking ? (
-          <span style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 16 }}>
-            {[0, 1, 2, 3, 4].map((i) => (
-              <span key={i} style={{ display: "block", width: 2, borderRadius: 2, background: GOLD, height: 5, animation: `aetherEq 700ms ease-in-out ${i * 110}ms infinite` }} />
-            ))}
-          </span>
-        ) : (
-          <Headphones style={{ width: 18, height: 18 }} />
-        )}
-      </button>
 
       <style>{`
         @keyframes aetherEq {

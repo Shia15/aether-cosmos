@@ -93,6 +93,7 @@ import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
 
 const NAV_ITEMS = [
+  { href: "/question-bank", label: "Question Bank · Mathematical Synthesis · Cross-System Coherence · Live Equation Clusters", icon: Sigma },
   { href: "/", label: "Graph Map", icon: Network },
   { href: "/page-directory", label: "Page Directory · All Pages · Gravity Synopsis · Site Index", icon: LayoutGrid },
   { href: "/coherence-atlas", label: "Coherence Atlas · Unified Visual Index · Knots · Emitters · Tunnels · Coherence Field · Regulation & Cosmos", icon: LayoutGrid },
@@ -105,7 +106,6 @@ const NAV_ITEMS = [
   { href: "/upload", label: "Ingest", icon: UploadCloud },
   { href: "/coherence", label: "Coherence", icon: Activity },
   { href: "/search", label: "Query", icon: Search },
-  { href: "/question-bank", label: "Question Bank · Mathematical Synthesis · Cross-System Coherence · Live Equation Clusters", icon: Sigma },
   { href: "/equations", label: "Lab", icon: FunctionSquare },
   { href: "/cultural", label: "Cultural", icon: Palette },
   { href: "/biology",        label: "Biology",        icon: Dna },
