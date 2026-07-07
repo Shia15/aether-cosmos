@@ -33,12 +33,14 @@ function getPageText(): string {
         const el = node.parentElement;
         if (!el) return NodeFilter.FILTER_REJECT;
         const tag = el.tagName.toLowerCase();
-        if (["script", "style", "noscript"].includes(tag)) return NodeFilter.FILTER_REJECT;
+        if (["script", "style", "noscript", "code", "pre"].includes(tag)) return NodeFilter.FILTER_REJECT;
         let cur: Element | null = el;
         while (cur) {
           if (excluded.has(cur)) return NodeFilter.FILTER_REJECT;
           if (cur.tagName === "NAV" || cur.getAttribute("role") === "navigation") return NodeFilter.FILTER_REJECT;
           if (cur.getAttribute("data-aether-bar") != null) return NodeFilter.FILTER_REJECT;
+          const ctag = cur.tagName.toLowerCase();
+          if (ctag === "code" || ctag === "pre") return NodeFilter.FILTER_REJECT;
           cur = cur.parentElement;
         }
         const cs = window.getComputedStyle(el);
@@ -56,7 +58,35 @@ function getPageText(): string {
     const t = n.textContent?.trim() ?? "";
     if (t) chunks.push(t);
   }
-  return chunks.join(" ").replace(/\s+/g, " ").trim();
+
+  return chunks
+    .join(" ")
+    .replace(/[^\w\s.,;:!?'"\-–—()]/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/([.!?])\s*/g, "$1  ")
+    .trim();
+}
+
+const VOICE_PREFS = [
+  "Google UK English Female",
+  "Google UK English Male",
+  "Samantha",
+  "Karen",
+  "Moira",
+  "Tessa",
+  "Google US English",
+  "Alex",
+];
+
+function pickVoice(): SpeechSynthesisVoice | null {
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  for (const name of VOICE_PREFS) {
+    const v = voices.find(v => v.name === name);
+    if (v) return v;
+  }
+  const eng = voices.find(v => v.lang.startsWith("en") && !v.name.toLowerCase().includes("compact"));
+  return eng ?? voices[0] ?? null;
 }
 
 export default function BackgroundMusic() {
@@ -127,19 +157,41 @@ export default function BackgroundMusic() {
     if (speaking) {
       window.speechSynthesis.cancel();
       setSpeaking(false);
+      const el = audioRef.current;
+      if (el && playing) fadeTo(saved.current.volume);
       return;
     }
     const text = getPageText();
     if (!text) return;
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 0.88;
-    utt.pitch = 1.05;
-    utt.onend = () => setSpeaking(false);
-    utt.onerror = () => setSpeaking(false);
-    utterRef.current = utt;
-    window.speechSynthesis.speak(utt);
-    setSpeaking(true);
-  }, [speaking]);
+
+    const speak = () => {
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.rate  = 0.76;
+      utt.pitch = 0.92;
+      utt.volume = 0.95;
+      const voice = pickVoice();
+      if (voice) utt.voice = voice;
+
+      const el = audioRef.current;
+      if (el && playing) fadeTo(0.1);
+
+      const restore = () => {
+        setSpeaking(false);
+        if (el && playing) fadeTo(saved.current.volume);
+      };
+      utt.onend = restore;
+      utt.onerror = restore;
+      utterRef.current = utt;
+      window.speechSynthesis.speak(utt);
+      setSpeaking(true);
+    };
+
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.onvoiceschanged = null; speak(); };
+    } else {
+      speak();
+    }
+  }, [speaking, playing, fadeTo]);
 
   useEffect(() => {
     const el = audioRef.current;
