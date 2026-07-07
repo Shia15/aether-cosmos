@@ -636,7 +636,7 @@ function GravitonTab() {
             body="In Lorenz gauge with ∂μh̄μν = 0. This is exact analogue of ∂μFμν = μ₀Jν (Maxwell), with h̄μν playing the role of Aν and Tμν playing Jν. Gravitons are spin-2 solutions of this wave equation propagating at c." />
           <EqCard eq="h = ΔL/L ~ 10⁻²¹" name="GRAVITATIONAL WAVE STRAIN" col={C.amber}
             body="For GW150914 (two black holes merging at 1.3 billion light-years): h ≈ 10⁻²¹. LIGO's 4 km arms changed by 1/1000th the width of a proton. The signal lasted 0.2 seconds; peak power ≈ 3.6×10⁴⁹ W — more than all stars in the observable universe combined." />
-          <EqCard eq="{Q, Q†} → G̃ (spin 3/2)" name:"SUSY: GRAVITON → GRAVITINO" col={C.teal}
+          <EqCard eq="{Q, Q†} → G̃ (spin 3/2)" name="SUSY: GRAVITON → GRAVITINO" col={C.teal}
             body="Supersymmetry predicts a gravitino — the spin-3/2 superpartner of the graviton. The local version of SUSY is supergravity. If SUSY is broken, the gravitino acquires mass via super-Higgs mechanism. Gravitino mass constrains cosmology — too light: overclosure; too heavy: late decay alters BBN." />
           <EqCard eq="∑ spins × species = 128 / 128" name="SUSY BOSON-FERMION DEGENERACY" col={C.gold}
             body="In N=8 supergravity (maximal SUSY): 128 bosonic + 128 fermionic degrees of freedom. The graviton (spin 2) sits at the top of the multiplet. This exact cancellation between bosons and fermions resolves the hierarchy problem — quantum corrections to the Higgs mass cancel." />

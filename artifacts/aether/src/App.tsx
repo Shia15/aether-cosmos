@@ -154,6 +154,7 @@ const GeometryOfPermissionView = lazy(() => import("@/pages/geometry-of-permissi
 const MathEnginePage = lazy(() => import("@/pages/math-engine"));
 const AetherLanguagePage = lazy(() => import("@/pages/aether-language"));
 const MathFrontierPage = lazy(() => import("@/pages/math-frontier"));
+const UnifiedFieldTheoryPage = lazy(() => import("@/pages/unified-field-theory"));
 const ProductResearchPage = lazy(() => import("@/pages/product-research"));
 const UltraMagnetismPage = lazy(() => import("@/pages/ultra-magnetism"));
 const QuantumVacuumPage = lazy(() => import("@/pages/quantum-vacuum"));
@@ -1054,6 +1055,7 @@ function Router() {
                 <Route path="/math-engine" component={MathEnginePage} />
                 <Route path="/aether-language" component={AetherLanguagePage} />
                 <Route path="/math-frontier" component={MathFrontierPage} />
+                <Route path="/unified-field-theory" component={UnifiedFieldTheoryPage} />
                 <Route path="/product-research" component={ProductResearchPage} />
                 <Route path="/ultra-magnetism" component={UltraMagnetismPage} />
                 <Route path="/quantum-vacuum" component={QuantumVacuumPage} />

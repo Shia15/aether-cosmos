@@ -263,6 +263,7 @@ const NAV_ITEMS = [
   { href: "/math-engine",           label: "Math Engine · Workbench",  icon: Calculator },
   { href: "/aether-language",       label: "AETHER Language · Coherence Grammar · Unified Symbolic System", icon: BookA },
   { href: "/math-frontier",         label: "Math Frontier · θ²/s · Astronomical Units · Quantum Uncertainty · Non-Euclidean · Primes · Supersymmetry", icon: Orbit },
+  { href: "/unified-field-theory",  label: "Unified Field Theory · Einstein · Maxwell · Lorentz · AETHER Synthesis · Graviton", icon: Waves },
   { href: "/product-research",      label: "Product Research",         icon: FlaskRound },
   { href: "/ultra-magnetism",       label: "Ultra-Magnetism · SC",     icon: Hexagon },
   { href: "/quantum-vacuum",        label: "Quantum Vacuum · Non-Local",icon: Sparkles },
