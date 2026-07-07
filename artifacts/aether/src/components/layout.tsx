@@ -262,6 +262,7 @@ const NAV_ITEMS = [
   { href: "/geometry-of-permission",label: "Geometry of Permission",   icon: KeySquare },
   { href: "/math-engine",           label: "Math Engine · Workbench",  icon: Calculator },
   { href: "/aether-language",       label: "AETHER Language · Coherence Grammar · Unified Symbolic System", icon: BookA },
+  { href: "/symbol-alphabet",       label: "Symbol Alphabet · Greek · Latin · Egyptian · Japanese · Russian · AETHER Layers", icon: Globe },
   { href: "/math-frontier",         label: "Math Frontier · θ²/s · Astronomical Units · Quantum Uncertainty · Non-Euclidean · Primes · Supersymmetry", icon: Orbit },
   { href: "/unified-field-theory",  label: "Unified Field Theory · Einstein · Maxwell · Lorentz · AETHER Synthesis · Graviton", icon: Waves },
   { href: "/product-research",      label: "Product Research",         icon: FlaskRound },

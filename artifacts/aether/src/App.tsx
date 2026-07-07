@@ -153,6 +153,7 @@ const ThermalHierarchyView = lazy(() => import("@/pages/thermal-hierarchy"));
 const GeometryOfPermissionView = lazy(() => import("@/pages/geometry-of-permission"));
 const MathEnginePage = lazy(() => import("@/pages/math-engine"));
 const AetherLanguagePage = lazy(() => import("@/pages/aether-language"));
+const SymbolAlphabetPage = lazy(() => import("@/pages/symbol-alphabet"));
 const MathFrontierPage = lazy(() => import("@/pages/math-frontier"));
 const UnifiedFieldTheoryPage = lazy(() => import("@/pages/unified-field-theory"));
 const ProductResearchPage = lazy(() => import("@/pages/product-research"));
@@ -1054,6 +1055,7 @@ function Router() {
                 <Route path="/geometry-of-permission" component={GeometryOfPermissionView} />
                 <Route path="/math-engine" component={MathEnginePage} />
                 <Route path="/aether-language" component={AetherLanguagePage} />
+                <Route path="/symbol-alphabet" component={SymbolAlphabetPage} />
                 <Route path="/math-frontier" component={MathFrontierPage} />
                 <Route path="/unified-field-theory" component={UnifiedFieldTheoryPage} />
                 <Route path="/product-research" component={ProductResearchPage} />
