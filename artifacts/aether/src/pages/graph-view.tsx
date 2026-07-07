@@ -652,6 +652,8 @@ export default function GraphView() {
             { name: "Starburst",            url: "https://star-structure.replit.app/",            col: "#f2c354", desc: "Star-structure simulation" },
             { name: "Simulation Notebook",  url: "https://star-structure.replit.app/notebook/",   col: "#2ef0d8", desc: "Live equations & experiments" },
             { name: "Neutrino Laser",       url: "https://neutrino-laser-analysis.replit.app",     col: "#c084fc", desc: "Neutrino laser analysis" },
+            { name: "AETHER System",        url: "https://aether-system.replit.app",               col: "#67e8f9", desc: "AETHER system — live deployment" },
+            { name: "Chlorophyll Drive",    url: "https://chlorophyll-cool-drive.replit.app",      col: "#4ade80", desc: "Chlorophyll cool drive — green energy" },
           ] as const).map(app => (
             <a key={app.url} href={app.url} target="_blank" rel="noopener noreferrer"
               style={{ display: "flex", alignItems: "center", gap: 9, padding: "8px 14px", borderRadius: 6, background: app.col + "12", border: `1px solid ${app.col}50`, textDecoration: "none", transition: "all 0.15s", flexShrink: 0 }}

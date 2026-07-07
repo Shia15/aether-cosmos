@@ -367,6 +367,20 @@ const CONNECTED = [
     dot: C.purple,
     badge: "ANALYSIS",
   },
+  {
+    name: "AETHER System",
+    url: "https://aether-system.replit.app",
+    desc: "AETHER system — live deployment of the core knowledge engine",
+    dot: C.blue,
+    badge: "SYSTEM",
+  },
+  {
+    name: "Chlorophyll Drive",
+    url: "https://chlorophyll-cool-drive.replit.app",
+    desc: "Chlorophyll cool drive — green energy and photosynthetic substrate",
+    dot: C.green,
+    badge: "ENERGY",
+  },
 ];
 
 export default function PageDirectory() {
