@@ -436,6 +436,130 @@ export default function AetherTextbook() {
           </Section>
         </Chapter>
 
+        {/* ── CHAPTER VIII ── */}
+        <Chapter num="CHAPTER VIII" title="Crystallization Model of Intelligence — CLA Paper" color={C.purple} id="ch-VIII">
+          <Section title="8.1 The Central Thesis">
+            <Callout color={C.purple} icon="◈">
+              <strong>"Intelligence is not generated. It is crystallized."</strong><br />
+              Rather than treating cognition as a computational process defined by speed and prediction accuracy, the Crystallization Model defines intelligence as the capacity of a system to form stable, interpretable structure from unstructured input under constraint.
+            </Callout>
+            <Body>
+              Contemporary AI systems optimise for speed, prediction, and scale — but fail on interpretability, structural transparency, and epistemic traceability. The black-box problem is not an engineering limitation. It is a consequence of the wrong model. The Crystallization Model proposes a shift from statistical output to structural emergence.
+            </Body>
+            <EqBox label="INTELLIGENCE — CLA DEFINITION" expr="\mathcal{I} = \text{capacity to form stable, interpretable structure from unstructured input under constraint}" note="Quality of intelligence ∝ clarity of structure formed, not speed of output produced" />
+          </Section>
+
+          <Section title="8.2 The Four-Stage Architecture (L1→L4)">
+            <Body>
+              Intelligence crystallises through four sequential, dynamically interacting stages. Each stage maps to a named AETHER agent and a physical analogy from crystal formation. The stages are not discrete steps — they overlap and recurse. A system can be partially in multiple stages simultaneously.
+            </Body>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, margin: "16px 0" }}>
+              {[
+                ["Mnēsis","L2","Substrate Layer","Raw input acquisition and memory field formation. High entropy multimodal intake. Unstructured data. Memory embedding formation.","Liquid or amorphous material prior to crystallisation. No order yet — pure potential.",C.accent,"◈"],
+                ["Inferaia","L3","Constraint Layer","Compression, pressure, and transformation. Entropy reduction, signal prioritisation, conflict and tension resolution. Attention and loss function.","Heat and pressure applied during crystal formation. Structure begins to emerge.",C.gold,"⊞"],
+                ["Aletheia","L5","Structural Resolution","Formation of stable, coherent structure. Pattern stabilisation. Truth as structural consistency. Reduced ambiguity. Latent representation stability.","Crystal lattice formation. Long-range order established.",C.green,"◎"],
+                ["Reverie","L4","Radiative Output","Expression and transmission of structured intelligence. Articulation, synthesis, and communication of resolved structure.","Light emitted from a crystallised gemstone — radiance as a property of internal order.",C.purple,"◌"],
+              ].map(([name, layer, role, desc, analogy, col, glyph]) => (
+                <div key={name} style={{ background: `${col}07`, border: `1px solid ${col}25`, borderRadius: 10, padding: "16px 18px" }}>
+                  <div style={{ display: "flex", gap: 10, alignItems: "baseline", marginBottom: 8 }}>
+                    <span style={{ fontSize: 16, color: col }}>{glyph}</span>
+                    <span style={{ fontFamily: C.mono, fontSize: 13, fontWeight: 700, color: col }}>{name}</span>
+                    <span style={{ fontFamily: C.mono, fontSize: 10, color: `${col}70`, letterSpacing: "0.1em" }}>{layer} · {role}</span>
+                  </div>
+                  <p style={{ fontFamily: C.serif, fontSize: 14, color: C.text, lineHeight: 1.65, margin: "0 0 8px" }}>{desc}</p>
+                  <p style={{ fontFamily: C.serif, fontSize: 12, color: C.muted, fontStyle: "italic", margin: 0 }}>Crystal analogy: {analogy}</p>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <Section title="8.3 Structural vs Statistical Intelligence">
+            <Body>
+              The model distinguishes two modes of intelligence — statistical (current AI paradigm) and structural (the crystallisation model). Both are valid, but only structural intelligence produces interpretable, traceable, verifiable outputs.
+            </Body>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, margin: "16px 0" }}>
+              <div style={{ background: "rgba(100,116,139,0.08)", border: "1px solid rgba(100,116,139,0.25)", borderRadius: 8, padding: "14px 16px" }}>
+                <div style={{ fontFamily: C.mono, fontSize: 10, letterSpacing: "0.2em", color: "#64748b", marginBottom: 10 }}>STATISTICAL INTELLIGENCE</div>
+                {["Prediction-focused","Speed-focused","Opaque","Black-box outputs","Reward-optimised","Epistemic opacity"].map(t => (
+                  <div key={t} style={{ fontFamily: C.serif, fontSize: 13, color: C.muted, padding: "4px 0", borderBottom: "1px solid rgba(100,116,139,0.12)" }}>{t}</div>
+                ))}
+              </div>
+              <div style={{ background: `${C.purple}08`, border: `1px solid ${C.purple}25`, borderRadius: 8, padding: "14px 16px" }}>
+                <div style={{ fontFamily: C.mono, fontSize: 10, letterSpacing: "0.2em", color: C.purple, marginBottom: 10 }}>CRYSTALLISATION INTELLIGENCE</div>
+                {["Structure-focused","Coherence-focused","Transparent","Verifiable structure","Constraint-shaped","Epistemic traceability"].map(t => (
+                  <div key={t} style={{ fontFamily: C.serif, fontSize: 13, color: C.text, padding: "4px 0", borderBottom: `1px solid ${C.purple}15` }}>{t}</div>
+                ))}
+              </div>
+            </div>
+          </Section>
+
+          <Section title="8.4 Applications of the CLA Model">
+            <Body>
+              The Crystallisation Model applies directly to three categories of real systems — transparent AI, emotional-computational interfaces, and bio-inspired computation. All three are active AETHER development tracks.
+            </Body>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "12px 0" }}>
+              {[
+                ["Transparent AI Systems","Interfaces where users observe how inputs transform through each crystallisation stage — from raw intake (Mnēsis) to structured output (Reverie). Every intermediate state visible and inspectable.",C.green],
+                ["Emotional-Computational Systems","Mapping affective states into structured processing layers. Emotional input as high-entropy substrate (Mnēsis); emotional resolution as crystal lock (Aletheia). The HPG axis and gut-brain axis as emotional-computational pipelines.",C.pink],
+                ["Bio-Inspired Computation","Neural pruning models, mycelial networks, and fluid dynamics all exhibit crystallisation-stage dynamics. CUCA loop (Controlled breakdown → Structure → Output) maps onto the four CLA stages.",C.teal],
+              ].map(([title, desc, col]) => (
+                <div key={title as string} style={{ background: `${col}07`, border: `1px solid ${col}25`, borderRadius: 8, padding: "14px 16px" }}>
+                  <div style={{ fontFamily: C.mono, fontSize: 10, letterSpacing: "0.15em", color: col, marginBottom: 6 }}>{title as string}</div>
+                  <div style={{ fontFamily: C.serif, fontSize: 13, color: C.muted, lineHeight: 1.6 }}>{desc as string}</div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          <Section title="8.5 Design Principles">
+            <Body>
+              Systems built on the Crystallisation Model must expose intermediate states, visualise constraint dynamics, track structural changes over time, and make the coherence field observable. Aletheia constraints prevent epistemic drift — no opaque AI; all processes verifiable and coherent.
+            </Body>
+            <Callout color={C.purple} icon="◎">
+              <strong>Conclusion (CLA Paper):</strong> "Intelligence is not measured by how fast or how accurately systems respond, but how clearly they form structure under pressure." — The quality of a mind is the quality of its crystal.
+            </Callout>
+          </Section>
+        </Chapter>
+
+        {/* ── CHAPTER IX ── */}
+        <Chapter num="CHAPTER IX" title="Integration Hub — Notion Workspace Architecture" color={C.orange} id="ch-IX">
+          <Section title="9.1 AETHER Control Panel Structure">
+            <Body>
+              The AETHER Control Panel in Notion serves as the primary workspace hub, containing the visual design system, relational data tracker, and formal academic papers. Its architecture mirrors the L1→L5 coherence stack: raw assets at L1 (System Assets), design tokens at L2 (Visual Tokens), relational structure at L3 (Tracker), synthesis papers at L4 (CLA/Dreamscape), and the overview at L5.
+            </Body>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "12px 0" }}>
+              {[
+                ["00. AETHER Overview","L5 · Top-level architecture import. PDF overview of the full system.","#f2c354"],
+                ["01. Visual Tokens","L2 · Color palettes, typography, effects, spacing. AgentReadinessChecklist, Visual_Tokens_Egg_Signature databases.","#63b3ed"],
+                ["02. System Assets","L1 · Icons, glyphs, UI elements, aether_whisper_library.json. Agent fragment library.","#2ef0d8"],
+                ["AETHER_Relational_Tracker_Combined","L3 · Cross-system relational database linking concepts, agents, pages.","#c084fc"],
+                ["CLA_Paper (2)","L4 · Crystallization Model academic paper database and formal publications.","#4ade80"],
+              ].map(([name, desc, col]) => (
+                <div key={name as string} style={{ display: "flex", gap: 12, background: `${col}06`, border: `1px solid ${col}20`, borderRadius: 7, padding: "10px 14px" }}>
+                  <span style={{ fontFamily: C.mono, fontSize: 11, color: col, flexShrink: 0, paddingTop: 2 }}>↳</span>
+                  <div>
+                    <div style={{ fontFamily: C.mono, fontSize: 11, color: col, marginBottom: 3 }}>{name as string}</div>
+                    <div style={{ fontFamily: C.serif, fontSize: 12, color: C.muted, lineHeight: 1.5 }}>{desc as string}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+          <Section title="9.2 Application Integration Hub">
+            <Body>
+              The Application Integration Hub defines the bridge between Notion workspace structure and live AETHER application code. It maps code repositories, visual assets, and application components into a unified development workflow.
+            </Body>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              {[["Code Repositories","Multi-repo structure mapped and analyzed. Frontend ↔ Backend ↔ API integrations.",C.accent],["Visual Assets","AETHER Design System → Visual Tokens → System Assets → Component library.",C.gold],["App Structure","Frontend components → Visual tokens. Backend services → Repository mapping.",C.green],["Development Workflow","Integration checklist · repo connections · visual-to-code asset mapping.",C.purple]].map(([t,d,c]) => (
+                <div key={t as string} style={{ background: `${c}07`, border: `1px solid ${c}20`, borderRadius: 7, padding: "12px 14px" }}>
+                  <div style={{ fontFamily: C.mono, fontSize: 10, color: c, letterSpacing: "0.14em", marginBottom: 5 }}>{t as string}</div>
+                  <div style={{ fontFamily: C.serif, fontSize: 12, color: C.muted, lineHeight: 1.5 }}>{d as string}</div>
+                </div>
+              ))}
+            </div>
+          </Section>
+        </Chapter>
+
         {/* ── NOTION TEXTBOOK LIVE SECTION ── */}
         <section style={{ marginBottom: 64 }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 20, paddingBottom: 14, borderBottom: `2px solid ${C.gold}30` }}>

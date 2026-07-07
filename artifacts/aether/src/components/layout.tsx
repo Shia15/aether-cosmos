@@ -159,6 +159,7 @@ const NAV_ITEMS = [
   { href: "/notion-sync", label: "Notion Sync · Pull Notion Pages into AETHER · Push Summaries to Notion · Two-Way Workspace Sync", icon: BookOpen },
   { href: "/notion-atlas", label: "Notion Atlas · seaaether Workspace Map · 131 Pages · 10 Knowledge Clusters · Synthesis Overview", icon: BookOpen },
   { href: "/aether-textbook", label: "AETHER Textbook · Unified Field · Solar & Energy · Biology & Quantum · Physics & Cosmology · Propulsion · Agents · Formal Mathematics", icon: BookOpen },
+  { href: "/agent-whispers", label: "Agent Whispers · aether_whisper_library.json · Reverie · Mnesis · Inferaia · Aletheia · Tone & Trigger Fragments · L1-L5 Agent Stack", icon: BookOpen },
   { href: "/solar-feminine", label: "Solar-Feminine Cycle · 26D Hormone Manifold · HPG Packet-Switching Network · Melatonin-GnRH Gate · 4-Colour Phases · LUNAR=WOMAN=66", icon: Sun },
   { href: "/symbolic-computation", label: "Symbolic Computation Hypothesis · Göbekli Tepe as Analog Information Processor · Pillar Graph · Light Oracle · Celestial Mapping", icon: Pyramid },
   { href: "/kinematic-replication", label: "Kinematic Self-Replication · Xenobots & Anthrobots · Bottom-Up Coherence · CUCA Loop · Controlled Breakdown", icon: GitFork },
