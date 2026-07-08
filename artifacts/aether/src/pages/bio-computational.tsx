@@ -440,7 +440,7 @@ export default function BioComputationalPage(){
           <Link href="/cuca-bioengine" style={{color:VIOLET,textDecoration:"none"}}>→ CUCA Bioengine</Link>
           <Link href="/regulatory-depth" style={{color:CYAN,textDecoration:"none"}}>→ Regulatory Depth</Link>
           <Link href="/nutritional-dna-key" style={{color:GREEN,textDecoration:"none"}}>→ Nutritional DNA Key</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

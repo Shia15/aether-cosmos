@@ -245,7 +245,7 @@ export default function DailyRitualPage(){
       <div style={{maxWidth:1080,margin:"0 auto",padding:"18px 36px 60px",display:"flex",flexWrap:"wrap",gap:14,fontFamily:"'DM Mono',monospace",fontSize:11}}>
         <Link href="/aether-flow" style={{color:GOLD,textDecoration:"none"}}>→ AETHER Flow</Link>
         <Link href="/aether-synthesis" style={{color:MOSS,textDecoration:"none"}}>→ AETHER Synthesis</Link>
-        <Link href="/" style={{color:FADE2,textDecoration:"none"}}>→ Knowledge Graph</Link>
+        <Link href="/graph-map" style={{color:FADE2,textDecoration:"none"}}>→ Knowledge Graph</Link>
       </div>
       <style>{`@media(max-width:820px){.ritual-grid{grid-template-columns:1fr !important;}}`}</style>
     </div>

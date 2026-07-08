@@ -357,7 +357,7 @@ export default function SlinkyPropulsionPage(){
           <Link href="/synaptic-entropy" style={{color:CYAN,textDecoration:"none"}}>\u2192 Synaptic Entropy Engine</Link>
           <Link href="/compact-fusion" style={{color:CYAN,textDecoration:"none"}}>\u2192 Compact Fusion Reactor</Link>
           <Link href="/warp-bubble-engine" style={{color:CYAN,textDecoration:"none"}}>\u2192 Warp Bubble Engine</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
         </div>
       </div>
     </div>

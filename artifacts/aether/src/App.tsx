@@ -499,6 +499,7 @@ const CoherentBodyPage          = lazy(() => import("@/pages/coherent-body"));
 const LightBodyPage             = lazy(() => import("@/pages/light-body"));
 const CloudTransportWarpPage    = lazy(() => import("@/pages/cloud-transport-warp"));
 const BillingPage                = lazy(() => import("@/pages/billing"));
+const HomeLanding                = lazy(() => import("@/pages/home-landing"));
 const BillingSuccessPage         = lazy(() => import("@/pages/billing-success"));
 
 const queryClient = new QueryClient();
@@ -1016,7 +1017,8 @@ function Router() {
           <Layout>
             <Suspense fallback={<PageLoader />}>
               <Switch>
-                <Route path="/" component={GraphView} />
+                <Route path="/" component={HomeLanding} />
+                <Route path="/graph-map" component={GraphView} />
                 <Route path="/architecture" component={ArchitectureView} />
                 <Route path="/upload" component={UploadView} />
                 <Route path="/coherence" component={CoherenceView} />

@@ -239,7 +239,7 @@ export default function CloudTransportWarpPage(){
           <Link href="/warp-bubble-engine" style={{color:CYAN,textDecoration:"none"}}>→ Warp Bubble Engine</Link>
           <Link href="/solar-architecture" style={{color:VIOLET,textDecoration:"none"}}>→ Solar Architecture</Link>
           <Link href="/transport-cavity" style={{color:GREEN,textDecoration:"none"}}>→ Transport Cavity</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

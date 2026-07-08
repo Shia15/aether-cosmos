@@ -507,7 +507,7 @@ export default function SymbolicComputationPage(){
           <Link href="/gobekli-plasma" style={{color:VIOLET,textDecoration:"none"}}>→ Göbekli Plasma</Link>
           <Link href="/symbolic-pillars" style={{color:CYAN,textDecoration:"none"}}>→ Symbolic Pillars</Link>
           <Link href="/gobekli-tepe" style={{color:GOLD,textDecoration:"none"}}>→ Göbekli Tepe</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

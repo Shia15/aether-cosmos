@@ -485,7 +485,7 @@ export default function CompactFusionPage(){
           <Link href="/aether-engine" style={{color:CYAN,textDecoration:"none"}}>
             \u2192 AETHER Engine
           </Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>
             \u2192 Knowledge Graph
           </Link>
         </div>

@@ -692,7 +692,7 @@ export default function AetherHabitatPage() {
           <Link href="/seismic-self-build" style={{ color: C.blue, textDecoration: "none" }}>→ Seismic Self-Build</Link>
           <Link href="/rhombus-gate" style={{ color: C.violet, textDecoration: "none" }}>→ Rhombus Gate · Piezo</Link>
           <Link href="/bio-magnetic-convergence" style={{ color: C.green, textDecoration: "none" }}>→ Bio-Magnetic Convergence</Link>
-          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{ color: C.muted, textDecoration: "none" }}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

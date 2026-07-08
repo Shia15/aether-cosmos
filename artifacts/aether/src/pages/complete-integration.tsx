@@ -148,7 +148,7 @@ export default function CompleteIntegrationPage(){
           <Link href="/aether-whitepaper-v2" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Whitepaper v2.0</Link>
           <Link href="/aether-unified-framework" style={{color:VIOLET,textDecoration:"none"}}>→ Unified Framework</Link>
           <Link href="/aether-synthesis" style={{color:GREEN,textDecoration:"none"}}>→ AETHER Synthesis</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

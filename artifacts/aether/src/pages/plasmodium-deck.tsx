@@ -341,7 +341,7 @@ export default function PlasmodiumDeckPage(){
           <Link href="/guf-flagship" style={{color:VIOLET,textDecoration:"none"}}>→ GUF Flagship</Link>
           <Link href="/warp-bubble-engine" style={{color:CYAN,textDecoration:"none"}}>→ Warp Bubble Engine</Link>
           <Link href="/gradient-field" style={{color:GOLD,textDecoration:"none"}}>→ Gradient Field</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

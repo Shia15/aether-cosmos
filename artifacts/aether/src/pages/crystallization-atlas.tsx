@@ -447,7 +447,7 @@ export default function CrystallizationAtlasPage() {
           <Link href="/crystallization-locking" style={{ color: CYAN, textDecoration: "none" }}>→ Crystallization · Locking</Link>
           <Link href="/substrate-synthesis" style={{ color: GREEN, textDecoration: "none" }}>→ Substrate Synthesis Studio</Link>
           <Link href="/periodic-table" style={{ color: GOLD, textDecoration: "none" }}>→ AETHER Periodic Table</Link>
-          <Link href="/" style={{ color: MUTED, textDecoration: "none" }}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{ color: MUTED, textDecoration: "none" }}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

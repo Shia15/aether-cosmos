@@ -261,7 +261,7 @@ export default function AetherWhitepaperV1Page(){
           <Link href="/computational-mathematics" style={{color:VIOLET,textDecoration:"none"}}>→ Computational Mathematics</Link>
           <Link href="/q-aether-research" style={{color:GREEN,textDecoration:"none"}}>→ Q~AETHER Research</Link>
           <Link href="/petrification-transformation" style={{color:ROSE,textDecoration:"none"}}>→ Petrification Transformation</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

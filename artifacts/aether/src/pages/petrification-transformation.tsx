@@ -207,7 +207,7 @@ export default function PetrificationTransformationPage(){
           <Link href="/crystallization-locking" style={{color:ROSE,textDecoration:"none"}}>→ Crystallization · Locking</Link>
           <Link href="/aether-whitepaper-v1" style={{color:GREEN,textDecoration:"none"}}>→ AETHER Whitepaper v1</Link>
           <Link href="/substrate-computing" style={{color:BLUE,textDecoration:"none"}}>→ Substrate Computing</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

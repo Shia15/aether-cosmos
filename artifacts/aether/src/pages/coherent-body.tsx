@@ -198,7 +198,7 @@ export default function CoherentBodyPage(){
           <Link href="/light-body" style={{color:GOLD,textDecoration:"none"}}>→ Light Body Genesis · Big Bang → All Life</Link>
           <Link href="/aether-synthesis" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Synthesis</Link>
           <Link href="/complete-integration" style={{color:VIOLET,textDecoration:"none"}}>→ The Complete Integration</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

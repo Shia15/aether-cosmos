@@ -397,7 +397,7 @@ export default function CoherenceEnginePage(){
           <Link href="/compact-fusion" style={{color:GREEN,textDecoration:"none"}}>\u2192 Fusion</Link>
           <Link href="/crystallization-atlas" style={{color:BLUE,textDecoration:"none"}}>\u2192 Crystal</Link>
           <Link href="/bio-computational" style={{color:ROSE,textDecoration:"none"}}>\u2192 Biological</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
         </div>
       </div>
     </div>

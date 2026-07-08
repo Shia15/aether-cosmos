@@ -217,7 +217,7 @@ export default function SubstrateComputingPage(){
           <Link href="/q-aether-research" style={{color:CYAN,textDecoration:"none"}}>→ Q~AETHER Research</Link>
           <Link href="/aether-whitepaper-v1" style={{color:GREEN,textDecoration:"none"}}>→ AETHER Whitepaper v1</Link>
           <Link href="/computational-mathematics" style={{color:VIOLET,textDecoration:"none"}}>→ Computational Mathematics</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

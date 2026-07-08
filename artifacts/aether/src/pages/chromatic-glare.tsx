@@ -726,7 +726,7 @@ export default function ChromaticGlarePage() {
           <Link href="/color-cosmology" style={{ color: C.cyan, fontSize: 12, fontFamily: FONT_MONO, letterSpacing: "0.1em", textDecoration: "none" }}>
             → Color Cosmology · Six Shells
           </Link>
-          <Link href="/" style={{ color: C.muted, fontSize: 12, fontFamily: FONT_MONO, letterSpacing: "0.1em", textDecoration: "none" }}>
+          <Link href="/graph-map" style={{ color: C.muted, fontSize: 12, fontFamily: FONT_MONO, letterSpacing: "0.1em", textDecoration: "none" }}>
             → Graph Map
           </Link>
         </div>

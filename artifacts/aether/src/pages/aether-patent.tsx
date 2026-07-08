@@ -218,7 +218,7 @@ export default function AetherPatentPage(){
           <Link href="/aether-unified-framework" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Unified Framework</Link>
           <Link href="/fibonacci-quaternion" style={{color:GOLD,textDecoration:"none"}}>→ Fibonacci–Quaternion AETHER</Link>
           <Link href="/cuca-bioengine" style={{color:GREEN,textDecoration:"none"}}>→ CUCA BioEngine v3.0</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

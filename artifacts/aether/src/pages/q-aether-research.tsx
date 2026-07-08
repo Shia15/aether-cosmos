@@ -196,7 +196,7 @@ export default function QAetherResearchPage(){
           <Link href="/q-aether" style={{color:CYAN,textDecoration:"none"}}>→ Q~AETHER Stack</Link>
           <Link href="/substrate-computing" style={{color:GREEN,textDecoration:"none"}}>→ Substrate Computing</Link>
           <Link href="/analog-reservoir" style={{color:VIOLET,textDecoration:"none"}}>→ Analog Reservoir</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

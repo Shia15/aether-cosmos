@@ -191,7 +191,7 @@ export default function AetherWhitepaperV2Page(){
           <Link href="/aether-symbol-reference" style={{color:CYAN,textDecoration:"none"}}>→ Symbol Reference</Link>
           <Link href="/aether-synthesis" style={{color:GREEN,textDecoration:"none"}}>→ AETHER Synthesis</Link>
           <Link href="/aether-unified-framework" style={{color:GOLD,textDecoration:"none"}}>→ Unified Framework</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

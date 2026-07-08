@@ -212,7 +212,7 @@ export default function JavaControlFlowPage() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 20, paddingTop: 20, borderTop: `1px solid ${BORDER}`, fontFamily: "monospace", fontSize: 12 }}>
           <Link href="/codebase-symbol-engine" style={{ color: CYAN, textDecoration: "none" }}>→ Codebase Symbol Engine</Link>
           <Link href="/equation-codex" style={{ color: VIOLET, textDecoration: "none" }}>→ Equation Codex</Link>
-          <Link href="/" style={{ color: MUTED, textDecoration: "none" }}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{ color: MUTED, textDecoration: "none" }}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

@@ -188,7 +188,7 @@ export default function CucaWhitePaperPage(){
           <Link href="/aether-unified-framework" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Unified Framework</Link>
           <Link href="/cuca-bioengine" style={{color:GREEN,textDecoration:"none"}}>→ CUCA BioEngine v3.2</Link>
           <Link href="/aether-theory-deck" style={{color:GOLD,textDecoration:"none"}}>→ AETHER Theory Deck</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

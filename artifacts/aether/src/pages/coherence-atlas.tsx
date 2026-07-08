@@ -198,7 +198,7 @@ export default function CoherenceAtlas() {
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${V.dim}44`, paddingTop: 24, display: "flex",
         justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-        <Link href="/" style={{ fontFamily: MONO, fontSize: 8, color: V.aurora, textDecoration: "none" }}>
+        <Link href="/graph-map" style={{ fontFamily: MONO, fontSize: 8, color: V.aurora, textDecoration: "none" }}>
           &lt;-- GRAPH MAP -- BACK TO AETHER
         </Link>
         <div style={{ fontFamily: MONO, fontSize: 8, color: V.dim, textAlign: "right" }}>

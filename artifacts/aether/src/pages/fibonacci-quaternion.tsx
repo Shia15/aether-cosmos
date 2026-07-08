@@ -170,7 +170,7 @@ export default function FibonacciQuaternionPage(){
           <Link href="/petrification-transformation" style={{color:ROSE,textDecoration:"none"}}>→ Petrification Transformation</Link>
           <Link href="/aether-theory-deck" style={{color:GOLD,textDecoration:"none"}}>→ AETHER Theory Deck</Link>
           <Link href="/aether-patent" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Patent Specification</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

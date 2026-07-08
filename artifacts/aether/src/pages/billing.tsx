@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { useUser } from "@clerk/react";
 import {
   useListBillingProducts,
   useCreateBillingCheckout,
@@ -77,6 +78,7 @@ function formatUsd(unitAmount: number, currency: string) {
 }
 
 export default function BillingPage() {
+  const { user, isLoaded: authLoaded, isSignedIn } = useUser();
   const { data: products, isLoading: productsLoading } = useListBillingProducts();
   const { data: status } = useGetBillingStatus();
   const checkout = useCreateBillingCheckout();
@@ -141,6 +143,46 @@ export default function BillingPage() {
             led through the simulations, the image atlases, and the working engines on a practical,
             staged timeline — from first principles to full-system synthesis.
           </p>
+
+          {/* ── Login area ── */}
+          {authLoaded && (
+            <div style={{ marginTop: 30, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+              {isSignedIn ? (
+                <div style={{
+                  display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 999,
+                  background: "rgba(245,200,76,0.06)", border: "1px solid rgba(245,200,76,0.22)",
+                  fontFamily: M, fontSize: 11, letterSpacing: "0.12em", color: GOLD_DIM,
+                }}>
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: GOLD, boxShadow: `0 0 8px ${GOLD}` }} />
+                  SIGNED IN AS {(user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "MEMBER").toUpperCase()}
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+                    <Link href="/sign-in">
+                      <Button style={{
+                        background: "transparent", color: GOLD, fontWeight: 700, fontSize: 13,
+                        padding: "18px 26px", borderRadius: 10, border: `1px solid rgba(245,200,76,0.45)`,
+                      }}>
+                        Sign in
+                      </Button>
+                    </Link>
+                    <Link href="/sign-up">
+                      <Button style={{
+                        background: "rgba(245,200,76,0.1)", color: GOLD, fontWeight: 700, fontSize: 13,
+                        padding: "18px 26px", borderRadius: 10, border: `1px solid rgba(245,200,76,0.25)`,
+                      }}>
+                        Create account
+                      </Button>
+                    </Link>
+                  </div>
+                  <div style={{ fontFamily: M, fontSize: 10, letterSpacing: "0.2em", color: MUTED }}>
+                    SIGN IN FIRST — YOUR PURCHASE IS TIED TO YOUR ACCOUNT
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

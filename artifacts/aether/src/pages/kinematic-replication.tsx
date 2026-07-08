@@ -489,7 +489,7 @@ export default function KinematicReplicationPage(){
           <Link href="/cuca-bioengine" style={{color:GREEN,textDecoration:"none"}}>→ CUCA Bio-Engine</Link>
           <Link href="/cuca-white-paper" style={{color:VIOLET,textDecoration:"none"}}>→ CUCA White Paper</Link>
           <Link href="/stromatolite-field" style={{color:CYAN,textDecoration:"none"}}>→ Stromatolite Field</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

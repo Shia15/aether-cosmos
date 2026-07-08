@@ -509,7 +509,7 @@ export default function UptippleBoatPage() {
           <Link href="/tidal-movement" style={{ color: C.cyan, fontSize: 12, fontFamily: FONT_MONO, letterSpacing: "0.1em", textDecoration: "none" }}>
             → Tidal Movement · Moon's Tide Oscillation
           </Link>
-          <Link href="/" style={{ color: C.muted, fontSize: 12, fontFamily: FONT_MONO, letterSpacing: "0.1em", textDecoration: "none" }}>
+          <Link href="/graph-map" style={{ color: C.muted, fontSize: 12, fontFamily: FONT_MONO, letterSpacing: "0.1em", textDecoration: "none" }}>
             → Graph Map
           </Link>
         </div>

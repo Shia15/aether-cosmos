@@ -41,7 +41,7 @@ export default function SubstratesPage() {
   const [q, setQ] = useState("");
 
   const items = useMemo(
-    () => (NAV_ITEMS as unknown as NavItem[]).filter(i => i.href !== "/substrates"),
+    () => (NAV_ITEMS as unknown as NavItem[]).filter(i => i.href !== "/substrates" && i.href !== "/"),
     []
   );
 
@@ -110,7 +110,7 @@ export default function SubstratesPage() {
             >
               See the work <span aria-hidden>→</span>
             </a>
-            <Link href="/" style={{ color: C.text, fontSize: 14 }}>
+            <Link href="/graph-map" style={{ color: C.text, fontSize: 14 }}>
               Graph Map
             </Link>
           </div>

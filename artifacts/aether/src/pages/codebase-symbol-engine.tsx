@@ -301,7 +301,7 @@ export default function CodebaseSymbolEnginePage() {
           <Link href="/java-control-flow" style={{ color: CYAN, textDecoration: "none" }}>→ Java Control Flow</Link>
           <Link href="/equation-codex" style={{ color: VIOLET, textDecoration: "none" }}>→ Equation Codex</Link>
           <Link href="/symbol-atlas" style={{ color: GREEN, textDecoration: "none" }}>→ Symbol Atlas</Link>
-          <Link href="/" style={{ color: MUTED, textDecoration: "none" }}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{ color: MUTED, textDecoration: "none" }}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

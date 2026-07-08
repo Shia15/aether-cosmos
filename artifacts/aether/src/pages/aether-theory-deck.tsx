@@ -148,7 +148,7 @@ export default function AetherTheoryDeckPage(){
           <Link href="/cuca-white-paper" style={{color:CYAN,textDecoration:"none"}}>→ CUCA White Paper v4.1</Link>
           <Link href="/aether-unified-framework" style={{color:GREEN,textDecoration:"none"}}>→ AETHER Unified Framework</Link>
           <Link href="/aether-whitepaper-v1" style={{color:GOLD,textDecoration:"none"}}>→ AETHER Whitepaper v1</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

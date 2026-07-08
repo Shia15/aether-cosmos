@@ -152,7 +152,7 @@ export default function AetherSynthesisPage(){
           <Link href="/aether-whitepaper-v2" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Whitepaper v2.0</Link>
           <Link href="/complete-integration" style={{color:VIOLET,textDecoration:"none"}}>→ The Complete Integration</Link>
           <Link href="/daily-ritual" style={{color:GOLD,textDecoration:"none"}}>→ Daily Sensing Ritual</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

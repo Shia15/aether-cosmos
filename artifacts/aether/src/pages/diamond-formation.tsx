@@ -227,7 +227,7 @@ export default function DiamondFormationPage(){
         <div style={{display:"flex",flexWrap:"wrap",gap:14,paddingTop:20,borderTop:`1px solid ${BORDER}`,fontFamily:"monospace",fontSize:12}}>
           <Link href="/petrification-transformation" style={{color:VIOLET,textDecoration:"none"}}>→ Petrification Transformation</Link>
           <Link href="/aether-theory-deck" style={{color:CYAN,textDecoration:"none"}}>→ AETHER Theory Deck</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

@@ -9,7 +9,12 @@ const DEFAULT_DESCRIPTION =
 
 export const routeMeta: Record<string, RouteMeta> = {
   "/": {
-    title: SITE_NAME,
+    title: `The Complete Course · ${SITE_NAME}`,
+    description:
+      "The entire AETHER knowledge system as one coherent 12-week course — one payment, lifetime access to every simulator, workbench, and image atlas.",
+  },
+  "/graph-map": {
+    title: `Graph Map · ${SITE_NAME}`,
     description: DEFAULT_DESCRIPTION,
   },
   "/research": {

@@ -546,7 +546,7 @@ export default function FerrofluidPropulsionPage(){
           <Link href="/slinky-propulsion" style={{color:CYAN,textDecoration:"none"}}>\u2192 Slinky Propulsion</Link>
           <Link href="/compact-fusion" style={{color:CYAN,textDecoration:"none"}}>\u2192 Compact Fusion</Link>
           <Link href="/biomagnetism" style={{color:CYAN,textDecoration:"none"}}>\u2192 Biomagnetism</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>\u2192 Knowledge Graph</Link>
         </div>
       </div>
     </div>

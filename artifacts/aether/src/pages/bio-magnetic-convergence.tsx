@@ -744,7 +744,7 @@ export default function BioMagneticConvergencePage() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 40, paddingTop: 22, borderTop: `1px solid ${C.border}`, fontFamily: "monospace", fontSize: 12 }}>
           <Link href="/ultra-magnetism" style={{ color: C.blue, textDecoration: "none" }}>→ Ultra-Magnetism · SC</Link>
           <Link href="/regulatory-depth" style={{ color: C.green, textDecoration: "none" }}>→ Regulatory Depth · Biology</Link>
-          <Link href="/" style={{ color: C.muted, textDecoration: "none" }}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{ color: C.muted, textDecoration: "none" }}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

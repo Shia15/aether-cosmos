@@ -285,7 +285,7 @@ export default function LightBodyPage(){
           <Link href="/coherent-body" style={{color:CYAN,textDecoration:"none"}}>→ The Coherent Body · Cellular Clock</Link>
           <Link href="/aether-symbol-reference" style={{color:VIOLET,textDecoration:"none"}}>→ AETHER Symbol Reference</Link>
           <Link href="/complete-integration" style={{color:GOLD,textDecoration:"none"}}>→ The Complete Integration</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>

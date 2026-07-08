@@ -207,7 +207,7 @@ export default function AetherUnifiedFrameworkPage(){
           <Link href="/cuca-white-paper" style={{color:CYAN,textDecoration:"none"}}>→ CUCA White Paper</Link>
           <Link href="/aether-patent" style={{color:GOLD,textDecoration:"none"}}>→ AETHER Patent Specification</Link>
           <Link href="/petrification-transformation" style={{color:ROSE,textDecoration:"none"}}>→ Petrification Transformation</Link>
-          <Link href="/" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
+          <Link href="/graph-map" style={{color:MUTED,textDecoration:"none"}}>→ Knowledge Graph</Link>
         </div>
       </div>
     </div>
