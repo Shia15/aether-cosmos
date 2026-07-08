@@ -175,6 +175,7 @@ export interface BillingPurchase {
   id: string;
   amount: number;
   currency: string;
+  priceId: string | null;
   createdAt: string;
 }
 

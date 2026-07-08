@@ -25,6 +25,9 @@ export class StripeService {
       mode,
       success_url: successUrl,
       cancel_url: cancelUrl,
+      ...(mode === "payment"
+        ? { payment_intent_data: { metadata: { priceId } } }
+        : {}),
     });
   }
 

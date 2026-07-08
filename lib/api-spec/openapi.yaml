@@ -797,6 +797,9 @@ components:
           type: integer
         currency:
           type: string
+        priceId:
+          type: string
+          nullable: true
         createdAt:
           type: string
           format: date-time
@@ -804,6 +807,7 @@ components:
         - id
         - amount
         - currency
+        - priceId
         - createdAt
 
     BillingStatus:

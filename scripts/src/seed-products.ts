@@ -12,11 +12,13 @@ const RETIRED_TIERS = [
 async function seed() {
   const stripe = await getUncachableStripeClient();
 
+  // Use products.list (strongly consistent) rather than products.search
+  // (eventually consistent, up to ~1 min indexing lag) so re-runs are safe.
+  const allActive = await stripe.products.list({ active: true, limit: 100 });
+
   for (const name of RETIRED_TIERS) {
-    const found = await stripe.products.search({
-      query: `name:'${name}' AND active:'true'`,
-    });
-    for (const product of found.data) {
+    const found = allActive.data.filter((p) => p.name === name);
+    for (const product of found) {
       const prices = await stripe.prices.list({ product: product.id, active: true, limit: 100 });
       for (const price of prices.data) {
         await stripe.prices.update(price.id, { active: false });
@@ -27,11 +29,7 @@ async function seed() {
     }
   }
 
-  const existing = await stripe.products.search({
-    query: `name:'${COURSE_NAME}' AND active:'true'`,
-  });
-
-  let product = existing.data[0];
+  let product = allActive.data.find((p) => p.name === COURSE_NAME);
   if (product) {
     console.log(`${COURSE_NAME} already exists (${product.id}).`);
   } else {

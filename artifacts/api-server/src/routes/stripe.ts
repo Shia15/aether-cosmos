@@ -132,6 +132,7 @@ router.get("/billing/status", async (req, res) => {
     id: row.id,
     amount: row.amount,
     currency: row.currency,
+    priceId: row.metadata?.priceId ?? null,
     createdAt: new Date(row.created * 1000).toISOString(),
   }));
 

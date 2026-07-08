@@ -3,7 +3,7 @@ import { Music, Pause, Volume2 } from "lucide-react";
 
 const AUDIO_SRC = `${import.meta.env.BASE_URL}audio/aether-ambient.mp3`;
 const LS_KEY = "aether.music.v1";
-const TEAL = "#2ef0d8";
+const TEAL = "#f5c84c";
 
 type Saved = { playing: boolean; volume: number };
 
@@ -174,11 +174,11 @@ export default function BackgroundMusic() {
           height: 46,
           borderRadius: "50%",
           cursor: "pointer",
-          border: `1px solid ${playing ? TEAL : "#1a3040"}`,
-          background: playing ? "rgba(46,240,216,0.12)" : "rgba(4,6,14,0.86)",
-          color: playing ? TEAL : "#8fb3c8",
+          border: `1px solid ${playing ? TEAL : "#3a3220"}`,
+          background: playing ? "rgba(245,200,76,0.12)" : "rgba(11,9,6,0.86)",
+          color: playing ? TEAL : "#cfc3a4",
           backdropFilter: "blur(6px)",
-          boxShadow: playing ? "0 0 18px rgba(46,240,216,0.35)" : "0 2px 10px rgba(0,0,0,0.4)",
+          boxShadow: playing ? "0 0 18px rgba(245,200,76,0.35)" : "0 2px 10px rgba(0,0,0,0.4)",
           transition: "all 0.25s",
         }}
       >
@@ -228,14 +228,14 @@ export default function BackgroundMusic() {
           paddingRight: hover ? 12 : 0,
           height: 38,
           borderRadius: 19,
-          border: hover ? "1px solid #1a3040" : "1px solid transparent",
-          background: "rgba(4,6,14,0.86)",
+          border: hover ? "1px solid #3a3220" : "1px solid transparent",
+          background: "rgba(11,9,6,0.86)",
           backdropFilter: "blur(6px)",
           transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
           whiteSpace: "nowrap",
         }}
       >
-        <Volume2 style={{ width: 15, height: 15, color: "#8fb3c8", flexShrink: 0 }} />
+        <Volume2 style={{ width: 15, height: 15, color: "#cfc3a4", flexShrink: 0 }} />
         <input
           type="range"
           min={0}

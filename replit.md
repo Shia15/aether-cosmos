@@ -39,6 +39,8 @@ Required Environment Variables:
 
 - **Monorepo Structure:** pnpm workspace with `artifacts/` for deployable apps and `lib/` for shared code ensures modularity.
 - **Code Generation:** Orval generates React Query hooks and Zod schemas from OpenAPI for type-safety.
+- **Darkcone Theme (system-wide):** Semantic tokens in `artifacts/aether/src/index.css` (`:root` + `.dark`) use the darkcone palette — warm near-black `#0b0906` background, gold `#f5c84c` primary/accent/ring, parchment `#f4f1ea` foreground. Raw hexes exposed as `--aether-cone-bg/gold/ivory`; script font token `--app-font-script` ('Great Vibes'). Sidebar wordmark is a gold calligraphic "Aether"; layout chrome, background-music widget, Clerk sign-in appearance, and loading splash all use gold/warm tones. Individual concept pages keep their own local palettes (nothing removed).
+- **Billing (single course):** One Stripe product — "AETHER · The Complete Course", $2,997 one-time (no subscriptions). Seed script `scripts/src/seed-products.ts` (uses `products.list`, idempotent; retired the 4 old tiers). Checkout in payment mode attaches `payment_intent_data.metadata.priceId`; `/api/billing/status` surfaces `priceId` per purchase and `billing.tsx` derives owned-state by priceId (amount-match fallback for legacy purchases).
 - **Interactive Canvases:** Extensive use of interactive live canvases for data visualization and simulation.
 - **Composite TypeScript Projects:** Utilizes TypeScript's project references for efficient type-checking and building.
 - **AI Integration:** Integrates Anthropic for features like auto-titling and section analysis.

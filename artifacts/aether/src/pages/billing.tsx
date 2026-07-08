@@ -86,7 +86,11 @@ export default function BillingPage() {
 
   const course = (products ?? []).find(p => p.price && !p.price.interval);
   const owned = (status?.purchases ?? []).some(
-    p => course?.price && p.amount === course.price.unitAmount,
+    p =>
+      course?.price &&
+      (p.priceId
+        ? p.priceId === course.price.id
+        : p.amount === course.price.unitAmount),
   );
   const hasBilling =
     (status?.subscriptions?.length ?? 0) > 0 || (status?.purchases?.length ?? 0) > 0;

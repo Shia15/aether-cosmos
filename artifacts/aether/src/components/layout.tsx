@@ -600,7 +600,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
   return (
     <>
       {text.slice(0, idx)}
-      <span style={{ color: "#00ff88", fontWeight: 700 }}>{text.slice(idx, idx + query.length)}</span>
+      <span style={{ color: "#f5c84c", fontWeight: 700 }}>{text.slice(idx, idx + query.length)}</span>
       {text.slice(idx + query.length)}
     </>
   );
@@ -655,11 +655,11 @@ function AuthWidget() {
   if (!isLoaded) return null;
   if (!isSignedIn) {
     return (
-      <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(46,240,216,0.08)" }}>
+      <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(245,200,76,0.08)" }}>
         <a href="/sign-in" onClick={(e) => { e.preventDefault(); setLocation("/sign-in"); }}
           style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6,
-            background: "rgba(0,255,178,0.06)", border: "1px solid rgba(0,255,178,0.18)",
-            color: "#00FFB2", fontFamily: "'Space Mono',monospace", fontSize: "0.6rem",
+            background: "rgba(245,200,76,0.06)", border: "1px solid rgba(245,200,76,0.18)",
+            color: "#f5c84c", fontFamily: "'Space Mono',monospace", fontSize: "0.6rem",
             letterSpacing: 2, textDecoration: "none", cursor: "pointer" }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
@@ -671,25 +671,25 @@ function AuthWidget() {
   }
   const display = user.firstName || user.emailAddresses[0]?.emailAddress || "User";
   return (
-    <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(46,240,216,0.08)" }}>
+    <div style={{ padding: "8px 12px", borderTop: "1px solid rgba(245,200,76,0.08)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6,
-        background: "rgba(0,255,178,0.04)", border: "1px solid rgba(0,255,178,0.12)" }}>
-        <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(0,255,178,0.15)",
-          border: "1px solid rgba(0,255,178,0.3)", display: "flex", alignItems: "center",
-          justifyContent: "center", color: "#00FFB2", flexShrink: 0, fontSize: "0.55rem",
+        background: "rgba(245,200,76,0.04)", border: "1px solid rgba(245,200,76,0.12)" }}>
+        <div style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(245,200,76,0.15)",
+          border: "1px solid rgba(245,200,76,0.3)", display: "flex", alignItems: "center",
+          justifyContent: "center", color: "#f5c84c", flexShrink: 0, fontSize: "0.55rem",
           fontFamily: "'Space Mono',monospace" }}>
           {(display[0] ?? "?").toUpperCase()}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.55rem", color: "#B8CCE8",
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.55rem", color: "#e8dfcc",
             letterSpacing: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {display}
           </div>
-          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.48rem", color: "#3A5060", letterSpacing: 1 }}>SIGNED IN</div>
+          <div style={{ fontFamily: "'Space Mono',monospace", fontSize: "0.48rem", color: "#6f6552", letterSpacing: 1 }}>SIGNED IN</div>
         </div>
         <button onClick={() => signOut({ redirectUrl: "/" })}
           title="Sign out"
-          style={{ background: "none", border: "none", cursor: "pointer", color: "#3A5060", padding: 2,
+          style={{ background: "none", border: "none", cursor: "pointer", color: "#6f6552", padding: 2,
             display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 4,
             flexShrink: 0 }}>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -825,7 +825,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        backgroundColor: "#020408",
+        backgroundColor: "#0b0906",
         logging: false,
         // Capture full scrollable height
         height: target.scrollHeight,
@@ -892,7 +892,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Cpu className="w-4 h-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="font-serif text-xl tracking-widest text-foreground uppercase font-bold">AETHER</h1>
+          <h1
+            style={{
+              fontFamily: "'Great Vibes', cursive",
+              fontSize: 30,
+              lineHeight: 1.05,
+              fontWeight: 400,
+              color: "#f5c84c",
+              textShadow: "0 0 20px rgba(245,200,76,0.35)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Aether
+          </h1>
           <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
             <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", isHealthy ? "bg-primary animate-pulse" : "bg-destructive")} />
             {isHealthy ? "System Online" : "System Offline"}
@@ -999,9 +1011,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           style={{
             display: "flex", alignItems: "center", gap: 5,
             padding: "4px 10px", borderRadius: 14, cursor: shotState === "busy" ? "wait" : "pointer",
-            border: `1px solid ${shotState === "done" ? "#44ee88" : "#1a3040"}`,
-            background: shotState === "done" ? "rgba(68,238,136,0.08)" : "rgba(46,240,216,0.05)",
-            color: shotState === "done" ? "#44ee88" : "#2ef0d8",
+            border: `1px solid ${shotState === "done" ? "#44ee88" : "#3a3220"}`,
+            background: shotState === "done" ? "rgba(68,238,136,0.08)" : "rgba(245,200,76,0.05)",
+            color: shotState === "done" ? "#44ee88" : "#f5c84c",
             fontFamily: "'Space Mono', monospace",
             fontSize: 8, letterSpacing: "0.08em",
             transition: "all 0.2s",
@@ -1028,21 +1040,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {sidebarCollapsed ? (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", height:"100%", paddingTop:14, paddingBottom:14, gap:6 }}>
             {/* Logo icon */}
-            <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(46,240,216,0.08)", border:"1px solid rgba(46,240,216,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:"#2ef0d8", marginBottom:8 }}>
+            <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(245,200,76,0.08)", border:"1px solid rgba(245,200,76,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f5c84c", marginBottom:8 }}>
               <Cpu style={{ width:16, height:16 }} />
             </div>
             {/* Expand toggle */}
             <button
               onClick={toggleSidebar}
               title="Expand sidebar"
-              style={{ width:32, height:32, borderRadius:6, background:"rgba(46,240,216,0.06)", border:"1px solid rgba(46,240,216,0.15)", display:"flex", alignItems:"center", justifyContent:"center", color:"#2ef0d8", cursor:"pointer" }}
+              style={{ width:32, height:32, borderRadius:6, background:"rgba(245,200,76,0.06)", border:"1px solid rgba(245,200,76,0.15)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f5c84c", cursor:"pointer" }}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="5,3 9,7 5,11" />
               </svg>
             </button>
             {/* Status dot */}
-            <div style={{ width:6, height:6, borderRadius:"50%", background: isHealthy ? "#2ef0d8" : "#ef4444", marginTop:"auto", marginBottom:4 }} />
+            <div style={{ width:6, height:6, borderRadius:"50%", background: isHealthy ? "#f5c84c" : "#ef4444", marginTop:"auto", marginBottom:4 }} />
           </div>
         ) : (
           sidebarContent
@@ -1066,11 +1078,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div style={{
             width:2, height:"100%", maxHeight:64,
             borderRadius:2,
-            background:"rgba(46,240,216,0.22)",
+            background:"rgba(245,200,76,0.22)",
             transition:"background 0.15s",
           }}
-            onMouseEnter={e => (e.currentTarget.style.background="rgba(46,240,216,0.55)")}
-            onMouseLeave={e => (e.currentTarget.style.background="rgba(46,240,216,0.22)")}
+            onMouseEnter={e => (e.currentTarget.style.background="rgba(245,200,76,0.55)")}
+            onMouseLeave={e => (e.currentTarget.style.background="rgba(245,200,76,0.22)")}
           />
         </div>
       </aside>
@@ -1125,9 +1137,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             style={{
               display: "flex", alignItems: "center", justifyContent: "center",
               width: 30, height: 30, borderRadius: "50%", cursor: shotState === "busy" ? "wait" : "pointer",
-              border: `1px solid ${shotState === "done" ? "#44ee88" : "#1a3040"}`,
-              background: shotState === "done" ? "rgba(68,238,136,0.1)" : "rgba(46,240,216,0.06)",
-              color: shotState === "done" ? "#44ee88" : "#2ef0d8",
+              border: `1px solid ${shotState === "done" ? "#44ee88" : "#3a3220"}`,
+              background: shotState === "done" ? "rgba(68,238,136,0.1)" : "rgba(245,200,76,0.06)",
+              color: shotState === "done" ? "#44ee88" : "#f5c84c",
               transition: "all 0.2s", flexShrink: 0,
               opacity: shotState === "busy" ? 0.5 : 1,
             }}
@@ -1138,7 +1150,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         <main
           ref={mainRef}
-          className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900/20 via-background to-background"
+          className="flex-1 relative flex flex-col min-w-0 overflow-y-auto overflow-x-hidden bg-background bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-background to-background"
         >
           {/* zoom + pan wrapper */}
           <div
@@ -1167,13 +1179,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
             transform: (zoomScale === 2 || zoomHint) ? "translateY(0) scale(1)" : "translateY(8px) scale(0.9)",
             transition: "opacity 0.25s, transform 0.25s",
             display: "flex", alignItems: "center", gap: 7,
-            background: "rgba(4,6,14,0.88)",
-            border: `1px solid ${zoomScale === 2 ? "#00FFB2" : "#3A5060"}`,
+            background: "rgba(11,9,6,0.88)",
+            border: `1px solid ${zoomScale === 2 ? "#f5c84c" : "#6f6552"}`,
             borderRadius: 6, padding: "5px 12px",
             fontFamily: "'Space Mono',monospace", fontSize: 11,
-            color: zoomScale === 2 ? "#00FFB2" : "#B8CCE8",
+            color: zoomScale === 2 ? "#f5c84c" : "#e8dfcc",
             backdropFilter: "blur(6px)",
-            boxShadow: zoomScale === 2 ? "0 0 16px #00FFB244" : "none",
+            boxShadow: zoomScale === 2 ? "0 0 16px #f5c84c44" : "none",
           }}>
             <span style={{ fontSize: 14, lineHeight: 1 }}>
               {dragging ? "✥" : zoomScale === 2 ? "🔍" : "🔎"}

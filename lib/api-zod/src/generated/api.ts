@@ -260,6 +260,7 @@ export const GetBillingStatusResponse = zod.object({
       id: zod.string(),
       amount: zod.number(),
       currency: zod.string(),
+      priceId: zod.string().nullable(),
       createdAt: zod.coerce.date(),
     }),
   ),
