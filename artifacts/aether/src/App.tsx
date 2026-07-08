@@ -477,6 +477,7 @@ const AetherTextbookPage        = lazy(() => import("@/pages/aether-textbook"));
 const AgentWhispersPage         = lazy(() => import("@/pages/agent-whispers"));
 const ClaudeChatPage            = lazy(() => import("@/pages/claude-chat"));
 const VercelDashboardPage       = lazy(() => import("@/pages/vercel-dashboard"));
+const SubstratesPage            = lazy(() => import("@/pages/substrates"));
 const SolarFemininePage         = lazy(() => import("@/pages/solar-feminine"));
 const SymbolicComputationPage   = lazy(() => import("@/pages/symbolic-computation"));
 const KinematicReplicationPage  = lazy(() => import("@/pages/kinematic-replication"));
@@ -1482,6 +1483,7 @@ function Router() {
                 <Route path="/agent-whispers" component={AgentWhispersPage} />
                 <Route path="/claude-chat" component={ClaudeChatPage} />
                 <Route path="/vercel-dashboard" component={VercelDashboardPage} />
+                <Route path="/substrates" component={SubstratesPage} />
                 <Route path="/solar-feminine" component={SolarFemininePage} />
                 <Route path="/symbolic-computation" component={SymbolicComputationPage} />
                 <Route path="/kinematic-replication" component={KinematicReplicationPage} />
