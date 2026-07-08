@@ -237,18 +237,6 @@ export default function DivineTimingPage() {
       padding:"3rem 1.5rem 5rem",
     }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');`}</style>
-      <div style={{ marginBottom:24 }}>
-        <div style={{ display:"inline-block", border:"1px solid #fbbf24", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#fbbf24", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(251,191,36,0.15)", borderLeft:"3px solid #fbbf24", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Divine Timing · Eris-in-Pisces Transit · 5 Windows · Field of Numbers · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(251,191,36,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five Eris transit windows (Oct 15 · Oct 21 · Blind · Mid-Nov · Nov 29) with a pulsing sun — the live AETHER divine timing transit simulation.
-          </p>
-          <DivineTimingCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <header style={{
           padding:"2.2rem 1.8rem", borderRadius:18, marginBottom:"2rem",

@@ -254,13 +254,6 @@ export default function GobekliTepePage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #d4a843",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#d4a843",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #d4a843",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#d4a843",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GÖBEKLI TEPE · PILLAR RING · SOLAR ALIGNMENT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(212,168,67,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Twelve-pillar enclosure D with solar transit — the live AETHER Göbekli Tepe simulation.</p></div>
-          <GobekliCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div className="border-b border-amber-900/30 px-6 py-4 sticky top-0 z-20"
         style={{ background: C.panel + "ee" }}>

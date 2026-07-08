@@ -623,14 +623,6 @@ export default function FlowNotebookPage() {
         @keyframes cb-fade-in { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
       `}</style>
 
-      <div style={{width:"100%",maxWidth:720,flexShrink:0,marginBottom:16}}>
-        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(1,8,16,0.9)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FLOW NOTEBOOK · MEET FLOW · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Animated ink lines and page-flow nodes — the live AETHER notebook simulation.</p></div>
-          <FlowNotebookCanvas />
-        </div>
-      </div>
-
       <div style={{ width: "100%", maxWidth: 720, display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <Link href="/aether-childrens-realm" style={{
           fontSize: 12, letterSpacing: "0.18em", color: "#5eead4",

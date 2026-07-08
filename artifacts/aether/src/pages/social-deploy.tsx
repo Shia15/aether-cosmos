@@ -226,13 +226,6 @@ export default function SocialDeployPage() {
       background:"radial-gradient(ellipse at top, rgba(167,139,250,0.10), rgba(2,6,23,0.95) 50%, rgba(2,6,23,1))",
       padding:"3rem 1.5rem", color:"#e5e7eb",
       fontFamily:"system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
-      <div style={{flexShrink:0,marginBottom:20}}>
-        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SOCIAL DEPLOY · CALM COMPANY OS · CONTENT ENGINE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4 platform beam nodes — the live AETHER social deploy simulation.</p></div>
-          <SocialDeployHeaderCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
 
         {/* Header */}

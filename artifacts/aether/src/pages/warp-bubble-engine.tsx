@@ -572,13 +572,6 @@ export default function WarpBubbleEnginePage() {
       background: BG, minHeight: "100vh", display: "flex", flexDirection: "column",
       fontFamily: MONO, color: "#c8d8e0", overflow: "hidden",
     }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:8}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WARP BUBBLE ENGINE · ALCUBIERRE METRIC · SPACE COMPRESSION · EXOTIC MATTER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Alcubierre bubble: compressed front + expanded rear — the live AETHER warp bubble simulation.</p></div>
-          <WarpBubbleEngineHeaderCanvas />
-        </div>
-      </div>
       {/* Top bar */}
       <div style={{
         background: PANEL_BG, borderBottom: `1px solid ${BORDER}`,

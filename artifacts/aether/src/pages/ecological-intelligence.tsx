@@ -284,19 +284,6 @@ export default function EcologicalIntelligencePage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2dd4bf", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2dd4bf", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(45,212,191,0.1)", borderLeft:"3px solid #2dd4bf", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Ecological Intelligence · Mycorrhizal Network · Bio-Signal Flow · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(45,212,191,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five forest nodes (Oak · Pine · Myco · Fungi · Algae) exchanging live nutrient packets — the live AETHER mycorrhizal intelligence simulation.
-          </p>
-          <EcoIntelCanvas />
-        </div>
-      </div>
-
       {/* Header */}
       <div className="border-b border-green-900/30 px-6 py-4 sticky top-0 z-20"
         style={{ background: C.panel + "ee" }}>

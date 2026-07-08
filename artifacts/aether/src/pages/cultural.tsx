@@ -277,19 +277,6 @@ export default function CulturalPage() {
 
   return (
     <div className="h-full overflow-y-auto px-8 py-8 space-y-16">
-      <div>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Cultural · Japanese Color Atlas · Seasonal Palette · Wabi-Sabi · AETHER Chromatics
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Eight traditional Japanese color orbs (Midori · Umemurasaki · Kogane · Hanada · Aka · Tokiwa · Fuji · Chairo) pulsing — the live AETHER cultural color atlas simulation.
-          </p>
-          <CulturalCanvas />
-        </div>
-      </div>
-
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-8 flex-wrap">
         <div className="space-y-4 flex-1 min-w-0">

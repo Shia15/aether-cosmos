@@ -585,13 +585,6 @@ export default function UltraMagnetismPage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #ff4477",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ff4477",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ff4477",borderRadius:4,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ff4477",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>ULTRA MAGNETISM · MAGNETIC FIELD · FLUX DENSITY · DIPOLE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,68,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>14 curved field lines + N/S poles — the live AETHER ultra-magnetism simulation.</p></div>
-          <UltraMagnetismHeaderCanvas />
-        </div>
-      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[10px] tracking-[0.4em] uppercase mb-2" style={{ color: C.muted }}>
           AETHER · ULTRA-MAGNETISM × SUPERCONDUCTIVITY · APRIL 2026

@@ -127,13 +127,6 @@ export default function PlateSwitchingPage() {
 
   return (
     <div style={s.page}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PLATE SWITCHING · OPTICAL HULL · BIO-INSPIRED OPTICS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 rotating optical plates — the live AETHER plate switching simulation.</p></div>
-          <PlateSwitchingHeaderCanvas />
-        </div>
-      </div>
       {/* HERO */}
       <div style={s.hero}>
         <div style={s.eyebrow}>AETHER · Bio-Inspired Optical Engineering · Plate-Switching Technology</div>

@@ -303,13 +303,6 @@ export default function StringNanobotPage() {
       background: `radial-gradient(ellipse at top, #040d1c 0%, ${C.void} 65%)`,
       color: C.text, fontFamily: "'Outfit', system-ui, sans-serif",
       padding: "3rem 1.5rem 6rem" }}>
-      <div style={{flexShrink:0,marginBottom:20}}>
-        <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>STRING NANOBOT · MOLECULAR MACHINE · NANO-ASSEMBLY · FIELD CRAWLER · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 nano-bots with particle links — the live AETHER string nanobot simulation.</p></div>
-          <StringNanobotHeaderCanvas />
-        </div>
-      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Mono&display=swap');`}</style>
 
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>

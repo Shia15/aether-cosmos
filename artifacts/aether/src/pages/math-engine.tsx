@@ -594,13 +594,6 @@ export default function MathEnginePage() {
 
   return (
     <div className="w-full min-h-screen flex flex-col" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(5,5,12,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MATH ENGINE · PRIME INSPECTION · GATE ALGEBRA · MATRIX OPS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>360° radial math field — the live AETHER unified math engine simulation.</p></div>
-          <MathEngineCanvas />
-        </div>
-      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[10px] tracking-[0.4em] uppercase mb-2" style={{ color: C.muted }}>
           AETHER · UNIFIED MATH ENGINE · APRIL 2026

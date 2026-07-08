@@ -355,14 +355,6 @@ function LivingNutritionCanvas() {
 export default function LivingNutritionPage() {
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #1fa8d4",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#1fa8d4",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #1fa8d4",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#1fa8d4",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LIVING NUTRITION · MINERAL FLOW · BIOAVAILABILITY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(31,168,212,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 mineral nodes (Zn Mg Fe B12 K Ca) in coherent drift — live AETHER nutrition simulation.</p></div>
-          <LivingNutritionCanvas />
-        </div>
-      </div>
-
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#020a04 0%,#030e10 50%,#020408 100%)",
         borderBottom: `1px solid ${TEAL}20`, padding: "60px 40px 40px", textAlign: "center" }}>

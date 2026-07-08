@@ -679,18 +679,6 @@ export default function EarlyUniversePage() {
 
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
-      <div style={{ marginBottom:24 }}>
-        <div style={{ display:"inline-block", border:"1px solid #ff9632", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#ff9632", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(255,150,50,0.15)", borderLeft:"3px solid #ff9632", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Early Universe · Big Bang · Nucleosynthesis · Recombination · CMB · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(255,150,50,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Repeating big bang — 40 particles exploding outward from a glowing primordial core — the live AETHER early universe simulation.
-          </p>
-          <EarlyUniverseCanvas />
-        </div>
-      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · early universe · quadratic gravity · ToE · standard model

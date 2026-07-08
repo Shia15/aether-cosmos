@@ -702,14 +702,6 @@ export default function FerroModesPage() {
   // ===== UI =====
   return (
     <div className="min-h-screen px-8 py-6" style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
-      <div style={{ marginBottom:20 }}>
-        <div style={{ display:"inline-block", border:"1px solid #9966ff", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#9966ff", fontFamily:"'DM Mono',monospace", marginBottom:14 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(11,12,15,0.95)", border:"1px solid rgba(153,102,255,0.12)", borderLeft:"3px solid #9966ff", borderRadius:10, padding:18, marginBottom:14 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:17, color:"#e0f8ff", margin:"0 0 6px" }}>Ferro Modes · Spike Mode · Flow Mode · Two-Mode Hardware · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(153,102,255,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Left half SPIKE MODE (sharp ferrofluid peaks) vs right half FLOW MODE (smooth peristaltic waves) — the live AETHER ferrofluid simulation.</p>
-          <FerroModesCanvas />
-        </div>
-      </div>
       <div className="mb-5">
         <div className="text-[10px] tracking-[0.3em] uppercase" style={{ color: C.muted }}>
           aether · ferrofluid · two-mode hardware · spike & flow

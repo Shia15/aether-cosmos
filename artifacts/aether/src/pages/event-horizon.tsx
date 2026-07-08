@@ -616,14 +616,6 @@ export default function EventHorizonPage() {
 
   return (
     <div style={{ background:BG, minHeight:"100vh", color:TEXT }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #c9a84c", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c9a84c", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(0,0,8,0.95)", border:"1px solid rgba(201,168,76,0.12)", borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>Event Horizon · Gravitational Singularity · Schwarzschild Radius · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(201,168,76,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>Stars pulled toward a central black hole — the live AETHER event horizon simulation.</p>
-          <EventHorizonCanvas />
-        </div>
-      </div>
       {/* Hero */}
       <div style={{ textAlign:"center", padding:"56px 24px 30px",
         background:"radial-gradient(ellipse 70% 55% at 50% 0%, rgba(0,0,20,0.9), rgba(2,4,8,1))" }}>

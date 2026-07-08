@@ -252,13 +252,6 @@ function PuthoffHeaderCanvas() {
 export default function PuthoffMetricEngineeringPage() {
   return (
     <div data-testid="page-puthoff-metric-engineering" style={{ background: B.bg, minHeight: "100vh", padding: "32px 28px", color: B.ink }}>
-      <div style={{flexShrink:0,margin:"-32px -28px 20px"}}>
-        <div style={{padding:"8px 28px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 28px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PUTHOFF METRIC ENGINEERING · VACUUM ENERGY · ZERO POINT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 orbital nodes around vacuum energy core — the AETHER Puthoff metric simulation.</p></div>
-          <PuthoffHeaderCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>

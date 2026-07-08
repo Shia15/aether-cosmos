@@ -340,13 +340,6 @@ export default function QuaternionsPage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{background:"#030514"}}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUATERNIONS · i · j · k · 4D ROTATION · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>3 rotating quaternion axes — the live AETHER quaternion simulation.</p></div>
-          <QuaternionsHeaderCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div className="border-b border-purple-900/40 px-6 py-4 sticky top-0 z-20" style={{background:"#030514ee"}}>
         <p className="text-[10px] tracking-[0.3em] text-purple-400/50 font-['Cinzel',serif] mb-0.5">

@@ -173,18 +173,6 @@ export default function DecisionEntropyPage() {
       fontSize: 17, lineHeight: 1.72, minHeight: "100vh", width: "100%",
 
     }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Decision Entropy · Branching Paths · Possibility Space · Temporal Bifurcation · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Live branching path simulation — decision seeds split into colorful trajectories navigating possibility space, the live AETHER temporal bifurcation engine.
-          </p>
-          <DecisionEntropyCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "64px 40px 100px" }}>
 
         {/* RUNNING HEAD */}

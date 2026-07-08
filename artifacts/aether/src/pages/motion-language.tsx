@@ -547,13 +547,6 @@ export default function MotionLanguagePage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui,sans-serif" }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #a78bfa",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#a78bfa",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #a78bfa",borderRadius:4,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#a78bfa",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MOTION LANGUAGE · PROPULSION · CALLIGRAPHY · UNIFIED GRAMMAR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(167,139,250,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 falling glyph streams — the live AETHER motion language simulation.</p></div>
-          <MotionLanguageCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1rem" }}>
         <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
           <h1 style={{ fontSize: "clamp(1.6rem,4vw,2.6rem)", fontWeight: 900, background: "linear-gradient(135deg,#a78bfa,#06b6d4,#22c55e,#f472b6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", margin: "0 0 0.5rem" }}>

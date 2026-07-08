@@ -183,13 +183,6 @@ function PhiTimeHeaderCanvas() {
 export default function PhiTimePage() {
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-8 py-10" style={{ background: B.bg }} data-testid="phi-time-page">
-      <div style={{flexShrink:0,marginBottom:20,marginLeft:-16,marginRight:-16}}>
-        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>φ-TIME · GOLDEN RATIO TIME INTERVALS · TEMPORAL COHERENCE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 phi-interval time streams — the live AETHER phi-time simulation.</p></div>
-          <PhiTimeHeaderCanvas />
-        </div>
-      </div>
       <div className="max-w-5xl mx-auto">
 
         {/* HEADER */}

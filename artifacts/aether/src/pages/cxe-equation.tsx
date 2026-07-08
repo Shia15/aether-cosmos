@@ -269,19 +269,6 @@ export default function CxeEquationPage() {
 
   return (
     <div style={{ height: "100%", overflowY: "auto", background: V.void, color: V.text, fontFamily: V.serif, scrollBehavior: "smooth" }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            CXE Equation · C(x,t) Coherence Field · Crystallization Master Eq · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Six live equation terms (C(x,t) · ∂²C/∂t² · ∇²C · γC(1−C) · ηΨ · ξ(x,t)) with pulsing orbs and ripple waves — the AETHER crystallization master equation.
-          </p>
-          <CxeEquationCanvas />
-        </div>
-      </div>
-
       {/* ── Sticky nav ── */}
       <nav style={{ position: "sticky", top: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 36px", background: "rgba(2,4,8,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(0,255,178,0.07)" }}>
         <div>

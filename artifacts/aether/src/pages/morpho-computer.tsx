@@ -346,13 +346,6 @@ export default function MorphoComputerView() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden font-mono" style={{ background: "linear-gradient(135deg,#0a0a0a,#1a1a2e)", color: "#00ff88" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00ff88",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00ff88",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(10,10,10,0.8)",borderLeft:"3px solid #00ff88",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00ff88",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>MORPHOGENETIC COMPUTER · REACTION-DIFFUSION · TURING PATTERN · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,255,136,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>72-cell morphogenetic grid — the live AETHER morpho-computer simulation.</p></div>
-          <MorphoComputerCanvas />
-        </div>
-      </div>
       <div className="px-4 py-3 border-b-2 border-[#00ff88] bg-black/50 text-center shrink-0">
         <div className="text-base font-bold tracking-wide" style={{ textShadow: "0 0 10px #00ff88,0 0 20px #00ff88" }}>
           MORPHOGENETIC COMPUTER — LIVE COMPUTATION

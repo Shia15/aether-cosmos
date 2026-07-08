@@ -305,18 +305,6 @@ function MonteCarloHistoriesGlyph() {
 export default function EniacMonteCarloPage() {
   return (
     <div data-testid="page-eniac-monte-carlo" style={{ background: B.bg, minHeight: "100vh", padding: "32px 28px", color: B.ink }}>
-      <div style={{ marginBottom:24 }}>
-        <div style={{ display:"inline-block", border:"1px solid #E6B85C", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#E6B85C", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(7,9,24,0.95)", border:"1px solid rgba(230,184,92,0.15)", borderLeft:"3px solid #E6B85C", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            ENIAC Monte Carlo · π Estimation · Random Sampling · Neutron Transport · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(230,184,92,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Live Monte Carlo π estimation — random points sampled inside/outside an ellipse — the live AETHER probabilistic computation simulation.
-          </p>
-          <EniacCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Header */}

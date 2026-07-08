@@ -513,13 +513,6 @@ export default function TritiumExtractPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11 }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:8}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>TRITIUM EXTRACT · HYDROGEN ISOTOPE · NUCLEAR FUSION · BETA DECAY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Tritium nucleus + rising beta particles — the live AETHER tritium extract simulation.</p></div>
-          <TritiumExtractHeaderCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div style={{ padding: "6px 14px", borderBottom: `1px solid ${BRD}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <span style={{ fontSize: 12, letterSpacing: 4, fontWeight: 700 }}>TRITIUM EXTRACTION</span>

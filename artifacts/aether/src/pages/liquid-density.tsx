@@ -561,14 +561,6 @@ export default function LiquidDensityPage() {
 
   return (
     <div style={{ background: BG0, minHeight: "100vh", fontFamily: body, color: PALE }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(3,8,16,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LIQUID DENSITY · FLUID STRATIFICATION · BUOYANCY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>12 density-stratified blobs — the live AETHER liquid density simulation.</p></div>
-          <LiquidDensityHeaderCanvas />
-        </div>
-      </div>
-
       {/* HERO */}
       <div style={{ position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse 70% 50% at 50% 0%, rgba(64,208,255,0.13) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 85% 70%, rgba(255,128,32,0.09) 0%, transparent 50%), radial-gradient(ellipse 40% 50% at 10% 70%, rgba(32,232,144,0.07) 0%, transparent 50%), linear-gradient(180deg,${BG1} 0%,${BG0} 100%)` }} />

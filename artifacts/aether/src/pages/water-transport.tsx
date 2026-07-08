@@ -1697,13 +1697,6 @@ export default function WaterTransportPage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #44aaff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44aaff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44aaff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44aaff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>WATER TRANSPORT · XYLEM · PHLOEM · TRANSPIRATION · OSMOSIS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,170,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Falling drops + 3-wave surface pool — the live AETHER water transport simulation.</p></div>
-          <WaterTransportHeaderCanvas />
-        </div>
-      </div>
       {/* Hero */}
       <div style={{
         padding: "68px 32px 44px",

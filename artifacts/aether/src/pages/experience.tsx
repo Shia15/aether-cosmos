@@ -340,15 +340,6 @@ export default function ExperiencePage() {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div style={{ flexShrink:0, padding:"16px 16px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(0,12,24,0.95)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:16, marginBottom:12 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:16, color:"#e0f8ff", margin:"0 0 6px" }}>Experience · Smart Animate · Frame Flow · Agent Relay · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(46,240,216,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Four agent nodes (SENSE · FRAME · REFLECT · ACT) with live signal pulses — the live AETHER experience simulation.</p>
-          <ExperienceCanvas />
-        </div>
-      </div>
-
       {/* ── Header bar ───────────────────────────────────────────────────────── */}
       <div className="flex-shrink-0 px-8 py-6 border-b border-border/20 flex items-center justify-between">
         <div>

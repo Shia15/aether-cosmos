@@ -349,13 +349,6 @@ export default function SpaceRocksPage() {
   let currentEra = -1;
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-8 max-w-5xl mx-auto">
-      <div style={{flexShrink:0,marginBottom:16}}>
-        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPACE ROCKS · ASTEROIDS · COHERENT CATASTROPHISM · IMPACT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>16 spinning asteroids — the live AETHER space rocks simulation.</p></div>
-          <SpaceRocksHeaderCanvas />
-        </div>
-      </div>
       <div className="space-y-2">
         <div className="font-mono text-xs text-amber-400/50 uppercase tracking-[0.25em]">AETHER · Coherent Catastrophism</div>
         <h1 className="font-serif text-4xl text-foreground">Rocks from Space Have Been<br />Reshaping <span className="text-amber-400 italic">Everything</span></h1>

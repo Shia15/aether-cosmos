@@ -97,18 +97,6 @@ function EarthCircuitCanvas() {
 export default function EarthCircuitPage() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Earth Circuit · Schumann Resonance · Global Electromagnetic Circuit · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five electromagnetic nodes (Surface · Ionosphere · Schumann · Magnetosphere · Ground) with live arc bolts — the live AETHER global circuit simulation.
-          </p>
-          <EarthCircuitCanvas />
-        </div>
-      </div>
       <style>{`@keyframes ec-fade { from { opacity:0; transform: translateY(6px) } to { opacity:1; transform: none } }
         .ec-fade { animation: ec-fade 0.55s ease-out both; }
         @media (prefers-reduced-motion: reduce) { .ec-fade { animation: none; } }`}</style>

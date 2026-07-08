@@ -297,18 +297,6 @@ export default function EnginesPage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="engines-page"
     >
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #c9a84c", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c9a84c", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.85)", border:"1px solid rgba(201,168,76,0.15)", borderLeft:"3px solid #c9a84c", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#3A2D1A", margin:"0 0 6px" }}>
-            Engines · Membrane · Gravity · Photon · Immune · Signal · Compute Substrate · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(58,45,26,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five engine nodes with live pulsing and cross-connections on the AETHER parchment substrate.
-          </p>
-          <EnginesSimCanvas />
-        </div>
-      </div>
       <style>{`
         @keyframes eng-breathe { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes eng-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(36px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

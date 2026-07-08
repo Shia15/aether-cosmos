@@ -572,18 +572,6 @@ export default function ComputerBrainsPage() {
       padding: "16px 12px 32px",
       fontFamily: "'Nunito', 'Quicksand', cursive",
     }}>
-      <div style={{ width:"100%", marginBottom:20 }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Computer Brains · CPU · RAM · GPU · Cache · Bus · Output · AETHER Chip Story
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Six chip components (CPU/teal · RAM/violet · GPU/gold · Cache/blue · Bus/green · Output/rose) with live data packets flowing through the circuit — the AETHER computer brain simulation.
-          </p>
-          <ComputerBrainsCanvas />
-        </div>
-      </div>
       <style>{`
         @keyframes chip-float-0 { 0%,100%{transform:translate(-50%,-50%) translateY(0);} 50%{transform:translate(-50%,-50%) translateY(-14px);} }
         @keyframes chip-float-1 { 0%,100%{transform:translate(-50%,-50%) translateY(-6px);} 50%{transform:translate(-50%,-50%) translateY(10px);} }

@@ -349,14 +349,6 @@ export default function StromatoliteAutomatonPage() {
   return (
     <div data-testid="stromatolite-automaton-page" style={{ background: B.bg, minHeight: "100vh", color: B.ink, padding: "40px 32px 80px" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-        <div style={{flexShrink:0,marginBottom:20}}>
-          <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
-            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>STROMATOLITE AUTOMATON · CELLULAR · BIO-MATRIX · ARCHEAN LIFE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>32×7 cellular automaton — the live AETHER stromatolite simulation.</p></div>
-            <StromatoliteAutomatonHeaderCanvas />
-          </div>
-        </div>
-
         {/* Hero */}
         <div style={{ marginBottom: 22 }}>
           <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, letterSpacing: 2.2, color: B.gold, textTransform: "uppercase" }}>

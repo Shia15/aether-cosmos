@@ -901,19 +901,6 @@ export default function DarkSunPage() {
   const [mode, setMode] = useState<Mode>("solar");
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #ff6418", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#ff6418", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(255,100,30,0.15)", borderLeft:"3px solid #ff6418", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Dark Sun · Solar Coherence · Plasma Prominence · Coronal Field · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(255,100,30,0.4)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Animated solar disk with eight pulsing plasma prominences and a corona gradient — the live AETHER dark sun coronal field simulation.
-          </p>
-          <DarkSunSimCanvas />
-        </div>
-      </div>
-
       {/* Hero */}
       <div style={{
         padding: "66px 28px 42px", textAlign: "center",

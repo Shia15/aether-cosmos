@@ -341,13 +341,6 @@ function HeliosphericCanvas() {
 export default function HeliosphericCoherenceView() {
   return (
     <div style={{ minHeight: "100vh", background: B.bg, color: B.ink, padding: "28px 24px 60px" }} data-testid="page-heliospheric-coherence">
-      <div style={{flexShrink:0,marginBottom:20}}>
-        <div style={{display:"inline-block",border:"1px solid #ffcc44",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#ffcc44",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #ffcc44",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#ffcc44",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>HELIOSPHERIC COHERENCE · SOLAR WIND · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(255,204,68,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Solar corona + planetary orbits + heliospheric current sheet — live AETHER simulation.</p></div>
-          <HeliosphericCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Title */}

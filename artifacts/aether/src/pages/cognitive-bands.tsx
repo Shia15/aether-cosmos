@@ -551,19 +551,6 @@ export default function CognitiveBandsPage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #9966ff", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#9966ff", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,2,14,0.9)", border:"1px solid rgba(153,102,255,0.1)", borderLeft:"3px solid #9966ff", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#ece0ff", margin:"0 0 6px" }}>
-            Cognitive Bands · Delta · Theta · Alpha · Beta · Gamma · AETHER Brainwave Field
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(153,102,255,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five EEG frequency bands (Delta/violet · Theta/teal · Alpha/blue · Beta/gold · Gamma/rose) animated as live sine waves — the AETHER cognitive brainwave field simulation.
-          </p>
-          <CogBandsSimCanvas />
-        </div>
-      </div>
-
       {/* Hero */}
       <div style={{
         padding: "66px 28px 42px", textAlign: "center",

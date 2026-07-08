@@ -601,13 +601,6 @@ function QuantumLivingSystemsHeaderCanvas() {
 export default function QuantumLivingSystemsView() {
   return (
     <div style={{ minHeight: "100vh", background: B.bg, color: B.ink, padding: "28px 24px 60px" }} data-testid="page-quantum-living-systems">
-      <div style={{flexShrink:0,margin:"-28px -24px 20px"}}>
-        <div style={{padding:"8px 24px"}}><div style={{display:"inline-block",border:"1px solid #44cc77",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#44cc77",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 24px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #44cc77",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#44cc77",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM LIVING SYSTEMS · BIO-QUANTUM · COHERENCE · LIFE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(68,204,119,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>18 quantum biological cells — the live AETHER quantum living systems simulation.</p></div>
-          <QuantumLivingSystemsHeaderCanvas />
-        </div>
-      </div>
       <div style={{ maxWidth: 1180, margin: "0 auto" }}>
 
         {/* Title */}

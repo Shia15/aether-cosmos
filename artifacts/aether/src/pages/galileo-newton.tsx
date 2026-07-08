@@ -637,13 +637,6 @@ export default function GalileoNewtonPage() {
       style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}
       data-testid="galileo-newton-page"
     >
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.85)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GALILEO · NEWTON · PENDULUM · ORBIT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Galileo pendulum + Newtonian orbital mechanics — live AETHER physics simulation.</p></div>
-          <GalileoCanvas />
-        </div>
-      </div>
       <style>{`
         @keyframes gn-breathe { 0%,100% { opacity: .55; transform: scale(1); } 50% { opacity: .85; transform: scale(1.05); } }
         @keyframes gn-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(34px,-20px,0); } 100% { transform: translate3d(0,0,0); } }

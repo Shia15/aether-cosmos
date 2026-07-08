@@ -484,19 +484,6 @@ export default function CucaClosedLoopPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden" }}>
-      <div style={{ padding:"16px 24px 0", flexShrink:0 }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,8,18,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            CUCA Closed Loop · Morphogenetic Feedback · Gyroid · Bio-Hybrid Skin · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Three-orbit feedback loop with rotating triangular coherence scaffold — the live AETHER CUCA morphogenetic closed-loop simulation.
-          </p>
-          <CucaClosedLoopCanvas />
-        </div>
-      </div>
-
       {/* Header */}
       <div style={{ padding: "6px 16px", borderBottom: "1px solid rgba(0,255,136,0.1)", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
         <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 4 }}>CUCA v4.0</span>

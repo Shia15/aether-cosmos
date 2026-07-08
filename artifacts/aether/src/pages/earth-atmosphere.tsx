@@ -69,18 +69,6 @@ export default function EarthAtmospherePage() {
 
   return (
     <div style={{ background: "#020617", minHeight: "100vh", color: "#e2e8f0", fontFamily: "system-ui, sans-serif" }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #60a5fa", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#60a5fa", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(96,165,250,0.1)", borderLeft:"3px solid #60a5fa", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Earth Atmosphere · Troposphere · Stratosphere · Mesosphere · Thermosphere · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(96,165,250,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Five concentric atmospheric layers around a live Earth core with labeled altitude rings — the live AETHER atmospheric resonance simulation.
-          </p>
-          <EarthAtmosphereCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #042f2e 50%, #0f172a 100%)", borderBottom: "1px solid #134e4a", padding: "2.5rem 2rem 2rem" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>

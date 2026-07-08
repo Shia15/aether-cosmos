@@ -217,13 +217,6 @@ export default function StackFabricPage() {
   return (
     <div className="min-h-screen w-full" style={{ background: B.bg }}>
       <main className="max-w-5xl mx-auto px-6 md:px-10 py-12 md:py-16" data-testid="stack-fabric-page">
-        <div style={{flexShrink:0,marginBottom:20}}>
-          <div style={{display:"inline-block",border:"1px solid #2ef0d8",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#2ef0d8",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-          <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #2ef0d8",borderRadius:4,overflow:"hidden"}}>
-            <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#2ef0d8",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>STACK FABRIC · LAYERED SYSTEMS · PROTOCOL MESH · COHERENT STACK · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(46,240,216,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 layered wave stacks — the live AETHER stack fabric simulation.</p></div>
-            <StackFabricHeaderCanvas />
-          </div>
-        </div>
         {/* HEADER */}
         <header className="mb-12">
           <div className="text-[10.5px] uppercase tracking-[0.36em]"

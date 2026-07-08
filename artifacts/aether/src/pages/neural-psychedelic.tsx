@@ -1108,13 +1108,6 @@ export default function NeuralPsychedelicPage() {
 
   return (
     <div style={{ minHeight: "100%", background: C.bg, color: C.white, fontFamily: "'DM Mono',monospace", overflowY: "auto" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00e5c0",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00e5c0",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(4,2,16,0.8)",borderLeft:"3px solid #00e5c0",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00e5c0",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>NEURAL PSYCHEDELIC · RECEPTOR BINDING · PINEAL · ORGANOID · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,229,192,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>6 warping torus rings — the live AETHER neural psychedelic simulation.</p></div>
-          <NeuralPsychedelicHeaderCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div style={{ borderBottom: "1px solid rgba(0,229,192,0.1)", padding: "2rem 2.5rem 1.5rem" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.35em", color: C.teal, textTransform: "uppercase", marginBottom: 8 }}>

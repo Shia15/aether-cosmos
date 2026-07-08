@@ -188,18 +188,6 @@ export default function CulturalInterpretationsPage() {
 
   return (
     <div className="min-h-screen" style={{ background: B.bg, color: B.text }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Cultural Interpretations · Astro · Myth · Science · Biology · Math · Phil · Culture · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Seven interpretive lens nodes sending signal packets across disciplines — the live AETHER multi-lens cultural interpretation simulation.
-          </p>
-          <CulturalInterpretationsCanvas />
-        </div>
-      </div>
       <div className="max-w-6xl mx-auto px-6 py-10" data-testid="page-cultural-interpretations">
 
         {/* HERO */}

@@ -227,14 +227,6 @@ export default function HypercomputationPage() {
 
   return (
     <div data-testid="hypercomputation-root" className="min-h-screen p-6" style={{ background: C.bg, color: C.text, fontFamily: "'JetBrains Mono', monospace" }}>
-      <div style={{flexShrink:0,marginBottom:20}}>
-        <div style={{display:"inline-block",border:"1px solid #64dcff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#64dcff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(5,5,12,0.8)",borderLeft:"3px solid #64dcff",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#64dcff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>HYPERCOMPUTATION · PHI-BRIDGE · TRUE LANGUAGE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(100,220,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8-node phi-bridge rotor — beyond-Turing coherence — live AETHER hypercomputation.</p></div>
-          <HyperCanvas />
-        </div>
-      </div>
-
       {/* ════ HEADER ════ */}
       <div className="border-b pb-5 mb-6" style={{ borderColor: C.border2 }}>
         <p className="text-[9px] tracking-[0.36em] uppercase mb-3" style={{ color: C.dim }}>

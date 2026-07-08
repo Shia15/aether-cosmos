@@ -512,13 +512,6 @@ function SpacetimeFabricHeaderCanvas() {
 export default function SpacetimeFabricPage() {
   return (
     <div style={{ height: "100%", overflowY: "auto", background: V.bg, color: V.text, fontFamily: V.serif }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SPACETIME FABRIC · CURVATURE · GRAVITATIONAL LENSING · GEODESIC · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Live warped grid — the AETHER spacetime fabric simulation.</p></div>
-          <SpacetimeFabricHeaderCanvas />
-        </div>
-      </div>
       {/* ── Hero ── */}
       <div style={{ background: "linear-gradient(180deg,rgba(4,10,20,1),rgba(2,4,8,1))", borderBottom: `1px solid ${V.border}`, padding: "60px 48px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 60% 80% at 50% 0%, rgba(68,136,255,0.05),transparent)", pointerEvents: "none" }} />

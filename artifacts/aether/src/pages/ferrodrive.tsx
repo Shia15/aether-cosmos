@@ -91,14 +91,6 @@ export default function FerroDriveView() {
   return (
     <div className="min-h-full" style={{ background: B.bg, color: B.text, fontFamily: "Inter, sans-serif" }}>
       <style>{`@keyframes fd-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.fd-fade{animation:fd-fade .55s ease-out both}@media(prefers-reduced-motion:reduce){.fd-fade{animation:none}}`}</style>
-      <div style={{ padding:"20px 20px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:14 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(0,10,25,0.95)", border:"1px solid rgba(46,240,216,0.12)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:18, marginBottom:14 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:17, color:"#e0f8ff", margin:"0 0 6px" }}>FerroDrive · Magnetic Fluid Propulsion · Bio-Magnetic Systems · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(46,240,216,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Six ferrofluid spike-and-flow bands rising in traveling waves — the live AETHER ferrodrive simulation.</p>
-          <FerroDriveCanvas />
-        </div>
-      </div>
       <div className="max-w-6xl mx-auto px-7 py-10 space-y-12">
         <header className="fd-fade space-y-3" data-testid="fd-hero">
           <div className="text-[10px] uppercase tracking-[0.32em]" style={{ color: B.cyan }}>

@@ -170,15 +170,6 @@ export default function FeedbackLoopView() {
 
   return (
     <div style={{ height: "100%", overflowY: "auto", background: "#030514", color: "#ccc", fontFamily: "Raleway, sans-serif" }}>
-      <div style={{ padding:"16px 16px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #c084fc", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#c084fc", fontFamily:"'DM Mono',monospace", marginBottom:12 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(3,5,20,0.95)", border:"1px solid rgba(192,132,252,0.12)", borderLeft:"3px solid #c084fc", borderRadius:10, padding:16, marginBottom:12 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:16, color:"#e0f8ff", margin:"0 0 6px" }}>Feedback Loop · Passive · Active · Symbolic · Integration · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:"rgba(192,132,252,0.35)", margin:"0 0 12px", lineHeight:1.65 }}>Three concentric orbital loops (PASSIVE · ACTIVE · SYMBOLIC) with tracer pulses — the live AETHER feedback simulation.</p>
-          <FeedbackLoopCanvas />
-        </div>
-      </div>
-
       {/* ── Page header ─────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid rgba(196,181,253,0.12)", padding: "18px 32px 14px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", background: "rgba(3,5,20,0.9)" }}>
         <div>

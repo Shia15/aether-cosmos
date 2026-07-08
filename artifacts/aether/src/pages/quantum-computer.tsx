@@ -373,12 +373,8 @@ export default function QuantumComputerPage(){
     <div style={{minHeight:'100%',background:BG,color:'#d4e8f7',fontFamily:"'Rajdhani',sans-serif",overflowY:'auto'}}>
       <div style={{maxWidth:1100,margin:'0 auto',padding:'16px 20px'}}>
 
-        {/* ── header canvas ── */}
-        <HeaderCanvas/>
-
         {/* ── title ── */}
         <div style={{marginTop:14,marginBottom:18}}>
-          <div style={{display:'inline-block',border:`1px solid rgba(31,212,200,0.4)`,padding:'3px 10px',fontSize:9,letterSpacing:'0.2em',color:`${TEAL}cc`,fontFamily:MN,marginBottom:8}}>LIVE SIMULATION</div>
           <h1 style={{fontFamily:OR,fontSize:22,fontWeight:900,letterSpacing:2,color:TEAL,textShadow:`0 0 24px ${TEAL}66`,margin:'4px 0'}}>AETHER Quantum Computer</h1>
           <p style={{fontSize:13,color:'rgba(180,210,240,0.7)',maxWidth:680,lineHeight:1.6,margin:0}}>
             Gate-model quantum circuit simulator operating in the 16-dimensional Hilbert space of 4 qubits. Build circuits from the AETHER gate palette, run the exact unitary evolution, and observe coherence collapse in real time via Bloch sphere + probability field.

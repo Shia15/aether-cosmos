@@ -394,18 +394,6 @@ export default function CucaGyroidPage() {
 
   return (
     <div data-testid="page-cuca-gyroid" style={{ background: T.bg, color: T.text, fontFamily: T.mono, minHeight: "100vh", position: "relative" }}>
-      <div style={{ padding:"24px 24px 0", position:"relative", zIndex:1 }}>
-        <div style={{ display:"inline-block", border:"1px solid #9333ea", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#9333ea", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(147,51,234,0.15)", borderLeft:"3px solid #9333ea", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            CUCA Gyroid v3.0 · Triply-Periodic Minimal Surface · Photonic Scaffold · AETHER
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(147,51,234,0.5)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Six violet orbital nodes tracing a gyroid lattice with an isometric scaffold — the live AETHER CUCA Gyroid v3.0 photonic crystal simulation.
-          </p>
-          <CucaGyroidCanvas />
-        </div>
-      </div>
       <div style={{ position: "absolute", inset: 0, pointerEvents: "none",
         background: "radial-gradient(ellipse 60% 50% at 50% 40%,rgba(147,51,234,.06) 0%,transparent 60%)" }} />
       <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto", padding: "40px 22px 64px" }}>

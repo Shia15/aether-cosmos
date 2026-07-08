@@ -515,13 +515,6 @@ export default function SymbolSifter() {
 
   return (
     <div style={{ background: "#03050a", minHeight: "100vh", color: "rgba(255,255,255,0.87)" }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>SYMBOL SIFTER · GLYPH FILTER · PATTERN SEARCH · SEMANTIC SORT · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>30 falling glyphs — the live AETHER symbol sifter simulation.</p></div>
-          <SymbolSifterHeaderCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div style={{ padding: "32px 32px 0", borderBottom: "1px solid rgba(255,255,255,0.05)", paddingBottom: 24 }}>
         <div style={{ fontFamily: "monospace", fontSize: 10, letterSpacing: "0.35em", color: "rgba(148,163,184,0.4)", textTransform: "uppercase", marginBottom: 8 }}>

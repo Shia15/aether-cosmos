@@ -175,13 +175,6 @@ export default function Research() {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(RESEARCH_SCHEMA) }}
     />
     <div style={{ height: "100%", overflowY: "auto", background: "rgb(4,3,18)", color: "rgba(255,255,255,0.85)", fontFamily: "'Raleway', 'Georgia', sans-serif" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 0",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>RESEARCH · KNOWLEDGE SYNTHESIS · FIELD STUDY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>The live AETHER research knowledge graph simulation.</p></div>
-          <ResearchHeaderCanvas />
-        </div>
-      </div>
       {/* MASTHEAD */}
       <div style={{ background: "linear-gradient(180deg, rgba(251,191,36,0.06) 0%, transparent 100%)", borderBottom: "1px solid rgba(251,191,36,0.15)", padding: "24px 32px 20px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 4 }}>

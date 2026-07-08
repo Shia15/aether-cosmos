@@ -706,19 +706,6 @@ export default function LiquidPrintPage() {
 
   return (
     <div style={{ background: C.bg, color: C.text, fontFamily: "Cinzel, ui-serif, Georgia, serif", minHeight: "100%", position: "relative", overflowX: "hidden" }}>
-      <div style={{ flexShrink: 0 }}>
-        <div style={{ padding: "8px 12px" }}>
-          <div style={{ display: "inline-block", border: "1px solid #2ef0d8", padding: "4px 12px", fontSize: 10, letterSpacing: "0.2em", color: "#2ef0d8", fontFamily: "'DM Mono',monospace", marginBottom: 16 }}>LIVE SIMULATION</div>
-        </div>
-        <div style={{ margin: "0 12px 20px", background: "rgba(6,7,12,0.8)", borderLeft: "3px solid #2ef0d8", borderRadius: 4, overflow: "hidden" }}>
-          <div style={{ padding: "12px 16px 8px" }}>
-            <h2 style={{ margin: 0, fontSize: 13, color: "#2ef0d8", fontFamily: "'DM Mono',monospace", letterSpacing: "0.15em", fontWeight: 400 }}>LIQUID PRINT · BIO-HYBRID INK · SUBSTRATE DEPOSITION · AETHER</h2>
-            <p style={{ margin: "4px 0 8px", fontSize: 10, color: "rgba(46,240,216,0.5)", fontFamily: "'DM Mono',monospace", letterSpacing: "0.1em" }}>5 orbiting ink blobs -- the live AETHER liquid print deposition simulation.</p>
-          </div>
-          <LiquidPrintCanvas />
-        </div>
-      </div>
-
       <style>{`
         @keyframes lp-breathe { 0%, 100% { opacity: .55; transform: scale(1); } 50% { opacity: .9; transform: scale(1.06); } }
         @keyframes lp-drift   { 0% { transform: translate3d(0,0,0); } 50% { transform: translate3d(40px,-22px,0); } 100% { transform: translate3d(0,0,0); } }

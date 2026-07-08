@@ -276,19 +276,6 @@ export default function CliNanoPage() {
       padding:"3rem 1.5rem 5rem",
     }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
-      <div style={{ marginBottom:24 }}>
-        <div style={{ display:"inline-block", border:"1px solid #4ade80", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#4ade80", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,8,2,0.9)", border:"1px solid rgba(74,222,128,0.1)", borderLeft:"3px solid #4ade80", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0ffe0", margin:"0 0 6px" }}>
-            CLI · nano · AETHER Interactive Shell · Key Tester · Cheat Sheet · Launch Flags
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(74,222,128,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Live terminal session with animated command output, blinking cursor, and progressive line reveal — the AETHER nano shell simulation.
-          </p>
-          <CliNanoCanvas />
-        </div>
-      </div>
-
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
         <header style={{
           padding:"2.2rem 1.8rem", borderRadius:18, marginBottom:"2rem",

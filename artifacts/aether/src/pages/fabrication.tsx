@@ -214,14 +214,6 @@ export default function Fabrication() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, fontFamily: "'Courier New', monospace", overflow: "hidden" }}>
-      <div style={{ flexShrink:0, padding:"12px 12px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:10 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,8,18,0.95)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:14, marginBottom:10 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:15, color:"#e0f8ff", margin:"0 0 5px" }}>Fabrication · Field Dynamics · Structure Crystallization · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:"rgba(46,240,216,0.35)", margin:"0 0 10px", lineHeight:1.65 }}>18×4 lattice nodes crystallizing in traveling waves — the live AETHER fabrication simulation.</p>
-          <FabricationCanvas />
-        </div>
-      </div>
       {/* HEADER */}
       <div style={{ padding: "10px 16px", borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>

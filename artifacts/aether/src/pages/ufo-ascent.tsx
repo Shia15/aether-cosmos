@@ -305,13 +305,6 @@ export default function UFOAscentView() {
 
   return (
     <div style={{ background: "#000", color: TEAL, fontFamily: "'DM Mono', monospace", height: "100%", minHeight: "calc(100vh - 4rem)", overflow: "hidden", display: "grid", gridTemplateColumns: "320px 1fr 280px", gridTemplateRows: "auto 48px 1fr 200px" }} data-testid="ufo-ascent-root">
-      <div style={{gridColumn:"1 / -1",flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:8}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UFO ASCENT · FIELD PROPULSION · ANTI-GRAVITY · SAUCER DYNAMICS · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Saucer hover + beam rays — the live AETHER UFO ascent simulation.</p></div>
-          <UFOAscentHeaderCanvas />
-        </div>
-      </div>
       {/* HEADER */}
       <header style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", borderBottom: "1px solid rgba(0,255,223,0.15)", background: "rgba(0,0,0,0.98)", zIndex: 10 }}>
         <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 15, fontWeight: 300, letterSpacing: "0.3em", textTransform: "uppercase", color: "#fff" }}>

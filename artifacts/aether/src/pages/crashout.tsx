@@ -354,19 +354,6 @@ export default function CrashoutPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden" }}>
-      <div style={{ padding:"16px 24px 0", flexShrink:0 }}>
-        <div style={{ display:"inline-block", border:"1px solid #ff6418", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#ff6418", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,8,18,0.9)", border:"1px solid rgba(255,100,30,0.15)", borderLeft:"3px solid #ff6418", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Crashout · Signal Burst · Entropy Cascade · Particle Decay · AETHER Fault Detection
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(255,100,30,0.45)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Hot orange particle burst erupting from centre with gravity-curved trajectories — the live AETHER crashout entropy fault simulation.
-          </p>
-          <CrashoutCanvas />
-        </div>
-      </div>
-
       {/* Header */}
       <div style={{ padding: "6px 16px", borderBottom: `1px solid ${BRD}`, display: "flex", alignItems: "center", gap: 14, flexShrink: 0, flexWrap: "wrap" }}>
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: 4 }}>CRASHOUT</span>

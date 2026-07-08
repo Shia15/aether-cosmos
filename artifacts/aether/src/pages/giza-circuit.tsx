@@ -149,13 +149,6 @@ function GizaCircuitCanvas() {
 export default function GizaCircuitPage() {
   return (
     <div className="min-h-screen" style={{ background: B.bg, color: B.text, fontFamily: "Cinzel, ui-serif, Georgia, serif" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.85)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GIZA CIRCUIT · PYRAMID RESONATOR · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Three pyramids with coherence beams — the live AETHER Giza circuit simulation.</p></div>
-          <GizaCircuitCanvas />
-        </div>
-      </div>
       <style>{`
         @keyframes gz-fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .gz-fade { animation: gz-fade 720ms ease-out both; }

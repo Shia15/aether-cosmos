@@ -224,19 +224,6 @@ export default function CompoundEyeRoadmapPage() {
 
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-      <div style={{ padding:"24px 24px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #1fa8d4", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#1fa8d4", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(31,168,212,0.1)", borderLeft:"3px solid #1fa8d4", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Compound Eye Roadmap · Faceted Optics · Ommatidial Array · AETHER Photonic Sensor
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(31,168,212,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Eighteen chromatic ommatidial facets pulsing in a compound-eye ring pattern — the live AETHER bio-photonic sensor simulation.
-          </p>
-          <CompoundEyeCanvas />
-        </div>
-      </div>
-
       {/* Hero */}
       <div style={{ background: "linear-gradient(160deg,#06020e 0%,#030812 50%,#020408 100%)",
         borderBottom: `1px solid ${VIOLET}20`, padding: "60px 40px 40px", textAlign: "center" }}>

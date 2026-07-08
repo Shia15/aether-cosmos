@@ -489,15 +489,6 @@ export default function EyeEvolutionPage() {
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", background: "rgb(2,8,18)", color: G, ...mono, overflow: "hidden", fontSize: 11 }}>
-      <div style={{ flexShrink:0, padding:"12px 12px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #44aaff", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#44aaff", fontFamily:"'DM Mono',monospace", marginBottom:10 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,8,18,0.95)", border:"1px solid rgba(68,170,255,0.12)", borderLeft:"3px solid #44aaff", borderRadius:10, padding:14, marginBottom:10 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:15, color:"#e0f8ff", margin:"0 0 5px" }}>Eye Evolution · 600 Million Years · Photoreceptive Patch → Fovea · AETHER</h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:10, color:"rgba(68,170,255,0.35)", margin:"0 0 10px", lineHeight:1.65 }}>Five stages (PATCH · CUP · PINHOLE · LENS · FOVEA) with pulsing concentric rings — the live AETHER eye evolution simulation.</p>
-          <EyeEvolutionCanvas />
-        </div>
-      </div>
-
       {/* Header */}
       <div style={{ padding: "8px 16px", borderBottom: `1px solid ${BRD}`, flexShrink: 0, display: "flex", alignItems: "center", gap: 16 }}>
         <div>

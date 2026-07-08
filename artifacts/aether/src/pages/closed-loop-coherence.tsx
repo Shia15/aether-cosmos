@@ -371,18 +371,6 @@ export default function ClosedLoopCoherencePage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text }} data-testid="page-closed-loop-coherence">
-      <div style={{ padding:"24px 32px 0" }}>
-        <div style={{ display:"inline-block", border:"1px solid #2ef0d8", borderRadius:4, padding:"4px 14px", fontSize:10, letterSpacing:"0.28em", color:"#2ef0d8", fontFamily:"'DM Mono',monospace", marginBottom:16 }}>LIVE SIMULATION</div>
-        <div style={{ background:"rgba(2,4,8,0.9)", border:"1px solid rgba(46,240,216,0.1)", borderLeft:"3px solid #2ef0d8", borderRadius:10, padding:20, marginBottom:16 }}>
-          <h2 style={{ fontFamily:"'DM Mono',monospace", fontSize:18, color:"#e0f8ff", margin:"0 0 6px" }}>
-            Closed-Loop Coherence · Robot · Env · Contam · Auto · PID Cross-Domain Control
-          </h2>
-          <p style={{ fontFamily:"'DM Mono',monospace", fontSize:12, color:"rgba(46,240,216,0.35)", margin:"0 0 14px", lineHeight:1.65 }}>
-            Four domain nodes (Robot/teal · Env/gold · Contam/rose · Auto/violet) exchanging coherence signals in a closed PID loop — the live AETHER cross-domain control simulation.
-          </p>
-          <ClosedLoopCanvas />
-        </div>
-      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[11px] tracking-[0.45em] uppercase" style={{ color: C.muted }}>
           AETHER · CLOSED-LOOP COHERENCE SYSTEM · APRIL 2026

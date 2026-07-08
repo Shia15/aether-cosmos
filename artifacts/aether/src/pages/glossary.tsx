@@ -228,13 +228,6 @@ export default function GlossaryPage() {
       color:"#e0f2fe", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
-      <div style={{flexShrink:0,marginBottom:20,padding:"0 0.5rem"}}>
-        <div style={{display:"inline-block",border:"1px solid #67e8f9",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#67e8f9",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(12,74,110,0.4)",borderLeft:"3px solid #67e8f9",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#67e8f9",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GLOSSARY · A–Z AETHER VOCABULARY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(103,232,249,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>26 letters waving — 40 terms · 11 categories — the live AETHER glossary animation.</p></div>
-          <GlossaryCanvas />
-        </div>
-      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1100, margin:"0 auto" }}>

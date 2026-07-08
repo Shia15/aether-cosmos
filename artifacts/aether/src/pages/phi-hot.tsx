@@ -260,13 +260,6 @@ export default function PhiHOTPage() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: C.bg, color: C.text }} data-testid="page-phi-hot">
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>φ-HOT · HIGHLY OPTIMIZED TOLERANCE · CASCADING HIERARCHY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>4-level cascading hierarchy — the live AETHER phi-HOT simulation.</p></div>
-          <PhiHOTHeaderCanvas />
-        </div>
-      </div>
       <header className="px-8 pt-8 pb-4 border-b" style={{ borderColor: C.border }}>
         <div className="text-[11px] tracking-[0.45em] uppercase" style={{ color: C.muted }}>
           AETHER · φ-HOT · HOLOGRAPHIC OPTICAL TWEEZER ARRAY · MARCH 2026

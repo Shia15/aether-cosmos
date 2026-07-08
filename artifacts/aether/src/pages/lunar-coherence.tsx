@@ -214,13 +214,6 @@ export default function LunarCoherencePage() {
       color:"#e2e8f0", fontFamily:"'Outfit', system-ui, sans-serif",
       padding:"3rem 1.5rem 5rem",
     }}>
-      <div style={{flexShrink:0,marginBottom:20}}>
-        <div style={{display:"inline-block",border:"1px solid #a78bfa",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#a78bfa",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,16,0.8)",borderLeft:"3px solid #a78bfa",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#a78bfa",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>LUNAR COHERENCE · TIDE ENVELOPE · MOON CYCLE · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(167,139,250,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Earth–Moon orbit with 5 tidal sine bands — the live AETHER lunar coherence simulation.</p></div>
-          <LunarCoherenceCanvas />
-        </div>
-      </div>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono&family=Outfit:wght@400;600;700&display=swap');`}</style>
 
       <div style={{ maxWidth:1200, margin:"0 auto" }}>

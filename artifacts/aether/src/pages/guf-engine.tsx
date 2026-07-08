@@ -161,13 +161,6 @@ export default function GufEnginePage() {
       className="min-h-screen"
       style={{ background: C.void, color: C.text, fontFamily: "'Rajdhani', 'Inter', ui-sans-serif, system-ui, sans-serif" }}
     >
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00ffee",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00ffee",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(0,5,20,0.8)",borderLeft:"3px solid #00ffee",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00ffee",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>GUF ENGINE · UNIFIED FIELD ROTOR · 8-ARM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,255,238,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8-arm coherence rotor — unified field engine — the live AETHER GUF simulation.</p></div>
-          <GufEngineCanvas />
-        </div>
-      </div>
       {/* ── Hero header ── */}
       <div
         className="relative px-6 pt-8 pb-6 border-b"

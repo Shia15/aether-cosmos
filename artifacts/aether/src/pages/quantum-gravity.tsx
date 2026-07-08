@@ -301,13 +301,6 @@ export default function QuantumGravityPage() {
   const [mode, setMode] = useState<Mode>("clash");
   return (
     <div style={{ background: BG, minHeight: "100vh", fontFamily: body, color: TEXT }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #9966ff",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#9966ff",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #9966ff",borderRadius:4,overflow:"hidden",marginBottom:20}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#9966ff",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>QUANTUM GRAVITY · SPACETIME CURVATURE · LOOP QUANTUM · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(153,102,255,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>84 spacetime lattice points warping — the live AETHER quantum gravity simulation.</p></div>
-          <QuantumGravityHeaderCanvas />
-        </div>
-      </div>
       <div style={{ padding: "66px 28px 42px", textAlign: "center", background: "linear-gradient(180deg,#030a14 0%,#020408 100%)", borderBottom: `1px solid ${VIOLET}18` }}>
         <div style={{ fontFamily: mono, fontSize: 10, color: VIOLET, letterSpacing: 4, marginBottom: 12 }}>AETHER COSMOS · QUANTUM GRAVITY · UNIFICATION</div>
         <h1 style={{ fontFamily: serif, fontSize: "clamp(18px,3.8vw,38px)", color: "#fff", margin: "0 0 10px", letterSpacing: 2, lineHeight: 1.15 }}>

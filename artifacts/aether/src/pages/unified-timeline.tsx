@@ -240,13 +240,6 @@ export default function UnifiedTimelinePage() {
 
   return (
     <div className="min-h-screen text-white font-['Raleway',sans-serif] pb-10" style={{ background: C.bg }}>
-      <div style={{flexShrink:0,padding:"8px 12px 0"}}>
-        <div style={{display:"inline-block",border:"1px solid #c9a84c",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#c9a84c",fontFamily:"'DM Mono',monospace",marginBottom:12}}>LIVE SIMULATION</div>
-        <div style={{background:"rgba(2,4,8,0.8)",borderLeft:"3px solid #c9a84c",borderRadius:4,overflow:"hidden",marginBottom:8}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#c9a84c",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>UNIFIED TIMELINE · CHRONOLOGICAL MAP · EVENT HORIZON · HISTORICAL ARC · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(201,168,76,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>8 pulsing timeline events with scan beam — the live AETHER unified timeline simulation.</p></div>
-          <UnifiedTimelineHeaderCanvas />
-        </div>
-      </div>
       {/* Header */}
       <div className="border-b px-6 py-4 sticky top-0 z-20"
         style={{ background: C.panel + "ee", borderColor: C.gold + "25" }}>

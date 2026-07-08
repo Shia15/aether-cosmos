@@ -503,13 +503,6 @@ export default function PDESimulator() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-black text-[#0f0] font-mono">
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #00ff88",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#00ff88",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(0,0,0,0.8)",borderLeft:"3px solid #00ff88",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#00ff88",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>PDE SIMULATOR · WAVE EQUATION · EMERGENT COMPLEXITY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(0,255,136,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>60-node wave equation — the live AETHER PDE simulator preview.</p></div>
-          <PDEHeaderCanvas />
-        </div>
-      </div>
       {/* Top bar */}
       <div className="flex items-center justify-between gap-3 px-4 py-2 border-b-2 border-[#00ff88] flex-shrink-0" style={{ background: "linear-gradient(135deg,#001a1a,#003333)" }}>
         <div>

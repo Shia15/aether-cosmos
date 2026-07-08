@@ -223,13 +223,6 @@ export default function FrogSimPaperPage() {
 
   return (
     <div style={{ height: "100%", overflowY: "auto", fontFamily: "system-ui,sans-serif", background: "#080510", color: "#e8dfc8" }}>
-      <div style={{flexShrink:0}}>
-        <div style={{padding:"8px 12px"}}><div style={{display:"inline-block",border:"1px solid #d4a843",padding:"4px 12px",fontSize:10,letterSpacing:"0.2em",color:"#d4a843",fontFamily:"'DM Mono',monospace",marginBottom:16}}>LIVE SIMULATION</div></div>
-        <div style={{margin:"0 12px 20px",background:"rgba(8,5,3,0.8)",borderLeft:"3px solid #d4a843",borderRadius:4,overflow:"hidden"}}>
-          <div style={{padding:"12px 16px 8px"}}><h2 style={{margin:0,fontSize:13,color:"#d4a843",fontFamily:"'DM Mono',monospace",letterSpacing:"0.15em",fontWeight:400}}>FROG SIM · PHOTONIC CRYOBIOLOGY · AETHER</h2><p style={{margin:"4px 0 8px",fontSize:10,color:"rgba(212,168,67,0.5)",fontFamily:"'DM Mono',monospace",letterSpacing:"0.1em"}}>Four-layer wood frog skin waveforms — chromatophore, melanin, iridophore, mucous — live.</p></div>
-          <FrogSimCanvas />
-        </div>
-      </div>
       <div style={{ background: "linear-gradient(135deg,#0e0820,#160a30)", borderBottom: "1px solid rgba(212,168,67,0.3)", padding: "14px 20px 10px", textAlign: "center" }}>
         <div style={{ fontSize: 10, letterSpacing: "0.2em", color: "#a08840", textTransform: "uppercase" }}>Rana sylvatica · Photonic Cryobiology</div>
         <div style={{ fontFamily: "Georgia,serif", fontSize: 18, color: "#d4a843", marginTop: 4, fontStyle: "italic" }}>Wood Frog Skin — Photonic Bio-Engine</div>
