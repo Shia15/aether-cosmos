@@ -17,6 +17,11 @@ export const routeMeta: Record<string, RouteMeta> = {
     title: `Graph Map · ${SITE_NAME}`,
     description: DEFAULT_DESCRIPTION,
   },
+  "/x-grok": {
+    title: `X · Grok Bridge · ${SITE_NAME}`,
+    description:
+      "@Strategicproce on X plus a live Grok analyst — list, query, and compare every AETHER system architecture in real time.",
+  },
   "/research": {
     title: `Research · ${SITE_NAME}`,
     description:

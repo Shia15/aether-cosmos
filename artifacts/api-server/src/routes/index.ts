@@ -17,6 +17,7 @@ import communityNotesRouter from "./community-notes";
 import notionRouter from "./notion";
 import stripeRouter from "./stripe";
 import anthropicRouter from "./anthropic";
+import grokRouter from "./grok";
 import vercelRouter from "./vercel";
 
 const router: IRouter = Router();
@@ -39,6 +40,7 @@ router.use(communityNotesRouter);
 router.use(notionRouter);
 router.use(stripeRouter);
 router.use(anthropicRouter);
+router.use(grokRouter);
 router.use(vercelRouter);
 
 export default router;
