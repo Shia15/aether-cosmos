@@ -192,6 +192,7 @@ const BloodDNALabPage = lazy(() => import("@/pages/blood-dna-lab"));
 const CircularFarmPage = lazy(() => import("@/pages/circular-farm"));
 const GradientFieldPage = lazy(() => import("@/pages/gradient-field"));
 const AetherEnginePage  = lazy(() => import("@/pages/aether-engine"));
+const NotionSynthesis   = lazy(() => import("@/pages/notion-synthesis"));
 const CommunityNotesPage = lazy(() => import("@/pages/community-notes"));
 const EyeEvolutionPage = lazy(() => import("@/pages/eye-evolution"));
 const QuantumGravityPage = lazy(() => import("@/pages/quantum-gravity"));
@@ -1086,6 +1087,7 @@ function Router() {
                 <Route path="/circular-farm" component={CircularFarmPage} />
                 <Route path="/gradient-field" component={GradientFieldPage} />
                 <Route path="/aether-engine" component={AetherEnginePage} />
+                <Route path="/notion-synthesis" component={NotionSynthesis} />
                 <Route path="/community-notes" component={CommunityNotesPage} />
                 <Route path="/eye-evolution" component={EyeEvolutionPage} />
                 <Route path="/quantum-gravity" component={QuantumGravityPage} />

@@ -120,6 +120,7 @@ export const NAV_ITEMS = [
   { href: "/circular-farm",   label: "Circular AI Farm",   icon: Leaf },
   { href: "/compote-chips",   label: "Crunchy Compote Chips",   icon: Leaf },
   { href: "/gradient-field",  label: "Gradient Field · Mechanisms Map · Helical Vacuum Flow · Pyramidal Engine · C(x,t) Superposition", icon: Atom },
+  { href: "/notion-synthesis", label: "Notion Synthesis · White Papers × Engine Operators · C(x,t) Cross-Domain Mapping · Patents · ~ → S Pathway", icon: Atom },
   { href: "/aether-engine",   label: "AETHER Engine · All Fields Unified · Matter Synthesis · Observer Coupling · Veil Effect · Crystallisation · LPE Gate", icon: Atom },
   { href: "/dmf-field",       label: "DMF Coherence Field · Grand Synthesis · Master Equation · Rankine Vortex · Water Ring-Layer D8 · 4-Cone UV · Mito ATP · Heart Coupling · Transport Cavity · Emitter Atlas", icon: Atom },
   { href: "/eye-evolution",  label: "Eye Evolution",       icon: Dna },
