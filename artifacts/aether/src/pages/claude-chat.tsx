@@ -203,7 +203,7 @@ export default function ClaudeChatPage() {
             <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.cyan, boxShadow: `0 0 6px ${C.cyan}` }} />
               <div style={{ fontSize: 13, fontWeight: 500, color: C.white }}>
-                {convData?.title ?? "Conversation"}
+                {conversations.find(c => c.id === activeConvId)?.title ?? "Conversation"}
               </div>
               <div style={{ marginLeft: "auto", fontSize: 10, color: C.muted, letterSpacing: "0.1em" }}>
                 CLAUDE SONNET 4.6 · AETHER INTEGRATION
