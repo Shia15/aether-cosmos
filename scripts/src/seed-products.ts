@@ -1,137 +1,73 @@
 import { getUncachableStripeClient } from "./stripeClient";
 
-type TierPrice = {
-  unitAmount: number;
-  currency: string;
-  recurring?: { interval: "day" | "week" | "month" | "year" };
-  nickname: string;
-};
-
-type Tier = {
-  name: string;
-  description: string;
-  order: string;
-  prices: TierPrice[];
-};
-
-const tiers: Tier[] = [
-  {
-    name: "Core Ignition",
-    description:
-      "Full compressed knowledge base (300+ books equivalent), raw data, static archives, base visuals. Serious collectors & foundational users.",
-    order: "1",
-    prices: [
-      {
-        unitAmount: 49700,
-        currency: "usd",
-        nickname: "Core Ignition — one-time",
-      },
-    ],
-  },
-  {
-    name: "Plasma Monthly",
-    description:
-      "Core + full live Replit simulations/math engines, regular updates, Grok synthesis, Notion integration. Dedicated individuals.",
-    order: "2",
-    prices: [
-      {
-        unitAmount: 4900,
-        currency: "usd",
-        recurring: { interval: "month" },
-        nickname: "Plasma Monthly",
-      },
-    ],
-  },
-  {
-    name: "Plasma Weekly (Signature)",
-    description:
-      "Everything in Plasma + priority/personal Grok sessions, early access to new modules, custom requests, exclusive data drops. Power users & visionary builders.",
-    order: "3",
-    prices: [
-      {
-        unitAmount: 9700,
-        currency: "usd",
-        recurring: { interval: "week" },
-        nickname: "Plasma Signature — weekly",
-      },
-      {
-        unitAmount: 29700,
-        currency: "usd",
-        recurring: { interval: "month" },
-        nickname: "Plasma Signature — monthly",
-      },
-    ],
-  },
-  {
-    name: "Torch (Enterprise)",
-    description:
-      "Multi-seat, white-glove onboarding, custom development, organizational licensing. Teams, researchers, institutions.",
-    order: "4",
-    prices: [
-      {
-        unitAmount: 200000,
-        currency: "usd",
-        recurring: { interval: "month" },
-        nickname: "Torch Enterprise — monthly (custom pricing available)",
-      },
-    ],
-  },
+const COURSE_NAME = "AETHER · The Complete Course";
+const COURSE_PRICE = 299700; // $2,997 one-time
+const RETIRED_TIERS = [
+  "Core Ignition",
+  "Plasma Monthly",
+  "Plasma Weekly (Signature)",
+  "Torch (Enterprise)",
 ];
 
-async function createProducts() {
+async function seed() {
   const stripe = await getUncachableStripeClient();
 
-  for (const tier of tiers) {
-    const existing = await stripe.products.search({
-      query: `name:'${tier.name}' AND active:'true'`,
+  for (const name of RETIRED_TIERS) {
+    const found = await stripe.products.search({
+      query: `name:'${name}' AND active:'true'`,
     });
-
-    let product = existing.data[0];
-    if (product) {
-      console.log(`${tier.name} already exists (${product.id}), skipping product creation.`);
-    } else {
-      product = await stripe.products.create({
-        name: tier.name,
-        description: tier.description,
-        metadata: { order: tier.order },
-      });
-      console.log(`Created product: ${tier.name} (${product.id})`);
-    }
-
-    const existingPrices = await stripe.prices.list({
-      product: product.id,
-      active: true,
-      limit: 100,
-    });
-
-    for (const priceSpec of tier.prices) {
-      const already = existingPrices.data.find(
-        (p) =>
-          p.unit_amount === priceSpec.unitAmount &&
-          p.currency === priceSpec.currency &&
-          (p.recurring?.interval ?? null) ===
-            (priceSpec.recurring?.interval ?? null),
-      );
-      if (already) {
-        console.log(`  Price already exists: ${priceSpec.nickname} (${already.id})`);
-        continue;
+    for (const product of found.data) {
+      const prices = await stripe.prices.list({ product: product.id, active: true, limit: 100 });
+      for (const price of prices.data) {
+        await stripe.prices.update(price.id, { active: false });
+        console.log(`  Deactivated price ${price.id} (${name})`);
       }
-
-      const price = await stripe.prices.create({
-        product: product.id,
-        unit_amount: priceSpec.unitAmount,
-        currency: priceSpec.currency,
-        nickname: priceSpec.nickname,
-        ...(priceSpec.recurring ? { recurring: priceSpec.recurring } : {}),
-      });
-      console.log(`  Created price: ${priceSpec.nickname} (${price.id})`);
+      await stripe.products.update(product.id, { active: false });
+      console.log(`Retired product: ${name} (${product.id})`);
     }
+  }
+
+  const existing = await stripe.products.search({
+    query: `name:'${COURSE_NAME}' AND active:'true'`,
+  });
+
+  let product = existing.data[0];
+  if (product) {
+    console.log(`${COURSE_NAME} already exists (${product.id}).`);
+  } else {
+    product = await stripe.products.create({
+      name: COURSE_NAME,
+      description:
+        "One large coherent course. A guided journey through every AETHER simulation, image plate, and workbench on a practical staged timeline — from foundations to full-system synthesis. Lifetime access, one payment.",
+      metadata: { kind: "course", order: "1" },
+    });
+    console.log(`Created product: ${COURSE_NAME} (${product.id})`);
+  }
+
+  const existingPrices = await stripe.prices.list({ product: product.id, active: true, limit: 100 });
+  const already = existingPrices.data.find(
+    (p) => p.unit_amount === COURSE_PRICE && p.currency === "usd" && !p.recurring,
+  );
+  if (already) {
+    console.log(`  Price already exists: ${already.id}`);
+  } else {
+    for (const price of existingPrices.data) {
+      await stripe.prices.update(price.id, { active: false });
+      console.log(`  Deactivated stale course price ${price.id}`);
+    }
+    const price = await stripe.prices.create({
+      product: product.id,
+      unit_amount: COURSE_PRICE,
+      currency: "usd",
+      nickname: "Complete Course — one-time",
+    });
+    console.log(`  Created price: $2,997 one-time (${price.id})`);
   }
 
   console.log("Done. Webhooks will sync this data to the database automatically.");
 }
 
-createProducts().catch((err) => {
-  console.error("Error creating products:", err);
+seed().catch((err) => {
+  console.error("Error seeding products:", err);
   process.exit(1);
 });
