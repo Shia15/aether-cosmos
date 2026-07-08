@@ -28,6 +28,12 @@ interface ChatMessage {
   content: string;
 }
 
+const PLATFORM_LINKS: { label: string; handle: string; url: string; icon: string; color: string }[] = [
+  { label: "GitHub", handle: "Shia15", url: "https://github.com/Shia15", icon: "⌥", color: "#EAE6F2" },
+  { label: "Vercel", handle: "seaaether", url: "https://vercel.com/shias-projects-51ab68e6", icon: "▲", color: "#EAE6F2" },
+  { label: "Replit", handle: "AETHER Workspace", url: "https://replit.com", icon: "◱", color: "#E8863C" },
+];
+
 export default function ClaudeChatPage() {
   const [, navigate] = useLocation();
   const [activeConvId, setActiveConvId] = useState<number | null>(null);
@@ -188,6 +194,35 @@ export default function ClaudeChatPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Platforms */}
+        <div style={{ borderTop: `1px solid ${C.border}`, padding: "12px 14px" }}>
+          <div style={{ fontSize: 10, color: C.muted, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 8 }}>
+            Platforms
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {PLATFORM_LINKS.map((p) => (
+              <a
+                key={p.label}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "flex", alignItems: "center", gap: 9,
+                  padding: "7px 10px", borderRadius: 7,
+                  border: `1px solid ${C.border}`, background: "rgba(255,255,255,0.02)",
+                  textDecoration: "none", transition: "background .15s, border-color .15s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(90,184,232,0.08)"; e.currentTarget.style.borderColor = `${C.cyan}44`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.02)"; e.currentTarget.style.borderColor = C.border; }}
+              >
+                <span style={{ fontSize: 13, color: p.color, width: 16, textAlign: "center" }}>{p.icon}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: C.white }}>{p.label}</span>
+                <span style={{ fontSize: 10, color: C.muted, marginLeft: "auto", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 110 }}>{p.handle}</span>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
