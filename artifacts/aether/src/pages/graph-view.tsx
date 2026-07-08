@@ -655,7 +655,6 @@ export default function GraphView() {
             { name: "AETHER System",        url: "https://aether-system.replit.app",               col: "#67e8f9", desc: "AETHER system — live deployment" },
             { name: "Chlorophyll Drive",    url: "https://chlorophyll-cool-drive.replit.app",      col: "#4ade80", desc: "Chlorophyll cool drive — green energy" },
             { name: "Spiral Vortex Engine", url: "https://vortex-synthesis.replit.app",            col: "#f5c84c", desc: "Vortex synthesis — spiral engine" },
-            { name: "Piano Arithmetic",     url: "https://vortex-synthesis.replit.app/piano-arithmetic/", col: "#fb923c", desc: "Piano arithmetic — music as number" },
             { name: "Notion Sync",          url: "/notion-sync",                                   col: "#a78bfa", desc: "Pull & push AETHER ↔ Notion" },
           ] as const).map(app => (
             <a key={app.url} href={app.url} target="_blank" rel="noopener noreferrer"
