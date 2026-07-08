@@ -119,14 +119,51 @@ const ARCHITECTURES: Arch[] = [
   },
 ];
 
-function buildContext(selected: Set<string>): string {
+// ── X post archive ───────────────────────────────────────────────────────────
+type XAccount = "@Strategicproce" | "@Shia449272";
+const ACCOUNTS: XAccount[] = ["@Strategicproce", "@Shia449272"];
+type XPost = { id: string; account: XAccount; text: string; addedAt: number };
+const POSTS_KEY = "aether.xposts.v1";
+
+function loadPosts(): XPost[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(POSTS_KEY) ?? "[]");
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(
+      (p): p is XPost =>
+        !!p && typeof p === "object" &&
+        typeof p.id === "string" &&
+        typeof p.text === "string" &&
+        (p.account === "@Strategicproce" || p.account === "@Shia449272"),
+    ).map(p => ({ ...p, addedAt: typeof p.addedAt === "number" ? p.addedAt : Date.now() }));
+  } catch { return []; }
+}
+function savePosts(posts: XPost[]) {
+  try { localStorage.setItem(POSTS_KEY, JSON.stringify(posts.slice(-400))); } catch { /* */ }
+}
+
+function buildContext(selected: Set<string>, posts: XPost[], includePosts: boolean): string {
   const pick =
     selected.size > 0
       ? ARCHITECTURES.filter(a => selected.has(a.id))
       : ARCHITECTURES;
-  return pick
+  let ctx = pick
     .map(a => `• ${a.name} [${a.kind}]: ${a.desc}`)
     .join("\n");
+  if (includePosts && posts.length > 0) {
+    // newest first, budget-capped so architectures always fit in the server's context cap
+    const budget = 17000;
+    let used = 0;
+    const lines: string[] = [];
+    for (const p of [...posts].reverse()) {
+      const line = `[${p.account}] ${p.text.replace(/\s+/g, " ").trim()}`;
+      if (used + line.length > budget) break;
+      used += line.length;
+      lines.push(line);
+    }
+    ctx += `\n\nPOST ARCHIVE (${lines.length} of ${posts.length} posts, newest first):\n${lines.join("\n---\n")}`;
+  }
+  return ctx;
 }
 
 // ── Chat types + persistence ────────────────────────────────────────────────
@@ -157,11 +194,17 @@ export default function XGrokPage() {
   const [streaming, setStreaming] = useState(false);
   const [streamText, setStreamText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [posts, setPosts] = useState<XPost[]>(loadPosts);
+  const [includePosts, setIncludePosts] = useState(true);
+  const [archiveOpen, setArchiveOpen] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [draftAccount, setDraftAccount] = useState<XAccount>("@Shia449272");
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const apiBase = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
 
+  useEffect(() => { savePosts(posts); }, [posts]);
   useEffect(() => { saveChat(msgs); }, [msgs]);
   useEffect(() => {
     const el = scrollRef.current;
@@ -197,7 +240,7 @@ export default function XGrokPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history,
-          context: buildContext(selected),
+          context: buildContext(selected, posts, includePosts),
         }),
         signal: ctrl.signal,
       });
@@ -241,7 +284,26 @@ export default function XGrokPage() {
       setStreamText("");
       abortRef.current = null;
     }
-  }, [msgs, selected, streaming, apiBase]);
+  }, [msgs, selected, streaming, apiBase, posts, includePosts]);
+
+  const addPosts = () => {
+    const chunks = draft
+      .split(/\n\s*\n/)
+      .map(c => c.trim())
+      .filter(c => c.length > 0);
+    if (chunks.length === 0) return;
+    const now = Date.now();
+    setPosts(prev => [
+      ...prev,
+      ...chunks.map((text, i) => ({
+        id: `${now}-${i}-${Math.random().toString(36).slice(2, 8)}`,
+        account: draftAccount,
+        text: text.slice(0, 2000),
+        addedAt: now,
+      })),
+    ]);
+    setDraft("");
+  };
 
   const selNames = ARCHITECTURES.filter(a => selected.has(a.id)).map(a => a.name);
   const comparePrompt =
@@ -264,8 +326,9 @@ export default function XGrokPage() {
             X · Grok Bridge
           </h1>
           <p style={{ color: B.dim, fontSize: 14, maxWidth: 720, marginTop: 12, lineHeight: 1.7 }}>
-            The public face of the system on X, and a live Grok analyst wired into every
-            AETHER architecture. Select architectures below, then query — or compare — them in real time.
+            Both faces of the system on X — @Strategicproce and @Shia449272 — plus a live Grok
+            analyst wired into every AETHER architecture and your own post archive. Select
+            architectures, add posts, then query — or compare — them in real time.
           </p>
         </div>
 
@@ -283,6 +346,21 @@ export default function XGrokPage() {
             </div>
             <div style={{ color: B.dim, fontSize: 12, marginTop: 10, lineHeight: 1.6 }}>
               Public channel of the AETHER system — posts, threads, and deploy announcements.
+            </div>
+          </a>
+
+          <a href="https://x.com/Shia449272" target="_blank" rel="noopener noreferrer"
+            data-testid="link-x-profile-shia"
+            style={{ display: "block", padding: "18px 20px", borderRadius: 10, background: B.panel, border: `1px solid ${B.line}`, textDecoration: "none" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 21, background: "#000", border: "1px solid rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: 20 }}>𝕏</div>
+              <div>
+                <div style={{ color: B.ivory, fontWeight: 700, fontSize: 15 }}>@Shia449272</div>
+                <div style={{ ...mono, fontSize: 10, color: B.faint, marginTop: 2 }}>X · ARCHIVE ACCOUNT ↗</div>
+              </div>
+            </div>
+            <div style={{ color: B.dim, fontSize: 12, marginTop: 10, lineHeight: 1.6 }}>
+              Second account — its posts feed the queryable Post Archive below.
             </div>
           </a>
 
@@ -365,6 +443,90 @@ export default function XGrokPage() {
           </div>
         </div>
 
+        {/* Post archive */}
+        <div style={{ marginBottom: 26, borderRadius: 12, background: B.panel, border: `1px solid ${B.line}`, overflow: "hidden" }} data-testid="post-archive">
+          <button onClick={() => setArchiveOpen(o => !o)}
+            data-testid="btn-archive-toggle"
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "13px 16px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+              <span style={{ ...mono, fontSize: 11, letterSpacing: "0.2em", color: B.ivory, textTransform: "uppercase" }}>
+                X Post Archive · Queryable
+              </span>
+              <span style={{ ...mono, fontSize: 9, padding: "2px 8px", borderRadius: 10, border: `1px solid ${B.line}`, color: B.gold }}>
+                {posts.length} post{posts.length !== 1 ? "s" : ""}
+              </span>
+              {ACCOUNTS.map(acc => {
+                const n = posts.filter(p => p.account === acc).length;
+                return n > 0 ? (
+                  <span key={acc} style={{ ...mono, fontSize: 9, color: B.faint }}>{acc} · {n}</span>
+                ) : null;
+              })}
+            </div>
+            <span style={{ ...mono, fontSize: 12, color: B.gold }}>{archiveOpen ? "−" : "+"}</span>
+          </button>
+
+          {archiveOpen && (
+            <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${B.line}` }}>
+              <div style={{ color: B.dim, fontSize: 11, lineHeight: 1.65, margin: "12px 0" }}>
+                X's official API requires paid access, so posts are archived here by paste: copy posts from{" "}
+                <a href="https://x.com/Shia449272" target="_blank" rel="noopener noreferrer" style={{ color: B.gold, textDecoration: "none" }}>@Shia449272</a>{" "}
+                or <a href="https://x.com/Strategicproce" target="_blank" rel="noopener noreferrer" style={{ color: B.gold, textDecoration: "none" }}>@Strategicproce</a>,
+                paste them below (blank line between posts to add several at once), and Grok can then quote, search, and cross-reference them against the architectures.
+              </div>
+
+              <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                {ACCOUNTS.map(acc => (
+                  <button key={acc} onClick={() => setDraftAccount(acc)}
+                    data-testid={`btn-account-${acc.slice(1)}`}
+                    style={{ ...mono, fontSize: 10, padding: "5px 12px", borderRadius: 6, cursor: "pointer", background: draftAccount === acc ? "rgba(245,200,76,0.14)" : "transparent", border: `1px solid ${draftAccount === acc ? "rgba(245,200,76,0.55)" : B.line}`, color: draftAccount === acc ? B.gold : B.faint }}>
+                    {acc}
+                  </button>
+                ))}
+              </div>
+
+              <textarea
+                value={draft}
+                onChange={e => setDraft(e.target.value)}
+                placeholder={`Paste one or more posts from ${draftAccount} — separate multiple posts with a blank line…`}
+                rows={4}
+                data-testid="input-posts"
+                style={{ width: "100%", background: B.bg, border: `1px solid ${B.line}`, borderRadius: 8, padding: "10px 12px", color: B.ivory, fontSize: 12, lineHeight: 1.6, outline: "none", resize: "vertical" }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", ...mono, fontSize: 10, color: B.dim }}>
+                  <input type="checkbox" checked={includePosts} onChange={e => setIncludePosts(e.target.checked)}
+                    data-testid="check-include-posts"
+                    style={{ accentColor: B.gold }} />
+                  FEED ARCHIVE INTO GROK CONTEXT
+                </label>
+                <button onClick={addPosts} disabled={!draft.trim()}
+                  data-testid="btn-add-posts"
+                  style={{ ...mono, fontSize: 10, letterSpacing: "0.1em", padding: "7px 16px", borderRadius: 6, cursor: draft.trim() ? "pointer" : "default", background: draft.trim() ? "rgba(245,200,76,0.16)" : "rgba(245,200,76,0.06)", border: "1px solid rgba(245,200,76,0.5)", color: B.gold, opacity: draft.trim() ? 1 : 0.5 }}>
+                  ADD TO ARCHIVE +
+                </button>
+              </div>
+
+              {posts.length > 0 && (
+                <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8, maxHeight: 260, overflowY: "auto" }}>
+                  {[...posts].reverse().map(p => (
+                    <div key={p.id} style={{ display: "flex", gap: 10, alignItems: "flex-start", padding: "9px 12px", borderRadius: 8, background: B.panel2, border: `1px solid ${B.line}` }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ ...mono, fontSize: 8, letterSpacing: "0.15em", color: p.account === "@Shia449272" ? B.grokTeal : B.gold, marginBottom: 3 }}>
+                          {p.account.toUpperCase()}
+                        </div>
+                        <div style={{ color: B.ivory, fontSize: 12, lineHeight: 1.6, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{p.text}</div>
+                      </div>
+                      <button onClick={() => setPosts(prev => prev.filter(x => x.id !== p.id))}
+                        title="Remove post"
+                        style={{ background: "transparent", border: "none", color: B.faint, cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 2 }}>×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Chat */}
         <div style={{ borderRadius: 12, background: B.panel, border: `1px solid ${B.line}`, overflow: "hidden" }}>
           <div style={{ padding: "12px 16px", borderBottom: `1px solid ${B.line}`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
@@ -397,7 +559,8 @@ export default function XGrokPage() {
                 <div style={{ ...mono, fontSize: 11, color: B.faint, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>No queries yet</div>
                 <div style={{ color: B.dim, fontSize: 12, lineHeight: 1.7 }}>
                   Try: "Which architectures share the coherence field C(x,t), and how do their uses differ?"
-                  — or select two above and hit <span style={{ color: B.gold }}>COMPARE SELECTED</span>.
+                  — select two above and hit <span style={{ color: B.gold }}>COMPARE SELECTED</span> —
+                  or add posts to the archive and ask "What themes run through my posts?"
                 </div>
               </div>
             )}

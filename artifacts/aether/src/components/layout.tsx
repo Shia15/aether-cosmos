@@ -98,7 +98,7 @@ export const NAV_ITEMS = [
   { href: "/vercel-dashboard", label: "Vercel Dashboard · Projects · Deployments · Status", icon: Triangle },
   { href: "/substrates", label: "Substrates · Complete Interface Atlas · Darkcone Front", icon: LayoutGrid },
   { href: "/claude-chat", label: "Claude Chat · AI-Powered Conversation · Anthropic Integration", icon: MessageSquare },
-  { href: "/x-grok", label: "Grok Bridge · X · @Strategicproce · Live Architecture Query", icon: MessageSquare },
+  { href: "/x-grok", label: "Grok Bridge · X · @Strategicproce + @Shia449272 · Post Archive · Live Architecture Query", icon: MessageSquare },
   { href: "/question-bank", label: "Question Bank · Mathematical Synthesis · Cross-System Coherence · Live Equation Clusters", icon: Sigma },
   { href: "/", label: "The Course · Home · Enroll", icon: CreditCard },
   { href: "/graph-map", label: "Graph Map", icon: Network },
