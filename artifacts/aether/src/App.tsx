@@ -665,94 +665,163 @@ function AuthKnowledgeCanvas() {
   return <canvas ref={ref} style={{position:"absolute",inset:0,width:"100%",height:"100%",display:"block"}}/>;
 }
 
-/* ── Auth layout: full-screen canvas + centered card ─ */
+/* ── Auth layout: Rootex-inspired landing page ─ */
 function AuthLayout({ children, loading }: { children?: ReactNode; loading?: boolean }) {
-  const domains=[
-    {col:"#C8A030",name:"Cosmic"},
-    {col:"#00FFB2",name:"Quantum"},
-    {col:"#44CC77",name:"Biology"},
-    {col:"#9966FF",name:"Math"},
-    {col:"#4488FF",name:"Physics"},
-    {col:"#FF9933",name:"Substrate"},
-    {col:"#FF6699",name:"Mind"},
+  const modules = [
+    { name: "Signal Processor", desc: "Coherence field analysis" },
+    { name: "Memory Parser",    desc: "Knowledge crystallisation" },
+    { name: "Mood Router",      desc: "Emotional intelligence routing" },
+    { name: "Intent Mapper",    desc: "Symbolic logic synthesis" },
+  ];
+  const stats = [
+    { label: "Nodes Active",    value: "20+" },
+    { label: "Memory Streams",  value: "Synced" },
+    { label: "Build Version",   value: "2.0.0" },
+    { label: "Last Pulse",      value: "Live" },
   ];
   return (
     <div style={{position:"fixed",top:0,left:0,width:"100vw",height:"100vh",
-      background:"#02030A",zIndex:9999,overflow:"hidden"}}>
+      background:"#0d0d14",zIndex:9999,overflowY:"auto",overflowX:"hidden"}}>
       <style>{`
-        @keyframes ak-spin{to{transform:rotate(360deg)}}
-        @keyframes ak-fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes ak-glow{0%,100%{box-shadow:0 0 32px rgba(0,255,178,0.10)}50%{box-shadow:0 0 56px rgba(0,255,178,0.22)}}
+        @keyframes rx-spin{to{transform:rotate(360deg)}}
+        @keyframes rx-fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes rx-glow{0%,100%{opacity:.6}50%{opacity:1}}
+        .rx-module:hover{background:rgba(255,255,255,0.07)!important;border-color:rgba(139,92,246,0.5)!important}
+        .rx-btn-primary:hover{opacity:0.88}
+        .rx-btn-secondary:hover{background:rgba(255,255,255,0.08)!important}
+        .rx-nav-link:hover{color:#fff!important}
       `}</style>
 
-      {/* Live knowledge graph background */}
-      <AuthKnowledgeCanvas/>
+      {/* Subtle gradient orbs in background */}
+      <div style={{position:"fixed",top:"-20%",right:"-10%",width:"60vw",height:"60vw",
+        background:"radial-gradient(circle,rgba(139,92,246,0.12) 0%,transparent 70%)",
+        pointerEvents:"none",zIndex:0}}/>
+      <div style={{position:"fixed",bottom:"-20%",left:"-10%",width:"50vw",height:"50vw",
+        background:"radial-gradient(circle,rgba(6,182,212,0.08) 0%,transparent 70%)",
+        pointerEvents:"none",zIndex:0}}/>
 
-      {/* Domain legend strip — bottom of screen */}
-      <div style={{position:"absolute",bottom:20,left:"50%",transform:"translateX(-50%)",
-        display:"flex",gap:14,alignItems:"center",zIndex:2}}>
-        {domains.map(d=>(
-          <div key={d.name} style={{display:"flex",alignItems:"center",gap:5}}>
-            <div style={{width:7,height:7,borderRadius:"50%",background:d.col,boxShadow:`0 0 6px ${d.col}`}}/>
-            <span style={{fontFamily:"'Space Mono',monospace",fontSize:7,
-              color:d.col+"99",letterSpacing:"0.1em"}}>{d.name}</span>
-          </div>
-        ))}
-      </div>
+      {/* Nav */}
+      <nav style={{position:"relative",zIndex:2,display:"flex",alignItems:"center",
+        justifyContent:"space-between",padding:"20px 48px",borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+        <div style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",fontWeight:700,
+          fontSize:18,color:"#fff",letterSpacing:"-0.01em"}}>AETHER</div>
+        <div style={{display:"flex",gap:32,alignItems:"center"}}>
+          {["Docs","Modules","API Access"].map(l=>(
+            <a key={l} className="rx-nav-link" href="#" style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+              fontSize:14,color:"rgba(255,255,255,0.6)",textDecoration:"none",transition:"color .15s"}}>{l}</a>
+          ))}
+          <a href={`${basePath}/sign-in`} style={{
+            fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+            fontSize:14,fontWeight:600,color:"#fff",textDecoration:"none",
+            background:"linear-gradient(135deg,#7c3aed,#6d28d9)",
+            padding:"8px 18px",borderRadius:8,
+            boxShadow:"0 0 20px rgba(124,58,237,0.35)",
+          }}>Launch Console</a>
+        </div>
+      </nav>
 
-      {/* Centered floating card */}
-      <div style={{position:"absolute",inset:0,display:"flex",
-        alignItems:"center",justifyContent:"center",padding:20,overflowY:"auto",zIndex:2}}>
-        <div style={{
-          width:"100%",maxWidth:440,
-          background:"rgba(4,6,18,0.82)",
-          backdropFilter:"blur(24px)",
-          border:"1px solid rgba(0,255,178,0.18)",
-          borderRadius:12,padding:"32px 32px 28px",
-          animation:"ak-fade .5s ease both, ak-glow 4s ease-in-out infinite",
-        }}>
-          {/* Wordmark */}
-          <div style={{textAlign:"center",marginBottom:6}}>
-            <div style={{fontFamily:"'Cinzel',serif",fontSize:"2rem",fontWeight:600,
-              color:"#00FFB2",letterSpacing:"0.4em",lineHeight:1,
-              textShadow:"0 0 36px rgba(0,255,178,0.45)"}}>AETHER</div>
-            <div style={{fontFamily:"'Space Mono',monospace",fontSize:7.5,
-              color:"rgba(0,255,178,0.45)",letterSpacing:"0.2em",marginTop:6}}>
-              KNOWLEDGE SYSTEM
+      {/* Main content */}
+      <div style={{position:"relative",zIndex:1,maxWidth:1200,margin:"0 auto",padding:"60px 48px 80px",
+        animation:"rx-fade .5s ease both"}}>
+
+        {/* Hero */}
+        <div style={{marginBottom:64}}>
+          <h1 style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+            fontWeight:800,fontSize:"clamp(2.4rem,5vw,4rem)",
+            color:"#fff",lineHeight:1.1,letterSpacing:"-0.03em",margin:"0 0 16px"}}>
+            Synthesise. Discover.<br/>Crystallise.
+          </h1>
+          <p style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+            fontSize:16,color:"rgba(255,255,255,0.5)",margin:0,maxWidth:440}}>
+            Symbolic intelligence meets coherent knowledge infrastructure.
+          </p>
+        </div>
+
+        {/* Two-column layout: modules + access panel */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr minmax(320px,420px)",gap:40,alignItems:"start"}}>
+
+          {/* Left — modules grid */}
+          <div>
+            <h2 style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+              fontWeight:600,fontSize:18,color:"#fff",margin:"0 0 20px",letterSpacing:"-0.01em"}}>
+              Modules
+            </h2>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:40}}>
+              {modules.map(m=>(
+                <div key={m.name} className="rx-module" style={{
+                  background:"rgba(255,255,255,0.04)",
+                  border:"1px solid rgba(255,255,255,0.1)",
+                  borderRadius:10,padding:"16px 18px",cursor:"pointer",
+                  transition:"background .15s,border-color .15s",
+                }}>
+                  <div style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+                    fontWeight:500,fontSize:14,color:"rgba(255,255,255,0.85)",marginBottom:4}}>{m.name}</div>
+                  <div style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+                    fontSize:12,color:"rgba(255,255,255,0.35)"}}>{m.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Live system feed */}
+            <h2 style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+              fontWeight:600,fontSize:18,color:"#fff",margin:"0 0 16px",letterSpacing:"-0.01em"}}>
+              Live System Feed
+            </h2>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              {stats.map(s=>(
+                <div key={s.label} style={{
+                  background:"rgba(255,255,255,0.03)",
+                  border:"1px solid rgba(255,255,255,0.08)",
+                  borderRadius:10,padding:"16px 18px",
+                }}>
+                  <div style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+                    fontSize:12,color:"rgba(255,255,255,0.4)",marginBottom:6}}>{s.label}</div>
+                  <div style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+                    fontWeight:600,fontSize:20,color:"#fff"}}>{s.value}</div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Tagline */}
-          <div style={{textAlign:"center",marginBottom:22,
-            fontFamily:"'Crimson Pro',serif",fontSize:13,
-            color:"rgba(184,204,232,0.55)",letterSpacing:"0.04em"}}>
-            Synthesise · Discover · Crystallise
+          {/* Right — access panel */}
+          <div style={{
+            background:"rgba(255,255,255,0.04)",
+            border:"1px solid rgba(255,255,255,0.1)",
+            borderRadius:14,padding:"28px 28px 24px",
+          }}>
+            <h2 style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+              fontWeight:600,fontSize:16,color:"#fff",margin:"0 0 20px",letterSpacing:"-0.01em"}}>
+              AETHER Access Panel
+            </h2>
+
+            {loading ? (
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:16,padding:"24px 0"}}>
+                <div style={{width:28,height:28,border:"2px solid rgba(124,58,237,0.2)",
+                  borderTop:"2px solid #7c3aed",borderRadius:"50%",
+                  animation:"rx-spin 1s linear infinite"}}/>
+                <div style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",fontSize:13,
+                  color:"rgba(255,255,255,0.4)"}}>Initialising…</div>
+                <a href={`${basePath}/sign-in`}
+                  style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+                    fontSize:14,fontWeight:600,color:"#fff",textDecoration:"none",
+                    background:"linear-gradient(135deg,#7c3aed,#6d28d9)",
+                    padding:"11px 28px",borderRadius:8,width:"100%",textAlign:"center",
+                    display:"block",boxSizing:"border-box",
+                    boxShadow:"0 0 20px rgba(124,58,237,0.35)"}}>
+                  Sign In
+                </a>
+              </div>
+            ) : children}
           </div>
+        </div>
 
-          {/* Divider */}
-          <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(0,255,178,0.2),transparent)",
-            marginBottom:22}}/>
-
-          {/* Form / loading */}
-          {loading ? (
-            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:18,padding:"16px 0"}}>
-              <div style={{width:32,height:32,border:"2px solid rgba(0,255,178,0.12)",
-                borderTop:"2px solid #00FFB2",borderRadius:"50%",
-                animation:"ak-spin 1s linear infinite"}}/>
-              <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
-                color:"rgba(0,255,178,0.45)",letterSpacing:"0.2em"}}>INITIALISING</div>
-              <a href={`${basePath}/sign-in`}
-                aria-label="Sign in to AETHER"
-                style={{fontFamily:"'Space Mono',monospace",fontSize:14,fontWeight:700,
-                  color:"#02030A",textDecoration:"none",letterSpacing:"0.22em",
-                  border:"1px solid #00FFB2",borderRadius:6,
-                  padding:"13px 44px",background:"#00FFB2",
-                  boxShadow:"0 0 28px rgba(0,255,178,0.5)",
-                  textTransform:"uppercase",cursor:"pointer"}}>
-                Sign In
-              </a>
-            </div>
-          ) : children}
+        {/* Bottom tagline */}
+        <div style={{marginTop:64,paddingTop:32,borderTop:"1px solid rgba(255,255,255,0.06)",
+          display:"flex",gap:24,flexWrap:"wrap"}}>
+          {["Precise Knowledge Infrastructure","Emotionally Intelligent Routing","Built for Human–System Harmony"].map(t=>(
+            <div key={t} style={{fontFamily:"'Inter',ui-sans-serif,system-ui,sans-serif",
+              fontSize:13,color:"rgba(255,255,255,0.35)"}}>• {t}</div>
+          ))}
         </div>
       </div>
     </div>
@@ -860,88 +929,63 @@ function AccessCodeGate({ children }: { children: ReactNode }) {
     }
   }
 
+  const F = "'Inter',ui-sans-serif,system-ui,sans-serif";
   return (
     <AuthLayout>
       <style>{`
-        @keyframes ak-shake {
-          0%,100%{transform:translateX(0)}
-          20%{transform:translateX(-8px)}
-          40%{transform:translateX(8px)}
-          60%{transform:translateX(-5px)}
-          80%{transform:translateX(5px)}
-        }
+        @keyframes rx-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+        .rx-inp{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:12px 14px;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;font-size:14px;color:rgba(255,255,255,0.85);width:100%;box-sizing:border-box;outline:none;transition:border-color .15s}
+        .rx-inp::placeholder{color:rgba(255,255,255,0.28)}
+        .rx-inp:focus{border-color:rgba(124,58,237,0.6)}
+        .rx-inp-err{border-color:rgba(239,68,68,0.7)!important}
       `}</style>
-      <div style={{display:"flex",flexDirection:"column",gap:10}}>
-        <div style={{textAlign:"center",marginBottom:4}}>
-          <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
-            color:"rgba(0,255,178,0.55)",letterSpacing:"0.25em",marginBottom:8}}>
-            SECURE ACCESS
-          </div>
-          <div style={{fontFamily:"'Crimson Pro',serif",fontSize:"0.95rem",
-            color:"rgba(184,204,232,0.7)",lineHeight:1.5}}>
-            Enter your access code to enter the knowledge system.
-          </div>
-        </div>
-
-        <div style={{height:1,background:"linear-gradient(90deg,transparent,rgba(0,255,178,0.15),transparent)",margin:"6px 0"}}/>
-
-        <div style={{
-          animation: shake ? "ak-shake 0.55s ease" : "none",
-        }}>
+      <div style={{display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{animation: shake ? "rx-shake 0.5s ease" : "none"}}>
           <input
+            className={`rx-inp${error ? " rx-inp-err" : ""}`}
             type="password"
             autoFocus
             value={input}
             onChange={(e) => { setInput(e.target.value); setError(false); }}
             onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
             placeholder="Enter access code"
-            style={{
-              width:"100%",boxSizing:"border-box",
-              background:"rgba(0,255,178,0.05)",
-              border:`1px solid ${error ? "rgba(255,68,119,0.6)" : "rgba(0,255,178,0.2)"}`,
-              borderRadius:6,
-              padding:"12px 16px",
-              fontFamily:"'Space Mono',monospace",fontSize:13,
-              color:"#B8CCE8",letterSpacing:"0.15em",
-              outline:"none",
-              transition:"border-color 0.2s",
-            }}
           />
         </div>
 
         {error && (
-          <div style={{fontFamily:"'Space Mono',monospace",fontSize:8,
-            color:"#FF4477",letterSpacing:"0.14em",textAlign:"center"}}>
-            INCORRECT CODE{attempts >= 3 ? ` -- ${attempts} attempts` : ""}
+          <div style={{fontFamily:F,fontSize:12,color:"#ef4444"}}>
+            Incorrect code{attempts >= 3 ? ` — ${attempts} attempts` : ""}
           </div>
         )}
 
-        <button
-          onClick={submit}
-          style={{
-            marginTop:4,
-            background:"rgba(0,255,178,0.1)",
-            border:"1px solid rgba(0,255,178,0.35)",
-            borderRadius:6,padding:"11px",
-            fontFamily:"'Space Mono',monospace",fontSize:9,
-            color:"#00FFB2",letterSpacing:"0.22em",
-            cursor:"pointer",transition:"all 0.18s",
-          }}
-        >
-          ENTER AETHER
-        </button>
-
-        <button
-          onClick={() => signOut({ redirectUrl: basePath || "/" })}
-          style={{
-            background:"transparent",border:"none",
-            fontFamily:"'Space Mono',monospace",fontSize:7,
-            color:"rgba(184,204,232,0.3)",letterSpacing:"0.14em",
-            cursor:"pointer",padding:"6px",textAlign:"center",
-          }}
-        >
-          sign out
-        </button>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:4}}>
+          <button
+            onClick={submit}
+            style={{
+              background:"linear-gradient(135deg,#7c3aed,#6d28d9)",
+              border:"none",borderRadius:8,padding:"11px 0",
+              fontFamily:F,fontSize:14,fontWeight:600,
+              color:"#fff",cursor:"pointer",
+              boxShadow:"0 0 20px rgba(124,58,237,0.35)",
+              transition:"opacity .15s",
+            }}
+          >
+            Enter AETHER
+          </button>
+          <button
+            style={{
+              background:"rgba(255,255,255,0.06)",
+              border:"1px solid rgba(255,255,255,0.12)",
+              borderRadius:8,padding:"11px 0",
+              fontFamily:F,fontSize:14,fontWeight:500,
+              color:"rgba(255,255,255,0.7)",cursor:"pointer",
+              transition:"background .15s",
+            }}
+            onClick={() => signOut({ redirectUrl: basePath || "/" })}
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     </AuthLayout>
   );
