@@ -16,6 +16,7 @@ import liveCursorsRouter from "./live-cursors";
 import communityNotesRouter from "./community-notes";
 import notionRouter from "./notion";
 import stripeRouter from "./stripe";
+import anthropicRouter from "./anthropic";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(liveCursorsRouter);
 router.use(communityNotesRouter);
 router.use(notionRouter);
 router.use(stripeRouter);
+router.use(anthropicRouter);
 
 export default router;

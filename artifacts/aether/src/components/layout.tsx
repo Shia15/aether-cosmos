@@ -89,11 +89,13 @@ import {
   Worm,
   CircleDot,
   CreditCard,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
 
 const NAV_ITEMS = [
+  { href: "/claude-chat", label: "Claude Chat · AI-Powered Conversation · Anthropic Integration", icon: MessageSquare },
   { href: "/question-bank", label: "Question Bank · Mathematical Synthesis · Cross-System Coherence · Live Equation Clusters", icon: Sigma },
   { href: "/", label: "Graph Map", icon: Network },
   { href: "/page-directory", label: "Page Directory · All Pages · Gravity Synopsis · Site Index", icon: LayoutGrid },
