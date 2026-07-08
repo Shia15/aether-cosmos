@@ -382,6 +382,20 @@ const CONNECTED = [
     badge: "ENERGY",
   },
   {
+    name: "Spiral Vortex Engine",
+    url: "https://vortex-synthesis.replit.app",
+    desc: "Vortex synthesis — spiral vortex engine, live deployment",
+    dot: C.gold,
+    badge: "PUBLISHED APP",
+  },
+  {
+    name: "Piano Arithmetic",
+    url: "https://vortex-synthesis.replit.app/piano-arithmetic/",
+    desc: "Piano arithmetic — music as number, tones as ratios",
+    dot: C.gold,
+    badge: "MUSIC · MATH",
+  },
+  {
     name: "Notion Sync",
     url: "/notion-sync",
     desc: "Pull Notion pages into AETHER knowledge graph · push synthesis notes back out",
