@@ -95,6 +95,7 @@ import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
 
 const NAV_ITEMS = [
+  { href: "/vercel-dashboard", label: "Vercel Dashboard · Projects · Deployments · Status", icon: Triangle },
   { href: "/claude-chat", label: "Claude Chat · AI-Powered Conversation · Anthropic Integration", icon: MessageSquare },
   { href: "/question-bank", label: "Question Bank · Mathematical Synthesis · Cross-System Coherence · Live Equation Clusters", icon: Sigma },
   { href: "/", label: "Graph Map", icon: Network },
