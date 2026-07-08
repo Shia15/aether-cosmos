@@ -806,7 +806,7 @@ export default function LiquidPrintPage() {
                   ops · <span style={{ color: C.gold, fontFamily: "JetBrains Mono, ui-monospace, monospace" }}>{ops}</span>
                 </div>
               </div>
-              <canvas ref={cvRef} data-testid="lp-canvas" style={{ width: "100%", height: 520, display: "block" }} />
+              <canvas ref={cvRef} data-testid="lp-canvas" style={{ width: "100%", height: 720, display: "block" }} />
             </div>
 
             {/* Tab content card */}
