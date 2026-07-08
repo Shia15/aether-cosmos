@@ -268,7 +268,11 @@ export default function VercelDashboard() {
                 </thead>
                 <tbody>
                   {filteredDeploys.length === 0 && (
-                    <tr><td colSpan={5} style={{ padding: "24px 18px", color: C.dim, textAlign: "center" }}>No deployments found</td></tr>
+                    <tr><td colSpan={5} style={{ padding: "24px 18px", color: C.dim, textAlign: "center" }}>
+                      {deployments.length > 0
+                        ? <>No successful deployments — {deployments.length} hidden · <button onClick={() => setShowAll(true)} style={{ background: "none", border: "none", color: C.blue, fontSize: 13, cursor: "pointer", fontFamily: F, padding: 0 }}>Show all</button></>
+                        : "No deployments found"}
+                    </td></tr>
                   )}
                   {filteredDeploys.map((d, i) => (
                     <tr key={d.uid} className="vd-row" style={{
