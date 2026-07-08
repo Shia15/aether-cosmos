@@ -93,6 +93,7 @@ export default function VercelDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [showAll, setShowAll] = useState(false);
 
   const load = useCallback(async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
@@ -125,9 +126,9 @@ export default function VercelDashboard() {
     latest: deployments[0],
   };
 
-  const filteredDeploys = selectedProject
-    ? deployments.filter(d => d.name === projects.find(p => p.id === selectedProject)?.name)
-    : deployments;
+  const filteredDeploys = deployments
+    .filter(d => selectedProject ? d.name === projects.find(p => p.id === selectedProject)?.name : true)
+    .filter(d => showAll ? true : d.state !== "ERROR" && d.state !== "CANCELED");
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.white, fontFamily: F, padding: "32px 40px" }}>
@@ -238,9 +239,24 @@ export default function VercelDashboard() {
 
           {/* Deployments */}
           <div>
-            <h2 style={{ fontSize: 15, fontWeight: 600, margin: "0 0 14px", color: C.white }}>
-              Deployments {selectedProject && <span style={{ color: C.muted, fontWeight: 400 }}>— {projects.find(p => p.id === selectedProject)?.name}</span>}
-            </h2>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: C.white }}>
+                Deployments {selectedProject && <span style={{ color: C.muted, fontWeight: 400 }}>— {projects.find(p => p.id === selectedProject)?.name}</span>}
+              </h2>
+              <button
+                onClick={() => setShowAll(v => !v)}
+                style={{
+                  background: showAll ? "rgba(239,68,68,0.12)" : "rgba(255,255,255,0.06)",
+                  border: `1px solid ${showAll ? C.red + "44" : C.border}`,
+                  borderRadius: 7, padding: "5px 12px",
+                  color: showAll ? C.red : C.muted,
+                  fontFamily: F, fontSize: 12, cursor: "pointer",
+                  transition: "all .15s",
+                }}
+              >
+                {showAll ? "Hide errors & canceled" : "Show all"}
+              </button>
+            </div>
             <Card style={{ padding: 0, overflow: "hidden" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: F, fontSize: 13 }}>
                 <thead>
