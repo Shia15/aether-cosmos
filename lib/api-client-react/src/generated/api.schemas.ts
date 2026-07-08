@@ -128,6 +128,61 @@ export interface CoherenceSummary {
   documentCount: number;
 }
 
+export interface ErrorResponse {
+  error: string;
+}
+
+export interface BillingPrice {
+  id: string;
+  unitAmount: number;
+  currency: string;
+  /** @nullable */
+  interval: string | null;
+}
+
+export type BillingProductMetadata = { [key: string]: string };
+
+export interface BillingProduct {
+  id: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  metadata: BillingProductMetadata;
+  price?: BillingPrice;
+}
+
+export interface CheckoutInput {
+  priceId: string;
+}
+
+export interface CheckoutSession {
+  /** @nullable */
+  url: string | null;
+}
+
+export interface BillingSubscription {
+  id: string;
+  status: string;
+  /** @nullable */
+  priceId: string | null;
+  /** @nullable */
+  productId: string | null;
+  /** @nullable */
+  currentPeriodEnd: string | null;
+}
+
+export interface BillingPurchase {
+  id: string;
+  amount: number;
+  currency: string;
+  createdAt: string;
+}
+
+export interface BillingStatus {
+  subscriptions: BillingSubscription[];
+  purchases: BillingPurchase[];
+}
+
 export type SearchConceptsParams = {
   q: string;
   type?: SearchConceptsType;

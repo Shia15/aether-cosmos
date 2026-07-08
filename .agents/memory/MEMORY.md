@@ -9,3 +9,4 @@
 - [HTML entities in JSX props](jsx-entities-in-props.md) — `&middot;`/`&amp;`/`&mdash;` only decode in JSX text nodes; inside string PROPS (title/sub/role/label) they render literally — use literal glyphs `·`/`—`/`&` instead
 - [Audio volume clamp](audio-volume-clamp.md) — HTMLMediaElement.volume outside [0,1] throws IndexSizeError at runtime; clamp every rAF fade assignment (float easing drifts slightly negative)
 - [Canvas sim spawn/prune balance](canvas-sim-spawn-prune.md) — spawn against ACTIVE-particle count, not total length, or a total cap below the prune threshold saturates the array and silently stalls the sim (only visible in a soak); guard dx/d normalization vs d=0 NaN
+- [Stripe connection settings shape](stripe-connection-settings-shape.md) — Replit's live Stripe connector returns `settings.secret` as a plain string, not the nested `secret_key`/`webhook_secret` shape documented in the stripe skill template

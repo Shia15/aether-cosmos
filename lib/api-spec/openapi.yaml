@@ -21,6 +21,8 @@ tags:
     description: Equation lab operations
   - name: coherence
     description: Coherence metrics
+  - name: billing
+    description: Payment and subscription operations
 paths:
   /healthz:
     get:
@@ -208,6 +210,84 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CoherenceSummary"
+
+  /billing/products:
+    get:
+      operationId: listBillingProducts
+      tags: [billing]
+      summary: List active pricing tiers with their prices
+      responses:
+        "200":
+          description: List of pricing tiers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BillingProduct"
+
+  /billing/checkout:
+    post:
+      operationId: createBillingCheckout
+      tags: [billing]
+      summary: Create a Stripe Checkout session for a price
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutInput"
+      responses:
+        "200":
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutSession"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /billing/portal:
+    post:
+      operationId: createBillingPortalSession
+      tags: [billing]
+      summary: Create a Stripe billing portal session for the current user
+      responses:
+        "200":
+          description: Portal session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutSession"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /billing/status:
+    get:
+      operationId: getBillingStatus
+      tags: [billing]
+      summary: Get the current user's active subscriptions and purchases
+      responses:
+        "200":
+          description: Billing status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillingStatus"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   schemas:
@@ -507,3 +587,118 @@ components:
         - edgeCount
         - clusters
         - documentCount
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    BillingPrice:
+      type: object
+      properties:
+        id:
+          type: string
+        unitAmount:
+          type: integer
+        currency:
+          type: string
+        interval:
+          type: ["string", "null"]
+      required:
+        - id
+        - unitAmount
+        - currency
+        - interval
+
+    BillingProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        price:
+          $ref: "#/components/schemas/BillingPrice"
+      required:
+        - id
+        - name
+        - metadata
+
+    CheckoutInput:
+      type: object
+      properties:
+        priceId:
+          type: string
+      required:
+        - priceId
+
+    CheckoutSession:
+      type: object
+      properties:
+        url:
+          type: ["string", "null"]
+      required:
+        - url
+
+    BillingSubscription:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        priceId:
+          type: ["string", "null"]
+        productId:
+          type: ["string", "null"]
+        currentPeriodEnd:
+          type: ["string", "null"]
+          format: date-time
+      required:
+        - id
+        - status
+        - priceId
+        - productId
+        - currentPeriodEnd
+
+    BillingPurchase:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - amount
+        - currency
+        - createdAt
+
+    BillingStatus:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillingSubscription"
+        purchases:
+          type: array
+          items:
+            $ref: "#/components/schemas/BillingPurchase"
+      required:
+        - subscriptions
+        - purchases

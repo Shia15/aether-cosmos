@@ -202,3 +202,65 @@ export const GetCoherenceSummaryResponse = zod.object({
   ),
   documentCount: zod.number(),
 });
+
+/**
+ * @summary List active pricing tiers with their prices
+ */
+export const ListBillingProductsResponseItem = zod.object({
+  id: zod.string(),
+  name: zod.string(),
+  description: zod.string().nullish(),
+  metadata: zod.record(zod.string(), zod.string()),
+  price: zod
+    .object({
+      id: zod.string(),
+      unitAmount: zod.number(),
+      currency: zod.string(),
+      interval: zod.string().nullable(),
+    })
+    .optional(),
+});
+export const ListBillingProductsResponse = zod.array(
+  ListBillingProductsResponseItem,
+);
+
+/**
+ * @summary Create a Stripe Checkout session for a price
+ */
+export const CreateBillingCheckoutBody = zod.object({
+  priceId: zod.string(),
+});
+
+export const CreateBillingCheckoutResponse = zod.object({
+  url: zod.string().nullable(),
+});
+
+/**
+ * @summary Create a Stripe billing portal session for the current user
+ */
+export const CreateBillingPortalSessionResponse = zod.object({
+  url: zod.string().nullable(),
+});
+
+/**
+ * @summary Get the current user's active subscriptions and purchases
+ */
+export const GetBillingStatusResponse = zod.object({
+  subscriptions: zod.array(
+    zod.object({
+      id: zod.string(),
+      status: zod.string(),
+      priceId: zod.string().nullable(),
+      productId: zod.string().nullable(),
+      currentPeriodEnd: zod.coerce.date().nullable(),
+    }),
+  ),
+  purchases: zod.array(
+    zod.object({
+      id: zod.string(),
+      amount: zod.number(),
+      currency: zod.string(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+});

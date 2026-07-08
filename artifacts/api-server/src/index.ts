@@ -1,5 +1,36 @@
+import { runMigrations } from "stripe-replit-sync";
 import app from "./app";
 import { logger } from "./lib/logger";
+import { getStripeSync } from "./lib/stripeClient";
+
+async function initStripe() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    logger.warn("DATABASE_URL not set, skipping Stripe initialization");
+    return;
+  }
+
+  try {
+    await runMigrations({ databaseUrl });
+
+    const stripeSync = await getStripeSync();
+
+    const domain = process.env.REPLIT_DOMAINS?.split(",")[0];
+    if (domain) {
+      const webhookBaseUrl = `https://${domain}`;
+      await stripeSync.findOrCreateManagedWebhook(
+        `${webhookBaseUrl}/api/billing/webhook`,
+      );
+    }
+
+    await stripeSync.syncBackfill();
+    logger.info("Stripe initialized and backfilled");
+  } catch (err) {
+    logger.error({ err }, "Failed to initialize Stripe");
+  }
+}
+
+await initStripe();
 
 const rawPort = process.env["PORT"];
 

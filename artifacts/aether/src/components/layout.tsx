@@ -88,6 +88,7 @@ import {
   StickyNote,
   Worm,
   CircleDot,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
@@ -569,6 +570,7 @@ const NAV_ITEMS = [
   { href: "/coherent-body",          label: "The Coherent Body · Cellular Clock · Stimulated vs Self-Organized · Dual Kuramoto Synchrony · Order Parameter r · Internal Synchronizing Clock ψ · State-Aware Cells", icon: HeartPulse},
   { href: "/light-body",             label: "Light Body Genesis · Big Bang → All Life · Cosmic Emergence Timeline · Matter → Light Crystallization · Human / Animal / Tree · Coherence Cosmology 𝒞→1", icon: Sparkles},
   { href: "/cloud-transport-warp",   label: "Cloud Transport System · Warp Drive Synthesis · Alcubierre Metric θ(x,y) · Solar + Planetary + Warp Unified · Matter-as-Cloud · Coherence Bubble · Elements of Motion", icon: Rocket},
+  { href: "/billing",                label: "Billing · Access Tiers · Core Ignition · Plasma Monthly · Plasma Weekly · Torch Enterprise", icon: CreditCard},
 ];
 
 // ── Visit tracking ──────────────────────────────────────────────────────────

@@ -495,6 +495,8 @@ const DailyRitualPage           = lazy(() => import("@/pages/daily-ritual"));
 const CoherentBodyPage          = lazy(() => import("@/pages/coherent-body"));
 const LightBodyPage             = lazy(() => import("@/pages/light-body"));
 const CloudTransportWarpPage    = lazy(() => import("@/pages/cloud-transport-warp"));
+const BillingPage                = lazy(() => import("@/pages/billing"));
+const BillingSuccessPage         = lazy(() => import("@/pages/billing-success"));
 
 const queryClient = new QueryClient();
 
@@ -1444,6 +1446,8 @@ function Router() {
                 <Route path="/coherent-body" component={CoherentBodyPage} />
                 <Route path="/light-body" component={LightBodyPage} />
                 <Route path="/cloud-transport-warp" component={CloudTransportWarpPage} />
+                <Route path="/billing" component={BillingPage} />
+                <Route path="/billing/success" component={BillingSuccessPage} />
                 <Route component={NotFound} />
               </Switch>
             </Suspense>
