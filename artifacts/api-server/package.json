@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/express": "^2.1.30",
     "@clerk/shared": "^4.20.0",
+    "@google-cloud/storage": "^7.21.0",
     "@notionhq/client": "^5.22.0",
     "@replit/connectors-sdk": "^0.4.1",
     "@workspace/api-zod": "workspace:*",
@@ -22,6 +23,7 @@
     "cors": "^2",
     "drizzle-orm": "catalog:",
     "express": "^5",
+    "google-auth-library": "^10.9.0",
     "http-proxy-middleware": "^4.1.1",
     "pino": "^9",
     "pino-http": "^10",

@@ -39,3 +39,5 @@ export * from "./searchConceptsParams";
 export * from "./searchConceptsType";
 export * from "./searchResult";
 export * from "./successResponse";
+export * from "./uploadUrlRequest";
+export * from "./uploadUrlResponse";

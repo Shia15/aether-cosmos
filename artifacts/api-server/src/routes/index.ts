@@ -21,6 +21,7 @@ import grokRouter from "./grok";
 import openaiRouter from "./openai";
 import vercelRouter from "./vercel";
 import googleDriveRouter from "./google-drive";
+import storageRouter from "./storage";
 
 const router: IRouter = Router();
 
@@ -46,5 +47,6 @@ router.use(grokRouter);
 router.use(openaiRouter);
 router.use(vercelRouter);
 router.use(googleDriveRouter);
+router.use(storageRouter);
 
 export default router;
