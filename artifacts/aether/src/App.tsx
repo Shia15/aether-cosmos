@@ -905,17 +905,24 @@ function ClerkProviderWithRoutes() {
 
 const ACCESS_CODE_STORAGE_KEY = "aether.access.v1";
 
+function safeSessionGet(key: string): string | null {
+  try { return sessionStorage.getItem(key); } catch { return null; }
+}
+function safeSessionSet(key: string, value: string): void {
+  try { sessionStorage.setItem(key, value); } catch { /* sandboxed iframe — ignore */ }
+}
+
 function AccessCodeGate({ children }: { children: ReactNode }) {
   const expectedCode = import.meta.env.VITE_AETHER_ACCESS_CODE as string | undefined;
   const { signOut } = useClerk();
 
   const [verified, setVerified] = useState(() => {
     if (!expectedCode) return true;
-    if (sessionStorage.getItem(ACCESS_CODE_STORAGE_KEY) === "1") return true;
+    if (safeSessionGet(ACCESS_CODE_STORAGE_KEY) === "1") return true;
     if (import.meta.env.DEV) {
       const params = new URLSearchParams(window.location.search);
       if (params.get("dev-access") === "1") {
-        sessionStorage.setItem(ACCESS_CODE_STORAGE_KEY, "1");
+        safeSessionSet(ACCESS_CODE_STORAGE_KEY, "1");
         return true;
       }
     }
@@ -930,7 +937,7 @@ function AccessCodeGate({ children }: { children: ReactNode }) {
 
   function submit() {
     if (input.trim() === expectedCode) {
-      sessionStorage.setItem(ACCESS_CODE_STORAGE_KEY, "1");
+      safeSessionSet(ACCESS_CODE_STORAGE_KEY, "1");
       setVerified(true);
     } else {
       const next = attempts + 1;
