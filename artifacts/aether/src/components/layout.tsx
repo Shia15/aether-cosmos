@@ -896,10 +896,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <>
       {/* Logo */}
       <div className="p-4 md:p-6 border-b border-border flex items-center gap-3 shrink-0">
-        <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary">
-          <Cpu className="w-4 h-4" />
-        </div>
-        <div className="flex-1 min-w-0">
+        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none", flex: 1, minWidth: 0 }}>
+          <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+            <Cpu className="w-4 h-4" />
+          </div>
+          <div className="flex-1 min-w-0">
           <h1
             style={{
               fontFamily: "'Great Vibes', cursive",
@@ -917,7 +918,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", isHealthy ? "bg-primary animate-pulse" : "bg-destructive")} />
             {isHealthy ? "System Online" : "System Offline"}
           </div>
-        </div>
+          </div>
+        </Link>
         {/* Close button — mobile only */}
         <button
           onClick={() => setDrawerOpen(false)}
@@ -1049,9 +1051,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {sidebarCollapsed ? (
           <div style={{ display:"flex", flexDirection:"column", alignItems:"center", height:"100%", paddingTop:14, paddingBottom:14, gap:6 }}>
             {/* Logo icon */}
-            <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(245,200,76,0.08)", border:"1px solid rgba(245,200,76,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f5c84c", marginBottom:8 }}>
-              <Cpu style={{ width:16, height:16 }} />
-            </div>
+            <Link href="/" style={{ display:"flex", alignItems:"center", justifyContent:"center" }} title="Home">
+              <div style={{ width:32, height:32, borderRadius:"50%", background:"rgba(245,200,76,0.08)", border:"1px solid rgba(245,200,76,0.2)", display:"flex", alignItems:"center", justifyContent:"center", color:"#f5c84c", marginBottom:8, cursor:"pointer" }}>
+                <Cpu style={{ width:16, height:16 }} />
+              </div>
+            </Link>
             {/* Expand toggle */}
             <button
               onClick={toggleSidebar}
