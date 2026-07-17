@@ -14,6 +14,7 @@ const GraphView = lazy(() => import("@/pages/graph-view"));
 const UploadView = lazy(() => import("@/pages/upload"));
 const CoherenceView = lazy(() => import("@/pages/coherence"));
 const SearchView = lazy(() => import("@/pages/search"));
+const CommandCenterView = lazy(() => import("@/pages/command-center"));
 const EquationsView = lazy(() => import("@/pages/equations"));
 const ArchitectureView = lazy(() => import("@/pages/architecture"));
 const PipelineView = lazy(() => import("@/pages/pipeline"));
@@ -1033,6 +1034,7 @@ function Router() {
                 <Route path="/upload" component={UploadView} />
                 <Route path="/coherence" component={CoherenceView} />
                 <Route path="/search" component={SearchView} />
+                <Route path="/command-center" component={CommandCenterView} />
                 <Route path="/equations" component={EquationsView} />
                 <Route path="/pipeline" component={PipelineView} />
                 <Route path="/lattice" component={LatticeView} />

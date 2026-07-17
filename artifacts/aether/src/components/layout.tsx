@@ -113,6 +113,7 @@ export const NAV_ITEMS = [
   { href: "/sources", label: "Sources", icon: Link2 },
   { href: "/upload", label: "Ingest", icon: UploadCloud },
   { href: "/coherence", label: "Coherence", icon: Activity },
+  { href: "/command-center", label: "Command Centre · Search Everything · Concepts + Visuals + Notion + Intake + X Posts", icon: Search },
   { href: "/search", label: "Query", icon: Search },
   { href: "/equations", label: "Lab", icon: FunctionSquare },
   { href: "/cultural", label: "Cultural", icon: Palette },

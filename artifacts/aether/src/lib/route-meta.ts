@@ -57,6 +57,11 @@ export const routeMeta: Record<string, RouteMeta> = {
     description:
       "Semantic search across the AETHER knowledge graph — find concepts, connections, and crystallized insights.",
   },
+  "/command-center": {
+    title: `Command Centre · ${SITE_NAME}`,
+    description:
+      "Unified search across all AETHER sources — knowledge graph concepts, visual library, Notion workspace, intake documents, and the X post archive in one query.",
+  },
   "/equations": {
     title: `Equations · ${SITE_NAME}`,
     description:
