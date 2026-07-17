@@ -4,7 +4,7 @@
   Saved to localStorage vault so AI Image Nest picks them up.
 ═══════════════════════════════════════════════════════════════════*/
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Upload, Image as ImageIcon, X, CheckCircle, AlertCircle, Loader2, Trash2, ExternalLink, FolderOpen } from "lucide-react";
+import { Upload, Image as ImageIcon, X, CheckCircle, AlertCircle, Loader2, Trash2, ExternalLink, FolderOpen, Zap, ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
 
 const VAULT_KEY = "aether.imagevault.v1";
@@ -166,8 +166,38 @@ export default function ImageUploadPage() {
         <div style={{ fontSize: 12, color: B.dim }}>Upload images from your computer · stored in AETHER cloud · available in AI Image Nest</div>
       </div>
 
+      {/* Grok Bridge Banner */}
+      <div style={{ margin: "0 32px", marginTop: 16, padding: "14px 18px", background: "linear-gradient(135deg,rgba(79,232,232,0.08),rgba(245,200,76,0.06))", border: "1px solid rgba(79,232,232,0.25)", borderRadius: 12, display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
+          <Zap size={20} color="#4fe8e8" />
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#4fe8e8", marginBottom: 2 }}>Grok Imagine Bridge</div>
+            <div style={{ fontSize: 11, color: B.dim, lineHeight: 1.5 }}>
+              Open your saved Grok images → right-click any image → Save → drag here to queue it into AETHER
+            </div>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: B.dim }}>
+            <span style={{ padding: "2px 8px", background: "rgba(79,232,232,0.1)", borderRadius: 4, color: "#4fe8e8", fontWeight: 600 }}>1</span> Open
+            <ArrowRight size={10} />
+            <span style={{ padding: "2px 8px", background: "rgba(79,232,232,0.1)", borderRadius: 4, color: "#4fe8e8", fontWeight: 600 }}>2</span> Save
+            <ArrowRight size={10} />
+            <span style={{ padding: "2px 8px", background: "rgba(79,232,232,0.1)", borderRadius: 4, color: "#4fe8e8", fontWeight: 600 }}>3</span> Drop here
+          </div>
+          <a
+            href="https://grok.com/imagine/saved"
+            target="_blank"
+            rel="noreferrer"
+            style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 18px", background: "#4fe8e822", border: "1px solid #4fe8e844", borderRadius: 8, color: "#4fe8e8", fontSize: 13, fontWeight: 700, textDecoration: "none", whiteSpace: "nowrap" }}
+          >
+            <ExternalLink size={13} /> grok.com/imagine/saved
+          </a>
+        </div>
+      </div>
+
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${B.line}`, padding: "0 32px" }}>
+      <div style={{ display: "flex", gap: 0, borderBottom: `1px solid ${B.line}`, padding: "0 32px", marginTop: 12 }}>
         {(["upload", "library"] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{ padding: "12px 20px", background: "none", border: "none", borderBottom: tab === t ? `2px solid ${B.gold}` : "2px solid transparent", color: tab === t ? B.gold : B.dim, cursor: "pointer", fontSize: 13, fontWeight: tab === t ? 700 : 400, textTransform: "capitalize" }}>
             {t === "upload" ? `Upload${pendingCount ? ` (${pendingCount} pending)` : ""}` : `Library (${vault.length})`}
