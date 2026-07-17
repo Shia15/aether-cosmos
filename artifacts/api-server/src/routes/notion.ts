@@ -100,6 +100,7 @@ router.get("/notion/pages", async (req: Request, res: Response): Promise<void> =
     const cursor = (req.query.cursor as string) ?? undefined;
     const body: Record<string, unknown> = {
       filter: { property: "object", value: "page" },
+      sort: { direction: "descending", timestamp: "last_edited_time" },
       page_size: 50,
     };
     if (query) body.query = query;
