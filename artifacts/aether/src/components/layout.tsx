@@ -607,6 +607,164 @@ function recordVisit(href: string) {
   } catch { /* ignore */ }
 }
 
+// ── Category colour system ───────────────────────────────────────────────────
+// Five genres: teal=AI/Bridges, violet=Theory/Docs, indigo=Physics/Space/Math,
+// emerald=Biology/Health/Nature, rose=Creative/Cultural. Unlisted = no tint.
+
+const CAT_STYLE: Record<string, { bg: string; dot: string }> = {
+  teal:    { bg: "rgba(45,212,191,0.07)",  dot: "#2dd4bf" },
+  violet:  { bg: "rgba(167,139,250,0.07)", dot: "#a78bfa" },
+  indigo:  { bg: "rgba(129,140,248,0.07)", dot: "#818cf8" },
+  emerald: { bg: "rgba(52,211,153,0.07)",  dot: "#34d399" },
+  rose:    { bg: "rgba(251,113,133,0.07)", dot: "#fb7185" },
+};
+
+const TEAL_HREFS = new Set([
+  "/claude-chat","/x-grok","/openai-bridge","/grok-imagine","/grok-synthesis",
+  "/image-upload","/ai-image-nest","/google-drive","/notion-sync","/notion-atlas",
+  "/notion-synthesis","/aether-intake","/command-center","/search","/synthesize",
+  "/knowledge-map","/photo-timeline","/aether-dashboard","/control-panel","/feedback-loop",
+  "/aether-os","/agent-mapping","/phrenology-agents","/aether-matrix",
+]);
+
+const VIOLET_HREFS = new Set([
+  "/aether-engine","/dmf-field","/gradient-field","/aether-unified-framework",
+  "/aether-whitepaper","/aether-whitepaper-v1","/aether-whitepaper-v2",
+  "/aether-patent","/aether-theory-deck","/clcs-architecture","/complete-integration",
+  "/aether-synthesis","/cuca-white-paper","/cuca-bioengine","/cuca-closed-loop",
+  "/cuca-hybrid-skin","/cuca-gyroid","/aether-symbol-reference","/aether-language",
+  "/universal-grammar","/agent-whispers","/aether-doctrine","/aether-textbook",
+  "/nine-shells","/shells-mind-map","/coherence-atlas","/core-resonance",
+  "/resonant-nexus","/aether-edge-constraint","/helical-framework",
+  "/guf-flagship","/guf-observatory","/guf-coins","/crystallization-locking",
+  "/q-aether-research","/substrate-computing","/dark-matter-vol2","/dark-matter-vol3",
+  "/path-forward","/grand-unified","/binding-the-dark","/non-physical-phenomena",
+  "/implicate-order","/knowable-universe","/symphonic-governance",
+  "/integration-dimensions","/stacked-rings-engine","/understanding-strand",
+  "/coherence-field-theory","/substrate-quantization-engine","/aether-metaphysics",
+  "/non-terrestrial","/aether-research","/dc-solar","/aether-whitepaper-v2",
+  "/symphonic-os","/symphonic-protocol","/aether-unified-framework",
+  "/complete-integration","/aether-symbol-reference","/fibonacci-quaternion",
+  "/aether-theory-deck","/coherence-engine","/page-directory","/graph-map",
+  "/coherence-atlas","/ecosystem","/architecture","/pipeline",
+]);
+
+const INDIGO_HREFS = new Set([
+  "/quantum-gravity","/plasma-knots","/compact-fusion","/black-hole-framework",
+  "/event-horizon","/early-universe","/plasma-confinement","/tait-knots",
+  "/antimatter-wave","/frames-of-reference","/orbital-mechanics","/photon-emission",
+  "/light-speed","/energetic-field-sim","/unified-field","/unified-field-theory",
+  "/slinky-propulsion","/uap-energy","/warp-drive-literature","/propulsion-dynamics",
+  "/mars-world","/cloud-transport-warp","/microgravity-infra","/ferrofluid-propulsion",
+  "/air-nanotube","/resonant-tunnel","/inertial-propulsion","/ufo-ascent","/ferrodrive",
+  "/quantum-vacuum","/spin-vacuum","/fibonacci-replicant","/phonon-stack",
+  "/quantum-computer","/mechanical-qubits","/quantum-substrate","/light-forces",
+  "/bursting-quaternions","/rotation-engine","/perceptive-universe","/time-processing",
+  "/superradiance","/gravitational-field","/quantum-gravity-cosmos","/wireless-power",
+  "/tidal-movement","/gobekli-plasma","/gobekli-tepe","/atlantis-alignment",
+  "/symbolic-computation","/giza-circuit","/light-body","/uap-energy",
+  "/pde-simulator","/q-aether","/q-aether-stack","/cgle-live","/lattice",
+  "/three-oscillator","/synchrony-field","/phi-crystallization","/coherence-nav",
+  "/coherence-science","/planetary-substrate","/heliospheric-coherence",
+  "/lightning-spectrum","/radiance-spectrum","/cosmic-convergence","/atlas-3i",
+  "/six-planet-alignment","/april-23-alignment","/as-above-so-below","/as-above",
+  "/prophetic-timeline","/cosmic-refine","/early-universe","/hilbert-storage",
+  "/stacked-rings","/floquet-petals","/orbital-mechanics","/dynamic-synthesis",
+  "/coherence-field-explorer","/node-lattice","/earth-computer","/gradient-field",
+  "/equations-in-motion","/math-engine","/math-frontier","/vortex-math",
+  "/octonion-aether","/fibonacci-quaternion","/quaternions","/polar-transform",
+  "/rational-function","/computational-mathematics","/even-odd","/incommensurable",
+  "/prime-anti-prime","/hypercomputation","/phi-framework","/phi-hot",
+  "/phi-hot-zipper","/analog-reservoir","/math-studio","/trig-reference",
+  "/fibonacci-quantization","/fibonacci-calendar","/aether-calendar","/vortex-math",
+  "/nine-shells","/question-bank","/equations","/symbolic-pillars","/knot-topology",
+  "/plasma-knots","/bursting-quaternions","/quantum-ringdown-biocycles",
+  "/manifold-26d","/topography-electroset","/webbed-phi-cascade","/hilbert-storage",
+  "/moon-mars-field","/lunar-plant-memory","/lunar-coherence","/lunar-ambient-field",
+  "/six-planet-alignment","/gobekli-tepe","/gobekli-plasma","/giza-circuit",
+  "/unified-field","/non-physical-phenomena","/earth-circuit","/earth-living-system",
+]);
+
+const EMERALD_HREFS = new Set([
+  "/biology","/blood-dna-lab","/biomagnetism","/bio-photonic-scent","/bio-computational",
+  "/neuroplasticity","/neuro-metabolic","/neural-psychedelic","/cerebral-organoids",
+  "/organoid-intel","/cancer-coherence","/aether-health","/coherent-body",
+  "/mycelium-substrate","/plant-coherence-system","/plant-intel","/solar-feminine",
+  "/womens-coherence-map","/nutrition-force","/pollen-flower","/circular-farm",
+  "/biomimetic-symphony","/biomimetic-revolutions","/biomimetic-quantum",
+  "/eye-evolution","/osmotic-pressure","/motor-cortex","/neuroweave",
+  "/hyper-perception","/brain-metabolism","/neural-topology","/neural-emergence",
+  "/brain-cube-camera","/wood-frog-biophotonics","/wood-frog-knots",
+  "/aquarium-chip","/ecological-intelligence","/bio-engine","/bio-hybrid-mirror",
+  "/polymer-biobreak","/aether-bodysuit","/photosynthesis-spark","/photosynthesis-planet",
+  "/stromatolite","/stromatolite-automaton","/stromatolite-field","/kinematic-replication",
+  "/plasmodium-deck","/thermal-decoy-filter","/mrna-readings","/three-rs-reality",
+  "/diamond-formation","/crystallization-atlas","/diamond-nanothreads","/carbon-layered",
+  "/diamond-pearl","/quartz-color","/bismuth","/compote-chips","/chocolate-tempering",
+  "/nutritional-dna-key","/electron-field","/under-ice-ecosystem","/fluid-substrate",
+  "/bio-magnetic-convergence","/aether-habitat","/alchemy-to-fusion","/alchemy-fusion",
+  "/puthoff-metric-engineering","/substrate-synthesis","/aether-foundations",
+  "/psilocybin-water-octopus","/pineal-moss-vision","/queen-bee-diapause",
+  "/nematic-bee-foton","/tunguska-asteroid-timeline","/tardigrade-density-msdd",
+  "/cryptobiosis-asu-telomeres","/plant-electroactivity","/plant-network",
+  "/mycorrhizal-network","/magic-c8","/slime-maze","/atp-transport",
+  "/borrelia-knot","/gut-brain","/planetary-neural","/life-gradient-planetary",
+  "/opal-genesis","/family-field-dynamics","/quantum-eye-field","/thermal-hierarchy",
+  "/cancer-coherence","/thermal-decoy-filter","/cla-coupled-fields","/bio-photonic-scent",
+  "/daily-ritual","/aether-health","/mom-study","/synaptic-entropy",
+  "/neuro-metabolic","/neuroplasticity","/neural-psychedelic","/stellar-brain",
+  "/pineal-moss-vision","/cognitive-architecture","/prism-principle",
+  "/regulatory-depth","/uv-amino-light","/full-spectrum-light","/osmotic-pressure",
+  "/nutrition-force","/brain-metabolism","/aether-bodysuit","/coherent-body",
+  "/light-body",
+]);
+
+const ROSE_HREFS = new Set([
+  "/cultural","/dreamscape","/experience","/boho-formula","/color-cosmology",
+  "/chromatic-glare","/transcendent-art","/resonance","/color-coherence",
+  "/learning-layers","/aether-childrens-realm","/computer-brains",
+  "/alphabet-map","/symbol-alphabet","/divine-timing","/awakening-timeline",
+  "/piano-arithmetic","/posting-architecture","/calm-company-os","/social-deploy",
+  "/sparkle-text","/baby-rhythm","/glossary","/cultural-interpretations",
+  "/seasonal-coherence","/phi-time","/phi-aether","/phi-coherent-wave",
+  "/logic-flowers","/flower-clock","/firework-coherence","/chladni-freeze",
+  "/aqua-cxe","/aether-egg-engine","/source-board","/terraform-sunrise",
+  "/aether-seasons","/aether-flow","/boho-formula","/aether-matrix",
+  "/core-resonance","/color-cosmology","/aether-components","/aether-core",
+  "/resonance","/crashout","/sparkle-text","/personal-operating-model",
+  "/daily-ritual","/discovery-loop","/aether-calendar","/portal-restoration",
+  "/april-23-alignment","/as-above-so-below","/prophetic-timeline",
+  "/color-coherence","/photo-timeline","/unified-timeline",
+  "/aether-carriage","/resonant-carriage","/blast-bubble-carriage",
+  "/light-body-topology","/aether-metaphysics","/fabrication","/research",
+  "/product-research","/source-board","/modules","/engines","/experience",
+  "/simulation","/dreamscape","/neural-emergence","/space-rocks","/phi-aether",
+  "/multiscale","/morpho-computer","/resonant-cell","/ultra-magnetism","/quantum-vacuum",
+  "/spin-vacuum","/concept-systems","/motion-doctrine","/earth-circuit",
+  "/mrna-readings","/source-board","/aqua-cxe","/cultural-interpretations",
+  "/stack-fabric","/bio-engine","/phi-time","/bio-hybrid-mirror","/aether-doctrine",
+  "/personal-operating-model","/aether-flow","/aether-seasons",
+  "/posting-architecture","/boho-formula","/discovery-loop","/closed-loop-coherence",
+  "/geometry-of-permission","/phi-hot","/phi-hot-zipper","/thermal-hierarchy",
+  "/math-engine","/symbol-alphabet","/alphabet-map","/math-frontier","/even-odd",
+  "/prime-anti-prime","/hypercomputation","/analog-reservoir","/trig-reference",
+  "/fibonacci-quantization","/math-studio","/crashout","/aether-egg-engine",
+  "/mari","/mari-core","/agents","/resonance","/boho-formula","/posting-architecture",
+  "/calm-company-os","/social-deploy","/brain-first-metabolism","/brain-metabolism",
+  "/decision-entropy","/guf-coins","/periodic-table","/engine-designer",
+  "/codebase-symbol-engine","/java-control-flow","/petrification-transformation",
+  "/aether-language","/universal-grammar","/symbol-alphabet","/alphabet-map",
+]);
+
+function getNavCategory(href: string): string | null {
+  if (TEAL_HREFS.has(href))    return "teal";
+  if (VIOLET_HREFS.has(href))  return "violet";
+  if (INDIGO_HREFS.has(href))  return "indigo";
+  if (EMERALD_HREFS.has(href)) return "emerald";
+  if (ROSE_HREFS.has(href))    return "rose";
+  return null;
+}
+
 // ── Highlight helper ─────────────────────────────────────────────────────────
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -631,8 +789,9 @@ function NavRow({
   onNavigate: (href: string) => void;
 }) {
   const Icon = item.icon;
-  // Short label: first segment before " · "
   const shortLabel = item.label.split(" · ")[0] ?? item.label;
+  const cat = getNavCategory(item.href);
+  const cs = cat ? CAT_STYLE[cat] : null;
   return (
     <Link key={item.href} href={item.href}>
       <div
@@ -640,11 +799,23 @@ function NavRow({
         className={cn(
           "flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 cursor-pointer group relative overflow-hidden",
           isActive
-            ? "text-primary bg-primary/5"
-            : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+            ? "text-primary"
+            : "text-muted-foreground hover:text-foreground"
         )}
+        style={isActive
+          ? { background: "rgba(245,200,76,0.06)" }
+          : cs
+            ? { background: cs.bg }
+            : { background: "transparent" }
+        }
       >
         {isActive && <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary" />}
+        {!isActive && cs && (
+          <span style={{
+            position: "absolute", left: 0, top: 0, bottom: 0, width: 2,
+            background: cs.dot, opacity: 0.5, borderRadius: "0 2px 2px 0",
+          }} />
+        )}
         <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
         <span className="font-mono text-sm tracking-wide truncate">
           <Highlight text={shortLabel} query={query} />
