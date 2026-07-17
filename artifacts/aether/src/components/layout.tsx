@@ -99,6 +99,7 @@ export const NAV_ITEMS = [
   { href: "/substrates", label: "Substrates · Complete Interface Atlas · Darkcone Front", icon: LayoutGrid },
   { href: "/claude-chat", label: "Claude Chat · AI-Powered Conversation · Anthropic Integration", icon: MessageSquare },
   { href: "/x-grok", label: "Grok Bridge · X · @Strategicproce + @Shia449272 · Post Archive · Live Architecture Query", icon: MessageSquare },
+  { href: "/openai-bridge", label: "OpenAI Bridge · GPT-4o · X Posts · YouTube Comments · Visual Library · Unified Synthesis", icon: MessageSquare },
   { href: "/question-bank", label: "Question Bank · Mathematical Synthesis · Cross-System Coherence · Live Equation Clusters", icon: Sigma },
   { href: "/", label: "The Course · Home · Enroll", icon: CreditCard },
   { href: "/graph-map", label: "Graph Map", icon: Network },

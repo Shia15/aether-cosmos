@@ -478,6 +478,7 @@ const AetherTextbookPage        = lazy(() => import("@/pages/aether-textbook"));
 const AgentWhispersPage         = lazy(() => import("@/pages/agent-whispers"));
 const ClaudeChatPage            = lazy(() => import("@/pages/claude-chat"));
 const XGrokPage                 = lazy(() => import("@/pages/x-grok"));
+const OpenAIBridgePage          = lazy(() => import("@/pages/openai-bridge"));
 const VercelDashboardPage       = lazy(() => import("@/pages/vercel-dashboard"));
 const SubstratesPage            = lazy(() => import("@/pages/substrates"));
 const SolarFemininePage         = lazy(() => import("@/pages/solar-feminine"));
@@ -1495,6 +1496,7 @@ function Router() {
                 <Route path="/agent-whispers" component={AgentWhispersPage} />
                 <Route path="/claude-chat" component={ClaudeChatPage} />
                 <Route path="/x-grok" component={XGrokPage} />
+                <Route path="/openai-bridge" component={OpenAIBridgePage} />
                 <Route path="/vercel-dashboard" component={VercelDashboardPage} />
                 <Route path="/substrates" component={SubstratesPage} />
                 <Route path="/solar-feminine" component={SolarFemininePage} />
