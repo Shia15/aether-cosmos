@@ -142,7 +142,45 @@ function savePosts(posts: XPost[]) {
   try { localStorage.setItem(POSTS_KEY, JSON.stringify(posts.slice(-400))); } catch { /* */ }
 }
 
-function buildContext(selected: Set<string>, posts: XPost[], includePosts: boolean): string {
+const IMG_IDX_URL = `${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}image-index.json`;
+
+let _visualCache: string | null = null;
+let _visualLoading = false;
+async function fetchVisualSummary(): Promise<string> {
+  if (_visualCache) return _visualCache;
+  if (_visualLoading) return ""; // will be empty until next call after load completes
+  _visualLoading = true;
+  try {
+    const r = await fetch(IMG_IDX_URL);
+    if (!r.ok) throw new Error("fetch failed");
+    const data: { file: string; dir: string; cat: string; video: boolean }[] = await r.json();
+    const total = data.length;
+    const vids = data.filter(d => d.video).length;
+    const imgs = total - vids;
+    const byDir: Record<string, number> = {};
+    data.forEach(d => { byDir[d.dir] = (byDir[d.dir] || 0) + 1; });
+    // Build a compact enumerated list, newest-first in each bucket
+    const lines: string[] = [];
+    Object.entries(byDir).forEach(([dir, count]) => {
+      const items = data.filter(d => d.dir === dir).slice(-40); // cap per dir to keep context small
+      const catLabel = dir.replace(/_imgs?$/i, "").toUpperCase();
+      lines.push(`${catLabel} LIBRARY (${count}): ${items.map(d => `${dir}/${d.file}`).join(", ")}`);
+    });
+    _visualCache = `VISUAL LIBRARY (${total} assets: ${imgs} images, ${vids} videos)\n${lines.join("\n")}`;
+    return _visualCache;
+  } catch {
+    return "VISUAL LIBRARY: unavailable";
+  } finally {
+    _visualLoading = false;
+  }
+}
+
+function buildContext(
+  selected: Set<string>,
+  posts: XPost[],
+  includePosts: boolean,
+  visualSummary: string,
+): string {
   const pick =
     selected.size > 0
       ? ARCHITECTURES.filter(a => selected.has(a.id))
@@ -162,6 +200,9 @@ function buildContext(selected: Set<string>, posts: XPost[], includePosts: boole
       lines.push(line);
     }
     ctx += `\n\nPOST ARCHIVE (${lines.length} of ${posts.length} posts, newest first):\n${lines.join("\n---\n")}`;
+  }
+  if (visualSummary) {
+    ctx += `\n\n${visualSummary}`;
   }
   return ctx;
 }
@@ -196,6 +237,7 @@ export default function XGrokPage() {
   const [error, setError] = useState<string | null>(null);
   const [posts, setPosts] = useState<XPost[]>(loadPosts);
   const [includePosts, setIncludePosts] = useState(true);
+  const [includeVisual, setIncludeVisual] = useState(true);
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [draft, setDraft] = useState("");
   const [draftAccount, setDraftAccount] = useState<XAccount>("@Shia449272");
@@ -203,6 +245,9 @@ export default function XGrokPage() {
   const abortRef = useRef<AbortController | null>(null);
 
   const apiBase = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+
+  // Prefetch visual summary once on mount
+  useEffect(() => { fetchVisualSummary(); }, []);
 
   useEffect(() => { savePosts(posts); }, [posts]);
   useEffect(() => { saveChat(msgs); }, [msgs]);
@@ -240,7 +285,7 @@ export default function XGrokPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history,
-          context: buildContext(selected, posts, includePosts),
+          context: buildContext(selected, posts, includePosts, includeVisual ? await fetchVisualSummary() : ""),
         }),
         signal: ctrl.signal,
       });
@@ -284,7 +329,7 @@ export default function XGrokPage() {
       setStreamText("");
       abortRef.current = null;
     }
-  }, [msgs, selected, streaming, apiBase, posts, includePosts]);
+  }, [msgs, selected, streaming, apiBase, posts, includePosts, includeVisual]);
 
   const addPosts = () => {
     const chunks = draft
@@ -498,6 +543,12 @@ export default function XGrokPage() {
                     data-testid="check-include-posts"
                     style={{ accentColor: B.gold }} />
                   FEED ARCHIVE INTO GROK CONTEXT
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 7, cursor: "pointer", ...mono, fontSize: 10, color: B.dim }}>
+                  <input type="checkbox" checked={includeVisual} onChange={e => setIncludeVisual(e.target.checked)}
+                    data-testid="check-include-visual"
+                    style={{ accentColor: B.grokTeal }} />
+                  FEED VISUAL LIBRARY (462 ASSETS)
                 </label>
                 <button onClick={addPosts} disabled={!draft.trim()}
                   data-testid="btn-add-posts"
