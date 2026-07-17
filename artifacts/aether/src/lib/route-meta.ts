@@ -304,4 +304,7 @@ export const KEY_PRERENDER_ROUTES = [
   "/aether-health",
   "/aether-metaphysics",
   "/aether-doctrine",
+  "/three-oscillator",
+  "/womens-coherence-map",
+  "/earth-computer",
 ];

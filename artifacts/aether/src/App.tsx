@@ -505,6 +505,9 @@ const CloudTransportWarpPage    = lazy(() => import("@/pages/cloud-transport-war
 const BillingPage                = lazy(() => import("@/pages/billing"));
 const HomeLanding                = lazy(() => import("@/pages/home-landing"));
 const BillingSuccessPage         = lazy(() => import("@/pages/billing-success"));
+const ThreeOscillatorPage        = lazy(() => import("@/pages/three-oscillator"));
+const WomensCoherenceMapPage     = lazy(() => import("@/pages/womens-coherence-map"));
+const EarthComputerPage          = lazy(() => import("@/pages/earth-computer"));
 
 const queryClient = new QueryClient();
 
@@ -1521,6 +1524,9 @@ function Router() {
                 <Route path="/coherent-body" component={CoherentBodyPage} />
                 <Route path="/light-body" component={LightBodyPage} />
                 <Route path="/cloud-transport-warp" component={CloudTransportWarpPage} />
+                <Route path="/three-oscillator" component={ThreeOscillatorPage} />
+                <Route path="/womens-coherence-map" component={WomensCoherenceMapPage} />
+                <Route path="/earth-computer" component={EarthComputerPage} />
                 <Route path="/billing" component={BillingPage} />
                 <Route path="/billing/success" component={BillingSuccessPage} />
                 <Route component={NotFound} />
