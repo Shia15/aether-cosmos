@@ -309,4 +309,5 @@ export const KEY_PRERENDER_ROUTES = [
   "/earth-computer",
   "/node-lattice",
   "/coherence-field-explorer",
+  "/google-drive",
 ];

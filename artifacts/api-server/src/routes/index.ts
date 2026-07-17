@@ -20,6 +20,7 @@ import anthropicRouter from "./anthropic";
 import grokRouter from "./grok";
 import openaiRouter from "./openai";
 import vercelRouter from "./vercel";
+import googleDriveRouter from "./google-drive";
 
 const router: IRouter = Router();
 
@@ -44,5 +45,6 @@ router.use(anthropicRouter);
 router.use(grokRouter);
 router.use(openaiRouter);
 router.use(vercelRouter);
+router.use(googleDriveRouter);
 
 export default router;
