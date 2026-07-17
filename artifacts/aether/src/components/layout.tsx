@@ -154,6 +154,7 @@ export const NAV_ITEMS = [
   { href: "/aether-patent", label: "AETHER Patent · Claims · FQP Architecture · Method Disclosures", icon: BookOpen },
   { href: "/cuca-white-paper", label: "CUCA White Paper · Coherent Unified Computational Array · Bio-Photonic Substrate", icon: BookOpen },
   { href: "/cuca-bioengine", label: "CUCA Bioengine · Living Substrate · Bio-Hybrid Computation", icon: Hexagon },
+  { href: "/ai-image-nest", label: "AI Image Nest · Live Typeahead · GPT Images · Vault · Drive Photos · Visual Search", icon: Atom },
   { href: "/google-drive", label: "Google Drive · Docs Bridge · Browse Files · Read Documents · Search Drive", icon: Atom },
   { href: "/node-lattice", label: "Node Lattice Propagation · BFS Illumination · Grid · Hex · Random Graph · Decay · Wavefront", icon: Atom },
   { href: "/coherence-field-explorer", label: "Coherence Field Explorer · C(x,t) · φ-Time Scheduling · Ptah Operator · Lattice · Contour", icon: Atom },

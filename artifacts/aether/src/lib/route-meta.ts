@@ -310,4 +310,5 @@ export const KEY_PRERENDER_ROUTES = [
   "/node-lattice",
   "/coherence-field-explorer",
   "/google-drive",
+  "/ai-image-nest",
 ];
