@@ -88,30 +88,85 @@ router.post("/grok/chat", async (req, res) => {
   }
 });
 
+// ── Matrix Field Scale — AETHER prompt enhancer ───────────────────────────────
+// Applies node+switch-plate coherence framing to enrich prompts that failed
+// or are sent in "enhanced" mode. Adds structural + aesthetic guidance without
+// changing the user's core intent.
+function matrixFieldEnhance(prompt: string): string {
+  const lower = prompt.toLowerCase();
+  const isAether = lower.includes("aether") || lower.includes("coherence") || lower.includes("lattice") || lower.includes("crystalliz");
+  const base = prompt.trim().slice(0, 900);
+  if (isAether) {
+    return `${base}. Ultra-detailed digital art, cinematic lighting, deep space background with warm gold and teal accents, 8K render quality.`;
+  }
+  return `${base}. Photorealistic or illustrative render with strong contrast, precise detail, and cinematic composition.`;
+}
+
+// Single image call — the model generates 1 image per request on this endpoint
+async function generateOne(enhancedPrompt: string): Promise<{ url?: string; b64_json?: string }> {
+  const resp = await fetch(`${OPENROUTER_BASE}/v1/images/generations`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model: IMAGE_MODEL, prompt: enhancedPrompt.slice(0, 1000) }),
+  });
+  if (!resp.ok) {
+    let errText = await resp.text();
+    // Try parsing as JSON to extract message
+    try {
+      const parsed = JSON.parse(errText) as { error?: { message?: string } | string };
+      if (typeof parsed.error === "object" && parsed.error?.message) errText = parsed.error.message;
+      else if (typeof parsed.error === "string") errText = parsed.error;
+    } catch { /* keep raw text */ }
+    throw new Error(`[${resp.status}] ${errText}`);
+  }
+  const data = await resp.json() as { data?: { url?: string; b64_json?: string }[] };
+  const first = data.data?.[0];
+  if (!first) throw new Error("No image data returned");
+  return first;
+}
+
 // ── Grok image generation (Aurora / grok-2-image-1212) ───────────────────────
+// n>1 is handled client-side by firing n parallel single-image calls.
+// On first error, retries once with matrix-field-enhanced prompt.
 router.post("/grok/imagine", async (req, res) => {
-  const { prompt, n = 1, size = "1024x1024" } = req.body ?? {};
+  const { prompt, n = 1, enhance = false } = req.body ?? {};
   if (!prompt || typeof prompt !== "string") {
     res.status(400).json({ error: "prompt required" });
     return;
   }
+  const count = Math.max(1, Math.min(4, Number(n) || 1));
+  const finalPrompt = enhance ? matrixFieldEnhance(prompt) : prompt.trim();
+
   try {
-    const resp = await fetch(`${OPENROUTER_BASE}/v1/images/generations`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: IMAGE_MODEL, prompt: prompt.slice(0, 1000), n, size }),
-    });
-    if (!resp.ok) {
-      const text = await resp.text();
-      req.log.error({ status: resp.status, text }, "grok imagine upstream error");
-      res.status(resp.status).json({ error: text });
+    // Fire count parallel requests (model only supports 1 at a time)
+    const tasks = Array.from({ length: count }, () =>
+      generateOne(finalPrompt).catch(async (err: Error) => {
+        // Retry once with matrix field enhancement
+        req.log.warn({ err: err.message }, "grok imagine retry with matrix enhance");
+        return generateOne(matrixFieldEnhance(prompt));
+      })
+    );
+
+    const settled = await Promise.allSettled(tasks);
+    const results: { url?: string; b64_json?: string }[] = [];
+    const errors: string[] = [];
+
+    for (const s of settled) {
+      if (s.status === "fulfilled") results.push(s.value);
+      else errors.push(s.reason?.message ?? String(s.reason));
+    }
+
+    if (results.length === 0) {
+      req.log.error({ errors }, "grok imagine all requests failed");
+      res.status(502).json({ error: errors[0] ?? "Image generation failed" });
       return;
     }
-    const data = await resp.json() as { data?: { url?: string; b64_json?: string }[]; error?: string };
-    res.json(data);
-  } catch (err) {
+
+    res.json({ data: results, _errors: errors.length > 0 ? errors : undefined });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
     req.log.error({ err }, "grok imagine failed");
-    res.status(502).json({ error: "Image generation failed" });
+    res.status(502).json({ error: msg });
   }
 });
 

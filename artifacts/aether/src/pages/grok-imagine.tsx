@@ -30,35 +30,45 @@ export default function GrokImaginePage() {
   const [error, setError]         = useState("");
   const [lightbox, setLightbox]   = useState<string | null>(null);
   const [count, setCount]         = useState<1 | 2 | 4>(1);
-  const [size, setSize]           = useState<"1024x1024" | "1792x1024" | "1024x1792">("1024x1024");
+  const [enhance, setEnhance]     = useState(false);
   const [history, setHistory]     = useState<{ prompt: string; url: string }[]>([]);
+  const [retrying, setRetrying]   = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  async function generate() {
+  async function generate(forceEnhance = false) {
     if (!prompt.trim() || loading) return;
-    setLoading(true); setError(""); setResults([]);
+    setLoading(true); setError(""); setResults([]); setRetrying(false);
     try {
       const resp = await fetch("/api/grok/imagine", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: prompt.trim(), n: count, size }),
+        body: JSON.stringify({ prompt: prompt.trim(), n: count, enhance: forceEnhance || enhance }),
       });
       const data = await resp.json();
       if (!resp.ok || data.error) {
-        setError(data.error ?? `Error ${resp.status}`);
+        const msg: string = data.error ?? `HTTP ${resp.status}`;
+        // Auto-retry once with matrix field enhancement
+        if (!forceEnhance) {
+          setRetrying(true);
+          setLoading(false);
+          await generate(true);
+          return;
+        }
+        setError(msg);
       } else if (data.data?.length) {
         setResults(data.data);
-        setHistory(h => [
-          ...data.data
-            .filter((d: GenResult) => d.url)
-            .map((d: GenResult) => ({ prompt: prompt.trim(), url: d.url! })),
-          ...h,
-        ].slice(0, 40));
+        const newUrls = (data.data as GenResult[])
+          .filter(d => d.url)
+          .map(d => ({ prompt: prompt.trim(), url: d.url! }));
+        setHistory(h => [...newUrls, ...h].slice(0, 40));
+      } else {
+        setError("No image was returned — try a different prompt");
       }
     } catch (e: any) {
       setError(e?.message ?? "Request failed");
     }
     setLoading(false);
+    setRetrying(false);
   }
 
   function saveToVault(url: string) {
@@ -128,13 +138,24 @@ export default function GrokImaginePage() {
                 <button key={n} style={s.chip(count === n)} onClick={() => setCount(n)}>{n} image{n>1?"s":""}</button>
               ))}
             </div>
-            <div style={s.opts}>
-              {(["1024x1024","1792x1024","1024x1792"] as const).map(sz => (
-                <button key={sz} style={s.chip(size === sz)} onClick={() => setSize(sz)}>{sz === "1024x1024" ? "Square" : sz === "1792x1024" ? "Wide" : "Tall"}</button>
-              ))}
+            <div style={{ ...s.opts, marginTop: 8 }}>
+              <button
+                style={{ ...s.chip(enhance), borderColor: enhance ? B.purple : undefined, color: enhance ? B.purple : undefined }}
+                onClick={() => setEnhance(e => !e)}
+                title="Matrix Field Scale: auto-enhance prompt with AETHER coherence framing"
+              >
+                {enhance ? "✦ Matrix Enhanced" : "◇ Matrix Enhance"}
+              </button>
+              <span style={{ fontSize: 10, color: B.dim, alignSelf: "center", lineHeight: 1.4 }}>
+                node+plate theory prompt boost
+              </span>
             </div>
-            <button style={s.genBtn(loading)} onClick={generate} disabled={loading}>
-              {loading ? "Generating…" : "✦ Generate  ⌘↵"}
+            <button style={s.genBtn(loading)} onClick={() => generate(false)} disabled={loading}>
+              {loading
+                ? retrying
+                  ? "↻ Retrying with Matrix Field…"
+                  : "Generating…"
+                : "✦ Generate  ⌘↵"}
             </button>
           </div>
 

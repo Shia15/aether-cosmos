@@ -23,6 +23,7 @@ type DriveFile = {
   thumbnailLink?: string;
   size?: string;
   owners?: { displayName: string }[];
+  _account?: "a" | "b";
 };
 
 const MIME_ICONS: Record<string, { label: string; color: string; symbol: string }> = {
@@ -63,36 +64,52 @@ const MIME_FILTERS = [
   { label: "PDFs",         value: "application/pdf" },
 ];
 
+type AccountFilter = "both" | "a" | "b";
+
+const ACCOUNT_LABELS: Record<AccountFilter, string> = {
+  both: "Both Accounts",
+  a: "Account A (Drive)",
+  b: "Account B (Docs)",
+};
+const ACCOUNT_COLORS: Record<string, string> = { a: "#4285f4", b: "#a78bfa" };
+
 export default function GoogleDrivePage() {
   const [files, setFiles] = useState<DriveFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [mimeFilter, setMimeFilter] = useState("");
+  const [account, setAccount] = useState<AccountFilter>("both");
   const [error, setError] = useState("");
+  const [accountErrors, setAccountErrors] = useState<{ a?: string; b?: string }>({});
   const [selected, setSelected] = useState<DriveFile | null>(null);
   const [docText, setDocText] = useState("");
   const [loadingText, setLoadingText] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const fetchFiles = useCallback(async (q: string, mime: string) => {
-    setLoading(true); setError("");
+  const fetchFiles = useCallback(async (q: string, mime: string, acct: AccountFilter) => {
+    setLoading(true); setError(""); setAccountErrors({});
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ account: acct });
       if (q)    params.set("q", q);
       if (mime) params.set("mime", mime);
       const resp = await fetch(`/api/google/drive/files?${params}`);
       const data = await resp.json();
       if (data.error) { setError(data.error); setFiles([]); }
-      else { setFiles(data.files ?? []); setLoaded(true); }
+      else {
+        setFiles(data.files ?? []);
+        setLoaded(true);
+        if (data._errors?.a || data._errors?.b) setAccountErrors({ a: data._errors?.a, b: data._errors?.b });
+      }
     } catch (e: any) { setError(String(e?.message ?? e)); }
     setLoading(false);
   }, []);
 
-  const fetchRecent = useCallback(async () => {
-    setLoading(true); setError("");
+  const fetchRecent = useCallback(async (acct: AccountFilter) => {
+    setLoading(true); setError(""); setAccountErrors({});
     try {
-      const resp = await fetch("/api/google/drive/recent");
+      const params = new URLSearchParams({ account: acct });
+      const resp = await fetch(`/api/google/drive/recent?${params}`);
       const data = await resp.json();
       if (data.error) { setError(data.error); setFiles([]); }
       else { setFiles(data.files ?? []); setLoaded(true); }
@@ -103,12 +120,17 @@ export default function GoogleDrivePage() {
   function handleQueryChange(v: string) {
     setQuery(v);
     clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchFiles(v, mimeFilter), 500);
+    debounceRef.current = setTimeout(() => fetchFiles(v, mimeFilter, account), 500);
   }
 
   function handleMimeChange(v: string) {
     setMimeFilter(v);
-    fetchFiles(query, v);
+    fetchFiles(query, v, account);
+  }
+
+  function handleAccountChange(acct: AccountFilter) {
+    setAccount(acct);
+    if (loaded) fetchFiles(query, mimeFilter, acct);
   }
 
   async function openFile(f: DriveFile) {
@@ -153,6 +175,32 @@ export default function GoogleDrivePage() {
         <div style={s.sub}>Browse files, read docs, synthesise with AETHER — powered by your Google account</div>
       </div>
 
+      {/* Account selector */}
+      <div style={{ display: "flex", gap: 8, padding: "14px 32px 0", alignItems: "center" }}>
+        <span style={{ fontSize: 11, color: B.dim, letterSpacing: 1, marginRight: 4 }}>ACCOUNT</span>
+        {(["both", "a", "b"] as const).map(acct => (
+          <button
+            key={acct}
+            onClick={() => handleAccountChange(acct)}
+            style={{
+              padding: "5px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer",
+              border: `1px solid ${account === acct ? (acct === "both" ? B.gold : ACCOUNT_COLORS[acct]) : B.line}`,
+              background: account === acct ? (acct === "both" ? "rgba(245,200,76,0.12)" : ACCOUNT_COLORS[acct] + "22") : B.panel,
+              color: account === acct ? (acct === "both" ? B.gold : ACCOUNT_COLORS[acct]) : B.dim,
+              fontWeight: account === acct ? 700 : 400,
+            }}
+          >
+            {ACCOUNT_LABELS[acct]}
+          </button>
+        ))}
+        {(accountErrors.a || accountErrors.b) && (
+          <span style={{ fontSize: 11, color: "#f87171", marginLeft: 8 }}>
+            {accountErrors.a ? "⚠ Account A: partial" : ""}
+            {accountErrors.b ? " ⚠ Account B: partial" : ""}
+          </span>
+        )}
+      </div>
+
       <div style={s.toolbar}>
         <input
           style={s.input}
@@ -160,7 +208,7 @@ export default function GoogleDrivePage() {
           value={query}
           onChange={e => handleQueryChange(e.target.value)}
         />
-        <button style={s.loadBtn} onClick={fetchRecent}>
+        <button style={s.loadBtn} onClick={() => fetchRecent(account)}>
           {loading ? "Loading…" : "Load Recent Docs"}
         </button>
         {MIME_FILTERS.map(f => (
@@ -195,9 +243,17 @@ export default function GoogleDrivePage() {
           {files.map(f => {
             const info = getMimeInfo(f.mimeType);
             const isSel = selected?.id === f.id;
+            const acctColor = f._account ? ACCOUNT_COLORS[f._account] : undefined;
             return (
-              <div key={f.id} style={s.card(isSel)} onClick={() => openFile(f)}>
-                <span style={s.badge(info.color)}>{info.symbol} {info.label}</span>
+              <div key={f.id} style={{ ...s.card(isSel), borderLeft: acctColor ? `3px solid ${acctColor}55` : undefined }} onClick={() => openFile(f)}>
+                <div style={{ display: "flex", gap: 6, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
+                  <span style={s.badge(info.color)}>{info.symbol} {info.label}</span>
+                  {f._account && (
+                    <span style={{ ...s.badge(acctColor!), padding: "2px 6px", fontSize: 9 }}>
+                      {f._account === "a" ? "Drive A" : "Docs B"}
+                    </span>
+                  )}
+                </div>
                 <div style={s.fname}>{f.name}</div>
                 <div style={s.fmeta}>
                   {fmtDate(f.modifiedTime)}
