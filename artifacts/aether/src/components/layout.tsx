@@ -714,6 +714,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
+  /* ── Full-width homepage: hide sidebar ── */
+  const isHomePage = location === "/";
+  const showSidebar = !isHomePage;
+
   /* ── Double-click zoom + drag pan ── */
   const [zoomScale, setZoomScale] = useState(1);
   const [zoomTx, setZoomTx] = useState(0);
@@ -1034,7 +1038,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen w-full bg-background overflow-hidden selection:bg-primary selection:text-primary-foreground">
 
-      {/* ── Desktop sidebar with pull bar ── */}
+      {/* ── Desktop sidebar with pull bar (hidden on homepage) ── */}
+      {showSidebar && (
       <aside
         className="hidden md:flex flex-col shrink-0 bg-sidebar border-r border-border relative"
         style={{ width: sidebarWidth, transition: dragRef.current ? "none" : "width 0.18s ease" }}
@@ -1089,23 +1094,28 @@ export function Layout({ children }: { children: React.ReactNode }) {
           />
         </div>
       </aside>
-
-      {/* ── Mobile drawer overlay ── */}
-      {drawerOpen && (
-        <div
-          className="fixed inset-0 z-40 md:hidden"
-          style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(2px)" }}
-          onClick={() => setDrawerOpen(false)}
-        />
       )}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col w-[min(80vw,300px)] bg-sidebar border-r border-border md:hidden transition-transform duration-300 ease-in-out",
-          drawerOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        {sidebarContent}
-      </aside>
+
+      {/* ── Mobile drawer overlay (hidden on homepage) ── */}
+      {showSidebar && (
+        <>
+          {drawerOpen && (
+            <div
+              className="fixed inset-0 z-40 md:hidden"
+              style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(2px)" }}
+              onClick={() => setDrawerOpen(false)}
+            />
+          )}
+          <aside
+            className={cn(
+              "fixed inset-y-0 left-0 z-50 flex flex-col w-[min(80vw,300px)] bg-sidebar border-r border-border md:hidden transition-transform duration-300 ease-in-out",
+              drawerOpen ? "translate-x-0" : "-translate-x-full"
+            )}
+          >
+            {sidebarContent}
+          </aside>
+        </>
+      )}
 
       {/* ── Ambient background music ── */}
       <BackgroundMusic />
@@ -1113,7 +1123,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* ── Main content ── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
-        {/* Mobile top bar */}
+        {/* Mobile top bar (hidden on homepage) */}
+        {showSidebar && (
         <header className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-sidebar/80 backdrop-blur-sm shrink-0 z-30">
           <button
             onClick={() => setDrawerOpen(true)}
@@ -1150,6 +1161,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Camera style={{ width: 13, height: 13 }} />
           </button>
         </header>
+        )}
 
         <main
           ref={mainRef}
