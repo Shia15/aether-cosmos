@@ -8,7 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 type LibImg   = { file: string; dir: string; cat: string; video: boolean };
 type VaultImg = { id: string; url: string; label: string; tags: string; addedAt: number; source: "vault"; isVideo?: boolean };
 type DriveImg = { id: string; url: string; label: string; source: "drive"; thumbnailLink?: string };
-type AnyImg   = { id: string; url: string; thumb: string; label: string; cat: string; source: "gpt" | "linkedin" | "vault" | "drive"; isVideo?: boolean };
+type AnyImg   = { id: string; url: string; thumb: string; label: string; cat: string; source: "gpt" | "linkedin" | "vault" | "grok" | "drive"; isVideo?: boolean };
 
 const VAULT_KEY = "aether.imagevault.v1";
 
@@ -25,11 +25,12 @@ const B = {
   gpt:   "#10a37f",
   li:    "#0077b5",
   vault: "#c084fc",
+  grok:  "#4fe8e8",
   drive: "#4285f4",
 };
 
-const SOURCE_COLORS: Record<string, string> = { gpt: B.gpt, linkedin: B.li, vault: B.vault, drive: B.drive };
-const SOURCE_LABELS: Record<string, string> = { gpt: "GPT Library", linkedin: "LinkedIn", vault: "My Vault", drive: "Drive" };
+const SOURCE_COLORS: Record<string, string> = { gpt: B.gpt, linkedin: B.li, vault: B.vault, grok: B.grok, drive: B.drive };
+const SOURCE_LABELS: Record<string, string> = { gpt: "GPT Library", linkedin: "LinkedIn", vault: "My Vault", grok: "Grok Images", drive: "Drive" };
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
 function scoreImg(img: AnyImg, tokens: string[]): number {
@@ -59,10 +60,11 @@ const PLACEHOLDERS = [
 export default function AiImageNestPage() {
   const [library, setLibrary] = useState<AnyImg[]>([]);
   const [vault, setVault]     = useState<AnyImg[]>([]);
+  const [grokImgs, setGrokImgs] = useState<AnyImg[]>([]);
   const [drive, setDrive]     = useState<AnyImg[]>([]);
   const [query, setQuery]     = useState("");
   const [results, setResults] = useState<AnyImg[]>([]);
-  const [source, setSource]   = useState<"all"|"gpt"|"linkedin"|"vault"|"drive">("all");
+  const [source, setSource]   = useState<"all"|"gpt"|"linkedin"|"vault"|"grok"|"drive">("all");
   const [lightbox, setLightbox] = useState<AnyImg | null>(null);
   const [addOpen, setAddOpen]   = useState(false);
   const [newUrl, setNewUrl]     = useState("");
@@ -92,7 +94,16 @@ export default function AiImageNestPage() {
   // ── Load vault from localStorage ────────────────────────────────────────────
   useEffect(() => {
     const raw = loadVault();
-    setVault(raw.map(v => ({ id: v.id, url: v.url, thumb: v.url, label: v.label || v.url, cat: v.tags || "vault", source: "vault" as const, isVideo: v.isVideo })));
+    const vaultItems: AnyImg[] = [];
+    const grokItems: AnyImg[] = [];
+    for (const v of raw) {
+      const isGrok = (v.tags ?? "").includes("grok-imagine");
+      const item: AnyImg = { id: v.id, url: v.url, thumb: v.url, label: v.label || v.url, cat: v.tags || "vault", source: isGrok ? "grok" : "vault", isVideo: v.isVideo };
+      if (isGrok) grokItems.push(item);
+      else vaultItems.push(item);
+    }
+    setVault(vaultItems);
+    setGrokImgs(grokItems);
   }, []);
 
   // ── Placeholder rotation ────────────────────────────────────────────────────
@@ -110,14 +121,15 @@ export default function AiImageNestPage() {
   }, [library]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Recompute results ───────────────────────────────────────────────────────
-  const recompute = useCallback((q: string, src: typeof source, lib: AnyImg[], vlt: AnyImg[], drv: AnyImg[]) => {
+  const recompute = useCallback((q: string, src: typeof source, lib: AnyImg[], vlt: AnyImg[], grk: AnyImg[], drv: AnyImg[]) => {
     const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
     let pool: AnyImg[] = [];
-    if (src === "all")      pool = [...lib, ...vlt, ...drv];
-    else if (src === "gpt") pool = lib.filter(i => i.source === "gpt");
+    if (src === "all")           pool = [...lib, ...vlt, ...grk, ...drv];
+    else if (src === "gpt")      pool = lib.filter(i => i.source === "gpt");
     else if (src === "linkedin") pool = lib.filter(i => i.source === "linkedin");
-    else if (src === "vault") pool = vlt;
-    else if (src === "drive") pool = drv;
+    else if (src === "vault")    pool = vlt;
+    else if (src === "grok")     pool = grk;
+    else if (src === "drive")    pool = drv;
 
     if (!tokens.length) { setResults(pool.slice(0, 200)); return; }
     const scored = pool.map(img => ({ img, sc: scoreImg(img, tokens) })).filter(x => x.sc > 0);
@@ -127,9 +139,9 @@ export default function AiImageNestPage() {
 
   useEffect(() => {
     clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => recompute(query, source, library, vault, drive), 120);
+    debounceRef.current = setTimeout(() => recompute(query, source, library, vault, grokImgs, drive), 120);
     return () => clearTimeout(debounceRef.current);
-  }, [query, source, library, vault, drive, recompute]);
+  }, [query, source, library, vault, grokImgs, drive, recompute]);
 
   // ── Load Drive images ───────────────────────────────────────────────────────
   async function loadDrive() {
@@ -161,10 +173,14 @@ export default function AiImageNestPage() {
     if (!newUrl.trim()) return;
     const u = newUrl.trim();
     const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(u);
-    const item: VaultImg = { id: `vault-${Date.now()}`, url: u, label: newLabel.trim() || u, tags: newTags.trim(), addedAt: Date.now(), source: "vault", isVideo };
+    const tags = newTags.trim();
+    const item: VaultImg = { id: `vault-${Date.now()}`, url: u, label: newLabel.trim() || u, tags, addedAt: Date.now(), source: "vault", isVideo };
     const existing = loadVault();
     saveVault([item, ...existing]);
-    setVault(v => [{ id: item.id, url: item.url, thumb: item.url, label: item.label, cat: item.tags, source: "vault", isVideo }, ...v]);
+    const isGrok = tags.includes("grok-imagine");
+    const newImg: AnyImg = { id: item.id, url: item.url, thumb: item.url, label: item.label, cat: tags, source: isGrok ? "grok" : "vault", isVideo };
+    if (isGrok) setGrokImgs(g => [newImg, ...g]);
+    else setVault(v => [newImg, ...v]);
     setNewUrl(""); setNewLabel(""); setNewTags(""); setAddOpen(false);
   }
 
@@ -172,6 +188,7 @@ export default function AiImageNestPage() {
     const updated = loadVault().filter(v => v.id !== id);
     saveVault(updated);
     setVault(v => v.filter(img => img.id !== id));
+    setGrokImgs(g => g.filter(img => img.id !== id));
   }
 
   // ── Counts ──────────────────────────────────────────────────────────────────
@@ -213,9 +230,14 @@ export default function AiImageNestPage() {
     <div style={s.page}>
       {/* Header */}
       <div style={s.header}>
-        <div style={s.h1}>AI Image Nest</div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <div style={s.h1}>AI Image Nest</div>
+          <a href="/grok-imagine" style={{ fontSize: 12, color: B.grok, textDecoration: "none", border: `1px solid ${B.grok}44`, borderRadius: 20, padding: "3px 12px", whiteSpace: "nowrap" as const }}>
+            ✦ Generate with Grok →
+          </a>
+        </div>
         <div style={s.sub}>
-          Live typeahead search across your AI-generated visual library · {gptCount} GPT images · {liCount} LinkedIn images · {vault.length} vault · {drive.length} Drive
+          Live typeahead search · {gptCount} GPT · {liCount} LinkedIn · {grokImgs.length} Grok · {vault.length} Vault · {drive.length} Drive
         </div>
       </div>
 
@@ -234,11 +256,16 @@ export default function AiImageNestPage() {
 
         {/* Source filters + actions */}
         <div style={s.row}>
-          {(["all","gpt","linkedin","vault","drive"] as const).map(src => (
-            <button key={src} style={s.pill(source === src, src === "all" ? B.gold : SOURCE_COLORS[src])} onClick={() => setSource(src)}>
-              {src === "all" ? `All · ${library.length + vault.length + drive.length}` : `${SOURCE_LABELS[src] ?? src} · ${src === "gpt" ? gptCount : src === "linkedin" ? liCount : src === "vault" ? vault.length : drive.length}`}
-            </button>
-          ))}
+          {(["all","gpt","linkedin","grok","vault","drive"] as const).map(src => {
+            const count = src === "all" ? library.length + vault.length + grokImgs.length + drive.length
+              : src === "gpt" ? gptCount : src === "linkedin" ? liCount
+              : src === "grok" ? grokImgs.length : src === "vault" ? vault.length : drive.length;
+            return (
+              <button key={src} style={s.pill(source === src, src === "all" ? B.gold : SOURCE_COLORS[src])} onClick={() => setSource(src)}>
+                {src === "all" ? `All · ${count}` : `${SOURCE_LABELS[src] ?? src} · ${count}`}
+              </button>
+            );
+          })}
           <button style={s.driveBtn} onClick={loadDrive} disabled={driveLoading || driveLoaded}>
             {driveLoading ? "Loading Drive…" : driveLoaded ? `✓ Drive loaded (${drive.length})` : "📂 Load Drive Photos"}
           </button>

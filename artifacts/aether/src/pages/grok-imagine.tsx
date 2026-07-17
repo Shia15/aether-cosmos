@@ -2,7 +2,7 @@
   Grok Imagine — Aurora image generation inside AETHER
   Model: x-ai/grok-2-image-1212 via /api/grok/imagine
 ═══════════════════════════════════════════════════════════════════*/
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 
 const B = {
   bg: "#0b0906", panel: "#14100a", panel2: "#1c160e",
@@ -33,6 +33,7 @@ export default function GrokImaginePage() {
   const [enhance, setEnhance]     = useState(false);
   const [history, setHistory]     = useState<{ prompt: string; url: string }[]>([]);
   const [retrying, setRetrying]   = useState(false);
+  const [savedId, setSavedId]     = useState<number | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   async function generate(forceEnhance = false) {
@@ -71,14 +72,16 @@ export default function GrokImaginePage() {
     setRetrying(false);
   }
 
-  function saveToVault(url: string) {
+  const saveToVault = useCallback((url: string, idx: number) => {
     const VAULT_KEY = "aether.imagevault.v1";
     try {
       const raw = JSON.parse(localStorage.getItem(VAULT_KEY) ?? "[]");
       const item = { id: `vault-${Date.now()}`, url, label: prompt.slice(0, 60), tags: "grok-imagine", addedAt: Date.now(), source: "vault", isVideo: false };
       localStorage.setItem(VAULT_KEY, JSON.stringify([item, ...raw].slice(0, 400)));
+      setSavedId(idx);
+      setTimeout(() => setSavedId(null), 2000);
     } catch { /* */ }
-  }
+  }, [prompt]);
 
   const s: Record<string, React.CSSProperties> = {
     page:   { minHeight: "100vh", background: B.bg, color: B.ivory, fontFamily: "inherit", display: "flex", flexDirection: "column" },
@@ -115,8 +118,13 @@ export default function GrokImaginePage() {
   return (
     <div style={s.page}>
       <div style={s.header}>
-        <div style={s.h1}>Grok Imagine · Aurora Image Generation</div>
-        <div style={s.sub}>Generate images with Grok's Aurora model (grok-2-image-1212) — describe anything from AETHER</div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <div style={s.h1}>Grok Imagine · Aurora Image Generation</div>
+          <a href="/ai-image-nest" style={{ fontSize: 12, color: B.cyan, textDecoration: "none", border: `1px solid ${B.cyan}44`, borderRadius: 20, padding: "3px 12px", whiteSpace: "nowrap" as const }}>
+            ◈ Image Nest →
+          </a>
+        </div>
+        <div style={s.sub}>Generate images with Grok's Aurora model (grok-2-image-1212) — saved images appear in Image Nest · Grok filter</div>
       </div>
 
       <div style={s.body}>
@@ -208,9 +216,17 @@ export default function GrokImaginePage() {
                 <div key={i} style={s.resultCard}>
                   <img src={src} alt={prompt} style={s.resultImg} onClick={() => setLightbox(src)} />
                   <div style={s.cardBar}>
-                    <button style={s.actBtn(B.cyan)} onClick={() => { saveToVault(src); }}>✦ Save to Vault</button>
+                    <button
+                      style={{ ...s.actBtn(savedId === i ? "#34d399" : B.cyan) }}
+                      onClick={() => saveToVault(src, i)}
+                    >
+                      {savedId === i ? "✓ Saved" : "✦ Save"}
+                    </button>
+                    {savedId === i && (
+                      <a href="/ai-image-nest" style={{ ...s.actBtn(B.cyan), textDecoration: "none" }}>◈ Nest →</a>
+                    )}
                     <a href={src} download={`grok-${Date.now()}.png`} style={s.actBtn(B.ivory)}>↓ Download</a>
-                    <a href={src} target="_blank" rel="noopener noreferrer" style={s.actBtn(B.gold)}>↗ Full size</a>
+                    <a href={src} target="_blank" rel="noopener noreferrer" style={s.actBtn(B.gold)}>↗ Open</a>
                   </div>
                 </div>
               );
@@ -224,7 +240,8 @@ export default function GrokImaginePage() {
         <div style={s.lb} onClick={() => setLightbox(null)}>
           <img src={lightbox} alt="" style={s.lbImg} onClick={e => e.stopPropagation()} />
           <div style={s.lbRow} onClick={e => e.stopPropagation()}>
-            <button style={s.lbBtn(B.cyan)} onClick={() => { saveToVault(lightbox); setLightbox(null); }}>✦ Save to Vault</button>
+            <button style={s.lbBtn(B.cyan)} onClick={() => { saveToVault(lightbox, -1); setLightbox(null); }}>✦ Save to Vault</button>
+            <a href="/ai-image-nest" style={{ ...s.lbBtn(B.cyan), opacity: 0.75, textDecoration: "none" }}>◈ Image Nest →</a>
             <a href={lightbox} download={`grok-${Date.now()}.png`} style={s.lbBtn(B.ivory)}>↓ Download</a>
             <a href={lightbox} target="_blank" rel="noopener noreferrer" style={s.lbBtn(B.gold)}>↗ Open full size</a>
             <button style={s.lbBtn(B.dim)} onClick={() => setLightbox(null)}>✕</button>
