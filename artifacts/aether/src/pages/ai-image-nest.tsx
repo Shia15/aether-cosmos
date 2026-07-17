@@ -6,9 +6,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type LibImg   = { file: string; dir: string; cat: string; video: boolean };
-type VaultImg = { id: string; url: string; label: string; tags: string; addedAt: number; source: "vault" };
+type VaultImg = { id: string; url: string; label: string; tags: string; addedAt: number; source: "vault"; isVideo?: boolean };
 type DriveImg = { id: string; url: string; label: string; source: "drive"; thumbnailLink?: string };
-type AnyImg   = { id: string; url: string; thumb: string; label: string; cat: string; source: "gpt" | "linkedin" | "vault" | "drive" };
+type AnyImg   = { id: string; url: string; thumb: string; label: string; cat: string; source: "gpt" | "linkedin" | "vault" | "drive"; isVideo?: boolean };
 
 const VAULT_KEY = "aether.imagevault.v1";
 
@@ -92,7 +92,7 @@ export default function AiImageNestPage() {
   // ── Load vault from localStorage ────────────────────────────────────────────
   useEffect(() => {
     const raw = loadVault();
-    setVault(raw.map(v => ({ id: v.id, url: v.url, thumb: v.url, label: v.label || v.url, cat: v.tags || "vault", source: "vault" as const })));
+    setVault(raw.map(v => ({ id: v.id, url: v.url, thumb: v.url, label: v.label || v.url, cat: v.tags || "vault", source: "vault" as const, isVideo: v.isVideo })));
   }, []);
 
   // ── Placeholder rotation ────────────────────────────────────────────────────
@@ -159,10 +159,12 @@ export default function AiImageNestPage() {
   // ── Add to vault ────────────────────────────────────────────────────────────
   function addToVault() {
     if (!newUrl.trim()) return;
-    const item: VaultImg = { id: `vault-${Date.now()}`, url: newUrl.trim(), label: newLabel.trim() || newUrl.trim(), tags: newTags.trim(), addedAt: Date.now(), source: "vault" };
+    const u = newUrl.trim();
+    const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(u);
+    const item: VaultImg = { id: `vault-${Date.now()}`, url: u, label: newLabel.trim() || u, tags: newTags.trim(), addedAt: Date.now(), source: "vault", isVideo };
     const existing = loadVault();
     saveVault([item, ...existing]);
-    setVault(v => [{ id: item.id, url: item.url, thumb: item.url, label: item.label, cat: item.tags, source: "vault" }, ...v]);
+    setVault(v => [{ id: item.id, url: item.url, thumb: item.url, label: item.label, cat: item.tags, source: "vault", isVideo }, ...v]);
     setNewUrl(""); setNewLabel(""); setNewTags(""); setAddOpen(false);
   }
 
@@ -277,13 +279,10 @@ export default function AiImageNestPage() {
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1.03)"; (e.currentTarget as HTMLElement).style.borderColor = SOURCE_COLORS[img.source] ?? B.gold; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; (e.currentTarget as HTMLElement).style.borderColor = B.line; }}
             >
-              <img
-                src={img.thumb}
-                alt={img.label}
-                style={s.img}
-                loading="lazy"
-                onError={e => { (e.target as HTMLImageElement).style.opacity = "0.2"; }}
-              />
+              {img.isVideo
+                ? <div style={{ ...s.img, display: "flex", alignItems: "center", justifyContent: "center", background: "#0d0a06", fontSize: 32 }}>▶</div>
+                : <img src={img.thumb} alt={img.label} style={s.img} loading="lazy" onError={e => { (e.target as HTMLImageElement).style.opacity = "0.2"; }} />
+              }
               <span style={s.badge(SOURCE_COLORS[img.source] ?? B.gold)}>
                 {SOURCE_LABELS[img.source] ?? img.source}
               </span>
@@ -306,7 +305,10 @@ export default function AiImageNestPage() {
       {/* Lightbox */}
       {lightbox && (
         <div style={s.lb} onClick={() => setLightbox(null)}>
-          <img src={lightbox.url} alt={lightbox.label} style={s.lbImg} onClick={e => e.stopPropagation()} />
+          {lightbox.isVideo
+            ? <video src={lightbox.url} controls autoPlay style={{ ...s.lbImg, maxHeight: "70vh" }} onClick={e => e.stopPropagation()} />
+            : <img src={lightbox.url} alt={lightbox.label} style={s.lbImg} onClick={e => e.stopPropagation()} />
+          }
           <div style={s.lbName}>{lightbox.label}</div>
           <div style={s.lbRow} onClick={e => e.stopPropagation()}>
             <a href={lightbox.url} target="_blank" rel="noopener noreferrer" style={s.lbBtn(B.gold)}>

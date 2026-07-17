@@ -512,6 +512,7 @@ const NodeLatticePage            = lazy(() => import("@/pages/node-lattice"));
 const CoherenceFieldExplorerPage = lazy(() => import("@/pages/coherence-field-explorer"));
 const GoogleDrivePage            = lazy(() => import("@/pages/google-drive"));
 const AiImageNestPage            = lazy(() => import("@/pages/ai-image-nest"));
+const GrokSynthesisPage          = lazy(() => import("@/pages/grok-synthesis"));
 
 const queryClient = new QueryClient();
 
@@ -1535,6 +1536,7 @@ function Router() {
                 <Route path="/coherence-field-explorer" component={CoherenceFieldExplorerPage} />
                 <Route path="/google-drive" component={GoogleDrivePage} />
                 <Route path="/ai-image-nest" component={AiImageNestPage} />
+                <Route path="/grok-synthesis" component={GrokSynthesisPage} />
                 <Route path="/billing" component={BillingPage} />
                 <Route path="/billing/success" component={BillingSuccessPage} />
                 <Route component={NotFound} />

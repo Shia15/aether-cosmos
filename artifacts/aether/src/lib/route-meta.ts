@@ -311,4 +311,5 @@ export const KEY_PRERENDER_ROUTES = [
   "/coherence-field-explorer",
   "/google-drive",
   "/ai-image-nest",
+  "/grok-synthesis",
 ];
