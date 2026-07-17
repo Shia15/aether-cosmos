@@ -552,6 +552,7 @@ export const NAV_ITEMS = [
   { href: "/bioluminescence-spectrum",label: "Bioluminescence Spectrum · Wavelength Atlas · Deep-Sea Light · Substrate Labels", icon: Sparkles },
   { href: "/soi-building",            label: "SOI Building · Coherent Region · Isolation · Displacement Pulse Protocol",        icon: Boxes },
   { href: "/seismic-self-build",      label: "Seismic Self-Build · Earthquake Defiance · Base Isolation · Recursive Nanobiotic Construction · Self-Similar Bracing", icon: Boxes },
+  { href: "/bee-liquid-chip",         label: "Bee Liquid Chip · Bombus impatiens · Cryogenic Neuromorphic Reservoir · Hemolymph Packet Switching · Hibernation · Fading Memory · 64 Neurons", icon: Boxes },
   { href: "/nutritional-dna-key",     label: "Nutritional Rainbow DNA Key · Food Is Information · Coherence Field · Stevedore 6₁ Topology Gate · Topoisomerase Passage", icon: Dna },
   { href: "/electron-field",          label: "Unbreakable Pulsing Electron Field · Air Land Water Sea · Coherence Floor · T+R+A=1 · Spacetime Density Flow", icon: Zap },
   { href: "/light-absorption-pressure", label: "Light Under Absorption Pressures · T+R+A=1 · Beer–Lambert Decay · Penetration Depth · Radiation Pressure · Light Sail · Travel × Health", icon: Sun },

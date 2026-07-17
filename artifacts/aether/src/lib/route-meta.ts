@@ -313,4 +313,5 @@ export const KEY_PRERENDER_ROUTES = [
   "/ai-image-nest",
   "/grok-synthesis",
   "/grok-imagine",
+  "/bee-liquid-chip",
 ];
