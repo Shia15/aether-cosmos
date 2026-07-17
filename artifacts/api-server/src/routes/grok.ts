@@ -3,6 +3,9 @@ import { openrouter } from "@workspace/integrations-openrouter-ai";
 
 const router: IRouter = Router();
 
+const OPENROUTER_BASE = process.env.AI_INTEGRATIONS_OPENROUTER_BASE_URL ?? "http://localhost:1106/modelfarm/openrouter";
+const IMAGE_MODEL = "x-ai/grok-2-image-1212";
+
 const GROK_MODEL = "x-ai/grok-4.5";
 
 const BASE_SYSTEM_PROMPT = `You are the AETHER Systems Analyst — a live Grok-powered assistant embedded inside the AETHER Knowledge System, operated on X via @Strategicproce (primary) and @Shia449272 (archive account).
@@ -82,6 +85,33 @@ router.post("/grok/chat", async (req, res) => {
       );
       res.end();
     }
+  }
+});
+
+// ── Grok image generation (Aurora / grok-2-image-1212) ───────────────────────
+router.post("/grok/imagine", async (req, res) => {
+  const { prompt, n = 1, size = "1024x1024" } = req.body ?? {};
+  if (!prompt || typeof prompt !== "string") {
+    res.status(400).json({ error: "prompt required" });
+    return;
+  }
+  try {
+    const resp = await fetch(`${OPENROUTER_BASE}/v1/images/generations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: IMAGE_MODEL, prompt: prompt.slice(0, 1000), n, size }),
+    });
+    if (!resp.ok) {
+      const text = await resp.text();
+      req.log.error({ status: resp.status, text }, "grok imagine upstream error");
+      res.status(resp.status).json({ error: text });
+      return;
+    }
+    const data = await resp.json() as { data?: { url?: string; b64_json?: string }[]; error?: string };
+    res.json(data);
+  } catch (err) {
+    req.log.error({ err }, "grok imagine failed");
+    res.status(502).json({ error: "Image generation failed" });
   }
 });
 

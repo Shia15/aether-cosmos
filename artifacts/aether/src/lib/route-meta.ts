@@ -312,4 +312,5 @@ export const KEY_PRERENDER_ROUTES = [
   "/google-drive",
   "/ai-image-nest",
   "/grok-synthesis",
+  "/grok-imagine",
 ];

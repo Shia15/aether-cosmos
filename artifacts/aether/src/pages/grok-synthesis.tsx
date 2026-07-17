@@ -261,7 +261,7 @@ ${query}`;
           if (!line.startsWith("data: ")) continue;
           const data = line.slice(6);
           if (data === "[DONE]") break;
-          try { const j = JSON.parse(data); const delta = j?.choices?.[0]?.delta?.content ?? ""; fullText += delta; setOutput(fullText); } catch { /* */ }
+          try { const j = JSON.parse(data); const delta = j?.content ?? j?.choices?.[0]?.delta?.content ?? ""; fullText += delta; setOutput(fullText); } catch { /* */ }
         }
       }
     } catch (err: any) {
