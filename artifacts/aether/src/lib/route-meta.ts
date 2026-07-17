@@ -307,4 +307,6 @@ export const KEY_PRERENDER_ROUTES = [
   "/three-oscillator",
   "/womens-coherence-map",
   "/earth-computer",
+  "/node-lattice",
+  "/coherence-field-explorer",
 ];
