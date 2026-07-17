@@ -14,7 +14,7 @@ const MAX_Q = 20;
 const STORAGE_KEY = "aether_intake_v1";
 
 type LayerKey = "N" | "C" | "S" | "F" | "P" | "D";
-type DocType = "pitch" | "paper" | "chart" | "note" | "textbook" | "formula" | "any";
+type DocType = "pitch" | "paper" | "chart" | "note" | "textbook" | "formula" | "simulator" | "any";
 type Status = "loading" | "ready" | "reading" | "titled" | "analyzing" | "done" | "error";
 
 const LAYER_META: Record<LayerKey, { name: string; icon: string; color: string; desc: string }> = {
@@ -95,6 +95,14 @@ const AI_SECTIONS: Record<string, AISection[]> = {
     { id: "dimfreedom",  icon: "◈", label: "Dimensions of Freedom",  prompt: "Which AETHER spatial dimensions does this chart's data span? List each by number." },
     { id: "implication", icon: "→", label: "System Implications",   prompt: "What does this chart imply for the AETHER system architecture?" },
   ],
+  simulator: [
+    { id: "title",      icon: "🏷", label: "Extracted Title",        prompt: "Extract the exact title or name of this Claude artifact or simulator. Return only the title." },
+    { id: "summary",    icon: "🖥", label: "What It Simulates",      prompt: "Describe in 2–3 sentences what this artifact simulates or demonstrates. What is the core interactive experience the user gets?" },
+    { id: "mathmap",    icon: "⊹", label: "Physics & Math Engine",  prompt: "List the key physics equations, algorithms, or mathematical principles powering this simulator. Map each to an AETHER shell: DM/GM/AM/HM/QM/LBM/LGM/DQM/DHM." },
+    { id: "dimfreedom", icon: "◈", label: "AETHER Dimensions",      prompt: "Which of the 26 AETHER spatial dimensions does this simulator operate within? List each dimension number and explain why it applies." },
+    { id: "coherence",  icon: "◎", label: "Shell Placement",        prompt: "Assign an AETHER layer (N/C/S/F/P/D) and primary shell for this artifact. Explain the field position." },
+    { id: "portreqs",   icon: "→", label: "Port to AETHER",         prompt: "What is needed to port this artifact into AETHER as a native React/TSX page? List: external libraries used, key canvas/simulation dependencies, approximate complexity (simple/medium/complex), and a suggested route path." },
+  ],
   default: [
     { id: "title",      icon: "🏷", label: "Extracted Title",       prompt: "Extract the main title from this document. Return only the title." },
     { id: "summary",    icon: "📝", label: "Summary",                prompt: "Summarize the key ideas in 3–4 sentences." },
@@ -105,19 +113,21 @@ const AI_SECTIONS: Record<string, AISection[]> = {
 };
 
 const DZ_CFG: Record<string, { icon: string; title: string; sub: string; types: string[]; layer: LayerKey }> = {
-  pitch: { icon: "📊", title: "Drop Pitch Decks here",   sub: "Up to 20 files. Titles auto-extracted from text.", types: ["PDF", "PPTX", "IMG"], layer: "P" },
-  paper: { icon: "📄", title: "Drop Written Papers here", sub: "Scientific papers, white papers. 20 max.",        types: ["PDF", "DOC", "TXT"], layer: "F" },
-  chart: { icon: "📈", title: "Drop Graphs & Charts here",sub: "Any visualization. 20 max.",                       types: ["PNG", "JPG", "PDF"], layer: "D" },
-  any:   { icon: "⊹", title: "Drop any Documents here",   sub: "Any type. Up to 20 at once.",                      types: ["ANY"],                layer: "N" },
+  pitch:  { icon: "📊", title: "Drop Pitch Decks here",      sub: "Up to 20 files. Titles auto-extracted from text.", types: ["PDF", "PPTX", "IMG"],                    layer: "P" },
+  paper:  { icon: "📄", title: "Drop Written Papers here",   sub: "Scientific papers, white papers. 20 max.",         types: ["PDF", "DOC", "TXT"],                    layer: "F" },
+  chart:  { icon: "📈", title: "Drop Graphs & Charts here",  sub: "Any visualization. 20 max.",                       types: ["PNG", "JPG", "PDF"],                    layer: "D" },
+  claude: { icon: "⚡", title: "Drop Claude Artifacts here", sub: "HTML simulators, JSX/TSX components, SVG, PY, MD — exported from Claude.",  types: ["HTML", "JSX", "TSX", "SVG", "PY", "MD", "JS"], layer: "S" },
+  any:    { icon: "⊹", title: "Drop any Documents here",     sub: "Any type. Up to 20 at once.",                       types: ["ANY"],                                  layer: "N" },
 };
-const SFL: Record<string, LayerKey> = { pitch: "P", paper: "F", chart: "D", any: "N", note: "N", textbook: "F", formula: "C" };
-const SFS: Record<string, string[]> = { pitch: ["LGM", "QM", "DM"], paper: ["LGM", "HM", "AM"], chart: ["GM", "HM", "QM"], default: ["DM", "GM"] };
+const SFL: Record<string, LayerKey> = { pitch: "P", paper: "F", chart: "D", any: "N", note: "N", textbook: "F", formula: "C", simulator: "S", claude: "S" };
+const SFS: Record<string, string[]> = { pitch: ["LGM", "QM", "DM"], paper: ["LGM", "HM", "AM"], chart: ["GM", "HM", "QM"], simulator: ["LGM", "QM", "HM"], default: ["DM", "GM"] };
 
 type QueueItem = {
   id: string;
   file: File | null;
   filename: string;
   dataURL: string | null;
+  blobUrl: string | null;
   mimeType: string;
   text: string;
   title: string;
@@ -128,6 +138,8 @@ type QueueItem = {
   layer: LayerKey;
   isImg: boolean;
   isPDF: boolean;
+  isSVG: boolean;
+  isHTML: boolean;
   dims: number[];
 };
 
@@ -157,9 +169,11 @@ function cleanFN(n: string) {
     .trim().replace(/\b\w/g, c => c.toUpperCase()) || "Untitled";
 }
 function detectDT(n: string, currentDz: string): DocType {
+  if (/\.(html|jsx|tsx|svg)$/i.test(n) || /simulat|engine|sim|artifact|canvas|physics/i.test(n)) return "simulator";
   if (/pitch|deck|slide|present/i.test(n)) return "pitch";
   if (/paper|research|journal|study|thesis|white/i.test(n)) return "paper";
   if (/chart|graph|data|plot|figure/i.test(n)) return "chart";
+  if (currentDz === "claude") return "simulator";
   return (currentDz === "any" ? "note" : currentDz) as DocType;
 }
 
@@ -338,6 +352,8 @@ export default function AetherIntakeView() {
   const [archiveFilter, setArchiveFilter] = useState<string>("ALL");
   const [dragOver, setDragOver] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [urlInput, setUrlInput] = useState("");
+  const [urlLoading, setUrlLoading] = useState(false);
   const cameraRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
 
@@ -413,15 +429,17 @@ export default function AetherIntakeView() {
       if (files.length > rem) showToast(`Added ${add.length} of ${files.length} — limit ${MAX_Q}`);
 
       const newItems: QueueItem[] = add.map(f => {
-        const isImg = f.type.startsWith("image/");
-        const isPDF = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+        const isImg  = f.type.startsWith("image/") && !/\.svg$/i.test(f.name);
+        const isPDF  = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+        const isSVG  = /\.svg$/i.test(f.name) || f.type === "image/svg+xml";
+        const isHTML = /\.html?$/i.test(f.name) || f.type === "text/html";
         const dt = detectDT(f.name, currentDz);
         return {
-          id: gqid(), file: f, filename: f.name, dataURL: null,
+          id: gqid(), file: f, filename: f.name, dataURL: null, blobUrl: null,
           mimeType: f.type || "application/octet-stream",
           text: "", title: "", docType: dt, status: "loading",
           aiData: {}, shells: SFS[dt] || SFS.default, layer: SFL[dt] || "N",
-          isImg, isPDF, dims: [],
+          isImg, isPDF, isSVG, isHTML, dims: [],
         };
       });
 
@@ -437,19 +455,26 @@ export default function AetherIntakeView() {
           };
           r.readAsDataURL(f);
         } else if (isPdfFile(f)) {
-          extractPdfText(f, 3000).then(text => {
+          extractPdfText(f, 6000).then(text => {
             updateQItem(item.id, { text, status: "ready" });
             setTimeout(() => extractTitle({ ...item, text, status: "ready" }), 50);
           }).catch(() => {
             updateQItem(item.id, { status: "ready" });
             setTimeout(() => extractTitle(item), 50);
           });
-        } else if (isCodeFile(f.name) || /\.(txt|md|rst|csv)$/i.test(f.name)) {
+        } else if (item.isSVG || item.isHTML || isCodeFile(f.name) || /\.(txt|md|rst|csv)$/i.test(f.name)) {
           const r = new FileReader();
           r.onload = e => {
-            const text = String(e.target?.result || "").slice(0, 3000);
-            updateQItem(item.id, { text, status: "ready" });
-            setTimeout(() => extractTitle({ ...item, text, status: "ready" }), 50);
+            const text = String(e.target?.result || "").slice(0, 8000);
+            // Create a sandboxed blob URL for HTML/SVG so we can preview it
+            let blobUrl: string | null = null;
+            if (item.isHTML || item.isSVG) {
+              const mime = item.isSVG ? "image/svg+xml" : "text/html";
+              const blob = new Blob([String(e.target?.result || "")], { type: mime });
+              blobUrl = URL.createObjectURL(blob);
+            }
+            updateQItem(item.id, { text, blobUrl, status: "ready" });
+            setTimeout(() => extractTitle({ ...item, text, blobUrl, status: "ready" }), 50);
           };
           r.readAsText(f);
         } else {
@@ -461,6 +486,40 @@ export default function AetherIntakeView() {
       return [...prevQueue, ...newItems];
     });
   }, [currentDz, showToast, updateQItem, extractTitle]);
+
+  // ── Fetch artifact from URL (claude.site or any public HTML) ─────────
+  const fetchArtifactUrl = useCallback(async () => {
+    const url = urlInput.trim();
+    if (!url) return;
+    setUrlLoading(true);
+    try {
+      const resp = await fetch(`${apiBase}/api/proxy-fetch?url=${encodeURIComponent(url)}`);
+      if (!resp.ok) throw new Error(`${resp.status}`);
+      const html = await resp.text();
+      const fname = url.split("/").pop()?.split("?")[0] || "artifact.html";
+      const finalName = /\.(html?|jsx?|tsx?)$/i.test(fname) ? fname : fname + ".html";
+      const blob = new Blob([html], { type: "text/html" });
+      const blobUrl = URL.createObjectURL(blob);
+      const fakeFile = new File([html], finalName, { type: "text/html" });
+      const dt: DocType = "simulator";
+      const id = gqid();
+      const item: QueueItem = {
+        id, file: fakeFile, filename: finalName, dataURL: null, blobUrl,
+        mimeType: "text/html", text: html.slice(0, 8000),
+        title: "", docType: dt, status: "ready",
+        aiData: {}, shells: SFS.simulator, layer: "S",
+        isImg: false, isPDF: false, isSVG: false, isHTML: true, dims: [],
+      };
+      setQueue(q => [...q, item]);
+      setUrlInput("");
+      showToast("⚡ Artifact fetched — click to analyze");
+      setTimeout(() => extractTitle(item), 80);
+    } catch (e) {
+      showToast("⚠ Could not fetch URL — check CORS or try saving the HTML file instead");
+    } finally {
+      setUrlLoading(false);
+    }
+  }, [urlInput, apiBase, showToast, extractTitle]);
 
   const removeQItem = (id: string) => {
     setQueue(q => q.filter(i => i.id !== id));
@@ -695,7 +754,7 @@ export default function AetherIntakeView() {
       {/* Hidden file inputs */}
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" multiple style={{ display: "none" }}
         onChange={e => { addToQueue([...(e.target.files || [])]); e.target.value = ""; }} />
-      <input ref={uploadRef} type="file" accept="image/*,application/pdf,.txt,.md,.rst,.py,.ipynb,.js,.ts,.jsx,.tsx,.r,.m,.cpp,.c,.cs,.java,.go,.rs,.sh,.sql,.tex" multiple style={{ display: "none" }}
+      <input ref={uploadRef} type="file" accept="image/*,application/pdf,.txt,.md,.rst,.py,.ipynb,.js,.ts,.jsx,.tsx,.html,.htm,.svg,.r,.m,.cpp,.c,.cs,.java,.go,.rs,.sh,.sql,.tex,.json,.yaml,.yml" multiple style={{ display: "none" }}
         onChange={e => { addToQueue([...(e.target.files || [])]); e.target.value = ""; }} />
 
       {/* Toast */}
@@ -792,6 +851,22 @@ export default function AetherIntakeView() {
               className="grid grid-cols-12 gap-6">
               {/* LEFT: drop, queue, manual */}
               <div className="col-span-12 lg:col-span-7 space-y-4">
+                {/* Claude artifact URL paste */}
+                <div className="flex gap-px" style={{ background: C.border }}>
+                  <input
+                    value={urlInput}
+                    onChange={e => setUrlInput(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && fetchArtifactUrl()}
+                    placeholder="Paste claude.site artifact URL or any public HTML link…"
+                    className="flex-1 px-3 py-2.5 text-xs outline-none"
+                    style={{ background: C.card, color: C.text, fontFamily: "'DM Mono',monospace", border: "none" }}
+                  />
+                  <button onClick={fetchArtifactUrl} disabled={urlLoading || !urlInput.trim()}
+                    className="px-4 py-2.5 text-[11px] uppercase tracking-wider flex-shrink-0"
+                    style={{ background: urlInput.trim() ? C.teal : "#1a2030", color: urlInput.trim() ? C.bg : C.text3, fontFamily: "'DM Mono',monospace", transition: "all 0.2s" }}
+                  >{urlLoading ? "⏳" : "⚡ Fetch"}</button>
+                </div>
+
                 {/* Quick actions */}
                 <div className="grid grid-cols-4 gap-px" style={{ background: C.border }}>
                   {[
@@ -891,7 +966,8 @@ export default function AetherIntakeView() {
                           <div className="w-9 h-9 flex-shrink-0 border flex items-center justify-center overflow-hidden"
                             style={{ borderColor: C.border, background: C.card }}>
                             {item.dataURL ? <img src={item.dataURL} alt="" className="w-full h-full object-cover" />
-                              : <span className="text-base">{item.isPDF ? "📄" : item.docType === "chart" ? "📈" : "📊"}</span>}
+                            : item.blobUrl && item.isSVG ? <img src={item.blobUrl} alt="" className="w-full h-full object-cover" />
+                              : <span className="text-base">{item.isPDF ? "📄" : item.docType === "chart" ? "📈" : item.docType === "simulator" ? "⚡" : item.isHTML ? "🖥" : "📊"}</span>}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="text-xs truncate" style={{ color: "#fff" }}>{item.filename}</div>
@@ -953,7 +1029,7 @@ export default function AetherIntakeView() {
                       <div>
                         <div className="text-[10px] uppercase tracking-[0.2em] mb-1" style={{ color: C.text3 }}>Document Type</div>
                         <div className="flex flex-wrap gap-1.5">
-                          {(["pitch", "paper", "chart", "note", "textbook", "formula"] as DocType[]).map(dt => (
+                          {(["pitch", "paper", "chart", "note", "textbook", "formula", "simulator"] as DocType[]).map(dt => (
                             <button key={dt} onClick={() => { setMDocType(dt); setMLayer(SFL[dt] || "N"); }}
                               className="text-[10px] px-2.5 py-1 border uppercase tracking-wider"
                               style={{
@@ -1055,6 +1131,23 @@ export default function AetherIntakeView() {
                         data-testid="btn-reanalyze"
                       >↺</button>
                     </div>
+                    {/* Live preview for HTML / SVG artifacts */}
+                    {activeItem.blobUrl && (
+                      <div style={{ padding: "10px 12px 0" }}>
+                        <div className="text-[9px] uppercase tracking-[0.2em] mb-1.5" style={{ color: C.text3 }}>
+                          ⚡ Sandboxed Preview
+                        </div>
+                        <iframe
+                          src={activeItem.blobUrl}
+                          sandbox="allow-scripts"
+                          title="Artifact Preview"
+                          style={{ width: "100%", height: activeItem.isSVG ? 180 : 240, border: `1px solid rgba(192,132,252,0.2)`, borderRadius: 4, background: "#000", display: "block" }}
+                        />
+                        <div className="text-[9px] mt-1" style={{ color: C.text3 }}>
+                          Read-only · no network · scripts sandboxed
+                        </div>
+                      </div>
+                    )}
                     <div className="max-h-[560px] overflow-y-auto">
                       {activeSecs.map(sec => {
                         const txt = activeItem.aiData[sec.id];
