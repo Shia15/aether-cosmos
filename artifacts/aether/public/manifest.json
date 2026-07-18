@@ -1,0 +1,28 @@
+{
+  "name": "AETHER Knowledge System",
+  "short_name": "AETHER",
+  "description": "AETHER synthesizes and discovers knowledge through a Knowledge Graph & Coherence System inspired by the Crystallization Model of Intelligence.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0906",
+  "theme_color": "#0b0906",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "science", "reference"],
+  "lang": "en",
+  "dir": "ltr"
+}
