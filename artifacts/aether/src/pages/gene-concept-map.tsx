@@ -32,6 +32,7 @@ interface GNode {
   org?: string;
   layer?: string;
   detail?: string;
+  peptide?: string;   // polypeptide encoded by this gene (partial N-terminal sequence, 1-letter AA code)
 }
 
 interface GLink {
@@ -55,52 +56,52 @@ const ORGANISMS: GNode[] = [
 
 const GENES: GNode[] = [
   // LUCA genes
-  { id:"16S",     name:"16S rRNA",     type:"gene", color:TERA, size:10, org:"luca",   desc:"Universal ribosomal RNA · phylogenetic barcode of all life", layer:"mnesis" },
-  { id:"atpA",    name:"atpA",         type:"gene", color:TERA, size:9,  org:"luca",   desc:"ATP synthase alpha subunit · chemiosmosis · proton gradient → ATP", layer:"aletheia" },
-  { id:"polA",    name:"polA",         type:"gene", color:TERA, size:9,  org:"luca",   desc:"DNA Polymerase I · primordial replicase · error rate ~10⁻⁷/base", layer:"infernia" },
-  { id:"recA-l",  name:"recA (LUCA)",  type:"gene", color:TERA, size:9,  org:"luca",   desc:"Primordial recombinase · homologous recombination · SOS response", layer:"reverie" },
-  { id:"groEL",   name:"GroEL",        type:"gene", color:TERA, size:9,  org:"luca",   desc:"Chaperonin · protein folding cage · universally conserved", layer:"mnesis" },
-  { id:"gapdh",   name:"GAPDH",        type:"gene", color:TERA, size:9,  org:"luca",   desc:"Glyceraldehyde-3-phosphate dehydrogenase · glycolysis core · reverse TCA", layer:"aletheia" },
+  { id:"16S",     name:"16S rRNA",     type:"gene", color:TERA, size:10, org:"luca",   desc:"Universal ribosomal RNA · phylogenetic barcode of all life", layer:"mnesis",    peptide:"ncRNA — functional RNA molecule, not translated to protein; forms the 30S ribosomal subunit scaffold" },
+  { id:"atpA",    name:"atpA",         type:"gene", color:TERA, size:9,  org:"luca",   desc:"ATP synthase alpha subunit · chemiosmosis · proton gradient → ATP", layer:"aletheia", peptide:"MSATLKLIINPFASRQLREHLKSSLANVEYAPITLGQRIADIEPNMVPEQGYHLVKAHGAQLRAENELKAMLEKAG..." },
+  { id:"polA",    name:"polA",         type:"gene", color:TERA, size:9,  org:"luca",   desc:"DNA Polymerase I · primordial replicase · error rate ~10⁻⁷/base", layer:"infernia", peptide:"MGSLNCIVAVSRKALEAALEKAGIRSVNQLHFGSSEIGHHQRFAQQLGFPIRNDKAMVEDLLEQLQGEGKF..." },
+  { id:"recA-l",  name:"recA (LUCA)",  type:"gene", color:TERA, size:9,  org:"luca",   desc:"Primordial recombinase · homologous recombination · SOS response", layer:"reverie",  peptide:"MAIDENKQKALAAALGQIEKQFGKGGIMEHFSKTLNEALAKLQKELDAKVHFSPSGKTPQARLLGRK..." },
+  { id:"groEL",   name:"GroEL",        type:"gene", color:TERA, size:9,  org:"luca",   desc:"Chaperonin · protein folding cage · universally conserved", layer:"mnesis",    peptide:"MAAKDVKFGNDARVKMLRGVNVLADAVKVTLGPKGRNVVLDKSFGAPTITKDGVSVAKEIRLELEK..." },
+  { id:"gapdh",   name:"GAPDH",        type:"gene", color:TERA, size:9,  org:"luca",   desc:"Glyceraldehyde-3-phosphate dehydrogenase · glycolysis core · reverse TCA", layer:"aletheia", peptide:"MVKVGVNGFGRIGRLVTRAAFNSGKVDIVSVNDPFIDLNYMVYMFQYDSTHGKFHGTVKAENGKLVINGK..." },
 
   // E. coli genes
-  { id:"oriC",    name:"oriC",         type:"gene", color:AMB, size:10, org:"ecoli", desc:"Origin of replication · bidirectional firing · dnaA box", layer:"mnesis" },
-  { id:"dnaA",    name:"dnaA",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"Initiator protein · binds oriC · triggers replication start", layer:"aletheia" },
-  { id:"lacZ",    name:"lacZ",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"β-galactosidase · lactose metabolism · operon paradigm", layer:"infernia" },
-  { id:"trpA",    name:"trpA",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"Tryptophan synthase · amino acid biosynthesis · feedback inhibition", layer:"reverie" },
-  { id:"rpoB",    name:"rpoB",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"RNA polymerase β subunit · transcription core · rifampicin target", layer:"mnesis" },
-  { id:"ftsZ",    name:"ftsZ",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"Z-ring GTPase · mid-cell constriction · division trigger", layer:"infernia" },
+  { id:"oriC",    name:"oriC",         type:"gene", color:AMB, size:10, org:"ecoli", desc:"Origin of replication · bidirectional firing · dnaA box", layer:"mnesis",    peptide:"ncDNA element — replication origin; contains 13-mer DnaA boxes; no open reading frame, not translated" },
+  { id:"dnaA",    name:"dnaA",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"Initiator protein · binds oriC · triggers replication start", layer:"aletheia", peptide:"MSLSLWQQCLARLQDPASRILEAFKRNSSPGQAVLEAAETLKRMQYQNDKEGPSGPVPRPQNLSSEDPQILNRFVEIH..." },
+  { id:"lacZ",    name:"lacZ",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"β-galactosidase · lactose metabolism · operon paradigm", layer:"infernia", peptide:"MTMITDSLAVVLQRRDWENPGVTQLNRLAAHPPFASWRNSEERARTTTPAVRDSLAVASGKDIVLKEVFRGLD..." },
+  { id:"trpA",    name:"trpA",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"Tryptophan synthase · amino acid biosynthesis · feedback inhibition", layer:"reverie",  peptide:"MERYLASSVEERIAKLEKYFGVSAEDLVGAITTLSIPFGNVTELDRLKQAAQEFNIQKGIAGMKQLNLS..." },
+  { id:"rpoB",    name:"rpoB",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"RNA polymerase β subunit · transcription core · rifampicin target", layer:"mnesis",    peptide:"MVYSYTDEEALLAGKLTRKLHDDQIIEQLAERLRSGELRSLHRSIGEPNQEFSAEAALGKFLKKLNEE..." },
+  { id:"ftsZ",    name:"ftsZ",         type:"gene", color:AMB, size:9,  org:"ecoli", desc:"Z-ring GTPase · mid-cell constriction · division trigger", layer:"infernia", peptide:"MFEPMELTNDAVIRANNTGISLLPDALERLKARGVEISDIIPGTRALYEGQGAILTGGVTSLGATVQAVNQFLKE..." },
 
   // Yeast genes
-  { id:"CDC28",   name:"CDC28",        type:"gene", color:GRN, size:10, org:"yeast", desc:"Master CDK kinase · drives all cell-cycle transitions · universal homolog", layer:"mnesis" },
-  { id:"CDC20",   name:"CDC20",        type:"gene", color:GRN, size:9,  org:"yeast", desc:"APC-C activator · anaphase-promoting complex · sister chromatid separation", layer:"aletheia" },
-  { id:"SIC1",    name:"SIC1",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"CDK inhibitor · START gate · must be degraded to enter S phase", layer:"infernia" },
-  { id:"CLN1",    name:"CLN1",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"G1 cyclin · complexes with Cdc28 · commits cell to division", layer:"reverie" },
-  { id:"ADE2",    name:"ADE2",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"Adenine biosynthesis · classic red/white colony color marker", layer:"mnesis" },
-  { id:"URA3",    name:"URA3",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"Orotidine-5'-phosphate decarboxylase · uracil auxotrophy marker", layer:"aletheia" },
+  { id:"CDC28",   name:"CDC28",        type:"gene", color:GRN, size:10, org:"yeast", desc:"Master CDK kinase · drives all cell-cycle transitions · universal homolog", layer:"mnesis",    peptide:"MEDYQTAWKDVNHKISQENLQNLQKDLAHLESKLQVHEGFDQSTMDQAAVLDKQAEMVQKMAENP..." },
+  { id:"CDC20",   name:"CDC20",        type:"gene", color:GRN, size:9,  org:"yeast", desc:"APC-C activator · anaphase-promoting complex · sister chromatid separation", layer:"aletheia", peptide:"MDKTPFLSRPNGELPPSLPAGDLTAPQTRKLQQLIPNQDRQSVDTSILESGNLGNDIFKQIKIQKKN..." },
+  { id:"SIC1",    name:"SIC1",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"CDK inhibitor · START gate · must be degraded to enter S phase", layer:"infernia", peptide:"MSGSSLSTSTSSGGVNSSRSSGRIRNSSMNPLRGPNESSTIEEFQPAAENGAGPASKTPQQNRPQLNND..." },
+  { id:"CLN1",    name:"CLN1",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"G1 cyclin · complexes with Cdc28 · commits cell to division", layer:"reverie",  peptide:"MSSSSSSSSKGKGKGKSKSGSSSDQRRSSVRNSSSSNNIDNSNNNFSSAHSAIAQASPKNDFNKSSLDAD..." },
+  { id:"ADE2",    name:"ADE2",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"Adenine biosynthesis · classic red/white colony color marker", layer:"mnesis",    peptide:"MSTQKLAEYVLEHHHFDLPGKVEVIIDDNRSGVPYVKAGQLQDMIQNLNIQKGICVDVKGEGKGVYLLD..." },
+  { id:"URA3",    name:"URA3",         type:"gene", color:GRN, size:9,  org:"yeast", desc:"Orotidine-5'-phosphate decarboxylase · uracil auxotrophy marker", layer:"aletheia", peptide:"MSKAIVKDYIAKDAPGKITLNIILLLNANDKLKLAEKHKDTLMEEIVDNLKASNGFYVTVNQFLSPPIF..." },
 
   // Human somatic genes
-  { id:"TP53",    name:"TP53",         type:"gene", color:CYAN, size:11, org:"soma", desc:"Guardian of the genome · G1/S & G2/M checkpoints · apoptosis trigger", layer:"infernia" },
-  { id:"BRCA1",   name:"BRCA1",        type:"gene", color:CYAN, size:9,  org:"soma", desc:"DNA repair · homologous recombination · breast/ovarian cancer susceptibility", layer:"reverie" },
-  { id:"MYC-h",   name:"MYC",          type:"gene", color:CYAN, size:9,  org:"soma", desc:"Master transcription factor · proliferation · metabolism · ribosome biogenesis", layer:"mnesis" },
-  { id:"CDK4",    name:"CDK4",         type:"gene", color:CYAN, size:9,  org:"soma", desc:"D-type cyclin-dependent kinase · G1 progression · Rb phosphorylation", layer:"aletheia" },
-  { id:"RB1",     name:"RB1",          type:"gene", color:CYAN, size:9,  org:"soma", desc:"Retinoblastoma protein · Restriction Point gate · E2F inhibitor", layer:"infernia" },
-  { id:"PCNA",    name:"PCNA",         type:"gene", color:CYAN, size:9,  org:"soma", desc:"Proliferating cell nuclear antigen · DNA polymerase processivity clamp", layer:"reverie" },
+  { id:"TP53",    name:"TP53",         type:"gene", color:CYAN, size:11, org:"soma", desc:"Guardian of the genome · G1/S & G2/M checkpoints · apoptosis trigger",    layer:"infernia", peptide:"MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGP..." },
+  { id:"BRCA1",   name:"BRCA1",        type:"gene", color:CYAN, size:9,  org:"soma", desc:"DNA repair · homologous recombination · breast/ovarian cancer susceptibility", layer:"reverie",  peptide:"MDLSALRVEEVQNVINAMQKILECPICLELIKEPVHGQWLDSPQPQKLIQDYPVSQFQSVGNETIMFAST..." },
+  { id:"MYC-h",   name:"MYC",          type:"gene", color:CYAN, size:9,  org:"soma", desc:"Master transcription factor · proliferation · metabolism · ribosome biogenesis", layer:"mnesis",  peptide:"MPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQQQSELQPPAPSEDIWKKFELLPTPPLSPS..." },
+  { id:"CDK4",    name:"CDK4",         type:"gene", color:CYAN, size:9,  org:"soma", desc:"D-type cyclin-dependent kinase · G1 progression · Rb phosphorylation",    layer:"aletheia", peptide:"MATTSVSSQLDLEESVQKILDGNIKSVDEMAHKLYSSGRDQFLVSSDQFSHSISGLDEAEIFD..." },
+  { id:"RB1",     name:"RB1",          type:"gene", color:CYAN, size:9,  org:"soma", desc:"Retinoblastoma protein · Restriction Point gate · E2F inhibitor",         layer:"infernia", peptide:"MASPPKKLSPEELPDSMEQIGRLIHQSCLSSDSVTEDSLLEDRVETRLFLEEMAKAERQQ..." },
+  { id:"PCNA",    name:"PCNA",         type:"gene", color:CYAN, size:9,  org:"soma", desc:"Proliferating cell nuclear antigen · DNA polymerase processivity clamp",   layer:"reverie",  peptide:"MFEARLVQGSILKKVLEALKDLINEACWDISSSGVNLQSMDSSHVSLVQLTLRSEGFDTYRCD..." },
 
   // Stem cell genes
-  { id:"OCT4",    name:"OCT4",         type:"gene", color:PURP, size:10, org:"stem", desc:"Pluripotency transcription factor · self-renewal gate · repress differentiation", layer:"mnesis" },
-  { id:"SOX2",    name:"SOX2",         type:"gene", color:PURP, size:9,  org:"stem", desc:"Partner to Oct4 · maintains pluripotency · neural development switch", layer:"aletheia" },
-  { id:"NANOG",   name:"NANOG",        type:"gene", color:PURP, size:9,  org:"stem", desc:"Pluripotency stabilizer · blocks differentiation signals · LIF-independent", layer:"infernia" },
-  { id:"KLF4",    name:"KLF4",         type:"gene", color:PURP, size:9,  org:"stem", desc:"Yamanaka factor · epithelial barrier · cell cycle exit · reprogramming", layer:"reverie" },
-  { id:"cMYC-s",  name:"c-MYC",        type:"gene", color:PURP, size:9,  org:"stem", desc:"Amplified in stem cells · drives abbreviated G1 · Warburg metabolism", layer:"mnesis" },
-  { id:"LIN28",   name:"LIN28",        type:"gene", color:PURP, size:9,  org:"stem", desc:"RNA-binding protein · blocks let-7 miRNA · promotes proliferation", layer:"aletheia" },
+  { id:"OCT4",    name:"OCT4",         type:"gene", color:PURP, size:10, org:"stem", desc:"Pluripotency transcription factor · self-renewal gate · repress differentiation", layer:"mnesis",   peptide:"MAGHLASDFAFSPPPGGGGDGSANSSSGSGGSGSTSSSSTSTGMGSTTSSSISSTSSPGGTVTLNRFNS..." },
+  { id:"SOX2",    name:"SOX2",         type:"gene", color:PURP, size:9,  org:"stem", desc:"Partner to Oct4 · maintains pluripotency · neural development switch",        layer:"aletheia", peptide:"MYNMMESFSTVASVPQMFNGSMDLLPWDSPLQMLSSEVEAQQEALSESGSGGGSGTSASRSSENSPRD..." },
+  { id:"NANOG",   name:"NANOG",        type:"gene", color:PURP, size:9,  org:"stem", desc:"Pluripotency stabilizer · blocks differentiation signals · LIF-independent",  layer:"infernia", peptide:"MSVDPACQETRMNFSGNLPGMSPNAGSANLPGMASPKPTAYPSFLPSQAMGSAAGHSSPYGQPQHQG..." },
+  { id:"KLF4",    name:"KLF4",         type:"gene", color:PURP, size:9,  org:"stem", desc:"Yamanaka factor · epithelial barrier · cell cycle exit · reprogramming",      layer:"reverie",  peptide:"MCDSSCRALLSSSTDQSRLSPEGPSQTPSSPGSPEAKPKRGRPPRKRSSEGPHSSGQPAEPGEAGKAS..." },
+  { id:"cMYC-s",  name:"c-MYC",        type:"gene", color:PURP, size:9,  org:"stem", desc:"Amplified in stem cells · drives abbreviated G1 · Warburg metabolism",        layer:"mnesis",   peptide:"MPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQQQSELQPPAPSEDIWKKFELLPTPPLSPSRRS..." },
+  { id:"LIN28",   name:"LIN28",        type:"gene", color:PURP, size:9,  org:"stem", desc:"RNA-binding protein · blocks let-7 miRNA · promotes proliferation",           layer:"aletheia", peptide:"MAAGGAGQQHQRAAGKMPYIINKMKVHCSEGHLDSQVREMIKLFNQRRKDQQARNAEALMAQDPKNQT..." },
 
   // Cancer genes
-  { id:"KRAS",    name:"KRAS*",        type:"gene", color:ROSE, size:10, org:"cancer", desc:"Constitutively active GTPase · locks growth signaling ON · undruggable", layer:"infernia" },
-  { id:"TP53-c",  name:"TP53*",        type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Loss-of-function mutant · checkpoints removed · apoptosis blocked", layer:"reverie" },
-  { id:"MYC-c",   name:"MYC*",         type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Amplified · drives transcription + metabolism · chromosomal instability", layer:"mnesis" },
-  { id:"PTEN",    name:"PTEN*",        type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Phosphatase tumor suppressor · PI3K/Akt brake removed · survival signal", layer:"aletheia" },
-  { id:"EGFR",    name:"EGFR*",        type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Receptor tyrosine kinase · overexpressed · growth signal amplification", layer:"infernia" },
-  { id:"BCL2",    name:"BCL2",         type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Anti-apoptotic · blocks cytochrome c release · survival at all costs", layer:"reverie" },
+  { id:"KRAS",    name:"KRAS*",        type:"gene", color:ROSE, size:10, org:"cancer", desc:"Constitutively active GTPase · locks growth signaling ON · undruggable",    layer:"infernia", peptide:"MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIED... (G12V: Gly→Val locks GTP-ON, RAF-MEK-ERK permanently active)" },
+  { id:"TP53-c",  name:"TP53*",        type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Loss-of-function mutant · checkpoints removed · apoptosis blocked",          layer:"reverie",  peptide:"MEEPQSDPSVEPPLSQETFSDLWKLLPE... (G245S missense: Arg245→Ser in DBD, cannot bind response elements)" },
+  { id:"MYC-c",   name:"MYC*",         type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Amplified · drives transcription + metabolism · chromosomal instability",    layer:"mnesis",   peptide:"MPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQ... (tandem amplification x20-100, wild-type sequence overproduced)" },
+  { id:"PTEN",    name:"PTEN*",        type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Phosphatase tumor suppressor · PI3K/Akt brake removed · survival signal",    layer:"aletheia", peptide:"MTAIIKEIVSRNKRRYQEDGFDLDLGKEMIADLVVS... (C124S: Cys124→Ser, phosphatase dead, PI3K/Akt unopposed)" },
+  { id:"EGFR",    name:"EGFR*",        type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Receptor tyrosine kinase · overexpressed · growth signal amplification",     layer:"infernia", peptide:"MRPSGTAGAALLALLAALCPASRALEEKKVCQGTSNKLTQLGTFEDHFLSLQ... (overexpressed; EGFRvIII lacks exons 2-7)" },
+  { id:"BCL2",    name:"BCL2",         type:"gene", color:ROSE, size:9,  org:"cancer", desc:"Anti-apoptotic · blocks cytochrome c release · survival at all costs",        layer:"reverie",  peptide:"MAHAGRTGYDNREIVMKYIHYKLSQRGYEWDAGDVGAAPPGAAPAPGIFSSQ... (t(14;18) fuses BCL2 to IgH promoter)" },
 ];
 
 const PLASMIDS: GNode[] = [
@@ -418,6 +419,25 @@ export default function GeneConceptMapPage() {
                   );
                 });
               })()}
+
+              {/* Central Dogma polypeptide */}
+              {selNode.peptide && (
+                <div style={{ marginTop: 12, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 10 }}>
+                  <div style={{ fontSize: 8, letterSpacing: "0.15em", color: "#2dd4bf", marginBottom: 4 }}>CENTRAL DOGMA · TRANSLATION</div>
+                  <div style={{ fontSize: 7.5, color: "rgba(255,255,255,0.4)", marginBottom: 6 }}>
+                    DNA → <span style={{ color: "#f5c84c" }}>mRNA</span> → <span style={{ color: "#4ade80" }}>polypeptide</span>
+                  </div>
+                  {selNode.peptide.startsWith("nc") ? (
+                    <div style={{ fontSize: 8, color: "#a78bfa", fontFamily: "monospace", lineHeight: 1.5, padding: "6px 8px", background: "rgba(167,139,250,0.06)", borderRadius: 4, border: "1px solid rgba(167,139,250,0.2)" }}>
+                      {selNode.peptide}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: 7.5, color: "#4ade80", fontFamily: "monospace", lineHeight: 1.6, wordBreak: "break-all", padding: "6px 8px", background: "rgba(74,222,128,0.05)", borderRadius: 4, border: "1px solid rgba(74,222,128,0.15)" }}>
+                      {selNode.peptide}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* layer badge */}
               {selNode.layer && (

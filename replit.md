@@ -140,6 +140,10 @@ I want iterative development. I prefer detailed explanations. Ask before making 
 - Database schema changes require `pnpm db:push`.
 - API client and Zod schemas must be regenerated with `pnpm codegen` after OpenAPI spec changes.
 
+## User preferences
+
+- **Timezone:** Always display timestamps in Eastern Time (`timeZone: "America/New_York"`). User lives in Central PA.
+
 ## Pointers
 
 - **Replit AI Docs:** _Populate as you build_

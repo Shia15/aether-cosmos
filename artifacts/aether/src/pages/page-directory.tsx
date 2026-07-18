@@ -34,7 +34,7 @@ function relDate(iso: string): string {
 }
 function fmtTime(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+  return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/New_York" });
 }
 
 // ── Category definitions ──────────────────────────────────────────────────────

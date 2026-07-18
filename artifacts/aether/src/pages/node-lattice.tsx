@@ -82,6 +82,7 @@ interface OrgSpec {
   aetherC: number; checkpointGate: boolean;
   enzymes: string[]; paths: string[]; desc: string;
   geneNames: string[]; geneCols: string[];
+  peptides: string[];   // polypeptide product of each gene (N-terminal AA sequence, 1-letter code)
 }
 
 const ORGS: Record<OrgKind, OrgSpec> = {
@@ -92,6 +93,7 @@ const ORGS: Record<OrgKind, OrgSpec> = {
     aetherC: 0.94, checkpointGate: false,
     geneNames: ["16S rRNA", "atpA", "polA", "recA", "GroEL", "GAPDH"],
     geneCols:  [TERA, GOLD, CYAN, GRN, VIO, AMB],
+    peptides:  ["ncRNA · scaffold ribosome 30S subunit · no translation", "MSATLKLIINPFASRQLREHLKS...", "MGSLNCIVAVSRKALEAALEKAG...", "MAIDENKQKALAAALGQIEKQFG...", "MAAKDVKFGNDARVKMLRGVNVL...", "MVKVGVNGFGRIGRLVTRAAFNS..."],
     enzymes: ["RNA Polymerase (proto-RNAP · ancestral to all life)", "Ribosome 70S (fully universal · least evolved structure)", "ATP Synthase / proto-ATPase (chemiosmosis · 3.8 Gya)", "DNA Pol I (proto-replicase · error rate ~10⁻⁷/base)", "RecA (primordial recombinase · genome repair)", "GroEL/GroES (chaperonin · protein folding · universal)"],
     paths: ["Wood-Ljungdahl (CO₂ + H₂ → acetyl-CoA · most ancestral)", "Proto-glycolysis (GAPDH · reverse TCA elements)", "Chemiosmosis (H⁺ gradient across membrane → ATP)", "Thioester chemistry (proto-metabolism without enzymes)"],
     desc: "The last node all extant life descends from — estimated 3.8–4.0 Gya. Every one of its ~355 genes is lethal-if-deleted; zero non-essential genes exist. No introns, no organelles, no nucleus, no cytoskeleton. Division is proto-binary fission: proto-FtsZ constricts the cell, but far more slowly than modern bacteria. Lives near alkaline hydrothermal vents (serpentinisation), runs on H₂/CO₂ chemistry, and uses an ancient lipid membrane whose composition is still debated (archaeal ether vs. bacterial ester lipids). This is the maximally evolutionarily constrained cell — everything that can be removed already was, by 4 billion years of selection.",
@@ -103,6 +105,7 @@ const ORGS: Record<OrgKind, OrgSpec> = {
     aetherC: 0.72, checkpointGate: false,
     geneNames: ["oriC", "dnaA", "lacZ", "trpA", "rpoB", "ftsZ"],
     geneCols:  [CYAN, GRN, GOLD, ROSE, VIO, AMB],
+    peptides:  ["ncDNA · replication origin · dnaA binding boxes · no translation", "MSLSLWQQCLARLQDPASRILE...", "MTMITDSLAVVLQRRDWENPGVT...", "MERYLASSVEERIAKLEKYFGVS...", "MVYSYTDEEALLAGKLTRKLHDD...", "MFEPMELTNDAVIRANNTGISLL..."],
     enzymes: ["DNA Pol III (main replicase)", "Topoisomerase II · GyrA (supercoil relief)", "FtsZ (Z-ring · division trigger)", "RecA (SOS repair · homologous recomb.)"],
     paths: ["Glycolysis → Pyruvate", "TCA cycle", "Oxidative phosphorylation", "Pentose phosphate pathway"],
     desc: "Binary fission — fastest common bacterium (~20 min real-time). No membrane-bound nucleus; circular chromosome replicated bidirectionally from oriC by two replication forks moving at ~1,000 bp/s. FtsZ GTPase polymerises into the Z-ring at mid-cell, constricts, and pinches the cell into two identical daughters. No G1 or G2 phases. No checkpoint gating.",
@@ -114,6 +117,7 @@ const ORGS: Record<OrgKind, OrgSpec> = {
     aetherC: 0.78, checkpointGate: true,
     geneNames: ["CDC28", "CDC20", "SIC1", "CLN1", "ADE2", "URA3"],
     geneCols:  [TEAL, GRN, GOLD, VIO, ROSE, CYAN],
+    peptides:  ["MEDYQTAWKDVNHKISQENLQNL...", "MDKTPFLSRPNGELPPSLPAGDL...", "MSGSSLSTSTSSGGVNSSRSSGRI...", "MSSSSSSSKGKGKGKSKSGSSSD...", "MSTQKLAEYVLEHHHFDLPGKVE...", "MSKAIVKDYIAKDAPGKITLNII..."],
     enzymes: ["Cdc28/Cdk1 (master kinase · drives all transitions)", "Cdc20 / APC-C (anaphase-promoting complex)", "Sic1 (CDK inhibitor · START gate)", "Clb2/Clb5 (B-type cyclins)"],
     paths: ["Fermentation (glucose → ethanol + CO₂)", "Gluconeogenesis", "Ergosterol pathway (membrane)", "Fatty acid synthesis"],
     desc: "Asymmetric budding — the bud grows as an outgrowth of the mother cell, which retains its identity and full complement of organelles. START commitment point in G1 (equivalent to Restriction Point in mammals) is gated by Cdc28/Sic1 balance. Model organism for cell-cycle research — nearly every mammalian CDK has a yeast homolog.",
@@ -125,6 +129,7 @@ const ORGS: Record<OrgKind, OrgSpec> = {
     aetherC: 0.83, checkpointGate: true,
     geneNames: ["TP53", "BRCA1", "MYC", "CDK4", "RB1", "PCNA"],
     geneCols:  [ROSE, GRN, GOLD, TEAL, VIO, CYAN],
+    peptides:  ["MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDP...", "MDLSALRVEEVQNVINAMQKILECPICLELIKEPVHGQWLDSPQPQKLIQDYPVSQFQS...", "MPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQQQSELQPPAPSEDIWKKFELLPTPP...", "MATTSVSSQLDLEESVQKILDGNIKSVDEMAHKLYSSGRDQFLVSSDQFSHSISGLDEAE...", "MASPPKKLSPEELPDSMEQIGRLIHQSCLSSDSVTEDSLLEDRVETRLFLEEMAKAERQQ...", "MFEARLVQGSILKKVLEALKDLINEACWDISSSGVNLQSMDSSHVSLVQLTLRSEGFDER..."],
     enzymes: ["DNA Pol δ/ε (replication)", "CDK1/Cyclin-B (G2→M trigger)", "Condensin I/II (chromosome compaction)", "Separase (cohesin cleavage · anaphase)", "Polo-like kinase 1 (PLK1 · centrosome)"],
     paths: ["Oxidative phosphorylation (primary ATP source)", "Pentose phosphate (NADPH / nucleotides)", "Serine–one-carbon (folate cycle)", "Fatty acid oxidation"],
     desc: "Full eukaryotic mitosis — 46 chromosomes condensed, aligned at metaphase plate, pulled to poles by spindle microtubules, encapsulated in daughter nuclei. Three checkpoints: G1/S Restriction Point (Rb/E2F), G2/M (CDK1/Cyclin-B activation), Spindle Assembly Checkpoint (SAC · Mad2/BubR1). Coherence gate C ≥ 0.65 required to cross G1/S.",
@@ -136,6 +141,7 @@ const ORGS: Record<OrgKind, OrgSpec> = {
     aetherC: 0.90, checkpointGate: true,
     geneNames: ["OCT4", "SOX2", "NANOG", "KLF4", "cMYC", "LIN28"],
     geneCols:  [PURP, GRN, GOLD, TEAL, ROSE, CYAN],
+    peptides:  ["MAGHLASDFAFSPPPGGGGDGSANSSSGSGGSGSTSSSSTSTGMGSTTSSSISSTSSPGG...", "MYNMMESFSTVASVPQMFNGSMDLLPWDSPLQMLSSEVEAQQEALSESGSGGGSGTSAS...", "MSVDPACQETRMNFSGNLPGMSPNAGSANLPGMASPKPTAYPSFLPSQAMGSAAGHSSPY...", "MCDSSCRALLSSSTDQSRLSPEGPSQTPSSPGSPEAKPKRGRPPRKRSSEGPHSSGQPAE...", "MPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQQQSELQPPAPSEDIWKKFELLPTPP...", "MAAGGAGQQHQRAAGKMPYIINKMKVHCSEGHLDSQVREMIKLFNQRRKDQQARNAEALM..."],
     enzymes: ["Oct4/Sox2/Nanog (pluripotency TF triad)", "LIF-STAT3 (self-renewal signalling)", "CDK2/Cyclin-E (abbreviated G1)", "DNMT3A/B (de novo methylation · differentiation)"],
     paths: ["Glycolysis (Warburg-like · fast ATP)", "OXPHOS switch (on differentiation)", "Acetyl-CoA metabolism (epigenetic fuel)", "One-carbon / folate (nucleotide synthesis)"],
     desc: "Asymmetric division: one daughter self-renews (maintains pluripotency), one begins differentiation. Very short G1 (Myc-driven CDK2 keeps Rb hyperphosphorylated). Large S-phase fraction = high replication coherence. Can enter G0 reversible quiescence (contact-inhibited). Yamanaka factors (Oct4+Sox2+Klf4+Myc) can reprogram somatic cells back to this state — coherence reset.",
@@ -147,6 +153,7 @@ const ORGS: Record<OrgKind, OrgSpec> = {
     aetherC: 0.42, checkpointGate: false,
     geneNames: ["KRAS*", "TP53*", "MYC*", "PTEN*", "EGFR*", "BCL2"],
     geneCols:  [ROSE, AMB, GOLD, VIO, GRN, TEAL],
+    peptides:  ["MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTI...(G12V: Gly→Val, locks GTP-ON)", "MEEPQSDPSVEPPLSQETFSDLWKLLPE...(G245S missense: DBD helix disrupted)", "MPLNVSFTNRNYDLDYDSVQPYFYCDEEENFYQQQ...(tandem amplification ×20–100)", "MTAIIKEIVSRNKRRYQEDGFDLDLGKEMIADLVVS...(C124S: phosphatase dead, PI3K brake lost)", "MRPSGTAGAALLALLAALCPASRALEEKKVCQGTSNKLTQLGTFEDHFLSLQRMFNNCEVVLGNLEITYVQRNYDLSFLKTIQEVAGYVLIALNTVERIPLENLQIIRGNMYYENSYALAVLSNYDANKTGLKELPMRNLQEILHGAVRFSNNPALCNVESIQWRDIVSSDFLSNMSMDFQNHLGSCQKCDPSCPNGSCWGAGEENCQKLTKIICAQQCSGRCRGKSPSDCCHNQCAAGCTGPRESDCLVCRKFRDEATCKDTCPPLMLYNPTTYQMDVNPEGKYSFGATCVKKCPRNYVVTDHGSCVRACGADSYEMEEDGVRKCKKCEGPCRKVCNGIGIGEFKDSLSINATNIKHFKNCTSISGDLHILPVAFRGDSFTHTPPLDPQELDILKTVKEITGFLLIQAWPENRTDLHAFENLEIIRGRTKQHGQFSLAVVSLNITSLGLRSLKEISDGDVIISGNKNLCYANTINWKKLFGTSGQKTKIISNRGENSCKATGQVCHALCSPEGCWGPEPRDCVSCRNVSRGRECVDKCNLLEGEPREFVENSECIQCHPECLPQAMNITCTGRGPDNCIQCAHYIDGPHCVKTCPAGVMGENNTLVWKYADAGHVCHLCHPNCTYGCTGPGLEGCPTNGPKIPSIATGMVGALLLLLVVALGIGLFMRRRHIVRKRTLRRLLQERELVEPLTPSGEAPNQALLRILKETEFKKIKVLGSGAFGTVYKGLWIPEGEKVKIPVAIKELREATSPKANKEILDEAYVMASVDNPHVCRLLGICLTSTVQLITQLMPFGCLLDYVREHKDNIGSQYLLNWCVQIAKGMNYLEDRRLVHRDLAARNVLVKTPQHVKITDFGLAKLLGAEEKEYHAEGGKVPIKWMALESILHRIYTHQSDVWSYGVTVWELMTFGSKPYDGIPASEISSILEKGERLPQPPICTIDVYMIMVKCWMIDADSRPKFRELIIEFSKMARDPQRYLVIQGDERMHLPSPTDSNFYRALMDEEDMDDVVDADEYLIPQQGFFSSPSTSRTPLLSSLSATSNNSTVACIDRNGLQSCPIKEDSFLQRYSSDPTGALTEDSIDDTFLPVPEYINQSVPKRPAGSVQNPVYHNQPLNPAPSRDPHYQDPHSTAVGNPEYLNTVQPTCVNSTFDSPAHWAQKGSHQISLDNPDYQQDFFPKEAKPNGIFKGSTAENAEYLRVAPQSSEFIGA...(overexpressed)", "MAHAGRTGYDNREIVMKYIHYKLSQRGYEWDAGDVGAAPPGAAPAPGIFSSQPGHTPHPAASRDPVARTSPLQTPAAPGAAAGPALSPVPPVVHLTLRQAGDDFSRRYYRLDLSANAGDTHLGIPEQNLIRRECNRVSEGDLAALEGFHSALELQDAQRILDREPRRMAEAFKDEGMAEAARVGERLSASPEEQLRYLTAQHIQLMQGKKLNQHLHSASGLTEQDELIRDLRASVDQTIEDLMRQFLDLNRQHQFAQSITPMISRALATEEMDRYIRDRLAMLPVQKRESITLREELLQREQAERIRAQKERDEREQRELEEARELEQISREHLDRLDQIFNQNQAQLHEKMRLMEERLEQMRARLEQMKARLEQMKA..."],
     enzymes: ["Mutant Ras (constitutively active GTPase)", "Inactive p53 (guardian silenced)", "Amplified Myc (transcription · metabolism)", "CDK4/6 (Rb bypass — no Restriction Point)", "Survivin (apoptosis block · IAP family)"],
     paths: ["Warburg effect (aerobic glycolysis → lactate)", "Glutaminolysis (carbon + nitrogen source)", "De novo lipid synthesis (membrane expansion)", "Serine pathway (nucleotide synthesis · rapid S phase)"],
     desc: "Checkpoint-deficient uncontrolled division. TP53 mutation removes G1/S and G2/M brakes. Mutant KRAS locks growth signalling permanently ON. Contact inhibition lost — cells pile into multilayer colonies. Telomerase reactivated → unlimited replication. Chromosomal instability causes segregation errors → aneuploidy. AETHER coherence field disrupted: C = 0.42 — well below the 0.65 LPE threshold — yet division continues because checkpoint gate is absent.",
@@ -1120,6 +1127,31 @@ export default function NodeLatticePage() {
                   <span style={{ fontSize: 9, color: spec.geneCols[i], fontFamily: MONO }}>{g}</span>
                 </div>
               ))}
+
+              {/* Central Dogma Translation */}
+              <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", margin: "12px 0 4px" }}>CENTRAL DOGMA · TRANSLATION</div>
+              <div style={{ fontSize: 8, color: SLATE, lineHeight: 1.5, marginBottom: 8 }}>
+                DNA codon sequence → mRNA transcript → polypeptide chain
+              </div>
+              <div style={{ fontSize: 8, color: MUTED, fontFamily: MONO, marginBottom: 10, display: "flex", gap: 4, alignItems: "center" }}>
+                <span style={{ color: CYAN }}>5'–ATG–</span>
+                <span style={{ color: GOLD }}>→ AUG–</span>
+                <span style={{ color: GRN }}>→ Met–···</span>
+              </div>
+              {spec.geneNames.map((g, i) => {
+                const pep = spec.peptides[i] ?? "";
+                const isNc = pep.startsWith("nc");
+                return (
+                  <div key={g} style={{ marginBottom: 8, paddingLeft: 8, borderLeft: `2px solid ${spec.geneCols[i]}44` }}>
+                    <div style={{ fontSize: 8, color: spec.geneCols[i], fontFamily: MONO, marginBottom: 2 }}>{g}</div>
+                    {isNc ? (
+                      <div style={{ fontSize: 7.5, color: VIO, fontFamily: MONO, lineHeight: 1.4 }}>{pep}</div>
+                    ) : (
+                      <div style={{ fontSize: 7, color: GRN + "bb", fontFamily: MONO, lineHeight: 1.5, wordBreak: "break-all" }}>{pep}</div>
+                    )}
+                  </div>
+                );
+              })}
 
               <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", margin: "10px 0 6px" }}>KEY ENZYMES</div>
               {spec.enzymes.map(e => (
