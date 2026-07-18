@@ -7,18 +7,18 @@ import { useLocation } from "wouter";
 import { NAV_ITEMS } from "@/components/layout";
 
 // ── Recently-added registry ──────────────────────────────────────────────────
-// Add new entries here whenever a page is created. addedAt = ISO date.
+// Add new entries here whenever a page is created. addedAt = ISO date + time.
 const RECENT_ADDITIONS: { href: string; addedAt: string; note?: string }[] = [
-  { href: "/rf-diffusion",             addedAt: "2026-07-18", note: "Protein structure visualiser · drag-rotate · PNG export" },
-  { href: "/bee-liquid-chip",          addedAt: "2026-07-17", note: "Cryogenic neuromorphic reservoir · hemolymph packet switching" },
-  { href: "/ai-image-nest",            addedAt: "2026-07-17", note: "GPT image vault · typeahead · Drive photos · visual search" },
-  { href: "/grok-imagine",             addedAt: "2026-07-17", note: "Aurora image generation · grok-2-image · AI art synthesis" },
-  { href: "/grok-synthesis",           addedAt: "2026-07-17", note: "Cross-synthesis · @Strategicproce × @Shia449272 · material nodes" },
-  { href: "/google-drive",             addedAt: "2026-07-17", note: "Browse & read Google Drive docs inside AETHER" },
-  { href: "/node-lattice",             addedAt: "2026-07-17", note: "BFS illumination · grid/hex/random graph · wavefront" },
-  { href: "/gene-concept-map",         addedAt: "2026-07-18", note: "Interactive gene atlas · 6 organisms · 36 genes · 9 plasmids · force graph" },
-  { href: "/coherence-field-explorer", addedAt: "2026-07-17", note: "C(x,t) field · φ-time scheduling · Ptah operator · lattice" },
-  { href: "/command-center",           addedAt: "2026-07-17", note: "5-source unified search · concepts + visuals + Notion + X" },
+  { href: "/gene-concept-map",         addedAt: "2026-07-18T02:15", note: "Interactive gene atlas · 6 organisms · 36 genes · 9 plasmids · force graph" },
+  { href: "/rf-diffusion",             addedAt: "2026-07-18T01:00", note: "Protein structure visualiser · drag-rotate · PNG export" },
+  { href: "/command-center",           addedAt: "2026-07-17T23:30", note: "5-source unified search · concepts + visuals + Notion + X" },
+  { href: "/coherence-field-explorer", addedAt: "2026-07-17T20:00", note: "C(x,t) field · φ-time scheduling · Ptah operator · lattice" },
+  { href: "/google-drive",             addedAt: "2026-07-17T18:45", note: "Browse & read Google Drive docs inside AETHER" },
+  { href: "/grok-imagine",             addedAt: "2026-07-17T16:20", note: "Aurora image generation · grok-2-image · AI art synthesis" },
+  { href: "/grok-synthesis",           addedAt: "2026-07-17T14:10", note: "Cross-synthesis · @Strategicproce × @Shia449272 · material nodes" },
+  { href: "/ai-image-nest",            addedAt: "2026-07-17T12:00", note: "GPT image vault · typeahead · Drive photos · visual search" },
+  { href: "/bee-liquid-chip",          addedAt: "2026-07-17T09:30", note: "Cryogenic neuromorphic reservoir · hemolymph packet switching" },
+  { href: "/node-lattice",             addedAt: "2026-07-17T08:00", note: "Cell division & gene replication · mutation · plasmid conjugation · live sim" },
 ];
 
 const RECENT_WINDOW_DAYS = 7;
@@ -31,6 +31,10 @@ function relDate(iso: string): string {
   if (d === 0) return "Today";
   if (d === 1) return "Yesterday";
   return `${d} days ago`;
+}
+function fmtTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
 // ── Category definitions ──────────────────────────────────────────────────────
@@ -283,7 +287,9 @@ export default function PageDirectoryPage() {
 
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div style={{ fontSize: 10, color: "#4ade8099", letterSpacing: 0.3 }}>{r.href}</div>
-                        <div style={{ fontSize: 10, color: "#4ade8066" }}>{relDate(r.addedAt)}</div>
+                        <div style={{ fontSize: 10, color: "#4ade8066" }}>
+                          {daysAgo(r.addedAt) === 0 ? fmtTime(r.addedAt) : `${relDate(r.addedAt)} · ${fmtTime(r.addedAt)}`}
+                        </div>
                       </div>
                     </div>
                   );
@@ -322,6 +328,10 @@ function groupByDate(items: { href: string; addedAt: string; note?: string; page
     const label = d === 0 ? "Today" : d === 1 ? "Yesterday" : new Date(item.addedAt).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
     if (!groups.has(label)) groups.set(label, []);
     groups.get(label)!.push(item);
+  }
+  // Sort within each date group by time (newest first)
+  for (const [, arr] of groups) {
+    arr.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
   }
   return Array.from(groups.entries()).map(([label, items]) => ({ label, items }));
 }
