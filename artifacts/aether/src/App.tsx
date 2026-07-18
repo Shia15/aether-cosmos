@@ -446,6 +446,7 @@ const BindingTheDarkPage        = lazy(() => import("@/pages/binding-the-dark"))
 const SymphonicGovernancePage   = lazy(() => import("@/pages/symphonic-governance"));
 const DiamondPearlPage          = lazy(() => import("@/pages/diamond-pearl"));
 const DimensionalCompilerPage   = lazy(() => import("@/pages/dimensional-compiler"));
+const AetherProductsPage        = lazy(() => import("@/pages/aether-products"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1485,6 +1486,7 @@ function Router() {
                 <Route path="/integration-dimensions" component={IntegrationDimensionsPage} />
                 <Route path="/stacked-rings-engine" component={StackedRingsEnginePage} />
                 <Route path="/dimensional-compiler" component={DimensionalCompilerPage} />
+                <Route path="/aether-products"     component={AetherProductsPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
