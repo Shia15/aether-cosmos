@@ -10,6 +10,7 @@ const ROSE  = "#f87171";
 const AMB   = "#fb923c";
 const GRN   = "#4ade80";
 const PURP  = "#c084fc";
+const TERA  = "#c4905a";  // terra-cotta · primordial / LUCA
 const SLATE = "#475569";
 const WHITE = "#e2e8f0";
 const MUTED = "#64748b";
@@ -17,7 +18,7 @@ const MONO  = "'DM Mono', monospace";
 const TAU   = 2 * Math.PI;
 
 type Phase   = "G0" | "G1" | "S" | "G2" | "M" | "fission" | "budding";
-type OrgKind = "ecoli" | "yeast" | "somatic" | "stem" | "cancer";
+type OrgKind = "luca" | "ecoli" | "yeast" | "somatic" | "stem" | "cancer";
 
 const PHASE_COL: Record<Phase, string> = {
   G0: SLATE, G1: TEAL, S: GOLD, G2: VIO, M: ROSE, fission: AMB, budding: GRN,
@@ -39,6 +40,17 @@ interface OrgSpec {
 }
 
 const ORGS: Record<OrgKind, OrgSpec> = {
+  luca: {
+    name: "LUCA", fullName: "Last Universal Common Ancestor · Proto-Cell",
+    color: TERA, cycleS: 120, chromCount: "1 (circular ~600 kb)", genomeSize: "~600 kb", geneCount: "~355 (all essential)",
+    phases: ["G1", "S", "fission"], phaseFrac: [0.50, 0.30, 0.20],
+    aetherC: 0.94, checkpointGate: false,
+    geneNames: ["16S rRNA", "atpA", "polA", "recA", "GroEL", "GAPDH"],
+    geneCols:  [TERA, GOLD, CYAN, GRN, VIO, AMB],
+    enzymes: ["RNA Polymerase (proto-RNAP · ancestral to all life)", "Ribosome 70S (fully universal · least evolved structure)", "ATP Synthase / proto-ATPase (chemiosmosis · 3.8 Gya)", "DNA Pol I (proto-replicase · error rate ~10⁻⁷/base)", "RecA (primordial recombinase · genome repair)", "GroEL/GroES (chaperonin · protein folding · universal)"],
+    paths: ["Wood-Ljungdahl (CO₂ + H₂ → acetyl-CoA · most ancestral)", "Proto-glycolysis (GAPDH · reverse TCA elements)", "Chemiosmosis (H⁺ gradient across membrane → ATP)", "Thioester chemistry (proto-metabolism without enzymes)"],
+    desc: "The last node all extant life descends from — estimated 3.8–4.0 Gya. Every one of its ~355 genes is lethal-if-deleted; zero non-essential genes exist. No introns, no organelles, no nucleus, no cytoskeleton. Division is proto-binary fission: proto-FtsZ constricts the cell, but far more slowly than modern bacteria. Lives near alkaline hydrothermal vents (serpentinisation), runs on H₂/CO₂ chemistry, and uses an ancient lipid membrane whose composition is still debated (archaeal ether vs. bacterial ester lipids). This is the maximally evolutionarily constrained cell — everything that can be removed already was, by 4 billion years of selection.",
+  },
   ecoli: {
     name: "E. coli", fullName: "Escherichia coli K-12",
     color: AMB, cycleS: 28, chromCount: "1 (circular)", genomeSize: "4.6 Mb", geneCount: "4,316",
@@ -148,7 +160,7 @@ export default function NodeLatticePage() {
   const [selCell, setSelCell] = useState<Cell | null>(null);
   const [stats, setStats]     = useState({ total: 0, byPhase: {} as Record<string, number>, avgC: 0 });
   const [orgKind, setOrgKind] = useState<OrgKind>("ecoli");
-  const [infoTab, setInfoTab] = useState<"cycle" | "org" | "aether">("cycle");
+  const [infoTab, setInfoTab] = useState<"cycle" | "org" | "aether" | "evolution">("cycle");
 
   // speed/gf/stress slider refs
   const speedSlRef = useRef<HTMLInputElement>(null);
@@ -608,7 +620,7 @@ export default function NodeLatticePage() {
 
         {/* info tabs */}
         <div style={{ display: "flex", borderBottom: "1px solid rgba(100,180,255,0.08)" }}>
-          {([["cycle","CELL CYCLE"],["org","ORGANISM"],["aether","AETHER"]] as [typeof infoTab, string][]).map(([t, l]) => (
+          {([["cycle","CYCLE"],["org","ORGANISM"],["aether","AETHER"],["evolution","EVOLUTION"]] as [typeof infoTab, string][]).map(([t, l]) => (
             <button key={t} onClick={() => setInfoTab(t)}
               style={{ flex: 1, padding: "7px 0", fontSize: 8, letterSpacing: "0.15em", background: "transparent", border: "none", borderBottom: infoTab === t ? `2px solid ${spec.color}` : "2px solid transparent", color: infoTab === t ? spec.color : MUTED, cursor: "pointer" }}>
               {l}
@@ -786,6 +798,118 @@ export default function NodeLatticePage() {
               ))}
             </div>
           )}
+
+          {infoTab === "evolution" && (
+            <div>
+              {/* intro */}
+              <div style={{ fontSize: 9, color: MUTED, lineHeight: 1.65, marginBottom: 12 }}>
+                A <span style={{ color: TERA }}>naturally constrained cell</span> is one where evolution has had the most time to eliminate every non-essential gene. LUCA is the deepest node — its genome is the irreducible core that all life shares. Below that core lies only chemistry.
+              </div>
+
+              {/* stability equations */}
+              <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", marginBottom: 8 }}>STABILITY EQUATIONS</div>
+              {[
+                { label: "Gibbs free energy (spontaneity)", eq: "ΔG = ΔH − T·ΔS < 0", note: "All biochemical reactions must satisfy this to proceed. Cell metabolism = continuous ΔG < 0 chain." },
+                { label: "Eigen error threshold", eq: "q^L > q_min = e^{−μ·L}", note: "Replication fidelity q per base, genome length L. Below threshold: genome melts — information destroyed. LUCA is at the threshold. Modern DNA pol proofreading raised q, allowing larger genomes." },
+                { label: "Replication survival fraction", eq: "Φ = q^L  (LUCA: 0.94)", note: "q = 0.9999999 (10⁻⁷ error/base), L = 600,000. E. coli: q ≈ 1−10⁻¹⁰, L = 4.6M → Φ ≈ 0.9995." },
+                { label: "Monod growth (nutrient-limited)", eq: "μ = μ_max · [S] / (K_s + [S])", note: "LUCA lived at hydrothermal vent — [S] = dissolved H₂/CO₂. K_s high → slow growth, stable equilibrium with vent flux." },
+                { label: "Fitness landscape (Fisher)", eq: "dW̄/dt = Var(w) / W̄", note: "Rate of fitness increase equals variance in fitness. LUCA had very low variance — maximum constraint means minimum evolvability." },
+                { label: "Membrane electrochemical potential", eq: "ΔμH⁺ = F·ΔΨ − RT·ln([H⁺]out/[H⁺]in)", note: "The proton motive force driving ATP synthase. The vent provided a natural H⁺ gradient before any membrane evolved — first 'free' energy source for life." },
+              ].map(({ label, eq, note }) => (
+                <div key={label} style={{ marginBottom: 10, borderLeft: `2px solid ${TERA}55`, paddingLeft: 8 }}>
+                  <div style={{ fontSize: 8, color: TERA }}>{label}</div>
+                  <div style={{ fontSize: 10, color: GOLD, fontFamily: MONO, margin: "2px 0" }}>{eq}</div>
+                  <div style={{ fontSize: 9, color: MUTED, lineHeight: 1.5 }}>{note}</div>
+                </div>
+              ))}
+
+              {/* bottom-up construction */}
+              <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", margin: "12px 0 8px" }}>BOTTOM-UP CONSTRUCTION</div>
+              {[
+                { level: "1 · Pure chemistry", col: "#4b5563", items: ["H₂O, CO₂, NH₃, H₂S, HCN (Miller-Urey)", "Amino acids, nucleobases via UV + heat", "Mineral surfaces (FeS, pyrite) as catalysts", "No information, no membrane, no selection"] },
+                { level: "2 · Polymer world", col: "#6b7280", items: ["Short peptides form spontaneously in hot/dry cycles", "RNA oligomers — 2'–5' and 3'–5' linkages", "No faithful copying yet — random sequence space", "Thioester bonds as proto-high-energy phosphate"] },
+                { level: "3 · RNA World", col: AMB, items: ["Ribozymes: RNA acts as both information AND catalyst", "Self-replicating RNA emerges (~4.2 Gya estimate)", "Error rate ~10⁻² — limits genome to ~100 bases (Eigen)", "Peptidyl transferase (ribosome core) still RNA today"] },
+                { level: "4 · LUCA · Proto-cell", col: TERA, items: ["DNA takes over information storage (more stable)", "Proteins take over catalysis (more versatile)", "Lipid membrane encloses the system", "~355 essential genes · chemiosmosis · ribosomes"] },
+                { level: "5 · Prokaryote crown", col: AMB, items: ["~4,000 genes in E. coli — 3,600 non-essential added", "Metabolic diversification (photosynthesis, nitrogen fixing)", "Horizontal gene transfer drives rapid innovation", "Fast division (~20 min) — relaxed constraint"] },
+                { level: "6 · Eukaryote", col: CYAN, items: ["Endosymbiosis: mitochondrion = engulfed α-proteobacterium", "Nucleus separates transcription from translation", "~20,000 genes · complex gene regulation", "Mitosis required for accurate 46-chromosome segregation"] },
+              ].map(({ level, col, items }) => (
+                <div key={level} style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 9, color: col, fontWeight: 700, marginBottom: 4 }}>{level}</div>
+                  {items.map(it => (
+                    <div key={it} style={{ fontSize: 9, color: MUTED, lineHeight: 1.5, paddingLeft: 8 }}>· {it}</div>
+                  ))}
+                </div>
+              ))}
+
+              {/* evolutionary chasms */}
+              <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", margin: "12px 0 8px" }}>EVOLUTIONARY CHASMS</div>
+              <div style={{ fontSize: 9, color: MUTED, lineHeight: 1.6, marginBottom: 8 }}>A chasm is a transition so improbable it happened only once in 4 billion years of life on Earth. Each one is an AETHER crystallisation event at the evolutionary scale — a phase transition in information complexity.</div>
+              {[
+                { name: "Chemistry → RNA World", age: "~4.2–4.0 Gya", difficulty: "Unknown — possibly the hardest", col: "#6b7280", desc: "Spontaneous polymerisation of RNA with catalytic activity. No known path from chemistry to a self-replicating molecule. May have required mineral templating (montmorillonite clay, FeS scaffolds at alkaline vents)." },
+                { name: "RNA World → LUCA (DNA/protein)", age: "~4.0–3.8 Gya", difficulty: "Happened once · no repeats", col: TERA, desc: "Genetic code origin: 64 codons → 20 amino acids. This code is nearly universal (only minor variations in mitochondria). Once fixed, the code became locked — any change breaks all existing proteins simultaneously. Maximum evolutionary constraint." },
+                { name: "LUCA → Crown Prokaryotes", age: "~3.8–3.0 Gya", difficulty: "Multiple events (Bacteria/Archaea split)", col: AMB, desc: "Domain divergence: Bacteria and Archaea differ in membrane lipid chemistry (ester vs. ether), yet share the same DNA, ribosomes, ATP synthase — all inherited from LUCA. Metabolic explosion: photosynthesis, nitrogen fixation, sulfur reduction." },
+                { name: "Prokaryote → Eukaryote", age: "~2.0–1.8 Gya", difficulty: "Happened once (endosymbiosis)", col: CYAN, desc: "An archaeal host engulfed an alpha-proteobacterium — instead of digesting it, they formed a permanent partnership. The bacterium became the mitochondrion. This gave eukaryotes 10,000× more energy per gene, enabling genome expansion. The nucleus then allowed complex gene regulation." },
+              ].map(({ name, age, difficulty, col, desc }) => (
+                <div key={name} style={{ marginBottom: 12, borderLeft: `3px solid ${col}`, paddingLeft: 10 }}>
+                  <div style={{ fontSize: 10, color: col, fontWeight: 700, marginBottom: 2 }}>{name}</div>
+                  <div style={{ display: "flex", gap: 12, marginBottom: 3 }}>
+                    <span style={{ fontSize: 8, color: MUTED }}>{age}</span>
+                    <span style={{ fontSize: 8, color: col + "88" }}>{difficulty}</span>
+                  </div>
+                  <div style={{ fontSize: 9, color: MUTED, lineHeight: 1.55 }}>{desc}</div>
+                </div>
+              ))}
+
+              {/* LUCA vs E. coli comparison */}
+              <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", margin: "12px 0 8px" }}>LUCA vs. E. COLI — PROKARYOTE CHASM</div>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 9 }}>
+                  <thead>
+                    <tr>
+                      {["Property", "LUCA", "E. coli"].map(h => (
+                        <th key={h} style={{ padding: "4px 6px", borderBottom: `1px solid rgba(100,180,255,0.12)`, color: MUTED, fontWeight: 400, textAlign: "left" }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ["Genes", "~355 (all essential)", "4,316 (~1,000 essential)"],
+                      ["Genome size", "~600 kb", "4.6 Mb (7.7× larger)"],
+                      ["Non-essential genes", "0%", "~77%"],
+                      ["Division time", "~120s sim / hours real", "~28s sim / 20 min real"],
+                      ["Error rate", "~10⁻⁷/base", "~10⁻¹⁰/base (proofreading)"],
+                      ["Survival Φ (q^L)", "~0.94", "~0.9995"],
+                      ["Energy source", "H₂/CO₂ (vent gradient)", "Glycolysis / OXPHOS"],
+                      ["Membrane lipids", "Debated (proto-ether?)", "Ester-linked fatty acids"],
+                      ["Gene transfer", "Vertical only (proto)", "HGT 15% of genome"],
+                      ["Evolutionary constraint", "MAXIMUM (all lethal)", "Moderate (77% flexible)"],
+                      ["AETHER coherence C̄", "0.94 (tightest system)", "0.72 (diversified)"],
+                    ].map(([prop, luca, ecoli]) => (
+                      <tr key={prop}>
+                        <td style={{ padding: "3px 6px", color: MUTED, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>{prop}</td>
+                        <td style={{ padding: "3px 6px", color: TERA, fontFamily: MONO, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>{luca}</td>
+                        <td style={{ padding: "3px 6px", color: AMB, fontFamily: MONO, borderBottom: "1px solid rgba(255,255,255,0.04)" }}>{ecoli}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* AETHER framing */}
+              <div style={{ fontSize: 8, color: MUTED, letterSpacing: "0.15em", margin: "14px 0 8px" }}>AETHER READING</div>
+              {[
+                { h: "LUCA = Maximum crystallisation", b: "LUCA has the highest coherence C = 0.94 because it is maximally ordered — every gene locked in, nothing redundant. This is the fully crystallised state of biology. Any mutation is a crack in the crystal; natural selection immediately repairs it." },
+                { h: "Evolution = controlled decoherence", b: "From LUCA to E. coli, the genome expanded 7.7× — but most new genes are non-essential. Coherence per gene dropped from 1.0 (all essential) to ~0.23 (23% essential). Evolvability requires some disorder (C < 1.0) to sample new sequence space." },
+                { h: "Chasms = phase transitions", b: "Each evolutionary chasm is a first-order phase transition in information space: the system crosses an energy barrier into a new attractor basin. RNA→DNA was a phase transition in information storage medium. Endosymbiosis was a phase transition in energy architecture. Both happened exactly once." },
+              ].map(({ h, b }) => (
+                <div key={h} style={{ marginBottom: 10, background: "rgba(0,0,0,0.25)", borderRadius: 6, padding: "8px 10px" }}>
+                  <div style={{ fontSize: 9, color: TERA, fontWeight: 600, marginBottom: 3 }}>{h}</div>
+                  <div style={{ fontSize: 9, color: MUTED, lineHeight: 1.6 }}>{b}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
         </div>
       </div>
     </div>
