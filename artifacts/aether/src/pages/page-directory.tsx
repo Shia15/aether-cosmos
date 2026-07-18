@@ -16,6 +16,7 @@ const RECENT_ADDITIONS: { href: string; addedAt: string; note?: string }[] = [
   { href: "/grok-synthesis",           addedAt: "2026-07-17", note: "Cross-synthesis · @Strategicproce × @Shia449272 · material nodes" },
   { href: "/google-drive",             addedAt: "2026-07-17", note: "Browse & read Google Drive docs inside AETHER" },
   { href: "/node-lattice",             addedAt: "2026-07-17", note: "BFS illumination · grid/hex/random graph · wavefront" },
+  { href: "/gene-concept-map",         addedAt: "2026-07-18", note: "Interactive gene atlas · 6 organisms · 36 genes · 9 plasmids · force graph" },
   { href: "/coherence-field-explorer", addedAt: "2026-07-17", note: "C(x,t) field · φ-time scheduling · Ptah operator · lattice" },
   { href: "/command-center",           addedAt: "2026-07-17", note: "5-source unified search · concepts + visuals + Notion + X" },
 ];

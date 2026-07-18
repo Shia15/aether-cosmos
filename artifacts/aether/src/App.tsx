@@ -511,6 +511,7 @@ const ThreeOscillatorPage        = lazy(() => import("@/pages/three-oscillator")
 const WomensCoherenceMapPage     = lazy(() => import("@/pages/womens-coherence-map"));
 const EarthComputerPage          = lazy(() => import("@/pages/earth-computer"));
 const NodeLatticePage            = lazy(() => import("@/pages/node-lattice"));
+const GeneConceptMapPage         = lazy(() => import("@/pages/gene-concept-map"));
 const CoherenceFieldExplorerPage = lazy(() => import("@/pages/coherence-field-explorer"));
 const GoogleDrivePage            = lazy(() => import("@/pages/google-drive"));
 const AiImageNestPage            = lazy(() => import("@/pages/ai-image-nest"));
@@ -1539,6 +1540,7 @@ function Router() {
                 <Route path="/womens-coherence-map" component={WomensCoherenceMapPage} />
                 <Route path="/earth-computer" component={EarthComputerPage} />
                 <Route path="/node-lattice" component={NodeLatticePage} />
+                <Route path="/gene-concept-map" component={GeneConceptMapPage} />
                 <Route path="/coherence-field-explorer" component={CoherenceFieldExplorerPage} />
                 <Route path="/google-drive" component={GoogleDrivePage} />
                 <Route path="/image-upload" component={ImageUploadPage} />

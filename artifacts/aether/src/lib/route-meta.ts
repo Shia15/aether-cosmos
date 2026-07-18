@@ -57,6 +57,11 @@ export const routeMeta: Record<string, RouteMeta> = {
     description:
       "Semantic search across the AETHER knowledge graph — find concepts, connections, and crystallized insights.",
   },
+  "/gene-concept-map": {
+    title: `Gene Concept Map \u00b7 ${SITE_NAME}`,
+    description:
+      "Interactive force-directed graph of every gene, plasmid, organism, biological system, and M.A.R.I. framework node across AETHER — connected by functional pathways and analogical bridges.",
+  },
   "/command-center": {
     title: `Command Centre · ${SITE_NAME}`,
     description:
