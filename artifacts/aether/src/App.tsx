@@ -448,6 +448,7 @@ const DiamondPearlPage          = lazy(() => import("@/pages/diamond-pearl"));
 const DimensionalCompilerPage   = lazy(() => import("@/pages/dimensional-compiler"));
 const AetherProductsPage        = lazy(() => import("@/pages/aether-products"));
 const VenusCyclesPage           = lazy(() => import("@/pages/venus-cycles"));
+const InvisibleWindPage         = lazy(() => import("@/pages/invisible-wind"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1489,6 +1490,7 @@ function Router() {
                 <Route path="/dimensional-compiler" component={DimensionalCompilerPage} />
                 <Route path="/aether-products"     component={AetherProductsPage} />
                 <Route path="/venus-cycles"        component={VenusCyclesPage} />
+                <Route path="/invisible-wind"      component={InvisibleWindPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
