@@ -315,6 +315,7 @@ const BioluminescenceSpectrumPage = lazy(() => import("@/pages/bioluminescence-s
 const SoiBuildingPage = lazy(() => import("@/pages/soi-building"));
 const SeismicSelfBuildPage = lazy(() => import("@/pages/seismic-self-build"));
 const BeeLiquidChipPage    = lazy(() => import("@/pages/bee-liquid-chip"));
+const RFDiffusionPage      = lazy(() => import("@/pages/rf-diffusion"));
 const NutritionalDnaKeyPage = lazy(() => import("@/pages/nutritional-dna-key"));
 const ElectronFieldPage = lazy(() => import("@/pages/electron-field"));
 const CoherenceAtlasPage = lazy(() => import("@/pages/coherence-atlas"));
@@ -1354,6 +1355,7 @@ function Router() {
                 <Route path="/soi-building" component={SoiBuildingPage} />
                 <Route path="/seismic-self-build" component={SeismicSelfBuildPage} />
                 <Route path="/bee-liquid-chip" component={BeeLiquidChipPage} />
+                <Route path="/rf-diffusion" component={RFDiffusionPage} />
                 <Route path="/nutritional-dna-key" component={NutritionalDnaKeyPage} />
                 <Route path="/electron-field" component={ElectronFieldPage} />
                 <Route path="/coherence-atlas" component={CoherenceAtlasPage} />

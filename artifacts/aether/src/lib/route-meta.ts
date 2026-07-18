@@ -314,4 +314,5 @@ export const KEY_PRERENDER_ROUTES = [
   "/grok-synthesis",
   "/grok-imagine",
   "/bee-liquid-chip",
+  "/rf-diffusion",
 ];
