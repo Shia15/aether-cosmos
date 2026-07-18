@@ -109,6 +109,9 @@ const ORGS: Record<OrgKind, OrgSpec> = {
 };
 
 // ── Cell data (mutable, held in ref) ─────────────────────────────────────────
+// geneState[i]: 0=normal, 1=adaptive mutation (beneficial), 2=random mutation, 3=silenced/lost
+type GeneState = 0 | 1 | 2 | 3;
+
 interface Cell {
   id: number; row: number; col: number;
   phase: Phase; phaseT: number;
@@ -117,11 +120,21 @@ interface Cell {
   genomePct: number;   // 0..1 DNA replication progress in S phase
   divAnim: number;     // 0..1 division animation (–1 = inactive)
   selected: boolean;
+  // mutation tracking
+  divisions: number;        // how many times this lineage has divided
+  geneState: GeneState[];   // per-gene mutation state (length = geneNames.length)
+  adaptMuts: number;        // count of adaptive mutations
+  randomMuts: number;       // count of random (deleterious) mutations
 }
 
 let _nextId = 0;
 function makeCell(row: number, col: number, org: OrgKind, phase: Phase = "G1"): Cell {
-  return { id: _nextId++, row, col, phase, phaseT: Math.random() * 0.5, coherence: 0.45 + Math.random() * 0.3, age: 0, arrested: false, org, genomePct: 0, divAnim: -1, selected: false };
+  return {
+    id: _nextId++, row, col, phase, phaseT: Math.random() * 0.5,
+    coherence: 0.45 + Math.random() * 0.3, age: 0, arrested: false, org,
+    genomePct: 0, divAnim: -1, selected: false,
+    divisions: 0, geneState: [0, 0, 0, 0, 0, 0], adaptMuts: 0, randomMuts: 0,
+  };
 }
 
 // ── Hex grid positions ────────────────────────────────────────────────────────
@@ -251,6 +264,15 @@ export default function NodeLatticePage() {
       cell.coherence = Math.max(0.2, Math.min(1.0, cell.coherence));
       // cancer cap
       if (cell.org === "cancer") cell.coherence = Math.min(0.55, cell.coherence);
+      // mutation coherence ceiling: random mutations erode max coherence; adaptive ones resist stress
+      const mutPenalty  = cell.randomMuts * 0.06;
+      const adaptBoost  = cell.adaptMuts  * 0.018;
+      const mutCeiling  = Math.max(0.28, (cell.org === "cancer" ? 0.55 : 1.0) - mutPenalty + adaptBoost);
+      cell.coherence = Math.min(mutCeiling, cell.coherence);
+      // adaptive mutations also partially offset stress penalty on G1 coherence rise
+      if ((cell.phase === "G1" || cell.phase === "G0") && cell.adaptMuts > 0) {
+        cell.coherence += dtSec * speed * 0.025 * cell.adaptMuts * (stressRef.current ?? 0);
+      }
 
       // how long this phase lasts
       const phaseIdx = spec.phases.indexOf(cell.phase);
@@ -292,29 +314,74 @@ export default function NodeLatticePage() {
       }
     }
 
+    // ── Mutation logic (called at each division) ───────────────────────────────
+    function applyMutations(target: Cell) {
+      const stress   = stressRef.current ?? 0;
+      const gCount   = ORGS[target.org].geneNames.length;
+      const divs     = target.divisions;
+
+      if (divs <= 5) {
+        // ── ADAPTIVE PHASE (cycles 1–5) ─────────────────────────────────────
+        // SOS / stress-directed: only stress-response genes (indices 3–5) can mutate.
+        // Probability proportional to stress level → directed, non-random.
+        const adaptP = 0.04 + stress * 0.22;
+        for (let g = 3; g < gCount; g++) {
+          if (target.geneState[g] === 0 && Math.random() < adaptP) {
+            target.geneState[g] = 1;  // adaptive mutation
+            target.adaptMuts++;
+          }
+        }
+      } else {
+        // ── RANDOM PHASE (cycles 6+) ────────────────────────────────────────
+        // Error threshold crossed — Eigen's limit breached.
+        // Any gene can mutate; probability grows with each overrun cycle.
+        const overrun = divs - 5;
+        const rP = 0.06 * (1 + overrun * 0.35) * (0.5 + stress * 0.5);
+        for (let g = 0; g < gCount; g++) {
+          if (target.geneState[g] <= 1 && Math.random() < rP) {
+            const wasAdapt = target.geneState[g] === 1;
+            // essential genes (0,1) silenced after many divisions
+            target.geneState[g] = (g < 2 && divs > 8) ? 3 : 2;
+            if (!wasAdapt) target.randomMuts++;
+          }
+        }
+      }
+    }
+
     function completeDivision(cell: Cell) {
       const spec = ORGS[cell.org];
       const phaseIdx = spec.phases.indexOf(cell.phase);
       if (phaseIdx < 0) return;
       const nextIdx = (phaseIdx + 1) % spec.phases.length;
 
-      // find adjacent empty slot
-      const nbrs = hexNeighbors(cell.row, cell.col);
+      // ── increment lineage generation count ────────────────────────────────
+      cell.divisions++;
+
+      // ── apply mutations to parent ─────────────────────────────────────────
+      applyMutations(cell);
+
+      // ── spawn daughter ────────────────────────────────────────────────────
+      const nbrs  = hexNeighbors(cell.row, cell.col);
       const empty = nbrs.filter(([r, c]) => !occupiedRef.current.has(key(r, c)));
 
       if (empty.length > 0 && cellsRef.current.length < 55) {
         const [dr, dc] = empty[Math.floor(Math.random() * empty.length)];
         const daughter = makeCell(dr, dc, cell.org, spec.phases[0] as Phase);
-        daughter.coherence = 0.38;
+        daughter.coherence  = 0.38;
+        daughter.divisions  = cell.divisions;          // inherit generation depth
+        daughter.geneState  = [...cell.geneState];     // inherit parent mutation map
+        daughter.adaptMuts  = cell.adaptMuts;
+        daughter.randomMuts = cell.randomMuts;
+        applyMutations(daughter);                       // daughter may diverge slightly
         occupiedRef.current.set(key(dr, dc), daughter.id);
         cellsRef.current.push(daughter);
       }
 
-      // reset parent
-      cell.phase = spec.phases[nextIdx] as Phase;
-      cell.phaseT = 0;
+      // ── reset parent ──────────────────────────────────────────────────────
+      cell.phase    = spec.phases[nextIdx] as Phase;
+      cell.phaseT   = 0;
       cell.genomePct = 0;
-      cell.divAnim = -1;
+      cell.divAnim  = -1;
       cell.coherence = 0.40;
     }
 
@@ -377,26 +444,38 @@ export default function NodeLatticePage() {
         ctx.setLineDash([]);
       }
 
-      // gene ring
+      // gene ring — mutation-aware
       const spec = ORGS[cell.org];
       const gR = CELL_R * 0.52;
       const geneCount = spec.geneNames.length;
       for (let g = 0; g < geneCount; g++) {
         const startA = (g / geneCount) * TAU - Math.PI / 2;
         const endA   = ((g + 0.78) / geneCount) * TAU - Math.PI / 2;
-        const gcol   = spec.geneCols[g];
-        // template strand
-        ctx.beginPath();
-        ctx.arc(x, y, gR, startA, endA);
-        ctx.strokeStyle = gcol + (cell.phase === "S" ? "55" : "aa");
-        ctx.lineWidth = 2.5; ctx.stroke();
-        // new strand in S phase
-        if (cell.phase === "S" || cell.phase === "G2") {
-          const repPct = cell.phase === "G2" ? 1 : cell.genomePct;
+        const gs     = (cell.geneState[g] ?? 0) as GeneState;
+
+        // derive appearance from mutation state
+        let gcol: string, alpha: string, lw: number, flicker = 1;
+        if      (gs === 0) { gcol = spec.geneCols[g]; alpha = cell.phase === "S" ? "55" : "aa"; lw = 2.5; }
+        else if (gs === 1) { gcol = GRN;      alpha = "dd"; lw = 3.2; }   // adaptive — bright green
+        else if (gs === 2) { gcol = "#8b94a3"; alpha = "88"; lw = 2.0;    // random — gray + flicker
+          flicker = 0.45 + 0.55 * Math.abs(Math.sin(t * 0.007 + g * 1.83)); }
+        else               { gcol = "#374151"; alpha = "33"; lw = 1.2; }  // silenced — near-invisible
+
+        ctx.globalAlpha = flicker;
+        ctx.beginPath(); ctx.arc(x, y, gR, startA, endA);
+        ctx.strokeStyle = gcol + alpha; ctx.lineWidth = lw; ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // new strand in S phase (inherits mutation colour)
+        if ((cell.phase === "S" || cell.phase === "G2") && gs < 3) {
+          const repPct  = cell.phase === "G2" ? 1 : cell.genomePct;
           const repEndA = startA + (endA - startA) * repPct;
           if (repEndA > startA) {
+            ctx.globalAlpha = gs === 2 ? flicker : 1;
             ctx.beginPath(); ctx.arc(x, y, gR - 4, startA, repEndA);
-            ctx.strokeStyle = gcol + "ff"; ctx.lineWidth = 2; ctx.stroke();
+            ctx.strokeStyle = (gs === 1 ? GRN : gs === 2 ? "#8b94a3" : gcol) + "ff";
+            ctx.lineWidth = 2; ctx.stroke();
+            ctx.globalAlpha = 1;
           }
         }
       }
@@ -424,7 +503,7 @@ export default function NodeLatticePage() {
         ctx.strokeStyle = ROSE + "44"; ctx.lineWidth = 1; ctx.stroke();
       }
 
-      // coherence label
+      // coherence label (selected only)
       if (cell.selected) {
         ctx.font = `bold 9px ${MONO}`;
         ctx.fillStyle = WHITE;
@@ -438,8 +517,29 @@ export default function NodeLatticePage() {
       ctx.font = `bold 9px ${MONO}`;
       ctx.fillStyle = pcol;
       ctx.textAlign = "center";
-      ctx.fillText(phaseSym[cell.phase], x, y + 3.5);
+      ctx.fillText(phaseSym[cell.phase], x, y + 1);
       ctx.textAlign = "start";
+
+      // generation counter — colour shifts green → amber → rose at the 5-cycle threshold
+      const divs    = cell.divisions;
+      const genCol  = divs === 0 ? SLATE
+                    : divs <= 5 ? `rgba(100,220,130,0.85)`
+                    : divs <= 8 ? AMB
+                    : ROSE;
+      ctx.font = `6.5px ${MONO}`;
+      ctx.fillStyle = genCol;
+      ctx.textAlign = "center";
+      ctx.fillText(`÷${divs}`, x, y + 12);
+      ctx.textAlign = "start";
+
+      // mutation indicator dot (top-right of cell) for cells with any mutations
+      if (cell.adaptMuts > 0 || cell.randomMuts > 0) {
+        const dotX = x + CELL_R * 0.7, dotY = y - CELL_R * 0.7;
+        const dotCol = cell.randomMuts > 0 ? ROSE : GRN;
+        ctx.beginPath(); ctx.arc(dotX, dotY, 3.5, 0, TAU);
+        ctx.fillStyle = dotCol + "dd"; ctx.fill();
+        ctx.strokeStyle = dotCol; ctx.lineWidth = 1; ctx.stroke();
+      }
     }
 
     function draw(t: number) {
@@ -651,6 +751,37 @@ export default function NodeLatticePage() {
                       <span style={{ fontSize: 9, color: c, fontFamily: MONO }}>{v}</span>
                     </div>
                   ))}
+                  {/* ── mutation status block ── */}
+                  <div style={{ marginTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
+                    <div style={{ fontSize: 8, letterSpacing: "0.15em", color: MUTED, marginBottom: 5 }}>MUTATION DYNAMICS</div>
+                    {[
+                      { l: "Generation ÷", v: String(selCell.divisions), c: selCell.divisions === 0 ? MUTED : selCell.divisions <= 5 ? GRN : selCell.divisions <= 8 ? AMB : ROSE },
+                      { l: "Mutation phase", v: selCell.divisions <= 5 ? "ADAPTIVE · directed" : selCell.divisions <= 8 ? "RANDOM · threshold crossed" : "UNTENABLE · genome decaying", c: selCell.divisions <= 5 ? GRN : selCell.divisions <= 8 ? AMB : ROSE },
+                      { l: "Adaptive mutations", v: String(selCell.adaptMuts), c: GRN },
+                      { l: "Random mutations", v: String(selCell.randomMuts), c: selCell.randomMuts > 0 ? ROSE : MUTED },
+                      { l: "Coherence ceiling", v: (Math.max(0.28, (selCell.org === "cancer" ? 0.55 : 1.0) - selCell.randomMuts * 0.06 + selCell.adaptMuts * 0.018)).toFixed(3), c: WHITE },
+                    ].map(({ l, v, c }) => (
+                      <div key={l} style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontSize: 9, color: MUTED }}>{l}</span>
+                        <span style={{ fontSize: 9, color: c, fontFamily: MONO }}>{v}</span>
+                      </div>
+                    ))}
+                    {/* per-gene state strip */}
+                    <div style={{ fontSize: 8, color: MUTED, marginTop: 5, marginBottom: 4 }}>gene ring state</div>
+                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                      {ORGS[selCell.org].geneNames.map((gn, i) => {
+                        const gs = selCell.geneState[i] ?? 0;
+                        const gc = gs === 0 ? ORGS[selCell.org].geneCols[i] : gs === 1 ? GRN : gs === 2 ? "#8b94a3" : "#374151";
+                        const label = gs === 0 ? "normal" : gs === 1 ? "adapt" : gs === 2 ? "random" : "silent";
+                        return (
+                          <div key={gn} title={`${gn}: ${label}`}
+                            style={{ fontSize: 8, padding: "2px 5px", borderRadius: 3, background: gc + "22", border: `1px solid ${gc}55`, color: gc, fontFamily: MONO }}>
+                            {gn}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div style={{ fontSize: 9, color: MUTED, marginBottom: 12 }}>Click a cell to inspect it</div>
