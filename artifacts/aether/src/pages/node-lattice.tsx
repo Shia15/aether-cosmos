@@ -17,6 +17,51 @@ const MUTED = "#64748b";
 const MONO  = "'DM Mono', monospace";
 const TAU   = 2 * Math.PI;
 
+// ── 9 Plasmid types ───────────────────────────────────────────────────────────
+const PLASMID_TYPES = [
+  { name:"pORI",  label:"Origin",       col:CYAN,  angV: 0.80,  rFrac:0.30, dR:4.5, fn:"Autonomous replication origin · par loci · minimal replicon" },
+  { name:"pMET",  label:"Metabolic",    col:GRN,   angV: 0.55,  rFrac:0.38, dR:4.2, fn:"Carbon-fixation gene cluster · Wood-Ljungdahl accessory enzymes" },
+  { name:"pRES",  label:"Resistance",   col:GOLD,  angV: 1.10,  rFrac:0.25, dR:3.6, fn:"β-lactamase · efflux pump genes · antibiotic resistance cassette" },
+  { name:"pVIR",  label:"Virulence",    col:VIO,   angV:-0.70,  rFrac:0.44, dR:5.0, fn:"Adhesin · toxin · type III secretion island · pathogenicity island" },
+  { name:"pTOX",  label:"Tox–Antitox", col:ROSE,  angV: 1.40,  rFrac:0.20, dR:3.0, fn:"MazEF / RelBE toxin–antitoxin module · stress-induced dormancy" },
+  { name:"pMOB",  label:"Conjugal",     col:AMB,   angV:-1.00,  rFrac:0.48, dR:4.6, fn:"tra / mob loci · conjugation machinery · F-pilus assembly" },
+  { name:"pSIG",  label:"Quorum",       col:TEAL,  angV: 0.90,  rFrac:0.34, dR:3.5, fn:"N-acylhomoserine lactone synthase · LuxI/LuxR quorum sensing" },
+  { name:"pFER",  label:"Iron",         col:TERA,  angV:-0.50,  rFrac:0.42, dR:4.0, fn:"Siderophore biosynthesis · fur regulation · iron acquisition cluster" },
+  { name:"pREP",  label:"High-copy",    col:PURP,  angV: 1.60,  rFrac:0.16, dR:2.5, fn:"ColE1-type high-copy-number replicon · RNAI/RNAII incompatibility" },
+] as const;
+type PlasmidTypeIdx = 0|1|2|3|4|5|6|7|8;
+
+// Per-organism default plasmid loadouts (indices into PLASMID_TYPES)
+const ORG_PLASMIDS: Record<string, PlasmidTypeIdx[]> = {
+  luca:    [0,1,6],         // pORI + pMET + pSIG  — ancestral core
+  ecoli:   [0,2,5,4,7],    // pORI + pRES + pMOB + pTOX + pFER
+  yeast:   [0,1,6,8],      // pORI + pMET + pSIG + pREP
+  somatic: [1,6],           // pMET + pSIG  — vestigial
+  stem:    [0,1,3,8],      // pORI + pMET + pVIR + pREP
+  cancer:  [2,5,4,3,8],   // pRES + pMOB + pTOX + pVIR + pREP
+};
+
+interface Plasmid {
+  typeIdx:  PlasmidTypeIdx;
+  angle:    number;   // current orbital angle (rad)
+  angVel:   number;   // rad/s (signed, CCW positive)
+  orbR:     number;   // orbital radius in px
+  dotR:     number;   // rendered dot radius in px
+  flashT:   number;   // replication flash brightness 0→1→0
+  isMini:   boolean;  // smaller/faster variant evolved after threshold divisions
+  copyNum:  number;   // 1..16 copy-number within cell
+  mutState: GeneState;
+}
+
+// Active conjugation events (pilus bridges between cells)
+interface ConjEvent {
+  srcId: number; tgtId: number;
+  progress: number;  // 0..1 — particle travelling the pilus
+  plasmidIdx: PlasmidTypeIdx;
+  done: boolean;
+}
+let conjEvents: ConjEvent[] = [];
+
 type Phase   = "G0" | "G1" | "S" | "G2" | "M" | "fission" | "budding";
 type OrgKind = "luca" | "ecoli" | "yeast" | "somatic" | "stem" | "cancer";
 
@@ -121,19 +166,47 @@ interface Cell {
   divAnim: number;     // 0..1 division animation (–1 = inactive)
   selected: boolean;
   // mutation tracking
-  divisions: number;        // how many times this lineage has divided
-  geneState: GeneState[];   // per-gene mutation state (length = geneNames.length)
-  adaptMuts: number;        // count of adaptive mutations
-  randomMuts: number;       // count of random (deleterious) mutations
+  divisions: number;
+  geneState: GeneState[];
+  adaptMuts: number;
+  randomMuts: number;
+  // plasmid system
+  plasmids: Plasmid[];
+  conjCooldown: number;  // seconds until this cell can initiate next conjugation
+}
+
+function makePlasmid(typeIdx: PlasmidTypeIdx, isMini = false): Plasmid {
+  const pt = PLASMID_TYPES[typeIdx];
+  const mini = isMini;
+  const sizeFac = mini ? 0.52 : 1;
+  const speedFac = mini ? 1.8 : 1;
+  const jitter = () => (Math.random() - 0.5) * 0.25;
+  return {
+    typeIdx,
+    angle:   Math.random() * TAU,
+    angVel:  (pt.angV + jitter()) * speedFac,
+    orbR:    pt.rFrac * 26 * sizeFac,   // 26 ≈ typical CELL_R at init
+    dotR:    pt.dR * sizeFac,
+    flashT:  0,
+    isMini:  mini,
+    copyNum: mini ? 4 + Math.floor(Math.random() * 8) : 1 + Math.floor(Math.random() * 3),
+    mutState: 0,
+  };
 }
 
 let _nextId = 0;
 function makeCell(row: number, col: number, org: OrgKind, phase: Phase = "G1"): Cell {
+  const defaultTypes = ORG_PLASMIDS[org] ?? [0];
+  const plasmids: Plasmid[] = defaultTypes.map(t => makePlasmid(t));
+  // stagger initial angles so they don't pile up
+  const step = TAU / Math.max(plasmids.length, 1);
+  plasmids.forEach((p, i) => { p.angle = i * step + Math.random() * 0.6; });
   return {
     id: _nextId++, row, col, phase, phaseT: Math.random() * 0.5,
     coherence: 0.45 + Math.random() * 0.3, age: 0, arrested: false, org,
     genomePct: 0, divAnim: -1, selected: false,
     divisions: 0, geneState: [0, 0, 0, 0, 0, 0], adaptMuts: 0, randomMuts: 0,
+    plasmids, conjCooldown: 0,
   };
 }
 
@@ -267,11 +340,38 @@ export default function NodeLatticePage() {
       // mutation coherence ceiling: random mutations erode max coherence; adaptive ones resist stress
       const mutPenalty  = cell.randomMuts * 0.06;
       const adaptBoost  = cell.adaptMuts  * 0.018;
-      const mutCeiling  = Math.max(0.28, (cell.org === "cancer" ? 0.55 : 1.0) - mutPenalty + adaptBoost);
+      // metabolic burden from plasmid load (>5 plasmids = slight cost)
+      const plasmidBurden = Math.max(0, cell.plasmids.length - 5) * 0.012;
+      const mutCeiling  = Math.max(0.28, (cell.org === "cancer" ? 0.55 : 1.0) - mutPenalty + adaptBoost - plasmidBurden);
       cell.coherence = Math.min(mutCeiling, cell.coherence);
       // adaptive mutations also partially offset stress penalty on G1 coherence rise
       if ((cell.phase === "G1" || cell.phase === "G0") && cell.adaptMuts > 0) {
         cell.coherence += dtSec * speed * 0.025 * cell.adaptMuts * (stressRef.current ?? 0);
+      }
+
+      // ── Plasmid dynamics ───────────────────────────────────────────────────
+      // Update orbital angles (each plasmid spins independently)
+      for (const p of cell.plasmids) {
+        p.angle += p.angVel * dtSec * speed;
+        // replication flash decay
+        if (p.flashT > 0) p.flashT = Math.max(0, p.flashT - dtSec * 2.0);
+        // S-phase replication flash: randomly trigger on plasmids
+        if (cell.phase === "S" && Math.random() < dtSec * speed * 0.9) {
+          p.flashT = 1.0;
+          p.copyNum = Math.min(16, p.copyNum + 1);
+        }
+      }
+      // reduce conjCooldown
+      cell.conjCooldown = Math.max(0, cell.conjCooldown - dtSec);
+
+      // After 3+ divisions, evolve mini-plasmids from existing pMOB/pRES (represents genome reduction)
+      if (cell.divisions >= 3 && cell.plasmids.length < 9 && Math.random() < dtSec * 0.004) {
+        const src = cell.plasmids.find(p => !p.isMini);
+        if (src) {
+          const mini = makePlasmid(src.typeIdx, true);
+          mini.angle = src.angle + Math.PI;  // start opposite the parent
+          cell.plasmids.push(mini);
+        }
       }
 
       // how long this phase lasts
@@ -368,11 +468,34 @@ export default function NodeLatticePage() {
         const [dr, dc] = empty[Math.floor(Math.random() * empty.length)];
         const daughter = makeCell(dr, dc, cell.org, spec.phases[0] as Phase);
         daughter.coherence  = 0.38;
-        daughter.divisions  = cell.divisions;          // inherit generation depth
-        daughter.geneState  = [...cell.geneState];     // inherit parent mutation map
+        daughter.divisions  = cell.divisions;
+        daughter.geneState  = [...cell.geneState];
         daughter.adaptMuts  = cell.adaptMuts;
         daughter.randomMuts = cell.randomMuts;
-        applyMutations(daughter);                       // daughter may diverge slightly
+        applyMutations(daughter);
+
+        // ── Plasmid partitioning to daughter ─────────────────────────────────
+        // Distribute plasmids: each plasmid goes to daughter with 50% probability
+        // (like real plasmid partitioning — not all copies guaranteed).
+        daughter.plasmids = [];
+        for (const p of cell.plasmids) {
+          // Full plasmids: each copy can segregate independently
+          const copiesForDaughter = Math.max(0, Math.round(p.copyNum * (0.3 + Math.random() * 0.4)));
+          if (copiesForDaughter > 0 || Math.random() < 0.7) {
+            const dp: Plasmid = { ...p, angle: p.angle + Math.PI * (0.5 + Math.random()), copyNum: Math.max(1, copiesForDaughter), flashT: 0 };
+            daughter.plasmids.push(dp);
+            // Parent retains remaining copies
+            p.copyNum = Math.max(1, p.copyNum - copiesForDaughter);
+          }
+        }
+        // Mini-plasmids: inherit a random subset (they replicate fast so no loss)
+        for (const p of cell.plasmids.filter(p => p.isMini)) {
+          if (Math.random() < 0.85) {
+            daughter.plasmids.push({ ...p, angle: p.angle + Math.PI });
+          }
+        }
+        daughter.conjCooldown = 3 + Math.random() * 4;
+
         occupiedRef.current.set(key(dr, dc), daughter.id);
         cellsRef.current.push(daughter);
       }
@@ -477,6 +600,49 @@ export default function NodeLatticePage() {
             ctx.lineWidth = 2; ctx.stroke();
             ctx.globalAlpha = 1;
           }
+        }
+      }
+
+      // ── Orbiting plasmids ─────────────────────────────────────────────────────
+      for (const p of cell.plasmids) {
+        const pt   = PLASMID_TYPES[p.typeIdx];
+        const orbR = p.orbR * (CELL_R / 26);  // scale to current CELL_R
+        const px   = x + Math.cos(p.angle) * orbR;
+        const py   = y + Math.sin(p.angle) * orbR;
+        const dr   = p.dotR * (CELL_R / 26);
+
+        // orbit trail (faint arc in direction of travel)
+        ctx.beginPath();
+        const trailA = p.angle - Math.sign(p.angVel) * 0.55;
+        ctx.arc(x, y, orbR, Math.min(p.angle, trailA), Math.max(p.angle, trailA));
+        ctx.strokeStyle = pt.col + "28"; ctx.lineWidth = 1.2; ctx.stroke();
+
+        // flash ring during S-phase replication
+        if (p.flashT > 0) {
+          const fr = dr + p.flashT * dr * 2.2;
+          ctx.beginPath(); ctx.arc(px, py, fr, 0, TAU);
+          const fGrd = ctx.createRadialGradient(px, py, dr * 0.5, px, py, fr);
+          fGrd.addColorStop(0, pt.col + Math.round(p.flashT * 200).toString(16).padStart(2, "0"));
+          fGrd.addColorStop(1, pt.col + "00");
+          ctx.fillStyle = fGrd; ctx.fill();
+        }
+
+        // plasmid dot (mini = smaller, slightly transparent)
+        const dotAlpha = p.isMini ? 0.65 : 1.0;
+        ctx.globalAlpha = dotAlpha;
+        ctx.beginPath(); ctx.arc(px, py, dr, 0, TAU);
+        const dGrd = ctx.createRadialGradient(px - dr * 0.3, py - dr * 0.3, 0, px, py, dr);
+        dGrd.addColorStop(0, pt.col + "ff"); dGrd.addColorStop(1, pt.col + "88");
+        ctx.fillStyle = dGrd; ctx.fill();
+        ctx.strokeStyle = pt.col; ctx.lineWidth = p.isMini ? 0.8 : 1.2; ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // copy-number ring on full plasmids (tiny arc indicating copy count)
+        if (!p.isMini && p.copyNum > 1) {
+          const cpFrac = Math.min(p.copyNum / 16, 1);
+          ctx.beginPath();
+          ctx.arc(px, py, dr + 2.5, -Math.PI / 2, -Math.PI / 2 + TAU * cpFrac);
+          ctx.strokeStyle = pt.col + "aa"; ctx.lineWidth = 1.5; ctx.stroke();
         }
       }
 
@@ -587,6 +753,73 @@ export default function NodeLatticePage() {
         }
       }
       for (const cell of toFinalizeDivision) completeDivision(cell);
+
+      // ── Horizontal Gene Transfer / Conjugation ─────────────────────────────
+      // Build id→cell map for quick lookup
+      const idMap = new Map<number, Cell>();
+      for (const cell of cells) idMap.set(cell.id, cell);
+
+      // Try initiating new conjugation events from cells with pMOB plasmid
+      const speed = speedRef.current ?? 1;
+      for (const cell of cells) {
+        if (cell.conjCooldown > 0) continue;
+        if (!cell.plasmids.some(p => p.typeIdx === 5)) continue;  // needs pMOB
+        const nbrs = hexNeighbors(cell.row, cell.col);
+        for (const [nr, nc] of nbrs) {
+          if (!occ.has(key(nr, nc))) continue;
+          const tgtId = occ.get(key(nr, nc))!;
+          const tgt   = idMap.get(tgtId);
+          if (!tgt || tgt.plasmids.length >= 9) continue;
+          // Transfer a random plasmid from src to tgt
+          const donorPlasmid = cell.plasmids[Math.floor(Math.random() * cell.plasmids.length)];
+          conjEvents.push({
+            srcId: cell.id, tgtId,
+            progress: 0,
+            plasmidIdx: donorPlasmid.typeIdx,
+            done: false,
+          });
+          cell.conjCooldown = 6 + Math.random() * 6;
+          break;
+        }
+      }
+
+      // Advance and draw pilus bridges
+      conjEvents = conjEvents.filter(ev => !ev.done);
+      for (const ev of conjEvents) {
+        ev.progress += dtSec * speed * 0.4;
+        const src = idMap.get(ev.srcId);
+        const tgt = idMap.get(ev.tgtId);
+        if (!src || !tgt) { ev.done = true; continue; }
+        if (ev.progress >= 1.0) {
+          // Transfer complete — add plasmid to target
+          if (tgt.plasmids.length < 9) {
+            const np = makePlasmid(ev.plasmidIdx, false);
+            tgt.plasmids.push(np);
+          }
+          ev.done = true;
+          continue;
+        }
+        // Draw pilus tube
+        const p1 = hexXY(src.row, src.col, CELL_R, offX, offY);
+        const p2 = hexXY(tgt.row, tgt.col, CELL_R, offX, offY);
+        const pt  = PLASMID_TYPES[ev.plasmidIdx];
+        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = pt.col + "44"; ctx.lineWidth = 2;
+        ctx.setLineDash([4, 3]); ctx.stroke(); ctx.setLineDash([]);
+        // Travelling particle along pilus
+        const px = p1.x + (p2.x - p1.x) * ev.progress;
+        const py = p1.y + (p2.y - p1.y) * ev.progress;
+        const pulseR = 4 + 2 * Math.sin(t * 0.012);
+        ctx.beginPath(); ctx.arc(px, py, pulseR, 0, TAU);
+        ctx.fillStyle = pt.col + "cc"; ctx.fill();
+        ctx.strokeStyle = pt.col; ctx.lineWidth = 1.5; ctx.stroke();
+        // Glow around particle
+        const pGrd = ctx.createRadialGradient(px, py, 0, px, py, pulseR * 3);
+        pGrd.addColorStop(0, pt.col + "66"); pGrd.addColorStop(1, pt.col + "00");
+        ctx.beginPath(); ctx.arc(px, py, pulseR * 3, 0, TAU);
+        ctx.fillStyle = pGrd; ctx.fill();
+      }
+
       for (const cell of cells) drawCell(cell, t);
 
       // stats update (every ~30 frames)
@@ -781,6 +1014,42 @@ export default function NodeLatticePage() {
                         );
                       })}
                     </div>
+                  </div>
+
+                  {/* ── Plasmid inventory ── */}
+                  <div style={{ marginTop: 8, borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 8 }}>
+                    <div style={{ fontSize: 8, letterSpacing: "0.15em", color: MUTED, marginBottom: 5 }}>
+                      PLASMID INVENTORY · {selCell.plasmids.length} elements
+                    </div>
+                    {selCell.plasmids.length === 0 && (
+                      <div style={{ fontSize: 9, color: SLATE }}>No plasmids</div>
+                    )}
+                    {selCell.plasmids.map((p, i) => {
+                      const pt = PLASMID_TYPES[p.typeIdx];
+                      const mutBadge = p.mutState === 1 ? "↑" : p.mutState === 2 ? "?" : p.mutState === 3 ? "✕" : "";
+                      return (
+                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: pt.col, flexShrink: 0 }} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 8, color: pt.col, fontFamily: MONO }}>
+                              {pt.name}{p.isMini ? " ·mini" : ""}{mutBadge}
+                            </div>
+                            <div style={{ fontSize: 7, color: MUTED }}>{pt.label}</div>
+                          </div>
+                          <div style={{ fontSize: 8, color: WHITE, fontFamily: MONO, textAlign: "right" }}>
+                            ×{p.copyNum}
+                            <span style={{ fontSize: 6, color: MUTED, marginLeft: 3 }}>
+                              {p.angVel > 0 ? "↻" : "↺"}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {selCell.conjCooldown > 0 && (
+                      <div style={{ fontSize: 8, color: AMB, marginTop: 4 }}>
+                        pilus cooldown {selCell.conjCooldown.toFixed(1)}s
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (
