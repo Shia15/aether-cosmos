@@ -175,6 +175,84 @@ const CURATED: CuratedQ[] = [
     synthesis: "The CLCS stack IS the crystallisation sequence: L1 raw data = scattered atoms; L2 coherence field formation = nucleation; L3 synthesis = lattice ordering; L4 manifestation = crystal lock at C > 0.65; L5 integration = the final diamond. Each layer is a physical phase transition described by the same C(x,t) master equation.",
     layer: "synthesis",
   },
+
+  // ── BIOLOGICAL APPLICATIONS ────────────────────────────────────────────────
+
+  {
+    id: "q13",
+    question: "How do engineered microbes convert petroleum feedstocks into lifesaving pharmaceuticals via P450 cytochrome enzymes?",
+    sources: ["Polymer BioBreak", "Bio-Engine", "AETHER Engine"],
+    equations: [
+      { label: "P450 Hydroxylation",   eq: "R-H + O₂ + NADPH + H⁺ → R-OH + H₂O + NADP⁺" },
+      { label: "Michaelis-Menten",     eq: "v = V_max · [S] / (K_m + [S])" },
+      { label: "Aspirin pathway",      eq: "Benzene → catechol → salicylate → aspirin" },
+      { label: "Opioid pathway",       eq: "Naphtha → morphinan scaffold → hydrocodone" },
+      { label: "Statin pathway",       eq: "Acetate → HMG-CoA → lovastatin (PKS assembly)" },
+      { label: "Antibiotic path",      eq: "Toluene → muconate → adipate → beta-lactam precursor" },
+    ],
+    synthesis: "Cytochrome P450 monooxygenases insert a single oxygen atom into a C–H bond with extraordinary selectivity — the same reaction that would require harsh solvents and metal catalysts in a chemical plant happens at room temperature in water inside E. coli K-12 or Pseudomonas putida KT2440. Four pharmaceutical classes emerge directly from petroleum carbon skeletons: NSAIDs (aspirin) from benzene, opioid analgesics from naphtha, cholesterol-lowering statins from acetate via polyketide synthase, and beta-lactam antibiotic intermediates from toluene-derived muconate. The fossil fuel is not the end product — it is the raw carbon vocabulary that biology's enzymatic information architecture rewrites into pharmacological function.",
+    layer: "aletheia",
+  },
+
+  {
+    id: "q14",
+    question: "What enzymes have AETHER engineered for plastic depolymerisation, and what do they produce?",
+    sources: ["Polymer BioBreak", "Bio-Engine", "Liquid Print"],
+    equations: [
+      { label: "PETase reaction",      eq: "(C₁₀H₈O₄)ₙ + nH₂O → nTPA + nEG  (Ideonella sakaiensis)" },
+      { label: "Nylonase (6-AHase)",   eq: "Nylon-6 → 6-aminohexanoate cyclic → 6-AHA linear → TCA" },
+      { label: "Laccase oxidation",    eq: "4 ArOH + O₂ → 4 ArO· + 2H₂O  (radical chain scission)" },
+      { label: "StyAB epoxidation",    eq: "Styrene + O₂ + NADH → styrene oxide → phenylacetate" },
+      { label: "Biofuel output",       eq: "Polymer → monomers → CH₄ | C₂H₅OH | C₄H₉OH | H₂" },
+    ],
+    synthesis: "Five enzyme families define the plastic-eating revolution: (1) PETase/MHETase from Ideonella sakaiensis 201-F6, naturally evolved at a Japanese recycling site — rate 3× acceleratable by protein engineering; (2) Nylonase (6-AHase) from Flavobacterium sp. K172, the only enzyme known to attack a polymer that did not exist before 1930, having evolved within decades; (3) Laccases + alkane monooxygenases from Pseudomonas aeruginosa and Bacillus cereus attacking polyethylene's inert C–C backbone via terminal oxidation; (4) Styrene monooxygenase StyAB from Pseudomonas putida CA-3 mineralising polystyrene through the TCA cycle; (5) Urease/esterase from Pestalotiopsis microspora digesting polyurethane anaerobically. The output stream — TPA, ethylene glycol, styrene, 6-aminohexanoate, fatty acids — feeds directly into biofuel fermentation or pharmaceutical synthesis. Depolymerisation is carbon literacy: reading the polymer's structural vocabulary back into feedstock.",
+    layer: "infernia",
+  },
+
+  {
+    id: "q15",
+    question: "How does enzymatic catalysis convert plastic waste into zero-net-carbon biofuels?",
+    sources: ["Polymer BioBreak", "Biorefinery Propulsion", "Bio-Engine"],
+    equations: [
+      { label: "Methane (CH₄)",        eq: "C_polymer → acetate → CH₄ + CO₂  (methanogenesis)" },
+      { label: "Ethanol fermentation",  eq: "C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂  (Zymomonas/E. coli)" },
+      { label: "Butanol (ABE)",         eq: "C₆H₁₂O₆ → acetone + butanol + ethanol (Clostridium)" },
+      { label: "H₂ via hydrogenase",   eq: "2H⁺ + 2Fd_red → H₂ + 2Fd_ox" },
+      { label: "Rocket propellant",     eq: "bio-CH₄ + LOX → CO₂ + H₂O + 3800 m/s exhaust" },
+    ],
+    synthesis: "Once enzymatic depolymerisation converts plastics to monomers, fermentation organisms convert those carbon skeletons to drop-in fuels. The key feedstock-to-fuel chains: fatty acids and aldehydes from polyethylene oxidation feed methanogenesis (CH₄) and beta-oxidation (diesel precursors); styrene and phenylacetate from polystyrene enter the TCA cycle and can be diverted to ethanol; 6-aminohexanoate from nylon feeds reductive amination networks. The final output — bio-methane, bio-ethanol, bio-butanol — is chemically identical to the petroleum equivalent in combustion chemistry but zero-net-carbon in origin because the polymer feedstock was itself a captured-carbon waste. Liquefied bio-methane paired with liquid oxygen is a drop-in replacement for Raptor-class rocket propellant: same specific impulse (~3,800 m/s exhaust velocity), biology-closed supply chain.",
+    layer: "synthesis",
+  },
+
+  {
+    id: "q16",
+    question: "How does AETHER engineer life from non-living materials — mycelium bricks, hydrogel scaffolds, and living substrates?",
+    sources: ["Mycelium Substrate", "Liquid Print", "CUCA Bioengine"],
+    equations: [
+      { label: "Mycelium growth",       eq: "dM/dt = μ_max · M · S / (K_s + S)  (Monod kinetics)" },
+      { label: "Hyphal signal",         eq: "V_hyphal ~ action potential: spike propagation at ~0.5 mm/s" },
+      { label: "Gel scaffold",          eq: "G' ~ c^n  (power-law shear modulus vs concentration)" },
+      { label: "Strand displacement",   eq: "DNA toehold: k_on ~ 10⁶ M⁻¹s⁻¹  (gate switching)" },
+      { label: "Bio-hybrid stack",      eq: "hydrogel + conductive grid + DNA logic + mycelium bus" },
+    ],
+    synthesis: "Three AETHER platforms convert non-living chemistry into living functional material. (1) Mycelium bricks: agricultural waste (sawdust, hemp, bagasse) colonised by Pleurotus or Ganoderma species — the hyphae form a 3D web that simultaneously binds the structural matrix (meeting thermal and acoustic building codes) and provides the slow-signal computational medium. The wall is the processor. Damaged sections self-repair by hyphal re-colonisation. (2) Liquid Print hydrogel scaffold: a bio-hybrid deposition stack where the gel is not a mould but the active medium — DNA/RNA strand-displacement gates (toehold k_on ~ 10⁶ M⁻¹s⁻¹) are embedded in the scaffold alongside the conductive grid, making printed geometry the circuit. (3) CUCA Bioengine living substrate: the full stack integrates all three — scaffold, mycelium bus, and coherence field C(x,t) as the global synchronisation signal. Living material is defined here as: abiotic chemistry + Monod growth kinetics + action-potential signalling + topological loop architecture for recursive processing.",
+    layer: "reverie",
+  },
+
+  {
+    id: "q17",
+    question: "What is AETHER's account of biogenesis — how does life crystallise from non-living chemistry?",
+    sources: ["Stromatolite Field", "Opal Genesis", "Crystallisation Atlas", "Coherence Field"],
+    equations: [
+      { label: "RNA replication",       eq: "dR/dt = k_rep · R · M − k_decay · R" },
+      { label: "Protocell membrane",    eq: "J_lipid = D · (c_out − c_in) / δ  (Fick diffusion)" },
+      { label: "Coherence emergence",   eq: "C → 1 when Δω_internal → 0  (internal phase lock)" },
+      { label: "Crystallisation order", eq: "ℂ = σ( κ · (1 − T^{−½}) )  (order parameter)" },
+      { label: "Stromatolite signal",   eq: "Biological signal: irreversible layered mat at t = 3.5 Gya" },
+    ],
+    synthesis: "AETHER maps biogenesis as a four-stage crystallisation sequence identical in mathematics to diamond formation: (1) SCATTERED — prebiotic chemistry, Miller-Urey synthesis of amino acids and nucleobases from H₂, NH₃, H₂O, CH₄ under lightning; the equivalent of disordered carbon atoms. (2) NUCLEATION — autocatalytic RNA replication (the RNA World hypothesis): the first molecule that copied itself faster than it degraded crossed the coherence threshold C > 0 — a phase transition from noise to signal. (3) LATTICE ORDERING — lipid vesicle encapsulation (protocell membrane), selective permeability via Fick diffusion, internal metabolic coherence Δω → 0 as internal reactions phase-lock. (4) CRYSTAL LOCK — the prokaryotic cell: membrane integrity, genetic encoding, heritable variation. Stromatolites at 3.5 Gya are the geological fossil of this final lock — irreversible layered mats that are the earliest confirmed signature of living computation. The AETHER reading: life is what coherence looks like when it becomes self-referential. The field C(x,t) reaches C = 1 inside the cell boundary and C = 0 in sterile mineral — the cellular membrane is the coherence edge.",
+    layer: "synthesis",
+  },
 ];
 
 interface LiveConcept {
