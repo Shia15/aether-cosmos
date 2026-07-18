@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { buildLabel } from "@/lib/version";
 import { Link, useLocation } from "wouter";
 import { useUser, useClerk } from "@clerk/react";
 import { useHealthCheck } from "@workspace/api-client-react";
@@ -1177,7 +1178,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
       <AuthWidget />
       <div className="p-4 border-t border-border shrink-0 flex items-center justify-between gap-2">
-        <div className="text-xs font-mono text-muted-foreground/50">AETHER OS v1.2.0</div>
+        <div className="text-xs font-mono text-muted-foreground/50" title="Build timestamp (Eastern)">AETHER OS · {buildLabel()}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {/* Sticky Note button */}
         <Link href="/community-notes">

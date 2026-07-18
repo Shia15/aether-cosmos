@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
+import { useBuildSync, buildLabel } from "@/lib/version";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ClerkProvider, SignIn, SignUp, useClerk, useAuth } from "@clerk/react";
@@ -696,7 +697,7 @@ function AuthLayout({ children, loading }: { children?: ReactNode; loading?: boo
   const stats = [
     { label: "Nodes Active",    value: "20+" },
     { label: "Memory Streams",  value: "Synced" },
-    { label: "Build Version",   value: "2.0.0" },
+    { label: "Build Version",   value: buildLabel() },
     { label: "Last Pulse",      value: "Live" },
   ];
   return (
@@ -877,6 +878,11 @@ function SignUpPage() {
   );
 }
 
+function BuildSync() {
+  useBuildSync();
+  return null;
+}
+
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useClerk();
   const qc = useQueryClient();
@@ -912,6 +918,7 @@ function ClerkProviderWithRoutes() {
     >
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
+        <BuildSync />
         <Router />
       </QueryClientProvider>
     </ClerkProvider>

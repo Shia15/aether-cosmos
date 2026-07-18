@@ -230,6 +230,10 @@ function prerenderPlugin(): Plugin {
 
 export default defineConfig({
   base: basePath,
+  define: {
+    // Baked-in at every build/publish — gives every deployment a unique clock stamp
+    __AETHER_BUILD__: JSON.stringify(new Date().toISOString()),
+  },
   plugins: [
     react(),
     tailwindcss({ optimize: false }),
