@@ -37,7 +37,10 @@ const PLATFORM_LINKS: { label: string; handle: string; url: string; icon: string
 export default function ClaudeChatPage() {
   const [, navigate] = useLocation();
   const [activeConvId, setActiveConvId] = useState<number | null>(null);
-  const [input, setInput] = useState("");
+  // Pre-populate from ?q= URL param (e.g. linked from Command Centre Notion hits)
+  const [input, setInput] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get("q") ?? ""; } catch { return ""; }
+  });
   const [pending, setPending] = useState(false);
   const [streamingText, setStreamingText] = useState("");
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);

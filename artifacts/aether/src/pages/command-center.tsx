@@ -504,6 +504,22 @@ function HitCard({ hit }: { hit: Hit }) {
             <Badge variant="outline" className="font-mono text-[9px] uppercase border-white/10 shrink-0" style={{ color: s.color }}>
               {s.label}
             </Badge>
+            {hit.source === "notion" && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const q = encodeURIComponent(`Discuss this Notion page with me:\n\nTitle: "${hit.title}"\nURL: ${hit.href ?? ""}\n\nPlease summarise its key points and ask me what I'd like to explore.`);
+                  window.location.href = `${BASE_URL}claude-chat?q=${q}`;
+                }}
+                className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wide border transition-colors hover:bg-white/5 cursor-pointer"
+                style={{ color: "#c8b8ff", borderColor: "rgba(200,184,255,0.25)", background: "rgba(200,184,255,0.06)" }}
+              >
+                <MessageSquare className="w-2.5 h-2.5" />
+                Claude
+              </button>
+            )}
           </div>
           <p className="text-muted-foreground font-mono text-[11px] truncate">{hit.sub}</p>
           {hit.snippet && (
