@@ -455,6 +455,7 @@ const AlfvenSynthesisPage       = lazy(() => import("@/pages/alfven-synthesis"))
 const SlimeGravityQuantPage     = lazy(() => import("@/pages/slime-gravity-quantization"));
 const CrystallizedLifePage      = lazy(() => import("@/pages/crystallized-life-synthesis"));
 const OntologicalPartialsPage   = lazy(() => import("@/pages/ontological-partials"));
+const PinealEyeMapPage          = lazy(() => import("@/pages/pineal-eye-map"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1503,6 +1504,7 @@ function Router() {
                 <Route path="/slime-gravity-quantization"   component={SlimeGravityQuantPage} />
                 <Route path="/crystallized-life-synthesis"  component={CrystallizedLifePage} />
                 <Route path="/ontological-partials"        component={OntologicalPartialsPage} />
+                <Route path="/pineal-eye-map"             component={PinealEyeMapPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
