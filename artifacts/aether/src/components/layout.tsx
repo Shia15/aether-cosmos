@@ -91,6 +91,7 @@ import {
   CircleDot,
   CreditCard,
   MessageSquare,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
@@ -319,6 +320,7 @@ export const NAV_ITEMS = [
   { href: "/pineal-eye-map",              label: "Pineal Eye Map · Genetic Traits · Solar · Geomagnetic · Connective · Coherence · EM Spectrum · Dark Matter · Brain Matter · Iris Zones · Magnetite · DMT · Melatonin · Collarette · Limbal Ring", icon: Zap },
   { href: "/gravitational-chirp",         label: "Gravitational Chirp · From Still Plates to Cosmic Sirens · Eddington 1919 · Shapiro 1964 · LIGO GW150914 · Binary Inspiral · Seeing to Timing to Hearing · Waveform · Ringdown", icon: Atom },
   { href: "/coherent-disturbance",        label: "Coherent Disturbance · Inverse Scattering · Light Water Plasma Spacetime · Field Reconstruction · Interferometry · Holography · Kelvin Wake · Alfvén Mach Cone · LIGO Matched Filter · Tomography", icon: Zap },
+  { href: "/aether-life-co",              label: "AETHER Life Co · Foundational Document · Sea@aetherlife.co · Business Overview · Core Spine · Emotional Clarity · Intentional Action · December 28 2025", icon: BriefcaseBusiness },
   { href: "/plate-switching",       label: "Plate-Switching · Optical Hull · Compound-Eye · 7-Layer Stack", icon: Layers },
   { href: "/agents",                label: "Agents · Four Eggs",         icon: Egg },
   { href: "/modules",               label: "System Modules",             icon: LayoutGrid },
@@ -706,7 +708,7 @@ const EMERALD_HREFS = new Set([
   "/neuroplasticity","/neuro-metabolic","/neural-psychedelic","/cerebral-organoids",
   "/organoid-intel","/cancer-coherence","/aether-health","/coherent-body",
   "/mycelium-substrate","/plant-coherence-system","/plant-intel","/solar-feminine",
-  "/womens-coherence-map","/venus-cycles","/invisible-wind","/quantum-exotic-matter","/substrate-sandwich","/alfven-synthesis","/slime-gravity-quantization","/crystallized-life-synthesis","/ontological-partials","/pineal-eye-map","/gravitational-chirp","/coherent-disturbance","/nutrition-force","/pollen-flower","/circular-farm",
+  "/womens-coherence-map","/venus-cycles","/invisible-wind","/quantum-exotic-matter","/substrate-sandwich","/alfven-synthesis","/slime-gravity-quantization","/crystallized-life-synthesis","/ontological-partials","/pineal-eye-map","/gravitational-chirp","/coherent-disturbance","/aether-life-co","/nutrition-force","/pollen-flower","/circular-farm",
   "/biomimetic-symphony","/biomimetic-revolutions","/biomimetic-quantum",
   "/eye-evolution","/osmotic-pressure","/motor-cortex","/neuroweave",
   "/hyper-perception","/brain-metabolism","/neural-topology","/neural-emergence",
