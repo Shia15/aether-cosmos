@@ -406,7 +406,7 @@ export default function LiquidPrintPage() {
           const yLin = y0 + (y1 - y0) * u;
           const wiggle = Math.sin(u * Math.PI * (1 + bd * 4) + i * 0.7 + t / 800) * (8 + bd * 26);
           ctx.fillStyle = C.cyan;
-          ctx.beginPath(); ctx.arc(x, yLin + wiggle, 1.6 + σ * 1.4, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(x, yLin + wiggle, Math.max(0.3, 1.6 + σ * 1.4), 0, Math.PI * 2); ctx.fill();
         }
       }
 
@@ -467,7 +467,7 @@ export default function LiquidPrintPage() {
       for (let i = 0; i < strandCount; i++) {
         const sx = padL + ((i * 113 + Math.floor(t / 30)) % plotW);
         const sy = padT + ((i * 71 + Math.floor(t / 50)) % plotH);
-        ctx.beginPath(); ctx.arc(sx, sy, 0.7 + cc * 0.7, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.3, 0.7 + cc * 0.7), 0, Math.PI * 2); ctx.fill();
       }
 
       // each gate: row of double-helix with input dots → output
@@ -630,7 +630,7 @@ export default function LiquidPrintPage() {
             const sy = ly + 6 + ((s * 53) % (slice - 12));
             const blink = (Math.sin(t / 300 + s * 1.3) > 0) ? 1 : 0.45;
             ctx.fillStyle = `rgba(224,104,120,${(0.4 + 0.5 * blink).toFixed(3)})`;
-            ctx.beginPath(); ctx.arc(sx, sy, 1.4 + sd * 1.0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.3, 1.4 + sd * 1.0), 0, Math.PI * 2); ctx.fill();
           }
         } else {
           // hybrid interface chip
