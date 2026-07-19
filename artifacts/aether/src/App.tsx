@@ -451,6 +451,7 @@ const VenusCyclesPage           = lazy(() => import("@/pages/venus-cycles"));
 const InvisibleWindPage         = lazy(() => import("@/pages/invisible-wind"));
 const QuantumExoticMatterPage   = lazy(() => import("@/pages/quantum-exotic-matter"));
 const SubstrateSandwichPage     = lazy(() => import("@/pages/substrate-sandwich"));
+const AlfvenSynthesisPage       = lazy(() => import("@/pages/alfven-synthesis"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1495,6 +1496,7 @@ function Router() {
                 <Route path="/invisible-wind"      component={InvisibleWindPage} />
                 <Route path="/quantum-exotic-matter" component={QuantumExoticMatterPage} />
                 <Route path="/substrate-sandwich"  component={SubstrateSandwichPage} />
+                <Route path="/alfven-synthesis"    component={AlfvenSynthesisPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
