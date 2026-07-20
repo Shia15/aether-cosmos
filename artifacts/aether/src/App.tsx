@@ -460,6 +460,7 @@ const GravitationalChirpPage    = lazy(() => import("@/pages/gravitational-chirp
 const CoherentDisturbancePage   = lazy(() => import("@/pages/coherent-disturbance"));
 const AetherLifeCoPage          = lazy(() => import("@/pages/aether-life-co"));
 const CancerTrajectoryPage      = lazy(() => import("@/pages/cancer-trajectory"));
+const GlassFieldHomesPage       = lazy(() => import("@/pages/glass-field-homes"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1513,6 +1514,7 @@ function Router() {
                 <Route path="/coherent-disturbance"       component={CoherentDisturbancePage} />
                 <Route path="/aether-life-co"             component={AetherLifeCoPage} />
                 <Route path="/cancer-trajectory"          component={CancerTrajectoryPage} />
+                <Route path="/glass-field-homes"          component={GlassFieldHomesPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
