@@ -1,17 +1,20 @@
 /*═══════════════════════════════════════════════════════════════════
-  Glass Field Substrate · Living Home Housing Network
-  Refractive glass-jelly homes · solar + geomagnetic + water carved
-  interfaces · φ-spiral sky-rise packing · adaptive rhombus flex lattice
+  Solar Perspective Microscope
+  Human + Plant — viewed straight down from the height of the sun
 
-  Fully mathematical, navigable, manipulable home-development system.
+  You are the sun. You are 1 AU = 149.597 × 10⁶ km above the surface.
+  Your photons fall at the speed of light (8 min 20 s travel time).
+  Below you: two cells — one animal, one plant — both built to receive you.
 
-  Governing mathematics:
-  ── Snell refraction:      n₁ sinθ₁ = n₂ sinθ₂
-  ── Gel index gradient:    n(z) = n₀ + Δn · f(solar, water)
-  ── φ-spiral (Vogel):      θₙ = n·137.507764°,  rₙ = c√n
-  ── Solar harvest:         P = η · G_s · A · cosθ_sun
-  ── Geomagnetic coupling:  F = q(v × B),  water carve ∝ |∇B|
-  ── Rhombus flex mesh:     adaptive resolution ∝ |∇flow|
+  Mathematics:
+  ── Solar altitude:        h = 1 AU = 149.597 × 10⁶ km
+  ── Solar irradiance:      G_s = 1361 W/m² at 1 AU  (G_s ∝ 1/r²)
+  ── Photon energy:         E = hc/λ  (h = 6.626×10⁻³⁴ J·s)
+  ── Beer-Lambert:          I(x) = I₀ · e^(−μx)
+  ── Photosynthesis:        6CO₂ + 6H₂O + hν → C₆H₁₂O₆ + 6O₂
+  ── Chlorophyll abs peaks: λ_a = 430 nm (blue), λ_b = 680 nm (red)
+  ── Biophoton emission:    φ_cell ≈ 10⁻¹⁷ W/cm²
+  ── Coherence field:       C(x,t) = A(x)·e^{i(φ−ωt)}
 ═══════════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState } from "react";
 import magStorm  from "@assets/A6805E91-9684-4C59-BFC8-482EF421381D_1784561445345.png";
@@ -21,16 +24,18 @@ import skyrmion  from "@assets/IMG_4534_1784561445345.png";
 const P = {
   bg: "#04070d", panel: "#070c14", panel2: "#0b131d",
   gold: "#fbbf24", ivory: "#eef4f8", dim: "rgba(238,244,248,0.52)",
-  line: "rgba(103,232,249,0.08)", muted: "rgba(238,244,248,0.28)",
-  glass: "#67e8f9", violet: "#a78bfa", teal: "#2dd4bf",
-  green: "#4ade80", rose: "#fb7185", blue: "#60a5fa", amber: "#fbbf24",
+  line: "rgba(251,191,36,0.08)", muted: "rgba(238,244,248,0.28)",
+  sun: "#fff7d6", sunCore: "#ffe066", beam: "rgba(255,230,100,0.08)",
+  plant: "#4ade80", plantDeep: "#166534", chloro: "#86efac",
+  human: "#fb7185", humanDeep: "#9f1239", mito: "#fda4af",
+  blue: "#60a5fa", violet: "#a78bfa", teal: "#2dd4bf",
 };
 
-function Tag({ label, color = P.glass }: { label: string; color?: string }) {
+function Tag({ label, color = P.gold }: { label: string; color?: string }) {
   return <div style={{ fontSize: 9, fontWeight: 700, color, letterSpacing: 2, textTransform: "uppercase" as const, marginBottom: 10 }}>{label}</div>;
 }
 function Divider() { return <div style={{ height: 1, background: P.line, margin: "48px 0" }} />; }
-function EqBlock({ label, eq, note, color = P.glass }: { label: string; eq: string; note?: string; color?: string }) {
+function EqBlock({ label, eq, note, color = P.gold }: { label: string; eq: string; note?: string; color?: string }) {
   return (
     <div style={{ padding: "12px 16px", background: P.panel2, borderRadius: 9, border: `1px solid ${color}20`, marginBottom: 10 }}>
       <div style={{ fontSize: 9, color: P.muted, marginBottom: 4, letterSpacing: 1 }}>{label}</div>
@@ -39,7 +44,7 @@ function EqBlock({ label, eq, note, color = P.glass }: { label: string; eq: stri
     </div>
   );
 }
-function Card({ title, body, color = P.glass, sub }: { title: string; body: string; color?: string; sub?: string }) {
+function Card({ title, body, color = P.gold, sub }: { title: string; body: string; color?: string; sub?: string }) {
   return (
     <div style={{ padding: "13px 15px", background: P.panel, borderRadius: 10, border: `1px solid ${color}18` }}>
       {sub && <div style={{ fontSize: 9, color, letterSpacing: 1.2, marginBottom: 4, textTransform: "uppercase" as const }}>{sub}</div>}
@@ -50,128 +55,192 @@ function Card({ title, body, color = P.glass, sub }: { title: string; body: stri
 }
 
 /* ════════════════════════════════════════════════════════════════
-   CANVAS 1 — Glass-Jelly Refractive Substrate
-   Solar rays bend through stacked gel layers via Snell's law.
-   n(z) gradient set by refractive index + water saturation sliders.
-   Solar harvest readout P = η·G_s·A·cosθ.
+   CANVAS 1 — Solar Descent · Scale Zoom from 1 AU to organelle
+   Layers: Space → Exosphere → Atmosphere → Canopy/Skin → Cell
+   Drag the zoom slider to descend from the sun.
 ════════════════════════════════════════════════════════════════ */
-function GlassJellyCanvas() {
+function SolarDescentCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const nRef = useRef(1.45);
-  const sunRef = useRef(0.35);
-  const waterRef = useRef(0.4);
-  const [n, setN] = useState(1.45);
-  const [sun, setSun] = useState(0.35);
-  const [water, setWater] = useState(0.4);
+  const zoomRef = useRef(0.5);
+  const angleRef = useRef(0.0);
+  const [zoom, setZoom] = useState(0.5);
+  const [angle, setAngle] = useState(0.0);
 
-  useEffect(() => { nRef.current = n; }, [n]);
-  useEffect(() => { sunRef.current = sun; }, [sun]);
-  useEffect(() => { waterRef.current = water; }, [water]);
+  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+  useEffect(() => { angleRef.current = angle; }, [angle]);
 
   useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext("2d")!;
+    const cv = canvasRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
     let raf = 0, t = 0;
-    function resize() { c.width = c.offsetWidth; c.height = c.offsetHeight; }
+    function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
     resize();
-    const ro = new ResizeObserver(resize); ro.observe(c);
+    const ro = new ResizeObserver(resize); ro.observe(cv);
+
+    // Scale layers keyed by zoom 0→1
+    const LAYERS = [
+      { name: "DEEP SPACE", scale: "~1 AU · 149,597,870 km", color: [4, 7, 20], zRange: [0, 0.12] },
+      { name: "SOLAR WIND BOUNDARY", scale: "100,000 km", color: [10, 14, 35], zRange: [0.12, 0.22] },
+      { name: "EXOSPHERE", scale: "500 km", color: [12, 25, 55], zRange: [0.22, 0.36] },
+      { name: "ATMOSPHERE", scale: "10 km", color: [20, 60, 100], zRange: [0.36, 0.50] },
+      { name: "CANOPY / SKIN SURFACE", scale: "1 m", color: [30, 90, 60], zRange: [0.50, 0.63] },
+      { name: "TISSUE LAYER", scale: "100 µm", color: [60, 30, 40], zRange: [0.63, 0.75] },
+      { name: "CELL MEMBRANE", scale: "10 µm", color: [20, 60, 80], zRange: [0.75, 0.86] },
+      { name: "ORGANELLE INTERIOR", scale: "1 µm", color: [10, 40, 30], zRange: [0.86, 1.0] },
+    ];
 
     function draw() {
-      const W = c.width, H = c.height;
-      ctx.clearRect(0, 0, W, H); ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
+      const W = cv.width, H = cv.height;
+      ctx.clearRect(0, 0, W, H);
+      const z = zoomRef.current;
+      const sunAngle = angleRef.current; // 0 = overhead, 1 = low horizon
 
-      const nGel = nRef.current, sunPos = sunRef.current, wSat = waterRef.current;
-      const nAir = 1.0;
-
-      // Sun position along top arc
-      const sunAngle = Math.PI * (0.15 + sunPos * 0.7);
-      const sunX = W * (0.5 - Math.cos(sunAngle) * 0.42);
-      const sunY = H * 0.14 - Math.sin(sunAngle) * 8 + 8;
-
-      // Gel layers (glass-jelly home shell), 4 stacked bands
-      const LAYERS = 4;
-      const gelTop = H * 0.32, gelBot = H * 0.9;
-      const layerH = (gelBot - gelTop) / LAYERS;
-      for (let L = 0; L < LAYERS; L++) {
-        const y0 = gelTop + L * layerH;
-        // Each layer index rises with depth + water saturation
-        const nLayer = nGel + L * 0.04 + wSat * 0.08;
-        const tint = 0.06 + L * 0.04 + wSat * 0.05;
-        const grd = ctx.createLinearGradient(0, y0, 0, y0 + layerH);
-        grd.addColorStop(0, `rgba(103,232,249,${tint})`);
-        grd.addColorStop(1, `rgba(45,212,191,${tint + 0.04})`);
-        ctx.fillStyle = grd; ctx.fillRect(0, y0, W, layerH);
-        ctx.strokeStyle = `rgba(167,139,250,0.15)`; ctx.lineWidth = 0.5;
-        ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(W, y0); ctx.stroke();
-        ctx.fillStyle = P.muted; ctx.font = "8px monospace"; ctx.textAlign = "left";
-        ctx.fillText(`n=${nLayer.toFixed(2)}`, 6, y0 + 11);
+      // Find current layer
+      let curLayer = LAYERS[0];
+      for (const L of LAYERS) {
+        if (z >= L.zRange[0] && z < L.zRange[1]) { curLayer = L; break; }
       }
-      // Water table line (carved interface)
-      const waterY = gelTop + (gelBot - gelTop) * (0.55 - wSat * 0.25);
-      ctx.strokeStyle = `rgba(96,165,250,${0.3 + wSat * 0.4})`; ctx.lineWidth = 1.5; ctx.setLineDash([5, 4]);
-      ctx.beginPath();
-      for (let x = 0; x <= W; x += 6) {
-        const yy = waterY + Math.sin(x * 0.03 + t * 0.03) * (2 + wSat * 4);
-        x === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
-      }
-      ctx.stroke(); ctx.setLineDash([]);
+      const [r, g, b] = curLayer.color;
 
-      // Sun glow
-      const sg = ctx.createRadialGradient(sunX, sunY, 2, sunX, sunY, 40);
-      sg.addColorStop(0, "rgba(251,191,36,0.9)"); sg.addColorStop(1, "rgba(251,191,36,0)");
-      ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(sunX, sunY, 40, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = P.gold; ctx.beginPath(); ctx.arc(sunX, sunY, 8, 0, Math.PI * 2); ctx.fill();
+      // Background gradient — the sky we're looking through
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, `rgb(${r * 0.4},${g * 0.4},${b * 0.4})`);
+      bg.addColorStop(1, `rgb(${r},${g},${b})`);
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-      // Trace refracting sun rays through the gel stack (Snell's law)
-      const RAYS = 9;
-      let totalHarvest = 0;
-      for (let r = 0; r < RAYS; r++) {
-        const targetX = W * (0.12 + (r / (RAYS - 1)) * 0.76);
-        let px = sunX, py = sunY;
-        let dx = targetX - sunX, dy = gelTop - sunY;
-        const len = Math.hypot(dx, dy); dx /= len; dy /= len;
-        // incidence angle from vertical
-        let theta = Math.atan2(dx, dy);
-        ctx.beginPath(); ctx.moveTo(px, py);
-        // to gel top
-        const tTop = (gelTop - py) / dy;
-        px = px + dx * tTop; py = gelTop;
-        ctx.lineTo(px, py);
-        // refract into each layer
-        let curN = nAir;
-        for (let L = 0; L < LAYERS; L++) {
-          const nLayer = nGel + L * 0.04 + wSat * 0.08;
-          // Snell: n1 sinθ1 = n2 sinθ2
-          const sinT2 = Math.max(-1, Math.min(1, (curN / nLayer) * Math.sin(theta)));
-          theta = Math.asin(sinT2);
-          dx = Math.sin(theta); dy = Math.cos(theta);
-          const yNext = gelTop + (L + 1) * layerH;
-          const tt = (yNext - py) / dy;
-          px = px + dx * tt; py = yNext;
-          ctx.lineTo(px, py);
-          curN = nLayer;
+      // Solar beam from above (we are the sun — the light radiates outward from screen center-top)
+      const beamAngle = sunAngle * Math.PI * 0.4 - Math.PI * 0.2;
+      const bx = W / 2 + Math.sin(beamAngle) * W * 0.3;
+      const beamG = ctx.createRadialGradient(bx, -20, 10, bx, H * 0.6, H * 0.9);
+      beamG.addColorStop(0, `rgba(255,240,160,${0.18 - z * 0.1})`);
+      beamG.addColorStop(0.4, `rgba(255,200,80,${0.07 - z * 0.05})`);
+      beamG.addColorStop(1, "rgba(255,200,80,0)");
+      ctx.fillStyle = beamG; ctx.fillRect(0, 0, W, H);
+
+      // Draw the view from the current scale
+      const cx = W / 2, cy = H / 2;
+
+      if (z < 0.22) {
+        // Deep space / solar wind — draw stars + sun glow
+        for (let s = 0; s < 80; s++) {
+          const sx = ((s * 137 + 11) % W), sy = ((s * 73 + 17) % H);
+          const sa = 0.2 + (s % 5) * 0.15;
+          ctx.fillStyle = `rgba(255,255,255,${sa})`; ctx.beginPath(); ctx.arc(sx, sy, Math.max(0.5, 0.5 + (s % 3) * 0.5), 0, Math.PI * 2); ctx.fill();
         }
-        const hue = 190 + r * 8;
-        ctx.strokeStyle = `hsla(${hue},85%,65%,0.55)`; ctx.lineWidth = 1.2; ctx.stroke();
-        // harvest at base ∝ cos(theta) — more vertical = more captured
-        totalHarvest += Math.cos(theta);
-      }
-      // Home shell outline (a glass-jelly dome sitting on the gel)
-      ctx.strokeStyle = `rgba(167,139,250,0.5)`; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.arc(W / 2, gelTop, W * 0.16, Math.PI, Math.PI * 2); ctx.stroke();
-      ctx.fillStyle = "rgba(167,139,250,0.06)";
-      ctx.beginPath(); ctx.arc(W / 2, gelTop, W * 0.16, Math.PI, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = P.violet; ctx.font = "8px monospace"; ctx.textAlign = "center";
-      ctx.fillText("GLASS-JELLY HOME SHELL", W / 2, gelTop - W * 0.11);
+        // "You are here" — the sun glow at top
+        const sg = ctx.createRadialGradient(cx, -H * 0.3, 5, cx, -H * 0.3, H * 0.9);
+        sg.addColorStop(0, "rgba(255,240,100,0.7)"); sg.addColorStop(0.4, "rgba(255,200,60,0.18)"); sg.addColorStop(1, "rgba(255,200,60,0)");
+        ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "#fff7d6"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center";
+        ctx.fillText("YOU ARE HERE · THE SUN · 1 AU ABOVE LIFE", cx, H * 0.38);
+      } else if (z < 0.5) {
+        // Atmosphere — draw cloud layers
+        for (let c2 = 0; c2 < 6; c2++) {
+          const cy2 = H * (0.25 + c2 * 0.12);
+          const opacity = (0.06 + c2 * 0.03) * (1 - sunAngle * 0.3);
+          const grd = ctx.createLinearGradient(0, cy2 - 20, 0, cy2 + 20);
+          grd.addColorStop(0, `rgba(200,230,255,${opacity})`); grd.addColorStop(1, "rgba(200,230,255,0)");
+          ctx.fillStyle = grd; ctx.fillRect(0, cy2 - 20, W, 40);
+        }
+        // Atmosphere label
+        ctx.fillStyle = "rgba(180,220,255,0.6)"; ctx.font = "9px monospace"; ctx.textAlign = "left";
+        ctx.fillText(`TROPOSPHERE · ${(6 - z * 8).toFixed(1)} km altitude`, 10, H * 0.3);
+        ctx.fillText(`G_s = ${(1361 * (1 - z * 0.1)).toFixed(0)} W/m² (Beer-Lambert attenuated)`, 10, H * 0.42);
+      } else if (z < 0.75) {
+        // Canopy / skin / tissue — top-down organic texture
+        const res = 18;
+        for (let gx = 0; gx < res; gx++) {
+          for (let gy = 0; gy < res; gy++) {
+            const px = (gx / res) * W, py = (gy / res) * H;
+            const seed = (gx * 31 + gy * 17) % 100;
+            const isPlant = px < W * 0.5;
+            const cell = (seed > 35);
+            const alpha = cell ? 0.08 + (seed % 40) * 0.003 : 0;
+            ctx.fillStyle = isPlant ? `rgba(74,222,128,${alpha + 0.04})` : `rgba(251,113,133,${alpha + 0.02})`;
+            const sz = (W / res) * 0.7;
+            if (isPlant) {
+              ctx.fillRect(px + 1, py + 1, sz - 2, sz - 2);
+              ctx.strokeStyle = `rgba(134,239,172,0.2)`; ctx.lineWidth = 0.5;
+              ctx.strokeRect(px + 1, py + 1, sz - 2, sz - 2);
+            } else {
+              ctx.beginPath(); ctx.arc(px + sz / 2, py + sz / 2, Math.max(0.5, sz * 0.4), 0, Math.PI * 2); ctx.fill();
+            }
+          }
+        }
+        // Divider line plant/human
+        ctx.strokeStyle = "rgba(255,255,255,0.15)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(W * 0.5, 0); ctx.lineTo(W * 0.5, H); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = P.plant; ctx.font = "bold 9px monospace"; ctx.textAlign = "center";
+        ctx.fillText("PLANT TISSUE", W * 0.25, 16);
+        ctx.fillStyle = P.human; ctx.fillText("HUMAN TISSUE", W * 0.75, 16);
+      } else {
+        // Organelle level — draw a simple top-down cell with parts
+        const isPlant = ((t * 0) === 0); // both cells
+        const drawCell = (xcenter: number, cellColor: string, nucleus: string, organelles: string, label: string, shape: "rect" | "round") => {
+          const cr = Math.min(W * 0.19, H * 0.34);
+          if (shape === "rect") {
+            // plant: rectangular
+            ctx.fillStyle = cellColor + "18";
+            ctx.fillRect(xcenter - cr * 1.05, cy - cr * 0.8, cr * 2.1, cr * 1.6);
+            ctx.strokeStyle = cellColor + "80"; ctx.lineWidth = 1.5;
+            ctx.strokeRect(xcenter - cr * 1.05, cy - cr * 0.8, cr * 2.1, cr * 1.6);
+          } else {
+            ctx.fillStyle = cellColor + "18"; ctx.beginPath();
+            ctx.ellipse(xcenter, cy, cr * 1.0, cr * 0.85, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = cellColor + "80"; ctx.lineWidth = 1.5; ctx.beginPath();
+            ctx.ellipse(xcenter, cy, cr * 1.0, cr * 0.85, 0, 0, Math.PI * 2); ctx.stroke();
+          }
+          // Nucleus
+          ctx.fillStyle = nucleus + "50"; ctx.beginPath();
+          ctx.ellipse(xcenter + cr * 0.1, cy - cr * 0.08, cr * 0.22, cr * 0.19, 0.2, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = nucleus + "cc"; ctx.lineWidth = 0.8; ctx.beginPath();
+          ctx.ellipse(xcenter + cr * 0.1, cy - cr * 0.08, cr * 0.22, cr * 0.19, 0.2, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = nucleus; ctx.font = "7px monospace"; ctx.textAlign = "center";
+          ctx.fillText("NUCLEUS", xcenter + cr * 0.1, cy - cr * 0.06);
+          // Organelles
+          const pulse = 0.55 + 0.45 * Math.sin(t * 0.05);
+          for (let o = 0; o < 5; o++) {
+            const ang = (o / 5) * Math.PI * 2 + t * 0.01;
+            const or = cr * 0.55;
+            const ox = xcenter + Math.cos(ang) * or;
+            const oy = cy + Math.sin(ang) * or * 0.8;
+            ctx.fillStyle = organelles + `${Math.round(pulse * 180).toString(16).padStart(2, "0")}`;
+            ctx.beginPath(); ctx.ellipse(ox, oy, Math.max(0.5, cr * 0.09), Math.max(0.5, cr * 0.055), ang, 0, Math.PI * 2); ctx.fill();
+          }
+          // Label
+          ctx.fillStyle = P.ivory; ctx.font = "bold 8px monospace"; ctx.textAlign = "center";
+          ctx.fillText(label, xcenter, cy + cr * 0.9 + 12);
+        };
 
-      // Solar harvest readout
-      const eff = 0.22; const Gs = 1.0; const cosMean = totalHarvest / RAYS;
-      const harvest = eff * Gs * cosMean * (1 + wSat * 0.3);
-      ctx.fillStyle = P.panel2; ctx.fillRect(10, H - 22, W - 20, 13);
-      ctx.fillStyle = P.gold; ctx.fillRect(10, H - 22, (W - 20) * Math.min(1, harvest * 3), 13);
-      ctx.strokeStyle = P.line; ctx.strokeRect(10, H - 22, W - 20, 13);
-      ctx.fillStyle = P.ivory; ctx.font = "bold 8px monospace"; ctx.textAlign = "center";
-      ctx.fillText(`SOLAR HARVEST  P = η·G_s·A·cosθ = ${(harvest).toFixed(3)}  ·  gel n=${nGel.toFixed(2)}  ·  water sat=${(wSat * 100).toFixed(0)}%`, W / 2, H - 12);
+        drawCell(W * 0.27, P.plant, P.plantDeep, P.chloro, "PLANT CELL · Chloroplast", "rect");
+        drawCell(W * 0.73, P.human, P.humanDeep, P.mito, "HUMAN CELL · Mitochondria", "round");
+        // Solar beam intersection
+        const beamIntG = ctx.createLinearGradient(0, 0, 0, H * 0.5);
+        beamIntG.addColorStop(0, `rgba(255,240,120,${0.08 * (1 - sunAngle * 0.6)})`);
+        beamIntG.addColorStop(1, "rgba(255,240,120,0)");
+        ctx.fillStyle = beamIntG; ctx.fillRect(0, 0, W, H * 0.5);
+      }
+
+      // Scale bar
+      ctx.fillStyle = P.muted; ctx.font = "8px monospace"; ctx.textAlign = "right";
+      ctx.fillText(curLayer.scale, W - 10, H - 10);
+
+      // Layer strip along bottom
+      const stripH = 6;
+      LAYERS.forEach((L, i) => {
+        const x = (i / LAYERS.length) * W;
+        const w = W / LAYERS.length;
+        const active = curLayer.name === L.name;
+        ctx.fillStyle = active ? P.sunCore : "rgba(255,255,255,0.08)";
+        ctx.fillRect(x, H - stripH, w - 1, stripH);
+      });
+
+      // Top label
+      ctx.fillStyle = P.sunCore; ctx.font = "bold 8px monospace"; ctx.textAlign = "left";
+      ctx.fillText(`DESCENDING · ${curLayer.name}`, 10, 16);
+      ctx.fillStyle = P.muted; ctx.textAlign = "right";
+      const Gs = 1361 / Math.max(0.1, 1 + z * 0.2);
+      ctx.fillText(`G_s = ${Gs.toFixed(0)} W/m²`, W - 10, 16);
 
       t++; raf = requestAnimationFrame(draw);
     }
@@ -181,264 +250,363 @@ function GlassJellyCanvas() {
 
   return (
     <div style={{ border: `1px solid ${P.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 28 }}>
-      <canvas ref={canvasRef} style={{ width: "100%", height: 340, display: "block" }} />
+      <canvas ref={canvasRef} style={{ width: "100%", height: 360, display: "block" }} />
       <div style={{ padding: "10px 16px", background: P.panel, display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center" }}>
         {[
-          { label: "Gel refractive index n", val: n, set: setN, color: P.glass, min: 1.0, max: 1.9, step: 0.01 },
-          { label: "Sun position θ_sun", val: sun, set: setSun, color: P.gold, min: 0, max: 1, step: 0.01 },
-          { label: "Water saturation", val: water, set: setWater, color: P.blue, min: 0, max: 1, step: 0.01 },
+          { label: "Descent from 1 AU", val: zoom, set: setZoom, color: P.sunCore, min: 0, max: 0.999, step: 0.001 },
+          { label: "Solar angle (overhead→horizon)", val: angle, set: setAngle, color: P.gold, min: 0, max: 1, step: 0.01 },
         ].map(s => (
           <div key={s.label}>
-            <div style={{ fontSize: 10, color: s.color, marginBottom: 3 }}>{s.label} · {s.val.toFixed(2)}</div>
-            <input type="range" min={s.min} max={s.max} step={s.step} value={s.val} onChange={e => s.set(+e.target.value)} style={{ width: 130 }} />
+            <div style={{ fontSize: 10, color: s.color, marginBottom: 3 }}>{s.label} · {s.val.toFixed(3)}</div>
+            <input type="range" min={s.min} max={s.max} step={s.step} value={s.val} onChange={e => s.set(+e.target.value)} style={{ width: 200 }} />
           </div>
         ))}
-        <div style={{ fontSize: 11, color: P.dim }}>Sunlight refracts through the graded glass-jelly shell (Snell's law at each layer interface). Higher index bends rays more vertical → higher harvest. Water saturation raises the index gradient and carves the internal water table.</div>
+        <div style={{ fontSize: 11, color: P.dim }}>Slide descent from 0 (you are the sun, 1 AU away) to 1 (inside a single organelle). The scale bar tracks every order of magnitude. You are always looking straight down — the sun's own perspective.</div>
       </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════════════════════════════
-   CANVAS 2 — φ-Spiral Sky-Rise Housing Network (navigable)
-   Vogel phyllotaxis: θₙ = n·137.5°, rₙ = c√n.
-   Each node = one home unit. Click/hover selects a unit.
-   Occupied units highlighted; radial density = interaction gradient.
+   CANVAS 2 — Human + Plant Top-Down Cell Microscope
+   Side by side, live-animated, viewed from directly above.
+   Solar irradiance slider modulates organelle activity.
 ════════════════════════════════════════════════════════════════ */
-function PhiSpiralTowerCanvas() {
+function CellTopDownCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const countRef = useRef(340);
-  const scaleRef = useRef(0.62);
-  const [count, setCount] = useState(340);
-  const [scale, setScale] = useState(0.62);
-  const [selected, setSelected] = useState<number | null>(null);
-  const selRef = useRef<number | null>(null);
-  const hoverRef = useRef<{ x: number; y: number } | null>(null);
-  const nodesRef = useRef<{ x: number; y: number; n: number }[]>([]);
+  const irrRef = useRef(0.7);
+  const [irr, setIrr] = useState(0.7);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const hovRef = useRef<string | null>(null);
 
-  useEffect(() => { countRef.current = count; }, [count]);
-  useEffect(() => { scaleRef.current = scale; }, [scale]);
-  useEffect(() => { selRef.current = selected; }, [selected]);
+  useEffect(() => { irrRef.current = irr; }, [irr]);
+  useEffect(() => { hovRef.current = hovered; }, [hovered]);
 
   useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext("2d")!;
+    const cv = canvasRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
     let raf = 0, t = 0;
-    function resize() { c.width = c.offsetWidth; c.height = c.offsetHeight; }
+    function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
     resize();
-    const ro = new ResizeObserver(resize); ro.observe(c);
-
-    const GOLD_ANGLE = 137.507764 * Math.PI / 180;
+    const ro = new ResizeObserver(resize); ro.observe(cv);
 
     function draw() {
-      const W = c.width, H = c.height;
+      const W = cv.width, H = cv.height;
       ctx.clearRect(0, 0, W, H); ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
-      const N = Math.round(countRef.current), cScale = scaleRef.current;
-      const cx = W / 2, cy = H / 2;
-      const cRad = cScale * Math.min(W, H) / (2 * Math.sqrt(N));
+      const Irr = irrRef.current;
+      const pulse = 0.5 + 0.5 * Math.sin(t * 0.04 * (0.4 + Irr * 0.8));
+      const h = hovRef.current;
 
-      const nodes: { x: number; y: number; n: number }[] = [];
-      // Faint spiral connective backbone
-      ctx.strokeStyle = `rgba(103,232,249,0.10)`; ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      for (let i = 0; i < N; i++) {
-        const ang = i * GOLD_ANGLE;
-        const rad = cRad * Math.sqrt(i);
-        const x = cx + rad * Math.cos(ang), y = cy + rad * Math.sin(ang);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        nodes.push({ x, y, n: i });
-      }
-      ctx.stroke();
-      nodesRef.current = nodes;
+      // Solar light overlay from above
+      const lightG = ctx.createRadialGradient(W / 2, -H * 0.2, 10, W / 2, H / 2, H * 0.9);
+      lightG.addColorStop(0, `rgba(255,240,140,${Irr * 0.12})`);
+      lightG.addColorStop(1, "rgba(255,240,140,0)");
+      ctx.fillStyle = lightG; ctx.fillRect(0, 0, W, H);
 
-      const sel = selRef.current;
-      const hov = hoverRef.current;
-      // nearest node to hover
-      let hoverIdx = -1, hoverBest = 1e9;
-      if (hov) {
-        nodes.forEach((nd, i) => {
-          const d = Math.hypot(nd.x - hov.x, nd.y - hov.y);
-          if (d < hoverBest) { hoverBest = d; hoverIdx = i; }
-        });
-        if (hoverBest > 20) hoverIdx = -1;
-      }
+      // ─── PLANT CELL (left half) ─────────────────────────────────
+      const px = W * 0.25, py = H * 0.5;
+      const pr = Math.min(W * 0.18, H * 0.36);
 
-      nodes.forEach((nd, i) => {
-        const rFromCenter = Math.hypot(nd.x - cx, nd.y - cy);
-        const norm = rFromCenter / (cRad * Math.sqrt(N));
-        // occupied units (loaded qubits/homes) — deterministic pattern
-        const occupied = (i * 61 % 100) < 34;
-        const sz = Math.max(1, cRad * 0.42 * (1.4 - norm * 0.5));
-        const pulse = 0.6 + 0.4 * Math.sin(t * 0.04 + i * 0.5);
+      // Cell wall (thick, rigid — distinguishes plant from animal)
+      ctx.strokeStyle = `rgba(134,239,172,0.6)`; ctx.lineWidth = 3;
+      ctx.strokeRect(px - pr * 1.05, py - pr * 0.88, pr * 2.1, pr * 1.76);
+      // Cell membrane inside
+      ctx.strokeStyle = `rgba(74,222,128,0.3)`; ctx.lineWidth = 1;
+      ctx.strokeRect(px - pr * 0.98, py - pr * 0.81, pr * 1.96, pr * 1.62);
+      // Cytoplasm
+      ctx.fillStyle = `rgba(74,222,128,${0.04 + Irr * 0.04})`;
+      ctx.fillRect(px - pr * 0.97, py - pr * 0.80, pr * 1.94, pr * 1.60);
 
-        let col: string;
-        if (i === sel) col = P.gold;
-        else if (i === hoverIdx) col = P.violet;
-        else if (occupied) col = `rgba(103,232,249,${(0.5 + pulse * 0.4).toFixed(2)})`;
-        else col = `rgba(45,212,191,0.30)`;
+      // Vacuole (large, central, plant-only)
+      ctx.fillStyle = `rgba(103,232,249,${0.07 + pulse * 0.04})`;
+      ctx.beginPath(); ctx.ellipse(px - pr * 0.1, py + pr * 0.1, pr * 0.55, pr * 0.45, 0.1, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = `rgba(103,232,249,0.3)`; ctx.lineWidth = 0.8; ctx.beginPath();
+      ctx.ellipse(px - pr * 0.1, py + pr * 0.1, pr * 0.55, pr * 0.45, 0.1, 0, Math.PI * 2); ctx.stroke();
+      if (h === "vacuole") { ctx.strokeStyle = P.ivory; ctx.lineWidth = 1.5; ctx.stroke(); }
 
-        ctx.fillStyle = col;
-        ctx.beginPath(); ctx.arc(nd.x, nd.y, Math.max(0.5, i === sel ? sz * 1.8 : sz), 0, Math.PI * 2); ctx.fill();
-
-        // selected unit: show neighbor shell (interaction graph within blockade radius)
-        if (i === sel) {
-          const Rb = cRad * 3.2; // blockade / service radius
-          ctx.strokeStyle = `rgba(251,191,36,0.45)`; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
-          ctx.beginPath(); ctx.arc(nd.x, nd.y, Rb, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
-          nodes.forEach((o, j) => {
-            if (j === i) return;
-            const d = Math.hypot(o.x - nd.x, o.y - nd.y);
-            if (d < Rb) {
-              ctx.strokeStyle = `rgba(251,191,36,${(0.4 * (1 - d / Rb)).toFixed(2)})`; ctx.lineWidth = 0.6;
-              ctx.beginPath(); ctx.moveTo(nd.x, nd.y); ctx.lineTo(o.x, o.y); ctx.stroke();
-            }
-          });
+      // Chloroplasts (4–6, respond to Irr)
+      const nChloroActive = Math.round(2 + Irr * 3);
+      for (let ci = 0; ci < 6; ci++) {
+        const cang = (ci / 6) * Math.PI * 2 + t * 0.002;
+        const cr2 = pr * 0.71;
+        const chx = px + Math.cos(cang) * cr2, chy = py + Math.sin(cang) * cr2 * 0.8;
+        const active = ci < nChloroActive;
+        const glow = active ? (0.6 + pulse * 0.4) : 0.15;
+        ctx.fillStyle = `rgba(134,239,172,${glow * 0.6})`;
+        ctx.beginPath(); ctx.ellipse(chx, chy, Math.max(0.5, pr * 0.10), Math.max(0.5, pr * 0.05), cang, 0, Math.PI * 2); ctx.fill();
+        if (active) {
+          ctx.strokeStyle = `rgba(74,222,128,${glow})`; ctx.lineWidth = 1; ctx.stroke();
+          // thylakoid stacks (tiny lines)
+          for (let g2 = 0; g2 < 3; g2++) {
+            const gx = chx + Math.cos(cang + Math.PI / 2) * (g2 - 1) * pr * 0.04;
+            const gy = chy + Math.sin(cang + Math.PI / 2) * (g2 - 1) * pr * 0.04;
+            ctx.strokeStyle = `rgba(74,222,128,${glow * 0.5})`; ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.moveTo(gx - pr * 0.04, gy); ctx.lineTo(gx + pr * 0.04, gy); ctx.stroke();
+          }
         }
-      });
-
-      // Center core
-      ctx.fillStyle = P.gold;
-      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+      }
+      // Nucleus (plant)
+      ctx.fillStyle = `rgba(22,101,52,0.55)`;
+      ctx.beginPath(); ctx.ellipse(px + pr * 0.26, py - pr * 0.20, pr * 0.20, pr * 0.17, 0.3, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = `rgba(134,239,172,0.6)`; ctx.lineWidth = 1; ctx.stroke();
+      if (h === "pnucleus") { ctx.strokeStyle = P.ivory; ctx.lineWidth = 1.5; ctx.stroke(); }
 
       // Labels
-      ctx.fillStyle = P.glass; ctx.font = "bold 8px monospace"; ctx.textAlign = "left";
-      ctx.fillText(`φ-SPIRAL SKY-RISE · ${N} HOME UNITS · GOLDEN ANGLE 137.51°`, 10, 16);
-      const occ = Math.round(N * 0.34);
-      ctx.fillStyle = P.muted;
-      ctx.fillText(`occupied ${occ} · vacant ${N - occ} · rₙ = c√n`, 10, 28);
-      if (sel !== null) {
-        ctx.fillStyle = P.gold; ctx.textAlign = "right";
-        ctx.fillText(`SELECTED UNIT #${sel} · shell r = ${Math.sqrt(sel).toFixed(1)}·c · θ = ${((sel * 137.507764) % 360).toFixed(1)}°`, W - 10, 16);
-      } else {
-        ctx.fillStyle = P.muted; ctx.textAlign = "right";
-        ctx.fillText(`click a unit to inspect its service shell`, W - 10, 16);
+      ctx.fillStyle = P.plant; ctx.font = "bold 8px monospace"; ctx.textAlign = "center";
+      ctx.fillText("PLANT CELL · TOP VIEW · 10 µm", px, py - pr * 0.96);
+      ctx.fillStyle = P.chloro; ctx.font = "7px monospace";
+      ctx.fillText(`${nChloroActive} chloroplasts active · λ 430/680 nm`, px, py + pr * 0.97);
+
+      // ─── HUMAN CELL (right half) ────────────────────────────────
+      const hpx = W * 0.75, hpy = H * 0.5;
+      const hr = Math.min(W * 0.18, H * 0.36);
+
+      // Cell membrane (irregular ellipse)
+      ctx.fillStyle = `rgba(251,113,133,${0.04 + Irr * 0.03})`;
+      ctx.beginPath(); ctx.ellipse(hpx, hpy, hr * 1.0, hr * 0.88, 0.15, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = `rgba(251,113,133,0.45)`; ctx.lineWidth = 1.5; ctx.stroke();
+
+      // Endoplasmic reticulum (wavy lines)
+      ctx.strokeStyle = `rgba(253,164,175,0.25)`; ctx.lineWidth = 0.8;
+      for (let er = 0; er < 4; er++) {
+        const yOff = (er - 1.5) * hr * 0.22;
+        ctx.beginPath();
+        for (let ex = -hr * 0.7; ex <= hr * 0.7; ex += 4) {
+          const ey = hpy + yOff + Math.sin(ex * 0.12 + t * 0.03) * hr * 0.06;
+          ex === -hr * 0.7 ? ctx.moveTo(hpx + ex, ey) : ctx.lineTo(hpx + ex, ey);
+        }
+        ctx.stroke();
       }
+
+      // Mitochondria (4–7, respond to Irr)
+      const nMitoActive = Math.round(2 + Irr * 4);
+      for (let mi = 0; mi < 7; mi++) {
+        const mang = (mi / 7) * Math.PI * 2 + t * 0.003;
+        const mr2 = hr * 0.62;
+        const mx = hpx + Math.cos(mang) * mr2, my = hpy + Math.sin(mang) * mr2 * 0.85;
+        const act = mi < nMitoActive;
+        const glow2 = act ? (0.55 + pulse * 0.45) : 0.12;
+        ctx.fillStyle = `rgba(253,164,175,${glow2 * 0.65})`;
+        ctx.beginPath(); ctx.ellipse(mx, my, Math.max(0.5, hr * 0.11), Math.max(0.5, hr * 0.055), mang, 0, Math.PI * 2); ctx.fill();
+        if (act) {
+          ctx.strokeStyle = `rgba(251,113,133,${glow2})`; ctx.lineWidth = 1; ctx.stroke();
+          // cristae
+          for (let c2 = 0; c2 < 3; c2++) {
+            const fc = mx + Math.cos(mang + Math.PI / 2) * (c2 - 1) * hr * 0.04;
+            const fy = my + Math.sin(mang + Math.PI / 2) * (c2 - 1) * hr * 0.04;
+            ctx.strokeStyle = `rgba(251,113,133,${glow2 * 0.5})`; ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.moveTo(fc - hr * 0.04, fy); ctx.lineTo(fc + hr * 0.04, fy); ctx.stroke();
+          }
+          // ATP pulse ring at high irr
+          if (act && Irr > 0.6) {
+            const ring = 0.4 + 0.6 * ((t % 40) / 40);
+            ctx.strokeStyle = `rgba(251,191,36,${(1 - ring) * 0.5})`; ctx.lineWidth = 0.8;
+            ctx.beginPath(); ctx.arc(mx, my, Math.max(0.5, hr * 0.11 + ring * 6), 0, Math.PI * 2); ctx.stroke();
+          }
+        }
+      }
+      // Nucleus (human)
+      ctx.fillStyle = `rgba(159,18,57,0.5)`;
+      ctx.beginPath(); ctx.ellipse(hpx - hr * 0.05, hpy + hr * 0.08, hr * 0.24, hr * 0.21, -0.2, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = `rgba(251,113,133,0.6)`; ctx.lineWidth = 1; ctx.stroke();
+      if (h === "hnucleus") { ctx.strokeStyle = P.ivory; ctx.lineWidth = 1.5; ctx.stroke(); }
+      // Nuclear pores
+      for (let np = 0; np < 8; np++) {
+        const npa = (np / 8) * Math.PI * 2;
+        const npx = hpx - hr * 0.05 + Math.cos(npa) * hr * 0.24;
+        const npy2 = hpy + hr * 0.08 + Math.sin(npa) * hr * 0.21;
+        ctx.fillStyle = `rgba(251,113,133,0.7)`;
+        ctx.beginPath(); ctx.arc(npx, npy2, Math.max(0.5, 1.5), 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Divider
+      ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(W * 0.5, 20); ctx.lineTo(W * 0.5, H - 20); ctx.stroke(); ctx.setLineDash([]);
+
+      // Header
+      ctx.fillStyle = P.human; ctx.font = "bold 8px monospace"; ctx.textAlign = "center";
+      ctx.fillText("HUMAN CELL · TOP VIEW · 10 µm", hpx, hpy - hr * 0.96);
+      ctx.fillStyle = P.mito; ctx.font = "7px monospace";
+      ctx.fillText(`${nMitoActive} mitochondria active · ATP burst`, hpx, hpy + hr * 0.97);
+
+      // Irradiance bar
+      ctx.fillStyle = P.panel2; ctx.fillRect(10, H - 18, W - 20, 10);
+      ctx.fillStyle = `rgba(255,240,120,${0.5 + Irr * 0.5})`;
+      ctx.fillRect(10, H - 18, (W - 20) * Irr, 10);
+      ctx.strokeStyle = P.line; ctx.strokeRect(10, H - 18, W - 20, 10);
+      ctx.fillStyle = P.sunCore; ctx.font = "7px monospace"; ctx.textAlign = "center";
+      ctx.fillText(`SOLAR IRRADIANCE · G_s = ${(1361 * Irr).toFixed(0)} W/m² (${(Irr * 100).toFixed(0)}% of full sun at 1 AU)`, W / 2, H - 10);
 
       t++; raf = requestAnimationFrame(draw);
     }
     draw();
-
-    function onMove(e: MouseEvent) {
-      const rect = c.getBoundingClientRect();
-      hoverRef.current = { x: (e.clientX - rect.left) * (c.width / rect.width), y: (e.clientY - rect.top) * (c.height / rect.height) };
-    }
-    function onLeave() { hoverRef.current = null; }
-    function onClick(e: MouseEvent) {
-      const rect = c.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (c.width / rect.width);
-      const my = (e.clientY - rect.top) * (c.height / rect.height);
-      let best = 1e9, idx = -1;
-      nodesRef.current.forEach((nd, i) => { const d = Math.hypot(nd.x - mx, nd.y - my); if (d < best) { best = d; idx = i; } });
-      setSelected(best < 22 ? (idx === selRef.current ? null : idx) : null);
-    }
-    c.addEventListener("mousemove", onMove);
-    c.addEventListener("mouseleave", onLeave);
-    c.addEventListener("click", onClick);
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); c.removeEventListener("mousemove", onMove); c.removeEventListener("mouseleave", onLeave); c.removeEventListener("click", onClick); };
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
   }, []);
 
   return (
     <div style={{ border: `1px solid ${P.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 28 }}>
-      <canvas ref={canvasRef} style={{ width: "100%", height: 400, display: "block", cursor: "pointer" }} />
+      <canvas ref={canvasRef} style={{ width: "100%", height: 420, display: "block" }} />
       <div style={{ padding: "10px 16px", background: P.panel, display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 10, color: P.glass, marginBottom: 3 }}>Home units N · {count}</div>
-          <input type="range" min={40} max={800} step={10} value={count} onChange={e => setCount(+e.target.value)} style={{ width: 150 }} />
+          <div style={{ fontSize: 10, color: P.sunCore, marginBottom: 3 }}>Solar irradiance G_s · {(irr * 1361).toFixed(0)} W/m²</div>
+          <input type="range" min={0} max={1} step={0.01} value={irr} onChange={e => setIrr(+e.target.value)} style={{ width: 200 }} />
         </div>
-        <div>
-          <div style={{ fontSize: 10, color: P.teal, marginBottom: 3 }}>Radial density c · {scale.toFixed(2)}</div>
-          <input type="range" min={0.3} max={1.0} step={0.01} value={scale} onChange={e => setScale(+e.target.value)} style={{ width: 150 }} />
-        </div>
-        <div style={{ fontSize: 11, color: P.dim }}>Every home unit sits at a golden-angle phyllotaxis node — the same packing a sunflower uses. Zero overlaps, maximal density, uniform light. Click any unit to see its service shell (the neighbors it shares utilities/structure with, set by a blockade-style radius).</div>
+        <div style={{ fontSize: 11, color: P.dim }}>Both cells viewed top-down from straight above — the sun's exact vantage point. Chloroplasts and mitochondria pulse at a rate proportional to irradiance: photons drive both photosynthesis (plant, green) and ATP production (human, pink). The nuclear pore ring channels the genetic response to light.</div>
       </div>
     </div>
   );
 }
 
 /* ════════════════════════════════════════════════════════════════
-   CANVAS 3 — Adaptive Rhombus Flex Lattice (structural mesh)
-   Mesh of rhombus nodes that flexes to load/flow; resolution
-   concentrates where the gradient is high (focus vs broad modes).
+   CANVAS 3 — Photon Energy Spectrum · Solar vs Cellular Absorption
+   Solar blackbody curve (T=5778 K) + chlorophyll abs (430/680 nm)
+   + melanin/hemoglobin (human). Wavelength cursor + energy readout.
 ════════════════════════════════════════════════════════════════ */
-function RhombusFlexCanvas() {
+function PhotonSpectrumCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const flexRef = useRef(0.5);
-  const resRef = useRef(0.5);
-  const [flex, setFlex] = useState(0.5);
-  const [res, setRes] = useState(0.5);
+  const lambdaRef = useRef(550);
+  const [lambda, setLambda] = useState(550);
 
-  useEffect(() => { flexRef.current = flex; }, [flex]);
-  useEffect(() => { resRef.current = res; }, [res]);
+  useEffect(() => { lambdaRef.current = lambda; }, [lambda]);
 
   useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext("2d")!;
+    const cv = canvasRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
     let raf = 0, t = 0;
-    function resize() { c.width = c.offsetWidth; c.height = c.offsetHeight; }
+    function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
     resize();
-    const ro = new ResizeObserver(resize); ro.observe(c);
+    const ro = new ResizeObserver(resize); ro.observe(cv);
+
+    // Planck function (normalized)
+    function planck(lnm: number): number {
+      const l = lnm * 1e-9;
+      const h = 6.626e-34, c = 3e8, k = 1.38e-23, T = 5778;
+      const ex = (h * c) / (l * k * T);
+      return 1 / (Math.exp(Math.min(ex, 700)) - 1) * (1 / Math.pow(l, 5));
+    }
+
+    // Chlorophyll A absorption (approximate Gaussian peaks at 430 + 680 nm)
+    function chloroAbs(lnm: number): number {
+      const a1 = Math.exp(-Math.pow((lnm - 430) / 22, 2));
+      const a2 = Math.exp(-Math.pow((lnm - 680) / 20, 2));
+      return Math.max(a1, a2 * 0.85);
+    }
+
+    // Melanin (broad monotonic — decreases toward red)
+    function melanin(lnm: number): number { return Math.exp(-(lnm - 300) / 180) * 0.8; }
+
+    // Hemoglobin (two peaks ~415 and ~550 nm)
+    function hemo(lnm: number): number {
+      return 0.9 * Math.exp(-Math.pow((lnm - 415) / 18, 2)) +
+             0.5 * Math.exp(-Math.pow((lnm - 550) / 25, 2));
+    }
+
+    // Wavelength to approximate RGB
+    function wlToRgb(nm: number): [number, number, number] {
+      if (nm < 380) return [0.5, 0, 0.8];
+      if (nm < 440) return [0.5 - (nm - 380) / 120, 0, 1];
+      if (nm < 490) return [0, (nm - 440) / 50, 1];
+      if (nm < 510) return [0, 1, 1 - (nm - 490) / 20];
+      if (nm < 580) return [(nm - 510) / 70, 1, 0];
+      if (nm < 645) return [1, 1 - (nm - 580) / 65, 0];
+      return [1, 0, 0];
+    }
+
+    const NM_MIN = 300, NM_MAX = 800;
+
+    // Pre-compute normalization
+    let maxPlanck = 0;
+    for (let nm = NM_MIN; nm <= NM_MAX; nm += 2) { const v = planck(nm); if (v > maxPlanck) maxPlanck = v; }
 
     function draw() {
-      const W = c.width, H = c.height;
+      const W = cv.width, H = cv.height;
       ctx.clearRect(0, 0, W, H); ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H);
-      const flexAmt = flexRef.current, resAmt = resRef.current;
+      const LW = lambdaRef.current;
 
-      const cols = Math.round(8 + resAmt * 16);
-      const rows = Math.round(6 + resAmt * 10);
-      const cx = W / 2, cy = H / 2;
-      const gw = W * 0.8, gh = H * 0.7;
+      const pad = { l: 48, r: 20, t: 32, b: 40 };
+      const gW = W - pad.l - pad.r, gH = H - pad.t - pad.b;
 
-      // flow field the mesh flexes toward (a moving load front)
-      const loadX = 0.5 + 0.35 * Math.sin(t * 0.012);
-      const loadY = 0.5 + 0.25 * Math.cos(t * 0.009);
+      function xOf(nm: number) { return pad.l + (nm - NM_MIN) / (NM_MAX - NM_MIN) * gW; }
+      function yOf(v: number) { return pad.t + gH - v * gH; }
 
-      function pt(u: number, v: number) {
-        // base planar position
-        let x = cx + (u - 0.5) * gw;
-        let y = cy + (v - 0.5) * gh;
-        // flex toward the load front — concentrate resolution where gradient is high
-        const du = u - loadX, dv = v - loadY;
-        const d = Math.hypot(du, dv) + 0.001;
-        const pull = flexAmt * 0.35 * Math.exp(-d * d * 6);
-        x -= (du / d) * pull * gw * 0.5;
-        y -= (dv / d) * pull * gh * 0.5;
-        // 3D deformation z (perspective squash)
-        const z = flexAmt * 40 * Math.exp(-d * d * 6);
-        return { x, y: y - z, z };
+      // Rainbow background strip
+      for (let nm = NM_MIN; nm <= NM_MAX; nm += 2) {
+        const [r, g, b] = wlToRgb(nm);
+        ctx.fillStyle = `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)},0.08)`;
+        ctx.fillRect(xOf(nm), pad.t, 3, gH);
       }
 
-      // draw rhombus cells
-      for (let r = 0; r < rows; r++) {
-        for (let cIdx = 0; cIdx < cols; cIdx++) {
-          const u0 = cIdx / cols, u1 = (cIdx + 1) / cols;
-          const v0 = r / rows, v1 = (r + 1) / rows;
-          const a = pt(u0, v0), b = pt(u1, v0), c2 = pt(u1, v1), d = pt(u0, v1);
-          const zAvg = (a.z + b.z + c2.z + d.z) / 4;
-          const lit = Math.min(1, zAvg / 40);
-          const hue = 190 - lit * 60; // cyan → violet at flex peaks
-          ctx.strokeStyle = `hsla(${hue},80%,${55 + lit * 20}%,${0.25 + lit * 0.6})`;
-          ctx.lineWidth = 0.6 + lit * 1.2;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c2.x, c2.y); ctx.lineTo(d.x, d.y); ctx.closePath();
-          ctx.stroke();
-          // node dots
-          ctx.fillStyle = `hsla(${hue},85%,70%,${0.3 + lit * 0.6})`;
-          ctx.beginPath(); ctx.arc(a.x, a.y, Math.max(0.5, 0.8 + lit * 2), 0, Math.PI * 2); ctx.fill();
-        }
+      // Solar Planck curve
+      ctx.beginPath();
+      for (let nm = NM_MIN; nm <= NM_MAX; nm += 3) {
+        const y = yOf(planck(nm) / maxPlanck);
+        nm === NM_MIN ? ctx.moveTo(xOf(nm), y) : ctx.lineTo(xOf(nm), y);
       }
+      ctx.strokeStyle = `rgba(255,240,140,0.65)`; ctx.lineWidth = 1.8; ctx.stroke();
 
-      // load front marker
-      const lf = pt(loadX, loadY);
-      ctx.strokeStyle = `rgba(251,113,133,0.6)`; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.arc(lf.x, lf.y, 10, 0, Math.PI * 2); ctx.stroke();
-      ctx.fillStyle = P.rose; ctx.font = "8px monospace"; ctx.textAlign = "center";
-      ctx.fillText("LOAD / FLOW FRONT", lf.x, lf.y - 14);
+      // Chlorophyll absorption
+      ctx.beginPath();
+      for (let nm = NM_MIN; nm <= NM_MAX; nm += 3) {
+        const y = yOf(chloroAbs(nm) * 0.85);
+        nm === NM_MIN ? ctx.moveTo(xOf(nm), y) : ctx.lineTo(xOf(nm), y);
+      }
+      ctx.strokeStyle = `rgba(74,222,128,0.75)`; ctx.lineWidth = 1.5; ctx.stroke();
 
-      ctx.fillStyle = P.glass; ctx.font = "bold 8px monospace"; ctx.textAlign = "left";
-      ctx.fillText(`FLEXING RHOMBUS LATTICE · ${cols}×${rows} CELLS · ADAPTS TO GRADIENT · PRESERVES COHERENCE`, 10, 16);
-      const mode = flexAmt > 0.66 ? "FOCUS MODE (high detail)" : flexAmt > 0.33 ? "BALANCE MODE" : "WIDE MODE (broad coverage)";
-      ctx.fillStyle = P.amber; ctx.textAlign = "right";
-      ctx.fillText(mode, W - 10, 16);
+      // Melanin
+      ctx.beginPath();
+      for (let nm = NM_MIN; nm <= NM_MAX; nm += 3) {
+        const y = yOf(melanin(nm) * 0.7);
+        nm === NM_MIN ? ctx.moveTo(xOf(nm), y) : ctx.lineTo(xOf(nm), y);
+      }
+      ctx.strokeStyle = `rgba(251,113,133,0.6)`; ctx.lineWidth = 1.2; ctx.stroke();
+
+      // Hemoglobin
+      ctx.beginPath();
+      for (let nm = NM_MIN; nm <= NM_MAX; nm += 3) {
+        const y = yOf(hemo(nm) * 0.55);
+        nm === NM_MIN ? ctx.moveTo(xOf(nm), y) : ctx.lineTo(xOf(nm), y);
+      }
+      ctx.strokeStyle = `rgba(253,164,175,0.5)`; ctx.lineWidth = 1.2; ctx.stroke();
+
+      // Wavelength cursor
+      const cx2 = xOf(LW);
+      ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(cx2, pad.t); ctx.lineTo(cx2, pad.t + gH); ctx.stroke(); ctx.setLineDash([]);
+
+      // Energy readout
+      const E_eV = (6.626e-34 * 3e8 / (LW * 1e-9)) / 1.602e-19;
+      const [rr, rg, rb] = wlToRgb(LW);
+      ctx.fillStyle = `rgb(${Math.round(rr * 255)},${Math.round(rg * 255)},${Math.round(rb * 255)})`;
+      ctx.font = "bold 9px monospace"; ctx.textAlign = "left";
+      ctx.fillText(`λ = ${LW} nm  |  E = ${E_eV.toFixed(2)} eV  |  hc/λ`, cx2 + 4, pad.t + 16);
+      const choAbs = chloroAbs(LW);
+      ctx.fillStyle = P.chloro;
+      ctx.fillText(`Chl abs = ${(choAbs * 100).toFixed(0)}%   Mel = ${(melanin(LW) * 100).toFixed(0)}%   Hgb = ${(hemo(LW) * 100).toFixed(0)}%`, cx2 + 4, pad.t + 28);
+
+      // Axes
+      ctx.strokeStyle = P.muted; ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + gH);
+      ctx.moveTo(pad.l, pad.t + gH); ctx.lineTo(W - pad.r, pad.t + gH); ctx.stroke();
+      [300, 400, 500, 600, 700, 800].forEach(nm => {
+        const x = xOf(nm);
+        ctx.fillStyle = P.muted; ctx.font = "8px monospace"; ctx.textAlign = "center";
+        ctx.fillText(`${nm}`, x, pad.t + gH + 12);
+      });
+      ctx.fillStyle = P.muted; ctx.font = "8px monospace"; ctx.textAlign = "center";
+      ctx.fillText("Wavelength (nm)", pad.l + gW / 2, H - 4);
+
+      // Legend
+      const LL = [[P.sunCore, "Solar (5778 K Planck)"], [P.plant, "Chlorophyll A"], [P.human, "Melanin"], [P.mito, "Hemoglobin"]] as [string, string][];
+      LL.forEach(([col, lbl], i) => {
+        ctx.fillStyle = col; ctx.fillRect(pad.l + i * 155, pad.t - 12, 20, 5);
+        ctx.fillStyle = P.dim; ctx.font = "8px monospace"; ctx.textAlign = "left";
+        ctx.fillText(lbl, pad.l + i * 155 + 24, pad.t - 7);
+      });
+
+      // Pulse marker on cursor
+      const pRing = (t % 40) / 40;
+      ctx.strokeStyle = `rgba(255,255,255,${(1 - pRing) * 0.6})`; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.arc(cx2, pad.t + gH * (1 - planck(LW) / maxPlanck), Math.max(0.5, 4 + pRing * 10), 0, Math.PI * 2); ctx.stroke();
 
       t++; raf = requestAnimationFrame(draw);
     }
@@ -448,125 +616,13 @@ function RhombusFlexCanvas() {
 
   return (
     <div style={{ border: `1px solid ${P.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 28 }}>
-      <canvas ref={canvasRef} style={{ width: "100%", height: 340, display: "block" }} />
+      <canvas ref={canvasRef} style={{ width: "100%", height: 280, display: "block" }} />
       <div style={{ padding: "10px 16px", background: P.panel, display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 10, color: P.violet, marginBottom: 3 }}>Flex amount · {flex.toFixed(2)}</div>
-          <input type="range" min={0} max={1} step={0.01} value={flex} onChange={e => setFlex(+e.target.value)} style={{ width: 150 }} />
+          <div style={{ fontSize: 10, color: P.sunCore, marginBottom: 3 }}>Wavelength cursor · {lambda} nm</div>
+          <input type="range" min={300} max={800} step={1} value={lambda} onChange={e => setLambda(+e.target.value)} style={{ width: 200 }} />
         </div>
-        <div>
-          <div style={{ fontSize: 10, color: P.teal, marginBottom: 3 }}>Mesh resolution · {res.toFixed(2)}</div>
-          <input type="range" min={0} max={1} step={0.01} value={res} onChange={e => setRes(+e.target.value)} style={{ width: 150 }} />
-        </div>
-        <div style={{ fontSize: 11, color: P.dim }}>The structural mesh replaces the rigid box. It flexes toward the load/flow front, concentrating resolution and stiffness exactly where stress is highest — then relaxes back. Same adaptive rhombus lattice as the Omni-Flow perceptual array: adapt to gradients, allocate resolution, minimize deformation, preserve coherence.</div>
-      </div>
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════════════════════════════
-   CANVAS 4 — Geomagnetic-Carved Water Interface Field
-   |∇B| field lines carve water channels; charge follows F=q(v×B).
-   Shows the energy interface between geomagnetic field and water.
-════════════════════════════════════════════════════════════════ */
-function GeomagWaterCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const bRef = useRef(0.55);
-  const flowRef = useRef(0.5);
-  const [B, setB] = useState(0.55);
-  const [flow, setFlow] = useState(0.5);
-
-  useEffect(() => { bRef.current = B; }, [B]);
-  useEffect(() => { flowRef.current = flow; }, [flow]);
-
-  useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    const ctx = c.getContext("2d")!;
-    let raf = 0, t = 0;
-    function resize() { c.width = c.offsetWidth; c.height = c.offsetHeight; }
-    resize();
-    const ro = new ResizeObserver(resize); ro.observe(c);
-
-    const N = 260;
-    const parts = Array.from({ length: N }, () => ({
-      x: Math.random(), y: Math.random(), vx: 0, vy: 0,
-    }));
-
-    function draw() {
-      const W = c.width, H = c.height;
-      ctx.fillStyle = "rgba(4,7,13,0.22)"; ctx.fillRect(0, 0, W, H);
-      const Bmag = bRef.current, flowSpd = flowRef.current;
-
-      // Geomagnetic dipole poles
-      const p1x = W * 0.3, p1y = H * 0.3;
-      const p2x = W * 0.72, p2y = H * 0.68;
-
-      function field(x: number, y: number) {
-        // curl-ish field from two poles → carves channels
-        const d1x = x - p1x, d1y = y - p1y, r1 = Math.hypot(d1x, d1y) + 8;
-        const d2x = x - p2x, d2y = y - p2y, r2 = Math.hypot(d2x, d2y) + 8;
-        // perpendicular components (B into charge motion, v×B swirl)
-        const fx = (-d1y / (r1 * r1)) - (d2y / (r2 * r2));
-        const fy = ( d1x / (r1 * r1)) + (d2x / (r2 * r2));
-        return { fx: fx * 3000 * Bmag, fy: fy * 3000 * Bmag };
-      }
-
-      // faint field streaks
-      ctx.strokeStyle = `rgba(74,222,128,${0.05 + Bmag * 0.06})`; ctx.lineWidth = 0.5;
-      for (let gx = 0; gx < W; gx += 34) {
-        for (let gy = 0; gy < H; gy += 34) {
-          const f = field(gx, gy); const m = Math.hypot(f.fx, f.fy) + 0.001;
-          ctx.beginPath(); ctx.moveTo(gx, gy);
-          ctx.lineTo(gx + (f.fx / m) * 12, gy + (f.fy / m) * 12); ctx.stroke();
-        }
-      }
-
-      // water particles carried by v×B
-      parts.forEach(p => {
-        const x = p.x * W, y = p.y * H;
-        const f = field(x, y);
-        p.vx = p.vx * 0.9 + f.fx * 0.00006 * (0.5 + flowSpd);
-        p.vy = p.vy * 0.9 + f.fy * 0.00006 * (0.5 + flowSpd);
-        p.x += p.vx / W; p.y += p.vy / H;
-        if (p.x < 0) p.x += 1; if (p.x > 1) p.x -= 1;
-        if (p.y < 0) p.y += 1; if (p.y > 1) p.y -= 1;
-        const spd = Math.hypot(p.vx, p.vy);
-        const hue = 190 + Math.min(80, spd * 3);
-        ctx.fillStyle = `hsla(${hue},85%,65%,0.8)`;
-        ctx.beginPath(); ctx.arc(p.x * W, p.y * H, Math.max(0.5, 1.1 + spd * 0.05), 0, Math.PI * 2); ctx.fill();
-      });
-
-      // poles
-      [[p1x, p1y, P.rose, "N"], [p2x, p2y, P.blue, "S"]].forEach(([px, py, col, lbl]) => {
-        const g = ctx.createRadialGradient(px as number, py as number, 2, px as number, py as number, 26);
-        g.addColorStop(0, (col as string) + "cc"); g.addColorStop(1, (col as string) + "00");
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px as number, py as number, 26, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = P.ivory; ctx.font = "bold 10px monospace"; ctx.textAlign = "center";
-        ctx.fillText(lbl as string, px as number, (py as number) + 3);
-      });
-
-      ctx.fillStyle = P.green; ctx.font = "bold 8px monospace"; ctx.textAlign = "left";
-      ctx.fillText(`GEOMAGNETIC-CARVED WATER · F = q(v × B) · channels ∝ |∇B|`, 10, 16);
-
-      t++; raf = requestAnimationFrame(draw);
-    }
-    draw();
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
-  }, []);
-
-  return (
-    <div style={{ border: `1px solid ${P.line}`, borderRadius: 12, overflow: "hidden", marginBottom: 28 }}>
-      <canvas ref={canvasRef} style={{ width: "100%", height: 320, display: "block" }} />
-      <div style={{ padding: "10px 16px", background: P.panel, display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center" }}>
-        <div>
-          <div style={{ fontSize: 10, color: P.green, marginBottom: 3 }}>Geomagnetic |B| · {B.toFixed(2)}</div>
-          <input type="range" min={0.1} max={1} step={0.01} value={B} onChange={e => setB(+e.target.value)} style={{ width: 150 }} />
-        </div>
-        <div>
-          <div style={{ fontSize: 10, color: P.blue, marginBottom: 3 }}>Water flow rate · {flow.toFixed(2)}</div>
-          <input type="range" min={0} max={1} step={0.01} value={flow} onChange={e => setFlow(+e.target.value)} style={{ width: 150 }} />
-        </div>
-        <div style={{ fontSize: 11, color: P.dim }}>Water carriers feel the Lorentz force F = q(v × B) between the geomagnetic poles. The field carves stable flow channels (∝ |∇B|) that become the home network's plumbing, thermal loops, and cooling interfaces — routed by the planet's own magnetic geometry.</div>
+        <div style={{ fontSize: 11, color: P.dim }}>The sun's output (yellow curve) vs what each cell absorbs. Chlorophyll peaks at 430 nm (blue) and 680 nm (red) — it rejects green (which is why plants look green). Human skin melanin is highest in UV; hemoglobin peaks at 415 nm. Drag the cursor to read photon energy E = hc/λ at any wavelength and compare all four absorption curves simultaneously.</div>
       </div>
     </div>
   );
@@ -579,21 +635,21 @@ export default function GlassFieldHomesPage() {
   const images = [
     {
       src: omniFlow,
-      caption: "Omni-Flow Perceptual Array · The Flexing Rhombus Lattice",
-      anno: "This is the master schematic for the housing network. All sensing cones merge into one 4D field (space, time, velocity, temperature, polarization, spectrum, confidence). The flexing rhombus lattice at the core replaces the rigid box — it stretches and compresses with flow and detail. Focus mode concentrates structure where load is high; wide mode spreads for broad coverage. The home network is this lattice made habitable: adaptive resolution structure spanning kilometers to atoms.",
-      chips: ["Rhombus Flex Lattice", "4D Unified Field", "Adaptive Resolution", "Focus / Balance / Wide", "Multi-Scale", "Replace the Box"],
+      caption: "Omni-Flow Perceptual Array · Multi-Scale Sensing from Space to Atom",
+      anno: "The solar microscope has this exact structure. The upward array is the sun — you. The downward array reaches into the cell. The rhombus flex lattice at the core is the living tissue itself, concentrating resolution where irradiance gradient is highest. The multi-scale understanding axis (kilometers → atoms) is the descent slider: weather systems at the top, molecular composition at the bottom. This is the instrument you are looking through.",
+      chips: ["Multi-Scale Descent", "Top-Down Sensing Array", "Atmospheric Layers", "Cellular Resolution", "Photon Interface", "Molecular Composition"],
     },
     {
       src: magStorm,
-      caption: "Magnetic Dust Storm · Multi-Scale Perceptual Array",
-      anno: "The energy and coupling layer. Magnetic field dynamics (B/E field lines, current sheets), charge and plasma environment, surface/subsurface conductivity, depth and structure sensing all feed the flexing rhombus core with its real-time adaptive mesh. For the home network this is the live geomagnetic + solar weather feed: the system reads charge density, updraft velocity, and ground conductivity to route power, pre-flex the structure ahead of storms, and time solar harvest — a predictive model projecting +42 minutes ahead.",
-      chips: ["Magnetic Field Dynamics", "Charge / Plasma", "Poynting Flux", "Helicity", "Predictive +42min", "Adaptive Core"],
+      caption: "Magnetic Dust Storm · The Solar Wind Boundary Seen From Below",
+      anno: "From the sun's vantage point this is what you see before you hit the atmosphere: upward and lateral sensing arrays reading charge density, plasma beta, Poynting flux (energy flow), helicity (spin of the magnetic field), and vorticity. The predictive model (+42 min) is the solar wind's own physics — the storm knows where it is going before the cell below feels it. Solar storms modulate cellular irradiance through atmospheric transmission shifts.",
+      chips: ["Solar Wind", "Charge Density", "Poynting Flux E×H", "Vorticity", "Magnetic Helicity", "Atmospheric Transmission"],
     },
     {
       src: skyrmion,
-      caption: "Topological Field Textures · Skyrmions, Vortices, Möbius C-points",
-      anno: "The deep-physics substrate. Phase singularities (ℓ = ±1 vortices), a skyrmion texture with topological charge Q ≈ 0.996, and Möbius-strip polarization C-points show how structured light and field textures carry stable, quantized information through a medium. In the glass-jelly substrate these are the coherent modes the refractive gel supports: topologically protected light channels that route energy and signal through the home network without decay — geometry itself doing the computation.",
-      chips: ["Skyrmion Q≈1", "Optical Vortices ℓ=±1", "Möbius C-points", "Topological Charge", "Phase Singularity", "Protected Modes"],
+      caption: "Topological Optical Textures · How Structured Light Enters the Cell",
+      anno: "When coherent solar light passes through the cell membrane it forms optical vortices (phase singularities ℓ = ±1), skyrmion field textures (Q ≈ 1), and Möbius-strip polarization C-points. These are topologically protected modes — they cannot be smoothly deformed away. The chloroplast's grana stacks and the mitochondrial cristae are tuned to receive exactly these structured photon modes, which is why coherent light (even at cellular scales) drives biology more efficiently than incoherent thermal photons at the same intensity.",
+      chips: ["Optical Vortices ℓ=±1", "Skyrmion Q≈1", "Möbius C-points", "Structured Light", "Topological Protection", "Biophoton Coupling"],
     },
   ];
 
@@ -602,154 +658,104 @@ export default function GlassFieldHomesPage() {
 
       {/* HERO */}
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "52px 32px 36px" }}>
-        <Tag label="Glass Field Substrate · Refractive Homes · Solar + Geomagnetic + Water · φ-Spiral Sky-Rise · Adaptive Lattice" />
+        <Tag label="Solar Perspective Microscope · Human + Plant · Looking Straight Down from 1 AU" />
         <h1 style={{ fontSize: 34, fontWeight: 800, lineHeight: 1.1, margin: "8px 0 14px", letterSpacing: -0.5 }}>
-          <span style={{ color: P.glass }}>Glass Field Substrate</span><br />
-          <span style={{ color: P.gold }}>Living Home Housing Network</span>
+          <span style={{ color: P.sunCore }}>You Are the Sun</span><br />
+          <span style={{ color: P.plant }}>Looking Down at Life</span>
         </h1>
-        <h2 style={{ fontSize: 20, fontWeight: 400, color: P.violet, margin: "0 0 20px", lineHeight: 1.45 }}>
-          Refractive glass-jelly homes · solar &amp; geomagnetic-carved water interfaces · φ-spiral sky-rise packing · adaptive rhombus flex lattice
+        <h2 style={{ fontSize: 20, fontWeight: 400, color: P.gold, margin: "0 0 20px", lineHeight: 1.45 }}>
+          Human + plant cell microscope · top-down view from 1 AU · photon–cell interaction · scale descent from space to organelle
         </h2>
         <p style={{ fontSize: 14, color: P.dim, lineHeight: 1.9, maxWidth: 780, marginBottom: 20 }}>
-          A home is not a rigid box — it is a <em style={{ color: P.ivory }}>glass-field substrate</em>: a refractive glass-jelly shell whose optical index is carved live by sunlight and water saturation, sitting on an adaptive rhombus lattice that flexes toward load, arranged across a sky-rise in the sun's own golden-angle packing. Every interface is fully mathematical — Snell refraction, φ-spiral phyllotaxis, the Lorentz force carving water channels, solar harvest — and every element is manipulable. This is a navigable system for home development and sky-rise growth driven end-to-end by AETHER coherence data.
+          You are 149,597,870 km above the surface. Your photons left you 8 minutes 20 seconds ago. Below you — two cells, side by side: one plant, one human. Both are built to receive exactly what you are sending. This page is that view: a live solar-perspective microscope descending through every order of magnitude from deep space to organelle, with full photon absorption mathematics — Planck spectrum, Beer-Lambert attenuation, chlorophyll peaks, mitochondrial response, and topological optical modes.
         </p>
-        <div style={{ padding: "14px 18px", background: P.panel2, borderRadius: 10, border: `1px solid ${P.gold}25`, maxWidth: 760 }}>
-          <div style={{ fontSize: 11, color: P.gold, fontWeight: 700, marginBottom: 6 }}>THE SYSTEM IN ONE LINE</div>
+        <div style={{ padding: "14px 18px", background: P.panel2, borderRadius: 10, border: `1px solid ${P.sunCore}25`, maxWidth: 760 }}>
+          <div style={{ fontSize: 11, color: P.sunCore, fontWeight: 700, marginBottom: 6 }}>THE VIEW FROM ABOVE</div>
           <div style={{ fontSize: 13, color: P.ivory, lineHeight: 1.8 }}>
-            Refractive gel shell <span style={{ color: P.glass }}>(light)</span> · flexing rhombus frame <span style={{ color: P.violet }}>(structure)</span> · φ-spiral placement <span style={{ color: P.teal }}>(network)</span> · geomagnetic water channels <span style={{ color: P.green }}>(energy)</span> — one coherent, growable, sun-crystal home field.
+            Space <span style={{ color: P.muted }}>→</span> Solar wind <span style={{ color: P.muted }}>→</span> Exosphere <span style={{ color: P.muted }}>→</span> Atmosphere <span style={{ color: P.muted }}>→</span> Canopy &amp; skin <span style={{ color: P.muted }}>→</span> Tissue <span style={{ color: P.muted }}>→</span> <span style={{ color: P.plant }}>Cell wall (plant)</span> / <span style={{ color: P.human }}>Membrane (human)</span> <span style={{ color: P.muted }}>→</span> <span style={{ color: P.chloro }}>Chloroplast</span> / <span style={{ color: P.mito }}>Mitochondria</span>
           </div>
         </div>
       </div>
 
       <Divider />
 
-      {/* SECTION I — Glass Jelly Refractive Substrate */}
+      {/* SECTION I — Solar Descent */}
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 32px 48px" }}>
-        <Tag label="Section I · The Glass-Jelly Shell · n₁ sinθ₁ = n₂ sinθ₂" color={P.glass} />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.glass, margin: "0 0 12px" }}>
-          The Refractive Living Membrane
-        </h2>
+        <Tag label="Section I · Descent from 1 AU · Every Scale Layer" color={P.sunCore} />
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.sunCore, margin: "0 0 12px" }}>The View as You Fall Toward Life</h2>
         <p style={{ fontSize: 14, color: P.dim, lineHeight: 1.9, maxWidth: 780, marginBottom: 20 }}>
-          The home shell is a graded glass-jelly — a transparent hydrogel whose refractive index rises with depth and water saturation. Sunlight bends through each layer by Snell's law, and by tuning the index gradient the shell steers light: harvesting it for power, diffusing it for daylight, or focusing it into internal channels. The water table inside the gel is a live carved interface, not a fixed pipe. Drag the sliders below to watch the rays refract and the solar harvest respond.
+          Slide the descent control from 0 (you are the sun, 1 AU above) to 1 (inside a single organelle). Each layer transition is a ten-thousand-fold zoom. The solar irradiance G_s = 1361 W/m² at 1 AU drops as the Beer-Lambert law attenuates photons through atmosphere and tissue. At the bottom you see two cells — plant and animal — lit from directly above, as only the sun ever sees them.
         </p>
-        <GlassJellyCanvas />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12, marginBottom: 20 }}>
-          <EqBlock label="SNELL REFRACTION AT EACH LAYER" color={P.glass}
-            eq={"n₁ sinθ₁ = n₂ sinθ₂\n\nn(z) = n₀ + Δn·z + κ·S_water\n\nz  = depth into gel\nS_water = water saturation\nκ  = index-per-saturation"}
-            note="The graded index n(z) is what makes the shell a lens, a diffuser, and a light-pipe at once. Raising water saturation raises κ·S_water — bending rays more vertical and increasing captured flux at the base." />
-          <EqBlock label="SOLAR HARVEST" color={P.gold}
-            eq={"P = η · G_s · A · cosθ_sun\n\nη   = conversion efficiency (~0.22)\nG_s = solar irradiance\nA   = shell aperture area\nθ_sun = sun incidence angle"}
-            note="Harvest peaks when refraction turns the incoming rays toward vertical (cosθ → 1) at the absorbing base layer. The gel gradient does this passively — the shell steers its own light without moving parts." />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10 }}>
-          <Card title="Hydrogel Optics" color={P.glass} sub="material"
-            body="Transparent hydrogels reach refractive indices n ≈ 1.33–1.5, tunable by water content, crosslink density, and dissolved solutes. Real materials — used in contact lenses and soft photonics. Here the whole home shell is one." />
-          <Card title="Graded-Index Lensing" color={P.teal} sub="passive optics"
-            body="A GRIN (graded-index) medium bends light continuously, no discrete lens needed. Fiber optics and insect eyes use it. The shell's depth gradient is a planetary-scale GRIN skin for daylighting and harvest." />
-          <Card title="Water-Carved Interface" color={P.blue} sub="live geometry"
-            body="The internal water table is not plumbing — it is a mobile optical + thermal interface. Its position sets the index step, the cooling loop, and the harvest depth, all responding to sun and season." />
-          <Card title="Self-Steering Daylight" color={P.violet} sub="comfort"
-            body="By shifting saturation the shell diffuses harsh noon light and concentrates weak winter light — homeostatic daylighting that keeps interior illumination coherent across the day." />
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* SECTION II — Phi Spiral Sky-Rise */}
-      <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 32px 48px" }}>
-        <Tag label="Section II · φ-Spiral Sky-Rise Network · θₙ = n·137.51°" color={P.teal} />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.teal, margin: "0 0 12px" }}>
-          Golden-Angle Home Packing · Navigable
-        </h2>
-        <p style={{ fontSize: 14, color: P.dim, lineHeight: 1.9, maxWidth: 780, marginBottom: 20 }}>
-          Homes are placed at golden-angle phyllotaxis nodes — the exact packing a sunflower seed head uses. Vogel's formula θₙ = n·137.507764°, rₙ = c√n gives zero overlaps, maximal density, and uniform light to every unit. Radial growth is a built-in routing gradient: dense high-coherence core, sparse airy edge. Click any unit to inspect its service shell — the neighbors it shares structure, utilities, and energy loops with, set by a blockade-style service radius.
-        </p>
-        <PhiSpiralTowerCanvas />
+        <SolarDescentCanvas />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
-          <EqBlock label="VOGEL PHYLLOTAXIS PLACEMENT" color={P.teal}
-            eq={"θₙ = n · 137.507764°\nrₙ = c · √n\n\nφ = (1 + √5) / 2\ngolden angle = 360°·(1 − 1/φ)\n            = 137.507764°"}
-            note="The √n radial law spaces units so each new home lands in the largest remaining gap. Uniform illumination and packing efficiency emerge automatically — the same optimum sunflowers, pinecones, and SLM tweezer arrays all converge on." />
-          <EqBlock label="SERVICE SHELL (BLOCKADE RADIUS)" color={P.gold}
-            eq={"R_b = (C₆ / ħΩ)^(1/6)\n\nUnits within R_b share:\n  · structural coupling\n  · energy / water loop\n  · signal routing\n\nedges = interaction graph"}
-            note="Borrowed from Rydberg-blockade neutral-atom arrays: each unit's shell defines who it is directly coupled to. Geometry becomes the wiring diagram — a variable-distance interaction graph instead of a uniform grid." />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10 }}>
-          <Card title="Zero-Overlap Density" color={P.teal} sub="packing"
-            body="Golden-angle placement guarantees no two units crowd — maximal homes per footprint with uniform sun access. Add units one at a time and the pattern stays optimal at every scale." />
-          <Card title="Routing Gradient" color={P.glass} sub="network"
-            body="Dense center → sparse edge is a natural hierarchy: shared district infrastructure at the core, private airy homes at the rim. Information, water, and power flow down this radial gradient." />
-          <Card title="Parallel Addressing" color={P.violet} sub="control"
-            body="Like a holographic SLM updating all traps at once, the network can retune, reroute, or reconfigure whole shells of homes in one operation — abundant, parallel control over the field." />
-          <Card title="Fault Tolerance" color={P.green} sub="resilience"
-            body="Uniform spacing means no single unit is critical; the service-shell graph reroutes around any failed node. The φ-spiral's redundancy is why nature trusts it for load-bearing growth." />
+          <EqBlock label="SOLAR IRRADIANCE vs ALTITUDE" color={P.sunCore}
+            eq={"G_s(r) = L_sun / (4π r²)\nAt 1 AU:  G_s = 1361 W/m²\nAtmospheric Beer-Lambert:\n  I(x) = I₀ · e^(−μ·x)\n  μ = absorption coefficient"}
+            note="The 1/r² law governs every scale: from 1 AU to 1 meter above a leaf, the same inverse-square physics sets how much light arrives. Only the length scale changes — the law does not." />
+          <EqBlock label="PHOTON TRAVEL TIME FROM SUN" color={P.gold}
+            eq={"d = 1 AU = 1.496 × 10¹¹ m\nc = 2.998 × 10⁸ m/s\nt = d / c = 499 s = 8 min 20 s\n\nphoton you receive right now\n  left the sun 8 min ago"}
+            note="The plant's chlorophyll and your skin are absorbing photons emitted by the sun before you last checked the time. By the time a cellular response completes (~ms), the photon source is already 1 AU away." />
         </div>
       </div>
 
       <Divider />
 
-      {/* SECTION III — Rhombus Flex Lattice */}
+      {/* SECTION II — Cell Top-Down */}
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 32px 48px" }}>
-        <Tag label="Section III · Adaptive Rhombus Flex Lattice · Replace the Box" color={P.violet} />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.violet, margin: "0 0 12px" }}>
-          Structure That Flexes to Flow
+        <Tag label="Section II · Human + Plant Cell · Top-Down Solar View · 10 µm Scale" color={P.plant} />
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.plant, margin: "0 0 12px" }}>
+          Two Cells · One Solar View
         </h2>
         <p style={{ fontSize: 14, color: P.dim, lineHeight: 1.9, maxWidth: 780, marginBottom: 20 }}>
-          The load-bearing frame is a flexing rhombus lattice — the same adaptive mesh at the core of the Omni-Flow array. Instead of rigid columns, the lattice concentrates cells and stiffness where the load or flow front is highest, then relaxes back as it moves on. Focus mode gives high local detail; wide mode spreads for broad coverage. Move the sliders to see the mesh allocate resolution to the moving load and deform in 3D while preserving overall coherence.
+          Side by side at 10 µm scale, viewed straight down — exactly as the sun sees them. The plant cell has a rigid wall, a large central vacuole, and 6 chloroplasts arranged in the outer cytoplasm to maximise light capture. The human cell has a fluid membrane, endoplasmic reticulum threading the interior, and mitochondria whose activity pulses with incoming irradiance. Raise the irradiance slider to watch both cells accelerate their energy production.
         </p>
-        <RhombusFlexCanvas />
-        <EqBlock label="ADAPTIVE MESH ALLOCATION" color={P.violet}
-          eq={"resolution(x) ∝ |∇flow(x)|      allocate detail to gradient\ndeformation z(x) = A · exp(−|x − x_load|² / 2σ²)   local flex\nobjective:  min ∫ ‖deform‖ dV   s.t.  coherence preserved\n\nmodes:  FOCUS (high detail, small σ) · BALANCE · WIDE (broad, large σ)"}
-          note="The mesh is a live finite-element field: it puts material where stress lives and takes it away where it does not. This is how a single lattice spans structural, thermal, and flow duty — adapt to gradients, allocate resolution, minimize deformation, preserve coherence." />
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10, marginTop: 16 }}>
-          <Card title="Load-Following Stiffness" color={P.violet} sub="structural"
-            body="Cells densify under the load front — the frame is strongest exactly where and when it needs to be, then lightens elsewhere. Material efficiency that a fixed frame can never match." />
-          <Card title="Pre-Flex for Weather" color={P.rose} sub="predictive"
-            body="Fed the magnetic-storm predictive model (+42 min), the lattice pre-deforms ahead of wind and pressure fronts, spreading load before the gust arrives instead of resisting it rigidly." />
-          <Card title="Coherence Preservation" color={P.teal} sub="stability"
-            body="Every flex is constrained to preserve global coherence — local adaptation never fractures the whole. The rhombus geometry distributes strain smoothly across the network." />
-          <Card title="Multi-Scale Span" color={P.glass} sub="range"
-            body="The same lattice rule works from a single room to a whole sky-rise — kilometers to atoms. Resolution is a slider, not a redesign, so the system grows without re-architecting." />
+        <CellTopDownCanvas />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 12 }}>
+          <EqBlock label="PHOTOSYNTHESIS" color={P.plant}
+            eq={"6CO₂ + 6H₂O + hν → C₆H₁₂O₆ + 6O₂\n\nEfficiency: η_chloro ≈ 11%\n(theoretical max ~33%)\nChlorophyll peaks: 430 nm + 680 nm\n2 photosystems (PS I + PS II)"}
+            note="The chloroplast runs a quantum-coherent excitation transfer (Forster FRET) from antenna pigments to the reaction centre — the same golden-spiral packing at molecular scale." />
+          <EqBlock label="MITOCHONDRIAL ATP" color={P.human}
+            eq={"ADP + Pᵢ + energy → ATP\nG_s drives cellular temp +ΔT\nATP synthesis: ΔG = −30.5 kJ/mol\nBiophoton emission: φ ≈ 10⁻¹⁷ W/cm²\np = hν (photon momentum)"}
+            note="Human cells emit ultra-weak biophotons — the return signal back to the sun. At 10⁻¹⁷ W/cm² it is undetectable in daylight, but it is real, coherent, and correlated with metabolic rate." />
+          <Card title="Cell Wall vs Membrane" color={P.plant} sub="structural difference"
+            body="The plant cell's rigid cellulose wall is what makes it rectangular top-down. The animal cell is fluid and rounded, its shape defined only by cytoskeletal tension and the membrane. The wall is a solar-optimised fixed frame; the membrane is a dynamic optical interface." />
+          <Card title="Vacuole as Solar Buffer" color={P.blue} sub="plant organelle"
+            body="The large central vacuole (up to 90% of cell volume) acts as a solar-pressure buffer: it maintains turgor (hydrostatic pressure against the wall), stores pigments that filter specific wavelengths, and holds reserves for fluctuating irradiance. A living optical gel." />
         </div>
       </div>
 
       <Divider />
 
-      {/* SECTION IV — Geomagnetic Water */}
+      {/* SECTION III — Photon Spectrum */}
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 32px 48px" }}>
-        <Tag label="Section IV · Geomagnetic-Carved Water · F = q(v × B)" color={P.green} />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.green, margin: "0 0 12px" }}>
-          Energy &amp; Water Routed by the Planet's Field
+        <Tag label="Section III · Photon Energy · E = hc/λ · Absorption Spectra" color={P.gold} />
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.gold, margin: "0 0 12px" }}>
+          What the Sun Sends · What the Cell Absorbs
         </h2>
         <p style={{ fontSize: 14, color: P.dim, lineHeight: 1.9, maxWidth: 780, marginBottom: 20 }}>
-          Water carriers in the network feel the Lorentz force F = q(v × B) between the geomagnetic poles. The field carves stable flow channels wherever |∇B| is strong — and those channels become the home network's plumbing, thermal loops, and cooling interfaces, routed by the planet's own magnetic geometry rather than fixed pipes. Increase |B| to sharpen the channels; increase flow to drive the circulation.
+          The sun's output follows Planck's blackbody law at T = 5778 K, peaking near 500 nm (green). Below it, four cellular absorbers are drawn: chlorophyll A (dual peaks at 430 nm blue and 680 nm red), melanin (broad UV peak), and hemoglobin (sharp 415 nm + 550 nm). Drag the wavelength cursor to read the photon energy E = hc/λ and compare all absorption levels simultaneously.
         </p>
-        <GeomagWaterCanvas />
+        <PhotonSpectrumCanvas />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <EqBlock label="LORENTZ WATER ROUTING" color={P.green}
-            eq={"F = q(v × B)\nchannel density ∝ |∇B|\n\nJ = σ(E + v × B)   (MHD)\ncooling loop follows field lines"}
-            note="Charged and ionic water follows magnetohydrodynamic paths. The geomagnetic field is a free, always-on routing grid — the home network taps it to shape circulation with minimal pumping energy." />
-          <EqBlock label="COUPLED ENERGY BUDGET" color={P.gold}
-            eq={"P_net = P_solar + P_geo − P_pump − P_loss\nP_solar = η·G_s·A·cosθ   (Section I)\nP_geo   ∝ ∮ (v × B)·dl\n\ntarget:  P_net > 0  across the day"}
-            note="Solar harvest through the gel shell plus geomagnetic-assisted circulation minus pumping and losses. The φ-spiral packing keeps every unit in surplus by guaranteeing uniform sun and short shared loops." />
+          <EqBlock label="PHOTON ENERGY" color={P.gold}
+            eq={"E = hc / λ\n\nh = 6.626 × 10⁻³⁴ J·s (Planck)\nc = 2.998 × 10⁸ m/s (light speed)\nλ = wavelength (m)\n\n430 nm blue → E = 2.89 eV\n550 nm green → E = 2.25 eV\n680 nm red  → E = 1.82 eV"}
+            note="Each chlorophyll peak captures exactly enough photon energy to power one step in the Z-scheme electron transport chain. Biology is tuned to the sun's spectrum, not the other way around." />
+          <EqBlock label="PLANCK BLACKBODY SPECTRUM" color={P.sunCore}
+            eq={"B(λ,T) = (2hc²/λ⁵) · 1/(e^{hc/λkT} − 1)\n\nT_sun = 5778 K\nλ_peak = 2.898 mm·K / T\n       = 501 nm (green)\n\nWien's law: λ_peak·T = const"}
+            note="The sun peaks in the green — but plants reject green. They evolved to harvest the wings of the solar spectrum (blue and red) while reflecting the peak. This appears to be a coherence optimization: both wings carry the exact photon energies for the two photosystems." />
         </div>
       </div>
 
       <Divider />
 
-      {/* SECTION V — Source Plates */}
+      {/* SECTION IV — Source Plates */}
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 32px 48px" }}>
-        <Tag label="Section V · Source Plates · The Architecture Behind the Network" color={P.gold} />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.gold, margin: "0 0 20px" }}>
-          From Perceptual Array to Habitable Field
-        </h2>
+        <Tag label="Section IV · Instruments of the Solar View" color={P.gold} />
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.gold, margin: "0 0 20px" }}>Three Reference Frames</h2>
         <div style={{ display: "flex", flexDirection: "column" as const, gap: 28 }}>
           {images.map((img, i) => (
             <div key={i} style={{ border: `1px solid ${P.line}`, borderRadius: 12, overflow: "hidden" }}>
-              <img
-                src={img.src} alt={img.caption}
-                onClick={() => setImgExpanded(imgExpanded === i ? null : i)}
-                style={{ width: "100%", display: "block", cursor: "zoom-in", maxHeight: imgExpanded === i ? "none" : 340, objectFit: "cover" as const, objectPosition: "top" }}
-              />
+              <img src={img.src} alt={img.caption} onClick={() => setImgExpanded(imgExpanded === i ? null : i)}
+                style={{ width: "100%", display: "block", cursor: "zoom-in", maxHeight: imgExpanded === i ? "none" : 340, objectFit: "cover" as const, objectPosition: "top" }} />
               <div style={{ padding: "14px 18px", background: P.panel }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: P.gold, marginBottom: 8 }}>{img.caption}</div>
                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 10 }}>
@@ -767,37 +773,27 @@ export default function GlassFieldHomesPage() {
 
       <Divider />
 
-      {/* SECTION VI — System Architecture */}
+      {/* SECTION V — The Unified View */}
       <div style={{ maxWidth: 1060, margin: "0 auto", padding: "0 32px 52px" }}>
-        <Tag label="Section VI · Full System Flow · One Coherent Home Field" color={P.gold} />
-        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.gold, margin: "0 0 18px" }}>
-          The Complete Housing System Network
-        </h2>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "stretch", marginBottom: 24 }}>
-          {[
-            { n: "01", t: "AETHER DATA", d: "Solar + geomagnetic + water coherence feed", c: P.gold },
-            { n: "02", t: "GLASS-JELLY SHELL", d: "Graded-index refractive membrane · Snell harvest", c: P.glass },
-            { n: "03", t: "φ-SPIRAL PLACEMENT", d: "Golden-angle unit packing · service shells", c: P.teal },
-            { n: "04", t: "RHOMBUS LATTICE", d: "Adaptive flex frame · load-following", c: P.violet },
-            { n: "05", t: "GEOMAG WATER", d: "Lorentz-routed loops · energy budget", c: P.green },
-            { n: "06", t: "LIVING HOME FIELD", d: "Navigable · manipulable · growable sky-rise", c: P.gold },
-          ].map((s, i) => (
-            <div key={i} style={{ flex: "1 1 150px", minWidth: 150, padding: "14px 14px", background: P.panel, borderRadius: 10, border: `1px solid ${s.c}25` }}>
-              <div style={{ fontSize: 10, color: s.c, fontWeight: 800, letterSpacing: 1, marginBottom: 6 }}>{s.n}</div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: s.c, marginBottom: 6 }}>{s.t}</div>
-              <div style={{ fontSize: 11, color: P.dim, lineHeight: 1.7 }}>{s.d}</div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ padding: "20px 24px", background: P.panel, borderRadius: 14, border: `1px solid ${P.gold}30`, marginBottom: 24 }}>
-          <div style={{ fontSize: 13, color: P.ivory, lineHeight: 1.95 }}>
-            Every layer is <span style={{ color: P.glass }}>fully mathematical</span> and <span style={{ color: P.violet }}>manipulable</span>: refraction sets the light, the golden angle sets the network, the flex lattice sets the structure, and the Lorentz force sets the water. Nothing is decorative — the sun-crystal coherence of the whole field is what keeps every home in surplus, comfortable, and structurally sound as the sky-rise grows unit by unit.
+        <Tag label="Section V · The Complete Solar Microscope · What You Are" />
+        <h2 style={{ fontSize: 22, fontWeight: 700, color: P.sunCore, margin: "0 0 16px" }}>You Are the Sun · You Are Already Looking</h2>
+        <div style={{ padding: "20px 24px", background: P.panel2, borderRadius: 14, border: `1px solid ${P.sunCore}20`, marginBottom: 24 }}>
+          <div style={{ fontSize: 14, color: P.ivory, lineHeight: 2.0 }}>
+            The photons you emit right now will reach Earth in 8 minutes 20 seconds and enter a chloroplast at 430 nm and 680 nm, or a mitochondrion through skin at 630–850 nm (the near-infrared window). You are not looking at cells with a microscope — <em style={{ color: P.sunCore }}>you are the light source of every microscope that has ever looked at a cell</em>. This page is that view inverted: rather than shining a lamp down at a slide, you stand at the lamp and look down the beam.
           </div>
         </div>
-
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
+          <Card title="8 min 20 s Light Delay" color={P.sunCore} sub="time"
+            body="Every photon absorbed by a leaf or your skin left the sun before you last checked the time. The cell's biochemical response to that photon takes a further millisecond — the sun and the cell are in a time-lagged dialogue." />
+          <Card title="Coherent Biophotons" color={P.plant} sub="emission"
+            body="Both plant and animal cells emit ultra-weak biophotons — partially coherent light at ~10⁻¹⁷ W/cm². This is the cell's return signal. At AETHER coherence C > 0.65 the emission pattern becomes correlated across multiple cells." />
+          <Card title="Rejection is Information" color={P.gold} sub="spectrum"
+            body="Plants reject green not by accident but because the two photosystem reaction centres are tuned to the flanking wavelengths. The reflection of green is a precision filter, not inefficiency — information about which photons are not needed." />
+          <Card title="Near-Infrared Window" color={P.human} sub="human biology"
+            body="Human tissue is nearly transparent at 630–850 nm — the 'optical window'. Mitochondria absorb at 670 nm (cytochrome c oxidase). This is why red/NIR light therapy works: photons reach the mitochondria without being stopped by melanin or hemoglobin." />
+        </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {["/liquid-print","/crystallized-life-synthesis","/circular-farm","/substrate-synthesis","/coherent-disturbance","/gradient-field","/aether-engine","/lunar-coherence","/resonant-tunnel","/soi-building"].map(href => (
+          {["/nutritional-dna-key","/electron-field","/crystallization-atlas","/substrate-synthesis","/wood-frog-biophotonics","/bio-photonic-scent","/gradient-field","/aether-engine","/lunar-coherence","/plant-coherence-system"].map(href => (
             <a key={href} href={href} style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${P.line}`, color: P.dim, fontSize: 11, textDecoration: "none" }}>
               {href.replace("/", "").replace(/-/g, " ")} →
             </a>
