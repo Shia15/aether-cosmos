@@ -91,6 +91,7 @@ import {
   CircleDot,
   CreditCard,
   MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import BackgroundMusic from "@/components/background-music";
@@ -1238,6 +1239,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
             NOTES
           </button>
         </Link>
+        {/* Open in new tab */}
+        <button
+          onClick={() => window.open(window.location.origin + location, "_blank", "noopener,noreferrer")}
+          title="Open current page in new tab"
+          style={{
+            display: "flex", alignItems: "center", gap: 4,
+            padding: "4px 8px", borderRadius: 14, cursor: "pointer",
+            border: "1px solid rgba(96,165,250,0.3)",
+            background: "rgba(96,165,250,0.05)",
+            color: "#60a5fa",
+            fontFamily: "'Space Mono', monospace",
+            fontSize: 8, letterSpacing: "0.08em",
+            transition: "all 0.2s",
+          }}
+        >
+          <ExternalLink style={{ width: 10, height: 10 }} />
+          OPEN
+        </button>
         {/* Screenshot button */}
         <button
           onClick={captureScreenshot}
