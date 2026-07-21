@@ -36,10 +36,11 @@ interface ImageEntry {
   dir: string;
   cat: string;
   video?: boolean;
+  url?: string;
 }
 
 function imgSrc(it: ImageEntry): string {
-  return `${BASE}${it.dir}/${it.file}`;
+  return it.url ?? `/api/storage/public-objects/${it.dir}/${it.file}`;
 }
 
 // ── Hero Carousel ─────────────────────────────────────────────────────────────

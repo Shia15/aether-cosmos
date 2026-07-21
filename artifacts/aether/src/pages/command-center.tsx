@@ -48,7 +48,7 @@ function tokenScore(hay: string, tokens: string[]): number {
 }
 
 // ── Visual library ───────────────────────────────────────────────────────────
-type ImageEntry = { file: string; dir: string; cat: string; video?: boolean };
+type ImageEntry = { file: string; dir: string; cat: string; video?: boolean; url?: string };
 
 const CAT_LABEL: Record<string, string> = {
   aether: "AETHER Architecture",
@@ -285,7 +285,7 @@ export default function CommandCenter() {
         rel: Math.min(1, rel),
         title: it.file,
         sub: `${CAT_LABEL[it.cat] ?? it.cat} · ${it.dir === "gpt_imgs" ? "GPT / OpenAI" : "LinkedIn"}`,
-        imageSrc: `${BASE_URL}${it.dir}/${it.file}`,
+        imageSrc: it.url ?? `/api/storage/public-objects/${it.dir}/${it.file}`,
         isVideo: it.video === true,
         external: true,
       });

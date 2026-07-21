@@ -5,7 +5,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type LibImg   = { file: string; dir: string; cat: string; video: boolean };
+type LibImg   = { file: string; dir: string; cat: string; video: boolean; url?: string };
 type VaultImg = { id: string; url: string; label: string; tags: string; addedAt: number; source: "vault"; isVideo?: boolean };
 type DriveImg = { id: string; url: string; label: string; source: "drive"; thumbnailLink?: string };
 type AnyImg   = { id: string; url: string; thumb: string; label: string; cat: string; source: "gpt" | "linkedin" | "vault" | "grok" | "drive"; isVideo?: boolean };
@@ -83,7 +83,7 @@ export default function AiImageNestPage() {
       .then((raw: LibImg[]) => {
         const imgs: AnyImg[] = raw.filter(i => !i.video).map(i => {
           const src = i.dir === "gpt_imgs" ? "gpt" : "linkedin";
-          const url = `${BASE}${i.dir}/${i.file}`;
+          const url = i.url ?? `/api/storage/public-objects/${i.dir}/${i.file}`;
           return { id: `${i.dir}/${i.file}`, url, thumb: url, label: i.file.replace(/\.[^.]+$/, "").replace(/[-_]/g, " "), cat: i.cat, source: src };
         });
         setLibrary(imgs);

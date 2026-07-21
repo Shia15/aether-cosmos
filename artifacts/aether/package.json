@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite --config vite.config.ts --host 0.0.0.0",
     "build": "vite build --config vite.config.ts",
-    "build:deploy": "vite build --config vite.config.ts && rm -rf public/gpt_imgs public/linkedin_imgs",
     "build:image-index": "node scripts/build-image-index.mjs",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit"

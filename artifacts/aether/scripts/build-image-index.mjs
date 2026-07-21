@@ -3,6 +3,9 @@
 // filename using the SAME keyword rules as public/knowledge-map-v2.html so the
 // unified Search engine and the Knowledge Map share one taxonomy.
 //
+// Each entry includes a `url` field pointing to the Object Storage serving
+// endpoint so the frontend never constructs paths from BASE_URL + dir + file.
+//
 // Run:  pnpm --filter @workspace/aether run build:image-index
 import { readdirSync, writeFileSync, existsSync } from "node:fs";
 import { join, dirname, resolve, extname } from "node:path";
@@ -42,7 +45,8 @@ for (const dir of DIRS) {
     const ext = extname(file).toLowerCase();
     const isVideo = VID_EXT.has(ext);
     if (!IMG_EXT.has(ext) && !isVideo) continue;
-    items.push({ file, dir, cat: catByFilename(file, isVideo), video: isVideo });
+    const url = `/api/storage/public-objects/${dir}/${file}`;
+    items.push({ file, dir, cat: catByFilename(file, isVideo), video: isVideo, url });
   }
 }
 

@@ -263,7 +263,7 @@ const BASE_URL = (import.meta.env.BASE_URL || "/");
 const IMAGE_INDEX_URL = `${BASE_URL}image-index.json`;
 const MAX_IMAGE_RESULTS = 36;
 
-type ImageEntry = { file: string; dir: string; cat: string; video?: boolean };
+type ImageEntry = { file: string; dir: string; cat: string; video?: boolean; url?: string };
 
 const CAT_META: Record<string, { label: string; color: string }> = {
   aether: { label: "AETHER Architecture", color: "#00D4FF" },
@@ -289,7 +289,7 @@ const IMAGE_INTENT = new Set([
 ]);
 
 function imageSrc(it: ImageEntry): string {
-  return `${BASE_URL}${it.dir}/${it.file}`;
+  return it.url ?? `/api/storage/public-objects/${it.dir}/${it.file}`;
 }
 
 function scoreImage(it: ImageEntry, tokens: string[], hasIntent: boolean): number {

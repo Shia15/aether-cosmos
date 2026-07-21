@@ -981,7 +981,7 @@ export default function SubstrateSynthesisPage() {
 const LI_COUNT = 227;
 const LI_URLS: string[] = Array.from({ length: LI_COUNT }, (_, i) => {
   const n = String(i + 1).padStart(3, "0");
-  return `${import.meta.env.BASE_URL}linkedin_imgs/li-${n}.jpg`;
+  return `/api/storage/public-objects/linkedin_imgs/li-${n}.jpg`;
 });
 
 function LazyImg({ src, index, total = LI_COUNT, accentColor = "#a78bfa" }: {
@@ -1177,7 +1177,7 @@ function LinkedInGallery() {
 const GPT_COUNT = 235;
 const GPT_URLS: string[] = Array.from({ length: GPT_COUNT }, (_, i) => {
   const n = String(i + 1).padStart(3, "0");
-  return `${import.meta.env.BASE_URL}gpt_imgs/gpt-${n}.png`;
+  return `/api/storage/public-objects/gpt_imgs/gpt-${n}.png`;
 });
 
 function GptGallery() {
