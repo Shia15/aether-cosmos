@@ -1,5 +1,5 @@
 // AETHER PWA Service Worker
-const CACHE_NAME = "aether-v1";
+const CACHE_NAME = "aether-v2";
 const STATIC_ASSETS = [
   "/",
   "/index.html",

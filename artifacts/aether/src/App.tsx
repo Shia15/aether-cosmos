@@ -467,6 +467,11 @@ const WaveCollapsePage          = lazy(() => import("@/pages/wave-collapse"));
 const LarmorFieldPage           = lazy(() => import("@/pages/larmor-field"));
 const SpinLatticePage           = lazy(() => import("@/pages/spin-lattice"));
 const LaserRegenPage            = lazy(() => import("@/pages/laser-regen"));
+const ColorPerceptionPage       = lazy(() => import("@/pages/color-perception"));
+const PlasmodiumWarpPage        = lazy(() => import("@/pages/plasmodium-warp"));
+const ElectricBreakdownPage     = lazy(() => import("@/pages/electric-breakdown"));
+const CavitationPlasmoidPage    = lazy(() => import("@/pages/cavitation-plasmoid"));
+const IonizationPlasmaPage      = lazy(() => import("@/pages/ionization-plasma"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1527,6 +1532,11 @@ function Router() {
                 <Route path="/larmor-field"            component={LarmorFieldPage} />
                 <Route path="/spin-lattice"          component={SpinLatticePage} />
                 <Route path="/laser-regen"         component={LaserRegenPage} />
+                <Route path="/color-perception"   component={ColorPerceptionPage} />
+                <Route path="/plasmodium-warp"    component={PlasmodiumWarpPage} />
+                <Route path="/electric-breakdown" component={ElectricBreakdownPage} />
+                <Route path="/cavitation-plasmoid" component={CavitationPlasmoidPage} />
+                <Route path="/ionization-plasma"  component={IonizationPlasmaPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
