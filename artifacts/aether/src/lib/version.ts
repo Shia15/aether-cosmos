@@ -27,16 +27,20 @@ export function useBuildSync() {
   const qc = useQueryClient();
 
   useEffect(() => {
-    const stored = localStorage.getItem(LS_KEY);
-    if (stored === BUILD_TS) return;
+    try {
+      const stored = localStorage.getItem(LS_KEY);
+      if (stored === BUILD_TS) return;
 
-    localStorage.setItem(LS_KEY, BUILD_TS);
+      localStorage.setItem(LS_KEY, BUILD_TS);
 
-    if (stored !== null) {
-      qc.invalidateQueries();
-      window.dispatchEvent(new CustomEvent("aether:version-bump", {
-        detail: { prev: stored, next: BUILD_TS },
-      }));
+      if (stored !== null) {
+        qc.invalidateQueries();
+        window.dispatchEvent(new CustomEvent("aether:version-bump", {
+          detail: { prev: stored, next: BUILD_TS },
+        }));
+      }
+    } catch {
+      // localStorage unavailable (sandboxed iframe, private browsing) — skip version sync
     }
   }, [qc]);
 }
