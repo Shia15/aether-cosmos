@@ -474,6 +474,7 @@ const NeuralOscillationsPage    = lazy(() => import("@/pages/neural-oscillations
 const MotorNeuronCascadePage    = lazy(() => import("@/pages/motor-neuron-cascade"));
 const IconTokenSystemPage       = lazy(() => import("@/pages/icon-token-system"));
 const BlueprintDecouplingPage   = lazy(() => import("@/pages/blueprint-decoupling"));
+const ImagingRealityPage        = lazy(() => import("@/pages/imaging-reality"));
 const SolarNeuralInterfacePage  = lazy(() => import("@/pages/solar-neural-interface"));
 const RainAIPage                = lazy(() => import("@/pages/rain-ai"));
 const HydrogenReversalPage      = lazy(() => import("@/pages/hydrogen-reversal"));
@@ -1549,6 +1550,7 @@ function Router() {
                 <Route path="/motor-neuron-cascade" component={MotorNeuronCascadePage} />
                 <Route path="/icon-token-system"   component={IconTokenSystemPage} />
                 <Route path="/blueprint-decoupling" component={BlueprintDecouplingPage} />
+                <Route path="/imaging-reality"       component={ImagingRealityPage} />
                 <Route path="/solar-neural-interface" component={SolarNeuralInterfacePage} />
                 <Route path="/rain-ai" component={RainAIPage} />
                 <Route path="/hydrogen-reversal" component={HydrogenReversalPage} />
