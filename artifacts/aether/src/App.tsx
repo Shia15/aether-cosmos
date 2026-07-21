@@ -472,6 +472,7 @@ const SynapticPlasticityPage    = lazy(() => import("@/pages/synaptic-plasticity
 const BrainMotorInterfacePage   = lazy(() => import("@/pages/brain-motor-interface"));
 const NeuralOscillationsPage    = lazy(() => import("@/pages/neural-oscillations"));
 const MotorNeuronCascadePage    = lazy(() => import("@/pages/motor-neuron-cascade"));
+const IconTokenSystemPage       = lazy(() => import("@/pages/icon-token-system"));
 const ColorPerceptionPage       = lazy(() => import("@/pages/color-perception"));
 const PlasmodiumWarpPage        = lazy(() => import("@/pages/plasmodium-warp"));
 const ElectricBreakdownPage     = lazy(() => import("@/pages/electric-breakdown"));
@@ -1542,6 +1543,7 @@ function Router() {
                 <Route path="/brain-motor-interface" component={BrainMotorInterfacePage} />
                 <Route path="/neural-oscillations" component={NeuralOscillationsPage} />
                 <Route path="/motor-neuron-cascade" component={MotorNeuronCascadePage} />
+                <Route path="/icon-token-system"   component={IconTokenSystemPage} />
                 <Route path="/color-perception"   component={ColorPerceptionPage} />
                 <Route path="/plasmodium-warp"    component={PlasmodiumWarpPage} />
                 <Route path="/electric-breakdown" component={ElectricBreakdownPage} />
