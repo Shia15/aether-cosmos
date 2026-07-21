@@ -474,6 +474,7 @@ const NeuralOscillationsPage    = lazy(() => import("@/pages/neural-oscillations
 const MotorNeuronCascadePage    = lazy(() => import("@/pages/motor-neuron-cascade"));
 const IconTokenSystemPage       = lazy(() => import("@/pages/icon-token-system"));
 const BlueprintDecouplingPage   = lazy(() => import("@/pages/blueprint-decoupling"));
+const GeminiChatPage            = lazy(() => import("@/pages/gemini-chat"));
 const InversionScreensaverPage  = lazy(() => import("@/pages/inversion-screensaver"));
 const SchumannNeuralFieldsPage  = lazy(() => import("@/pages/schumann-neural-fields"));
 const VacuumComputationPage     = lazy(() => import("@/pages/vacuum-computation"));
@@ -1553,6 +1554,7 @@ function Router() {
                 <Route path="/motor-neuron-cascade" component={MotorNeuronCascadePage} />
                 <Route path="/icon-token-system"   component={IconTokenSystemPage} />
                 <Route path="/blueprint-decoupling" component={BlueprintDecouplingPage} />
+                <Route path="/gemini-chat"            component={GeminiChatPage} />
                 <Route path="/inversion-screensaver"  component={InversionScreensaverPage} />
                 <Route path="/schumann-neural-fields" component={SchumannNeuralFieldsPage} />
                 <Route path="/vacuum-computation"    component={VacuumComputationPage} />

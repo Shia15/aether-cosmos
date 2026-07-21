@@ -22,6 +22,7 @@ import openaiRouter from "./openai";
 import vercelRouter from "./vercel";
 import googleDriveRouter from "./google-drive";
 import storageRouter from "./storage";
+import geminiRouter from "./gemini";
 import proxyFetchRouter from "./proxy-fetch";
 
 const router: IRouter = Router();
@@ -49,6 +50,7 @@ router.use(openaiRouter);
 router.use(vercelRouter);
 router.use(googleDriveRouter);
 router.use(storageRouter);
+router.use(geminiRouter);
 router.use(proxyFetchRouter);
 
 export default router;
