@@ -3,3 +3,10 @@
 
 # No need to store the pnpm store twice.
 .local
+
+# Chat-session attachments and dev-only screenshots — not needed in production.
+attached_assets/
+screenshots/
+
+# Dev cache — rebuilt automatically, not needed in production.
+.cache/
