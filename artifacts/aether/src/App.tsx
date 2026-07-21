@@ -466,6 +466,7 @@ const FieldHealerPage           = lazy(() => import("@/pages/field-healer"));
 const WaveCollapsePage          = lazy(() => import("@/pages/wave-collapse"));
 const LarmorFieldPage           = lazy(() => import("@/pages/larmor-field"));
 const SpinLatticePage           = lazy(() => import("@/pages/spin-lattice"));
+const LaserRegenPage            = lazy(() => import("@/pages/laser-regen"));
 const AnimalSilhouettesPage     = lazy(() => import("@/pages/animal-silhouettes"));
 const PathForwardPage           = lazy(() => import("@/pages/path-forward"));
 const DarkMatterVol2Page        = lazy(() => import("@/pages/dark-matter-vol2"));
@@ -1525,6 +1526,7 @@ function Router() {
                 <Route path="/wave-collapse"            component={WaveCollapsePage} />
                 <Route path="/larmor-field"            component={LarmorFieldPage} />
                 <Route path="/spin-lattice"          component={SpinLatticePage} />
+                <Route path="/laser-regen"         component={LaserRegenPage} />
                 <Route path="/whats-new"           component={WhatsNewPage} />
                 <Route path="/lightning-spectrum"  component={LightningSpectrumPage} />
                 <Route path="/nutrition-force"     component={NutritionForcePage} />
