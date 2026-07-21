@@ -2,6 +2,11 @@
   Bombus impatiens · Liquid Chip Packet Switching Simulation
   Cryogenic Neuromorphic Liquid-State Reservoir — 64 neurons
   Based on Darveau et al. 2026 — Proc. R. Soc. B
+
+  Section II (appended): Tetrachromatic Vision Simulation
+  Source: chatgpt.com/share/6a5fbdcc
+  4-cone bee vision: UV + Blue + Green + Red
+  Hidden UV landing strips on flowers
 ═══════════════════════════════════════════════════════════════════*/
 import { useEffect, useRef, useState, useCallback } from "react";
 
@@ -626,7 +631,180 @@ export default function BeeLiquidChipPage() {
         ))}
       </div>
 
+      {/* ── TETRACHROMATIC VISION SECTION ─────────────────────────── */}
+      <TetrachomaticSection />
+
       <style>{`@keyframes blink{0%,100%{opacity:0.3}50%{opacity:1}}`}</style>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TETRACHROMATIC VISION SECTION
+   Appended from: chatgpt.com/share/6a5fbdcc
+   Bee 4-cone vision (UV + Blue + Green + Red) vs human 3-cone
+   UV landing strips on flowers — hidden to humans, vivid to bees
+══════════════════════════════════════════════════════════════════*/
+function TetrachomaticSection() {
+  const cvRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = cvRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d")!;
+    let raf = 0, t = 0;
+    function resize() { cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; }
+    const ro = new ResizeObserver(resize); ro.observe(cv); resize();
+
+    function drawFlower(ctx: CanvasRenderingContext2D, cx: number, cy: number, R: number, uvMode: boolean) {
+      const PETALS = 6;
+      for (let i = 0; i < PETALS; i++) {
+        const ang = (i / PETALS) * Math.PI * 2 - Math.PI / 2;
+        const px = cx + R * 0.7 * Math.cos(ang);
+        const py = cy + R * 0.7 * Math.sin(ang);
+        const petalR = R * 0.55;
+        if (uvMode) {
+          // UV channel: petals base pink+orange, UV guide lines as vivid orange/red streaks
+          const pg = ctx.createRadialGradient(px, py, 0, px, py, petalR);
+          pg.addColorStop(0, "rgba(255,120,60,0.9)");
+          pg.addColorStop(0.4, "rgba(255,60,120,0.7)");
+          pg.addColorStop(1, "rgba(80,0,200,0.2)");
+          ctx.fillStyle = pg;
+          ctx.beginPath(); ctx.arc(px, py, petalR, 0, Math.PI * 2); ctx.fill();
+          // UV landing guide lines: vivid streaks toward centre
+          ctx.strokeStyle = `rgba(255,80,0,${0.6 + 0.3 * Math.sin(t * 0.04 + i)})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(cx + Math.cos(ang + Math.PI) * R * 0.12, cy + Math.sin(ang + Math.PI) * R * 0.12);
+          ctx.stroke();
+        } else {
+          // Human vision: normal pink/white petals
+          const pg = ctx.createRadialGradient(px, py, 0, px, py, petalR);
+          pg.addColorStop(0, "rgba(255,200,215,0.95)");
+          pg.addColorStop(0.6, "rgba(240,160,185,0.8)");
+          pg.addColorStop(1, "rgba(200,130,160,0.3)");
+          ctx.fillStyle = pg;
+          ctx.beginPath(); ctx.arc(px, py, petalR, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      // Centre: yellow for human, blue-UV target for bee
+      if (uvMode) {
+        const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.22);
+        cg.addColorStop(0, "rgba(80,0,255,0.9)");
+        cg.addColorStop(1, "rgba(255,80,0,0.4)");
+        ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(cx, cy, R * 0.22, 0, Math.PI * 2); ctx.fill();
+        // Pulsing UV beacon
+        const beacon = 0.5 + 0.5 * Math.sin(t * 0.1);
+        ctx.strokeStyle = `rgba(160,40,255,${beacon * 0.8})`; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(cx, cy, R * 0.32, 0, Math.PI * 2); ctx.stroke();
+      } else {
+        const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.22);
+        cg.addColorStop(0, "rgba(255,220,40,0.95)");
+        cg.addColorStop(1, "rgba(220,160,20,0.6)");
+        ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(cx, cy, R * 0.22, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+
+    function draw() {
+      const W = cv.width, H = cv.height;
+      ctx.clearRect(0, 0, W, H);
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, "#030810"); bg.addColorStop(1, "#060d1a");
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      const midX = W * 0.5;
+      // Divider
+      ctx.strokeStyle = "rgba(79,195,195,0.2)"; ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(midX, 0); ctx.lineTo(midX, H); ctx.stroke();
+      ctx.setLineDash([]);
+
+      const flR = Math.min(W * 0.22, H * 0.35, 90);
+      const fy = H * 0.5;
+
+      // Left: Human trichromatic
+      drawFlower(ctx, W * 0.27, fy, flR, false);
+      // Right: Bee tetrachromatic (UV mode)
+      drawFlower(ctx, W * 0.73, fy, flR, true);
+
+      // Bee icon right side
+      const beeX = W * 0.73 + flR + 14, beeY = fy - flR * 0.5;
+      ctx.fillStyle = "rgba(255,210,60,0.7)"; ctx.font = "20px sans-serif"; ctx.textAlign = "left";
+      ctx.fillText("🐝", beeX, beeY);
+
+      // Panel headers
+      ctx.fillStyle = "#A8DDE8"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center";
+      ctx.fillText("HUMAN VISION", W * 0.27, 22);
+      ctx.fillStyle = "#A8DDE8"; ctx.font = "8px monospace";
+      ctx.fillText("Trichromatic (3 cones)", W * 0.27, 35);
+      ctx.fillStyle = "#FFD080"; ctx.font = "bold 11px monospace";
+      ctx.fillText("BEE (TETRACHROMATIC) VISION", W * 0.73, 22);
+      ctx.fillStyle = "#FFD080"; ctx.font = "8px monospace";
+      ctx.fillText("Tetrachromatic (4 cones · UV added)", W * 0.73, 35);
+
+      // Cone legend - human
+      const hCones = [{ col:"#5599FF", lbl:"UV (absent)" }, { col:"#5599FF", lbl:"Blue" }, { col:"#55CC55", lbl:"Green" }, { col:"#FF5555", lbl:"Red" }];
+      const bCones = [{ col:"#CC44FF", lbl:"UV 300nm" }, { col:"#5599FF", lbl:"Blue" }, { col:"#55CC55", lbl:"Green" }, { col:"#FF5555", lbl:"Red" }];
+      [hCones, bCones].forEach((cones, side) => {
+        const lx = side === 0 ? W * 0.05 : W * 0.52;
+        const ly = H - 36;
+        cones.forEach((c, i) => {
+          const isUV = i === 0;
+          ctx.fillStyle = isUV && side === 0 ? "rgba(100,120,160,0.4)" : c.col;
+          ctx.beginPath(); ctx.arc(lx + i * (W * 0.095), ly, 5, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = isUV && side === 0 ? "rgba(140,160,200,0.5)" : c.col + "cc";
+          ctx.font = "7px monospace"; ctx.textAlign = "center";
+          ctx.fillText(c.lbl, lx + i * (W * 0.095), ly + 14);
+        });
+      });
+
+      // Annotation: UV landing strip label on right
+      const uvLabelY = fy + flR * 0.85;
+      ctx.fillStyle = "rgba(255,100,20,0.9)"; ctx.font = "bold 8px monospace"; ctx.textAlign = "center";
+      ctx.fillText("UV LANDING STRIPS", W * 0.73, uvLabelY);
+      ctx.fillStyle = "rgba(255,100,20,0.6)"; ctx.font = "7px monospace";
+      ctx.fillText("visible only to pollinators", W * 0.73, uvLabelY + 12);
+
+      t++; raf = requestAnimationFrame(draw);
+    }
+    draw();
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, []);
+
+  return (
+    <div style={{ background:"#030810", borderTop:"1px solid rgba(79,195,195,0.15)", padding:"28px 20px 32px" }}>
+      <div style={{ maxWidth: 960, margin:"0 auto" }}>
+        <div style={{ fontSize:9, fontWeight:700, color:"#4FC3C3", letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>
+          SECTION II · TETRACHROMATIC BEE VISION · UV LANDING STRIPS · 4-CONE SPECTRAL SYSTEM
+        </div>
+        <h2 style={{ fontSize:18, fontWeight:700, color:"#FFD080", marginBottom:6 }}>Tetrachromatic Vision · UV Channel Revealed</h2>
+        <p style={{ fontSize:12, color:"rgba(168,221,232,0.75)", lineHeight:1.85, maxWidth:820, marginBottom:20 }}>
+          A normal bee already perceives ultraviolet patterns on flowers that humans cannot naturally see — nectar guides, polarization cues, contrast fields. Many flowers effectively contain "hidden landing strips" visible only to pollinators. The tetrachromatic extension pushes further into a hypothetical hybrid system: UV sensitivity (bee-like) + standard blue/green/red = 4 cone channels. The UV channel (peak ~300–380nm) reveals flower petal guides as vivid orange-red markings in false-colour remapping. The pulsing blue-violet centre marks the nectary — the landing target. Photography equivalent: multispectral cameras capturing UV + visible + red, then remapping the image into a false-colour view simulating what a "red-seeing bee" might experience.
+        </p>
+
+        <div style={{ border:"1px solid rgba(79,195,195,0.15)", borderRadius:10, overflow:"hidden", marginBottom:18 }}>
+          <canvas ref={cvRef} style={{ width:"100%", height:260, display:"block" }} />
+        </div>
+        <div style={{ fontSize:9, color:"rgba(90,122,138,0.8)", textAlign:"center", marginBottom:20 }}>
+          Left: human trichromatic view (3 cones) · Right: bee tetrachromatic view (UV cone added) · Orange streaks = UV nectar guide lines · Pulsing violet ring = UV landing target beacon
+        </div>
+
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))", gap:12 }}>
+          {[
+            { label:"UV Cone Peak", val:"~300–380 nm", col:"#CC44FF", desc:"Bee UV cone sensitivity. Humans are UV-blind (lens filters it). Enables detection of petal guide patterns totally invisible in visible light." },
+            { label:"Blue Cone", val:"~430 nm",      col:"#5599FF", desc:"Shared with humans but shifted. Bees use blue heavily for sky polarization navigation — the same cone doubles as a compass sensor." },
+            { label:"Green Cone", val:"~530 nm",     col:"#55CC55", desc:"Broadest response in bees. Green is the background channel — used to compute contrast against vegetation and to detect petal edge sharpness." },
+            { label:"Red Cone (human)", val:"~560 nm", col:"#FF5555", desc:"Humans have a red cone; bees do not. This is why red flowers appear dark to bees. The hypothetical 4th channel re-adds red to create the full 4-dimensional colour space." },
+          ].map((item, i) => (
+            <div key={i} style={{ padding:"12px 14px", background:"rgba(6,13,26,0.8)", borderRadius:8, border:`1px solid ${item.col}22` }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                <span style={{ fontSize:10, fontWeight:700, color:item.col }}>{item.label}</span>
+                <span style={{ fontSize:12, fontWeight:700, color:item.col, fontFamily:"monospace" }}>{item.val}</span>
+              </div>
+              <div style={{ fontSize:10, color:"rgba(168,221,232,0.65)", lineHeight:1.7 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
