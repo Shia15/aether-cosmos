@@ -475,6 +475,7 @@ const MotorNeuronCascadePage    = lazy(() => import("@/pages/motor-neuron-cascad
 const IconTokenSystemPage       = lazy(() => import("@/pages/icon-token-system"));
 const BlueprintDecouplingPage   = lazy(() => import("@/pages/blueprint-decoupling"));
 const AetherHealthRoboticsPage  = lazy(() => import("@/pages/aether-health-robotics"));
+const TimeFieldMapPage          = lazy(() => import("@/pages/time-field-map"));
 const GeminiChatPage            = lazy(() => import("@/pages/gemini-chat"));
 const InversionScreensaverPage  = lazy(() => import("@/pages/inversion-screensaver"));
 const SchumannNeuralFieldsPage  = lazy(() => import("@/pages/schumann-neural-fields"));
@@ -1556,6 +1557,7 @@ function Router() {
                 <Route path="/icon-token-system"   component={IconTokenSystemPage} />
                 <Route path="/blueprint-decoupling" component={BlueprintDecouplingPage} />
                 <Route path="/aether-health-robotics" component={AetherHealthRoboticsPage} />
+                <Route path="/time-field-map"         component={TimeFieldMapPage} />
                 <Route path="/gemini-chat"            component={GeminiChatPage} />
                 <Route path="/inversion-screensaver"  component={InversionScreensaverPage} />
                 <Route path="/schumann-neural-fields" component={SchumannNeuralFieldsPage} />
