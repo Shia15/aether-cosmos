@@ -18,7 +18,7 @@ localPort = 24696
 run = "pnpm --filter @workspace/aether run dev"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/aether", "run", "build" ]
+build = [ "pnpm", "--filter", "@workspace/aether", "run", "build:deploy" ]
 publicDir = "artifacts/aether/dist/public"
 serve = "static"
 
