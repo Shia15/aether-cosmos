@@ -11,3 +11,4 @@
 - [Canvas sim spawn/prune balance](canvas-sim-spawn-prune.md) — spawn against ACTIVE-particle count, not total length, or a total cap below the prune threshold saturates the array and silently stalls the sim (only visible in a soak); guard dx/d normalization vs d=0 NaN
 - [Stripe connection settings shape](stripe-connection-settings-shape.md) — Replit's live Stripe connector returns `settings.secret` as a plain string, not the nested `secret_key`/`webhook_secret` shape documented in the stripe skill template
 - [Architect content-policy declines](architect-content-policy.md) — architect review can decline on esoteric project prose; retry with neutral, mechanics-only task phrasing succeeds
+- [Deploy container build flow](deploy-container-build-flow.md) — .replitignore runs AFTER the build; dist/ (with Vite-bundled @assets images ~1.3 GB) is always included; excluding attached_assets/ saves ~2.9 GB net
