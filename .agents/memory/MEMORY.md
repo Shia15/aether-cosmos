@@ -12,3 +12,4 @@
 - [Stripe connection settings shape](stripe-connection-settings-shape.md) — Replit's live Stripe connector returns `settings.secret` as a plain string, not the nested `secret_key`/`webhook_secret` shape documented in the stripe skill template
 - [Architect content-policy declines](architect-content-policy.md) — architect review can decline on esoteric project prose; retry with neutral, mechanics-only task phrasing succeeds
 - [Deploy container build flow](deploy-container-build-flow.md) — .replitignore runs AFTER the build; dist/ (with Vite-bundled @assets images ~1.3 GB) is always included; excluding attached_assets/ saves ~2.9 GB net
+- [Object Storage image migration](object-storage-image-migration.md) — @assets alias removed; all 742 images now in GCS served via /api/storage/public-objects/<filename>; use migrate:attached-assets script for new images
