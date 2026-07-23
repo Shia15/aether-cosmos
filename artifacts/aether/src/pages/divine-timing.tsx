@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import letterImg from "@assets/IMG_1704_1778075886223.jpeg";
-
+const letterImg = "/api/storage/public-objects/IMG_1704_1778075886223.jpeg";
 function CelestialCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
   const raf = useRef(0);

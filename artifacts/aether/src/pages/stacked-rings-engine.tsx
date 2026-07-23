@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import posterImg from "@assets/image_1782608630835.png";
-import fractalImg from "@assets/preview_(8)_1782608660805.webp";
-
+const posterImg = "/api/storage/public-objects/image_1782608630835.png";
+const fractalImg = "/api/storage/public-objects/preview_(8)_1782608660805.webp";
 const VOID = "#020810";
 const DEEP = "#030d1a";
 const RING1 = "#0a1628";

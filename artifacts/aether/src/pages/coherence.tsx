@@ -5,9 +5,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, Zap, TrendingUp, AlertTriangle, GitMerge, BarChart2, Waves, Sigma, Radio } from "lucide-react";
 import { motion } from "framer-motion";
-import fieldReceptionImg from "@assets/field_reception_shia_miller-01.jpg";
-import topoQubitImg     from "@assets/b8917dfe-433d-4bd6-860e-5d3daa6025ed_1777219687871.png";
-
+const fieldReceptionImg = "/api/storage/public-objects/field_reception_shia_miller-01.jpg";
+const topoQubitImg = "/api/storage/public-objects/b8917dfe-433d-4bd6-860e-5d3daa6025ed_1777219687871.png";
 // ─── Field-statistic helpers (computed client-side from graph data) ───────────
 // These mirror the simulation engine's metrics applied to the knowledge graph's
 // own coherence distribution, bridging the semantic and physical layers.

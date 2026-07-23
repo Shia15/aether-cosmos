@@ -1,8 +1,7 @@
 import { useRef, useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgDoctrine from "@assets/ChatGPT_Image_Apr_26,_2026,_02_27_54_PM_1777228076738.png";
-
+const imgDoctrine = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_02_27_54_PM_1777228076738.png";
 const B = {
   bg:        "#1c160e",
   panel:     "#2a2014",

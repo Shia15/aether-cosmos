@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import imgManifold     from "@assets/Gemini_Generated_Image_pcibmopcibmopcib_1782753190640.png";
-import imgFabric        from "@assets/image_1782753208874.png";
-import imgSpaceWeather  from "@assets/Gemini_Generated_Image_ivb8b8ivb8b8ivb8_1782753367299.png";
-import imgLifeGradient  from "@assets/image_1782753451465.png";
-
+const imgManifold = "/api/storage/public-objects/Gemini_Generated_Image_pcibmopcibmopcib_1782753190640.png";
+const imgFabric = "/api/storage/public-objects/image_1782753208874.png";
+const imgSpaceWeather = "/api/storage/public-objects/Gemini_Generated_Image_ivb8b8ivb8b8ivb8_1782753367299.png";
+const imgLifeGradient = "/api/storage/public-objects/image_1782753451465.png";
 /* ══════════════════════════════════════════════════════════
    AETHER MATTER SYNTHESIS ENGINE — ALL FIELDS UNIFIED
    Master Control Equation:

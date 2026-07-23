@@ -1,25 +1,24 @@
 import { useEffect, useRef } from "react";
 import { Leaf, Compass, Feather, Sparkles, Flame, Sun, type LucideIcon } from "lucide-react";
-import bohoRocket     from "@assets/image_1778100676889.png";
-import bohoLogo       from "@assets/ChatGPT_Image_Apr_25,_2026,_05_37_33_PM_1777153057484.png";
-import quoteRest      from "@assets/ChatGPT_Image_Apr_25,_2026,_05_26_31_PM_1777152394705.png";
-import quoteShia      from "@assets/ChatGPT_Image_Apr_25,_2026,_05_30_02_PM_1777152606163.png";
-import quoteCompass   from "@assets/ChatGPT_Image_Apr_25,_2026,_05_33_17_PM_1777152801014.png";
-import quoteFlowLong  from "@assets/ChatGPT_Image_Apr_25,_2026,_05_34_08_PM_1777152851926.png";
-import quoteFlowMed   from "@assets/ChatGPT_Image_Apr_25,_2026,_05_34_32_PM_1777152876053.png";
-import quoteFlowShort from "@assets/ChatGPT_Image_Apr_25,_2026,_05_35_01_PM_1777152904200.png";
-import bohoFlowMethod   from "@assets/0D9F5EF3-83FA-49CF-959F-34398DAFD665_1778370123916.png";
-import bohoFlowNotebook from "@assets/F6A455B5-CC74-450F-A384-E00396EF643D_1778370123916.png";
-import bohoAcronym      from "@assets/E298391E-3C3A-49B6-842C-F829477BDCDC_1778370123916.png";
-import bohoPresent      from "@assets/DD80CC7D-D028-4BD1-8E48-32D7F1B21CCC_1778370123916.png";
-import bohoDoing        from "@assets/81780865-34A0-4F4D-88AC-966F509D2724_1778370123916.png";
-import bohoEnergy       from "@assets/956BBE89-87E5-4819-B829-785E139308AD_1778370123916.png";
-import bohoLogoClean    from "@assets/1A4C9ACE-E649-4987-9AC0-D199C3D15534_1778370123916.png";
-import bohoWhy          from "@assets/AE529428-1296-4DEE-B5B9-C7D500076C18_1778370123916.png";
-import bohoEmail        from "@assets/821E34A7-D63A-4317-8D6A-421C98737BE8_1778370123916.png";
-import bohoChanneling   from "@assets/0E1A9AAE-920A-41DF-A767-2892C51A72D4_1778370123916.png";
-import bohoNervous      from "@assets/996FDFC2-D196-4C05-8DF2-1AF81071A494_1778370123916.png";
-
+const bohoRocket = "/api/storage/public-objects/image_1778100676889.png";
+const bohoLogo = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_37_33_PM_1777153057484.png";
+const quoteRest = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_26_31_PM_1777152394705.png";
+const quoteShia = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_30_02_PM_1777152606163.png";
+const quoteCompass = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_33_17_PM_1777152801014.png";
+const quoteFlowLong = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_34_08_PM_1777152851926.png";
+const quoteFlowMed = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_34_32_PM_1777152876053.png";
+const quoteFlowShort = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_35_01_PM_1777152904200.png";
+const bohoFlowMethod = "/api/storage/public-objects/0D9F5EF3-83FA-49CF-959F-34398DAFD665_1778370123916.png";
+const bohoFlowNotebook = "/api/storage/public-objects/F6A455B5-CC74-450F-A384-E00396EF643D_1778370123916.png";
+const bohoAcronym = "/api/storage/public-objects/E298391E-3C3A-49B6-842C-F829477BDCDC_1778370123916.png";
+const bohoPresent = "/api/storage/public-objects/DD80CC7D-D028-4BD1-8E48-32D7F1B21CCC_1778370123916.png";
+const bohoDoing = "/api/storage/public-objects/81780865-34A0-4F4D-88AC-966F509D2724_1778370123916.png";
+const bohoEnergy = "/api/storage/public-objects/956BBE89-87E5-4819-B829-785E139308AD_1778370123916.png";
+const bohoLogoClean = "/api/storage/public-objects/1A4C9ACE-E649-4987-9AC0-D199C3D15534_1778370123916.png";
+const bohoWhy = "/api/storage/public-objects/AE529428-1296-4DEE-B5B9-C7D500076C18_1778370123916.png";
+const bohoEmail = "/api/storage/public-objects/821E34A7-D63A-4317-8D6A-421C98737BE8_1778370123916.png";
+const bohoChanneling = "/api/storage/public-objects/0E1A9AAE-920A-41DF-A767-2892C51A72D4_1778370123916.png";
+const bohoNervous = "/api/storage/public-objects/996FDFC2-D196-4C05-8DF2-1AF81071A494_1778370123916.png";
 const B = {
   bg:        "#F4EDE0",
   panel:     "#FAF6EC",

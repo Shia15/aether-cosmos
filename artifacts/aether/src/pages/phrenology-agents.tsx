@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import phrenoImg from "@assets/image_1782206256206.jpeg";
-
+const phrenoImg = "/api/storage/public-objects/image_1782206256206.jpeg";
 /* ── palette ───────────────────────────────────────── */
 const BG  = "#06070C";
 const MN  = "'Space Mono', monospace";

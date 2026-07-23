@@ -1,10 +1,9 @@
-import highTechBrain from "@assets/IMG_2066_1781448388514.jpeg";
-import fullBrainMap from "@assets/IMG_2065_1781448388514.jpeg";
-import neuroHarmonics from "@assets/73AA8635-4D7D-4E14-AC3F-5D71069DB72E_1781448388514.png";
-import aetherRouterPost from "@assets/IMG_1934_1781448388514.jpeg";
-import catVibrationPost from "@assets/IMG_1929_1781448388514.jpeg";
-import queenFlowers from "@assets/IMG_1932_1781448388514.jpeg";
-
+const highTechBrain = "/api/storage/public-objects/IMG_2066_1781448388514.jpeg";
+const fullBrainMap = "/api/storage/public-objects/IMG_2065_1781448388514.jpeg";
+const neuroHarmonics = "/api/storage/public-objects/73AA8635-4D7D-4E14-AC3F-5D71069DB72E_1781448388514.png";
+const aetherRouterPost = "/api/storage/public-objects/IMG_1934_1781448388514.jpeg";
+const catVibrationPost = "/api/storage/public-objects/IMG_1929_1781448388514.jpeg";
+const queenFlowers = "/api/storage/public-objects/IMG_1932_1781448388514.jpeg";
 import { useEffect, useRef, useState } from "react";
 
 /* ── style constants ─────────────────────────────────────────────────────── */

@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgGrid  from "@assets/ChatGPT_Image_Apr_26,_2026,_02_29_23_PM_1777228166552.png";
-import imgPhase from "@assets/ChatGPT_Image_Apr_26,_2026,_02_30_52_PM_1777228254997.png";
-
+const imgGrid = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_02_29_23_PM_1777228166552.png";
+const imgPhase = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_02_30_52_PM_1777228254997.png";
 const B = {
   bg:        "#080513",
   panel:     "#0e0a22",

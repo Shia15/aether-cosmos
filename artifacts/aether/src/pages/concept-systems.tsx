@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "react";
-import imgProducts from "@assets/870b94f0-ef64-47ba-b130-d8c26ac96ff3_1777221871725.png";
-import imgTokenSystem from "@assets/5f816d5c-e98d-4498-93e4-a3be9087c8d3_1777221875021.png";
-import imgRobotSmall from "@assets/ChatGPT_Image_Apr_26,_2026,_12_54_37_PM_1777222481541.png";
-import imgRobotMedium from "@assets/ChatGPT_Image_Apr_26,_2026,_12_54_46_PM_1777222488120.png";
-import imgRobotLarge from "@assets/ChatGPT_Image_Apr_26,_2026,_12_54_53_PM_1777222497388.png";
-
+const imgProducts = "/api/storage/public-objects/870b94f0-ef64-47ba-b130-d8c26ac96ff3_1777221871725.png";
+const imgTokenSystem = "/api/storage/public-objects/5f816d5c-e98d-4498-93e4-a3be9087c8d3_1777221875021.png";
+const imgRobotSmall = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_54_37_PM_1777222481541.png";
+const imgRobotMedium = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_54_46_PM_1777222488120.png";
+const imgRobotLarge = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_54_53_PM_1777222497388.png";
 const B = {
   bg: "#0a0c16", panel: "#11141f", ink: "#eaf0ff",
   text: "rgba(220,228,250,0.78)", muted: "rgba(220,228,250,0.45)",

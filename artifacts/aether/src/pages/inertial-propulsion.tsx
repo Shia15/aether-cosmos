@@ -2,9 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import imgCalc from "@assets/image_1782759541470.png";
-import imgMatrix from "@assets/image_1782759572268.png";
-
+const imgCalc = "/api/storage/public-objects/image_1782759541470.png";
+const imgMatrix = "/api/storage/public-objects/image_1782759572268.png";
 /* ==========================================================================
    INERTIAL TUBE DRIVE
    The buildable propulsion layer for the Air Nanotube Transport. Instead of a

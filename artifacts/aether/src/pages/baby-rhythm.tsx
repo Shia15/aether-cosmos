@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import notebookSchedule from "@assets/image_1778074195249.jpg";
-import notebookFingerFoods from "@assets/image_1778074206643.jpg";
-import printedSoftVeg from "@assets/image_1778074225020.jpg";
-import printedSoftFruits from "@assets/image_1778074240886.jpg";
-import notebookFeeding from "@assets/image_1778074259010.jpg";
-import notebookWeek1 from "@assets/image_1778074274213.jpg";
-import notebookWeek2 from "@assets/image_1778074297296.jpg";
-import registryPage1 from "@assets/IMG_1747_1778363169114.jpeg";
-import registryPage2 from "@assets/IMG_1749_1778363169114.jpeg";
-import showerEvents from "@assets/IMG_1748_1778363169114.jpeg";
-
+const notebookSchedule = "/api/storage/public-objects/image_1778074195249.jpg";
+const notebookFingerFoods = "/api/storage/public-objects/image_1778074206643.jpg";
+const printedSoftVeg = "/api/storage/public-objects/image_1778074225020.jpg";
+const printedSoftFruits = "/api/storage/public-objects/image_1778074240886.jpg";
+const notebookFeeding = "/api/storage/public-objects/image_1778074259010.jpg";
+const notebookWeek1 = "/api/storage/public-objects/image_1778074274213.jpg";
+const notebookWeek2 = "/api/storage/public-objects/image_1778074297296.jpg";
+const registryPage1 = "/api/storage/public-objects/IMG_1747_1778363169114.jpeg";
+const registryPage2 = "/api/storage/public-objects/IMG_1749_1778363169114.jpeg";
+const showerEvents = "/api/storage/public-objects/IMG_1748_1778363169114.jpeg";
 const KICKER: React.CSSProperties = { fontSize:11, letterSpacing:"0.32em", color:"#f9a8d4",
   fontFamily:"'DM Mono',monospace", textTransform:"uppercase", marginBottom:6 };
 

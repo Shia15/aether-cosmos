@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import imgFibTorus     from "@assets/image_(23)_1782754907458.jpg";
-import imgPhiResonance from "@assets/Gemini_Generated_Image_xru7hlxru7hlxru7_1782755291272.png";
-import imgTorusField   from "@assets/Viergutz-Fig10_1782754632793.jpg";
-
+const imgFibTorus = "/api/storage/public-objects/image_(23)_1782754907458.jpg";
+const imgPhiResonance = "/api/storage/public-objects/Gemini_Generated_Image_xru7hlxru7hlxru7_1782755291272.png";
+const imgTorusField = "/api/storage/public-objects/Viergutz-Fig10_1782754632793.jpg";
 /* ── palette ── */
 const C = {
   bg:     "#040a04",

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import heroLiving from "@assets/ChatGPT_Image_Jun_28,_2026,_01_06_29_PM_1782666399331.png";
-import heroSpectrum from "@assets/ChatGPT_Image_Jun_28,_2026,_01_10_58_PM_1782666667059.png";
-
+const heroLiving = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_01_06_29_PM_1782666399331.png";
+const heroSpectrum = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_01_10_58_PM_1782666667059.png";
 const C = {
   bg:     "#04060E",
   panel:  "rgba(8,12,24,0.85)",

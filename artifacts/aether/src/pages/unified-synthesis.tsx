@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
-import refImg from "@assets/image_(27)_1778042504322.jpg";
-
+const refImg = "/api/storage/public-objects/image_(27)_1778042504322.jpg";
 /* ──────────────────────────────────────────────────────────────────────
    AETHER · Unified Synthesis v3.0
    Chemical Signals, Biological Computation & the Coherence

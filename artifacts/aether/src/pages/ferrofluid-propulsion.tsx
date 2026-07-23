@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import imgFerro from "@assets/IMG_3934_1783108235908.jpeg";
-
+const imgFerro = "/api/storage/public-objects/IMG_3934_1783108235908.jpeg";
 const BG="#04060d",PAN="#0a0d1a",PAN2="#0d1020",BORDER="#182038",TEXT="#b8cce8",MUTED="#5a6e8c";
 const GOLD="#ffb830",CYAN="#3fd8d0",VIOLET="#a87aff",GREEN="#50d49a",BLUE="#4ab0ff",ROSE="#f06090";
 function hexA(h:string,a:number){

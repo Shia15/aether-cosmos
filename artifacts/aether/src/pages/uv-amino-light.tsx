@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import img1 from "@assets/image_1782206372818.jpeg";
-import img2 from "@assets/image_1782206427314.jpeg";
-import img3 from "@assets/image_1782206444614.jpeg";
-import img4 from "@assets/image_1782206471730.jpeg";
-import img5 from "@assets/image_1782206486757.jpeg";
-
+const img1 = "/api/storage/public-objects/image_1782206372818.jpeg";
+const img2 = "/api/storage/public-objects/image_1782206427314.jpeg";
+const img3 = "/api/storage/public-objects/image_1782206444614.jpeg";
+const img4 = "/api/storage/public-objects/image_1782206471730.jpeg";
+const img5 = "/api/storage/public-objects/image_1782206486757.jpeg";
 /* ── palette ─────────────────────────────────────── */
 const BG    = "#030508";
 const TEAL  = "#1fd4c8";

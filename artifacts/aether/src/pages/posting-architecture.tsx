@@ -3,41 +3,40 @@ import {
   Zap, BookOpen, Star, Layers, Infinity as InfinityIcon, type LucideIcon,
 } from "lucide-react";
 
-import bohoLogo        from "@assets/ChatGPT_Image_Apr_25,_2026,_05_37_33_PM_1777153057484.png";
-import qConscious      from "@assets/ChatGPT_Image_Apr_25,_2026,_05_43_01_PM_1777153384842.png";
-import paletteQuad     from "@assets/ChatGPT_Image_Apr_25,_2026,_05_43_27_PM_1777153411094.png";
-import qRootedCode     from "@assets/ChatGPT_Image_Apr_25,_2026,_05_43_52_PM_1777153436582.png";
-import imgAngelHours   from "@assets/ChatGPT_Image_Apr_25,_2026,_05_44_41_PM_1777153485541.png";
-import qFlowCycle      from "@assets/ChatGPT_Image_Apr_25,_2026,_05_45_26_PM_1777153529599.png";
-import imgCircuitTree  from "@assets/ChatGPT_Image_Apr_25,_2026,_05_45_58_PM_1777153569504.png";
-import qPassion        from "@assets/ChatGPT_Image_Apr_25,_2026,_05_46_32_PM_1777153596064.png";
-import qLead           from "@assets/ChatGPT_Image_Apr_25,_2026,_05_49_59_PM_1777153812253.png";
-import qNowYouDark     from "@assets/8730002b-1193-4f95-b6a0-47061973f2b9_1777153881796.png";
-import qNowYouLight    from "@assets/b7638385-0885-40c2-ba32-2b2483a3c010_1777153936905.png";
-import qAlligators     from "@assets/6d8e10fa-6fae-47b7-b9b7-5b72e24430b1_1777153972517.png";
-import qSeen           from "@assets/471ee993-22f2-43fd-98ef-133ff3d3ae59_1777154017094.png";
-import imgPostingArch  from "@assets/9e59936f-2428-441c-84d7-e96f17377969_1777154039805.png";
-import qAffirmations   from "@assets/03a338f7-a5e3-4380-b7f6-6722b6244929_1777154274230.png";
-import qHermetics      from "@assets/6aead329-7647-460d-85d1-6c94a308ca03_1777154359400.png";
-import qMerkaba        from "@assets/c7ba1a76-5fdb-4670-84bc-0f1dca7a7ffe_1777154436263.png";
-import qAkasha         from "@assets/c96a7f66-e932-4e8a-8dcc-e9d4d7178214_1777154461464.png";
+const bohoLogo = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_37_33_PM_1777153057484.png";
+const qConscious = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_43_01_PM_1777153384842.png";
+const paletteQuad = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_43_27_PM_1777153411094.png";
+const qRootedCode = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_43_52_PM_1777153436582.png";
+const imgAngelHours = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_44_41_PM_1777153485541.png";
+const qFlowCycle = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_45_26_PM_1777153529599.png";
+const imgCircuitTree = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_45_58_PM_1777153569504.png";
+const qPassion = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_46_32_PM_1777153596064.png";
+const qLead = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_49_59_PM_1777153812253.png";
+const qNowYouDark = "/api/storage/public-objects/8730002b-1193-4f95-b6a0-47061973f2b9_1777153881796.png";
+const qNowYouLight = "/api/storage/public-objects/b7638385-0885-40c2-ba32-2b2483a3c010_1777153936905.png";
+const qAlligators = "/api/storage/public-objects/6d8e10fa-6fae-47b7-b9b7-5b72e24430b1_1777153972517.png";
+const qSeen = "/api/storage/public-objects/471ee993-22f2-43fd-98ef-133ff3d3ae59_1777154017094.png";
+const imgPostingArch = "/api/storage/public-objects/9e59936f-2428-441c-84d7-e96f17377969_1777154039805.png";
+const qAffirmations = "/api/storage/public-objects/03a338f7-a5e3-4380-b7f6-6722b6244929_1777154274230.png";
+const qHermetics = "/api/storage/public-objects/6aead329-7647-460d-85d1-6c94a308ca03_1777154359400.png";
+const qMerkaba = "/api/storage/public-objects/c7ba1a76-5fdb-4670-84bc-0f1dca7a7ffe_1777154436263.png";
+const qAkasha = "/api/storage/public-objects/c96a7f66-e932-4e8a-8dcc-e9d4d7178214_1777154461464.png";
 // new card-deck additions
-import qLostSauce      from "@assets/2a23415f-8bde-40b7-9829-e21fdeee8e5a_1777156543957.png";
-import qConsuming      from "@assets/48d52b5e-f6cf-4576-8750-75b3a0c53e9f_1777156615549.png";
-import qMagnetism      from "@assets/b699464a-6ea8-4174-936a-07c021bbba47_1777156431150.png";
-import qNeedEachOther  from "@assets/31cc112e-68f3-4af4-b2ec-442c0efe4044_1777156455603.png";
-import qMotionInk      from "@assets/2e16e31d-7bd4-4419-b975-7266e2cfd9d6_1777156273285.png";
-import qMotionPeach    from "@assets/c493de26-0f95-48d8-8333-37c3629de2c4_1777156341681.png";
-import qClarityNebula  from "@assets/43858f84-97d7-436c-9e7b-0b5fded25aff_1777156378840.png";
-import qClarityBoutique from "@assets/82d70821-48a7-4c03-aa2e-408e23bb6ff0_1777156402767.png";
-import qLenaChaos       from "@assets/a126c364-6cab-4711-87f2-ef9b888386a3_1777219700882.png";
-import qLaplacian       from "@assets/ChatGPT_Image_Apr_26,_2026,_12_09_11_PM_1777219760373.png";
-import qAgentsStructure from "@assets/acfdc033-3b49-4cae-ba3f-27cc0c5e0ec7_1777219786581.png";
-import qSnowClarity     from "@assets/3cf4c1ca-dcce-49ee-89e4-5303ae4959b0_1777219889196.png";
-import qShowUpClarity   from "@assets/29b14ec0-dec0-41a9-91ec-1c97ebd4855f_1777220938414.png";
-import qChannelEnergy   from "@assets/ChatGPT_Image_Apr_26,_2026,_12_44_46_PM_1777221888242.png";
-import qChangeWasInternal from "@assets/ChatGPT_Image_Apr_26,_2026,_01_04_14_PM_1777223056726.png";
-
+const qLostSauce = "/api/storage/public-objects/2a23415f-8bde-40b7-9829-e21fdeee8e5a_1777156543957.png";
+const qConsuming = "/api/storage/public-objects/48d52b5e-f6cf-4576-8750-75b3a0c53e9f_1777156615549.png";
+const qMagnetism = "/api/storage/public-objects/b699464a-6ea8-4174-936a-07c021bbba47_1777156431150.png";
+const qNeedEachOther = "/api/storage/public-objects/31cc112e-68f3-4af4-b2ec-442c0efe4044_1777156455603.png";
+const qMotionInk = "/api/storage/public-objects/2e16e31d-7bd4-4419-b975-7266e2cfd9d6_1777156273285.png";
+const qMotionPeach = "/api/storage/public-objects/c493de26-0f95-48d8-8333-37c3629de2c4_1777156341681.png";
+const qClarityNebula = "/api/storage/public-objects/43858f84-97d7-436c-9e7b-0b5fded25aff_1777156378840.png";
+const qClarityBoutique = "/api/storage/public-objects/82d70821-48a7-4c03-aa2e-408e23bb6ff0_1777156402767.png";
+const qLenaChaos = "/api/storage/public-objects/a126c364-6cab-4711-87f2-ef9b888386a3_1777219700882.png";
+const qLaplacian = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_09_11_PM_1777219760373.png";
+const qAgentsStructure = "/api/storage/public-objects/acfdc033-3b49-4cae-ba3f-27cc0c5e0ec7_1777219786581.png";
+const qSnowClarity = "/api/storage/public-objects/3cf4c1ca-dcce-49ee-89e4-5303ae4959b0_1777219889196.png";
+const qShowUpClarity = "/api/storage/public-objects/29b14ec0-dec0-41a9-91ec-1c97ebd4855f_1777220938414.png";
+const qChannelEnergy = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_44_46_PM_1777221888242.png";
+const qChangeWasInternal = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_04_14_PM_1777223056726.png";
 const B = {
   bg:        "#F4EDE0",
   panel:     "#FAF6EC",

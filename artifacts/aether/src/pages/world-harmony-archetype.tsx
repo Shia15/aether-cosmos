@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import worldHarmony from "@assets/E83593FA-C921-4346-B35C-BA83E5852D0E_1782248376422.png";
-
+const worldHarmony = "/api/storage/public-objects/E83593FA-C921-4346-B35C-BA83E5852D0E_1782248376422.png";
 const V = {
   bg: "#020408",
   panel: "#04070e",

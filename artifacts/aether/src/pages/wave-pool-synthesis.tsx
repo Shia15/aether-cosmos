@@ -1,8 +1,7 @@
-import wavePoolPhysical from "@assets/IMG_1820_1781448388514.jpeg";
-import navierStokesSide from "@assets/IMG_1829_1781448388514.jpeg";
-import cntGenerator3D from "@assets/IMG_1832_1781448388514.jpeg";
-import wavePoolTopView from "@assets/Grok_Image_2026-05-11_at_10.40.20_PM_1781448388514.png";
-
+const wavePoolPhysical = "/api/storage/public-objects/IMG_1820_1781448388514.jpeg";
+const navierStokesSide = "/api/storage/public-objects/IMG_1829_1781448388514.jpeg";
+const cntGenerator3D = "/api/storage/public-objects/IMG_1832_1781448388514.jpeg";
+const wavePoolTopView = "/api/storage/public-objects/Grok_Image_2026-05-11_at_10.40.20_PM_1781448388514.png";
 import { useState, useEffect, useRef } from "react";
 
 const TABS = [

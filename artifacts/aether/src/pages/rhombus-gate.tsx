@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import imgVortexStone from "@assets/IMG_3682_1782767136954.jpeg";
-import imgCutawayVortex from "@assets/IMG_3683_1782767136954.jpeg";
-import imgPyramidGate from "@assets/IMG_3686_1782767136954.jpeg";
-import imgResonantTool from "@assets/IMG_3684_1782767136954.jpeg";
-
+const imgVortexStone = "/api/storage/public-objects/IMG_3682_1782767136954.jpeg";
+const imgCutawayVortex = "/api/storage/public-objects/IMG_3683_1782767136954.jpeg";
+const imgPyramidGate = "/api/storage/public-objects/IMG_3686_1782767136954.jpeg";
+const imgResonantTool = "/api/storage/public-objects/IMG_3684_1782767136954.jpeg";
 const V = {
   bg: "#05060C", aurora: "#00FFB2", gold: "#C8A030", blue: "#4488FF",
   vio: "#9966FF", amb: "#FF9933", rose: "#FF6699", plasma: "#FF4477",

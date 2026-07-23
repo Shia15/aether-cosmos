@@ -1,8 +1,7 @@
-import quantumSubstrate from "@assets/5691890B-386F-4A72-A6B4-303D728077C4_1781448388514.png";
-import resonantCell from "@assets/65A7A2E3-063F-4F8A-A92B-D74BB81B294B_1781448388514.png";
-import ancientCurrents from "@assets/8D9910A2-2ACC-4CAA-8532-84639E46A5E7_1781448388514.png";
-import atlantisBeacon from "@assets/IMG_1764_1781448388514.jpeg";
-
+const quantumSubstrate = "/api/storage/public-objects/5691890B-386F-4A72-A6B4-303D728077C4_1781448388514.png";
+const resonantCell = "/api/storage/public-objects/65A7A2E3-063F-4F8A-A92B-D74BB81B294B_1781448388514.png";
+const ancientCurrents = "/api/storage/public-objects/8D9910A2-2ACC-4CAA-8532-84639E46A5E7_1781448388514.png";
+const atlantisBeacon = "/api/storage/public-objects/IMG_1764_1781448388514.jpeg";
 import { useState, useEffect, useRef } from "react";
 
 const TABS = [

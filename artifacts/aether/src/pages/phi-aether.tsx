@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import imgInfernia from "@assets/1_1781441110829.jpeg";
+const imgInfernia = "/api/storage/public-objects/1_1781441110829.jpeg";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 // ── Constants ────────────────────────────────────────────────────────────────

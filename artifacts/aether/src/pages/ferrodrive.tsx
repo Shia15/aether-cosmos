@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
-import imgSysA from "@assets/ChatGPT_Image_Apr_26,_2026,_12_44_55_PM_1777221900485.png";
-import imgSysB from "@assets/ChatGPT_Image_Apr_26,_2026,_12_45_08_PM_1777221911140.png";
-import imgEvolutions from "@assets/ChatGPT_Image_Apr_26,_2026,_12_45_29_PM_1777221942931.png";
-import imgBioMagnetic from "@assets/ChatGPT_Image_Apr_26,_2026,_12_45_36_PM_1777221952424.png";
-
+const imgSysA = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_44_55_PM_1777221900485.png";
+const imgSysB = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_45_08_PM_1777221911140.png";
+const imgEvolutions = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_45_29_PM_1777221942931.png";
+const imgBioMagnetic = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_45_36_PM_1777221952424.png";
 const B = {
   bg: "#0b0e16", panel: "#11151f", ink: "#eaf0ff",
   text: "rgba(220,228,250,0.78)", muted: "rgba(220,228,250,0.45)",

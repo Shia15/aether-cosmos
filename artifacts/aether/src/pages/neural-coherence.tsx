@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import notesImg from "@assets/IMG_3268_1781552539516.jpeg";
-
+const notesImg = "/api/storage/public-objects/IMG_3268_1781552539516.jpeg";
 /* ── Palette ──────────────────────────────────── */
 const BG     = "#020408";
 const BLUE   = "#1a9fd4";

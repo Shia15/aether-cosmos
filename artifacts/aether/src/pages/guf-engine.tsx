@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import opticalHull from "@assets/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781373384314.png";
-import bioPropulsion2 from "@assets/4be3c722-8597-4582-a959-2b041a230c54_(2)_1781373387026.png";
-import bioPropulsion1 from "@assets/4be3c722-8597-4582-a959-2b041a230c54_(1)_1781373390083.png";
-import scaleHierarchy from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
-import ferroSilicon from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_46_PM_1781373535656.png";
-import crystallization from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
-import geoFormation from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
-
+const opticalHull = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781373384314.png";
+const bioPropulsion2 = "/api/storage/public-objects/4be3c722-8597-4582-a959-2b041a230c54_(2)_1781373387026.png";
+const bioPropulsion1 = "/api/storage/public-objects/4be3c722-8597-4582-a959-2b041a230c54_(1)_1781373390083.png";
+const scaleHierarchy = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
+const ferroSilicon = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_58_46_PM_1781373535656.png";
+const crystallization = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
+const geoFormation = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const C = {

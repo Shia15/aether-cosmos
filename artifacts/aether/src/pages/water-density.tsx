@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import chladniImg from "@assets/IMG_3241_1781550160764.jpeg";
-
+const chladniImg = "/api/storage/public-objects/IMG_3241_1781550160764.jpeg";
 /* ── Palette ─────────────────────────────────────── */
 const BG     = "#020408";
 const BLUE   = "#1a9fd4";

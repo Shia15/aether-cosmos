@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import sourceBoardImg from "@assets/image_1782003400689.png";
-
+const sourceBoardImg = "/api/storage/public-objects/image_1782003400689.png";
 /* ── Palette ─────────────────────────────────────────── */
 const BG   = "#020408";
 const TEAL = "#2ef0d8";

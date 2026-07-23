@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import boostRoutingImg from "@assets/bd2f545b-2a7c-42d8-a589-10c696bb19c8_1777219745091.png";
-
+const boostRoutingImg = "/api/storage/public-objects/bd2f545b-2a7c-42d8-a589-10c696bb19c8_1777219745091.png";
 const C = {
   bg: "#0B0C0F", panel: "rgba(17,19,24,0.86)",
   border: "rgba(232,200,120,0.14)", border2: "rgba(232,200,120,0.32)",

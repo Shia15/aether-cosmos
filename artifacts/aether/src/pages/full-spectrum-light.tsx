@@ -1,14 +1,13 @@
 import { useEffect, useRef } from "react";
-import imgFovea     from "@assets/spec_fovea.jpg";
-import imgRetCell   from "@assets/spec_retinal_cells.jpg";
-import imgLGN       from "@assets/spec_lgn_pathway.jpg";
-import imgPineal    from "@assets/spec_pineal.jpg";
-import imgMelan     from "@assets/spec_melanocyte.jpg";
-import imgOtt       from "@assets/spec_ott.jpg";
-import imgRPE       from "@assets/spec_rpe.jpg";
-import imgDNA       from "@assets/spec_dna.jpg";
-import imgDHA       from "@assets/spec_dha.jpg";
-
+const imgFovea = "/api/storage/public-objects/spec_fovea.jpg";
+const imgRetCell = "/api/storage/public-objects/spec_retinal_cells.jpg";
+const imgLGN = "/api/storage/public-objects/spec_lgn_pathway.jpg";
+const imgPineal = "/api/storage/public-objects/spec_pineal.jpg";
+const imgMelan = "/api/storage/public-objects/spec_melanocyte.jpg";
+const imgOtt = "/api/storage/public-objects/spec_ott.jpg";
+const imgRPE = "/api/storage/public-objects/spec_rpe.jpg";
+const imgDNA = "/api/storage/public-objects/spec_dna.jpg";
+const imgDHA = "/api/storage/public-objects/spec_dha.jpg";
 /* ── palette ─────────────────────────────────── */
 const BG   = "#040608";
 const TEAL = "#1fd4c8";

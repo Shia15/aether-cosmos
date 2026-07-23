@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import pvImage from "@assets/pv_1776475134590.jpeg";
-import binaryMap from "@assets/bianary_map_1776475138397.jpeg";
-import bigOImage from "@assets/operators_1776475143201.jpeg";
-import hexImage from "@assets/hex_lotix_1776475148908.jpeg";
-import logicGates from "@assets/logic_gates_1776475152336.jpeg";
-
+const pvImage = "/api/storage/public-objects/pv_1776475134590.jpeg";
+const binaryMap = "/api/storage/public-objects/bianary_map_1776475138397.jpeg";
+const bigOImage = "/api/storage/public-objects/operators_1776475143201.jpeg";
+const hexImage = "/api/storage/public-objects/hex_lotix_1776475148908.jpeg";
+const logicGates = "/api/storage/public-objects/logic_gates_1776475152336.jpeg";
 const C = {
   teal: "#2dd4bf", gold: "#f2bf65", purple: "#c084fc",
   cyan: "#00ff88", orange: "#ff6b35", bg: "#030514", panel: "#07021a",

@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import sigilImg   from "@assets/68785CA9-810A-40EF-92C2-810F848DEFBD_1781999352934.png";
-import layerImg   from "@assets/IMG_3465_1781999489966.png";
-import isoImg     from "@assets/IMG_3460_1781999489966.png";
-import thermoImg  from "@assets/5F3C41A7-8516-4E4F-B00F-27B4539619C5_1781999489966.png";
-import nestedImg  from "@assets/IMG_3461_1781999489966.png";
-import biodigImg  from "@assets/IMG_3464_1781999489966.png";
-import cloudImg   from "@assets/IMG_3354_1781999352934.jpeg";
-import soiImg     from "@assets/IMG_3468_1781999489966.png";
-import mpcImg     from "@assets/IMG_3467_1781999489966.png";
-import qtfImg     from "@assets/IMG_3458_1781999489966.png";
-
+const sigilImg = "/api/storage/public-objects/68785CA9-810A-40EF-92C2-810F848DEFBD_1781999352934.png";
+const layerImg = "/api/storage/public-objects/IMG_3465_1781999489966.png";
+const isoImg = "/api/storage/public-objects/IMG_3460_1781999489966.png";
+const thermoImg = "/api/storage/public-objects/5F3C41A7-8516-4E4F-B00F-27B4539619C5_1781999489966.png";
+const nestedImg = "/api/storage/public-objects/IMG_3461_1781999489966.png";
+const biodigImg = "/api/storage/public-objects/IMG_3464_1781999489966.png";
+const cloudImg = "/api/storage/public-objects/IMG_3354_1781999352934.jpeg";
+const soiImg = "/api/storage/public-objects/IMG_3468_1781999489966.png";
+const mpcImg = "/api/storage/public-objects/IMG_3467_1781999489966.png";
+const qtfImg = "/api/storage/public-objects/IMG_3458_1781999489966.png";
 /* ── Palette ─────────────────────────────────────────── */
 const BG   = "#020408";
 const TEAL = "#2ef0d8";

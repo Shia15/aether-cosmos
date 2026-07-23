@@ -1,19 +1,17 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Link } from "wouter";
 
-import imgSpiral from "@assets/download_(24)_1782927603039.jpg";
-import imgVascular from "@assets/download_(22)_1782927615486.jpg";
-import imgCoil from "@assets/download_(21)_1782927626797.jpg";
-import imgCheckpoint from "@assets/download_(18)_1782927677739.jpg";
-import imgBrainTree from "@assets/download_(17)_1782927692875.jpg";
-import imgPlanet from "@assets/download_(16)_1782927706674.jpg";
-import imgPipeline from "@assets/46839d4f-507d-4309-b8b6-5a38797d9962_1782927766796.jpg";
-
-import vidHero from "@assets/grok-video-e531adf0-aa50-47dd-adc1-655663ea1efb_1782927381779.mp4";
-import vidA from "@assets/7dc68708-761a-479c-9b05-10590262ccfe_hd_1782927461693.mp4";
-import vidB from "@assets/grok-video-a2467162-1ad8-4fec-9f47-6cdfd25b9594_(1)_1782927489715.mp4";
-import vidC from "@assets/338e357b-5c7e-46ab-a0e7-9d2991c94fea_hd_1782927551831.mp4";
-
+const imgSpiral = "/api/storage/public-objects/download_(24)_1782927603039.jpg";
+const imgVascular = "/api/storage/public-objects/download_(22)_1782927615486.jpg";
+const imgCoil = "/api/storage/public-objects/download_(21)_1782927626797.jpg";
+const imgCheckpoint = "/api/storage/public-objects/download_(18)_1782927677739.jpg";
+const imgBrainTree = "/api/storage/public-objects/download_(17)_1782927692875.jpg";
+const imgPlanet = "/api/storage/public-objects/download_(16)_1782927706674.jpg";
+const imgPipeline = "/api/storage/public-objects/46839d4f-507d-4309-b8b6-5a38797d9962_1782927766796.jpg";
+const vidHero = "/api/storage/public-objects/grok-video-e531adf0-aa50-47dd-adc1-655663ea1efb_1782927381779.mp4";
+const vidA = "/api/storage/public-objects/7dc68708-761a-479c-9b05-10590262ccfe_hd_1782927461693.mp4";
+const vidB = "/api/storage/public-objects/grok-video-a2467162-1ad8-4fec-9f47-6cdfd25b9594_(1)_1782927489715.mp4";
+const vidC = "/api/storage/public-objects/338e357b-5c7e-46ab-a0e7-9d2991c94fea_hd_1782927551831.mp4";
 const C = {
   bg: "#05060C",
   panel: "#0b0e18",

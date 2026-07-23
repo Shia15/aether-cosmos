@@ -1,6 +1,5 @@
-import imgTimeline from "@assets/ChatGPT_Image_Apr_26,_2026,_12_50_01_PM_1777222210963.png";
-import img2026 from "@assets/ChatGPT_Image_Apr_26,_2026,_01_05_04_PM_1777223110893.png";
-
+const imgTimeline = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_50_01_PM_1777222210963.png";
+const img2026 = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_05_04_PM_1777223110893.png";
 const B = {
   bg: "#0a0d1c", panel: "#11172a", ink: "#eaf0ff",
   text: "rgba(220,228,255,0.78)", muted: "rgba(220,228,255,0.45)",

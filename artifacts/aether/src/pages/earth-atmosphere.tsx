@@ -1,15 +1,14 @@
 import { useEffect, useRef } from "react";
-import earthResonanceCoupled from "@assets/IMG_2708_1781446780853.png";
-import earthResonance4Seas from "@assets/ECEE5F00-2517-4697-8031-C87261CE412A_1781446780853.png";
-import treeSapClimate from "@assets/DAA77E2A-BAAE-435F-A029-5F15FEFE56CD_1781446780853.png";
-import paleoclimatology from "@assets/1FA2582D-1B7E-4BE1-AAE5-1591B4EE17B6_1781446780853.png";
-import plantCommunication from "@assets/1F408A70-223D-498E-8A09-731A4F8E6244_1781446780853.png";
-import codeCultureCosmos from "@assets/FAFC9861-8046-4005-AF70-B5810D71C8E2_1781446780853.png";
-import laserMatrix from "@assets/29A240ED-5DA4-4189-8496-2838BE84F39E_1781446780853.png";
-import atmosphericMatrix from "@assets/0C9F44FF-7591-4A33-B623-F926890E2BF0_1781446780853.png";
-import aiAtmospheric from "@assets/IMG_2709_1781446780853.png";
-import emergentBubbles from "@assets/06DD1D28-9ABF-4AF4-9C1A-A31A86895C34_1781446780853.png";
-
+const earthResonanceCoupled = "/api/storage/public-objects/IMG_2708_1781446780853.png";
+const earthResonance4Seas = "/api/storage/public-objects/ECEE5F00-2517-4697-8031-C87261CE412A_1781446780853.png";
+const treeSapClimate = "/api/storage/public-objects/DAA77E2A-BAAE-435F-A029-5F15FEFE56CD_1781446780853.png";
+const paleoclimatology = "/api/storage/public-objects/1FA2582D-1B7E-4BE1-AAE5-1591B4EE17B6_1781446780853.png";
+const plantCommunication = "/api/storage/public-objects/1F408A70-223D-498E-8A09-731A4F8E6244_1781446780853.png";
+const codeCultureCosmos = "/api/storage/public-objects/FAFC9861-8046-4005-AF70-B5810D71C8E2_1781446780853.png";
+const laserMatrix = "/api/storage/public-objects/29A240ED-5DA4-4189-8496-2838BE84F39E_1781446780853.png";
+const atmosphericMatrix = "/api/storage/public-objects/0C9F44FF-7591-4A33-B623-F926890E2BF0_1781446780853.png";
+const aiAtmospheric = "/api/storage/public-objects/IMG_2709_1781446780853.png";
+const emergentBubbles = "/api/storage/public-objects/06DD1D28-9ABF-4AF4-9C1A-A31A86895C34_1781446780853.png";
 import { useState } from "react";
 
 const TABS = [

@@ -1,12 +1,11 @@
-import coherentCancerCare from "@assets/8C4BA75D-7FCC-429F-9202-61503AC85C19_1781446780853.png";
-import aetherResonanceEngine from "@assets/994704D2-1196-44A8-9F1A-B709EDC5CCB6_1781446780853.png";
-import universeArchive from "@assets/7CE2D364-23F2-4130-87AC-50FE500A45EB_1781446780853.png";
-import fractalLight from "@assets/22BE668C-ACD4-4C99-A934-49AE8E9925BC_1781446780853.png";
-import backwardsWaves from "@assets/FDD48C65-CEF2-4773-8A49-B923F4D4592A_1781446780853.png";
-import dynamicAdaptive from "@assets/4B792D20-1118-4E06-B9A1-77FD1FDAEB3D_1781446780853.png";
-import solarNeural1 from "@assets/DE78871E-EA85-4C52-BB6F-1645DBB84DD7_1781446780853.png";
-import solarNeural2 from "@assets/533761B4-974D-4AE4-AA14-06CF1286A280_1781446780853.png";
-
+const coherentCancerCare = "/api/storage/public-objects/8C4BA75D-7FCC-429F-9202-61503AC85C19_1781446780853.png";
+const aetherResonanceEngine = "/api/storage/public-objects/994704D2-1196-44A8-9F1A-B709EDC5CCB6_1781446780853.png";
+const universeArchive = "/api/storage/public-objects/7CE2D364-23F2-4130-87AC-50FE500A45EB_1781446780853.png";
+const fractalLight = "/api/storage/public-objects/22BE668C-ACD4-4C99-A934-49AE8E9925BC_1781446780853.png";
+const backwardsWaves = "/api/storage/public-objects/FDD48C65-CEF2-4773-8A49-B923F4D4592A_1781446780853.png";
+const dynamicAdaptive = "/api/storage/public-objects/4B792D20-1118-4E06-B9A1-77FD1FDAEB3D_1781446780853.png";
+const solarNeural1 = "/api/storage/public-objects/DE78871E-EA85-4C52-BB6F-1645DBB84DD7_1781446780853.png";
+const solarNeural2 = "/api/storage/public-objects/533761B4-974D-4AE4-AA14-06CF1286A280_1781446780853.png";
 import { useEffect, useRef, useState } from "react";
 
 const TABS = [

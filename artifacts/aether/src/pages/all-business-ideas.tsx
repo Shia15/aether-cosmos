@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import dailyScheduleImg from "@assets/image_1778368895411.jpg";
-import businessIdeasImg from "@assets/image_1778368906231.jpg";
-
+const dailyScheduleImg = "/api/storage/public-objects/image_1778368895411.jpg";
+const businessIdeasImg = "/api/storage/public-objects/image_1778368906231.jpg";
 const C = {
   bg:     "#0a0714",
   panel:  "rgba(14,10,36,0.92)",

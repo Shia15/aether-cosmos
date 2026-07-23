@@ -1,22 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import imgTransport from "@assets/Gemini_Generated_Image_fwivy7fwivy7fwiv_1782920005182.png";
-import imgSpectral from "@assets/Gemini_Generated_Image_w1iv0w1iv0w1iv0w_1782920005183.png";
-import imgInfoGain from "@assets/Gemini_Generated_Image_wmyjldwmyjldwmyj_1782920005183.png";
-import imgRingLayer from "@assets/Gemini_Generated_Image_l9zo1il9zo1il9zo_1782920005184.png";
-import imgMito from "@assets/2efe9ded-1713-45f5-aa4b-9563cdf1ffaa_1782920005185.jpg";
-import imgMaster from "@assets/7d51f5d0-727d-411b-abf2-361b05e55814_1782920005185.jpg";
-import imgPhi from "@assets/Gemini_Generated_Image_xru7hlxru7hlxru7_1782920005186.png";
-import imgVoidEmber from "@assets/Gemini_Generated_Image_c3j49bc3j49bc3j4_1782920005187.png";
-import imgCohNode from "@assets/Gemini_Generated_Image_21v3z921v3z921v3_1782920005188.png";
-import imgCrystalIR from "@assets/Gemini_Generated_Image_nzpjfznzpjfznzpj_1782920005188.png";
-import imgMycelium from "@assets/Gemini_Generated_Image_ddcufdddcufdddcu_1782920005189.png";
-import imgCuca from "@assets/Gemini_Generated_Image_v4cvshv4cvshv4cv_1782920005189.png";
-import imgGR from "@assets/Gemini_Generated_Image_r2zvd1r2zvd1r2zv_1782920005190.png";
-import imgFilament from "@assets/Gemini_Generated_Image_of5f1jof5f1jof5f_1782920005190.png";
-import imgVortex from "@assets/Gemini_Generated_Image_ot7ybpot7ybpot7y_1782920005191.png";
-
+const imgTransport = "/api/storage/public-objects/Gemini_Generated_Image_fwivy7fwivy7fwiv_1782920005182.png";
+const imgSpectral = "/api/storage/public-objects/Gemini_Generated_Image_w1iv0w1iv0w1iv0w_1782920005183.png";
+const imgInfoGain = "/api/storage/public-objects/Gemini_Generated_Image_wmyjldwmyjldwmyj_1782920005183.png";
+const imgRingLayer = "/api/storage/public-objects/Gemini_Generated_Image_l9zo1il9zo1il9zo_1782920005184.png";
+const imgMito = "/api/storage/public-objects/2efe9ded-1713-45f5-aa4b-9563cdf1ffaa_1782920005185.jpg";
+const imgMaster = "/api/storage/public-objects/7d51f5d0-727d-411b-abf2-361b05e55814_1782920005185.jpg";
+const imgPhi = "/api/storage/public-objects/Gemini_Generated_Image_xru7hlxru7hlxru7_1782920005186.png";
+const imgVoidEmber = "/api/storage/public-objects/Gemini_Generated_Image_c3j49bc3j49bc3j4_1782920005187.png";
+const imgCohNode = "/api/storage/public-objects/Gemini_Generated_Image_21v3z921v3z921v3_1782920005188.png";
+const imgCrystalIR = "/api/storage/public-objects/Gemini_Generated_Image_nzpjfznzpjfznzpj_1782920005188.png";
+const imgMycelium = "/api/storage/public-objects/Gemini_Generated_Image_ddcufdddcufdddcu_1782920005189.png";
+const imgCuca = "/api/storage/public-objects/Gemini_Generated_Image_v4cvshv4cvshv4cv_1782920005189.png";
+const imgGR = "/api/storage/public-objects/Gemini_Generated_Image_r2zvd1r2zvd1r2zv_1782920005190.png";
+const imgFilament = "/api/storage/public-objects/Gemini_Generated_Image_of5f1jof5f1jof5f_1782920005190.png";
+const imgVortex = "/api/storage/public-objects/Gemini_Generated_Image_ot7ybpot7ybpot7y_1782920005191.png";
 const V = {
   bg: "#05060C", aurora: "#00FFB2", gold: "#C8A030", blue: "#4488FF",
   vio: "#9966FF", amb: "#FF9933", rose: "#FF6699", plasma: "#FF4477",

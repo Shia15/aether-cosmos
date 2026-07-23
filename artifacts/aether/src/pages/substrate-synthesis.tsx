@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import fusionSubstrate from "@assets/HHvIaowXQAY-n8z_(1)_1778197228444.jpg";
-import shiaCaCO3 from "@assets/IMG_1606_1778070646724.jpeg";
-import shiaSpatialIntention from "@assets/IMG_1603_1778070646724.jpeg";
-import bavsSubstrates from "@assets/IMG_1600_1778070646724.png";
-import photochemHypothesis from "@assets/IMG_1599_1778070646724.png";
-import layeredOpticalFramework from "@assets/5CF0BA96-40F7-436B-878A-8D93871C36B9_1778070646724.png";
-import blueVioletPaper from "@assets/1FCF6888-89B7-4E22-B40A-2DB7BCE6E11D_1778070646724.png";
-import geologicalAccelerator from "@assets/C4A9F181-C71B-4042-96B3-91D5C4AF73A3_1778070646724.png";
-import treeOfLife from "@assets/IMG_1588_1778070646724.jpeg";
-import gufScaleHierarchy from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
-import gufFerroSilicon from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_46_PM_1781373535656.png";
-import gufCrystallization from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
-import gufGeoFormation from "@assets/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
-import shiaLifeFormula from "@assets/IMG_1577_1778070646724.jpeg";
-
+const fusionSubstrate = "/api/storage/public-objects/HHvIaowXQAY-n8z_(1)_1778197228444.jpg";
+const shiaCaCO3 = "/api/storage/public-objects/IMG_1606_1778070646724.jpeg";
+const shiaSpatialIntention = "/api/storage/public-objects/IMG_1603_1778070646724.jpeg";
+const bavsSubstrates = "/api/storage/public-objects/IMG_1600_1778070646724.png";
+const photochemHypothesis = "/api/storage/public-objects/IMG_1599_1778070646724.png";
+const layeredOpticalFramework = "/api/storage/public-objects/5CF0BA96-40F7-436B-878A-8D93871C36B9_1778070646724.png";
+const blueVioletPaper = "/api/storage/public-objects/1FCF6888-89B7-4E22-B40A-2DB7BCE6E11D_1778070646724.png";
+const geologicalAccelerator = "/api/storage/public-objects/C4A9F181-C71B-4042-96B3-91D5C4AF73A3_1778070646724.png";
+const treeOfLife = "/api/storage/public-objects/IMG_1588_1778070646724.jpeg";
+const gufScaleHierarchy = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781373531778.png";
+const gufFerroSilicon = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_58_46_PM_1781373535656.png";
+const gufCrystallization = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_59_05_PM_1781373570882.png";
+const gufGeoFormation = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_59_11_PM_1781373575937.png";
+const shiaLifeFormula = "/api/storage/public-objects/IMG_1577_1778070646724.jpeg";
 // ── Synthesis conditions, rates from 1FCF6888 (mg/L precipitated after 180 min)
 interface Condition {
   key: string;

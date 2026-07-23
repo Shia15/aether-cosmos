@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
-import imgDoctrine from "@assets/3c946795-be6d-49c9-8cd5-9bfe1985d7eb_1777222328204.png";
-import imgSeparation from "@assets/ChatGPT_Image_Apr_26,_2026,_12_54_29_PM_1777222471368.png";
-
+const imgDoctrine = "/api/storage/public-objects/3c946795-be6d-49c9-8cd5-9bfe1985d7eb_1777222328204.png";
+const imgSeparation = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_54_29_PM_1777222471368.png";
 const B = {
   bg: "#080c18", panel: "#10162a", ink: "#e6efff",
   text: "rgba(216,228,255,0.78)", muted: "rgba(216,228,255,0.45)",

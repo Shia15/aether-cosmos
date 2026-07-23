@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
-import imgKiller   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_00_23_PM_1777222826075.png";
-import imgInBlood  from "@assets/ChatGPT_Image_Apr_26,_2026,_01_00_51_PM_1777222853833.png";
-import imgSafetyA  from "@assets/ChatGPT_Image_Apr_26,_2026,_01_01_25_PM_1777222887442.png";
-import imgSafetyB  from "@assets/ChatGPT_Image_Apr_26,_2026,_01_01_31_PM_1777222899745.png";
-
+const imgKiller = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_00_23_PM_1777222826075.png";
+const imgInBlood = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_00_51_PM_1777222853833.png";
+const imgSafetyA = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_01_25_PM_1777222887442.png";
+const imgSafetyB = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_01_31_PM_1777222899745.png";
 const B = {
   bg: "#0a0608",
   panel: "#15090d",

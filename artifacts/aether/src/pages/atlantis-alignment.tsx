@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import infographic from "@assets/1767210329858_1776476951085.jpeg";
-
+const infographic = "/api/storage/public-objects/1767210329858_1776476951085.jpeg";
 const C = {
   teal: "#2dd4bf", gold: "#f2bf65", purple: "#c084fc",
   green: "#4ade80", rose: "#fb7185", orange: "#fb923c",

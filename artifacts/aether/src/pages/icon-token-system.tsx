@@ -7,8 +7,7 @@
   constellation + car silhouette canvas)
 ═══════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState } from "react";
-import tokenSystemImg from "@assets/A857A8BB-6271-4776-833A-04DE2F392844_1784658986654.png";
-
+const tokenSystemImg = "/api/storage/public-objects/A857A8BB-6271-4776-833A-04DE2F392844_1784658986654.png";
 const P = {
   bg: "#02030d", panel: "#060818", panel2: "#0a0f24",
   ivory: "#f0eeff", dim: "rgba(240,238,255,0.55)", muted: "rgba(240,238,255,0.28)",

@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import img_unifiedLang from "@assets/9FBE865E-F140-4465-B288-2F0A1946B597_1781446726264.png";
-import img_calligraphyAlpha from "@assets/09ACA4A4-A258-4D5C-ACDB-91B90CFE8198_1781446726264.png";
-import img_compoundCurves from "@assets/29D9BA8E-F00A-4748-A728-1B193429B39E_1781446726264.png";
-import img_hyperloop from "@assets/99753AAA-1A60-4556-B9E1-1271001DA85E_1781446726264.png";
-import img_waveVortex from "@assets/2298EB82-5F48-4B8D-9847-046808BF8F80_1781446726264.png";
-import img_nessieNeuro from "@assets/3F50FD27-DE03-4D80-AB65-A623C3D2D19F_1781446726264.png";
-import img_nessieBlueprint from "@assets/88515D0B-36BF-4F49-994F-3AB6204FEC9E_1781446726264.png";
-import img_nessieSnowflake from "@assets/B6ABB1D9-8DC3-4325-9DBD-83C7D8EF4F51_1781446726264.png";
-import img_roboticHand from "@assets/4A252038-40A7-49D4-BED1-20BD51CC846B_1781446726264.png";
-
+const img_unifiedLang = "/api/storage/public-objects/9FBE865E-F140-4465-B288-2F0A1946B597_1781446726264.png";
+const img_calligraphyAlpha = "/api/storage/public-objects/09ACA4A4-A258-4D5C-ACDB-91B90CFE8198_1781446726264.png";
+const img_compoundCurves = "/api/storage/public-objects/29D9BA8E-F00A-4748-A728-1B193429B39E_1781446726264.png";
+const img_hyperloop = "/api/storage/public-objects/99753AAA-1A60-4556-B9E1-1271001DA85E_1781446726264.png";
+const img_waveVortex = "/api/storage/public-objects/2298EB82-5F48-4B8D-9847-046808BF8F80_1781446726264.png";
+const img_nessieNeuro = "/api/storage/public-objects/3F50FD27-DE03-4D80-AB65-A623C3D2D19F_1781446726264.png";
+const img_nessieBlueprint = "/api/storage/public-objects/88515D0B-36BF-4F49-994F-3AB6204FEC9E_1781446726264.png";
+const img_nessieSnowflake = "/api/storage/public-objects/B6ABB1D9-8DC3-4325-9DBD-83C7D8EF4F51_1781446726264.png";
+const img_roboticHand = "/api/storage/public-objects/4A252038-40A7-49D4-BED1-20BD51CC846B_1781446726264.png";
 const TABS = [
   { id: "alphabet", label: "Motion Alphabet" },
   { id: "maglev", label: "MagLev Propulsion" },

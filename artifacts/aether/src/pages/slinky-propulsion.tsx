@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import imgSlinky from "@assets/F4DC77FE-F441-4262-96DD-2F6141C81AB6_1783105484756.png";
-
+const imgSlinky = "/api/storage/public-objects/F4DC77FE-F441-4262-96DD-2F6141C81AB6_1783105484756.png";
 const BG="#04060d",PAN="#0a0d1a",PAN2="#0d1020",BORDER="#182038",TEXT="#b8cce8",MUTED="#5a6e8c";
 const GOLD="#ffb830",CYAN="#3fd8d0",VIOLET="#a87aff",GREEN="#50d49a",BLUE="#4ab0ff";
 function hexA(h:string,a:number){

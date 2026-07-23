@@ -1,21 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 
-import orbWhiteImg    from "@assets/404D068D-CF5E-4BD4-9C98-5B0AC802C5B0_1781996548259.png";
-import orbTealImg     from "@assets/15A292C6-FB92-4D87-B470-FCA72B7BCB28_1781996548259.png";
-import tokenSheetImg  from "@assets/CA31693F-D61A-4F03-A6E1-0E13B3B151BC_1781996548259.png";
-import auraStatesImg  from "@assets/2072A243-1A49-4070-8A00-3C497286B920_1781996548260.png";
-import ctrlPanel3Img  from "@assets/4C8D0EBE-45E7-46FE-B92A-C55DF5167AAE_1781996548260.png";
-import sigilStatesImg from "@assets/68785CA9-810A-40EF-92C2-810F848DEFBD_1781996548260.png";
-import rootexImg      from "@assets/8C14E0A4-27FF-42A2-BF03-4F270CC1B125_1781996548260.png";
-import cloudStreetsImg from "@assets/IMG_3354_1781996548260.jpeg";
-import waterCurveImg  from "@assets/CA497883-D76C-4E11-AE30-859CCC1006B9_1781996548260.png";
-import emergentImg    from "@assets/1E31757A-FAC7-409C-9609-A1EF7BAB975D_1781996548260.png";
-import surfaceFlowImg from "@assets/54F93098-A9AB-4DFF-82AD-518A62C1D511_1781996548260.png";
-import infinityDroneImg from "@assets/834421B5-67EA-47F4-B6F0-5A1B9D08F3DC_1781996548260.png";
-import magneticImg    from "@assets/755D7B65-B495-41F7-BDD4-5F64330CD4E8_1781996548260.png";
-import floquetImg     from "@assets/5C18778D-62B3-4620-AC8B-B70401DB566A_1781996548260.png";
-import cosmicChainImg from "@assets/IMG_3324_1781996548260.png";
-
+const orbWhiteImg = "/api/storage/public-objects/404D068D-CF5E-4BD4-9C98-5B0AC802C5B0_1781996548259.png";
+const orbTealImg = "/api/storage/public-objects/15A292C6-FB92-4D87-B470-FCA72B7BCB28_1781996548259.png";
+const tokenSheetImg = "/api/storage/public-objects/CA31693F-D61A-4F03-A6E1-0E13B3B151BC_1781996548259.png";
+const auraStatesImg = "/api/storage/public-objects/2072A243-1A49-4070-8A00-3C497286B920_1781996548260.png";
+const ctrlPanel3Img = "/api/storage/public-objects/4C8D0EBE-45E7-46FE-B92A-C55DF5167AAE_1781996548260.png";
+const sigilStatesImg = "/api/storage/public-objects/68785CA9-810A-40EF-92C2-810F848DEFBD_1781996548260.png";
+const rootexImg = "/api/storage/public-objects/8C14E0A4-27FF-42A2-BF03-4F270CC1B125_1781996548260.png";
+const cloudStreetsImg = "/api/storage/public-objects/IMG_3354_1781996548260.jpeg";
+const waterCurveImg = "/api/storage/public-objects/CA497883-D76C-4E11-AE30-859CCC1006B9_1781996548260.png";
+const emergentImg = "/api/storage/public-objects/1E31757A-FAC7-409C-9609-A1EF7BAB975D_1781996548260.png";
+const surfaceFlowImg = "/api/storage/public-objects/54F93098-A9AB-4DFF-82AD-518A62C1D511_1781996548260.png";
+const infinityDroneImg = "/api/storage/public-objects/834421B5-67EA-47F4-B6F0-5A1B9D08F3DC_1781996548260.png";
+const magneticImg = "/api/storage/public-objects/755D7B65-B495-41F7-BDD4-5F64330CD4E8_1781996548260.png";
+const floquetImg = "/api/storage/public-objects/5C18778D-62B3-4620-AC8B-B70401DB566A_1781996548260.png";
+const cosmicChainImg = "/api/storage/public-objects/IMG_3324_1781996548260.png";
 /* ── Palette ────────────────────────────────────────────── */
 const BG     = "#020408";
 const TEAL   = "#2ef0d8";

@@ -1,13 +1,13 @@
-import biomolSynth1 from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_07_PM_1781376106373.png";
-import biomolSynth2 from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_07_PM_1781376123436.png";
-import mismatchBrief from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_10_PM_1781376123439.png";
-import oozingAshTrees from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_14_PM_1781376123440.png";
-import coherenceDynV1 from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_20_PM_1781376123442.png";
-import coherenceDynV2 from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_24_PM_1781376123444.png";
-import gravityAccel from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_28_PM_1781376123447.png";
-import cellQuantum from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_33_PM_1781376123447.png";
-import pinkFrogDrive from "@assets/ChatGPT_Image_Jun_13,_2026,_02_40_38_PM_1781376123448.png";
-import plateHull from "@assets/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781376123449.png";
+const biomolSynth1 = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_07_PM_1781376106373.png";
+const biomolSynth2 = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_07_PM_1781376123436.png";
+const mismatchBrief = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_10_PM_1781376123439.png";
+const oozingAshTrees = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_14_PM_1781376123440.png";
+const coherenceDynV1 = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_20_PM_1781376123442.png";
+const coherenceDynV2 = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_24_PM_1781376123444.png";
+const gravityAccel = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_28_PM_1781376123447.png";
+const cellQuantum = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_33_PM_1781376123447.png";
+const pinkFrogDrive = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_02_40_38_PM_1781376123448.png";
+const plateHull = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_12_48_38_PM_1781376123449.png";
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 

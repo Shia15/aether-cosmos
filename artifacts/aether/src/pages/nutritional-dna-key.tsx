@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import plateNutrition from "@assets/ChatGPT_Image_May_9,_2026,_02_48_12_PM_1782671843324.png";
-import plateTrefoil from "@assets/Gemini_Generated_Image_bp8s3tbp8s3tbp8s_1782732632585.png";
-import plateCinquefoil from "@assets/ChatGPT_Image_Jun_29,_2026,_07_06_40_AM_1782732632585.png";
-import plateStevedore from "@assets/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782732622437.png";
-import plateFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_08_58_11_PM_1782732632584.png";
-import plateFigureEight from "@assets/ChatGPT_Image_Jun_29,_2026,_07_31_16_AM_1782919933841.png";
-
+const plateNutrition = "/api/storage/public-objects/ChatGPT_Image_May_9,_2026,_02_48_12_PM_1782671843324.png";
+const plateTrefoil = "/api/storage/public-objects/Gemini_Generated_Image_bp8s3tbp8s3tbp8s_1782732632585.png";
+const plateCinquefoil = "/api/storage/public-objects/ChatGPT_Image_Jun_29,_2026,_07_06_40_AM_1782732632585.png";
+const plateStevedore = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782732622437.png";
+const plateFrog = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_08_58_11_PM_1782732632584.png";
+const plateFigureEight = "/api/storage/public-objects/ChatGPT_Image_Jun_29,_2026,_07_31_16_AM_1782919933841.png";
 const V = {
   bg:"#05060C",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
   vio:"#9966FF",amb:"#FF9933",rose:"#FF6699",plasma:"#FF4477",

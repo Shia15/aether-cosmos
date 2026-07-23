@@ -1,6 +1,5 @@
 import React from "react";
-import imgTimeline from "@assets/fnint-18-1321872-g001_1782757431754.png";
-
+const imgTimeline = "/api/storage/public-objects/fnint-18-1321872-g001_1782757431754.png";
 /* ==========================================================================
    THE SYMPHONIC CONVERGENCE - HIGH-VIEW ATLAS
    --------------------------------------------------------------------------

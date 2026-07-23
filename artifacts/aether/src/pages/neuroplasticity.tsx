@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import imgFoundationalLayer from "@assets/b0238d9b-2d7f-4378-818d-76a8e6f8623c_1777221801707.png";
-
+const imgFoundationalLayer = "/api/storage/public-objects/b0238d9b-2d7f-4378-818d-76a8e6f8623c_1777221801707.png";
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Section = "exercise" | "diet" | "sleep" | "ex-diet" | "ex-sleep" | "diet-sleep" | "center" | null;
 

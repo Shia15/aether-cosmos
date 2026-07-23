@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import imgEyeBrain1 from "@assets/75582979-447D-4385-A8BF-098A64CA0F83_1783361635546.png";
-import imgEyeBrain2 from "@assets/19BE4EB8-0994-473E-964B-17E3C777ABD1_1783361635546.png";
-
+const imgEyeBrain1 = "/api/storage/public-objects/75582979-447D-4385-A8BF-098A64CA0F83_1783361635546.png";
+const imgEyeBrain2 = "/api/storage/public-objects/19BE4EB8-0994-473E-964B-17E3C777ABD1_1783361635546.png";
 const BG   = "#050608";
 const GOLD = "#F2C354";
 const TEAL = "#2DD4BF";

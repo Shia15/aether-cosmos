@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import imgBrainSpine    from "@assets/image_1782210690214.jpeg";
-import imgLinkedIn      from "@assets/IMG_3532_1782213457468.jpeg";
-import imgNeNi          from "@assets/cog_intuition_ne_ni.jpg";
-import imgSnKeywords    from "@assets/cog_sn_keywords.jpg";
-import imgFunctions     from "@assets/cog_functions_diagram.jpg";
-import imgTypes         from "@assets/cog_16_types.jpg";
-import imgStacks        from "@assets/cog_function_stacks.jpg";
-
+const imgBrainSpine = "/api/storage/public-objects/image_1782210690214.jpeg";
+const imgLinkedIn = "/api/storage/public-objects/IMG_3532_1782213457468.jpeg";
+const imgNeNi = "/api/storage/public-objects/cog_intuition_ne_ni.jpg";
+const imgSnKeywords = "/api/storage/public-objects/cog_sn_keywords.jpg";
+const imgFunctions = "/api/storage/public-objects/cog_functions_diagram.jpg";
+const imgTypes = "/api/storage/public-objects/cog_16_types.jpg";
+const imgStacks = "/api/storage/public-objects/cog_function_stacks.jpg";
 /* ── palette ─────────────────────────────────── */
 const BG   = "#030408";
 const TEAL = "#1fd4c8";

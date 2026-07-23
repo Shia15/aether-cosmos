@@ -1,9 +1,8 @@
 import { useMemo, useState, useEffect, useRef, type ReactElement, type ReactNode } from "react";
 import { Link } from "wouter";
-import imgAetherTable from "@assets/13de39eb-e52f-42ff-8b68-3035082613d5_1782925137742.jpg";
-import imgHydrostatic from "@assets/805c76b0-3353-4c63-9310-1e7c2af8434f_1782925240255.jpg";
-import imgIodine from "@assets/9e367620-1836-47e7-ab0c-69cbb11dd5c5_1782925242089.jpg";
-
+const imgAetherTable = "/api/storage/public-objects/13de39eb-e52f-42ff-8b68-3035082613d5_1782925137742.jpg";
+const imgHydrostatic = "/api/storage/public-objects/805c76b0-3353-4c63-9310-1e7c2af8434f_1782925240255.jpg";
+const imgIodine = "/api/storage/public-objects/9e367620-1836-47e7-ab0c-69cbb11dd5c5_1782925242089.jpg";
 const C = {
   bg: "#05060C",
   panel: "#0b0e18",

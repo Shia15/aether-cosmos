@@ -12,10 +12,9 @@
   ── Energy harvest:      E = ½·L·I²  (inductive coupling)
 ═══════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState, useCallback } from "react";
-import omniFlow from "@assets/72D555D1-E91E-4B74-A73B-4628B8538AA1_1784561445345.png";
-import magStorm from "@assets/A6805E91-9684-4C59-BFC8-482EF421381D_1784561445345.png";
-import skyrmion from "@assets/IMG_4534_1784561445345.png";
-
+const omniFlow = "/api/storage/public-objects/72D555D1-E91E-4B74-A73B-4628B8538AA1_1784561445345.png";
+const magStorm = "/api/storage/public-objects/A6805E91-9684-4C59-BFC8-482EF421381D_1784561445345.png";
+const skyrmion = "/api/storage/public-objects/IMG_4534_1784561445345.png";
 const P={
   bg:"#000a12",panel:"#000f1a",panel2:"#001220",
   ivory:"#e0f8ff",dim:"rgba(224,248,255,0.55)",muted:"rgba(224,248,255,0.28)",

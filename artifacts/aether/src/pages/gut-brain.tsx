@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import imgGutBrain from "@assets/770EA1EA-DBF1-41FD-93A6-A8742013520F_1782484195842.png";
-
+const imgGutBrain = "/api/storage/public-objects/770EA1EA-DBF1-41FD-93A6-A8742013520F_1782484195842.png";
 /* ── palette ───────────────────────────────────────────────── */
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",

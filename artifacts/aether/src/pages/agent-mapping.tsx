@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import imgTable from "@assets/image_1782210051505.jpeg";
-
+const imgTable = "/api/storage/public-objects/image_1782210051505.jpeg";
 /* ── M.A.R.I. agent data ─────────────────────── */
 const AGENTS = [
   {

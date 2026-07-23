@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
-import imgControlFlow from "@assets/8C6CC664-6AF5-4A6B-A175-ED5AFD0CA1DC_1783095490513.JPG";
-
+const imgControlFlow = "/api/storage/public-objects/8C6CC664-6AF5-4A6B-A175-ED5AFD0CA1DC_1783095490513.JPG";
 const BG = "#04060d";
 const PAN = "#0a0d1a";
 const PAN2 = "#0d1020";

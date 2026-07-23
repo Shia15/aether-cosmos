@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import earthImg from "@assets/71D32D54-9572-4BFC-9895-CFC0D17D8022_1782493532725.png";
-
+const earthImg = "/api/storage/public-objects/71D32D54-9572-4BFC-9895-CFC0D17D8022_1782493532725.png";
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",
   vio:"#9966FF", amb:"#FF9933", rose:"#FF6699", plasma:"#FF4477",

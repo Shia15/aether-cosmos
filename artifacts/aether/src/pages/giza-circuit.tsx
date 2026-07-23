@@ -6,15 +6,14 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import imgGizaCode    from "@assets/1c7dc8a4-b3bc-40a5-ab00-fb02edf4babc_1777220453234.png";
-import imgGoldHead    from "@assets/f4a65042-bde6-49d2-a810-4e65911baaa3_1777220462178.png";
-import imgManifesto   from "@assets/ChatGPT_Image_Apr_26,_2026,_12_18_25_PM_1777220502883.png";
-import imgTarot       from "@assets/f3213d92-97e3-41af-8609-400ba620039c_1777220534955.png";
-import imgSchematic   from "@assets/92d50ed6-2c9c-4d07-99a7-0d112e2ee14d_1777220671515.png";
-import imgHermeticSeal      from "@assets/ChatGPT_Image_Apr_26,_2026,_12_50_18_PM_1777222220016.png";
-import imgHermeticResonator from "@assets/ChatGPT_Image_Apr_26,_2026,_12_50_27_PM_1777222235348.png";
-import imgTimeStoneSound    from "@assets/ChatGPT_Image_Apr_26,_2026,_12_51_25_PM_1777222331319.png";
-
+const imgGizaCode = "/api/storage/public-objects/1c7dc8a4-b3bc-40a5-ab00-fb02edf4babc_1777220453234.png";
+const imgGoldHead = "/api/storage/public-objects/f4a65042-bde6-49d2-a810-4e65911baaa3_1777220462178.png";
+const imgManifesto = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_18_25_PM_1777220502883.png";
+const imgTarot = "/api/storage/public-objects/f3213d92-97e3-41af-8609-400ba620039c_1777220534955.png";
+const imgSchematic = "/api/storage/public-objects/92d50ed6-2c9c-4d07-99a7-0d112e2ee14d_1777220671515.png";
+const imgHermeticSeal = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_50_18_PM_1777222220016.png";
+const imgHermeticResonator = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_50_27_PM_1777222235348.png";
+const imgTimeStoneSound = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_51_25_PM_1777222331319.png";
 // boho-creme + stone palette (matches /atlas-3i family)
 const B = {
   bg:        "#F4EDE0",

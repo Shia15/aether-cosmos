@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import imgQuarks   from "@assets/image_1782210457403.png";
-import imgDirac    from "@assets/antimatter_dirac.jpg";
-import imgSModel   from "@assets/antimatter_standard_model.jpg";
-import imgPet      from "@assets/antimatter_pet.jpg";
-import imgDemons   from "@assets/antimatter_demons.jpg";
-import imgSpine1   from "@assets/antimatter_spine_light.jpg";
-import imgSpine2   from "@assets/antimatter_spine_wave.jpg";
-
+const imgQuarks = "/api/storage/public-objects/image_1782210457403.png";
+const imgDirac = "/api/storage/public-objects/antimatter_dirac.jpg";
+const imgSModel = "/api/storage/public-objects/antimatter_standard_model.jpg";
+const imgPet = "/api/storage/public-objects/antimatter_pet.jpg";
+const imgDemons = "/api/storage/public-objects/antimatter_demons.jpg";
+const imgSpine1 = "/api/storage/public-objects/antimatter_spine_light.jpg";
+const imgSpine2 = "/api/storage/public-objects/antimatter_spine_wave.jpg";
 /* ── palette ──────────────────────────────────── */
 const BG   = "#030507";
 const TEAL = "#1fd4c8";

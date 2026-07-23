@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import imgTorusField   from "@assets/Viergutz-Fig10_1782754632793.jpg";
-import imgPodMycelium  from "@assets/download_(15)_1782754663389.jpg";
-import imgInjection    from "@assets/download_(7)_1782754681649.jpg";
-import imgNetworkCar   from "@assets/download_(3)_1782754703060.jpg";
-import imgVortexDoctor from "@assets/download_1782754712613.jpg";
-import imgMedNetwork   from "@assets/46839d4f-507d-4309-b8b6-5a38797d9962_1782754722677.jpg";
-import imgMeditTorus   from "@assets/1615473368-meditation-o_1782754813938.webp";
-import imgFibTorus     from "@assets/image_(23)_1782754907458.jpg";
-import imgPhiResonance from "@assets/Gemini_Generated_Image_xru7hlxru7hlxru7_1782755291272.png";
-import imgVoidEmber    from "@assets/Gemini_Generated_Image_c3j49bc3j49bc3j4_1782755350993.png";
-import imgCrystalIR    from "@assets/Gemini_Generated_Image_nzpjfznzpjfznzpj_1782755478533.png";
-import imgMycelDark    from "@assets/Gemini_Generated_Image_ddcufdddcufdddcu_1782755521356.png";
-import imgCucaGyroid   from "@assets/Gemini_Generated_Image_v4cvshv4cvshv4cv_1782755586051.png";
-
+const imgTorusField = "/api/storage/public-objects/Viergutz-Fig10_1782754632793.jpg";
+const imgPodMycelium = "/api/storage/public-objects/download_(15)_1782754663389.jpg";
+const imgInjection = "/api/storage/public-objects/download_(7)_1782754681649.jpg";
+const imgNetworkCar = "/api/storage/public-objects/download_(3)_1782754703060.jpg";
+const imgVortexDoctor = "/api/storage/public-objects/download_1782754712613.jpg";
+const imgMedNetwork = "/api/storage/public-objects/46839d4f-507d-4309-b8b6-5a38797d9962_1782754722677.jpg";
+const imgMeditTorus = "/api/storage/public-objects/1615473368-meditation-o_1782754813938.webp";
+const imgFibTorus = "/api/storage/public-objects/image_(23)_1782754907458.jpg";
+const imgPhiResonance = "/api/storage/public-objects/Gemini_Generated_Image_xru7hlxru7hlxru7_1782755291272.png";
+const imgVoidEmber = "/api/storage/public-objects/Gemini_Generated_Image_c3j49bc3j49bc3j4_1782755350993.png";
+const imgCrystalIR = "/api/storage/public-objects/Gemini_Generated_Image_nzpjfznzpjfznzpj_1782755478533.png";
+const imgMycelDark = "/api/storage/public-objects/Gemini_Generated_Image_ddcufdddcufdddcu_1782755521356.png";
+const imgCucaGyroid = "/api/storage/public-objects/Gemini_Generated_Image_v4cvshv4cvshv4cv_1782755586051.png";
 const C = {
   bg: "#06070C",
   panel: "rgba(20,18,32,0.62)",

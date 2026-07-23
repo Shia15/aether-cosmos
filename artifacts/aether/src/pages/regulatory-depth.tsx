@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import imgChromatin   from "@assets/Gemini_Generated_Image_f4nig2f4nig2f4ni_1782734452851.png";
-import imgMethylation from "@assets/Gemini_Generated_Image_nkbtawnkbtawnkbt_1782734530065.png";
-import imgSynthesis   from "@assets/image_1782734551897.png";
-import imgSplicing    from "@assets/image_1782209675669.jpeg";
-import imgTweet       from "@assets/image_1782209692388.png";
-
+const imgChromatin = "/api/storage/public-objects/Gemini_Generated_Image_f4nig2f4nig2f4ni_1782734452851.png";
+const imgMethylation = "/api/storage/public-objects/Gemini_Generated_Image_nkbtawnkbtawnkbt_1782734530065.png";
+const imgSynthesis = "/api/storage/public-objects/image_1782734551897.png";
+const imgSplicing = "/api/storage/public-objects/image_1782209675669.jpeg";
+const imgTweet = "/api/storage/public-objects/image_1782209692388.png";
 /* ── palette ─────────────────────────────────── */
 const BG   = "#040508";
 const TEAL = "#1fd4c8";

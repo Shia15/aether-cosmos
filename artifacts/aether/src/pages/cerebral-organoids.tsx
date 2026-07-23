@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import organoidImage from "@assets/1768187060155_1776476195607.jpeg";
-
+const organoidImage = "/api/storage/public-objects/1768187060155_1776476195607.jpeg";
 const C = {
   teal: "#2dd4bf", gold: "#f2bf65", purple: "#c084fc",
   green: "#4ade80", rose: "#fb7185", pink: "#f472b6",

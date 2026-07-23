@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "wouter";
 
-import chipDesign  from "@assets/ChatGPT_Image_Dec_8,_2025,_10_29_41_AM_1778090307695.png";
-import chipWaving  from "@assets/ChatGPT_Image_Dec_8,_2025,_10_29_45_AM_1778090307695.png";
-import chipCity    from "@assets/ChatGPT_Image_Dec_8,_2025,_10_32_56_AM_1778090307694.png";
-import chipJob     from "@assets/ChatGPT_Image_Dec_8,_2025,_10_33_06_AM_1778090307692.png";
-import chipHelpers from "@assets/ChatGPT_Image_Dec_8,_2025,_10_33_13_AM_1778090307691.png";
-
+const chipDesign = "/api/storage/public-objects/ChatGPT_Image_Dec_8,_2025,_10_29_41_AM_1778090307695.png";
+const chipWaving = "/api/storage/public-objects/ChatGPT_Image_Dec_8,_2025,_10_29_45_AM_1778090307695.png";
+const chipCity = "/api/storage/public-objects/ChatGPT_Image_Dec_8,_2025,_10_32_56_AM_1778090307694.png";
+const chipJob = "/api/storage/public-objects/ChatGPT_Image_Dec_8,_2025,_10_33_06_AM_1778090307692.png";
+const chipHelpers = "/api/storage/public-objects/ChatGPT_Image_Dec_8,_2025,_10_33_13_AM_1778090307691.png";
 type IlluKind = "friends" | "busy" | "done" | "learning" | "stars" | "yourturn";
 
 type PageDef =

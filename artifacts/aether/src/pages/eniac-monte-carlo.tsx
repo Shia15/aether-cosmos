@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import singleStepImg from "@assets/IMG_1462_1777522469652.jpeg";
-import branchTreeImg from "@assets/IMG_1467_1777522469652.jpeg";
-
+const singleStepImg = "/api/storage/public-objects/IMG_1462_1777522469652.jpeg";
+const branchTreeImg = "/api/storage/public-objects/IMG_1467_1777522469652.jpeg";
 function EniacCanvas() {
   const ref = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef(0);

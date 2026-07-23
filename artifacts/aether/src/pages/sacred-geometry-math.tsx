@@ -1,8 +1,7 @@
-import sacredGeometry from "@assets/IMG_2001_1781448388514.png";
-import cucaEquation from "@assets/IMG_1999_1781448388514.png";
-import integralTypes from "@assets/IMG_1998_1781448388514.jpeg";
-import atomicGeometry from "@assets/A66C4D09-0C1D-4F7A-96A5-446A7204E678_1781448388514.png";
-
+const sacredGeometry = "/api/storage/public-objects/IMG_2001_1781448388514.png";
+const cucaEquation = "/api/storage/public-objects/IMG_1999_1781448388514.png";
+const integralTypes = "/api/storage/public-objects/IMG_1998_1781448388514.jpeg";
+const atomicGeometry = "/api/storage/public-objects/A66C4D09-0C1D-4F7A-96A5-446A7204E678_1781448388514.png";
 import { useState, useEffect, useRef } from "react";
 
 const TABS = [

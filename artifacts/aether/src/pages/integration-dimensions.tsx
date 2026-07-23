@@ -1,5 +1,4 @@
-import knottedImg from '@assets/page4-04_(1)_1782608156982.png';
-
+const knottedImg = "/api/storage/public-objects/page4-04_(1)_1782608156982.png";
 const BG = '#04060E';
 const SURF = '#080d18';
 const AURORA = '#00FFB2';

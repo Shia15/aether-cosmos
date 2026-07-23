@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import imgColorLadder  from "@assets/Gemini_Generated_Image_d7z5bcd7z5bcd7z5_1782737472126.png";
-import imgManifold     from "@assets/Gemini_Generated_Image_pcibmopcibmopcib_1782737636346.png";
-import imgQuarks       from "@assets/Gemini_Generated_Image_rq3dtzrq3dtzrq3d_(1)_1782737693751.png";
-import imgRegDark      from "@assets/Gemini_Generated_Image_73me5d73me5d73me_1782737718413.png";
-
+const imgColorLadder = "/api/storage/public-objects/Gemini_Generated_Image_d7z5bcd7z5bcd7z5_1782737472126.png";
+const imgManifold = "/api/storage/public-objects/Gemini_Generated_Image_pcibmopcibmopcib_1782737636346.png";
+const imgQuarks = "/api/storage/public-objects/Gemini_Generated_Image_rq3dtzrq3dtzrq3d_(1)_1782737693751.png";
+const imgRegDark = "/api/storage/public-objects/Gemini_Generated_Image_73me5d73me5d73me_1782737718413.png";
 /* ── palette ──────────────────────────────────────────── */
 const G    = "#00ff88";
 const DIM  = "rgba(0,255,136,0.4)";

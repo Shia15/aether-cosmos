@@ -1,37 +1,32 @@
 import { Link } from "wouter";
 
 /* ── knot topology ─────────────────────────────────────── */
-import kTrefoil from "@assets/Gemini_Generated_Image_bp8s3tbp8s3tbp8s_1782919933853.png";
-import kFigureEight from "@assets/ChatGPT_Image_Jun_29,_2026,_07_31_16_AM_1782919933841.png";
-import kCinquefoil from "@assets/ChatGPT_Image_Jun_29,_2026,_07_06_40_AM_1782919933853.png";
-import kStevedore from "@assets/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782919933851.png";
-import kStevedoreSim from "@assets/ChatGPT_Image_Jun_28,_2026,_08_58_11_PM_1782919933852.png";
-
+const kTrefoil = "/api/storage/public-objects/Gemini_Generated_Image_bp8s3tbp8s3tbp8s_1782919933853.png";
+const kFigureEight = "/api/storage/public-objects/ChatGPT_Image_Jun_29,_2026,_07_31_16_AM_1782919933841.png";
+const kCinquefoil = "/api/storage/public-objects/ChatGPT_Image_Jun_29,_2026,_07_06_40_AM_1782919933853.png";
+const kStevedore = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_36_39_PM_1782919933851.png";
+const kStevedoreSim = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_08_58_11_PM_1782919933852.png";
 /* ── bio-photonic emitters ─────────────────────────────── */
-import ePhiOvertone from "@assets/ChatGPT_Image_Jun_30,_2026,_11_10_19_AM_1782920506186.png";
-import eCarmineIR from "@assets/ChatGPT_Image_Jun_30,_2026,_11_13_30_AM_1782920506187.png";
-import ePhantomIR from "@assets/ChatGPT_Image_Jun_30,_2026,_11_33_02_AM_1782920506188.png";
-import eCoralSWIR from "@assets/f2d30afa-9b9d-4fff-bc30-52d2d2799891_1782920506190.png";
-import eCoherenceNode from "@assets/ChatGPT_Image_Jun_28,_2026,_02_14_27_PM_1782919933849.png";
-import eSubstrateDark from "@assets/ChatGPT_Image_Jun_28,_2026,_02_17_55_PM_1782919933849.png";
-import eCerulean from "@assets/ChatGPT_Image_Jun_28,_2026,_02_19_47_PM_1782919933850.png";
-import eBodyPhoton from "@assets/image_(31)_1782920506189.jpg";
-
+const ePhiOvertone = "/api/storage/public-objects/ChatGPT_Image_Jun_30,_2026,_11_10_19_AM_1782920506186.png";
+const eCarmineIR = "/api/storage/public-objects/ChatGPT_Image_Jun_30,_2026,_11_13_30_AM_1782920506187.png";
+const ePhantomIR = "/api/storage/public-objects/ChatGPT_Image_Jun_30,_2026,_11_33_02_AM_1782920506188.png";
+const eCoralSWIR = "/api/storage/public-objects/f2d30afa-9b9d-4fff-bc30-52d2d2799891_1782920506190.png";
+const eCoherenceNode = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_14_27_PM_1782919933849.png";
+const eSubstrateDark = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_17_55_PM_1782919933849.png";
+const eCerulean = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_19_47_PM_1782919933850.png";
+const eBodyPhoton = "/api/storage/public-objects/image_(31)_1782920506189.jpg";
 /* ── tunnel transport ──────────────────────────────────── */
-import tAirNanotube from "@assets/ChatGPT_Image_Jun_28,_2026,_01_03_43_PM_1782919933847.png";
-import tLivingAir from "@assets/ChatGPT_Image_Jun_28,_2026,_01_06_29_PM_1782919933847.png";
-import tSpectrumTunnel from "@assets/ChatGPT_Image_Jun_28,_2026,_01_10_58_PM_1782919933848.png";
-
+const tAirNanotube = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_01_03_43_PM_1782919933847.png";
+const tLivingAir = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_01_06_29_PM_1782919933847.png";
+const tSpectrumTunnel = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_01_10_58_PM_1782919933848.png";
 /* ── coherence field ───────────────────────────────────── */
-import cWoodFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_02_38_24_PM_1782919933851.png";
-import cLightMedia from "@assets/ChatGPT_Image_Jun_28,_2026,_02_44_54_PM_1782919933852.png";
-
+const cWoodFrog = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_38_24_PM_1782919933851.png";
+const cLightMedia = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_44_54_PM_1782919933852.png";
 /* ── regulation & cosmos ───────────────────────────────── */
-import rNcRNA from "@assets/Gemini_Generated_Image_73me5d73me5d73me_1782919987489.png";
-import rQuarks from "@assets/Gemini_Generated_Image_rq3dtzrq3dtzrq3d_(1)_1782919987489.png";
-import rMeristem from "@assets/Gemini_Generated_Image_jb7g0ajb7g0ajb7g_1782919987490.png";
-import rRootHair from "@assets/Gemini_Generated_Image_sjnv2isjnv2isjnv_1782919987490.png";
-
+const rNcRNA = "/api/storage/public-objects/Gemini_Generated_Image_73me5d73me5d73me_1782919987489.png";
+const rQuarks = "/api/storage/public-objects/Gemini_Generated_Image_rq3dtzrq3dtzrq3d_(1)_1782919987489.png";
+const rMeristem = "/api/storage/public-objects/Gemini_Generated_Image_jb7g0ajb7g0ajb7g_1782919987490.png";
+const rRootHair = "/api/storage/public-objects/Gemini_Generated_Image_sjnv2isjnv2isjnv_1782919987490.png";
 const V = {
   bg: "#05060C", aurora: "#00FFB2", gold: "#C8A030", blue: "#4488FF",
   vio: "#9966FF", amb: "#FF9933", rose: "#FF6699", plasma: "#FF4477",

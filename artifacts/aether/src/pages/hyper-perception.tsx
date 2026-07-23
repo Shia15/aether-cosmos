@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import heroImg from "@assets/grok-image-22553fb7-eff9-4b6a-aa65-8dafaa254f15_1782665615041.png";
-
+const heroImg = "/api/storage/public-objects/grok-image-22553fb7-eff9-4b6a-aa65-8dafaa254f15_1782665615041.png";
 const C = {
   bg:     "#04060E",
   panel:  "rgba(8,12,24,0.85)",

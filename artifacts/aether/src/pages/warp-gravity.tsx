@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import img_warp_drive from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_57_AM_1781429635925.png";
-import img_smtq from "@assets/ChatGPT_Image_Jun_14,_2026,_03_28_00_AM_1781429635925.png";
-import img_pixelated from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_32_AM_1781429635926.png";
-import img_500d from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_36_AM_1781429635927.png";
-import img_stacked_rings from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_38_AM_1781429662706.png";
-import img_dynamic_eq from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_32_AM_1781429635921.png";
-import img_systemic_eq from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_37_AM_1781429635922.png";
-import img_octonion from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_29_AM_1781429662713.png";
-import img_8d_framework from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_29_AM_1781429635920.png";
-import img_500hud from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_18_AM_1781429635919.png";
-
+const img_warp_drive = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_57_AM_1781429635925.png";
+const img_smtq = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_28_00_AM_1781429635925.png";
+const img_pixelated = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_32_AM_1781429635926.png";
+const img_500d = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_36_AM_1781429635927.png";
+const img_stacked_rings = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_38_AM_1781429662706.png";
+const img_dynamic_eq = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_32_AM_1781429635921.png";
+const img_systemic_eq = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_37_AM_1781429635922.png";
+const img_octonion = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_29_AM_1781429662713.png";
+const img_8d_framework = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_29_AM_1781429635920.png";
+const img_500hud = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_18_AM_1781429635919.png";
 function AlcubierreCanvas() {
   const cvRef  = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef(0);

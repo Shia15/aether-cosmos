@@ -14,16 +14,15 @@
   ─ Magnetic dust storm multi-scale perceptual array
 ═══════════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState } from "react";
-import slimeQuantImg        from "@assets/E514D86D-00E9-4E33-A416-06F23067C2F8_1784479389127.png";
-import mitoTransductImg     from "@assets/IMG_4544_1784479389127.png";
-import lfUiaImg             from "@assets/IMG_4543_1784479389127.png";
-import humanEcologyImg      from "@assets/46011959-13F8-4C90-901C-BE067D9718D1_1784479389127.png";
-import hexLatticeImg        from "@assets/IMG_4535_1784479389127.png";
-import skyrmionImg          from "@assets/IMG_4534_1784479389127.png";
-import xPostImg             from "@assets/IMG_4531_1784479389127.jpeg";
-import magneticStormImg     from "@assets/A6805E91-9684-4C59-BFC8-482EF421381D_1784479389127.png";
-import eighQubitsImg        from "@assets/C82480C5-FB6F-4F0F-8353-A57AACF5983C_1784479473010.png";
-
+const slimeQuantImg = "/api/storage/public-objects/E514D86D-00E9-4E33-A416-06F23067C2F8_1784479389127.png";
+const mitoTransductImg = "/api/storage/public-objects/IMG_4544_1784479389127.png";
+const lfUiaImg = "/api/storage/public-objects/IMG_4543_1784479389127.png";
+const humanEcologyImg = "/api/storage/public-objects/46011959-13F8-4C90-901C-BE067D9718D1_1784479389127.png";
+const hexLatticeImg = "/api/storage/public-objects/IMG_4535_1784479389127.png";
+const skyrmionImg = "/api/storage/public-objects/IMG_4534_1784479389127.png";
+const xPostImg = "/api/storage/public-objects/IMG_4531_1784479389127.jpeg";
+const magneticStormImg = "/api/storage/public-objects/A6805E91-9684-4C59-BFC8-482EF421381D_1784479389127.png";
+const eighQubitsImg = "/api/storage/public-objects/C82480C5-FB6F-4F0F-8353-A57AACF5983C_1784479473010.png";
 /* ── palette ── */
 const P = {
   bg: "#060810", panel: "#0d1018", panel2: "#101520",

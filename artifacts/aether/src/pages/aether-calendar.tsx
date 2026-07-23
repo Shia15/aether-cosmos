@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import calendarImg from "@assets/IMG_1762_1778363853862.jpeg";
-import capricornImg from "@assets/IMG_1759_1778363853862.jpeg";
-import greatYearImg from "@assets/IMG_1763_1778364001395.jpeg";
-import westonScheduleImg from "@assets/IMG_1767_1778365929380.jpeg";
-import bodyRhythmImg from "@assets/4A68DFAE-54B4-4C9C-B16F-E90B7599FC13_1778367019669.png";
-import nov2025Img from "@assets/IMG_1770_1778367796097.jpeg";
-
+const calendarImg = "/api/storage/public-objects/IMG_1762_1778363853862.jpeg";
+const capricornImg = "/api/storage/public-objects/IMG_1759_1778363853862.jpeg";
+const greatYearImg = "/api/storage/public-objects/IMG_1763_1778364001395.jpeg";
+const westonScheduleImg = "/api/storage/public-objects/IMG_1767_1778365929380.jpeg";
+const bodyRhythmImg = "/api/storage/public-objects/4A68DFAE-54B4-4C9C-B16F-E90B7599FC13_1778367019669.png";
+const nov2025Img = "/api/storage/public-objects/IMG_1770_1778367796097.jpeg";
 const C = {
   bg:     "#060412",
   panel:  "#0e0a24",

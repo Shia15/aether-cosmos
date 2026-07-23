@@ -1,9 +1,8 @@
 import { useEffect, useRef } from "react";
-import imgDipole       from "@assets/ChatGPT_Image_Apr_26,_2026,_12_57_25_PM_1777222648879.png";
-import imgTransition   from "@assets/cbc24b1e-72e0-4a6f-8482-df9d87f7d424_1777222684737.png";
-import imgFieldLines   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_03_26_PM_1777223014978.png";
-import imgIonization   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_05_39_PM_1777223144093.png";
-
+const imgDipole = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_57_25_PM_1777222648879.png";
+const imgTransition = "/api/storage/public-objects/cbc24b1e-72e0-4a6f-8482-df9d87f7d424_1777222684737.png";
+const imgFieldLines = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_03_26_PM_1777223014978.png";
+const imgIonization = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_05_39_PM_1777223144093.png";
 const B = {
   bg: "#0a0712",
   panel: "#150f1f",

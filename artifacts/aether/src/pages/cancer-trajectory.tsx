@@ -15,10 +15,9 @@
   ── Coherence restoration: Γ = B + M + I + C
 ═══════════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState } from "react";
-import sandEarth     from "@assets/6983E8B1-BE62-4E72-9DFF-59975FA84D14_1784561193354.png";
-import fluidDynamics from "@assets/IMG_4569_1784561193354.png";
-import seafloor      from "@assets/BD65BD5C-0595-4792-8D74-C88B6BC781B5_1784561193354.png";
-
+const sandEarth = "/api/storage/public-objects/6983E8B1-BE62-4E72-9DFF-59975FA84D14_1784561193354.png";
+const fluidDynamics = "/api/storage/public-objects/IMG_4569_1784561193354.png";
+const seafloor = "/api/storage/public-objects/BD65BD5C-0595-4792-8D74-C88B6BC781B5_1784561193354.png";
 const P = {
   bg: "#030809", panel: "#070d0f", panel2: "#0b1315",
   gold: "#f5c84c", ivory: "#f4f1ea", dim: "rgba(244,241,234,0.5)",

@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgAtom        from "@assets/ChatGPT_Image_Apr_26,_2026,_01_05_24_PM_1777223128052.png";
-import imgFTL         from "@assets/4e71d2da-20fa-4e1a-8750-b30fa248aded_1777222940540.png";
-import imgSlowLight   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_02_29_PM_1777222956765.png";
-import imgUnified     from "@assets/ChatGPT_Image_Apr_26,_2026,_01_03_53_PM_1777223038120.png";
-import imgMeasurement from "@assets/ChatGPT_Image_Apr_26,_2026,_12_58_46_PM_1777222728920.png";
-
+const imgAtom = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_05_24_PM_1777223128052.png";
+const imgFTL = "/api/storage/public-objects/4e71d2da-20fa-4e1a-8750-b30fa248aded_1777222940540.png";
+const imgSlowLight = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_02_29_PM_1777222956765.png";
+const imgUnified = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_03_53_PM_1777223038120.png";
+const imgMeasurement = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_12_58_46_PM_1777222728920.png";
 const B = {
   bg: "#070914",
   panel: "#0e1426",

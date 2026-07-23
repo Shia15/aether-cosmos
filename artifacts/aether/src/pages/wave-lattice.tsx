@@ -1,10 +1,9 @@
 /* ── Wave Lattice ─── Dynamic Wave Physics · AETHER Lattice Engine ─────── */
 import { useRef, useEffect, useCallback, useState } from "react";
-import imgSpringNeap from "@assets/ChatGPT_Image_Jul_6,_2026,_01_58_47_PM_1783360734756.png";
-import imgSUSY       from "@assets/ChatGPT_Image_Jul_6,_2026,_01_58_37_PM_1783360736655.png";
-import imgConstants  from "@assets/Gemini_Generated_Image_128lfj128lfj128l_1783360738585.png";
-import imgDimensions from "@assets/Gemini_Generated_Image_rqp224rqp224rqp2_1783360747284.png";
-
+const imgSpringNeap = "/api/storage/public-objects/ChatGPT_Image_Jul_6,_2026,_01_58_47_PM_1783360734756.png";
+const imgSUSY = "/api/storage/public-objects/ChatGPT_Image_Jul_6,_2026,_01_58_37_PM_1783360736655.png";
+const imgConstants = "/api/storage/public-objects/Gemini_Generated_Image_128lfj128lfj128l_1783360738585.png";
+const imgDimensions = "/api/storage/public-objects/Gemini_Generated_Image_rqp224rqp224rqp2_1783360747284.png";
 /* ── Palette ──────────────────────────────────────────────────────────────── */
 const BG     = "#0a0b0f";
 const TEXT   = "#e8e8f0";

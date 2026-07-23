@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import latentEcologyImg from "@assets/8b20aa55-bae7-47a2-91f0-67fd277909a4_1777219831966.png";
-
+const latentEcologyImg = "/api/storage/public-objects/8b20aa55-bae7-47a2-91f0-67fd277909a4_1777219831966.png";
 const C = {
   bg: "#0B0C0F", panel: "rgba(17,19,24,0.86)",
   border: "rgba(232,200,120,0.14)", border2: "rgba(232,200,120,0.32)",

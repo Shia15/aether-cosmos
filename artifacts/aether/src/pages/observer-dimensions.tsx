@@ -1,20 +1,19 @@
-import img_l8a from "@assets/ChatGPT_Image_Jun_14,_2026,_03_26_49_AM_1781429613480.png";
-import img_l8b from "@assets/ChatGPT_Image_Jun_14,_2026,_03_26_49_AM_1781429635907.png";
-import img_aether_field1 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_42_AM_1781429662706.png";
-import img_aether_field2 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_45_AM_1781429662707.png";
-import img_compound1 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_02_AM_1781429635914.png";
-import img_compound2 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_08_AM_1781429635915.png";
-import img_compound3 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_14_AM_1781429635916.png";
-import img_symbolic from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_09_AM_1781429662710.png";
-import img_sunrise from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_40_AM_1781429662714.png";
-import img_biomolecular from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_19_AM_1781429662711.png";
-import img_bone_marrow from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_23_AM_1781429662712.png";
-import img_nutrition from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_26_AM_1781429662712.png";
-import img_cell_quantum from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_53_AM_1781429662708.png";
-import img_pink_frog from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_49_AM_1781429662707.png";
-import img_ash_trees from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_13_AM_1781429662710.png";
-import img_civ_lag from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_16_AM_1781429662711.png";
-
+const img_l8a = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_26_49_AM_1781429613480.png";
+const img_l8b = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_26_49_AM_1781429635907.png";
+const img_aether_field1 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_42_AM_1781429662706.png";
+const img_aether_field2 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_45_AM_1781429662707.png";
+const img_compound1 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_02_AM_1781429635914.png";
+const img_compound2 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_08_AM_1781429635915.png";
+const img_compound3 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_14_AM_1781429635916.png";
+const img_symbolic = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_09_AM_1781429662710.png";
+const img_sunrise = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_40_AM_1781429662714.png";
+const img_biomolecular = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_19_AM_1781429662711.png";
+const img_bone_marrow = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_23_AM_1781429662712.png";
+const img_nutrition = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_26_AM_1781429662712.png";
+const img_cell_quantum = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_53_AM_1781429662708.png";
+const img_pink_frog = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_49_AM_1781429662707.png";
+const img_ash_trees = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_13_AM_1781429662710.png";
+const img_civ_lag = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_16_AM_1781429662711.png";
 const SECTIONS = [
   {
     title: "L8 Observer Fusion · Perception Universe Atlas",

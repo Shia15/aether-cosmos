@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import emitterCoherence from "@assets/ChatGPT_Image_Jun_28,_2026,_02_14_27_PM_1782670485215.png";
-import emitterSubstrate from "@assets/ChatGPT_Image_Jun_28,_2026,_02_17_55_PM_1782670690599.png";
-import emitterCerulean from "@assets/ChatGPT_Image_Jun_28,_2026,_02_19_47_PM_1782670795970.png";
-import emitterPhiOvertone from "@assets/ChatGPT_Image_Jun_30,_2026,_11_10_19_AM_1782920506186.png";
-import emitterCarmineIR from "@assets/ChatGPT_Image_Jun_30,_2026,_11_13_30_AM_1782920506187.png";
-import emitterPhantomIR from "@assets/ChatGPT_Image_Jun_30,_2026,_11_33_02_AM_1782920506188.png";
-import emitterCoralSWIR from "@assets/f2d30afa-9b9d-4fff-bc30-52d2d2799891_1782920506190.png";
-import bodyPhoton from "@assets/image_(31)_1782920506189.jpg";
-
+const emitterCoherence = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_14_27_PM_1782670485215.png";
+const emitterSubstrate = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_17_55_PM_1782670690599.png";
+const emitterCerulean = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_19_47_PM_1782670795970.png";
+const emitterPhiOvertone = "/api/storage/public-objects/ChatGPT_Image_Jun_30,_2026,_11_10_19_AM_1782920506186.png";
+const emitterCarmineIR = "/api/storage/public-objects/ChatGPT_Image_Jun_30,_2026,_11_13_30_AM_1782920506187.png";
+const emitterPhantomIR = "/api/storage/public-objects/ChatGPT_Image_Jun_30,_2026,_11_33_02_AM_1782920506188.png";
+const emitterCoralSWIR = "/api/storage/public-objects/f2d30afa-9b9d-4fff-bc30-52d2d2799891_1782920506190.png";
+const bodyPhoton = "/api/storage/public-objects/image_(31)_1782920506189.jpg";
 const V = {
   bg:"#04060E",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
   vio:"#9966FF",amb:"#FF9933",rose:"#FF6699",plasma:"#FF4477",

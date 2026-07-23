@@ -2,16 +2,15 @@ import { Link } from "wouter";
 import { useState, useEffect, useRef } from "react";
 import { ArrowUpRight, Sun, Telescope, Globe, Compass, Layers, Sigma, BookOpen } from "lucide-react";
 
-import imgAnchor       from "@assets/ChatGPT_Image_Apr_26,_2026,_01_19_11_PM_1777223957356.png";
-import imgPerception   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_19_50_PM_1777223993326.png";
-import imgRainbowEqn   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_19_35_PM_1777223982420.png";
-import imgPerceptShift from "@assets/ChatGPT_Image_Apr_26,_2026,_01_19_26_PM_1777223968964.png";
-import imgPlanets      from "@assets/ChatGPT_Image_Apr_26,_2026,_01_22_21_PM_1777224155915.png";
-import imgWheel        from "@assets/ChatGPT_Image_Apr_26,_2026,_01_21_51_PM_1777224159935.png";
-import imgSatNep       from "@assets/ChatGPT_Image_Apr_26,_2026,_01_23_11_PM_1777224193211.png";
-import imgHelio        from "@assets/ChatGPT_Image_Apr_26,_2026,_01_23_51_PM_1777224234171.png";
-import imgGobekli      from "@assets/ChatGPT_Image_Apr_26,_2026,_01_19_01_PM_1777223943867.png";
-
+const imgAnchor = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_19_11_PM_1777223957356.png";
+const imgPerception = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_19_50_PM_1777223993326.png";
+const imgRainbowEqn = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_19_35_PM_1777223982420.png";
+const imgPerceptShift = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_19_26_PM_1777223968964.png";
+const imgPlanets = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_22_21_PM_1777224155915.png";
+const imgWheel = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_21_51_PM_1777224159935.png";
+const imgSatNep = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_23_11_PM_1777224193211.png";
+const imgHelio = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_23_51_PM_1777224234171.png";
+const imgGobekli = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_19_01_PM_1777223943867.png";
 const B = {
   bg:        "#F4EDE0",
   panel:     "#FAF6EC",

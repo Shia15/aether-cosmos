@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import manifestImg from "@assets/preview_1781619226428.webp";
-
+const manifestImg = "/api/storage/public-objects/preview_1781619226428.webp";
 const BG     = "#020408";
 const ACCENT = "#1fa8d4";
 const GOLD   = "#c9a84c";

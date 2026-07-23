@@ -1,28 +1,26 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Link } from "wouter";
 
-import imgVoronoi from "@assets/IMG_1076_1782927026649.jpeg";
-import imgLab from "@assets/IMG_3786_1782927026649.jpeg";
-import imgUI from "@assets/IMG_3785_1782927026649.jpeg";
-import imgNightDome from "@assets/IMG_3781_1782927026649.jpeg";
-import imgBubbleCut from "@assets/IMG_3782_1782927026649.jpeg";
-import imgMultiBubble from "@assets/IMG_3778_1782927026649.jpeg";
-import imgArchHabitat from "@assets/IMG_3777_1782927026649.jpeg";
-import imgGrowRoom from "@assets/IMG_3776_1782927026649.jpeg";
-import imgPodTower from "@assets/IMG_3773_1782927026649.jpeg";
-import imgSpiralTower from "@assets/IMG_3770_1782927026649.jpeg";
-import imgTowerAnno from "@assets/IMG_3760_1782927026649.jpeg";
-import imgTowerHelix from "@assets/IMG_3767_1782927026649.jpeg";
-import imgHighK from "@assets/IMG_3756_1782927026649.png";
-import imgUAP from "@assets/IMG_3753_1782927026649.png";
-import imgALD from "@assets/IMG_3755_1782927026649.png";
-import imgInverbase from "@assets/IMG_3747_1782927026649.png";
-
-import vidA from "@assets/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_75633519_1782927026649.mp4";
-import vidB from "@assets/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_a2a8878e_1782927026649.mp4";
-import vidC from "@assets/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_7e5d4779_1782927026649.mp4";
-import vidD from "@assets/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_b9ef72e5_1782927026649.mp4";
-
+const imgVoronoi = "/api/storage/public-objects/IMG_1076_1782927026649.jpeg";
+const imgLab = "/api/storage/public-objects/IMG_3786_1782927026649.jpeg";
+const imgUI = "/api/storage/public-objects/IMG_3785_1782927026649.jpeg";
+const imgNightDome = "/api/storage/public-objects/IMG_3781_1782927026649.jpeg";
+const imgBubbleCut = "/api/storage/public-objects/IMG_3782_1782927026649.jpeg";
+const imgMultiBubble = "/api/storage/public-objects/IMG_3778_1782927026649.jpeg";
+const imgArchHabitat = "/api/storage/public-objects/IMG_3777_1782927026649.jpeg";
+const imgGrowRoom = "/api/storage/public-objects/IMG_3776_1782927026649.jpeg";
+const imgPodTower = "/api/storage/public-objects/IMG_3773_1782927026649.jpeg";
+const imgSpiralTower = "/api/storage/public-objects/IMG_3770_1782927026649.jpeg";
+const imgTowerAnno = "/api/storage/public-objects/IMG_3760_1782927026649.jpeg";
+const imgTowerHelix = "/api/storage/public-objects/IMG_3767_1782927026649.jpeg";
+const imgHighK = "/api/storage/public-objects/IMG_3756_1782927026649.png";
+const imgUAP = "/api/storage/public-objects/IMG_3753_1782927026649.png";
+const imgALD = "/api/storage/public-objects/IMG_3755_1782927026649.png";
+const imgInverbase = "/api/storage/public-objects/IMG_3747_1782927026649.png";
+const vidA = "/api/storage/public-objects/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_75633519_1782927026649.mp4";
+const vidB = "/api/storage/public-objects/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_a2a8878e_1782927026649.mp4";
+const vidC = "/api/storage/public-objects/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_7e5d4779_1782927026649.mp4";
+const vidD = "/api/storage/public-objects/_users_ba1dc190-cb0c-4f70-baae-2c0a87f5fdb6_generated_b9ef72e5_1782927026649.mp4";
 const C = {
   bg: "#05060C",
   panel: "#0b0e18",

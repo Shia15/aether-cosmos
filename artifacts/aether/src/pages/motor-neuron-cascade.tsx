@@ -11,10 +11,9 @@
   ── Fatigue:       f(t) = 1 - f_rate · t / (1 + K_fat · f(t))
 ═══════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState } from "react";
-import omniFlow from "@assets/72D555D1-E91E-4B74-A73B-4628B8538AA1_1784561445345.png";
-import magStorm from "@assets/A6805E91-9684-4C59-BFC8-482EF421381D_1784561445345.png";
-import skyrmion from "@assets/IMG_4534_1784561445345.png";
-
+const omniFlow = "/api/storage/public-objects/72D555D1-E91E-4B74-A73B-4628B8538AA1_1784561445345.png";
+const magStorm = "/api/storage/public-objects/A6805E91-9684-4C59-BFC8-482EF421381D_1784561445345.png";
+const skyrmion = "/api/storage/public-objects/IMG_4534_1784561445345.png";
 const P = {
   bg: "#080500", panel: "#100a00", panel2: "#180f00",
   ivory: "#fff8e0", dim: "rgba(255,248,224,0.55)", muted: "rgba(255,248,224,0.28)",

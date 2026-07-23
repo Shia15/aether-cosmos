@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import imgHelical from "@assets/image_1782753031971.png";
-
+const imgHelical = "/api/storage/public-objects/image_1782753031971.png";
 /* ──────────────────────────────────────────────────────────
    AETHER Gradient Field · Mechanisms Map
    Helical vacuum flow: v_θ = (Γ/2πr)·e^(−r²/σ²), v_z = ωr

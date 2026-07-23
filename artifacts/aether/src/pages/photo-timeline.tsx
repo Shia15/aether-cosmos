@@ -1,26 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 
-import imgFoundation    from "@assets/05F69282-BF36-4812-AF0F-FBAB52F12E79_1775556055904.jpeg";
-import imgCoherence     from "@assets/1767110444938_1777481208115.jpeg";
-import imgLattice       from "@assets/1767877706621_1776476947273.jpeg";
-import imgOrganoid      from "@assets/1768187060155_1776476195607.jpeg";
-import imgBAVS          from "@assets/1771048128470_1776472092826.jpeg";
-import imgCaCO3         from "@assets/1771091077676_1776472098040.jpeg";
-import imgPhaseMap      from "@assets/1771631084537_1776471889837.jpeg";
-import imgBridge        from "@assets/1771897171039_1776471894012.jpeg";
-import imgPlasma        from "@assets/1773507882313_1776444095094.jpeg";
-import imgKnot          from "@assets/1773507882402_1776444091428.jpeg";
-import imgGeo           from "@assets/1773804564758_1776443821427.jpeg";
-import imgCore          from "@assets/1774305389240_1776443829956.jpeg";
-import imgLight         from "@assets/1774305390705_1776443829957.jpeg";
-import imgMolecular     from "@assets/1774305391649_1776443829956.jpeg";
-import imgAlignment     from "@assets/1776435373437_1776440919786.jpeg";
-import imgCosmicLock    from "@assets/1776435373457_1776440915948.jpeg";
-import imgBinaryMap     from "@assets/bianary_map_1776475138397.jpeg";
-import imgDuaMind       from "@assets/duamind_1776472102804.jpeg";
-import imgField         from "@assets/field_reception_shia_miller-01.jpg";
-import imgFusion        from "@assets/HHvH_fdWwAYSagD_(1)_1778197246440.jpg";
-
+const imgFoundation = "/api/storage/public-objects/05F69282-BF36-4812-AF0F-FBAB52F12E79_1775556055904.jpeg";
+const imgCoherence = "/api/storage/public-objects/1767110444938_1777481208115.jpeg";
+const imgLattice = "/api/storage/public-objects/1767877706621_1776476947273.jpeg";
+const imgOrganoid = "/api/storage/public-objects/1768187060155_1776476195607.jpeg";
+const imgBAVS = "/api/storage/public-objects/1771048128470_1776472092826.jpeg";
+const imgCaCO3 = "/api/storage/public-objects/1771091077676_1776472098040.jpeg";
+const imgPhaseMap = "/api/storage/public-objects/1771631084537_1776471889837.jpeg";
+const imgBridge = "/api/storage/public-objects/1771897171039_1776471894012.jpeg";
+const imgPlasma = "/api/storage/public-objects/1773507882313_1776444095094.jpeg";
+const imgKnot = "/api/storage/public-objects/1773507882402_1776444091428.jpeg";
+const imgGeo = "/api/storage/public-objects/1773804564758_1776443821427.jpeg";
+const imgCore = "/api/storage/public-objects/1774305389240_1776443829956.jpeg";
+const imgLight = "/api/storage/public-objects/1774305390705_1776443829957.jpeg";
+const imgMolecular = "/api/storage/public-objects/1774305391649_1776443829956.jpeg";
+const imgAlignment = "/api/storage/public-objects/1776435373437_1776440919786.jpeg";
+const imgCosmicLock = "/api/storage/public-objects/1776435373457_1776440915948.jpeg";
+const imgBinaryMap = "/api/storage/public-objects/bianary_map_1776475138397.jpeg";
+const imgDuaMind = "/api/storage/public-objects/duamind_1776472102804.jpeg";
+const imgField = "/api/storage/public-objects/field_reception_shia_miller-01.jpg";
+const imgFusion = "/api/storage/public-objects/HHvH_fdWwAYSagD_(1)_1778197246440.jpg";
 // ── Photo entries — real attached_assets images with derived dates ─────────────
 const PHOTOS = [
   { src: imgFoundation,  ts: 1775556055904, label: "Foundation Signal",     caption: "Early substrate field — the baseline scan before the AETHER crystallization model was formalised." },

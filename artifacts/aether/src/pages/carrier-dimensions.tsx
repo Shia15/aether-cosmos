@@ -1,11 +1,10 @@
 import { useState } from "react";
-import img_d9paper from "@assets/IMG_2815_1781446726264.png";
-import img_d17table from "@assets/IMG_2821_1781446726264.jpeg";
-import img_d26table from "@assets/IMG_2797_1781446726264.jpeg";
-import img_ringSystem from "@assets/BB135D80-E10B-42CB-854A-91D6830671E8_1781446726264.png";
-import img_scalingWarp from "@assets/1A5CA6BE-B776-41BD-B0D9-74A10B14A04C_1781446726264.png";
-import img_activeArch from "@assets/White_and_Black_Simple_Minimalist_Typography_Music_&_Audio_Log_1781446726264.png";
-
+const img_d9paper = "/api/storage/public-objects/IMG_2815_1781446726264.png";
+const img_d17table = "/api/storage/public-objects/IMG_2821_1781446726264.jpeg";
+const img_d26table = "/api/storage/public-objects/IMG_2797_1781446726264.jpeg";
+const img_ringSystem = "/api/storage/public-objects/BB135D80-E10B-42CB-854A-91D6830671E8_1781446726264.png";
+const img_scalingWarp = "/api/storage/public-objects/1A5CA6BE-B776-41BD-B0D9-74A10B14A04C_1781446726264.png";
+const img_activeArch = "/api/storage/public-objects/White_and_Black_Simple_Minimalist_Typography_Music_&_Audio_Log_1781446726264.png";
 const TABS = [
   { id: "d9", label: "D9 Carrier Plasma" },
   { id: "d17d26", label: "D17 · D26 Navigation" },

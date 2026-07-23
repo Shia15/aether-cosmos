@@ -7,6 +7,8 @@
     "hello": "tsx ./src/hello.ts",
     "seed:stripe": "tsx ./src/seed-products.ts",
     "migrate:images": "tsx ./src/migrate-images-to-storage.ts",
+    "migrate:attached-assets": "tsx ./src/migrate-attached-assets.ts",
+    "codemod:assets": "tsx ./src/codemod-assets-to-storage.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

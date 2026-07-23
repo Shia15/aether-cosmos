@@ -1,15 +1,14 @@
 import { Link } from "wouter";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
-import imgPoster   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_10_01_PM_1777223506175.png";
-import imgFrames   from "@assets/ChatGPT_Image_Apr_26,_2026,_01_09_42_PM_1777223511075.png";
-import imgDecadron from "@assets/ChatGPT_Image_Apr_26,_2026,_01_12_09_PM_1777223532329.png";
-import imgAqua2    from "@assets/ChatGPT_Image_Apr_26,_2026,_01_13_15_PM_1777223596911.png";
-import imgLoop          from "@assets/ChatGPT_Image_Apr_26,_2026,_01_13_40_PM_1777223641885.png";
-import imgNestedScaling from "@assets/IMG_3461_1782003806201.png";
-import imgMpcDensity    from "@assets/IMG_3459_1782003806201.png";
-import img426Hz         from "@assets/0DE9502F-C577-457B-BC49-46AE3A83F6D7_1782003806201.png";
-
+const imgPoster = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_10_01_PM_1777223506175.png";
+const imgFrames = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_09_42_PM_1777223511075.png";
+const imgDecadron = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_12_09_PM_1777223532329.png";
+const imgAqua2 = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_13_15_PM_1777223596911.png";
+const imgLoop = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_13_40_PM_1777223641885.png";
+const imgNestedScaling = "/api/storage/public-objects/IMG_3461_1782003806201.png";
+const imgMpcDensity = "/api/storage/public-objects/IMG_3459_1782003806201.png";
+const img426Hz = "/api/storage/public-objects/0DE9502F-C577-457B-BC49-46AE3A83F6D7_1782003806201.png";
 const B = {
   bg: "#06080f",
   panel: "#0c1120",

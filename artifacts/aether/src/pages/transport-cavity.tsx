@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import imgVortex     from "@assets/Gemini_Generated_Image_ot7ybpot7ybpot7y_1782757858911.png";
-import imgFramework  from "@assets/Gemini_Generated_Image_fwivy7fwivy7fwiv_1782757938529.png";
-import imgNavier     from "@assets/image_1782758044567.png";
-import imgSpectral   from "@assets/Gemini_Generated_Image_w1iv0w1iv0w1iv0w_1782758115977.png";
-import imgUVgain     from "@assets/Gemini_Generated_Image_wmyjldwmyjldwmyj_1782758177162.png";
-import imgSkylight   from "@assets/image_1782758302848.png";
-import imgVOC        from "@assets/image_1782758345728.png";
-import imgSap        from "@assets/image_1782758419756.png";
-import imgStar       from "@assets/ChatGPT_Image_Feb_13,_2026,_11_57_49_PM_1782758222453.png";
-import imgDNA1       from "@assets/ChatGPT_Image_Feb_14,_2026,_12_02_34_AM_1782758245973.png";
-import imgDNA2       from "@assets/ChatGPT_Image_Feb_14,_2026,_12_02_30_AM_1782758245974.png";
-
+const imgVortex = "/api/storage/public-objects/Gemini_Generated_Image_ot7ybpot7ybpot7y_1782757858911.png";
+const imgFramework = "/api/storage/public-objects/Gemini_Generated_Image_fwivy7fwivy7fwiv_1782757938529.png";
+const imgNavier = "/api/storage/public-objects/image_1782758044567.png";
+const imgSpectral = "/api/storage/public-objects/Gemini_Generated_Image_w1iv0w1iv0w1iv0w_1782758115977.png";
+const imgUVgain = "/api/storage/public-objects/Gemini_Generated_Image_wmyjldwmyjldwmyj_1782758177162.png";
+const imgSkylight = "/api/storage/public-objects/image_1782758302848.png";
+const imgVOC = "/api/storage/public-objects/image_1782758345728.png";
+const imgSap = "/api/storage/public-objects/image_1782758419756.png";
+const imgStar = "/api/storage/public-objects/ChatGPT_Image_Feb_13,_2026,_11_57_49_PM_1782758222453.png";
+const imgDNA1 = "/api/storage/public-objects/ChatGPT_Image_Feb_14,_2026,_12_02_34_AM_1782758245973.png";
+const imgDNA2 = "/api/storage/public-objects/ChatGPT_Image_Feb_14,_2026,_12_02_30_AM_1782758245974.png";
 /* ==========================================================================
    DMF SPACE-FILLED TRANSPORT CAVITY
    A coherence-modulated Rankine-vortex conduit that carries objects up, down,

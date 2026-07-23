@@ -1,12 +1,11 @@
 import { useState } from "react";
-import imgHull        from "@assets/ChatGPT_Image_Jun_14,_2026,_09_09_58_AM_1781442766266.png";
-import imgCrystal     from "@assets/ChatGPT_Image_Jun_14,_2026,_09_10_43_AM_1781442789014.png";
-import imgPlasmoid    from "@assets/ChatGPT_Image_Jun_14,_2026,_09_10_19_AM_1781442800260.png";
-import imgScale       from "@assets/ChatGPT_Image_Jun_14,_2026,_09_10_15_AM_1781442808034.png";
-import imgGeo         from "@assets/ChatGPT_Image_Jun_14,_2026,_09_10_50_AM_1781442812030.png";
-import imgCaCO3       from "@assets/ChatGPT_Image_Jun_14,_2026,_09_10_47_AM_1781442816244.png";
-import imgScale2      from "@assets/ChatGPT_Image_Jun_14,_2026,_09_10_15_AM_1781442842016.png";
-
+const imgHull = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_09_58_AM_1781442766266.png";
+const imgCrystal = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_10_43_AM_1781442789014.png";
+const imgPlasmoid = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_10_19_AM_1781442800260.png";
+const imgScale = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_10_15_AM_1781442808034.png";
+const imgGeo = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_10_50_AM_1781442812030.png";
+const imgCaCO3 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_10_47_AM_1781442816244.png";
+const imgScale2 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_09_10_15_AM_1781442842016.png";
 type Tab = "hull" | "scale" | "crystallization" | "materials";
 
 const TABS: { key: Tab; label: string; sub: string; color: string }[] = [

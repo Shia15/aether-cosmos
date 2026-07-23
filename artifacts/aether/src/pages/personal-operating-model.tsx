@@ -1,7 +1,6 @@
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgPOM from "@assets/ChatGPT_Image_Apr_26,_2026,_02_28_16_PM_1777228099115.png";
-
+const imgPOM = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_02_28_16_PM_1777228099115.png";
 const B = {
   bg:        "#1c160e",
   panel:     "#2a2014",

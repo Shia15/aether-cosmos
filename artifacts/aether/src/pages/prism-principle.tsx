@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
-import tweetPrism  from "@assets/image_1782209138824.png";
-import tweetReg    from "@assets/image_1782209603008.png";
-import noteBoho    from "@assets/prism_boho_formula.jpg";
-import noteMental  from "@assets/prism_mental_protocol.jpg";
-import noteLaunch  from "@assets/prism_launch_sequence.jpg";
-import noteAuto    from "@assets/prism_automation.jpg";
-
+const tweetPrism = "/api/storage/public-objects/image_1782209138824.png";
+const tweetReg = "/api/storage/public-objects/image_1782209603008.png";
+const noteBoho = "/api/storage/public-objects/prism_boho_formula.jpg";
+const noteMental = "/api/storage/public-objects/prism_mental_protocol.jpg";
+const noteLaunch = "/api/storage/public-objects/prism_launch_sequence.jpg";
+const noteAuto = "/api/storage/public-objects/prism_automation.jpg";
 /* ── palette ─────────────────────────────────── */
 const BG   = "#040407";
 const TEAL = "#1fd4c8";

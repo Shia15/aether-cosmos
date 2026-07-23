@@ -1,8 +1,7 @@
 import React from "react";
-import imgFabric   from "@assets/0fd65c19-5b0e-43ac-b056-923397fbf88f_1782757006058.png";
-import imgFilament from "@assets/Gemini_Generated_Image_of5f1jof5f1jof5f_1782756940819.png";
-import imgSymbols  from "@assets/IMG_8586_1782757006059.jpg";
-
+const imgFabric = "/api/storage/public-objects/0fd65c19-5b0e-43ac-b056-923397fbf88f_1782757006058.png";
+const imgFilament = "/api/storage/public-objects/Gemini_Generated_Image_of5f1jof5f1jof5f_1782756940819.png";
+const imgSymbols = "/api/storage/public-objects/IMG_8586_1782757006059.jpg";
 const C = {
   bg:     "#06050E",
   panel:  "rgba(18,14,32,0.72)",

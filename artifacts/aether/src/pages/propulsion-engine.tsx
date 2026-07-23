@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import scaleHierarchy from "@assets/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781374238871.png";
-import organicHeart from "@assets/image_(7)_1781374277640.jpg";
-import organicCell from "@assets/Pczu4_1781374277641.jpg";
-import compoundEyeMath from "@assets/ChatGPT_Image_Jun_6,_2026,_10_16_24_PM_1781374303074.png";
-import ferroSiliconDetailed from "@assets/ChatGPT_Image_Jun_8,_2026,_02_03_27_PM_1781374303075.png";
-import compoundEyeMath2 from "@assets/ChatGPT_Image_Jun_6,_2026,_10_13_36_PM_1781374310172.png";
-import compoundEyeVisual from "@assets/ChatGPT_Image_Jun_6,_2026,_10_16_15_PM_1781374310174.png";
-
+const scaleHierarchy = "/api/storage/public-objects/ChatGPT_Image_Jun_13,_2026,_01_58_40_PM_1781374238871.png";
+const organicHeart = "/api/storage/public-objects/image_(7)_1781374277640.jpg";
+const organicCell = "/api/storage/public-objects/Pczu4_1781374277641.jpg";
+const compoundEyeMath = "/api/storage/public-objects/ChatGPT_Image_Jun_6,_2026,_10_16_24_PM_1781374303074.png";
+const ferroSiliconDetailed = "/api/storage/public-objects/ChatGPT_Image_Jun_8,_2026,_02_03_27_PM_1781374303075.png";
+const compoundEyeMath2 = "/api/storage/public-objects/ChatGPT_Image_Jun_6,_2026,_10_13_36_PM_1781374310172.png";
+const compoundEyeVisual = "/api/storage/public-objects/ChatGPT_Image_Jun_6,_2026,_10_16_15_PM_1781374310174.png";
 const C = {
   void:   "#010408",
   deep:   "#030912",

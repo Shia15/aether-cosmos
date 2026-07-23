@@ -1,17 +1,16 @@
 import React, { useState } from "react";
-import img_vortexRingPink from "@assets/93D0C2CE-9414-417D-A672-9A0F1F33B556_1781446652782.png";
-import img_vortexRingBlue from "@assets/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781446652782.png";
-import img_bubbleDynamics from "@assets/0502F370-FA89-4126-942E-B5741F1E0BB1_1781446652782.png";
-import img_energyVortexCam from "@assets/412D585C-CDB5-4981-B6A1-811B38ECB469_1781446652782.png";
-import img_spaceFieldTracking from "@assets/284CC93B-6173-42B5-8889-875ADD2543C4_1781446652782.png";
-import img_fourForces from "@assets/C75938F3-0E42-45DB-A381-ACE5B8A195CF_1781446652782.png";
-import img_ftlTravel from "@assets/6E63E8F1-8940-4FC6-A4BF-0CBBF7E6D186_1781446652782.png";
-import img_warpFabric from "@assets/D844F817-F8A9-4EC4-9337-5BE46DB4CCBE_1781446652782.png";
-import img_timeTransport from "@assets/BD948A29-4A76-466B-8A78-9546C8DFDC30_1781446652782.png";
-import img_cameraDecoherence from "@assets/8468C669-2065-4AE9-81A6-5B1F575FB091_1781446652782.png";
-import img_quaternionBurst from "@assets/ED378685-2438-4F12-B100-312E2B5DC9A1_1781446652782.png";
-import img_futureForward from "@assets/62A6B0CC-A6ED-4F58-B331-61156CB0EB1A_1781446652782.png";
-
+const img_vortexRingPink = "/api/storage/public-objects/93D0C2CE-9414-417D-A672-9A0F1F33B556_1781446652782.png";
+const img_vortexRingBlue = "/api/storage/public-objects/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781446652782.png";
+const img_bubbleDynamics = "/api/storage/public-objects/0502F370-FA89-4126-942E-B5741F1E0BB1_1781446652782.png";
+const img_energyVortexCam = "/api/storage/public-objects/412D585C-CDB5-4981-B6A1-811B38ECB469_1781446652782.png";
+const img_spaceFieldTracking = "/api/storage/public-objects/284CC93B-6173-42B5-8889-875ADD2543C4_1781446652782.png";
+const img_fourForces = "/api/storage/public-objects/C75938F3-0E42-45DB-A381-ACE5B8A195CF_1781446652782.png";
+const img_ftlTravel = "/api/storage/public-objects/6E63E8F1-8940-4FC6-A4BF-0CBBF7E6D186_1781446652782.png";
+const img_warpFabric = "/api/storage/public-objects/D844F817-F8A9-4EC4-9337-5BE46DB4CCBE_1781446652782.png";
+const img_timeTransport = "/api/storage/public-objects/BD948A29-4A76-466B-8A78-9546C8DFDC30_1781446652782.png";
+const img_cameraDecoherence = "/api/storage/public-objects/8468C669-2065-4AE9-81A6-5B1F575FB091_1781446652782.png";
+const img_quaternionBurst = "/api/storage/public-objects/ED378685-2438-4F12-B100-312E2B5DC9A1_1781446652782.png";
+const img_futureForward = "/api/storage/public-objects/62A6B0CC-A6ED-4F58-B331-61156CB0EB1A_1781446652782.png";
 const TABS = [
   { id: "engine", label: "Vortex-Ring Engine" },
   { id: "space", label: "Space Field Systems" },

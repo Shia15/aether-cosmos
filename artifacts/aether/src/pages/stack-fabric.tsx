@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgStack1 from "@assets/ChatGPT_Image_Apr_26,_2026,_01_34_55_PM_1777224898821.png";
-import imgStack2 from "@assets/ChatGPT_Image_Apr_26,_2026,_01_32_15_PM_1777224905065.png";
-import imgGACA  from "@assets/ChatGPT_Image_Apr_26,_2026,_01_38_08_PM_1777225090313.png";
-
+const imgStack1 = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_34_55_PM_1777224898821.png";
+const imgStack2 = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_32_15_PM_1777224905065.png";
+const imgGACA = "/api/storage/public-objects/ChatGPT_Image_Apr_26,_2026,_01_38_08_PM_1777225090313.png";
 const B = {
   bg:        "#06080f",
   panel:     "#0c1120",

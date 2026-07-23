@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import mayaTable   from "@assets/IMG_4484_1784409956288.jpeg";
-import xPost       from "@assets/IMG_4443_1784409868092.jpeg";
-import radialField from "@assets/IMG_4483_1784409956288.png";
-import meshLattice from "@assets/IMG_4481_1784409956289.png";
-
+const mayaTable = "/api/storage/public-objects/IMG_4484_1784409956288.jpeg";
+const xPost = "/api/storage/public-objects/IMG_4443_1784409868092.jpeg";
+const radialField = "/api/storage/public-objects/IMG_4483_1784409956288.png";
+const meshLattice = "/api/storage/public-objects/IMG_4481_1784409956289.png";
 /* ── palette ── */
 const C = {
   bg:     "#050308",

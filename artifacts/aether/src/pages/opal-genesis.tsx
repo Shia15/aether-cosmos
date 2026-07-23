@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import aetherRef from "@assets/17FFC0EB-3B7D-4748-A761-80A09AA4E273_1782493826521.png";
-
+const aetherRef = "/api/storage/public-objects/17FFC0EB-3B7D-4748-A761-80A09AA4E273_1782493826521.png";
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",
   vio:"#9966FF", amb:"#FF9933", rose:"#FF6699", plasma:"#FF4477",

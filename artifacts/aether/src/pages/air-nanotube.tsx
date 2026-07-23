@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import heroImg from "@assets/ChatGPT_Image_Jun_28,_2026,_01_03_43_PM_1782666242276.png";
-
+const heroImg = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_01_03_43_PM_1782666242276.png";
 const C = {
   bg:     "#04060E",
   panel:  "rgba(8,12,24,0.85)",

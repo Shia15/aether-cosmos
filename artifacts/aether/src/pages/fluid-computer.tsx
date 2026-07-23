@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import img1 from "@assets/F267AF72-C84E-4CCD-84A4-5F3A408923FE_1782248870607.png";
-import img2 from "@assets/1DBBC817-C6CA-4CC9-83E1-D0E507B40433_1782248870607.png";
-import img3 from "@assets/29A240ED-5DA4-4189-8496-2838BE84F39E_1782248870607.png";
-import img4 from "@assets/06DD1D28-9ABF-4AF4-9C1A-A31A86895C34_1782248870607.png";
-import img5 from "@assets/IMG_2749_1782248870607.png";
-
+const img1 = "/api/storage/public-objects/F267AF72-C84E-4CCD-84A4-5F3A408923FE_1782248870607.png";
+const img2 = "/api/storage/public-objects/1DBBC817-C6CA-4CC9-83E1-D0E507B40433_1782248870607.png";
+const img3 = "/api/storage/public-objects/29A240ED-5DA4-4189-8496-2838BE84F39E_1782248870607.png";
+const img4 = "/api/storage/public-objects/06DD1D28-9ABF-4AF4-9C1A-A31A86895C34_1782248870607.png";
+const img5 = "/api/storage/public-objects/IMG_2749_1782248870607.png";
 const V = {
   bg: "#010409", panel: "#03060e",
   aurora: "#00FFB2", gold: "#C8A030",

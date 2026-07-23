@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "react";
-import quoteResonance from "@assets/ChatGPT_Image_Apr_25,_2026,_05_21_14_PM_1777152079090.png";
-import quoteQuiet from "@assets/ChatGPT_Image_Apr_25,_2026,_05_22_00_PM_1777152122490.png";
-import quoteHumanBeings from "@assets/ChatGPT_Image_Apr_25,_2026,_05_23_45_PM_1777152228349.png";
-import quoteBoiling from "@assets/ChatGPT_Image_Apr_25,_2026,_05_25_13_PM_1777152322790.png";
-import quoteSun from "@assets/ChatGPT_Image_Apr_25,_2026,_05_25_34_PM_1777152337275.png";
-
+const quoteResonance = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_21_14_PM_1777152079090.png";
+const quoteQuiet = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_22_00_PM_1777152122490.png";
+const quoteHumanBeings = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_23_45_PM_1777152228349.png";
+const quoteBoiling = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_25_13_PM_1777152322790.png";
+const quoteSun = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_25_34_PM_1777152337275.png";
 const C = {
   bg: "#06070C",
   panel: "rgba(20,18,32,0.62)",

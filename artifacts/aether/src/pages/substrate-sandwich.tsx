@@ -6,19 +6,18 @@
 ═══════════════════════════════════════════════════════════════════*/
 import { useRef, useEffect, useState } from "react";
 
-import sandwichCube    from "@assets/IMG_4494_1784416489052.jpeg";
-import deploymentImg   from "@assets/IMG_4495_1784416489052.jpeg";
-import corningImg      from "@assets/IMG_4499_1784416489052.jpeg";
-import magneticImg     from "@assets/IMG_4496_1784416489052.jpeg";
-import cytoplasmImg    from "@assets/IMG_4487_1784416489052.png";
-import livingClockImg  from "@assets/IMG_4485_1784416489052.png";
-import dynTransImg     from "@assets/IMG_4489_1784416489052.png";
-import phiAetherImg    from "@assets/BD89380E-EB70-480C-9A72-F65BCA1A3FFC_1784416547605.png";
-import fractureImg     from "@assets/76747593-DBFD-4864-BFAA-77B3F99F9D70_1784416547605.png";
-import denseWaterImg   from "@assets/C2B7568F-72DC-4DD7-9AFB-385136C3F224_1784416547605.png";
-import heOxImg         from "@assets/816B918E-5D67-4582-B7A6-5F8538FE8933_1784416547605.png";
-import hwmImg          from "@assets/D84C7F3C-A20A-4281-932D-37197BE96644_1784416547605.png";
-
+const sandwichCube = "/api/storage/public-objects/IMG_4494_1784416489052.jpeg";
+const deploymentImg = "/api/storage/public-objects/IMG_4495_1784416489052.jpeg";
+const corningImg = "/api/storage/public-objects/IMG_4499_1784416489052.jpeg";
+const magneticImg = "/api/storage/public-objects/IMG_4496_1784416489052.jpeg";
+const cytoplasmImg = "/api/storage/public-objects/IMG_4487_1784416489052.png";
+const livingClockImg = "/api/storage/public-objects/IMG_4485_1784416489052.png";
+const dynTransImg = "/api/storage/public-objects/IMG_4489_1784416489052.png";
+const phiAetherImg = "/api/storage/public-objects/BD89380E-EB70-480C-9A72-F65BCA1A3FFC_1784416547605.png";
+const fractureImg = "/api/storage/public-objects/76747593-DBFD-4864-BFAA-77B3F99F9D70_1784416547605.png";
+const denseWaterImg = "/api/storage/public-objects/C2B7568F-72DC-4DD7-9AFB-385136C3F224_1784416547605.png";
+const heOxImg = "/api/storage/public-objects/816B918E-5D67-4582-B7A6-5F8538FE8933_1784416547605.png";
+const hwmImg = "/api/storage/public-objects/D84C7F3C-A20A-4281-932D-37197BE96644_1784416547605.png";
 const P = {
   bg: "#0b0906", panel: "#13100c", panel2: "#1a1510",
   gold: "#f5c84c", ivory: "#f4f1ea", dim: "rgba(244,241,234,0.5)",

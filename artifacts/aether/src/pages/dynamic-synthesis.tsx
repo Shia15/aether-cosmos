@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import dynImg from "@assets/IMG_3602_1782496557258.png";
-
+const dynImg = "/api/storage/public-objects/IMG_3602_1782496557258.png";
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",
   vio:"#9966FF", amb:"#FF9933", rose:"#FF6699", plasma:"#FF4477",

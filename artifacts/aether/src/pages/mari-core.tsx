@@ -10,9 +10,8 @@ import {
   Coins,
   type LucideIcon,
 } from "lucide-react";
-import diagramVertical from "@assets/ChatGPT_Image_Apr_25,_2026,_05_15_14_PM_1777151726101.png";
-import diagramHorizontal from "@assets/ChatGPT_Image_Apr_25,_2026,_05_15_04_PM_1777151731928.png";
-
+const diagramVertical = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_15_14_PM_1777151726101.png";
+const diagramHorizontal = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_05_15_04_PM_1777151731928.png";
 const C = {
   bg: "#06070C",
   panel: "rgba(20,18,32,0.62)",

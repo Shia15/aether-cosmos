@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import paperImg from "@assets/image_1782205801087.jpeg";
-
+const paperImg = "/api/storage/public-objects/image_1782205801087.jpeg";
 /* ── palette — papyrus + AETHER ───────────────────── */
 const BG    = "#010408";
 const PAPER = "#e8d5a3";

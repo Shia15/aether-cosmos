@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight, RotateCcw, Sunrise } from "lucide-react";
-import eggsLineup from "@assets/ChatGPT_Image_Apr_25,_2026,_04_58_54_PM_1777150792841.png";
-
+const eggsLineup = "/api/storage/public-objects/ChatGPT_Image_Apr_25,_2026,_04_58_54_PM_1777150792841.png";
 const B = {
   bg: "#070918",
   ink: "#E7ECF7",

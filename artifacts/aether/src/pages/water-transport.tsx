@@ -1,26 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import temporalMapping from "@assets/58E5DACB-2E46-4F33-8C36-BB61D447FD63_1781615189390.png";
-import coherencingEq   from "@assets/IMG_2189_1781615189390.png";
-import decoherenceFrag from "@assets/IMG_2191_1781615189390.png";
-import opticalScatter  from "@assets/IMG_2185_1781615189390.png";
-import spatioPhase     from "@assets/IMG_2188_1781615189390.png";
-import emergentBubble  from "@assets/1236A754-8B2F-4AB3-B9FB-B7193F336F74_1781615189390.png";
-import warpDrive       from "@assets/IMG_2203_1781615189390.png";
-import coherenceMech   from "@assets/IMG_2212_1781615189390.png";
-import tgemeMatrix     from "@assets/IMG_2217_1781615189390.png";
-import warpCore        from "@assets/IMG_2199_1781615189390.jpeg";
-import magneticRecon   from "@assets/F23D6CDB-AA6F-44AE-B136-E72229CEEA68_1781617123305.png";
-import plasmaTransport  from "@assets/BE46CD04-CA24-458D-AB3C-1BE609D84123_1781617123305.png";
-import droneSystem      from "@assets/BB7734DC-A62E-42CC-AE60-3E6912BF1494_1781617123305.png";
-import dolphinVortex    from "@assets/IMG_3100_1781614705910.jpeg";
-import vortexRingEngine from "@assets/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781614705910.png";
-import bubbleThermal    from "@assets/0502F370-FA89-4126-942E-B5741F1E0BB1_1781614705910.png";
-import futurePortal     from "@assets/62A6B0CC-A6ED-4F58-B331-61156CB0EB1A_1781614705910.png";
-import quaternionBurst  from "@assets/ED378685-2438-4F12-B100-312E2B5DC9A1_1781614705910.png";
-import spaceTracking    from "@assets/284CC93B-6173-42B5-8889-875ADD2543C4_1781614705911.png";
-import maglev           from "@assets/4A252038-40A7-49D4-BED1-20BD51CC846B_1781614705911.png";
-import oscillating      from "@assets/4D914387-3E58-4DE1-8A7B-A4DB50266322_1781614705911.png";
-
+const temporalMapping = "/api/storage/public-objects/58E5DACB-2E46-4F33-8C36-BB61D447FD63_1781615189390.png";
+const coherencingEq = "/api/storage/public-objects/IMG_2189_1781615189390.png";
+const decoherenceFrag = "/api/storage/public-objects/IMG_2191_1781615189390.png";
+const opticalScatter = "/api/storage/public-objects/IMG_2185_1781615189390.png";
+const spatioPhase = "/api/storage/public-objects/IMG_2188_1781615189390.png";
+const emergentBubble = "/api/storage/public-objects/1236A754-8B2F-4AB3-B9FB-B7193F336F74_1781615189390.png";
+const warpDrive = "/api/storage/public-objects/IMG_2203_1781615189390.png";
+const coherenceMech = "/api/storage/public-objects/IMG_2212_1781615189390.png";
+const tgemeMatrix = "/api/storage/public-objects/IMG_2217_1781615189390.png";
+const warpCore = "/api/storage/public-objects/IMG_2199_1781615189390.jpeg";
+const magneticRecon = "/api/storage/public-objects/F23D6CDB-AA6F-44AE-B136-E72229CEEA68_1781617123305.png";
+const plasmaTransport = "/api/storage/public-objects/BE46CD04-CA24-458D-AB3C-1BE609D84123_1781617123305.png";
+const droneSystem = "/api/storage/public-objects/BB7734DC-A62E-42CC-AE60-3E6912BF1494_1781617123305.png";
+const dolphinVortex = "/api/storage/public-objects/IMG_3100_1781614705910.jpeg";
+const vortexRingEngine = "/api/storage/public-objects/28F81FD8-CBDD-408E-A325-3C503283EBBB_1781614705910.png";
+const bubbleThermal = "/api/storage/public-objects/0502F370-FA89-4126-942E-B5741F1E0BB1_1781614705910.png";
+const futurePortal = "/api/storage/public-objects/62A6B0CC-A6ED-4F58-B331-61156CB0EB1A_1781614705910.png";
+const quaternionBurst = "/api/storage/public-objects/ED378685-2438-4F12-B100-312E2B5DC9A1_1781614705910.png";
+const spaceTracking = "/api/storage/public-objects/284CC93B-6173-42B5-8889-875ADD2543C4_1781614705911.png";
+const maglev = "/api/storage/public-objects/4A252038-40A7-49D4-BED1-20BD51CC846B_1781614705911.png";
+const oscillating = "/api/storage/public-objects/4D914387-3E58-4DE1-8A7B-A4DB50266322_1781614705911.png";
 /* ── Palette ────────────────────────────────────────────── */
 const BG      = "#020408";
 const ACCENT  = "#1fa8d4";    // ocean teal-blue

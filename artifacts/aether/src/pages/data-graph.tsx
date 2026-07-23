@@ -1,13 +1,12 @@
-import imgEquationChain  from "@assets/E8EA2ECE-E59B-4AAE-A36A-85F42983D549_1782737419033.png";
-import imgEarthSystem    from "@assets/FACFD044-81DC-45E6-8446-C381DC17C6CE_1782737419033.png";
-import imgPlanetNeural   from "@assets/B0A19A28-9DE0-47D7-8D1E-2C9BC2F32814_1782737419033.png";
-import imgPngb           from "@assets/IMG_3675_1782737419033.png";
-import imgAlmostPngb     from "@assets/IMG_3677_1782737419033.png";
-import imgScaleChart     from "@assets/92A31566-30D3-4F97-9999-764B419B1315_1782737419033.png";
-import imgSeaAir         from "@assets/B6E20017-0CA1-4646-9614-6AE4DD8BEACC_1782737419033.png";
-import imgBioOptical     from "@assets/0FDBD7B2-B4C0-4624-AD69-55C7D0F02E57_1782737419033.png";
-import imgUptipple       from "@assets/32899788-7DE4-4065-BFF6-FD6201714114_1782737419033.png";
-
+const imgEquationChain = "/api/storage/public-objects/E8EA2ECE-E59B-4AAE-A36A-85F42983D549_1782737419033.png";
+const imgEarthSystem = "/api/storage/public-objects/FACFD044-81DC-45E6-8446-C381DC17C6CE_1782737419033.png";
+const imgPlanetNeural = "/api/storage/public-objects/B0A19A28-9DE0-47D7-8D1E-2C9BC2F32814_1782737419033.png";
+const imgPngb = "/api/storage/public-objects/IMG_3675_1782737419033.png";
+const imgAlmostPngb = "/api/storage/public-objects/IMG_3677_1782737419033.png";
+const imgScaleChart = "/api/storage/public-objects/92A31566-30D3-4F97-9999-764B419B1315_1782737419033.png";
+const imgSeaAir = "/api/storage/public-objects/B6E20017-0CA1-4646-9614-6AE4DD8BEACC_1782737419033.png";
+const imgBioOptical = "/api/storage/public-objects/0FDBD7B2-B4C0-4624-AD69-55C7D0F02E57_1782737419033.png";
+const imgUptipple = "/api/storage/public-objects/32899788-7DE4-4065-BFF6-FD6201714114_1782737419033.png";
 /* ── palette ─────────────────────────────────── */
 const BG   = "#040508";
 const TEAL = "#1fd4c8";

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import imgTaitPlate from "@assets/HGxT-BZXEAA4c3U_1777222187177.jpeg";
-
+const imgTaitPlate = "/api/storage/public-objects/HGxT-BZXEAA4c3U_1777222187177.jpeg";
 const B = {
   bg: "#f4ecdc", panel: "#fbf6ea", ink: "#2a2218",
   text: "rgba(42,34,24,0.78)", muted: "rgba(42,34,24,0.5)",

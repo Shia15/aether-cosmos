@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import protoImg from "@assets/1771631084537_1776471889837.jpeg";
-import frameworkImg from "@assets/1771897171039_1776471894012.jpeg";
-
+const protoImg = "/api/storage/public-objects/1771631084537_1776471889837.jpeg";
+const frameworkImg = "/api/storage/public-objects/1771897171039_1776471894012.jpeg";
 // ── Reservoir constants ───────────────────────────────────────────────────────
 const GRID = 8;
 const N = GRID * GRID; // 64 nodes

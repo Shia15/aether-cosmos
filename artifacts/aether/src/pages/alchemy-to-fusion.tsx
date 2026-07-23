@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowUpRight } from "lucide-react";
-import imgReactor from "@assets/PNG_image_1777497089577.png";
-
+const imgReactor = "/api/storage/public-objects/PNG_image_1777497089577.png";
 const B = {
   bg: "#070918",
   ink: "#E7ECF7",

@@ -1,9 +1,8 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { Link } from "wouter";
 
-import imgJavaConcepts from "@assets/17AFCB8E-85D1-4F11-BA60-7BC42DA9FA11_1783095490513.JPG";
-import imgJavaOperators from "@assets/0F94F671-1D04-4EED-BC72-05B77C27CA07_1783095490513.JPG";
-
+const imgJavaConcepts = "/api/storage/public-objects/17AFCB8E-85D1-4F11-BA60-7BC42DA9FA11_1783095490513.JPG";
+const imgJavaOperators = "/api/storage/public-objects/0F94F671-1D04-4EED-BC72-05B77C27CA07_1783095490513.JPG";
 const BG = "#04060d";
 const PAN = "#0a0d1a";
 const PAN2 = "#0d1020";

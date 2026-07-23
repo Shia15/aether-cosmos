@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from "react";
-import imgGravitropism  from "@assets/Gemini_Generated_Image_hfeys3hfeys3hfey_1782753878224.png";
-import imgMeristem      from "@assets/Gemini_Generated_Image_jb7g0ajb7g0ajb7g_1782753900629.png";
-import imgRootHair      from "@assets/Gemini_Generated_Image_sjnv2isjnv2isjnv_1782753926093.png";
-import imgMossEcology   from "@assets/Gemini_Generated_Image_yz72jyz72jyz72jy_1782753944404.png";
-import imgSaffronRoot   from "@assets/image_1782754082763.png";
-import imgPoppyRoot     from "@assets/Gemini_Generated_Image_t2acpet2acpet2ac_1782754133064.png";
-
+const imgGravitropism = "/api/storage/public-objects/Gemini_Generated_Image_hfeys3hfeys3hfey_1782753878224.png";
+const imgMeristem = "/api/storage/public-objects/Gemini_Generated_Image_jb7g0ajb7g0ajb7g_1782753900629.png";
+const imgRootHair = "/api/storage/public-objects/Gemini_Generated_Image_sjnv2isjnv2isjnv_1782753926093.png";
+const imgMossEcology = "/api/storage/public-objects/Gemini_Generated_Image_yz72jyz72jyz72jy_1782753944404.png";
+const imgSaffronRoot = "/api/storage/public-objects/image_1782754082763.png";
+const imgPoppyRoot = "/api/storage/public-objects/Gemini_Generated_Image_t2acpet2acpet2ac_1782754133064.png";
 const TAU=Math.PI*2, PI=Math.PI;
 const CW=900;
 

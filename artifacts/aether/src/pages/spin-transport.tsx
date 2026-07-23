@@ -1,17 +1,16 @@
 import { useEffect, useRef } from "react";
-import img_framework1 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_26_54_AM_1781429635909.png";
-import img_framework2 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_26_58_AM_1781429635912.png";
-import img_architecture from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_40_AM_1781429635922.png";
-import img_higgs from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_43_AM_1781429635923.png";
-import img_coherence_dyn1 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_02_AM_1781429662709.png";
-import img_coherence_dyn2 from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_06_AM_1781429662709.png";
-import img_gravity_accel from "@assets/ChatGPT_Image_Jun_14,_2026,_03_29_58_AM_1781429662708.png";
-import img_phi_clock from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_50_AM_1781429586415.png";
-import img_math_scale from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_32_AM_1781429662713.png";
-import img_marble from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_49_AM_1781429635924.png";
-import img_liquid_water from "@assets/ChatGPT_Image_Jun_14,_2026,_03_27_52_AM_1781429635924.png";
-import img_coherence_factor from "@assets/ChatGPT_Image_Jun_14,_2026,_03_30_35_AM_1781429662714.png";
-
+const img_framework1 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_26_54_AM_1781429635909.png";
+const img_framework2 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_26_58_AM_1781429635912.png";
+const img_architecture = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_40_AM_1781429635922.png";
+const img_higgs = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_43_AM_1781429635923.png";
+const img_coherence_dyn1 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_02_AM_1781429662709.png";
+const img_coherence_dyn2 = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_06_AM_1781429662709.png";
+const img_gravity_accel = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_29_58_AM_1781429662708.png";
+const img_phi_clock = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_50_AM_1781429586415.png";
+const img_math_scale = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_32_AM_1781429662713.png";
+const img_marble = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_49_AM_1781429635924.png";
+const img_liquid_water = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_27_52_AM_1781429635924.png";
+const img_coherence_factor = "/api/storage/public-objects/ChatGPT_Image_Jun_14,_2026,_03_30_35_AM_1781429662714.png";
 function SpinTransportCanvas() {
   const cvRef  = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef(0);

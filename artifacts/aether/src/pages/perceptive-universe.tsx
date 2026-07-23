@@ -1,23 +1,22 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
 /* ── Asset imports ── */
-import sfvImg        from "@assets/Blue_Handdrawn_Vintage_Aesthetic_Creative_Studio_Logo_-_1_1781994622727.jpeg";
-import freq264Img    from "@assets/0DF0AB72-86D6-4F60-ABFA-B594C7EC8B92_1781994622728.png";
-import unifiedFieldImg from "@assets/IMG_3390_1781994622728.png";
-import mpcImg        from "@assets/IMG_3388_1781994622728.png";
-import cymatics426Img from "@assets/86C11DE3-7DB4-46D5-9D19-087D6483F19B_1781994622728.png";
-import doubleslitImg from "@assets/68991823-FE36-456A-A53E-1DCF9C1F2939_1781994622728.png";
-import echoesImg     from "@assets/40318960-9FFA-4956-BF6D-CAC841C15C49_1781994622728.png";
-import quote1Img     from "@assets/523FD425-7FBD-42C0-AE77-CE04EA5AAABF_1781994622728.png";
-import quote2Img     from "@assets/7D486897-E3C8-484C-994C-7C5B6EB19EA2_1781994622728.png";
-import quote3Img     from "@assets/6FBE7E95-5FA3-4780-B189-A7A6EA21F70E_1781994622728.png";
-import quote4Img     from "@assets/2841B7F2-A760-4344-97E1-C4B098D2E1E1_1781994622728.png";
-import quote5Img     from "@assets/5214405A-87A3-4748-BAA8-6856494B9FC8_1781994622728.png";
-import abstractImg   from "@assets/2072A243-1A49-4070-8A00-3C497286B920_1781994622728.png";
-import tokensImg     from "@assets/CA31693F-D61A-4F03-A6E1-0E13B3B151BC_1781994622728.png";
-import cpanelImg     from "@assets/4C8D0EBE-45E7-46FE-B92A-C55DF5167AAE_1781994622728.png";
-import sigilEggsImg  from "@assets/68785CA9-810A-40EF-92C2-810F848DEFBD_1781994622728.png";
-
+const sfvImg = "/api/storage/public-objects/Blue_Handdrawn_Vintage_Aesthetic_Creative_Studio_Logo_-_1_1781994622727.jpeg";
+const freq264Img = "/api/storage/public-objects/0DF0AB72-86D6-4F60-ABFA-B594C7EC8B92_1781994622728.png";
+const unifiedFieldImg = "/api/storage/public-objects/IMG_3390_1781994622728.png";
+const mpcImg = "/api/storage/public-objects/IMG_3388_1781994622728.png";
+const cymatics426Img = "/api/storage/public-objects/86C11DE3-7DB4-46D5-9D19-087D6483F19B_1781994622728.png";
+const doubleslitImg = "/api/storage/public-objects/68991823-FE36-456A-A53E-1DCF9C1F2939_1781994622728.png";
+const echoesImg = "/api/storage/public-objects/40318960-9FFA-4956-BF6D-CAC841C15C49_1781994622728.png";
+const quote1Img = "/api/storage/public-objects/523FD425-7FBD-42C0-AE77-CE04EA5AAABF_1781994622728.png";
+const quote2Img = "/api/storage/public-objects/7D486897-E3C8-484C-994C-7C5B6EB19EA2_1781994622728.png";
+const quote3Img = "/api/storage/public-objects/6FBE7E95-5FA3-4780-B189-A7A6EA21F70E_1781994622728.png";
+const quote4Img = "/api/storage/public-objects/2841B7F2-A760-4344-97E1-C4B098D2E1E1_1781994622728.png";
+const quote5Img = "/api/storage/public-objects/5214405A-87A3-4748-BAA8-6856494B9FC8_1781994622728.png";
+const abstractImg = "/api/storage/public-objects/2072A243-1A49-4070-8A00-3C497286B920_1781994622728.png";
+const tokensImg = "/api/storage/public-objects/CA31693F-D61A-4F03-A6E1-0E13B3B151BC_1781994622728.png";
+const cpanelImg = "/api/storage/public-objects/4C8D0EBE-45E7-46FE-B92A-C55DF5167AAE_1781994622728.png";
+const sigilEggsImg = "/api/storage/public-objects/68785CA9-810A-40EF-92C2-810F848DEFBD_1781994622728.png";
 /* ── Palette ── */
 const BG    = "#020408";
 const GOLD  = "#c9a84c";

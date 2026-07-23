@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import imgFlowerTorus from "@assets/0A85C6B6-CA53-4FCA-80C0-9E198796A05B_1782484195842.png";
-import imgFloquetRef  from "@assets/F428D75C-36D9-4C14-B67B-E499860287E1_1782484195842.png";
-import imgCosmTorus   from "@assets/CEC0967A-23A8-46EC-B61F-31E608A9E932_1782484195842.jpeg";
-import imgFlowerLife  from "@assets/550C9FD6-57FC-4FE5-A59C-6E1FE688844F_1782484195842.jpeg";
-import imgRoseRhod    from "@assets/6091BF3F-D10B-4C80-923E-69A30B98A52D_1782484195842.jpeg";
-
+const imgFlowerTorus = "/api/storage/public-objects/0A85C6B6-CA53-4FCA-80C0-9E198796A05B_1782484195842.png";
+const imgFloquetRef = "/api/storage/public-objects/F428D75C-36D9-4C14-B67B-E499860287E1_1782484195842.png";
+const imgCosmTorus = "/api/storage/public-objects/CEC0967A-23A8-46EC-B61F-31E608A9E932_1782484195842.jpeg";
+const imgFlowerLife = "/api/storage/public-objects/550C9FD6-57FC-4FE5-A59C-6E1FE688844F_1782484195842.jpeg";
+const imgRoseRhod = "/api/storage/public-objects/6091BF3F-D10B-4C80-923E-69A30B98A52D_1782484195842.jpeg";
 /* ── palette ───────────────────────────────────────────────── */
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",

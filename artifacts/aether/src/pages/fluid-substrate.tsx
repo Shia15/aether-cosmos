@@ -1,13 +1,12 @@
 import { useRef, useEffect, useState } from "react";
-import imgDrySteel      from "@assets/A4F98AE2-65C3-41DB-B738-AB2E68A158B2_1783363382279.png";
-import imgVortexTube    from "@assets/IMG_4059_1783363382279.png";
-import imgAirNanotube   from "@assets/375190CE-437D-4F4F-B58C-C30BFDA49D4C_1783363382279.png";
-import imgBiolum        from "@assets/2299D766-4A18-4806-9C6C-C9DE3AB8E3F9_1783363382279.png";
-import imgFunnel        from "@assets/IMG_4046_1783363382279.jpeg";
-import imgRibosome      from "@assets/IMG_4047_1783363382279.jpeg";
-import imgEinstein      from "@assets/IMG_4063_1783363382279.jpeg";
-import imgZeta          from "@assets/IMG_4064_1783363382279.jpeg";
-
+const imgDrySteel = "/api/storage/public-objects/A4F98AE2-65C3-41DB-B738-AB2E68A158B2_1783363382279.png";
+const imgVortexTube = "/api/storage/public-objects/IMG_4059_1783363382279.png";
+const imgAirNanotube = "/api/storage/public-objects/375190CE-437D-4F4F-B58C-C30BFDA49D4C_1783363382279.png";
+const imgBiolum = "/api/storage/public-objects/2299D766-4A18-4806-9C6C-C9DE3AB8E3F9_1783363382279.png";
+const imgFunnel = "/api/storage/public-objects/IMG_4046_1783363382279.jpeg";
+const imgRibosome = "/api/storage/public-objects/IMG_4047_1783363382279.jpeg";
+const imgEinstein = "/api/storage/public-objects/IMG_4063_1783363382279.jpeg";
+const imgZeta = "/api/storage/public-objects/IMG_4064_1783363382279.jpeg";
 // ─── Palette ──────────────────────────────────────────────────────────────
 const BG   = "#0a0e1a";
 const TEAL = "#00FFEE";

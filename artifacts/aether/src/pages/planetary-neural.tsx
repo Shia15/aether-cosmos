@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import imgPlanetary from "@assets/2FB64D9D-19C2-4675-AA57-CEC1704DEDE2_1782484195842.png";
-
+const imgPlanetary = "/api/storage/public-objects/2FB64D9D-19C2-4675-AA57-CEC1704DEDE2_1782484195842.png";
 /* ── palette ───────────────────────────────────────────────── */
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",

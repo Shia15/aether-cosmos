@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import imgLadder from "@assets/image_1782758559095.png";
-import imgWater  from "@assets/Gemini_Generated_Image_l9zo1il9zo1il9zo_1782758590853.png";
-import imgKpert  from "@assets/image_1782758774766.png";
-import imgBioDome from "@assets/image_1782758790666.png";
-import imgChip   from "@assets/image_1782758833412.png";
-import imgMito   from "@assets/image_1782758921066.png";
-import imgMaster from "@assets/image_1782758966918.png";
-
+const imgLadder = "/api/storage/public-objects/image_1782758559095.png";
+const imgWater = "/api/storage/public-objects/Gemini_Generated_Image_l9zo1il9zo1il9zo_1782758590853.png";
+const imgKpert = "/api/storage/public-objects/image_1782758774766.png";
+const imgBioDome = "/api/storage/public-objects/image_1782758790666.png";
+const imgChip = "/api/storage/public-objects/image_1782758833412.png";
+const imgMito = "/api/storage/public-objects/image_1782758921066.png";
+const imgMaster = "/api/storage/public-objects/image_1782758966918.png";
 /* ==========================================================================
    THE COMPLETE AETHER DMF OBSERVABLE · MASTER EQUATION & GRAND SYNTHESIS
    The capstone page. Every prior thread — the transport cavity, the DMF

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import restorationImg from "@assets/2E4D299F-AE6C-4A8D-A146-E888B177F6A0_1782493532725.png";
-
+const restorationImg = "/api/storage/public-objects/2E4D299F-AE6C-4A8D-A146-E888B177F6A0_1782493532725.png";
 const V = {
   bg:"#04060E", aurora:"#00FFB2", gold:"#C8A030", blue:"#4488FF",
   vio:"#9966FF", amb:"#FF9933", rose:"#FF6699", plasma:"#FF4477",

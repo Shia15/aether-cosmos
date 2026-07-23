@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import infographic from "@assets/E514D86D-00E9-4E33-A416-06F23067C2F8_1782531582029.png";
-
+const infographic = "/api/storage/public-objects/E514D86D-00E9-4E33-A416-06F23067C2F8_1782531582029.png";
 const V = {
   bg:"#04060E",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
   vio:"#9966FF",amb:"#FF9933",rose:"#FF6699",plasma:"#FF4477",

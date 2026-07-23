@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import imgGutBrain from "@assets/770EA1EA-DBF1-41FD-93A6-A8742013520F_1782484195842.png";
-
+const imgGutBrain = "/api/storage/public-objects/770EA1EA-DBF1-41FD-93A6-A8742013520F_1782484195842.png";
 const BG    = "#020810";
 const PNL   = "#071220";
 const PNL2  = "#0a1628";

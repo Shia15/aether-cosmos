@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import humanStrandImg  from "@assets/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000038123.png";
-import strandDiagram  from "@assets/C20E8497-E3A4-4693-AB3B-D03440AEA4B8_1782000566540.png";
-import humanStrand2   from "@assets/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000566540.png";
-
+const humanStrandImg = "/api/storage/public-objects/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000038123.png";
+const strandDiagram = "/api/storage/public-objects/C20E8497-E3A4-4693-AB3B-D03440AEA4B8_1782000566540.png";
+const humanStrand2 = "/api/storage/public-objects/42C7A69D-3F45-4D4B-81EC-4F92E157EB18_1782000566540.png";
 /* ── Palette ─────────────────────────────────────────── */
 const BG   = "#020408";
 const TEAL = "#2ef0d8";

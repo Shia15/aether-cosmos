@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import plateLight from "@assets/ChatGPT_Image_Jun_28,_2026,_02_44_54_PM_1782672305141.png";
-import plateDensity from "@assets/ChatGPT_Image_Jun_28,_2026,_02_46_34_PM_1782672398737.png";
-import plateWoodFrog from "@assets/ChatGPT_Image_Jun_28,_2026,_02_38_24_PM_1782919933851.png";
-
+const plateLight = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_44_54_PM_1782672305141.png";
+const plateDensity = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_46_34_PM_1782672398737.png";
+const plateWoodFrog = "/api/storage/public-objects/ChatGPT_Image_Jun_28,_2026,_02_38_24_PM_1782919933851.png";
 const V = {
   bg:"#05060C",aurora:"#00FFB2",gold:"#C8A030",blue:"#4488FF",
   vio:"#9966FF",amb:"#FF9933",rose:"#FF6699",plasma:"#FF4477",
