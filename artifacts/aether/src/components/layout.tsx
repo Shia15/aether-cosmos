@@ -420,6 +420,7 @@ export const NAV_ITEMS = [
   { href: "/codebase-symbol-engine", label: "Codebase Creation · Symbol Engine · Dynamics & Integration · Java Concepts · Operators · Data Types", icon: Hexagon },
   { href: "/java-control-flow", label: "Java Control Flow · If-Else · Loops · Switch · String Methods · indexOf · substring · equals", icon: Hexagon },
   { href: "/petrification-transformation", label: "Petrification Transformation · Entropy Decay · dS/dt · Disruption · Infiltration · Locking · Coherence Reversal", icon: Hexagon },
+  { href: "/scholar-q", label: "Scholar Q · ORCID · arXiv · Nature · Research Publications · Publication Queue · Cybersecurity", icon: BookOpen },
   { href: "/q-aether-research", label: "Q~AETHER · Emergent Quantum-Photonic Analog Field Reservoir · Five-Layer Architecture · DNLS · Hebbian · Kerr", icon: Hexagon },
   { href: "/computational-mathematics", label: "Expanding Computational Mathematics · Quaternions · Octonions · Fano Plane · Einstein GR · AETHER Five-Phase", icon: Hexagon },
   { href: "/substrate-computing", label: "Substrate Computing · Si₃N₄ Waveguide · DNLS · Fibonacci Anyons · Multi-Omic Integration · 60% Survival", icon: Hexagon },

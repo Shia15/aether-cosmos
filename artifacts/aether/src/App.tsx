@@ -369,6 +369,7 @@ const CodebaseSymbolEnginePage = lazy(() => import("@/pages/codebase-symbol-engi
 const JavaControlFlowPage = lazy(() => import("@/pages/java-control-flow"));
 const PetrificationTransformationPage = lazy(() => import("@/pages/petrification-transformation"));
 const QAetherResearchPage = lazy(() => import("@/pages/q-aether-research"));
+const ScholarQPage = lazy(() => import("@/pages/scholar-q"));
 const ComputationalMathematicsPage = lazy(() => import("@/pages/computational-mathematics"));
 const SubstrateComputingPage = lazy(() => import("@/pages/substrate-computing"));
 const AetherWhitepaperV1Page = lazy(() => import("@/pages/aether-whitepaper-v1"));
@@ -1587,6 +1588,7 @@ function Router() {
                 <Route path="/java-control-flow" component={JavaControlFlowPage} />
                 <Route path="/petrification-transformation" component={PetrificationTransformationPage} />
                 <Route path="/q-aether-research" component={QAetherResearchPage} />
+                <Route path="/scholar-q" component={ScholarQPage} />
                 <Route path="/computational-mathematics" component={ComputationalMathematicsPage} />
                 <Route path="/substrate-computing" component={SubstrateComputingPage} />
                 <Route path="/aether-whitepaper-v1" component={AetherWhitepaperV1Page} />

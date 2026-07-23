@@ -24,6 +24,7 @@ import googleDriveRouter from "./google-drive";
 import storageRouter from "./storage";
 import geminiRouter from "./gemini";
 import proxyFetchRouter from "./proxy-fetch";
+import scholarRouter from "./scholar";
 
 const router: IRouter = Router();
 
@@ -52,5 +53,6 @@ router.use(googleDriveRouter);
 router.use(storageRouter);
 router.use(geminiRouter);
 router.use(proxyFetchRouter);
+router.use(scholarRouter);
 
 export default router;
