@@ -115,4 +115,111 @@ router.get("/scholar/orcid", async (req: Request, res: Response): Promise<void> 
   }
 });
 
+/**
+ * GET /api/scholar/notion-papers
+ * Returns the user's research papers from Notion, enriched with arXiv readiness metadata.
+ * Reads from the curated research parent page and the CLA_Paper database.
+ */
+router.get("/scholar/notion-papers", async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const { ReplitConnectors } = await import("@replit/connectors-sdk");
+    const connectors = new ReplitConnectors();
+
+    const notionProxy = (path: string, body?: object) =>
+      connectors.proxy("notion", path, {
+        method: body ? "POST" : "GET",
+        ...(body ? { body: JSON.stringify(body), headers: { "Content-Type": "application/json" } } : {}),
+      }).then((r: any) => r.json());
+
+    // Fetch child pages from the main research parent page in parallel with CLA_Paper db
+    const [parentChildren, claDb] = await Promise.all([
+      notionProxy("/v1/blocks/33a6e876-9112-81cf-89d4-de1f222ba804/children?page_size=100"),
+      notionProxy("/v1/databases/3396e876-9112-8026-8bd5-e47bad95194c/query", { page_size: 50 }),
+    ]);
+
+    // Map known papers with enriched metadata
+    const KNOWN_PAPERS: Record<string, { category: string; readiness: number; summary: string }> = {
+      "37d6e876-9112-81a4-b048-e02af7fb7205": {
+        category: "q-bio.QM",
+        readiness: 90,
+        summary: "An 11-layer computational cascade model linking solar electromagnetic activity (F10.7) to epigenetic coherence via iodine/selenium endocrine pathways. Includes governing equations and CUCA architecture."
+      },
+      "3486e876-9112-814f-aacd-db70365b1edf": {
+        category: "q-bio.MN",
+        readiness: 55,
+        summary: "Brain-First Metabolism Framework — substrate restoration as prerequisite to signal optimization. Explores sequence-dependent metabolic coherence."
+      },
+      "3486e876-9112-8180-9b43-d0031a5fe957": {
+        category: "physics.gen-ph",
+        readiness: 50,
+        summary: "AETHER Patent covering advanced propulsion theory and warp field dynamics using Alcubierre-analog geometry."
+      },
+      "3486e876-9112-81b1-80db-e4426029a582": {
+        category: "physics.gen-ph",
+        readiness: 40,
+        summary: "Pyramidal resonance as Earth's coupled oscillator — resonance physics applied to geophysical standing wave structures."
+      },
+    };
+
+    const childPages = (parentChildren?.results ?? [])
+      .filter((b: any) => b.type === "child_page")
+      .map((b: any) => {
+        const meta = KNOWN_PAPERS[b.id] ?? { category: "cs.AI", readiness: 30, summary: "" };
+        return {
+          id: b.id,
+          title: b.child_page?.title ?? "Untitled",
+          source: "notion-page",
+          category: meta.category,
+          readiness: meta.readiness,
+          summary: meta.summary,
+          notionUrl: `https://notion.so/${b.id.replace(/-/g, "")}`,
+        };
+      })
+      .filter((p: any) => !p.title.endsWith(".html") && !p.title.endsWith(".jsx") && !p.title.endsWith(".md 🛸 "))
+      .sort((a: any, b: any) => b.readiness - a.readiness);
+
+    const claEntries = (claDb?.results ?? []).map((p: any) => {
+      const title = p.properties?.Page?.title?.[0]?.plain_text ?? "Untitled";
+      const url = p.properties?.URL?.url ?? "";
+      const tags = (p.properties?.Tags?.multi_select ?? []).map((t: any) => t.name);
+      return { id: p.id, title, source: "cla-paper", url, tags, category: "cs.AI", readiness: 20, summary: "" };
+    }).filter((p: any) => p.title.length > 3 && !p.title.startsWith("http"));
+
+    res.json({
+      papers: childPages,
+      claEntries,
+      featured: {
+        id: "37d6e876-9112-81a4-b048-e02af7fb7205",
+        title: "A Computational Cascade Model: Solar Luminosity to Epigenetic Coherence",
+        subtitle: "With CUCA Formal Laws and Empirical Validation Framework",
+        author: "Shia Miller",
+        affiliation: "AetherLife.co · Cosmic Chaos Corporation™, Hollidaysburg, Pennsylvania",
+        date: "June 2026",
+        abstract: "The AETHER Solar Physics Engine formalizes an 11-layer computational cascade linking solar electromagnetic activity to integrated biological disease risk. Beginning with the F10.7 solar flux index, the model propagates through interplanetary magnetic field (IMF) modulation, geomagnetic Kp forcing, ocean upwelling dynamics, marine iodine transport, thyroid hormone axis, mitochondrial ATP production, neural coherence, gut microbiome diversity, circadian entrainment, and epigenetic aging rate — each layer governed by a formal equation derived from the empirical literature. The two-variable bottleneck hypothesis (iodine supply and selenium status) generates a falsifiable prediction: populations with adequate selenium should show attenuated solar-cycle-phase correlations with metabolic disease. The CUCA (Closed-Loop Universal Coherence Architecture) framework provides the unifying control-theoretic structure.",
+        keywords: ["solar-biological coupling", "thyroid coherence", "epigenetic aging", "circadian rhythm", "gut-brain axis", "AETHER framework", "CUCA architecture", "coherence cascade", "F10.7", "iodine deficiency"],
+        sections: [
+          "1. Introduction — The Disciplinary Gap & Central Thesis",
+          "2. The Physical Cascade (Layers 1–4) — F10.7, IMF, Kp, Ocean Upwelling",
+          "3. The Endocrine Cascade (Layers 5–6) — Marine Iodine, Thyroid Hormone Axis",
+          "4. The Cellular Energetics Cascade (Layers 7–8) — Mitochondrial ATP, Neural Coherence",
+          "5. The Extended Biological Cascade (Layers 9–11) — Gut Microbiome, Circadian, Epigenetic",
+        ],
+        suggestedCategory: "q-bio.QM",
+        altCategories: ["physics.bio-ph", "physics.gen-ph", "q-bio.NC"],
+        readiness: 90,
+        notionUrl: "https://notion.so/37d6e8769112-81a4-b048-e02af7fb7205",
+        missingFor100: [
+          "Add a formal References section (10–20 cited papers)",
+          "Add a Methods / Limitations subsection",
+          "Register on arXiv (requires one-time endorsement for q-bio)",
+          "Convert equations to LaTeX format for the arXiv submission system",
+        ],
+      }
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(502).json({ error: "Notion fetch failed: " + msg });
+  }
+});
+
 export default router;

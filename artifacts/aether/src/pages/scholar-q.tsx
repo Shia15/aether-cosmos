@@ -9,6 +9,37 @@ const ORCID_ID = "0009-0000-5537-1034";
 const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 /* ── types ── */
+interface NotionFeaturedPaper {
+  id: string;
+  title: string;
+  subtitle: string;
+  author: string;
+  affiliation: string;
+  date: string;
+  abstract: string;
+  keywords: string[];
+  sections: string[];
+  suggestedCategory: string;
+  altCategories: string[];
+  readiness: number;
+  notionUrl: string;
+  missingFor100: string[];
+}
+interface NotionPaper {
+  id: string;
+  title: string;
+  source: string;
+  category: string;
+  readiness: number;
+  summary: string;
+  notionUrl: string;
+}
+interface NotionPapersData {
+  papers: NotionPaper[];
+  claEntries: { id: string; title: string; url: string; tags: string[] }[];
+  featured: NotionFeaturedPaper;
+}
+
 interface OrcidWork {
   title: string;
   type: string;
@@ -390,6 +421,167 @@ function SubmissionGuide() {
   );
 }
 
+/* ── arXiv submission preview for featured paper ── */
+function FeaturedPaperPreview({ paper }: { paper: NotionFeaturedPaper }) {
+  const pct = paper.readiness;
+  const barColor = pct >= 80 ? GREEN : pct >= 50 ? GOLD : ROSE;
+
+  return (
+    <div>
+      {/* readiness meter */}
+      <Card style={{ border: `1px solid ${barColor}44`, marginBottom: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+          <span style={{ fontFamily: "monospace", fontSize: 11, color: barColor, fontWeight: 700 }}>
+            Submission Readiness: {pct}%
+          </span>
+          {tag("MOST COMPLETE", barColor)}
+        </div>
+        <div style={{ height: 6, background: DIM, borderRadius: 3, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${pct}%`, background: barColor, borderRadius: 3, transition: "width 0.6s ease" }} />
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <p style={{ fontFamily: "monospace", fontSize: 10, color: MUTED, margin: "0 0 6px" }}>
+            Still needed for 100%:
+          </p>
+          {paper.missingFor100.map((m, i) => (
+            <div key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start", marginBottom: 4 }}>
+              <span style={{ color: GOLD, fontFamily: "monospace", fontSize: 10, flexShrink: 0 }}>→</span>
+              <span style={{ fontFamily: "monospace", fontSize: 10, color: TEXT, lineHeight: 1.5 }}>{m}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* arXiv abstract card — exactly how it will appear on arxiv.org */}
+      <Card style={{ border: `1px solid ${CYAN}44` }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+          {tag("arXiv PREPRINT PREVIEW", CYAN)}
+          {tag(paper.suggestedCategory, GOLD)}
+          {paper.altCategories.map(c => tag(c, MUTED))}
+        </div>
+
+        <div style={{ borderBottom: `1px solid ${BORDER}`, paddingBottom: 12, marginBottom: 12 }}>
+          <h3 style={{ fontFamily: "monospace", fontSize: 15, color: TEXT, margin: "0 0 4px", lineHeight: 1.4, fontWeight: 700 }}>
+            {paper.title}
+          </h3>
+          <p style={{ fontFamily: "monospace", fontSize: 12, color: VIOLET, margin: "0 0 4px" }}>
+            {paper.subtitle}
+          </p>
+          <p style={{ fontFamily: "monospace", fontSize: 11, color: MUTED, margin: "0 0 2px" }}>
+            {paper.author}
+          </p>
+          <p style={{ fontFamily: "monospace", fontSize: 10, color: DIM, margin: 0 }}>
+            {paper.affiliation} · Preprint {paper.date}
+          </p>
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ fontFamily: "monospace", fontSize: 10, color: CYAN, margin: "0 0 6px", letterSpacing: 1 }}>ABSTRACT</p>
+          <p style={{ fontFamily: "monospace", fontSize: 11, color: TEXT, margin: 0, lineHeight: 1.8 }}>
+            {paper.abstract}
+          </p>
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ fontFamily: "monospace", fontSize: 10, color: CYAN, margin: "0 0 6px", letterSpacing: 1 }}>KEYWORDS</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+            {paper.keywords.map(k => <span key={k} style={{
+              fontSize: 9, fontFamily: "monospace", padding: "2px 7px",
+              borderRadius: 4, border: `1px solid ${MUTED}44`, color: MUTED,
+              background: `${MUTED}12`, letterSpacing: 1, textTransform: "uppercase" as const,
+              whiteSpace: "nowrap" as const,
+            }}>{k}</span>)}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 14 }}>
+          <p style={{ fontFamily: "monospace", fontSize: 10, color: CYAN, margin: "0 0 8px", letterSpacing: 1 }}>TABLE OF CONTENTS</p>
+          {paper.sections.map((s, i) => (
+            <p key={i} style={{ fontFamily: "monospace", fontSize: 11, color: MUTED, margin: "0 0 3px", lineHeight: 1.5 }}>
+              {s}
+            </p>
+          ))}
+        </div>
+
+        <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <a href="https://arxiv.org/submit" target="_blank" rel="noreferrer" style={{
+            fontFamily: "monospace", fontSize: 11, color: BG, background: GOLD,
+            border: "none", borderRadius: 6, padding: "8px 18px", textDecoration: "none", fontWeight: 700,
+          }}>
+            Submit This to arXiv ↗
+          </a>
+          <a href={paper.notionUrl} target="_blank" rel="noreferrer" style={{
+            fontFamily: "monospace", fontSize: 11, color: VIOLET,
+            border: `1px solid ${VIOLET}44`, borderRadius: 6, padding: "8px 18px",
+            textDecoration: "none", background: `${VIOLET}10`,
+          }}>
+            Open in Notion ↗
+          </a>
+        </div>
+      </Card>
+
+      {/* Step-by-step submission guide for THIS paper */}
+      <Card style={{ marginTop: 12, border: `1px solid ${GOLD}22` }}>
+        <p style={{ fontFamily: "monospace", fontSize: 10, color: GOLD, margin: "0 0 10px", letterSpacing: 1 }}>
+          EXACT STEPS TO SUBMIT THIS PAPER TO arXiv
+        </p>
+        {[
+          { n: "1", step: "Request arXiv endorsement for q-bio.QM", detail: "Go to arxiv.org → click Register → after account creation, request endorsement for Quantitative Biology. Takes 1–3 days. Only needed once." },
+          { n: "2", step: "Export your paper from Notion", detail: "In Notion: open the Solar Physics paper → ··· menu → Export → Markdown & CSV. This gives you the text you'll paste into arXiv." },
+          { n: "3", step: "Prepare the submission on arXiv", detail: "Go to arxiv.org/submit → New Submission → Category: q-bio.QM (Quantitative Methods) → upload your paper file or paste text." },
+          { n: "4", step: "Fill the metadata form", detail: `Title: "${paper.title}" | Authors: Shia Miller | Abstract: copy from your Notion paper | Keywords: solar-biological coupling; thyroid coherence; epigenetic aging; F10.7` },
+          { n: "5", step: "Link your ORCID iD", detail: "In the submission form, add your ORCID: 0009-0000-5537-1034. It will permanently connect this preprint to your ORCID profile." },
+          { n: "6", step: "Submit and wait", detail: "arXiv processes submissions overnight (Sun–Fri). Your paper goes live the next business day with a permanent arXiv ID like arXiv:2607.XXXXX." },
+        ].map(({ n, step, detail }) => (
+          <div key={n} style={{ display: "flex", gap: 12, marginBottom: 12, alignItems: "flex-start" }}>
+            <div style={{
+              width: 22, height: 22, borderRadius: "50%", background: `${GOLD}22`,
+              border: `1px solid ${GOLD}55`, display: "flex", alignItems: "center",
+              justifyContent: "center", fontFamily: "monospace", fontSize: 10, color: GOLD, flexShrink: 0,
+            }}>{n}</div>
+            <div>
+              <p style={{ fontFamily: "monospace", fontSize: 12, color: TEXT, margin: "0 0 3px", fontWeight: 700 }}>{step}</p>
+              <p style={{ fontFamily: "monospace", fontSize: 10, color: MUTED, margin: 0, lineHeight: 1.6 }}>{detail}</p>
+            </div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+}
+
+/* ── other notion papers list ── */
+function OtherPapersList({ papers }: { papers: NotionPaper[] }) {
+  const filtered = papers.filter(p => p.id !== "37d6e876-9112-81a4-b048-e02af7fb7205");
+  if (filtered.length === 0) return null;
+  return (
+    <>
+      {filtered.slice(0, 8).map(p => (
+        <Card key={p.id}>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 6, alignItems: "center" }}>
+            {tag(p.category, MUTED)}
+            <div style={{ flex: 1 }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{ width: 50, height: 4, background: DIM, borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${p.readiness}%`, background: p.readiness >= 70 ? GREEN : p.readiness >= 40 ? GOLD : ROSE, borderRadius: 2 }} />
+              </div>
+              <span style={{ fontFamily: "monospace", fontSize: 9, color: MUTED }}>{p.readiness}%</span>
+            </div>
+          </div>
+          <p style={{ fontFamily: "monospace", fontSize: 12, color: TEXT, margin: "0 0 4px", lineHeight: 1.4 }}>
+            {p.title.replace(/[🌕🛸🌌🤖💎✨🌹🧚🌊🍪🌸🌺🌷🌼🎩🥧☀️🧮🤩🥞🍩♾️🪉🫶🗂📝📑🌱💖]/g, "").trim()}
+          </p>
+          {p.summary && <p style={{ fontFamily: "monospace", fontSize: 10, color: MUTED, margin: "0 0 8px", lineHeight: 1.6 }}>{p.summary}</p>}
+          <a href={p.notionUrl} target="_blank" rel="noreferrer"
+            style={{ fontFamily: "monospace", fontSize: 10, color: CYAN, textDecoration: "none" }}>
+            Open in Notion ↗
+          </a>
+        </Card>
+      ))}
+    </>
+  );
+}
+
 /* ── main page ── */
 export default function ScholarQPage() {
   const [person, setPerson] = useState<{ given: string; family: string; bio: string } | null>(null);
@@ -399,7 +591,9 @@ export default function ScholarQPage() {
   const [arxivInput, setArxivInput] = useState("cybersecurity education");
   const [arxivLoading, setArxivLoading] = useState(false);
   const [worksLoading, setWorksLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"tracked" | "arxiv" | "guide" | "queue">("tracked");
+  const [notionData, setNotionData] = useState<NotionPapersData | null>(null);
+  const [notionLoading, setNotionLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"papers" | "tracked" | "arxiv" | "guide" | "queue">("papers");
 
   /* fetch ORCID person + works via API proxy */
   useEffect(() => {
@@ -464,7 +658,21 @@ export default function ScholarQPage() {
 
   useEffect(() => { fetchArxiv(arxivQuery); }, [arxivQuery, fetchArxiv]);
 
+  /* fetch Notion papers */
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/scholar/notion-papers`);
+        const data = await res.json();
+        setNotionData(data);
+      } catch { /* show nothing */ } finally {
+        setNotionLoading(false);
+      }
+    })();
+  }, []);
+
   const TABS: { key: typeof activeTab; label: string; color: string; count?: number }[] = [
+    { key: "papers", label: "My Papers", color: ROSE, count: notionData ? notionData.papers.length : undefined },
     { key: "tracked", label: "ORCID Works", color: GREEN, count: works.length },
     { key: "arxiv", label: "arXiv Feed", color: GOLD },
     { key: "guide", label: "How to Publish", color: VIOLET },
@@ -514,6 +722,38 @@ export default function ScholarQPage() {
             </button>
           ))}
         </div>
+
+        {/* tab: My Papers (Notion) */}
+        {activeTab === "papers" && (
+          <Section title="My Research Papers · From Notion" accent={ROSE}>
+            {notionLoading ? (
+              <Card><p style={{ fontFamily: "monospace", fontSize: 12, color: MUTED, margin: 0 }}>Loading your Notion papers…</p></Card>
+            ) : !notionData ? (
+              <Card><p style={{ fontFamily: "monospace", fontSize: 12, color: MUTED, margin: 0 }}>Could not reach Notion. Check API server.</p></Card>
+            ) : (
+              <>
+                <p style={{ fontFamily: "monospace", fontSize: 11, color: MUTED, marginBottom: 16, lineHeight: 1.7 }}>
+                  Found <strong style={{ color: TEXT }}>{notionData.papers.length}</strong> research documents in your Notion workspace.
+                  The Solar Physics Engine paper is your most complete — it's 90% arXiv-ready right now.
+                </p>
+                <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 3, height: 14, background: ROSE, borderRadius: 2 }} />
+                  <span style={{ fontFamily: "monospace", fontSize: 11, color: ROSE, letterSpacing: 1 }}>FEATURED · READY TO SUBMIT</span>
+                </div>
+                <FeaturedPaperPreview paper={notionData.featured} />
+                {notionData.papers.filter(p => p.id !== notionData.featured.id).length > 0 && (
+                  <>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, margin: "20px 0 10px" }}>
+                      <div style={{ width: 3, height: 14, background: MUTED, borderRadius: 2 }} />
+                      <span style={{ fontFamily: "monospace", fontSize: 11, color: MUTED, letterSpacing: 1 }}>OTHER RESEARCH PAGES</span>
+                    </div>
+                    <OtherPapersList papers={notionData.papers} />
+                  </>
+                )}
+              </>
+            )}
+          </Section>
+        )}
 
         {/* tab: ORCID works */}
         {activeTab === "tracked" && (
