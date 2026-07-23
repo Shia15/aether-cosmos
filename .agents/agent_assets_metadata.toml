@@ -12,3 +12,9 @@ id = "xp8zjEJMcC9ws_dhokkwd"
 uri = "file://.local/outputs/AETHER-Pitch-Deck.pdf"
 type = "pdf"
 title = "AETHER Pitch Deck.pdf"
+
+[[outputs]]
+id = "gmNmiKuWZlgLfOAtuMmqP"
+uri = "file://solar_physics_preprint.pdf"
+type = "pdf"
+title = "A Computational Cascade Model: Solar Luminosity to Epigenetic Coherence — Preprint Draft"
