@@ -33,6 +33,7 @@ channel = "stable-25_05"
 
 [userenv.shared]
 VITE_AETHER_ACCESS_CODE = "99996"
+SPRINGER_NATURE_API_KEY = "9b257a6b2bc8bcd17bd60ebb70297d8c"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-d144c474-6ba3-46a7-9d57-763f2ffbc787"
