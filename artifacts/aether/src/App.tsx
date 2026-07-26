@@ -980,6 +980,16 @@ function safeSessionSet(key: string, value: string): void {
   try { sessionStorage.setItem(key, value); } catch { /* sandboxed iframe — ignore */ }
 }
 
+// ── Inversion-field helpers (screensaver background for the gate) ──────────
+function _ivClampHue(h: number) { return ((h % 360) + 360) % 360; }
+function _ivHslToRgb(h: number, s: number, l: number): [number, number, number] {
+  const hh = _ivClampHue(h) / 360, ss = s / 100, ll = l / 100;
+  const k = (n: number) => (n + hh * 12) % 12;
+  const a = ss * Math.min(ll, 1 - ll);
+  const f = (n: number) => ll - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+
 function AccessCodeGate({ children }: { children: ReactNode }) {
   const expectedCode = import.meta.env.VITE_AETHER_ACCESS_CODE as string | undefined;
   const { signOut } = useClerk();
@@ -996,10 +1006,100 @@ function AccessCodeGate({ children }: { children: ReactNode }) {
     }
     return false;
   });
-  const [input, setInput] = useState("");
-  const [error, setError] = useState(false);
-  const [shake, setShake] = useState(false);
+  const [input, setInput]     = useState("");
+  const [error, setError]     = useState(false);
+  const [shake, setShake]     = useState(false);
   const [attempts, setAttempts] = useState(0);
+
+  // Canvas screensaver
+  const cvRef  = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const cv = cvRef.current;
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
+
+    const SPEED = 0.55, N_BLOBS = 8, GLOW = 0.72;
+    let t = 0;
+
+    function resize() {
+      cv.width  = window.innerWidth  * devicePixelRatio;
+      cv.height = window.innerHeight * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    const draw = () => {
+      const W = window.innerWidth, H = window.innerHeight;
+      const m = 0.5 + 0.5 * Math.sin(t * 0.004);         // auto-cycling mix
+      const baseHue = _ivClampHue(t * SPEED * 0.35);
+
+      ctx.fillStyle = "rgba(4,3,8,0.22)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = "screen";
+
+      for (let i = 0; i < N_BLOBS; i++) {
+        const ph   = t * 0.009 * (0.55 + SPEED) + (i * Math.PI * 2) / N_BLOBS;
+        const ph2  = t * 0.007 * (0.4  + SPEED) + (i * Math.PI * 1.3) / N_BLOBS;
+        const orbitX = W * (0.28 + 0.08 * Math.sin(t * 0.0013 * (i + 1)));
+        const orbitY = H * (0.24 + 0.06 * Math.cos(t * 0.0017 * (i + 1)));
+        const x = W * 0.5 + Math.cos(ph)  * orbitX;
+        const y = H * 0.5 + Math.sin(ph2) * orbitY;
+
+        const coreHue = _ivClampHue(baseHue + (i * 360) / N_BLOBS);
+        const invHue  = _ivClampHue(coreHue + 180);
+        const cCore = _ivHslToRgb(coreHue, 92, 56);
+        const cInv  = _ivHslToRgb(invHue,  92, 56);
+
+        const rr = Math.round(cCore[0] + (cInv[0] - cCore[0]) * m);
+        const gg = Math.round(cCore[1] + (cInv[1] - cCore[1]) * m);
+        const bb = Math.round(cCore[2] + (cInv[2] - cCore[2]) * m);
+
+        const baseR  = Math.min(W, H) * (0.10 + GLOW * 0.14);
+        const breath = 1 + 0.08 * Math.sin(t * 0.018 + i * 1.1);
+        const radius = baseR * breath;
+
+        // halo
+        const haloR = radius * 2.1;
+        const ha    = 0.12 + GLOW * 0.22;
+        const halo  = ctx.createRadialGradient(x, y, 0, x, y, haloR);
+        halo.addColorStop(0,   `rgba(${cInv[0]},${cInv[1]},${cInv[2]},${ha})`);
+        halo.addColorStop(0.5, `rgba(${cInv[0]},${cInv[1]},${cInv[2]},${ha * 0.4})`);
+        halo.addColorStop(1,   "rgba(0,0,0,0)");
+        ctx.fillStyle = halo;
+        ctx.beginPath(); ctx.arc(x, y, haloR, 0, Math.PI * 2); ctx.fill();
+
+        // mid glow
+        const midR = radius * 1.35;
+        const mid  = ctx.createRadialGradient(x, y, radius * 0.55, x, y, midR);
+        mid.addColorStop(0, `rgba(${rr},${gg},${bb},${0.45 + m * 0.3})`);
+        mid.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = mid;
+        ctx.beginPath(); ctx.arc(x, y, midR, 0, Math.PI * 2); ctx.fill();
+
+        // bright core
+        const core = ctx.createRadialGradient(x, y, 0, x, y, radius);
+        core.addColorStop(0,   `rgba(${rr},${gg},${bb},0.97)`);
+        core.addColorStop(0.4, `rgba(${rr},${gg},${bb},0.75)`);
+        core.addColorStop(1,   "rgba(0,0,0,0)");
+        ctx.fillStyle = core;
+        ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = "source-over";
+      t++;
+      rafRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
 
   if (verified || !expectedCode) return <>{children}</>;
 
@@ -1018,64 +1118,116 @@ function AccessCodeGate({ children }: { children: ReactNode }) {
   }
 
   const F = "'Inter',ui-sans-serif,system-ui,sans-serif";
+  const MN = "'Space Mono',monospace";
+
   return (
-    <AuthLayout>
+    <div style={{ position: "fixed", inset: 0, background: "#040308", overflow: "hidden" }}>
       <style>{`
         @keyframes rx-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-        .rx-inp{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:12px 14px;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;font-size:14px;color:rgba(255,255,255,0.85);width:100%;box-sizing:border-box;outline:none;transition:border-color .15s}
-        .rx-inp::placeholder{color:rgba(255,255,255,0.28)}
-        .rx-inp:focus{border-color:rgba(124,58,237,0.6)}
-        .rx-inp-err{border-color:rgba(239,68,68,0.7)!important}
+        @keyframes rx-gate-in{from{opacity:0;transform:translateY(18px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+        .rx-inp{background:rgba(255,255,255,0.06);border:1px solid rgba(180,120,255,0.22);border-radius:10px;padding:13px 15px;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;font-size:15px;color:rgba(255,255,255,0.9);width:100%;box-sizing:border-box;outline:none;transition:border-color .2s,box-shadow .2s}
+        .rx-inp::placeholder{color:rgba(255,255,255,0.25);letter-spacing:0.08em}
+        .rx-inp:focus{border-color:rgba(124,58,237,0.7);box-shadow:0 0 0 3px rgba(124,58,237,0.15)}
+        .rx-inp-err{border-color:rgba(239,68,68,0.7)!important;box-shadow:0 0 0 3px rgba(239,68,68,0.1)!important}
+        .rx-btn-enter:hover{opacity:0.88;box-shadow:0 0 32px rgba(124,58,237,0.55)!important}
+        .rx-btn-out:hover{background:rgba(255,255,255,0.1)!important}
       `}</style>
-      <div style={{display:"flex",flexDirection:"column",gap:12}}>
-        <div style={{animation: shake ? "rx-shake 0.5s ease" : "none"}}>
-          <input
-            className={`rx-inp${error ? " rx-inp-err" : ""}`}
-            type="password"
-            autoFocus
-            value={input}
-            onChange={(e) => { setInput(e.target.value); setError(false); }}
-            onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
-            placeholder="Enter access code"
-          />
-        </div>
 
-        {error && (
-          <div style={{fontFamily:F,fontSize:12,color:"#ef4444"}}>
-            Incorrect code{attempts >= 3 ? ` — ${attempts} attempts` : ""}
+      {/* Inversion field canvas */}
+      <canvas
+        ref={cvRef}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
+      />
+
+      {/* Dark vignette so the card stays readable */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 20%, rgba(4,3,8,0.55) 100%)",
+        pointerEvents: "none",
+      }} />
+
+      {/* Centred login card */}
+      <div style={{
+        position: "relative", zIndex: 10,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        height: "100vh", padding: "24px",
+      }}>
+        <div style={{
+          width: "100%", maxWidth: 340,
+          background: "rgba(6,4,14,0.72)",
+          border: "1px solid rgba(180,120,255,0.22)",
+          borderRadius: 18,
+          padding: "32px 28px 28px",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          boxShadow: "0 0 60px rgba(124,58,237,0.18), 0 0 120px rgba(46,240,216,0.08), inset 0 1px 0 rgba(255,255,255,0.06)",
+          animation: "rx-gate-in 0.55s cubic-bezier(0.16,1,0.3,1) both",
+        }}>
+          {/* Wordmark */}
+          <div style={{ textAlign: "center", marginBottom: 26 }}>
+            <div style={{ fontFamily: MN, fontSize: 10, letterSpacing: "0.35em", color: "rgba(200,160,255,0.55)", marginBottom: 6, textTransform: "uppercase" }}>
+              ◈ &nbsp; A E T H E R
+            </div>
+            <div style={{ fontFamily: MN, fontSize: 9, letterSpacing: "0.18em", color: "rgba(46,240,216,0.4)", textTransform: "uppercase" }}>
+              Access Required
+            </div>
           </div>
-        )}
 
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginTop:4}}>
-          <button
-            onClick={submit}
-            style={{
-              background:"linear-gradient(135deg,#7c3aed,#6d28d9)",
-              border:"none",borderRadius:8,padding:"11px 0",
-              fontFamily:F,fontSize:14,fontWeight:600,
-              color:"#fff",cursor:"pointer",
-              boxShadow:"0 0 20px rgba(124,58,237,0.35)",
-              transition:"opacity .15s",
-            }}
-          >
-            Enter AETHER
-          </button>
-          <button
-            style={{
-              background:"rgba(255,255,255,0.06)",
-              border:"1px solid rgba(255,255,255,0.12)",
-              borderRadius:8,padding:"11px 0",
-              fontFamily:F,fontSize:14,fontWeight:500,
-              color:"rgba(255,255,255,0.7)",cursor:"pointer",
-              transition:"background .15s",
-            }}
-            onClick={() => signOut({ redirectUrl: basePath || "/" })}
-          >
-            Sign out
-          </button>
+          {/* Input */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ animation: shake ? "rx-shake 0.5s ease" : "none" }}>
+              <input
+                className={`rx-inp${error ? " rx-inp-err" : ""}`}
+                type="password"
+                autoFocus
+                value={input}
+                onChange={(e) => { setInput(e.target.value); setError(false); }}
+                onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+                placeholder="Enter access code"
+              />
+            </div>
+
+            {error && (
+              <div style={{ fontFamily: F, fontSize: 12, color: "#ef4444", paddingLeft: 2 }}>
+                Incorrect code{attempts >= 3 ? ` — ${attempts} attempts` : ""}
+              </div>
+            )}
+
+            <button
+              className="rx-btn-enter"
+              onClick={submit}
+              style={{
+                background: "linear-gradient(135deg,#7c3aed,#5b21b6)",
+                border: "none", borderRadius: 10, padding: "13px 0",
+                fontFamily: F, fontSize: 14, fontWeight: 600,
+                color: "#fff", cursor: "pointer",
+                boxShadow: "0 0 24px rgba(124,58,237,0.4)",
+                transition: "opacity .15s, box-shadow .15s",
+                letterSpacing: "0.02em",
+              }}
+            >
+              Enter AETHER
+            </button>
+
+            <button
+              className="rx-btn-out"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: 10, padding: "11px 0",
+                fontFamily: F, fontSize: 13, fontWeight: 500,
+                color: "rgba(255,255,255,0.45)", cursor: "pointer",
+                transition: "background .15s",
+              }}
+              onClick={() => signOut({ redirectUrl: basePath || "/" })}
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </div>
-    </AuthLayout>
+    </div>
   );
 }
 
