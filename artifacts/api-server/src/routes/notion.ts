@@ -198,6 +198,108 @@ router.get("/notion/sync-all", async (req: Request, res: Response): Promise<void
   }
 });
 
+router.get("/notion/sync-claude", async (req: Request, res: Response): Promise<void> => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const send = (data: Record<string, unknown>) => {
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  };
+
+  try {
+    const connectors = getConnectors();
+
+    // Collect pages across several queries and deduplicate by ID
+    const searchTerms = ["AETHER", "claude", "artifact"];
+    const seenIds = new Set<string>();
+    const pages: NotionPageResult[] = [];
+
+    send({ type: "status", message: "Scanning workspace for Claude artifacts…" });
+
+    for (const term of searchTerms) {
+      let cursor: string | undefined;
+      do {
+        const body: Record<string, unknown> = {
+          query: term,
+          filter: { property: "object", value: "page" },
+          sort: { direction: "descending", timestamp: "last_edited_time" },
+          page_size: 100,
+        };
+        if (cursor) body.start_cursor = cursor;
+        const resp = await connectors.proxy("notion", "/v1/search", {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await resp.json() as {
+          results?: NotionPageResult[];
+          has_more?: boolean;
+          next_cursor?: string | null;
+        };
+        for (const r of data.results ?? []) {
+          if (!seenIds.has(r.id)) {
+            seenIds.add(r.id);
+            pages.push(r);
+          }
+        }
+        cursor = data.has_more && data.next_cursor ? data.next_cursor : undefined;
+      } while (cursor);
+    }
+
+    send({ type: "total", total: pages.length, message: `Found ${pages.length} Claude artifacts` });
+
+    let imported = 0;
+    let skipped = 0;
+
+    for (let i = 0; i < pages.length; i++) {
+      const p = pages[i];
+      const title = pageTitle(p);
+
+      send({ type: "progress", index: i + 1, total: pages.length, title, status: "importing" });
+
+      try {
+        const content = await fetchPageBlocks(connectors, p.id);
+        const body = JSON.stringify({
+          title,
+          content: content.slice(0, 8000) || `[AETHER Claude artifact: ${title}]`,
+          source: `notion:${p.id}`,
+          layer: "L3",
+          docType: "notion",
+          tags: ["claude-artifact", "notion-sync", "aether"],
+        });
+
+        const docResp = await fetch(`http://localhost:${process.env.PORT ?? 8080}/api/documents`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+        });
+        const doc = await docResp.json() as { id?: string; error?: string };
+
+        if (doc.id) {
+          imported++;
+          send({ type: "progress", index: i + 1, total: pages.length, title, status: "done", docId: doc.id });
+        } else {
+          skipped++;
+          send({ type: "progress", index: i + 1, total: pages.length, title, status: "skipped", error: doc.error });
+        }
+      } catch (err) {
+        skipped++;
+        send({ type: "progress", index: i + 1, total: pages.length, title, status: "error", error: String(err) });
+      }
+
+      await new Promise(r => setTimeout(r, 120));
+    }
+
+    send({ type: "done", imported, skipped, total: pages.length });
+  } catch (err) {
+    send({ type: "error", message: err instanceof Error ? err.message : String(err) });
+  } finally {
+    res.end();
+  }
+});
+
 router.post("/notion/push", async (req: Request, res: Response): Promise<void> => {
   try {
     const connectors = getConnectors();

@@ -58,7 +58,8 @@ function label(s: string) {
 export default function NotionSync() {
   const [tab, setTab] = useState<Tab>("sync");
 
-  // ── SYNC ALL state ──
+  // ── SYNC state ──
+  const [syncMode, setSyncMode] = useState<"all" | "claude">("claude");
   const [syncing, setSyncing] = useState(false);
   const [syncDone, setSyncDone] = useState(false);
   const [syncStatus, setSyncStatus] = useState("");
@@ -98,7 +99,8 @@ export default function NotionSync() {
     setSyncSkipped(0);
     setSyncLog([]);
 
-    const es = new EventSource(`${BASE}/api/notion/sync-all`);
+    const endpoint = syncMode === "claude" ? "sync-claude" : "sync-all";
+    const es = new EventSource(`${BASE}/api/notion/${endpoint}`);
 
     es.onmessage = (e: MessageEvent) => {
       const ev = JSON.parse(e.data) as SyncEvent;
@@ -272,30 +274,52 @@ export default function NotionSync() {
         {/* ══ SYNC ALL TAB ══ */}
         {tab === "sync" && (
           <div>
-            {/* How-to share panel */}
+            {/* Mode selector */}
+            {!syncing && (
+              <div style={{ display: "flex", gap: 0, marginBottom: 20, borderRadius: 8, border: `1px solid rgba(99,179,237,0.2)`, overflow: "hidden" }}>
+                {([["claude", "◈ Claude Artifacts", C.purple], ["all", "⊞ All Pages", C.gold]] as [typeof syncMode, string, string][]).map(([mode, lbl, col]) => (
+                  <button key={mode} onClick={() => { setSyncMode(mode); setSyncDone(false); setSyncError(""); setSyncLog([]); }}
+                    style={{ flex: 1, padding: "11px 0", border: "none", borderRight: mode === "claude" ? `1px solid rgba(99,179,237,0.2)` : "none", background: syncMode === mode ? `rgba(${mode === "claude" ? "192,132,252" : "242,195,84"},0.1)` : "transparent", color: syncMode === mode ? col : C.muted, fontFamily: C.mono, fontSize: 11, letterSpacing: "0.18em", cursor: "pointer", transition: "all .15s" }}>
+                    {lbl}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Mode description */}
             {!syncing && !syncDone && (
-              <div style={{ background: "rgba(242,195,84,0.06)", border: "1px solid rgba(242,195,84,0.25)", borderRadius: 10, padding: "20px 24px", marginBottom: 24 }}>
-                <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.gold, marginBottom: 12 }}>STEP 1 — SHARE YOUR WORKSPACE WITH REPLIT</div>
-                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>
-                  To unlock all hundreds of pages, open <strong>any top-level page</strong> in your seaaether workspace and share it with the Replit integration — this grants access to all sub-pages underneath it automatically.
-                </p>
-                <ol style={{ color: C.muted, fontSize: 13, lineHeight: 2.2, paddingLeft: 20, margin: 0 }}>
-                  <li>Open the top page of your seaaether workspace in Notion</li>
-                  <li>Click <strong style={{ color: C.text }}>···</strong> (top-right) → <strong style={{ color: C.text }}>Connections</strong></li>
-                  <li>Find <strong style={{ color: C.text }}>Replit</strong> and click <strong style={{ color: C.text }}>Connect to integration</strong></li>
-                  <li>Repeat for any other top-level pages or databases</li>
-                </ol>
-                <div style={{ marginTop: 14, fontFamily: C.mono, fontSize: 10, color: "rgba(242,195,84,0.5)", letterSpacing: "0.16em" }}>
-                  CURRENTLY ACCESSIBLE: ~20 PAGES · AFTER SHARING: HUNDREDS
-                </div>
+              <div style={{ background: syncMode === "claude" ? "rgba(192,132,252,0.06)" : "rgba(242,195,84,0.06)", border: `1px solid ${syncMode === "claude" ? "rgba(192,132,252,0.25)" : "rgba(242,195,84,0.25)"}`, borderRadius: 10, padding: "18px 22px", marginBottom: 22 }}>
+                {syncMode === "claude" ? (
+                  <>
+                    <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.purple, marginBottom: 10 }}>CLAUDE ARTIFACTS — TARGETED SYNC</div>
+                    <p style={{ color: C.text, fontSize: 14, lineHeight: 1.7, margin: 0 }}>
+                      Scans your workspace for pages matching <strong>AETHER</strong>, <strong>claude</strong>, and <strong>artifact</strong> — pulling every framework, paper, and synthesis you've built with Claude. Deduplicates automatically and tags everything <code style={{ background: "rgba(192,132,252,0.15)", padding: "1px 6px", borderRadius: 4, fontSize: 12 }}>claude-artifact</code> in the graph.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.gold, marginBottom: 10 }}>ALL PAGES — FULL WORKSPACE SWEEP</div>
+                    <p style={{ color: C.text, fontSize: 14, lineHeight: 1.7, margin: "0 0 14px" }}>
+                      Imports every page the Replit integration can see. To unlock more pages, share top-level sections with the integration from Notion's <strong>Connections</strong> panel.
+                    </p>
+                    <ol style={{ color: C.muted, fontSize: 13, lineHeight: 2.2, paddingLeft: 20, margin: 0 }}>
+                      <li>Open a top-level page → <strong style={{ color: C.text }}>···</strong> → <strong style={{ color: C.text }}>Connections</strong></li>
+                      <li>Find <strong style={{ color: C.text }}>Replit</strong> → <strong style={{ color: C.text }}>Connect to integration</strong></li>
+                    </ol>
+                  </>
+                )}
               </div>
             )}
 
             {/* Big sync button */}
             {!syncing && (
               <button onClick={runSyncAll}
-                style={{ width: "100%", padding: "18px 0", borderRadius: 8, border: `1px solid ${syncDone ? C.green : C.gold}`, background: syncDone ? "rgba(74,222,128,0.08)" : "rgba(242,195,84,0.08)", color: syncDone ? C.green : C.gold, fontFamily: C.mono, fontSize: 14, letterSpacing: "0.3em", cursor: "pointer", marginBottom: 24 }}>
-                {syncDone ? `✓ SYNCED ${syncImported} PAGES — RUN AGAIN` : "⟳ SYNC ALL NOTION PAGES INTO AETHER"}
+                style={{ width: "100%", padding: "18px 0", borderRadius: 8, border: `1px solid ${syncDone ? C.green : syncMode === "claude" ? C.purple : C.gold}`, background: syncDone ? "rgba(74,222,128,0.08)" : syncMode === "claude" ? "rgba(192,132,252,0.08)" : "rgba(242,195,84,0.08)", color: syncDone ? C.green : syncMode === "claude" ? C.purple : C.gold, fontFamily: C.mono, fontSize: 14, letterSpacing: "0.3em", cursor: "pointer", marginBottom: 24 }}>
+                {syncDone
+                  ? `✓ SYNCED ${syncImported} ARTIFACTS — RUN AGAIN`
+                  : syncMode === "claude"
+                    ? "◈ SYNC CLAUDE ARTIFACTS INTO AETHER"
+                    : "⟳ SYNC ALL NOTION PAGES INTO AETHER"}
               </button>
             )}
 
@@ -366,10 +390,11 @@ export default function NotionSync() {
               <div style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 8, padding: "16px 20px" }}>
                 <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.green, marginBottom: 10 }}>SYNC COMPLETE</div>
                 <p style={{ color: C.text, fontSize: 14, lineHeight: 1.6, margin: 0 }}>
-                  <strong>{syncImported} pages</strong> are now live in the AETHER knowledge graph —
-                  your frameworks, papers, simulations, and Claude artifacts are all indexed and searchable.
-                  Head to <a href="/search" style={{ color: C.accent }}>Search</a> and try any concept from your textbook.
-                  Share more Notion pages and run Sync All again anytime to pull new content.
+                  <strong>{syncImported} {syncMode === "claude" ? "Claude artifacts" : "pages"}</strong> are now live in the AETHER knowledge graph —
+                  {syncMode === "claude"
+                    ? " your AETHER frameworks, papers, and Claude-built artifacts are all indexed, tagged, and searchable."
+                    : " your full Notion workspace is indexed and searchable."}
+                  {" "}Head to <a href="/search" style={{ color: C.accent }}>Search</a> and try any concept from your work.
                 </p>
               </div>
             )}
