@@ -1146,6 +1146,37 @@ function AccessCodeGate({ children }: { children: ReactNode }) {
         pointerEvents: "none",
       }} />
 
+      {/* Access code displayed on the screensaver */}
+      <div style={{
+        position: "absolute", bottom: 48, left: 0, right: 0,
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+        zIndex: 5, pointerEvents: "none",
+      }}>
+        <div style={{
+          fontFamily: "'Space Mono',monospace", fontSize: 10,
+          letterSpacing: "0.42em", textTransform: "uppercase",
+          color: "rgba(180,120,255,0.45)",
+        }}>
+          Access Code
+        </div>
+        <div style={{
+          fontFamily: "'Space Mono',monospace",
+          fontSize: 38, fontWeight: 700, letterSpacing: "0.25em",
+          color: "rgba(255,255,255,0.82)",
+          textShadow: "0 0 24px rgba(124,58,237,0.9), 0 0 60px rgba(46,240,216,0.4), 0 0 100px rgba(124,58,237,0.3)",
+          animation: "rx-code-pulse 3.2s ease-in-out infinite",
+        }}>
+          {expectedCode ?? ""}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes rx-code-pulse {
+          0%,100% { opacity: 0.7; text-shadow: 0 0 24px rgba(124,58,237,0.9), 0 0 60px rgba(46,240,216,0.4); }
+          50%      { opacity: 1;   text-shadow: 0 0 36px rgba(124,58,237,1),   0 0 80px rgba(46,240,216,0.7), 0 0 120px rgba(124,58,237,0.5); }
+        }
+      `}</style>
+
       {/* Centred login card */}
       <div style={{
         position: "relative", zIndex: 10,
