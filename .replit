@@ -32,7 +32,7 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-VITE_AETHER_ACCESS_CODE = "AETHER2026"
+VITE_AETHER_ACCESS_CODE = "99996"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-d144c474-6ba3-46a7-9d57-763f2ffbc787"
