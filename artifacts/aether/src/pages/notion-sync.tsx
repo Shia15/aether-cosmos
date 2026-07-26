@@ -16,7 +16,7 @@ const C = {
   mono: "'DM Mono',monospace",
 };
 
-type Tab = "sync" | "pull" | "push";
+type Tab = "sync" | "pull" | "push" | "orcid";
 
 type SyncEvent =
   | { type: "status"; message: string }
@@ -79,6 +79,77 @@ export default function NotionSync() {
   const [selectedPage, setSelectedPage] = useState<NotionPage | null>(null);
   const [pageContent, setPageContent] = useState("");
   const [loadingPage, setLoadingPage] = useState(false);
+
+  // ── ORCID state ──
+  const [orcidId, setOrcidId] = useState("0009-0000-5537-1034");
+  const [orcidSyncing, setOrcidSyncing] = useState(false);
+  const [orcidDone, setOrcidDone] = useState(false);
+  const [orcidStatus, setOrcidStatus] = useState("");
+  const [orcidTotal, setOrcidTotal] = useState(0);
+  const [orcidIndex, setOrcidIndex] = useState(0);
+  const [orcidImported, setOrcidImported] = useState(0);
+  const [orcidSkipped, setOrcidSkipped] = useState(0);
+  const [orcidError, setOrcidError] = useState("");
+  const [orcidLog, setOrcidLog] = useState<{ title: string; status: "done"|"skipped"|"error"; doi?: string; year?: string; journal?: string }[]>([]);
+  const orcidLogRef = useRef<HTMLDivElement>(null);
+
+  const runOrcidSync = useCallback(() => {
+    if (orcidSyncing || !orcidId.trim()) return;
+    setOrcidSyncing(true);
+    setOrcidDone(false);
+    setOrcidError("");
+    setOrcidStatus("Connecting to ORCID…");
+    setOrcidTotal(0);
+    setOrcidIndex(0);
+    setOrcidImported(0);
+    setOrcidSkipped(0);
+    setOrcidLog([]);
+
+    const es = new EventSource(`${BASE}/api/orcid/sync?id=${encodeURIComponent(orcidId.trim())}`);
+
+    es.onmessage = (e: MessageEvent) => {
+      const ev = JSON.parse(e.data) as {
+        type: string; message?: string; total?: number; index?: number;
+        title?: string; status?: string; doi?: string; year?: string; journal?: string;
+        imported?: number; skipped?: number;
+      };
+      if (ev.type === "status") {
+        setOrcidStatus(ev.message ?? "");
+      } else if (ev.type === "total") {
+        setOrcidTotal(ev.total ?? 0);
+        setOrcidStatus(ev.message ?? "");
+      } else if (ev.type === "progress") {
+        setOrcidIndex(ev.index ?? 0);
+        if (ev.status !== "importing") {
+          setOrcidLog(prev => {
+            const next = [{ title: ev.title ?? "", status: ev.status as "done"|"skipped"|"error", doi: ev.doi, year: ev.year, journal: ev.journal }, ...prev];
+            setTimeout(() => orcidLogRef.current?.scrollTo({ top: 0, behavior: "smooth" }), 50);
+            return next;
+          });
+          if (ev.status === "done") setOrcidImported(n => n + 1);
+          else setOrcidSkipped(n => n + 1);
+        }
+        setOrcidStatus(`Processing ${ev.index} / ${ev.total}`);
+      } else if (ev.type === "done") {
+        setOrcidImported(ev.imported ?? 0);
+        setOrcidSkipped(ev.skipped ?? 0);
+        setOrcidTotal(ev.total ?? 0);
+        setOrcidStatus(`Complete — ${ev.imported} publications imported`);
+        setOrcidDone(true);
+        setOrcidSyncing(false);
+        es.close();
+      } else if (ev.type === "error") {
+        setOrcidError(ev.message ?? "Unknown error");
+        setOrcidSyncing(false);
+        es.close();
+      }
+    };
+    es.onerror = () => {
+      if (!orcidDone) setOrcidError("Connection lost — check Search for imported papers.");
+      setOrcidSyncing(false);
+      es.close();
+    };
+  }, [orcidSyncing, orcidDone, orcidId]);
 
   // ── PUSH state ──
   const [pushTitle, setPushTitle] = useState("");
@@ -263,9 +334,9 @@ export default function NotionSync() {
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-          {([["sync","⟳ Sync All"], ["pull","← Pull"], ["push","→ Push"]] as [Tab, string][]).map(([t, lbl]) => (
+          {([["sync","⟳ Sync All"], ["pull","← Pull"], ["push","→ Push"], ["orcid","◎ ORCID"]] as [Tab, string][]).map(([t, lbl]) => (
             <button key={t} onClick={() => setTab(t)}
-              style={{ padding: "8px 20px", borderRadius: 6, border: `1px solid ${tab === t ? C.gold : "rgba(99,179,237,0.2)"}`, background: tab === t ? "rgba(242,195,84,0.1)" : "transparent", color: tab === t ? C.gold : C.muted, fontFamily: C.mono, fontSize: 11, letterSpacing: "0.18em", cursor: "pointer" }}>
+              style={{ padding: "8px 20px", borderRadius: 6, border: `1px solid ${tab === t ? (t === "orcid" ? C.green : C.gold) : "rgba(99,179,237,0.2)"}`, background: tab === t ? (t === "orcid" ? "rgba(74,222,128,0.1)" : "rgba(242,195,84,0.1)") : "transparent", color: tab === t ? (t === "orcid" ? C.green : C.gold) : C.muted, fontFamily: C.mono, fontSize: 11, letterSpacing: "0.18em", cursor: "pointer" }}>
               {lbl}
             </button>
           ))}
@@ -488,6 +559,111 @@ export default function NotionSync() {
               )}
               {pushResult?.error && <div style={{ color: "#f87171", fontFamily: C.mono, fontSize: 12 }}>Error: {pushResult.error}</div>}
             </div>
+          </div>
+        )}
+
+        {/* ══ ORCID TAB ══ */}
+        {tab === "orcid" && (
+          <div style={{ maxWidth: 720 }}>
+            {/* ORCID ID input */}
+            {!orcidSyncing && (
+              <div style={{ background: "rgba(74,222,128,0.05)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 10, padding: "20px 22px", marginBottom: 22 }}>
+                <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.green, marginBottom: 12 }}>ORCID PUBLICATIONS SYNC</div>
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.7, margin: "0 0 16px" }}>
+                  Pulls every publication from your ORCID profile, enriches each one with full metadata from CrossRef (abstract, authors, journal), and imports them into the AETHER knowledge graph tagged as <code style={{ background: "rgba(74,222,128,0.12)", padding: "1px 6px", borderRadius: 4, fontSize: 12 }}>publication</code>.
+                </p>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <input
+                    value={orcidId}
+                    onChange={e => setOrcidId(e.target.value)}
+                    placeholder="0000-0000-0000-0000"
+                    style={{ flex: 1, padding: "9px 13px", borderRadius: 6, border: `1px solid rgba(74,222,128,0.3)`, background: "rgba(74,222,128,0.05)", color: C.text, fontFamily: C.mono, fontSize: 13, outline: "none", letterSpacing: "0.08em" }}
+                  />
+                  <div style={{ fontFamily: C.mono, fontSize: 10, color: C.muted, whiteSpace: "nowrap" }}>ORCID ID</div>
+                </div>
+              </div>
+            )}
+
+            {/* Sync button */}
+            {!orcidSyncing && (
+              <button onClick={runOrcidSync} disabled={!orcidId.trim()}
+                style={{ width: "100%", padding: "18px 0", borderRadius: 8, border: `1px solid ${orcidDone ? C.green : "rgba(74,222,128,0.5)"}`, background: orcidDone ? "rgba(74,222,128,0.1)" : "rgba(74,222,128,0.07)", color: C.green, fontFamily: C.mono, fontSize: 14, letterSpacing: "0.3em", cursor: orcidId.trim() ? "pointer" : "not-allowed", marginBottom: 24, opacity: orcidId.trim() ? 1 : 0.4 }}>
+                {orcidDone ? `✓ SYNCED ${orcidImported} PUBLICATIONS — RUN AGAIN` : "◎ SYNC ORCID PUBLICATIONS INTO AETHER"}
+              </button>
+            )}
+
+            {/* Progress panel */}
+            {(orcidSyncing || orcidDone || orcidError) && (
+              <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 10, padding: 20, marginBottom: 20 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ fontFamily: C.mono, fontSize: 11, color: orcidDone ? C.green : C.accent, letterSpacing: "0.18em" }}>{orcidStatus}</div>
+                  {orcidTotal > 0 && (
+                    <div style={{ fontFamily: C.mono, fontSize: 11, color: C.muted }}>
+                      {orcidIndex}/{orcidTotal} · {orcidTotal > 0 ? Math.round((orcidIndex / orcidTotal) * 100) : 0}%
+                    </div>
+                  )}
+                </div>
+
+                {orcidTotal > 0 && (
+                  <div style={{ height: 4, background: "rgba(74,222,128,0.1)", borderRadius: 2, marginBottom: 16, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${orcidTotal > 0 ? Math.round((orcidIndex / orcidTotal) * 100) : 0}%`, background: C.green, borderRadius: 2, transition: "width 0.4s ease" }} />
+                  </div>
+                )}
+
+                {(orcidImported > 0 || orcidSkipped > 0) && (
+                  <div style={{ display: "flex", gap: 20, marginBottom: 16 }}>
+                    <div style={{ fontFamily: C.mono, fontSize: 11 }}>
+                      <span style={{ color: C.green }}>✓ {orcidImported}</span>
+                      <span style={{ color: C.muted }}> imported</span>
+                    </div>
+                    <div style={{ fontFamily: C.mono, fontSize: 11 }}>
+                      <span style={{ color: C.orange }}>{orcidSkipped}</span>
+                      <span style={{ color: C.muted }}> skipped</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Live log with paper details */}
+                <div ref={orcidLogRef} style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+                  {orcidLog.map((entry, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, padding: "8px 10px", borderRadius: 6, background: entry.status === "done" ? "rgba(74,222,128,0.05)" : "rgba(255,255,255,0.02)", border: `1px solid ${entry.status === "done" ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.05)"}` }}>
+                      <span style={{ color: entry.status === "done" ? C.green : entry.status === "error" ? "#f87171" : C.muted, fontFamily: C.mono, flexShrink: 0, marginTop: 1 }}>
+                        {entry.status === "done" ? "✓" : entry.status === "error" ? "✗" : "·"}
+                      </span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{entry.title}</div>
+                        <div style={{ fontFamily: C.mono, fontSize: 10, color: C.muted, marginTop: 3, display: "flex", gap: 12 }}>
+                          {entry.year && <span>{entry.year}</span>}
+                          {entry.journal && <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 260 }}>{entry.journal}</span>}
+                          {entry.doi && <a href={`https://doi.org/${entry.doi}`} target="_blank" rel="noopener noreferrer" style={{ color: C.accent, textDecoration: "none" }}>↗ DOI</a>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {orcidSyncing && (
+                    <div style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12, padding: "4px 10px" }}>
+                      <span style={{ color: C.accent, fontFamily: C.mono }}>…</span>
+                      <span style={{ color: C.muted }}>fetching metadata…</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {orcidError && (
+              <div style={{ color: "#f87171", fontFamily: C.mono, fontSize: 12, marginBottom: 16 }}>{orcidError}</div>
+            )}
+
+            {orcidDone && (
+              <div style={{ background: "rgba(74,222,128,0.06)", border: "1px solid rgba(74,222,128,0.25)", borderRadius: 8, padding: "16px 20px" }}>
+                <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.green, marginBottom: 10 }}>PUBLICATIONS IMPORTED</div>
+                <p style={{ color: C.text, fontSize: 14, lineHeight: 1.6, margin: 0 }}>
+                  <strong>{orcidImported} publications</strong> from ORCID <code style={{ fontFamily: C.mono, fontSize: 12 }}>{orcidId}</code> are now live in the knowledge graph —
+                  enriched with abstracts, author lists, and journal info from CrossRef.
+                  Head to <a href="/search" style={{ color: C.accent }}>Search</a> to explore your work inside AETHER.
+                </p>
+              </div>
+            )}
           </div>
         )}
 

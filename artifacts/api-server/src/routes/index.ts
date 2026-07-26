@@ -25,6 +25,7 @@ import storageRouter from "./storage";
 import geminiRouter from "./gemini";
 import proxyFetchRouter from "./proxy-fetch";
 import scholarRouter from "./scholar";
+import orcidRouter from "./orcid";
 
 const router: IRouter = Router();
 
@@ -54,5 +55,6 @@ router.use(storageRouter);
 router.use(geminiRouter);
 router.use(proxyFetchRouter);
 router.use(scholarRouter);
+router.use(orcidRouter);
 
 export default router;
