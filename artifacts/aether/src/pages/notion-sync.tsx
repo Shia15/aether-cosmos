@@ -16,7 +16,7 @@ const C = {
   mono: "'DM Mono',monospace",
 };
 
-type Tab = "sync" | "pull" | "push" | "orcid";
+type Tab = "sync" | "pull" | "push" | "orcid" | "springer";
 
 type SyncEvent =
   | { type: "status"; message: string }
@@ -79,6 +79,69 @@ export default function NotionSync() {
   const [selectedPage, setSelectedPage] = useState<NotionPage | null>(null);
   const [pageContent, setPageContent] = useState("");
   const [loadingPage, setLoadingPage] = useState(false);
+
+  // ── SPRINGER state ──
+  type SpringerRecord = {
+    title: string; doi: string; url: string; abstract: string;
+    publicationName: string; publicationDate: string; contentType: string;
+    creators: { creator: string; ORCID?: string }[];
+    subjects: string[]; keyword: string[]; openaccess: boolean; publisher: string;
+  };
+  const [snQuery, setSnQuery] = useState("");
+  const [snDraft, setSnDraft] = useState("");
+  const [snPage, setSnPage] = useState(1);
+  const [snTotal, setSnTotal] = useState(0);
+  const [snLoading, setSnLoading] = useState(false);
+  const [snError, setSnError] = useState("");
+  const [snResults, setSnResults] = useState<SpringerRecord[]>([]);
+  const [snImporting, setSnImporting] = useState<Record<string, "idle"|"loading"|"done"|"error">>({});
+  const [snExpanded, setSnExpanded] = useState<string | null>(null);
+
+  const PAGE_SIZE = 10;
+
+  const runSnSearch = useCallback(async (q: string, page: number) => {
+    if (!q.trim() || snLoading) return;
+    setSnLoading(true);
+    setSnError("");
+    try {
+      const resp = await fetch(`${BASE}/api/springer/search?q=${encodeURIComponent(q)}&page=${page}&ps=${PAGE_SIZE}`);
+      const data = await resp.json() as { records?: SpringerRecord[]; total?: number; error?: string };
+      if (data.error) { setSnError(data.error); return; }
+      setSnResults(data.records ?? []);
+      setSnTotal(data.total ?? 0);
+      setSnQuery(q);
+      setSnPage(page);
+    } catch (err) {
+      setSnError(String(err));
+    } finally {
+      setSnLoading(false);
+    }
+  }, [snLoading]);
+
+  const snImport = useCallback(async (record: SpringerRecord) => {
+    const key = record.doi || record.title;
+    setSnImporting(prev => ({ ...prev, [key]: "loading" }));
+    try {
+      const resp = await fetch(`${BASE}/api/springer/import`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ record }),
+      });
+      const data = await resp.json() as { ok?: boolean; error?: string };
+      setSnImporting(prev => ({ ...prev, [key]: data.ok ? "done" : "error" }));
+    } catch {
+      setSnImporting(prev => ({ ...prev, [key]: "error" }));
+    }
+  }, []);
+
+  const snImportAll = useCallback(async () => {
+    for (const rec of snResults) {
+      const key = rec.doi || rec.title;
+      if (snImporting[key] === "done") continue;
+      await snImport(rec);
+      await new Promise(r => setTimeout(r, 120));
+    }
+  }, [snResults, snImporting, snImport]);
 
   // ── ORCID state ──
   const [orcidId, setOrcidId] = useState("0009-0000-5537-1034");
@@ -334,12 +397,17 @@ export default function NotionSync() {
 
         {/* Tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-          {([["sync","⟳ Sync All"], ["pull","← Pull"], ["push","→ Push"], ["orcid","◎ ORCID"]] as [Tab, string][]).map(([t, lbl]) => (
-            <button key={t} onClick={() => setTab(t)}
-              style={{ padding: "8px 20px", borderRadius: 6, border: `1px solid ${tab === t ? (t === "orcid" ? C.green : C.gold) : "rgba(99,179,237,0.2)"}`, background: tab === t ? (t === "orcid" ? "rgba(74,222,128,0.1)" : "rgba(242,195,84,0.1)") : "transparent", color: tab === t ? (t === "orcid" ? C.green : C.gold) : C.muted, fontFamily: C.mono, fontSize: 11, letterSpacing: "0.18em", cursor: "pointer" }}>
-              {lbl}
-            </button>
-          ))}
+          {([["sync","⟳ Sync All"], ["pull","← Pull"], ["push","→ Push"], ["orcid","◎ ORCID"], ["springer","◈ Springer"]] as [Tab, string][]).map(([t, lbl]) => {
+            const active = tab === t;
+            const col = t === "orcid" ? C.green : t === "springer" ? C.purple : C.gold;
+            const bg = t === "orcid" ? "rgba(74,222,128,0.1)" : t === "springer" ? "rgba(192,132,252,0.1)" : "rgba(242,195,84,0.1)";
+            return (
+              <button key={t} onClick={() => setTab(t)}
+                style={{ padding: "8px 20px", borderRadius: 6, border: `1px solid ${active ? col : "rgba(99,179,237,0.2)"}`, background: active ? bg : "transparent", color: active ? col : C.muted, fontFamily: C.mono, fontSize: 11, letterSpacing: "0.18em", cursor: "pointer" }}>
+                {lbl}
+              </button>
+            );
+          })}
         </div>
 
         {/* ══ SYNC ALL TAB ══ */}
@@ -663,6 +731,145 @@ export default function NotionSync() {
                   Head to <a href="/search" style={{ color: C.accent }}>Search</a> to explore your work inside AETHER.
                 </p>
               </div>
+            )}
+          </div>
+        )}
+
+        {/* ══ SPRINGER TAB ══ */}
+        {tab === "springer" && (
+          <div style={{ maxWidth: 760 }}>
+            {/* header */}
+            <div style={{ background: "rgba(192,132,252,0.05)", border: "1px solid rgba(192,132,252,0.2)", borderRadius: 10, padding: "18px 22px", marginBottom: 22 }}>
+              <div style={{ fontFamily: C.mono, fontSize: 9, letterSpacing: "0.26em", color: C.purple, marginBottom: 8 }}>SPRINGER NATURE META API · FULL CORPUS SEARCH</div>
+              <p style={{ color: C.text, fontSize: 13, lineHeight: 1.65, margin: 0 }}>
+                Search across all Springer Nature journals, books, and conference proceedings — then import any paper directly into your AETHER knowledge graph with full metadata, abstract, and subject tags.
+              </p>
+            </div>
+
+            {/* search bar */}
+            <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+              <input
+                value={snDraft}
+                onChange={e => setSnDraft(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") runSnSearch(snDraft, 1); }}
+                placeholder="cyber physical systems · solar coherence · network security…"
+                style={{ flex: 1, padding: "11px 15px", borderRadius: 7, border: `1px solid rgba(192,132,252,0.35)`, background: "rgba(192,132,252,0.04)", color: C.text, fontFamily: "'DM Sans',sans-serif", fontSize: 14, outline: "none" }}
+              />
+              <button
+                onClick={() => runSnSearch(snDraft, 1)}
+                disabled={snLoading || !snDraft.trim()}
+                style={{ padding: "11px 22px", borderRadius: 7, border: `1px solid rgba(192,132,252,0.5)`, background: snLoading ? "transparent" : "rgba(192,132,252,0.12)", color: C.purple, fontFamily: C.mono, fontSize: 12, letterSpacing: "0.15em", cursor: snDraft.trim() && !snLoading ? "pointer" : "not-allowed", opacity: snDraft.trim() && !snLoading ? 1 : 0.4, minWidth: 90 }}>
+                {snLoading ? "…" : "SEARCH"}
+              </button>
+            </div>
+
+            {/* quick-topic chips */}
+            {!snQuery && !snLoading && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
+                {["cyber physical systems", "digital forensics", "cybersecurity education", "network security exercises", "solar physics plasma", "coherence field theory"].map(chip => (
+                  <button key={chip} onClick={() => { setSnDraft(chip); runSnSearch(chip, 1); }}
+                    style={{ padding: "5px 13px", borderRadius: 20, border: "1px solid rgba(192,132,252,0.25)", background: "rgba(192,132,252,0.05)", color: C.muted, fontFamily: C.mono, fontSize: 10, letterSpacing: "0.1em", cursor: "pointer" }}>
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {snError && (
+              <div style={{ color: "#f87171", fontFamily: C.mono, fontSize: 12, marginBottom: 16 }}>{snError}</div>
+            )}
+
+            {/* results header */}
+            {snTotal > 0 && (
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <div style={{ fontFamily: C.mono, fontSize: 11, color: C.muted }}>
+                  <span style={{ color: C.purple }}>{snTotal.toLocaleString()}</span> results for <span style={{ color: C.text }}>"{snQuery}"</span>
+                  {" · "}page {snPage} of {Math.ceil(snTotal / PAGE_SIZE)}
+                </div>
+                <button
+                  onClick={snImportAll}
+                  style={{ padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(192,132,252,0.35)", background: "rgba(192,132,252,0.07)", color: C.purple, fontFamily: C.mono, fontSize: 10, letterSpacing: "0.14em", cursor: "pointer" }}>
+                  ↓ IMPORT ALL {snResults.length}
+                </button>
+              </div>
+            )}
+
+            {/* result cards */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+              {snResults.map((rec) => {
+                const key = rec.doi || rec.title;
+                const importState = snImporting[key] ?? "idle";
+                const isExpanded = snExpanded === key;
+                const year = rec.publicationDate?.slice(0, 4) ?? "";
+                const authors = rec.creators.slice(0, 3).map(c => c.creator).join(", ") + (rec.creators.length > 3 ? ` +${rec.creators.length - 3}` : "");
+                return (
+                  <div key={key} style={{ background: C.panel, border: `1px solid ${importState === "done" ? "rgba(192,132,252,0.35)" : C.border}`, borderRadius: 10, padding: "14px 18px", transition: "border-color 0.2s" }}>
+                    <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* title */}
+                        <div style={{ fontSize: 14, fontWeight: 600, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{rec.title}</div>
+                        {/* meta row */}
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, fontFamily: C.mono, fontSize: 10, color: C.muted, marginBottom: rec.abstract ? 8 : 0 }}>
+                          {year && <span style={{ color: C.accent }}>{year}</span>}
+                          {rec.publicationName && <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 240 }}>{rec.publicationName}</span>}
+                          {authors && <span>{authors}</span>}
+                          {rec.openaccess && <span style={{ color: C.green }}>OA</span>}
+                          {rec.contentType && <span style={{ opacity: 0.6 }}>{rec.contentType}</span>}
+                          {rec.doi && <a href={`https://doi.org/${rec.doi}`} target="_blank" rel="noopener noreferrer" style={{ color: C.accent, textDecoration: "none" }}>↗ DOI</a>}
+                        </div>
+                        {/* abstract toggle */}
+                        {rec.abstract && (
+                          <>
+                            <button onClick={() => setSnExpanded(isExpanded ? null : key)}
+                              style={{ background: "none", border: "none", color: C.muted, fontFamily: C.mono, fontSize: 10, cursor: "pointer", padding: 0, letterSpacing: "0.1em" }}>
+                              {isExpanded ? "▲ hide abstract" : "▼ show abstract"}
+                            </button>
+                            {isExpanded && (
+                              <div style={{ marginTop: 10, fontSize: 13, color: C.muted, lineHeight: 1.65, borderLeft: "2px solid rgba(192,132,252,0.3)", paddingLeft: 12 }}>
+                                {rec.abstract}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      {/* import button */}
+                      <button
+                        onClick={() => snImport(rec)}
+                        disabled={importState === "loading" || importState === "done"}
+                        style={{ flexShrink: 0, padding: "7px 14px", borderRadius: 6, border: `1px solid ${importState === "done" ? "rgba(74,222,128,0.4)" : importState === "error" ? "rgba(248,113,113,0.4)" : "rgba(192,132,252,0.4)"}`, background: importState === "done" ? "rgba(74,222,128,0.08)" : importState === "error" ? "rgba(248,113,113,0.08)" : "rgba(192,132,252,0.08)", color: importState === "done" ? C.green : importState === "error" ? "#f87171" : C.purple, fontFamily: C.mono, fontSize: 10, letterSpacing: "0.14em", cursor: importState === "idle" || importState === "error" ? "pointer" : "default", whiteSpace: "nowrap" }}>
+                        {importState === "done" ? "✓ ADDED" : importState === "loading" ? "…" : importState === "error" ? "✗ RETRY" : "↓ IMPORT"}
+                      </button>
+                    </div>
+                    {/* subject tags */}
+                    {rec.subjects?.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 10 }}>
+                        {rec.subjects.slice(0, 6).map(s => (
+                          <span key={s} style={{ padding: "2px 8px", borderRadius: 3, background: "rgba(192,132,252,0.08)", fontFamily: C.mono, fontSize: 9, color: C.purple, letterSpacing: "0.08em" }}>{s}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* pagination */}
+            {snTotal > PAGE_SIZE && (
+              <div style={{ display: "flex", gap: 10, justifyContent: "center", alignItems: "center" }}>
+                <button onClick={() => runSnSearch(snQuery, snPage - 1)} disabled={snPage <= 1 || snLoading}
+                  style={{ padding: "7px 18px", borderRadius: 6, border: "1px solid rgba(192,132,252,0.25)", background: "transparent", color: snPage > 1 ? C.purple : C.muted, fontFamily: C.mono, fontSize: 11, cursor: snPage > 1 ? "pointer" : "not-allowed", opacity: snPage > 1 ? 1 : 0.35 }}>
+                  ← PREV
+                </button>
+                <span style={{ fontFamily: C.mono, fontSize: 11, color: C.muted }}>{snPage} / {Math.ceil(snTotal / PAGE_SIZE)}</span>
+                <button onClick={() => runSnSearch(snQuery, snPage + 1)} disabled={snPage >= Math.ceil(snTotal / PAGE_SIZE) || snLoading}
+                  style={{ padding: "7px 18px", borderRadius: 6, border: "1px solid rgba(192,132,252,0.25)", background: "transparent", color: snPage < Math.ceil(snTotal / PAGE_SIZE) ? C.purple : C.muted, fontFamily: C.mono, fontSize: 11, cursor: snPage < Math.ceil(snTotal / PAGE_SIZE) ? "pointer" : "not-allowed", opacity: snPage < Math.ceil(snTotal / PAGE_SIZE) ? 1 : 0.35 }}>
+                  NEXT →
+                </button>
+              </div>
+            )}
+
+            {snLoading && !snResults.length && (
+              <div style={{ textAlign: "center", padding: 40, fontFamily: C.mono, fontSize: 12, color: C.muted, letterSpacing: "0.18em" }}>SEARCHING SPRINGER NATURE…</div>
             )}
           </div>
         )}
